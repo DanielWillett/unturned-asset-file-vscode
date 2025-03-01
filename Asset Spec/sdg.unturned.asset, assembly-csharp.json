@@ -1,0 +1,74 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.Asset, Assembly-CSharp",
+    "DisplayName": "Asset",
+    "Parent": null,
+    "Category": "NONE",
+    "Properties": [
+        {
+            "Key": "GUID",
+            "Type": "Guid",
+            "Variable": "GUID",
+            "Description": "Globally unique identifier for this asset.",
+            "Required": true,
+            "CanBeInMetadata": true
+        },
+        {
+            "Key": "Type",
+            "Type": "Type",
+            "Description": "Type of Asset to create.",
+            "Required": true,
+            "CanBeInMetadata": true
+        },
+        {
+            "Key": "ID",
+            "Type": "UInt16",
+            "Variable": "id",
+            "Description": "Short ID unique to this asset's category."
+        },
+        {
+            "Key": "Ignore_NPOT",
+            "Type": "Flag",
+            "Variable": "ignoreNPOT",
+            "Description": "Should texture non-power-of-two warnings be ignored?",
+            "DefaultValue": false
+        },
+        {
+            "Key": "Ignore_TexRW",
+            "Type": "Flag",
+            "Variable": "ignoreTextureReadable",
+            "Description": "Should read/write texture warnings be ignored?",
+            "DefaultValue": false
+        },
+        {
+            "Key": "Master_Bundle_Override",
+            "Type": "MasterBundleName",
+            "Description": "Override which .masterbundle file this asset uses."
+        },
+        {
+            "Key": "Exclude_From_Master_Bundle",
+            "Type": "Flag",
+            "Description": "Indicates that this asset should skip loading from a master bundle and look for a legacy bundle instead."
+        },
+        {
+            "Key": "Bundle_Override_Path",
+            "Type": "LegacyBundleName",
+            "Description": "Override which .unity3d file this asset uses."
+        },
+        {
+            "Key": "Asset_Bundle_Version",
+            "Type": "AssetBundleVersion",
+            "Description": "Defines which asset bundle version to use for this asset's legacy bundle."
+        },
+        {
+            "Key": "Enable_Shader_Consolidation",
+            "Type": "Flag",
+            "Description": "Forces the game to replace shaders on this asset's models with the known in-game shaders."
+        },
+        {
+            "Key": "Disable_Shader_Consolidation",
+            "Type": "Flag",
+            "Description": "Keeps the game from replacing shaders on this asset's models with the known in-game shaders. Requires that @Asset_Bundle_Version be >= 3."
+        }
+    ]
+}

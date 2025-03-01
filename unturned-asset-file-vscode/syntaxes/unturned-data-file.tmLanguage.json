@@ -1,0 +1,230 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Unturned Data File",
+	"scopeName": "source.unturned-data-file",
+	"fileTypes": [ ".dat", ".asset" ],
+	"foldingStartMarker": "[\\{\\[]\\s*$",
+	"foldingStopMarker": "^\\s*[\\]\\}]",
+	"patterns": [
+		{
+			"include": "#comment"
+		},
+		{
+			"include": "#key-value"
+		},
+		{
+			"include": "#dictionary"
+		},
+		{
+			"include": "#list"
+		}
+	],
+	"repository": {
+		"comment": {
+			"patterns": [
+				{
+					"name": "comment.line",
+					"match": "^\\s*\/.*$"
+				}
+			]
+		},
+		"dictionary": {
+			"begin": "^\\s*\\{",
+			"end": "^\\s*\\}",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.bracket.curly.begin"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.bracket.curly.end"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"include": "#key-value"
+				},
+				{
+					"include": "#dictionary"
+				},
+				{
+					"include": "#list"
+				}
+			]
+		},
+		"list": {
+			"begin": "^\\s*\\[",
+			"end": "^\\s*\\]",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.bracket.square.begin"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.bracket.square.end"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"include": "#dictionary"
+				},
+				{
+					"include": "#list"
+				},
+				{
+					"include": "#lone-value"
+				}
+			]
+		},
+		"lone-value": {
+			"patterns": [
+				{
+					"name": "meta.value",
+					"match": "^(?:[ \\t\\f]*(?:(\\\")([^\\\"\\\\]*(?:\\\\.[^\\\"\\\\]*)*)(\\\")(?:\\s*(\\/.*)){0,1}\\s*|([^\\[\\]\\{\\}].*)))$",
+					"captures": {
+						"1": {
+							"name": "punctuation"
+						},
+						"2": {
+							"name": "string.quoted.double",
+							"patterns": [
+								{
+									"include": "#value"
+								}
+							]
+						},
+						"3": {
+							"name": "punctuation"
+						},
+						"4": {
+							"name": "comment.line"
+						},
+						"5": {
+							"name": "string",
+							"patterns": [
+								{
+									"include": "#value"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"key-value": {
+			"patterns": [
+				{
+					"name": "meta.keyvaluepair",
+					"match": "^\\s*(?:(\\\")([^\\\"\\\\]*(?:\\\\.[^\\\"\\\\]*)*)(\\\")|([^\\\"\\s\\{\\}\\[\\]][^\\s]*)\\s)(?:[ \\t\\f]*(?:(\\\")([^\\\"\\\\]*(?:\\\\.[^\\\"\\\\]*)*)(\\\")(?:\\s*(\\/.*)){0,1}|(.+))){0,1}$",
+					"captures": {
+						"1": {
+							"name": "punctuation"
+						},
+						"2": {
+							"name": "variable.parameter",
+							"patterns": [
+								{
+									"name": "constant.character.escape",
+									"match": "\\\\[nt\\\\]"
+								}
+							]
+						},
+						"3": {
+							"name": "punctuation"
+						},
+						"4": {
+							"name": "variable.parameter"
+						},
+						"5": {
+							"name": "punctuation"
+						},
+						"6": {
+							"name": "string.quoted.double",
+							"patterns": [
+								{
+									"include": "#value"
+								}
+							]
+						},
+						"7": {
+							"name": "punctuation"
+						},
+						"8": {
+							"name": "comment.line"
+						},
+						"9": {
+							"name": "string",
+							"patterns": [
+								{
+									"include": "#value"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"value": {
+			"patterns": [
+				{
+					"name": "constant.numeric",
+					"match": "[0-9a-fA-F]{8}(?:-{0,1}[0-9a-fA-F]{4}){3}-{0,1}[0-9a-fA-F]{12}"
+				},
+				{
+					"name": "constant.numeric",
+					"match": "-{0,1}(?:[\\.\\,]{0,1}\\d{1,3})+"
+				},
+				{
+					"name": "keyword.boolean",
+					"match": "[tT][rR][uU][eE]|[fF][aA][lL][sS][eE]"
+				},
+				{
+					"name": "string.other",
+					"match": "((?:[A-Z][\\w]*\\.)+[A-Z]\\w*)(?:\\,\\s*([\\w\\-\\.][\\w\\-\\. ]*)){0,1}(?:\\,\\s*Version\\s*=\\s*((?:\\d+\\.){3}\\d+)){0,1}(?:\\,\\s*Culture\\s*=\\s*([^\\s,]+)){0,1}(?:\\,\\s*PublicKeyToken\\s*=\\s*(?:(null)|([^\\s,]+))){0,1}",
+					"captures": {
+						"1": {
+							"name": "entity.name.type.class"
+						},
+						"2": {
+							"name": "constant.other"
+						},
+						"3": {
+							"name": "constant.other"
+						},
+						"4": {
+							"name": "constant.other"
+						},
+						"5": {
+							"name": "constant.other"
+						},
+						"6": {
+							"name": "constant.other"
+						}
+					}
+				},
+				{
+					"name": "string.other",
+					"match": "(.*)",
+					"captures": {
+						"1": {
+							"patterns": [
+								{
+									"name": "constant.character.escape",
+									"match": "\\\\[nt\\\\]"
+								}
+							]
+						}
+					}
+				}
+			]
+		}
+	}
+}

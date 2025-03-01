@@ -1,0 +1,186 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema",
+    "$id": "https://github.com/DanielWillett/unturned-asset-file-vscode/tree/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "title": "Asset Property Specification",
+    "description": "Defines what properties are available in asset files.",
+    "type": "object",
+    "$defs": {
+        "datPropertyType": {
+            "anyOf": [
+                {
+                    "type": [ "string", "object" ]
+                },
+                {
+                    "const": "Flag",
+                    "title": "A flag which does not have a value."
+                },
+                {
+                    "const": "UInt8",
+                    "title": "An integer from 0 to 255 inclusive."
+                },
+                {
+                    "const": "UInt16",
+                    "title": "An integer from 0 to 65535 inclusive."
+                },
+                {
+                    "const": "UInt32",
+                    "title": "An integer from 0 to 4294967295 inclusive."
+                },
+                {
+                    "const": "UInt64",
+                    "title": "An integer from 0 to 18446744073709551615 inclusive."
+                },
+                {
+                    "const": "Int8",
+                    "title": "An integer from -128 to 127 inclusive."
+                },
+                {
+                    "const": "Int16",
+                    "title": "An integer from -32768 to 32767 inclusive."
+                },
+                {
+                    "const": "Int32",
+                    "title": "An integer from -2147483648 to 2147483647 inclusive."
+                },
+                {
+                    "const": "Int64",
+                    "title": "An integer from -9223372036854775808 to 9223372036854775807 inclusive."
+                },
+                {
+                    "const": "String",
+                    "title": "Zero or more characters of UTF-16 text."
+                },
+                {
+                    "const": "Float32",
+                    "title": "Single-precision floating point decimal."
+                },
+                {
+                    "const": "Float64",
+                    "title": "Double-precision floating point decimal."
+                },
+                {
+                    "const": "Float128",
+                    "title": "Quadruple-precision floating point decimal."
+                },
+                {
+                    "const": "Boolean",
+                    "title": "True or false value."
+                },
+                {
+                    "const": "Character",
+                    "title": "A single UTF-16 character."
+                },
+                {
+                    "const": "Type",
+                    "title": "A type that exists in the base game."
+                },
+                {
+                    "const": "Guid",
+                    "title": "A Globally Unique Identifier (also called a UUID)."
+                },
+                {
+                    "const": "GuidOrId",
+                    "title": "An asset GUID or short ID."
+                },
+                {
+                    "const": "DateTime",
+                    "title": "A UTC date and time."
+                },
+                {
+                    "const": "DatList",
+                    "title": "A list of values."
+                },
+                {
+                    "const": "DatDictionary",
+                    "title": "A dictionary of values."
+                },
+                {
+                    "const": "MasterBundleName",
+                    "title": "The name of a .masterbundle file."
+                },
+                {
+                    "const": "LegacyBundleName",
+                    "title": "The name of a .unity3d file."
+                },
+                {
+                    "const": "AssetBundleVersion",
+                    "title": "The version of an asset bundle or master bundle."
+                }
+            ]
+        }
+    },
+    "properties": {
+        "Type": {
+            "description": "Assembly-qualified name of the asset type.",
+            "type": "string"
+        },
+        "Category": {
+            "description": "Category of the asset, if any.",
+            "type": "string",
+            "enum": [ "NONE", "ITEM", "EFFECT", "OBJECT", "RESOURCE", "VEHICLE", "ANIMAL", "MYTHIC", "SKIN", "SPAWN", "NPC" ]
+        },
+        "DisplayName": {
+            "description": "Display name of the type of asset.",
+            "type": "string"
+        },
+        "Parent": {
+            "description": "Assembly-qualified name of the parent asset type, or null for Asset.",
+            "type": [ "string", "null" ]
+        },
+        "Properties": {
+            "description": "List of all properties that can be defined.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "Key": {
+                        "description": "The key of the flag or property.",
+                        "type": "string"
+                    },
+                    "Aliases": {
+                        "description": "Other keys that can be used for the flag or property.",
+                        "type": "array",
+                        "items": { "type": "string" }
+                    },
+                    "Type": {
+                        "description": "The type of the property.",
+                        "$ref": "#/$defs/datPropertyType"
+                    },
+                    "Required": {
+                        "description": "If this property is required.",
+                        "type": "boolean"
+                    },
+                    "CanBeInMetadata": {
+                        "description": "If this property can be read from the Metadata section.",
+                        "type": "boolean"
+                    },
+                    "DefaultValue": {
+                        "description": "The default value for this property if applicable."
+                    },
+                    "Description": {
+                        "description": "Short description of the property.",
+                        "type": "string"
+                    },
+                    "Markdown": {
+                        "description": "Longer markdown description of the property.",
+                        "type": [ "string", "null" ]
+                    },
+                    "Minimum": {
+                        "type": [ "number", "string" ],
+                        "description": "Minimum value of the property."
+                    },
+                    "Maximum": {
+                        "type": [ "number", "string" ],
+                        "description": "Maximum value of the property."
+                    },
+                    "Deprecated": {
+                        "type": "boolean",
+                        "description": "If this property shouldn't be used anymore or was left in for legacy features."
+                    }
+                },
+                "required": [ "Key", "Type" ]
+            }
+        }
+    },
+    "required": [ "Type", "DisplayName", "Parent" ]
+}
