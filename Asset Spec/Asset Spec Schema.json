@@ -79,6 +79,14 @@
                     "title": "A Globally Unique Identifier (also called a UUID)."
                 },
                 {
+                    "const": "AssetReference",
+                    "title": "A Globally Unique Identifier (also called a UUID)."
+                },
+                {
+                    "const": "ContentReference",
+                    "title": "A reference to a Unity object in the specified masterbundle."
+                },
+                {
                     "const": "GuidOrId",
                     "title": "An asset GUID or short ID."
                 },
@@ -107,6 +115,74 @@
                     "title": "The version of an asset bundle or master bundle."
                 }
             ]
+        },
+        "datProperty": {
+            "type": "object",
+            "properties": {
+                "Key": {
+                    "description": "The key of the flag or property.",
+                    "type": "string"
+                },
+                "Aliases": {
+                    "description": "Other keys that can be used for the flag or property.",
+                    "type": "array",
+                    "items": { "type": "string" }
+                },
+                "Type": {
+                    "description": "The type of the property.",
+                    "$ref": "#/$defs/datPropertyType"
+                },
+                "ElementType": {
+                    "description": "The type of the elements of a DatList.",
+                    "$ref": "#/$defs/datPropertyType"
+                },
+                "Required": {
+                    "description": "If this property is required.",
+                    "type": "boolean"
+                },
+                "CanBeInMetadata": {
+                    "description": "If this property can be read from the Metadata section.",
+                    "type": "boolean"
+                },
+                "DefaultValue": {
+                    "description": "The default value for this property if applicable. If IncludedDefaultValue is used, this indicates the default value if the property is not included."
+                },
+                "IncludedDefaultValue": {
+                    "description": "The default value for this property if applicable. Indicates the default value if the property is included but not parsed correctly."
+                },
+                "Description": {
+                    "description": "Short description of the property.",
+                    "type": "string"
+                },
+                "Variable": {
+                    "description": "Name of the variable in the C# class.",
+                    "type": "string"
+                },
+                "Markdown": {
+                    "description": "Longer markdown description of the property.",
+                    "type": [ "string", "null" ]
+                },
+                "Minimum": {
+                    "type": [ "number", "string" ],
+                    "description": "Inclusive minimum value of the property."
+                },
+                "Maximum": {
+                    "type": [ "number", "string" ],
+                    "description": "Inclusive maximum value of the property."
+                },
+                "Except": {
+                    "type": "array",
+                    "items": {
+                        "type": [ "number", "string" ]
+                    },
+                    "description": "Exceptions to the minimum/maximum range."
+                },
+                "Deprecated": {
+                    "type": "boolean",
+                    "description": "If this property shouldn't be used anymore or was left in for legacy features."
+                }
+            },
+            "required": [ "Key", "Type" ]
         }
     },
     "properties": {
@@ -131,54 +207,31 @@
             "description": "List of all properties that can be defined.",
             "type": "array",
             "items": {
+                "$ref": "#/$defs/datProperty"
+            }
+        },
+        "Types": {
+            "description": "List of related custom types.",
+            "type": "array",
+            "items": {
                 "type": "object",
                 "properties": {
-                    "Key": {
-                        "description": "The key of the flag or property.",
-                        "type": "string"
-                    },
-                    "Aliases": {
-                        "description": "Other keys that can be used for the flag or property.",
-                        "type": "array",
-                        "items": { "type": "string" }
-                    },
                     "Type": {
-                        "description": "The type of the property.",
-                        "$ref": "#/$defs/datPropertyType"
-                    },
-                    "Required": {
-                        "description": "If this property is required.",
-                        "type": "boolean"
-                    },
-                    "CanBeInMetadata": {
-                        "description": "If this property can be read from the Metadata section.",
-                        "type": "boolean"
-                    },
-                    "DefaultValue": {
-                        "description": "The default value for this property if applicable."
-                    },
-                    "Description": {
-                        "description": "Short description of the property.",
+                        "description": "Fully qualified type name.",
                         "type": "string"
                     },
-                    "Markdown": {
-                        "description": "Longer markdown description of the property.",
-                        "type": [ "string", "null" ]
+                    "DisplayName": {
+                        "description": "Display name of the type.",
+                        "type": "string"
                     },
-                    "Minimum": {
-                        "type": [ "number", "string" ],
-                        "description": "Minimum value of the property."
-                    },
-                    "Maximum": {
-                        "type": [ "number", "string" ],
-                        "description": "Maximum value of the property."
-                    },
-                    "Deprecated": {
-                        "type": "boolean",
-                        "description": "If this property shouldn't be used anymore or was left in for legacy features."
+                    "Properties": {
+                        "description": "List of all properties that can be defined.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/$defs/datProperty"
+                        }
                     }
-                },
-                "required": [ "Key", "Type" ]
+                }
             }
         }
     },
