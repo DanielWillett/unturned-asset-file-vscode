@@ -163,6 +163,10 @@
                     "description": "The key of the flag or property.",
                     "type": "string"
                 },
+                "SingleKeyOverride": {
+                    "type": [ "string", "null" ],
+                    "description": "If 'KeyIsRegex', the singular version of the key which would not be regex (ex. Blade for Blade_1)."
+                },
                 "KeyIsRegex": {
                     "type": "boolean",
                     "description": "If 'Key' is a regex expression to match properties."
@@ -183,6 +187,10 @@
                             }
                         }
                     }
+                },
+                "Count": {
+                    "type": [ "number", "string" ],
+                    "description": "Number of keys to look for, can be a property from the asset."
                 },
                 "Aliases": {
                     "description": "Other keys that can be used for the flag or property.",
@@ -295,9 +303,17 @@
                         "type": "string",
                         "description": "The name of the asset in Unity."
                     },
+                    "SingleAssetNameOverride": {
+                        "type": [ "string", "null" ],
+                        "description": "If 'AssetNameIsRegex', the singular version of the asset name which would not be regex."
+                    },
                     "AssetNameIsRegex": {
                         "type": "boolean",
                         "description": "If 'AssetName' is a regex expression to match properties."
+                    },
+                    "Count": {
+                        "type": [ "number", "string" ],
+                        "description": "Number of assets to look for, can be a property from the asset."
                     },
                     "AssetNameGroups": {
                         "type": [ "array", "null" ],
@@ -331,6 +347,56 @@
                     "Type": {
                         "type": "string",
                         "description": "The fully qualified type of unity asset to load."
+                    },
+                    "AnimationComponentFindArgument": {
+                        "type": [ "string", "null" ],
+                        "description": "The child GameObject that should have the Animation component attached." 
+                    },
+                    "Animations": {
+                        "type": "array",
+                        "description": "List of animations that can be available on the Animation component.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "Name": {
+                                    "type": "string",
+                                    "description": "The name of the animation in Unity."
+                                },
+                                "Required": {
+                                    "type": "boolean",
+                                    "description": "If the animation is required."
+                                },
+                                "SingleNameOverride": {
+                                    "type": [ "string", "null" ],
+                                    "description": "If 'NameIsRegex', the singular version of the name which would not be regex."
+                                },
+                                "NameIsRegex": {
+                                    "type": "boolean",
+                                    "description": "If 'Name' is a regex expression to match properties."
+                                },
+                                "NameGroups": {
+                                    "type": [ "array", "null" ],
+                                    "description": "If 'NameIsRegex', then this is a list of groups by name to match with other properties within the given regex group.",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "RegexGroup": {
+                                                "type": "number",
+                                                "description": "The regex group (starting from 1) that acts as the identifier for this group."
+                                            },
+                                            "Name": {
+                                                "type": "string",
+                                                "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                                            }
+                                        }
+                                    }
+                                },
+                                "Count": {
+                                    "type": [ "number", "string" ],
+                                    "description": "Number of animations to look for, can be a property from the asset."
+                                }
+                            }
+                        }
                     }
                 }
             }
