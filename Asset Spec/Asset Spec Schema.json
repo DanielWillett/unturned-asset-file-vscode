@@ -163,6 +163,27 @@
                     "description": "The key of the flag or property.",
                     "type": "string"
                 },
+                "KeyIsRegex": {
+                    "type": "boolean",
+                    "description": "If 'Key' is a regex expression to match properties."
+                },
+                "KeyGroups": {
+                    "type": [ "array", "null" ],
+                    "description": "If 'KeyIsRegex', then this is a list of groups by name to match with other properties within the given regex group.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "RegexGroup": {
+                                "type": "number",
+                                "description": "The regex group (starting from 1) that acts as the identifier for this group."
+                            },
+                            "Name": {
+                                "type": "string",
+                                "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                            }
+                        }
+                    }
+                },
                 "Aliases": {
                     "description": "Other keys that can be used for the flag or property.",
                     "type": "array",
@@ -264,8 +285,8 @@
                 "$ref": "#/$defs/datProperty"
             }
         },
-        "UnityPrefabs": {
-            "description": "List of all prefabs with an expected name.",
+        "BundleAssets": {
+            "description": "List of all assets loaded from Unity bundles with an expected name.",
             "type": "array",
             "items": {
                 "type": "object",
@@ -274,6 +295,27 @@
                         "type": "string",
                         "description": "The name of the asset in Unity."
                     },
+                    "AssetNameIsRegex": {
+                        "type": "boolean",
+                        "description": "If 'AssetName' is a regex expression to match properties."
+                    },
+                    "AssetNameGroups": {
+                        "type": [ "array", "null" ],
+                        "description": "If 'AssetNameIsRegex', then this is a list of groups by name to match with other properties within the given regex group.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "RegexGroup": {
+                                    "type": "number",
+                                    "description": "The regex group (starting from 1) that acts as the identifier for this group."
+                                },
+                                "Name": {
+                                    "type": "string",
+                                    "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                                }
+                            }
+                        }
+                    },
                     "Description": {
                         "type": "string",
                         "description": "Description of what the prefab does."
@@ -281,6 +323,14 @@
                     "Deprecated": {
                         "type": "boolean",
                         "description": "If the prefab is no longer used or has been swapped for newer prefab features."
+                    },
+                    "Required": {
+                        "type": "boolean",
+                        "description": "If the prefab is required to exist (or doesn't make sense to not exist)."
+                    },
+                    "Type": {
+                        "type": "string",
+                        "description": "The fully qualified type of unity asset to load."
                     }
                 }
             }
