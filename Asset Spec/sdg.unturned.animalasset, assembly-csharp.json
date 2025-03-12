@@ -1,0 +1,444 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.AnimalAsset, Assembly-CSharp",
+    "DisplayName": "Animal",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html",
+    "Category": "ANIMAL",
+    "VanillaIdLimit": 50,
+    "Properties":
+    [
+        {
+            "Key": "Bypass_ID_Limit",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows IDs to be less than 50 if this isn't the vanilla bundle."
+        },
+        {
+            "Key": "Speed_Run",
+            "Type": "Float32",
+            "Minimum": 0,
+            "DefaultValue": 0.0,
+            "Description": "Speed in m/s while the animal is running.",
+            "Variable": "speedRun",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Speed_Walk",
+            "Type": "Float32",
+            "Minimum": 0,
+            "DefaultValue": 0.0,
+            "Description": "Speed in m/s while the animal is walking.",
+            "Variable": "speedWalk",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Behaviour",
+            "Type": "SDG.Unturned.EAnimalBehaviour, Assembly-CSharp",
+            "Required": true,
+            "Description": "How the animal reacts to alerting players.",
+            "Variable": "behaviour",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Health",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Description": "The maximum amout of health the animal has. For reference, most vanilla animals have 100 health, except the Pig and Wolf which have 50.",
+            "Variable": "health",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Regen",
+            "Type": "Float32",
+            "DefaultValue": 10.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "Number of seconds it takes to regenerate one health point.",
+            "Variable": "regen",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Damage",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "Amount of damage this animal does to players and vehicles. This is multiplied by the 'Damage_Multiplier' property in the server configuration.",
+            "Variable": "damage",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Meat",
+            "Type": "Id",
+            "ElementType": "ITEM",
+            "DefaultValue": 0,
+            "Description": "The short ID of the meat item dropped by the animal. 2-4 meat items will be dropped.",
+            "Variable": "meat",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+        },
+        {
+            "Key": "Pelt",
+            "Type": "Id",
+            "ElementType": "ITEM",
+            "DefaultValue": 0,
+            "Description": "The short ID of the pelt item dropped by the animal. 2-4 pelt items will be dropped.",
+            "Variable": "pelt",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+        },
+        {
+            "Key": "Reward_ID",
+            "Type": "Id",
+            "ElementType": "SPAWN",
+            "DefaultValue": 0,
+            "Description": "The short ID of a spawn table to use for the animal drops. A random amount of items between @Reward_Min and @Reward_Max will be dropped. Pelt and Meat are ignored if this is set.",
+            "Variable": "rewardID",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+        },
+        {
+            "Key": "Reward_Min",
+            "Type": "UInt8",
+            "DefaultValue": 3,
+            "IncludedDefaultValue": 0,
+            "Maximum": "Reward_Max",
+            "Description": "The minimum number of items to drop from the provided spawn table if @Reward_ID is set.",
+            "Variable": "rewardMin",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+        },
+        {
+            "Key": "Reward_Max",
+            "Type": "UInt8",
+            "DefaultValue": 4,
+            "IncludedDefaultValue": 0,
+            "Minimum": "Reward_Min",
+            "Description": "The maximum number of items to drop from the provided spawn table if @Reward_ID is set.",
+            "Variable": "rewardMin",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+        },
+        {
+            "Key": "Roars",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "The number of 'Roar_#' audio clips to load from the Unity bundle. Roar sounds are played when the animal attacks.",
+            "Variable": "roars",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
+            "CountForRegexGroup": "animal-roars"
+        },
+        {
+            "Key": "Panics",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "The number of 'Panic_#' audio clips to load from the Unity bundle. Panic sounds are played when the animal is damaged.",
+            "Variable": "panics",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
+            "CountForRegexGroup": "animal-panics"
+        },
+        {
+            "Key": "Attack_Anim_Variants",
+            "Type": "Int32",
+            "DefaultValue": 1,
+            "Minimum": 0,
+            "Description": "The number of 'Attack_#' animations attached to the Animation component of the animal's 'Character' object.",
+            "Variable": "attackAnimVariantsCount",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
+            "CountForRegexGroup": "animal-anim-attack"
+        },
+        {
+            "Key": "Eat_Anim_Variants",
+            "Type": "Int32",
+            "DefaultValue": 1,
+            "Minimum": 0,
+            "Description": "The number of 'Eat' or 'Eat_#' animations attached to the Animation component of the animal's 'Character' object.",
+            "Variable": "eatAnimVariantsCount",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
+            "CountForRegexGroup": "animal-anim-eat"
+        },
+        {
+            "Key": "Glance_Anim_Variants",
+            "Type": "Int32",
+            "DefaultValue": 2,
+            "Minimum": 0,
+            "Description": "The number of 'Glance_#' animations attached to the Animation component of the animal's 'Character' object.",
+            "Variable": "glanceAnimVariantsCount",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
+            "CountForRegexGroup": "animal-anim-glance"
+        },
+        {
+            "Key": "Startle_Anim_Variants",
+            "Type": "Int32",
+            "DefaultValue": 1,
+            "Minimum": 0,
+            "Description": "The number of 'Startle' or 'Startle_#' animations attached to the Animation component of the animal's 'Character' object.",
+            "Variable": "startleAnimVariantsCount",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
+            "CountForRegexGroup": "animal-anim-startle"
+        },
+        {
+            "Key": "Horizontal_Attack_Range",
+            "Type": "Float32",
+            "DefaultValue": 2.25,
+            "Description": "Maximum horizontal distance this animal can attack a player from if they're on foot.",
+            "Variable": "horizontalAttackRangeSquared",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Horizontal_Vehicle_Attack_Range",
+            "Type": "Float32",
+            "DefaultValue": 4.4,
+            "Description": "Maximum horizontal distance this animal can attack a player from if they're in a vehicle.",
+            "Variable": "horizontalVehicleAttackRangeSquared",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Vertical_Attack_Range",
+            "Type": "Float32",
+            "DefaultValue": 2.0,
+            "Description": "Maximum vertical distance this animal can attack a player from.",
+            "Variable": "verticalAttackRange",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Attack_Interval",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Number of seconds between attacks.",
+            "Variable": "attackInterval",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Should_Play_Anims_On_Dedicated_Server",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not animations are played on dedicated servers.",
+            "Variable": "shouldPlayAnimsOnDedicatedServer",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Should_Prevent_Move_During_Startle",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the animal will wait for it's Startle animation to finish before moving.",
+            "Variable": "ShouldPreventMoveDuringStartle",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+        },
+        {
+            "Key": "Reward_XP",
+            "Type": "UInt32",
+            "DefaultValue": 0,
+            "Description": "The amount of XP to award the player with after killing this animal.",
+            "Variable": "rewardXP",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EAnimalBehaviour, Assembly-CSharp",
+            "DisplayName": "Animal Behavior Type",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Description": "Players will have no effect on the animal's behavior. Currently identical to IGNORE."
+                },
+                {
+                    "Value": "OFFENSE",
+                    "Description": "Animals will hunt nearby alerting players."
+                },
+                {
+                    "Value": "DEFENSE",
+                    "Description": "Animals will flee from nearby alerting players."
+                },
+                {
+                    "Value": "IGNORE",
+                    "Description": "Players will have no effect on the animal's behavior."
+                }
+            ]
+        }
+    ],
+    "Localization":
+    [
+        {
+            "Key": "Name",
+            "Type": "String",
+            "Description": "Display name of the animal.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Animal_Client",
+            "Description": "The model loaded on remote clients connected to a server.",
+            "Required": true,
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "AnimationComponentFindArgument": "Character",
+            "Animations":
+            [
+                {
+                    "Name": "Idle",
+                    "Required": true
+                },
+                {
+                    "Name": "Walk",
+                    "Required": true
+                },
+                {
+                    "Name": "Run",
+                    "Required": true
+                },
+                {
+                    "Name": "Attack_(\\d+)",
+                    "AssetNameIsRegex": true,
+                    "AssetNameGroups":
+                    [
+                        {
+                            "Name": "animal-anim-attack",
+                            "RegexGroup": 1
+                        }
+                    ]
+                },
+                {
+                    "Name": "Eat_(\\d+)",
+                    "SingleNameOverride": "Eat",
+                    "AssetNameIsRegex": true,
+                    "AssetNameGroups":
+                    [
+                        {
+                            "Name": "animal-anim-eat",
+                            "RegexGroup": 1
+                        }
+                    ]
+                },
+                {
+                    "Name": "Glance_(\\d+)",
+                    "AssetNameIsRegex": true,
+                    "AssetNameGroups":
+                    [
+                        {
+                            "Name": "animal-anim-glance",
+                            "RegexGroup": 1
+                        }
+                    ]
+                },
+                {
+                    "Name": "Startle_(\\d+)",
+                    "SingleNameOverride": "Startle",
+                    "AssetNameIsRegex": true,
+                    "AssetNameGroups":
+                    [
+                        {
+                            "Name": "animal-anim-startle",
+                            "RegexGroup": 1
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "AssetName": "Animal_Server",
+            "Description": "The model loaded on local clients hosting a server or singleplayer.",
+            "Required": true,
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "AnimationComponentFindArgument": "Character",
+            "Animations":
+            [
+                {
+                    "Name": "Idle",
+                    "Required": true
+                },
+                {
+                    "Name": "Walk",
+                    "Required": true
+                },
+                {
+                    "Name": "Run",
+                    "Required": true
+                },
+                {
+                    "Name": "Attack_(\\d+)",
+                    "AssetNameIsRegex": true,
+                    "AssetNameGroups":
+                    [
+                        {
+                            "Name": "animal-anim-attack",
+                            "RegexGroup": 1
+                        }
+                    ]
+                },
+                {
+                    "Name": "Eat_(\\d+)",
+                    "SingleNameOverride": "Eat",
+                    "AssetNameIsRegex": true,
+                    "AssetNameGroups":
+                    [
+                        {
+                            "Name": "animal-anim-eat",
+                            "RegexGroup": 1
+                        }
+                    ]
+                },
+                {
+                    "Name": "Glance_(\\d+)",
+                    "AssetNameIsRegex": true,
+                    "AssetNameGroups":
+                    [
+                        {
+                            "Name": "animal-anim-glance",
+                            "RegexGroup": 1
+                        }
+                    ]
+                },
+                {
+                    "Name": "Startle_(\\d+)",
+                    "SingleNameOverride": "Startle",
+                    "AssetNameIsRegex": true,
+                    "AssetNameGroups":
+                    [
+                        {
+                            "Name": "animal-anim-startle",
+                            "RegexGroup": 1
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "AssetName": "Animal_Dedicated",
+            "Description": "The model loaded on dedicated servers.",
+            "Required": true,
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule"
+        },
+        {
+            "AssetName": "Ragdoll",
+            "Description": "The model loaded on clients when the animal is killed.",
+            "Required": true,
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule"
+        },
+        {
+            "AssetName": "Roar_(\\d+)",
+            "AssetNameIsRegex": true,
+            "AssetNameGroups":
+            [
+                {
+                    "Name": "animal-roars",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "Randomly selected roar sound.",
+            "Required": true,
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+        },
+        {
+            "AssetName": "Panic_(\\d+)",
+            "AssetNameIsRegex": true,
+            "AssetNameGroups":
+            [
+                {
+                    "Name": "animal-panics",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "Randomly selected panic sound.",
+            "Required": true,
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+        }
+    ]
+}

@@ -1,0 +1,29 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Framework.Foliage.FoliageResourceInfoAsset, Assembly-CSharp",
+    "DisplayName": "Resource Foliage",
+    "Parent": "SDG.Framework.Foliage.FoliageInfoAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference",
+    "Category": "NONE",
+    "Properties":
+    [
+        {
+            "Key": "Resource",
+            "Type": "AssetReference",
+            "Required": true,
+            "ElementType": "SDG.Unturned.ResourceAsset, Assembly-CSharp",
+            "Description": "The resource to spawn when this foliage is placed.",
+            "Variable": "resource",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference"
+        },
+        {
+            "Key": "Obstruction_Radius",
+            "Type": "Float32",
+            "DefaultValue": 4.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "The distance around a resource that needs to be clear for it to be placed. Snowshoe objects do not block resources.",
+            "Variable": "obstructionRadius",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference"
+        }
+    ]
+}

@@ -1,0 +1,324 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.DialogueAsset, Assembly-CSharp",
+    "DisplayName": "Dialogue",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html",
+    "Category": "NPC",
+    "VanillaIdLimit": 2000,
+    "Properties":
+    [
+        {
+            "Key": "Bypass_ID_Limit",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle."
+        },
+        {
+            "Key": "Messages",
+            "Type": "Int32",
+            "Minimum": 0,
+            "DefaultValue": 0,
+            "Description": "The number of messages defined in this dialogue. Messages are the entry-point of a dialogue, where the first message that passes it's condition check is shown to the player.",
+            "Variable": "messages",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
+            "CountForRegexGroup": "dialogue-messages"
+        },
+        {
+            "Key": "Message_(\\d+)_Pages",
+            "Type": "UInt8",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-messages",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "The number of pages for message @dialogue-messages.",
+            "Variable": "pages",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
+            "CountForRegexGroup": "dialogue-message-pages"
+        },
+        {
+            "Key": "Message_(\\d+)_Responses",
+            "Type": "UInt8",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-messages",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "The number of responses for message @dialogue-messages. Responses appear as buttons for the player to answer an NPC. Note that only either @Response_@dialogue-responses_Messages or @Message_@dialogue-messages_Responses can be used, not both.",
+            "Variable": "responses",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
+            "CountForRegexGroup": "dialogue-message-responses",
+            "ExclusiveWith": [ "Response_@dialogue-responses_Messages" ]
+        },
+        {
+            "Key": "Message_(\\d+)_Response_(\\d+)",
+            "Type": "UInt8",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "Minimum": 0,
+            "MaximumExclusive": "Responses",
+            "Required": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-messages",
+                    "RegexGroup": 1
+                },
+                {
+                    "Name": "dialogue-message-responses",
+                    "RegexGroup": 2
+                }
+            ],
+            "Description": "The index of a response in @Responses. Responses appear as buttons for the player to answer an NPC.",
+            "Variable": "responses",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
+            "CountForRegexGroup": "dialogue-message-responses"
+        },
+        {
+            "Key": "Message_(\\d+)_Prev",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.DialogueAsset, Assembly-CSharp",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-messages",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "The GUID or short ID of the previous dialogue page of message @dialogue-messages. The player will be returned to this dialogue if no responses are available.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
+            "Variable": "prevGuid"
+        },
+        {
+            "Key": "Message_(\\d+)_FaceOverride",
+            "Type": "FaceIndex",
+            "KeyIsRegex": true,
+            "DefaultValue": null,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-messages",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "The index of an overridden face image to use during message @dialogue-messages.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
+            "Variable": "faceOverride"
+        },
+        {
+            "Key": "Message_(\\d+)_Condition_",
+            "Type": "LegacyConditionList",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-messages",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "Conditions that must be met for message @dialogue-messages to be shown.",
+            "Variable": "conditions"
+        },
+        {
+            "Key": "Message_(\\d+)_Reward_",
+            "Type": "LegacyRewardList",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-messages",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "Rewards applied before viewing message @dialogue-messages.",
+            "Variable": "rewards"
+        },
+        {
+            "Key": "Responses",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "The number of responses defined in this dialogue. Messages can reference responses by index to indicate which responses are shown per message.",
+            "Variable": "responses",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
+            "CountForRegexGroup": "dialogue-responses"
+        },
+        {
+            "Key": "Response_(\\d+)_Messages",
+            "Type": "UInt8",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-responses",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "The number of messages listed to show response @dialogue-responses on. Responses appear as buttons for the player to answer an NPC. Note that only either @Response_@dialogue-responses_Messages or @Message_@dialogue-messages_Responses can be used, not both.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
+            "Variable": "messages",
+            "ExclusiveWith": [ "Message_@dialogue-messages_Responses" ]
+        },
+        {
+            "Key": "Response_(\\d+)_Message_(\\d+)",
+            "Type": "UInt8",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "Minimum": 0,
+            "MaximumExclusive": "Messages",
+            "Required": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-responses",
+                    "RegexGroup": 1
+                },
+                {
+                    "Name": "dialogue-response-messages",
+                    "RegexGroup": 2
+                }
+            ],
+            "Description": "The index of a message in @Messages. Responses appear as buttons for the player to answer an NPC. Note that only either @Response_@dialogue-responses_Messages or @Message_@dialogue-messages_Responses can be used, not both.",
+            "Variable": "messages",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
+            "CountForRegexGroup": "dialogue-message-responses"
+        },
+        {
+            "Key": "Response_(\\d+)_Dialogue",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.DialogueAsset, Assembly-CSharp",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-responses",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "The dialogue to open after the player selects response @dialogue-responses.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
+            "Variable": "dialogueGuid",
+            "ExclusiveWith": [ "Response_@dialogue-responses_Quest", "Response_@dialogue-responses_Vendor" ]
+        },
+        {
+            "Key": "Response_(\\d+)_Quest",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.QuestAsset, Assembly-CSharp",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-responses",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "The quest to start after the player selects response @dialogue-responses.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
+            "Variable": "questGuid",
+            "ExclusiveWith": [ "Response_@dialogue-responses_Dialogue", "Response_@dialogue-responses_Vendor" ]
+        },
+        {
+            "Key": "Response_(\\d+)_Vendor",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.VendorAsset, Assembly-CSharp",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-responses",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "The vendor (shop) to open after the player selects response @dialogue-responses.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
+            "Variable": "vendorGuid",
+            "ExclusiveWith": [ "Response_@dialogue-responses_Dialogue", "Response_@dialogue-responses_Quest" ]
+        },
+        {
+            "Key": "Response_(\\d+)_Condition_",
+            "Type": "LegacyConditionList",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-responses",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "Conditions that must be met for response @dialogue-responses to be visible.",
+            "Variable": "conditions"
+        },
+        {
+            "Key": "Response_(\\d+)_Reward_",
+            "Type": "LegacyRewardList",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-responses",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "Rewards applied for choosing response @dialogue-responses.",
+            "Variable": "rewards"
+        }
+    ],
+    "Localization":
+    [
+        {
+            "Key": "Message_(\\d+)_Page_(\\d+)",
+            "Type": "RichTextString",
+            "KeyIsRegex": true,
+            "Required": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-messages",
+                    "RegexGroup": 1
+                },
+                {
+                    "Name": "dialogue-message-pages",
+                    "RegexGroup": 2
+                }
+            ],
+            "Variable": "text",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#localization",
+            "Description": "The localized text on page @dialogue-message-pages of message @dialogue-messages."
+        },
+        {
+            "Key": "Response_(\\d+)",
+            "Type": "RichTextString",
+            "KeyIsRegex": true,
+            "Required": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "dialogue-responses",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "The vendor (shop) to open after the player selects response @dialogue-responses.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
+            "Variable": "text",
+            "ExclusiveWith": [ "Response_@dialogue-responses_Dialogue", "Response_@dialogue-responses_Quest" ]
+        }
+    ]
+}

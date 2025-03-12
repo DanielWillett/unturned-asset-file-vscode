@@ -1,0 +1,75 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.CraftingBlacklistAsset, Assembly-CSharp",
+    "DisplayName": "Crafting Blacklist Rule",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html",
+    "Category": "NONE",
+    "Properties":
+    [
+        {
+            "Key": "Input_Items",
+            "Type": "List",
+            "ElementType": "AssetReference",
+            "SpecialTypes": [ "SDG.Unturned.ItemAsset, Assembly-CSharp" ],
+            "Description": "Blueprints using any items in this list will not be able to be crafted.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
+            "Variable": "inputItems"
+        },
+        {
+            "Key": "Output_Items",
+            "Type": "List",
+            "ElementType": "AssetReference",
+            "SpecialTypes": [ "SDG.Unturned.ItemAsset, Assembly-CSharp" ],
+            "Description": "Blueprints producing any items in this list will not be able to be crafted.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
+            "Variable": "outputItems"
+        },
+        {
+            "Key": "Blueprints",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.CraftingBlacklistAsset+BlacklistedBlueprint, Assembly-CSharp",
+            "Description": "List of specific blueprints to disable.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
+            "Variable": "blueprints"
+        },
+        {
+            "Key": "Allow_Core_Blueprints",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Set to false to disable all assets defined by vanilla items.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
+            "Variable": "allowCoreBlueprints"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.CraftingBlacklistAsset+BlacklistedBlueprint, Assembly-CSharp",
+            "DisplayName": "Blacklisted Blueprint",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
+            "Properties":
+            [
+                {
+                    "Key": "Item",
+                    "Type": "AssetReference",
+                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                    "Description": "The item the blueprint is declared in.",
+                    "Variable": "assetRef",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
+                    "Required": true
+                },
+                {
+                    "Key": "Blueprint",
+                    "Type": "Int32",
+                    "Minimum": 0,
+                    "DefaultValue": 0,
+                    "Description": "The index of the blueprint to blacklist, starting at 0.",
+                    "Variable": "index",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
+                    "Required": true
+                }
+            ]
+        }
+    ]
+}

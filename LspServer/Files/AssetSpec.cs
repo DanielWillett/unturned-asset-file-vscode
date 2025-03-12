@@ -1,3 +1,5 @@
+using LspServer.Types;
+using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SDG.Unturned;
 using System.Text.Json.Serialization;
 
@@ -17,6 +19,34 @@ public class AssetSpec
 
     [JsonIgnore]
     public AssetSpec? ParentSpec { get; set; }
+
+    public AssetSpecProperty? FindProperty(string key)
+    {
+        for (AssetSpec? spec = this; spec != null; spec = spec.ParentSpec)
+        {
+            if (spec.Properties == null)
+                continue;
+
+            foreach (AssetSpecProperty property in spec.Properties)
+            {
+                if (property.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
+                    return property;
+            }
+            foreach (AssetSpecProperty property in spec.Properties)
+            {
+                if (property.Aliases == null)
+                    continue;
+
+                foreach (string alias in property.Aliases)
+                {
+                    if (alias.Equals(key, StringComparison.OrdinalIgnoreCase))
+                        return property;
+                }
+            }
+        }
+
+        return null;
+    }
 }
 
 public class AssetSpecProperty
@@ -31,4 +61,9 @@ public class AssetSpecProperty
     public string? Description { get; set; }
     public string? Markdown { get; set; }
     public bool Deprecated { get; set; }
+
+    public SymbolKind GetSymbolKind()
+    {
+        return KnownTypes.GetSymbolKind(Type);
+    }
 }

@@ -1,0 +1,43 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
+    "DisplayName": "Foliage Collection",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Category": "NONE",
+    "Properties":
+    [
+        {
+            "Key": "Foliage",
+            "Required": true,
+            "Type": "List",
+            "ElementType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset+FoliageInfoCollectionElement, Assembly-CSharp",
+            "Description": "List of assets and their weights.",
+            "Variable": "elements"
+        }
+    ],
+    "Types":
+    [
+        {
+            "DisplayName": "Foliage Collection Element",
+            "Type": "SDG.Framework.Foliage.FoliageInfoCollectionAsset+FoliageInfoCollectionElement, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Asset",
+                    "Required": true,
+                    "Type": "AssetReference",
+                    "ElementType": "SDG.Unturned.FoliageInfoAsset, Assembly-CSharp",
+                    "Description": "The foliage to spawn.",
+                    "Variable": "asset"
+                },
+                {
+                    "Key": "Weight",
+                    "Type": "Float32",
+                    "DefaultValue": 1,
+                    "Description": "The foliage to spawn.",
+                    "Variable": "asset"
+                }
+            ]
+        }
+    ]
+}

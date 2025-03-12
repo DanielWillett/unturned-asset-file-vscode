@@ -3,10 +3,11 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 
 namespace LspServer.Files;
 
-internal class OpenedFile
+public class OpenedFile
 {
     private string _text;
-    public AssetFileTree? _tree;
+    private AssetFileTree? _tree;
+    private FileLineIndex _index;
 
     public AssetFileTree Tree
     {
@@ -20,6 +21,18 @@ internal class OpenedFile
         }
     }
 
+    public FileLineIndex LineIndex
+    {
+        get
+        {
+            if (_index.IsValid)
+                return _index;
+
+            _index = new FileLineIndex(_text);
+            return _index;
+        }
+    }
+
     public DocumentUri Uri { get; }
 
     public string Text
@@ -29,6 +42,7 @@ internal class OpenedFile
         {
             _text = value;
             _tree = null;
+            _index = default;
         }
     }
 

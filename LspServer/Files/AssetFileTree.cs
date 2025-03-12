@@ -23,7 +23,6 @@ public class AssetFileTree : IEnumerable<AssetFileNode>
     private AssetFileDictionaryValueNode? _metadata;
     private AssetFileDictionaryValueNode? _asset;
     public AssetFileDictionaryValueNode Root { get; }
-
     public AssetFileDictionaryValueNode? Metadata
     {
         get

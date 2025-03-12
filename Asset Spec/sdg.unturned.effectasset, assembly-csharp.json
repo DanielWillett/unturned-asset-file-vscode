@@ -1,0 +1,241 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+    "DisplayName": "Effect or UI",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html",
+    "Category": "EFFECT",
+    "VanillaIdLimit": 200,
+    "Properties":
+    [
+        {
+            "Key": "Bypass_ID_Limit",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows IDs to be less than 200 if this isn't the vanilla bundle."
+        },
+        {
+            "Key": "Gore",
+            "Type": "Flag",
+            "Description": "Prevents players with the gore option disabled from seeing particle emissions and splatter from this effect.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
+            "Variable": "gore"
+        },
+        {
+            "Key": "Splatter",
+            "Type": "UInt8",
+            "Description": "Number of splatter variations available.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
+            "Variable": "splatters",
+            "CountForRegexGroup": "effect-splatters"
+        },
+        {
+            "Key": "Splatters",
+            "Type": "UInt8",
+            "Description": "Number of splatters to spawn. This is multiplied by 8 when the player has the 'Splatterific' skill boost applied unless @Splatter_Liquid is true.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
+            "Variable": "splatter"
+        },
+        {
+            "Key": "Splatter_Liquid",
+            "Type": "Flag",
+            "Description": "The splatter will be visible when effects are disabled by settings, and direction will be randomized.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
+            "Variable": "splatterLiquid"
+        },
+        {
+            "Key": "Splatter_Temperature",
+            "Type": "SDG.Unturned.EPlayerTemperature, Assembly-CSharp",
+            "Description": "The temperature effect created by the effect when it spawns. Players walking within range will be affected. The area of effect is based on the X-scale of the overall effect.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
+            "Variable": "splatterTemperature"
+        },
+        {
+            "Key": "Splatter_Lifetime",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The median number of seconds the splatters will stay alive.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
+            "Minimum": "Splatter_Lifetime_Spread",
+            "Except": [ 0.0 ],
+            "Variable": "splatterLifetime"
+        },
+        {
+            "Key": "Splatter_Lifetime_Spread",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "The radius around @Splatter_Lifetime that the actual lifetime could be for each splatter in seconds. For example, if @Splatter_Lifetime is 5 and @Splatter_Lifetime_Spread is 1, the lifetime could be anywhere between 4 and 6 seconds.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
+            "Minimum": 0,
+            "Maximum": "Splatter_Lifetime",
+            "Variable": "splatterLifetimeSpread"
+        },
+        {
+            "Key": "Lifetime",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The median number of seconds the effect will stay alive.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
+            "Minimum": "Lifetime_Spread",
+            "Except": [ 0.0 ],
+            "Variable": "splatterLifetime"
+        },
+        {
+            "Key": "Lifetime_Spread",
+            "Type": "Float32",
+            "DefaultValue": 4.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "The radius around @Lifetime that the actual lifetime could be for the effect in seconds. For example, if @Lifetime is 5 and @Lifetime_Spread is 1, the lifetime could be anywhere between 4 and 6 seconds.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
+            "Minimum": 0,
+            "Maximum": "Lifetime",
+            "Variable": "splatterLifetimeSpread"
+        },
+        {
+            "Key": "Static",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Disable sound effect pitch randomization.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
+            "Variable": "isStatic"
+        },
+        {
+            "Key": "Is_Music",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Makes this effect silent if a player has music disabled.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
+            "Variable": "isMusic"
+        },
+        {
+            "Key": "Preload",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "IncludedDefaultValue": 0,
+            "Description": "Number of effects to cache and pool on startup.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
+            "Variable": "preload"
+        },
+        {
+            "Key": "Splatter_Preload",
+            "Type": "UInt8",
+            "DefaultValue": "@Splatters / @Splatter * @Preload",
+            "IncludedDefaultValue": 0,
+            "Description": "Number of splatter effects to cache and pool on startup. Note that @Preload has to be > 0 to preload splatters.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
+            "Variable": "splatterPreload"
+        },
+        {
+            "Key": "Blast",
+            "Type": "GuidOrId",
+            "ElementType": "EFFECT",
+            "DefaultValue": 0,
+            "Description": "The blast-mark effect to spawn when the effect is spawned. This is only displayed if the player has blast-marks enabled and has the deferred render mode selected.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
+            "Variable": "blastmarkEffectGuid"
+        },
+        {
+            "Key": "Relevant_Distance",
+            "Type": "Float32",
+            "DefaultValue": 128,
+            "Description": "The distance in meters that players can see this effect. Non-positive numbers will result in a radius of 128m.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
+            "Variable": "relevantDistance"
+        },
+        {
+            "Key": "Spawn_On_Dedicated_Server",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Whether or not the effect will also be instantiated on the dedicated server. This property has no effect on temperature effects.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
+            "Variable": "spawnOnDedicatedServer"
+        },
+        {
+            "Key": "Randomize_Rotation",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "IncludedDefaultValue": false,
+            "Description": "Whether or not the effect will be rotated around the hit axis.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
+            "Variable": "spawnOnDedicatedServer"
+        },
+        {
+            "Key": "CameraShake_Radius",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "The distance from the effect where players' cameras will shake if camera shake is enabled.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#camera-shake",
+            "Variable": "cameraShakeRadius"
+        },
+        {
+            "Key": "CameraShake_MagnitudeDegrees",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "The magnitude of the camera shake effect in degrees if camera shake is enabled.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#camera-shake",
+            "Variable": "cameraShakeMagnitudeDegrees"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EPlayerTemperature, Assembly-CSharp",
+            "DisplayName": "Temperature",
+            "Values":
+            [
+                {
+                    "Value": "FREEZING",
+                    "Description": "Damages the player up to 8 points depending on their clothes."
+                },
+                {
+                    "Value": "COLD",
+                    "Description": "Does not damage the player."
+                },
+                {
+                    "Value": "WARM",
+                    "Description": "Does not damage the player."
+                },
+                {
+                    "Value": "BURNING",
+                    "Description": "Damages the player by 10 points."
+                },
+                {
+                    "Value": "NONE",
+                    "Description": "Neutral temperature."
+                },
+                {
+                    "Value": "COVERED",
+                    "Description": "Sheltered from cold or warmth."
+                },
+                {
+                    "Value": "ACID",
+                    "Description": "Damages the player by 10 points."
+                }
+            ]
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Effect",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "The effect to spawn. UI effects should contain a Canvas component.",
+            "Required": true
+        },
+        {
+            "AssetName": "Splatter_(\\d+)",
+            "AssetNameIsRegex": true,
+            "AssetNameGroups":
+            [
+                {
+                    "Name": "effect-splatters",
+                    "RegexGroup": 1
+                }
+            ],
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "A splatter effect variation.",
+            "Required": true
+        }
+    ]
+}

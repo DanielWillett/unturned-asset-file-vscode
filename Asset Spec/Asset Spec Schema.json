@@ -51,6 +51,10 @@
                     "title": "Zero or more characters of UTF-16 text."
                 },
                 {
+                    "const": "RichTextString",
+                    "title": "Zero or more characters of UTF-16 text with rich-text tags supported."
+                },
+                {
                     "const": "Float32",
                     "title": "Single-precision floating point decimal."
                 },
@@ -91,8 +95,28 @@
                     "title": "A reference to a Unity object in the specified masterbundle. Exact same as ContentReference."
                 },
                 {
+                    "const": "FaceIndex",
+                    "title": "An index of a built-in face texture."
+                },
+                {
+                    "const": "BeardIndex",
+                    "title": "An index of a built-in beard texture."
+                },
+                {
+                    "const": "HairIndex",
+                    "title": "An index of a built-in hair texture."
+                },
+                {
+                    "const": "LegacyRewardList",
+                    "title": "A list of rewards following the layout of 'SDG.Unturned.INPCReward, Assembly-CSharp'."
+                },
+                {
+                    "const": "LegacyConditionList",
+                    "title": "A list of conditions following the layout of 'SDG.Unturned.INPCCondition, Assembly-CSharp'."
+                },
+                {
                     "const": "GuidOrId",
-                    "title": "An asset GUID or short ID."
+                    "title": "An asset GUID or short ID, where ElementType is the category or asset type."
                 },
                 {
                     "const": "Id",
@@ -139,11 +163,11 @@
                     "title": "A Vector3 euler rotation Key_X, Key_Y, Key_Z properties."
                 },
                 {
-                    "const": "DatList",
+                    "const": "List",
                     "title": "A list of values."
                 },
                 {
-                    "const": "DatDictionary",
+                    "const": "Dictionary",
                     "title": "A dictionary of values."
                 },
                 {
@@ -169,7 +193,7 @@
                 },
                 "SingleKeyOverride": {
                     "type": [ "string", "null" ],
-                    "description": "If 'KeyIsRegex', the singular version of the key which would not be regex (ex. Blade for Blade_1)."
+                    "description": "If 'KeyIsRegex', the singular version of the key which would not be regex (ex. Blade for Blade_#)."
                 },
                 "KeyIsRegex": {
                     "type": "boolean",
@@ -192,9 +216,9 @@
                         }
                     }
                 },
-                "Count": {
-                    "type": [ "number", "string" ],
-                    "description": "Number of keys to look for, can be a property from the asset."
+                "CountForRegexGroup": {
+                    "type": [ "string", "null" ],
+                    "description": "The regex-group for which this property is a count for."
                 },
                 "Aliases": {
                     "description": "Other keys that can be used for the flag or property.",
@@ -206,7 +230,7 @@
                     "$ref": "#/$defs/datPropertyType"
                 },
                 "ElementType": {
-                    "description": "The type of the elements of a DatList.",
+                    "description": "The type of the elements of a List.",
                     "$ref": "#/$defs/datPropertyType"
                 },
                 "SpecialTypes": {
@@ -240,7 +264,7 @@
                 },
                 "Docs": {
                     "description": "Link to the Unturned modding docs when a page is available.",
-                    "type": "string",
+                    "type": [ "string", "null" ],
                     "format": "uri"
                 },
                 "Markdown": {
@@ -248,12 +272,20 @@
                     "type": [ "string", "null" ]
                 },
                 "Minimum": {
-                    "type": [ "number", "string" ],
-                    "description": "Inclusive minimum value of the property."
+                    "type": [ "number", "string", "null" ],
+                    "description": "Inclusive minimum value of the property. Can also be another property."
                 },
                 "Maximum": {
-                    "type": [ "number", "string" ],
-                    "description": "Inclusive maximum value of the property."
+                    "type": [ "number", "string", "null" ],
+                    "description": "Inclusive maximum value of the property. Can also be another property."
+                },
+                "MinimumExclusive": {
+                    "type": [ "number", "string", "null" ],
+                    "description": "Exclusive minimum value of the property. Can also be another property."
+                },
+                "MaximumExclusive": {
+                    "type": [ "number", "string", "null" ],
+                    "description": "Exclusive maximum value of the property. Can also be another property."
                 },
                 "Except": {
                     "type": "array",
@@ -261,6 +293,13 @@
                         "type": [ "number", "string" ]
                     },
                     "description": "Exceptions to the minimum/maximum range."
+                },
+                "ExclusiveWith": {
+                    "type": "array",
+                    "items": {
+                        "type": [ "number", "string" ]
+                    },
+                    "description": "List of properties that should not co-exist with this property."
                 },
                 "Deprecated": {
                     "type": "boolean",
@@ -287,6 +326,17 @@
         "Parent": {
             "description": "Assembly-qualified name of the parent asset type, or null for Asset.",
             "type": [ "string", "null" ]
+        },
+        "Docs": {
+            "description": "Link to the Unturned modding docs when a page is available.",
+            "type": [ "string", "null" ],
+            "format": "uri"
+        },
+        "VanillaIdLimit": {
+            "description": "The first ID that isn't reserved by vanilla. 0 if this doesn't apply.",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 65535
         },
         "Properties": {
             "description": "List of all properties that can be defined.",
@@ -320,9 +370,10 @@
                         "type": "boolean",
                         "description": "If 'AssetName' is a regex expression to match properties."
                     },
-                    "Count": {
-                        "type": [ "number", "string" ],
-                        "description": "Number of assets to look for, can be a property from the asset."
+                    "Docs": {
+                        "description": "Link to the Unturned modding docs when a page is available.",
+                        "type": [ "string", "null" ],
+                        "format": "uri"
                     },
                     "AssetNameGroups": {
                         "type": [ "array", "null" ],
@@ -399,10 +450,6 @@
                                             }
                                         }
                                     }
-                                },
-                                "Count": {
-                                    "type": [ "number", "string" ],
-                                    "description": "Number of animations to look for, can be a property from the asset."
                                 }
                             }
                         }
@@ -423,6 +470,11 @@
                     "DisplayName": {
                         "description": "Display name of the type.",
                         "type": "string"
+                    },
+                    "Docs": {
+                        "description": "Link to the Unturned modding docs when a page is available.",
+                        "type": [ "string", "null" ],
+                        "format": "uri"
                     },
                     "Values": {
                         "description": "List of enum values.",

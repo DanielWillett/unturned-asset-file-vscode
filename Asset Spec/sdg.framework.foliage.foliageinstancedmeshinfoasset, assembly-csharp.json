@@ -1,0 +1,69 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
+    "DisplayName": "Instanced Mesh Foliage",
+    "Parent": "SDG.Framework.Foliage.FoliageInfoAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
+    "Category": "NONE",
+    "Properties":
+    [
+        {
+            "Key": "Mesh",
+            "Required": true,
+            "Type": "ContentReference",
+            "ElementType": "UnityEngine.Mesh, UnityEngine.CoreModule",
+            "Description": "The mesh to spawn where foliage is expected to be visible.",
+            "Variable": "mesh"
+        },
+        {
+            "Key": "Material",
+            "Required": true,
+            "Type": "ContentReference",
+            "ElementType": "UnityEngine.Material, UnityEngine.CoreModule",
+            "Description": "The material to render the mesh with.",
+            "Variable": "material"
+        },
+        {
+            "Key": "Cast_Shadows",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "If the foliage should cast shadows onto the ground.",
+            "Variable": "castShadows"
+        },
+        {
+            "Key": "Tile_Dither",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "IncludedDefaultValue": false,
+            "Deprecated": true,
+            "Description": "Gradually fade out foliage as the distance from the player increases. This option is no longer supported by the game.",
+            "Variable": "tileDither"
+        },
+        {
+            "Key": "Draw_Distance",
+            "Type": "Int32",
+            "DefaultValue": -1,
+            "IncludedDefaultValue": 0,
+            "Minimum": 1,
+            "Except": [ -1 ],
+            "Description": "The maximum distance in foliage tiles from the player in which foliage will be drawn. Foliage tiles outside the player's foliage quality setting will not be rendered either way. -1 indicates an infinite range confined to the player's foliage quality setting.",
+            "Variable": "drawDistance"
+        },
+        {
+            "Key": "Christmas_Redirect",
+            "Type": "AssetReference",
+            "DefaultValue": null,
+            "ElementType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
+            "Description": "The foliage to spawn during the Christmas holiday.",
+            "Variable": "christmasRedirect"
+        },
+        {
+            "Key": "Halloween_Redirect",
+            "Type": "AssetReference",
+            "DefaultValue": null,
+            "ElementType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
+            "Description": "The foliage to spawn during the Halloween holiday.",
+            "Variable": "halloweenRedirect"
+        }
+    ]
+}

@@ -3,14 +3,17 @@
     "Type": "SDG.Unturned.Asset, Assembly-CSharp",
     "DisplayName": "Asset",
     "Parent": null,
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html",
     "Category": "NONE",
-    "Properties": [
+    "Properties":
+    [
         {
             "Key": "GUID",
             "Type": "Guid",
             "Variable": "GUID",
             "Description": "Globally unique identifier for this asset.",
             "Required": true,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header",
             "CanBeInMetadata": true
         },
         {
@@ -18,12 +21,14 @@
             "Type": "Type",
             "Description": "Type of Asset to create.",
             "Required": true,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header",
             "CanBeInMetadata": true
         },
         {
             "Key": "ID",
             "Type": "UInt16",
             "Variable": "id",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#body",
             "Description": "Short ID unique to this asset's category."
         },
         {
@@ -31,6 +36,7 @@
             "Type": "Flag",
             "Variable": "ignoreNPOT",
             "Description": "Should texture non-power-of-two warnings be ignored?",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-validation.html#asset-validation",
             "DefaultValue": false
         },
         {
@@ -38,6 +44,7 @@
             "Type": "Flag",
             "Variable": "ignoreTextureReadable",
             "Description": "Should read/write texture warnings be ignored?",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-validation.html#asset-validation",
             "DefaultValue": false
         },
         {

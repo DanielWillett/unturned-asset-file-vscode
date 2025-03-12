@@ -8,7 +8,6 @@ using OmniSharp.Extensions.LanguageServer.Server;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using OmniSharp.Extensions.JsonRpc;
 
 namespace LspServer;
 
@@ -35,13 +34,19 @@ internal sealed class UnturnedAssetFileLspServer
 
         ConfigureServices(serv);
 
-        ILoggerFactory factory = LoggerFactory.Create(l => l.AddProvider(new FileLoggerProvider()).SetMinimumLevel(LogLevel.Trace));
+        ILoggerFactory loggerFactory = LoggerFactory.Create(l => l
+            .AddProvider(new FileLoggerProvider())
+            //.AddLanguageProtocolLogging()
+            .SetMinimumLevel(LogLevel.Trace)
+        );
 
         serv
-            .AddSingleton(factory)
+            .AddSingleton(loggerFactory)
             .AddTransient(typeof(ILogger<>), typeof(Logger<>))
             .AddSingleton<UnturnedAssetFileSyncHandler>()
             .AddSingleton<KeyCompletionHandler>()
+            .AddSingleton<DocumentSymbolHandler>()
+            .AddSingleton<HoverHandler>()
             .AddSingleton<OpenedFileTracker>()
             .AddSingleton<AssetSpecDictionary>()
             .AddSingleton(new JsonSerializerOptions
@@ -54,15 +59,17 @@ internal sealed class UnturnedAssetFileLspServer
             {
                 Console.InputEncoding = Encoding.UTF8;
                 Console.OutputEncoding = Encoding.UTF8;
-                bldr.WithLoggerFactory(factory)
+                bldr.WithLoggerFactory(loggerFactory)
                     .WithOutput(Console.OpenStandardOutput())
                     .WithInput(Console.OpenStandardInput())
                     .WithHandler<UnturnedAssetFileSyncHandler>()
+                    .WithHandler<HoverHandler>()
+                    .WithHandler<DocumentSymbolHandler>()
                     .WithHandler<KeyCompletionHandler>();
 
                 bldr.ServerInfo = new ServerInfo { Name = "Unturned Data File LSP", Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(4) };
             });
-
+        
         IServiceProvider serviceProvider = serv.BuildServiceProvider(validateScopes: true);
 
         ILogger<UnturnedAssetFileLspServer> logger = serviceProvider.GetRequiredService<ILogger<UnturnedAssetFileLspServer>>();
@@ -100,6 +107,8 @@ internal class FileLoggerProvider : ILoggerProvider
 
                 if (exception != null)
                     writer.WriteLine(exception);
+
+                writer.Flush();
             }
         }
 
@@ -117,10 +126,7 @@ internal class FileLoggerProvider : ILoggerProvider
                 Access = FileAccess.Write,
                 Share = FileShare.Read,
                 Options = FileOptions.SequentialScan
-            })
-        {
-            AutoFlush = true
-        };
+            });
     }
 
     public void Dispose()

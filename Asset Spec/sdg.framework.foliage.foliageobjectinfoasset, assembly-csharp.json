@@ -1,0 +1,28 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Framework.Foliage.FoliageObjectInfoAsset, Assembly-CSharp",
+    "DisplayName": "Object Foliage",
+    "Parent": "SDG.Framework.Foliage.FoliageInfoAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
+    "Category": "NONE",
+    "Properties":
+    [
+        {
+            "Key": "Object",
+            "Type": "AssetReference",
+            "Required": true,
+            "ElementType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
+            "Description": "The object to spawn when this foliage is placed.",
+            "Variable": "obj"
+        },
+        {
+            "Key": "Obstruction_Radius",
+            "Type": "Float32",
+            "DefaultValue": 4.0,
+            "IncludedDefaultValue": 0.0,
+            "Deprecated": true,
+            "Description": "The distance around an object that needs to be clear for it to be placed. Not currently used by the game.",
+            "Variable": "obstructionRadius"
+        }
+    ]
+}
