@@ -95,6 +95,10 @@
                     "title": "An asset GUID or short ID."
                 },
                 {
+                    "const": "Id",
+                    "title": "A short ID, where ElementType is the category."
+                },
+                {
                     "const": "DateTime",
                     "title": "A UTC date and time."
                 },
@@ -233,6 +237,11 @@
                 "Variable": {
                     "description": "Name of the variable in the C# class.",
                     "type": "string"
+                },
+                "Docs": {
+                    "description": "Link to the Unturned modding docs when a page is available.",
+                    "type": "string",
+                    "format": "uri"
                 },
                 "Markdown": {
                     "description": "Longer markdown description of the property.",
