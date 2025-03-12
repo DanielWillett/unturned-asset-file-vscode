@@ -84,7 +84,11 @@
                 },
                 {
                     "const": "ContentReference",
-                    "title": "A reference to a Unity object in the specified masterbundle."
+                    "title": "A reference to a Unity object in the specified masterbundle. Exact same as MasterBundleReference."
+                },
+                {
+                    "const": "MasterBundleReference",
+                    "title": "A reference to a Unity object in the specified masterbundle. Exact same as ContentReference."
                 },
                 {
                     "const": "GuidOrId",
@@ -93,6 +97,42 @@
                 {
                     "const": "DateTime",
                     "title": "A UTC date and time."
+                },
+                {
+                    "const": "Position",
+                    "title": "A Vector3 position (X, Y, Z) or object."
+                },
+                {
+                    "const": "PositionOrLegacy",
+                    "title": "A Vector3 position (X, Y, Z), object, or Key_X, Key_Y, Key_Z properties."
+                },
+                {
+                    "const": "LegacyPosition",
+                    "title": "A Vector3 position Key_X, Key_Y, Key_Z properties."
+                },
+                {
+                    "const": "Scale",
+                    "title": "A Vector3 scale (X, Y, Z) or object."
+                },
+                {
+                    "const": "ScaleOrLegacy",
+                    "title": "A Vector3 scale (X, Y, Z), object, or Key_X, Key_Y, Key_Z properties."
+                },
+                {
+                    "const": "LegacyScale",
+                    "title": "A Vector3 scale Key_X, Key_Y, Key_Z properties."
+                },
+                {
+                    "const": "EulerRotation",
+                    "title": "A Vector3 euler rotation (X, Y, Z) or object."
+                },
+                {
+                    "const": "EulerRotationOrLegacy",
+                    "title": "A Vector3 euler rotation (X, Y, Z), object, or Key_X, Key_Y, Key_Z properties."
+                },
+                {
+                    "const": "LegacyEulerRotation",
+                    "title": "A Vector3 euler rotation Key_X, Key_Y, Key_Z properties."
                 },
                 {
                     "const": "DatList",
@@ -135,6 +175,13 @@
                 "ElementType": {
                     "description": "The type of the elements of a DatList.",
                     "$ref": "#/$defs/datPropertyType"
+                },
+                "SpecialTypes": {
+                    "description": "A special subset of element type, such as barricade or useable type.",
+                    "type": "array",
+                    "items": {
+                        "type": [ "string", "number", "null" ]
+                    }
                 },
                 "Required": {
                     "description": "If this property is required.",
@@ -208,6 +255,34 @@
             "type": "array",
             "items": {
                 "$ref": "#/$defs/datProperty"
+            }
+        },
+        "Localization": {
+            "description": "List of all localization properties that can be defined.",
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/datProperty"
+            }
+        },
+        "UnityPrefabs": {
+            "description": "List of all prefabs with an expected name.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "AssetName": {
+                        "type": "string",
+                        "description": "The name of the asset in Unity."
+                    },
+                    "Description": {
+                        "type": "string",
+                        "description": "Description of what the prefab does."
+                    },
+                    "Deprecated": {
+                        "type": "boolean",
+                        "description": "If the prefab is no longer used or has been swapped for newer prefab features."
+                    }
+                }
             }
         },
         "Types": {
