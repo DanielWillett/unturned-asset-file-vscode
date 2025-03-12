@@ -415,6 +415,23 @@
                         "description": "Display name of the type.",
                         "type": "string"
                     },
+                    "Values": {
+                        "description": "List of enum values.",
+                        "type": "array",
+                        "items": { 
+                            "type": "object",
+                            "properties": {
+                                "Value": {
+                                    "type": "string",
+                                    "description": "The name of the enum field."
+                                },
+                                "Description": {
+                                    "type": "string",
+                                    "description": "Description of what the enum value does."
+                                }
+                            }
+                        }
+                    },
                     "Properties": {
                         "description": "List of all properties that can be defined.",
                         "type": "array",
