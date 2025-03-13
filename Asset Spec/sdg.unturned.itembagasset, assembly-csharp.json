@@ -1,0 +1,28 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemBagAsset, Assembly-CSharp",
+    "DisplayName": "Storage Clothing Item",
+    "Parent": "SDG.Unturned.ItemClothingAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/bag-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "Properties":
+    [
+        {
+            "Key": "Width",
+            "Type": "UInt8",
+            "Description": "Number of columns of storage in this item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/bag-asset.html#width-uint8-0",
+            "Variable": "width",
+            "DefaultValue": 0
+        },
+        {
+            "Key": "Height",
+            "Type": "UInt8",
+            "Description": "Number of rows of storage in this item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/bag-asset.html#height-uint8-0",
+            "Variable": "height",
+            "DefaultValue": 0
+        }
+    ]
+}
