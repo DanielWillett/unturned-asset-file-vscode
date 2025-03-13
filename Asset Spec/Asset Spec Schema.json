@@ -338,6 +338,10 @@
             "minimum": 0,
             "maximum": 65535
         },
+        "RequireId": {
+            "description": "If this type requires a non-zero unique ID.",
+            "type": "boolean"
+        },
         "Properties": {
             "description": "List of all properties that can be defined.",
             "type": "array",
@@ -411,6 +415,10 @@
                     "AnimationComponentFindArgument": {
                         "type": [ "string", "null" ],
                         "description": "The child GameObject that should have the Animation component attached." 
+                    },
+                    "Variable": {
+                        "description": "Name of the variable in the C# class.",
+                        "type": "string"
                     },
                     "Animations": {
                         "type": "array",

@@ -1,0 +1,31 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemArrestStartAsset, Assembly-CSharp",
+    "DisplayName": "Catcher Item",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/arrest-start-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Strength",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Description": "Number of times a player has to lean to release themselves when restrained.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/arrest-start-asset.html#property-descriptions",
+            "Variable": "strength"
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Use",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound to play when the item is used.",
+            "Required": true,
+            "Variable": "use"
+        }
+    ]
+}

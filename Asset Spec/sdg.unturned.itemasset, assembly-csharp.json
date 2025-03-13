@@ -1,0 +1,269 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "DisplayName": "Item",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Bypass_ID_Limit",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle."
+        },
+        {
+            "Key": "Pro",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates an item on the Steam Marketplace.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#pro-flag",
+            "Variable": "isPro"
+        },
+        {
+            "Key": "Instantiated_Item_Name_Override",
+            "Type": "String",
+            "DefaultValue": "ID",
+            "Description": "The GameObject name of the item when held or spawned in-game. By default this is the @ID of the item but may be changed for sharing animations.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#instantiated-item-name-override-string",
+            "Variable": "instantiatedItemName"
+        },
+        {
+            "Key": "Type",
+            "Type": "SDG.Unturned.EItemType, Assembly-CSharp",
+            "Required": true,
+            "Description": "The type of item to create.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#type-doc-data-eitemtype",
+            "Variable": "type"
+        }
+    ],
+    "Localization":
+    [
+        {
+            "Key": "Name",
+            "Type": "String",
+            "DefaultValue": "Name",
+            "Description": "Localized name of the item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#localization",
+            "Variable": "itemName"
+        },
+        {
+            "Key": "Description",
+            "Type": "RichTextString",
+            "DefaultValue": "Description",
+            "Description": "Localized description of the item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#localization",
+            "Variable": "itemDescription"
+        }
+    ],
+    "Types":
+    [
+        {
+            "DisplayName": "Item Type",
+            "Type": "SDG.Unturned.EItemType, Assembly-CSharp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eitemtype.html",
+            "Values":
+            [
+                {
+                    "Value": "HAT",
+                    "Description": "A hat or helmet."
+                },
+                {
+                    "Value": "PANTS",
+                    "Description": "Pants with storage."
+                },
+                {
+                    "Value": "SHIRT",
+                    "Description": "A shirt with storage."
+                },
+                {
+                    "Value": "MASK",
+                    "Description": "A mask that covers the player's face or head."
+                },
+                {
+                    "Value": "BACKPACK",
+                    "Description": "A backpack or bag with storage."
+                },
+                {
+                    "Value": "VEST",
+                    "Description": "A vest or overshirt with storage"
+                },
+                {
+                    "Value": "GLASSES",
+                    "Description": "Glasses or eyewear."
+                },
+                {
+                    "Value": "GUN",
+                    "Description": "An item that fires bullets or projectiles."
+                },
+                {
+                    "Value": "SIGHT",
+                    "Description": "A sight or scope attachment equipped to a gun."
+                },
+                {
+                    "Value": "TACTICAL",
+                    "Description": "A tactical light, laser, rangefinder, or melee attachment equipped to a gun."
+                },
+                {
+                    "Value": "GRIP",
+                    "Description": "A grip attachment equipped to a gun"
+                },
+                {
+                    "Value": "BARREL",
+                    "Description": "A suppressor or barrel attachment equipped to a gun."
+                },
+                {
+                    "Value": "MAGAZINE",
+                    "Description": "An ammo/projectile magazine or clip attachment equipped to a gun."
+                },
+                {
+                    "Value": "FOOD",
+                    "Description": "Consumable food that can be eaten."
+                },
+                {
+                    "Value": "WATER",
+                    "Description": "Consumable water that can be drank."
+                },
+                {
+                    "Value": "MEDICAL",
+                    "Description": "Consumable medical supplies that can be used on the player or other players."
+                },
+                {
+                    "Value": "MELEE",
+                    "Description": "An item that can be used as a melee weapon, flashlight, or repair tool."
+                },
+                {
+                    "Value": "FUEL",
+                    "Description": "An item that can store and move fuel."
+                },
+                {
+                    "Value": "TOOL",
+                    "Description": "A generic tool like a lockpick, carjack, housing planner, etc."
+                },
+                {
+                    "Value": "BARRICADE",
+                    "Description": "A placeable item that can usually be placed anywhere, including vehicles."
+                },
+                {
+                    "Value": "STORAGE",
+                    "Description": "A barricade which can store items."
+                },
+                {
+                    "Value": "BEACON",
+                    "Description": "A barricade that can spawn zombies in waves."
+                },
+                {
+                    "Value": "FARM",
+                    "Description": "A seed that can be planted on ground or special ground obejcts/placeables."
+                },
+                {
+                    "Value": "TRAP",
+                    "Description": "A barricade that acts as a trap that may or may not be explosive."
+                },
+                {
+                    "Value": "STRUCTURE",
+                    "Description": "A placeable item that can not be placed on vehicles."
+                },
+                {
+                    "Value": "SUPPLY",
+                    "Description": "A basic item that can not be held but may be used in crafting recipes or for other reasons."
+                },
+                {
+                    "Value": "THROWABLE",
+                    "Description": "A throwable grenade-like item that can explode, emit particles, and/or act as a flashbang."
+                },
+                {
+                    "Value": "GROWER",
+                    "Description": "A fertilizer item that can be used on @FARM barricades."
+                },
+                {
+                    "Value": "OPTIC",
+                    "Description": "A item that can be used to zoom in, such as binoculars. Using the item will cause a marker to be placed where the player is looking."
+                },
+                {
+                    "Value": "REFILL",
+                    "Description": "A bottle item used to drink and transport water."
+                },
+                {
+                    "Value": "FISHER",
+                    "Description": "A fishing rod item."
+                },
+                {
+                    "Value": "CLOUD",
+                    "Description": "An item that modifies the player's gravity constant when held."
+                },
+                {
+                    "Value": "MAP",
+                    "Description": "An item that can enable the satellite or chart UI elements."
+                },
+                {
+                    "Value": "KEY",
+                    "Description": "An item that opens @BOX items from the Steam Marketplace."
+                },
+                {
+                    "Value": "BOX",
+                    "Description": "An item is opened by @KEY items from the Steam Marketplace."
+                },
+                {
+                    "Value": "ARREST_START",
+                    "Description": "An item that is used to restrain a player."
+                },
+                {
+                    "Value": "ARREST_END",
+                    "Description": "An item that is used to release a player that is restrained."
+                },
+                {
+                    "Value": "TANK",
+                    "Description": "A barricade that can store either fuel or water."
+                },
+                {
+                    "Value": "GENERATOR",
+                    "Description": "A barricade that produces electricity within a given area."
+                },
+                {
+                    "Value": "DETONATOR",
+                    "Description": "An item used to detonate explosive charges."
+                },
+                {
+                    "Value": "CHARGE",
+                    "Description": "A barricade that is exploded using a @DETONATOR item."
+                },
+                {
+                    "Value": "LIBRARY",
+                    "Description": "A barricade that stores experience."
+                },
+                {
+                    "Value": "FILTER",
+                    "Description": "An item that keeps a radiation-proof @MASK item working while the player is in a radiated zone."
+                },
+                {
+                    "Value": "SENTRY",
+                    "Description": "A storage barricade that fires on other players using it's equipped gun."
+                },
+                {
+                    "Value": "VEHICLE_REPAIR_TOOL",
+                    "Description": "Items that repair vehicles, currently just batteries."
+                },
+                {
+                    "Value": "TIRE",
+                    "Description": "An item that can replace missing tires on vehicles."
+                },
+                {
+                    "Value": "COMPASS",
+                    "Description": "An item that can enable the compass UI element."
+                },
+                {
+                    "Value": "OIL_PUMP",
+                    "Description": "An item that can gradually pump fuel from the ground."
+                },
+                {
+                    "Value": "VEHICLE_PAINT_TOOL",
+                    "Description": "An item that can paint vehicles a specific color."
+                }
+            ]
+        }
+    ]
+}

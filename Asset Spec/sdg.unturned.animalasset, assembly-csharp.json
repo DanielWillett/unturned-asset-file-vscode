@@ -6,6 +6,7 @@
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html",
     "Category": "ANIMAL",
     "VanillaIdLimit": 50,
+    "RequireId": true,
     "Properties":
     [
         {
@@ -330,7 +331,8 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "Variable": "client"
         },
         {
             "AssetName": "Animal_Server",
@@ -398,19 +400,22 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "Variable": "server"
         },
         {
             "AssetName": "Animal_Dedicated",
             "Description": "The model loaded on dedicated servers.",
             "Required": true,
-            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule"
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "dedicated"
         },
         {
             "AssetName": "Ragdoll",
             "Description": "The model loaded on clients when the animal is killed.",
             "Required": true,
-            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule"
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "ragdoll"
         },
         {
             "AssetName": "Roar_(\\d+)",
@@ -424,7 +429,8 @@
             ],
             "Description": "Randomly selected roar sound.",
             "Required": true,
-            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Variable": "roars"
         },
         {
             "AssetName": "Panic_(\\d+)",
@@ -438,7 +444,8 @@
             ],
             "Description": "Randomly selected panic sound.",
             "Required": true,
-            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Variable": "panics"
         }
     ]
 }

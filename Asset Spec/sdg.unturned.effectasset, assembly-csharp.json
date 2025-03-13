@@ -221,7 +221,8 @@
             "AssetName": "Effect",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The effect to spawn. UI effects should contain a Canvas component.",
-            "Required": true
+            "Required": true,
+            "Variable": "effect"
         },
         {
             "AssetName": "Splatter_(\\d+)",
@@ -235,7 +236,8 @@
             ],
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "A splatter effect variation.",
-            "Required": true
+            "Required": true,
+            "Variable": "splatters"
         }
     ]
 }
