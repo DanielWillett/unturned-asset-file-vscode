@@ -1,0 +1,70 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp",
+    "DisplayName": "Barrel Attachment Item",
+    "Parent": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "Properties":
+    [
+        {
+            "Key": "Braked",
+            "Type": "Flag",
+            "Description": "Whether or not the gun's muzzle flash will be hidden while this item is attached.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#braked-flag",
+            "Variable": "isBraked",
+            "DefaultValue": false
+        },
+        {
+            "Key": "Silenced",
+            "Type": "Flag",
+            "Description": "Prevents zombies and animals from being alerted when the gun shoots.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#silenced-flag",
+            "Variable": "isSilenced",
+            "DefaultValue": false
+        },
+        {
+            "Key": "Volume",
+            "Type": "Float32",
+            "Description": "A volume multiplier on the attached gun's fire sound.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#volume-float32-1",
+            "Variable": "isSilenced",
+            "DefaultValue": 1.0
+        },
+        {
+            "Key": "Durability",
+            "Type": "UInt8",
+            "Maximum": 100,
+            "Description": "The amount of durability (out of 100) lost when firing the attached gun.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#durability-uint8-0",
+            "Variable": "durability",
+            "DefaultValue": 0
+        },
+        {
+            "Key": "Gunshot_Rolloff_Distance_Multiplier",
+            "Type": "Float32",
+            "Maximum": 100,
+            "Description": "Multiplier to the maximum distance a gunshot can be heard as configured by the gun.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#gunshot-rolloff-distance-multiplier-float32",
+            "Variable": "gunshotRolloffDistanceMultiplier",
+            "DefaultValue": "@Silenced ? 0.5 : 1.0"
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Shoot",
+            "Description": "The sound played when the gun this item is attached to shoots. Optional.",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Variable": "shoot"
+        },
+        {
+            "AssetName": "Barrel",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "The model that appears on the gun when the item is attached.",
+            "Variable": "barrel",
+            "Required": true
+        }
+    ]
+}

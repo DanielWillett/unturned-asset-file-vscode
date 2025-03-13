@@ -1,0 +1,139 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
+    "DisplayName": "Barricade Item",
+    "Parent": "SDG.Unturned.ItemPlaceableAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "Properties":
+    [
+        {
+            "Key": "Has_Clip_Prefab",
+            "Type": "Boolean",
+            "Description": "Whether or not this barricade defines a 'Clip' prefab in Unity.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "DefaultValue": true
+        },
+        {
+            "Key": "PlacementPreviewPrefab",
+            "Type": "MasterBundleReference",
+            "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "DefaultValue": null,
+            "Variable": "placementPreviewRef",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "PlacementAudioClip",
+            "Type": "MasterBundleReference",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Variable": "use",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Build",
+            "Type": "SDG.Unturned.EBuild, Assembly-CSharp",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Required": true,
+            "Variable": "build",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EBuild, Assembly-CSharp",
+            "DisplayName": "Barricade Type",
+            "Values":
+            [
+                {
+                    "Value": "FORTIFICATION",
+                    "Casing": "Fortification",
+                    "Description": "A fortification barricade that gets placed in a window 'Slot' slot.",
+                    "InteractableType": null
+                },
+                {
+                    "Value": "BARRICADE",
+                    "Casing": "Barricade",
+                    "Description": "A standard barricade with no special behavior.",
+                    "InteractableType": null
+                },
+                {
+                    "Value": "DOOR",
+                    "Casing": "Door",
+                    "Description": "A barricade which should be placed in a doorway 'Door' slot.",
+                    "InteractableType": "SDG.Unturned.InteractableDoor, Assembly-CSharp"
+                },
+                {
+                    "Value": "GATE",
+                    "Casing": "Gate",
+                    "Description": "A barricade which should be placed in a garage 'Gate' slot.",
+                    "InteractableType": "SDG.Unturned.InteractableDoor, Assembly-CSharp"
+                },
+                {
+                    "Value": "BED",
+                    "Casing": "Bed",
+                    "Description": "A barricade which can be claimed and respawned at.",
+                    "InteractableType": "SDG.Unturned.InteractableBed, Assembly-CSharp"
+                },
+                {
+                    "Value": "LADDER",
+                    "Casing": "Ladder",
+                    "Description": "A barricade which can be climbed by players.",
+                    "InteractableType": null
+                },
+                {
+                    "Value": "STORAGE",
+                    "Casing": "Storage",
+                    "Description": "A barricade which can store items.",
+                    "RequiredBaseType": "SDG.Unturned.ItemStorageAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableStorage, Assembly-CSharp"
+                },
+                {
+                    "Value": "FARM",
+                    "Casing": "Farm",
+                    "Description": "A seed barricade that can grow and bear items.",
+                    "RequiredBaseType": "SDG.Unturned.ItemFarmAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableFarm, Assembly-CSharp"
+                },
+                {
+                    "Value": "TORCH",
+                    "Casing": "Torch",
+                    "Description": "A fire barricade which is placed on the wall.",
+                    "RequiredBaseType": "SDG.Unturned.ItemFarmAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableFire, Assembly-CSharp"
+                }
+            ]
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Clip",
+            "Description": "The barricade object loaded on dedicated servers. This object should not contain renderers usually.",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "barricade",
+            "Required": "@Has_Clip_Prefab"
+        },
+        {
+            "AssetName": "Barricade",
+            "Description": "The barricade object loaded in-game and on dedicated servers if @Has_Clip_Prefab is false.",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "barricade",
+            "Required": true
+        },
+        {
+            "AssetName": "Nav",
+            "Description": "The collider used for zombie and animal navigation.",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "nav"
+        },
+        {
+            "AssetName": "Use",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the barricade is placed.",
+            "Variable": "use"
+        }
+    ]
+}

@@ -242,7 +242,7 @@
                 },
                 "Required": {
                     "description": "If this property is required.",
-                    "type": "boolean"
+                    "type": [ "string", "boolean" ]
                 },
                 "CanBeInMetadata": {
                     "description": "If this property can be read from the Metadata section.",
@@ -405,7 +405,7 @@
                         "description": "If the prefab is no longer used or has been swapped for newer prefab features."
                     },
                     "Required": {
-                        "type": "boolean",
+                        "type": [ "string", "boolean" ],
                         "description": "If the prefab is required to exist (or doesn't make sense to not exist)."
                     },
                     "Type": {
@@ -431,7 +431,7 @@
                                     "description": "The name of the animation in Unity."
                                 },
                                 "Required": {
-                                    "type": "boolean",
+                                    "type": [ "string", "boolean" ],
                                     "description": "If the animation is required."
                                 },
                                 "SingleNameOverride": {
@@ -494,11 +494,20 @@
                                     "type": "string",
                                     "description": "The name of the enum field."
                                 },
+                                "Casing": {
+                                    "type": "string",
+                                    "description": "The proper-case version of 'Value'."
+                                },
+                                "RequiredBaseType": {
+                                    "type": "string",
+                                    "description": "The required type of this asset to use this value (also matches subtypes)."
+                                },
                                 "Description": {
                                     "type": "string",
                                     "description": "Description of what the enum value does."
                                 }
-                            }
+                            },
+                            "required": [ "Value" ]
                         }
                     },
                     "Properties": {
