@@ -297,9 +297,26 @@
                 "ExclusiveWith": {
                     "type": "array",
                     "items": {
-                        "type": [ "number", "string" ]
+                        "type": [ "string" ]
                     },
                     "description": "List of properties that should not co-exist with this property."
+                },
+                "InclusiveWith": {
+                    "type": "array",
+                    "items": {
+                        "type": [ "object", "string" ],
+                        "properties": {
+                            "key": {
+                                "type": "string",
+                                "description": "The property that is required."
+                            },
+                            "value": {
+                                "type": [ "string", "array", "number", "null", "boolean" ],
+                                "description": "The value that is required or a list of allowed values."
+                            }
+                        }
+                    },
+                    "description": "List of properties and optional values that should exist if this exists."
                 },
                 "Deprecated": {
                     "type": "boolean",
