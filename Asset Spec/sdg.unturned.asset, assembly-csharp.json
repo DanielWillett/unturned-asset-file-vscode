@@ -19,6 +19,7 @@
         {
             "Key": "Type",
             "Type": "Type",
+            "SpecialTypes": [ "SDG.Unturned.Asset, Assembly-CSharp" ],
             "Description": "Type of Asset to create.",
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header",
@@ -61,6 +62,11 @@
             "Key": "Bundle_Override_Path",
             "Type": "LegacyBundleName",
             "Description": "Override which .unity3d file this asset uses."
+        },
+        {
+            "Key": "Bundle_Path_Include_Filename",
+            "Type": "Boolean",
+            "Description": "Includes the file name in the bundle path, so if you have an asset that isn't in it's own folder, use this property for the correct bundle path."
         },
         {
             "Key": "Asset_Bundle_Version",

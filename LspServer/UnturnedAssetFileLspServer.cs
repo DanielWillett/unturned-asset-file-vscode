@@ -1,5 +1,6 @@
-using LspServer.Files;
-using LspServer.Handlers;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Files;
+using DanielWillett.UnturnedDataFileLspServer.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
@@ -9,7 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
-namespace LspServer;
+namespace DanielWillett.UnturnedDataFileLspServer;
 
 internal sealed class UnturnedAssetFileLspServer
 {
@@ -35,8 +36,10 @@ internal sealed class UnturnedAssetFileLspServer
         ConfigureServices(serv);
 
         ILoggerFactory loggerFactory = LoggerFactory.Create(l => l
+#if DEBUG
             .AddProvider(new FileLoggerProvider())
-            //.AddLanguageProtocolLogging()
+#endif
+            .AddLanguageProtocolLogging()
             .SetMinimumLevel(LogLevel.Trace)
         );
 
@@ -48,7 +51,8 @@ internal sealed class UnturnedAssetFileLspServer
             .AddSingleton<DocumentSymbolHandler>()
             .AddSingleton<HoverHandler>()
             .AddSingleton<OpenedFileTracker>()
-            .AddSingleton<AssetSpecDictionary>()
+            .AddSingleton<LspAssetSpecDatabase>()
+            .AddTransient<AssetSpecDatabase>(sp => sp.GetRequiredService<LspAssetSpecDatabase>())
             .AddSingleton(new JsonSerializerOptions
             {
                 WriteIndented = true
@@ -76,6 +80,8 @@ internal sealed class UnturnedAssetFileLspServer
 
         logger.LogInformation("Starting LSP server...");
 
+        await serviceProvider.GetRequiredService<LspAssetSpecDatabase>().InitializeAsync();
+
         ILanguageServer languageServer = serviceProvider.GetRequiredService<ILanguageServer>();
 
         await languageServer.Initialize(CancellationToken.None);
@@ -84,7 +90,7 @@ internal sealed class UnturnedAssetFileLspServer
         await languageServer.WaitForExit.ConfigureAwait(false);
     }
 }
-
+#if DEBUG
 internal class FileLoggerProvider : ILoggerProvider
 {
     public readonly StreamWriter _writer;
@@ -119,7 +125,7 @@ internal class FileLoggerProvider : ILoggerProvider
 
     public FileLoggerProvider()
     {
-        _writer = new StreamWriter("log.txt", Encoding.UTF8,
+        _writer = new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "log.txt"), Encoding.UTF8,
             new FileStreamOptions
             {
                 Mode = FileMode.Create,
@@ -136,3 +142,4 @@ internal class FileLoggerProvider : ILoggerProvider
 
     public ILogger CreateLogger(string categoryName) => new Logger(categoryName, _writer);
 }
+#endif

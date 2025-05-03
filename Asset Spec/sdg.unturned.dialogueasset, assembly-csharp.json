@@ -65,7 +65,7 @@
             "KeyIsRegex": true,
             "DefaultValue": 0,
             "Minimum": 0,
-            "MaximumExclusive": "Responses",
+            "MaximumExclusive": "@Responses",
             "Required": true,
             "KeyGroups":
             [
@@ -178,7 +178,7 @@
             "KeyIsRegex": true,
             "DefaultValue": 0,
             "Minimum": 0,
-            "MaximumExclusive": "Messages",
+            "MaximumExclusive": "@Messages",
             "Required": true,
             "KeyGroups":
             [

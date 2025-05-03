@@ -1,0 +1,36 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
+
+public sealed class Float128SpecPropertyType : BasicSpecPropertyType<Float128SpecPropertyType, decimal>
+{
+    public static readonly Float128SpecPropertyType Instance = new Float128SpecPropertyType();
+
+    static Float128SpecPropertyType() { }
+    private Float128SpecPropertyType() { }
+
+    /// <inheritdoc />
+    public override string Type => "Float128";
+
+    /// <inheritdoc />
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
+
+    /// <inheritdoc />
+    public override string DisplayName => "Decimal";
+
+    /// <inheritdoc />
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out decimal value)
+    {
+        if (parse.Node == null)
+        {
+            return MissingNode(in parse, out value);
+        }
+
+        if (parse.Node is not AssetFileStringValueNode strValNode || !KnownTypeValueHelper.TryParseDecimal(strValNode.Value, out value))
+        {
+            return FailedToParse(in parse, out value);
+        }
+        
+        return true;
+    }
+}

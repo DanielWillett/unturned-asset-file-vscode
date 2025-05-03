@@ -1,26 +1,26 @@
-using LspServer.Files;
-using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Files;
 
-namespace LspServer.Completions;
+namespace DanielWillett.UnturnedDataFileLspServer.Completions;
 
 public struct KeyCompletionState
 {
     public AssetFileNode? Node { get; }
-    public AssetSpecProperty Property { get; set; }
+    public SpecProperty Property { get; set; }
     public OpenedFile File { get; }
-    public Position Position { get; }
+    public FilePosition Position { get; }
     public bool IsOnNewLine { get; }
-    public AssetSpec Spec { get; }
-    public AssetInformation Information { get; }
+    public InverseTypeHierarchy TypeHierarchy { get; }
     public string? Alias { get; set; }
 
-    public KeyCompletionState(AssetFileNode? node, Position position, bool isOnNewLine, AssetSpec spec, AssetInformation information, string? alias, AssetSpecProperty property, OpenedFile file)
+    public KeyCompletionState(AssetFileNode? node, FilePosition position, bool isOnNewLine, InverseTypeHierarchy typeHierarchy, string? alias, SpecProperty property, OpenedFile file)
     {
         Node = node;
         Position = position;
         IsOnNewLine = isOnNewLine;
-        Spec = spec;
-        Information = information;
+        TypeHierarchy = typeHierarchy;
         Alias = alias;
         Property = property;
         File = file;

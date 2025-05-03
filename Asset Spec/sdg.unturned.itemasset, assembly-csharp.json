@@ -1,5 +1,6 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    // "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset%20Spec%20Schema.json",
     "Type": "SDG.Unturned.ItemAsset, Assembly-CSharp",
     "DisplayName": "Item",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -26,7 +27,7 @@
         {
             "Key": "Instantiated_Item_Name_Override",
             "Type": "String",
-            "DefaultValue": "ID",
+            "DefaultValue": "@ID",
             "Description": "The GameObject name of the item when held or spawned in-game. By default this is the @ID of the item but may be changed for sharing animations.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#instantiated-item-name-override-string",
             "Variable": "instantiatedItemName"
@@ -38,7 +39,694 @@
             "Description": "The type of item to create.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#type-doc-data-eitemtype",
             "Variable": "type"
-        }
+        },
+        {
+            "Key": "Econ_Icon_Use_Id",
+            "Type": "Boolean",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Pro",
+                    "Value": true
+                }
+            ],
+            "DefaultValue": false,
+            "Description": "Instructs the item icon generator to use the item's ID to lookup an icon instead of it's @GUID or special path.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#pro-flag",
+            "Variable": "econIconUseId"
+        },
+        {
+            "Key": "Size_X",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Minimum": 1,
+            "Description": "The width in tiles of the item in the inventory.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#size-x-uint8-1",
+            "Variable": "size_x"
+        },
+        {
+            "Key": "Size_Y",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Minimum": 1,
+            "Description": "The height in tiles of the item in the inventory.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#size-y-uint8-1",
+            "Variable": "size_y"
+        },
+        {
+            "Key": "Size_Z",
+            "Type": "Float32",
+            "DefaultValue": -1,
+            "MinimumExclusive": 0,
+            "Except": [ -1 ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Use_Auto_Icon_Measurements",
+                    "Value": false
+                }
+            ],
+            "Description": "Overrides the orthoganal size of the camera that captures the item icon. This is half of the vertical height of the camera's view.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#size-z-float32-1",
+            "Variable": "iconCameraOrthographicSize"
+        },
+        {
+            "Key": "Use_Auto_Icon_Measurements",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Enables automatic icon zoom measurement instead of using @Size_Z for icon zoom.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#use-auto-icon-measurements-bool-true",
+            "Variable": "isEligibleForAutomaticIconMeasurements"
+        },
+        {
+            "Key": "Size2_Z",
+            "Type": "Float32",
+            "DefaultValue": -1,
+            "MinimumExclusive": 0,
+            "Except": [ -1 ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Pro",
+                    "Value": true
+                }
+            ],
+            "Description": "Overrides the orthoganal size of the camera that captures the economy icon. This is half of the vertical height of the camera's view.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#size2-z-float32-1",
+            "Variable": "econIconCameraOrthographicSize"
+        },
+        {
+            "Key": "Shared_Skin_Lookup_ID",
+            "Type": "Id",
+            "ElementType": "ITEM",
+            "DefaultValue": "@ID",
+            "Description": "The item who's skins can be used for this item. Usually this is the same ID as the current item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#shared-skin-lookup-id-uint16",
+            "Variable": "sharedSkinLookupID"
+        },
+        {
+            "Key": "Shared_Skin_Apply_Visuals",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Should visuals (such as the item skin) be applied when @Shared_Skin_Lookup_ID is a different item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#shared-skin-apply-visuals-bool-true",
+            "Variable": "SharedSkinShouldApplyVisuals"
+        },
+        {
+            "Key": "Amount",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Minimum": 1,
+            "Description": "Maximum amount of items in a stackable item (like a magazine or ammo crate).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#amount-uint8-1",
+            "Variable": "amount"
+        },
+        {
+            "Key": "Count_Min",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Minimum": 1,
+            "Description": "Minimum number of items to spawn in a stackable item (like a magazine or ammo crate) when spawning naturally.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#count-min-uint8-1",
+            "Variable": "countMin"
+        },
+        {
+            "Key": "Count_Max",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Minimum": 1,
+            "Description": "Maximum number of items to spawn in a stackable item (like a magazine or ammo crate) when spawning naturally.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#count-max-uint8-1",
+            "Variable": "countMax"
+        },
+        {
+            "Key": "Quality_Min",
+            "Type": "UInt8",
+            "DefaultValue": 10,
+            "IncludedDefaultValue": 0,
+            "Maximum": "@Quality_Max",
+            "Description": "Minimum quality/durability level to naturally spawn the item at.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#quality-min-uint8-10",
+            "Variable": "qualityMin"
+        },
+        {
+            "Key": "Quality_Max",
+            "Type": "UInt8",
+            "DefaultValue": 90,
+            "IncludedDefaultValue": 0,
+            "Minimum": "@Quality_Min",
+            "Maximum": 100,
+            "Description": "Maximum quality/durability level to naturally spawn the item at.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#quality-max-uint8-90",
+            "Variable": "qualityMax"
+        },
+        {
+            "Key": "EquipableModelParent",
+            "Type": "SDG.Unturned.EEquipableModelParent, Assembly-CSharp",
+            "DefaultValue": "RightHook",
+            "ExclusiveWith": [ "Backward" ],
+            "Description": "Which of the player's bone the item will be attached to.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#equipablemodelparent-eequipablemodelparent",
+            "Variable": "EquipableModelParent"
+        },
+        {
+            "Key": "Backward",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "ExclusiveWith": [ "EquipableModelParent" ],
+            "Description": "If the item will be attached to the player's left hand instead of their right hand. '@EquipableModelParent LeftHook' should be used instead.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#equipablemodelparent-eequipablemodelparent",
+            "Variable": "EquipableModelParent",
+            "Deprecated": true
+        },
+        {
+            "Key": "Left_Handed_Characters_Mirror_Equipable",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "If the model of the item should be mirrored for left handed characters.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#left-handed-characters-mirror-equipable-bool-true",
+            "Variable": "shouldLeftHandedCharactersMirrorEquippedItem"
+        },
+        {
+            "Key": "Use_Auto_Stat_Descriptions",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "If item stats should be automatically added to the description.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#use-auto-stat-descriptions-bool-true",
+            "Variable": "isEligibleForAutoStatDescriptions"
+        },
+        {
+            "Key": "Procedurally_Animate_Inertia",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "If first-person animations should procedurally be given extra inertia to improve low-quality animations.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#procedurally-animate-inertia-bool-true",
+            "Variable": "shouldProcedurallyAnimateInertia"
+        },
+        {
+            "Key": "Useable",
+            "Type": "TypeOrEnum",
+            "ElementType": "SDG.Unturned.EUseableType, Assembly-CSharp",
+            "SpecialTypes": [ "SDG.Unturned.Useable, Assembly-CSharp" ],
+            "DefaultValue": null,
+            "Description": "The type of Useable object to create when this item is equipped.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#useable-doc-item-asset-intro-euseabletype-none",
+            "Variable": "useable"
+        },
+        {
+            "Key": "Can_Player_Equip",
+            "Type": "Boolean",
+            "DefaultValueSwitch":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Useable",
+                            "Operation": "neq",
+                            "Comparand": null
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "If players are allowed to equip this item. When set to false only sentries can equip it.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#can-player-equip-bool",
+            "Variable": "canPlayerEquip"
+        },
+        {
+            "Key": "Equipable_Movement_Speed_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1,
+            "Description": "Speed multiplier for how fast the player can move on foot. May get combined with attachments if applicable.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#equipable-movement-speed-multiplier-float32-1",
+            "Variable": "equipableMovementSpeedMultiplier"
+        },
+        {
+            "Key": "EquipAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Can_Player_Equip",
+                    "Value": true
+                }
+            ],
+            "Description": "Redirects the @Equip sound to another asset or masterbundle.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#equipaudioclip-master-bundle-pointer-equip",
+            "Variable": "equip"
+        },
+        {
+            "Key": "InspectAudioDef",
+            "Type": "AudioReference",
+            "DefaultValue": null,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Can_Player_Equip",
+                    "Value": true
+                }
+            ],
+            "Description": "Specify the sound played when inspecting this item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#inspectaudiodef-master-bundle-pointer",
+            "Variable": "inspectAudio"
+        },
+        {
+            "Key": "EquipablePrefab",
+            "Type": "MasterBundleReferenceString",
+            "DefaultValue": null,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Can_Player_Equip",
+                    "Value": true
+                }
+            ],
+            "Description": "Overrides the item held by the player when equipped.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#equipableprefab-master-bundle-pointer",
+            "Variable": "equipablePrefab"
+        },
+        {
+            "Key": "InventoryAudio",
+            "Type": "AudioReference",
+            "DefaultValueSwitch":
+            [
+                {
+                    "When":
+                    {
+                        "Variable": "Type",
+                        "Operation": "assignable-to",
+                        "Comparand": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp"
+                    },
+                    "Cases":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Name",
+                                    "Operation": "contains-i",
+                                    "Comparand": "Seed"
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/Seeds.asset"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Name",
+                                    "Operation": "contains-i",
+                                    "Comparand": "Metal"
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/SmallMetal.asset"
+                        },
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "Size_X",
+                                    "Operation": "lte",
+                                    "Comparand": 1
+                                },
+                                {
+                                    "Variable": "Size_Y",
+                                    "Operation": "lte",
+                                    "Comparand": 1
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/LightMetalEquipment.asset"
+                        },
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "Size_X",
+                                    "Operation": "lte",
+                                    "Comparand": 2
+                                },
+                                {
+                                    "Variable": "Size_Y",
+                                    "Operation": "lte",
+                                    "Comparand": 2
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/MediumMetalEquipment.asset"
+                        },
+                        {
+                            "Value": "core.masterbundle::Sounds/Inventory/HeavyMetalEquipment.asset"
+                        }
+                    ]
+                },
+                {
+                    "When":
+                    {
+                        "Variable": "Type",
+                        "Operation": "assignable-to",
+                        "Comparand": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp"
+                    },
+                    "Cases":
+                    [
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "SDG.Unturned.ItemBagAsset::Width",
+                                    "Operation": "lte",
+                                    "Comparand": 3
+                                },
+                                {
+                                    "Variable": "SDG.Unturned.ItemBagAsset::Height",
+                                    "Operation": "lte",
+                                    "Comparand": 3
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/LightMetalEquipment.asset"
+                        },
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "SDG.Unturned.ItemBagAsset::Width",
+                                    "Operation": "lte",
+                                    "Comparand": 6
+                                },
+                                {
+                                    "Variable": "SDG.Unturned.ItemBagAsset::Height",
+                                    "Operation": "lte",
+                                    "Comparand": 6
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/MediumMetalEquipment.asset"
+                        },
+                        {
+                            "Value": "core.masterbundle::Sounds/Inventory/HeavyMetalEquipment.asset"
+                        }
+                    ]
+                },
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Type",
+                            "Operation": "assignable-to",
+                            "Comparand": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp"
+                        }
+                    ],
+                    "Value": "core.masterbundle::Sounds/Inventory/SmallGunAttachment.asset"
+                },
+                {
+                    "When":
+                    {
+                        "Variable": "Type",
+                        "Operation": "assignable-to",
+                        "Comparand": "SDG.Unturned.ItemClothingAsset, Assembly-CSharp"
+                    },
+                    "Cases":
+                    [
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "Size_X",
+                                    "Operation": "lte",
+                                    "Comparand": 1
+                                },
+                                {
+                                    "Variable": "Size_Y",
+                                    "Operation": "lte",
+                                    "Comparand": 1
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/LightCloth.asset"
+                        },
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "Rarity",
+                                    "Operation": "eq",
+                                    "Comparand": "COMMON"
+                                },
+                                {
+                                    "Variable": "Rarity",
+                                    "Operation": "eq",
+                                    "Comparand": "UNCOMMON"
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/LightClothEquipment.asset"
+                        },
+                        {
+                            "Value": "core.masterbundle::Sounds/Inventory/MediumClothEquipment.asset"
+                        }
+                    ]
+                },
+                {
+                    "When":
+                    {
+                        "Variable": "Type",
+                        "Operation": "assignable-to",
+                        "Comparand": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+                    },
+                    "Cases":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Name",
+                                    "Operation": "contains-i",
+                                    "Comparand": "Bow"
+                                },
+                                {
+                                    "Variable": "Size_X",
+                                    "Operation": "lt",
+                                    "Comparand": 2
+                                },
+                                {
+                                    "Variable": "Size_Y",
+                                    "Operation": "lt",
+                                    "Comparand": 2
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/LightGrab.asset"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Name",
+                                    "Operation": "contains-i",
+                                    "Comparand": "Bow"
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/RoughGrab.asset"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Size_X",
+                                    "Operation": "lte",
+                                    "Comparand": 2
+                                },
+                                {
+                                    "Variable": "Size_Y",
+                                    "Operation": "lte",
+                                    "Comparand": 2
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/SmallGunAttachment"
+                        },
+                        {
+                            "Value": "core.masterbundle::Sounds/Inventory/LargeGunAttachment.asset"
+                        }
+                    ]
+                },
+                {
+                    "When":
+                    {
+                        "Variable": "Type",
+                        "Operation": "assignable-to",
+                        "Comparand": "SDG.Unturned.ItemStructureAsset, Assembly-CSharp"
+                    },
+                    "Cases":
+                    [
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "Name",
+                                    "Operation": "contains-i",
+                                    "Comparand": "Metal"
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/SmallMetal.asset"
+                        },
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "Size_X",
+                                    "Operation": "lte",
+                                    "Comparand": 1
+                                },
+                                {
+                                    "Variable": "Size_Y",
+                                    "Operation": "lte",
+                                    "Comparand": 1
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/LightMetalEquipment.asset"
+                        },
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "Size_X",
+                                    "Operation": "lte",
+                                    "Comparand": 2
+                                },
+                                {
+                                    "Variable": "Size_Y",
+                                    "Operation": "lte",
+                                    "Comparand": 2
+                                }
+                            ],
+                            "Value": "core.masterbundle::Sounds/Inventory/MediumMetalEquipment.asset"
+                        },
+                        {
+                            "Value": "core.masterbundle::Sounds/Inventory/HeavyMetalEquipment.asset"
+                        }
+                    ]
+                },
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Size_X",
+                            "Operation": "gte",
+                            "Comparand": 2
+                        },
+                        {
+                            "Variable": "Size_Y",
+                            "Operation": "gte",
+                            "Comparand": 2
+                        }
+                    ],
+                    "Value": "core.masterbundle::Sounds/Inventory/RoughGrab.asset"
+                },
+                {
+                    "Value": "core.masterbundle::Sounds/Inventory/LightGrab.asset"
+                }
+            ],
+            "IncludedDefaultValue": null,
+            "Description": "Overrides the sound the item makes when being manipulated in the inventory.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#inventoryaudio-master-bundle-pointer",
+            "Variable": "inventoryAudio"
+        },
+        {
+            "Key": "Slot",
+            "Type": "SDG.Unturned.ESlotType, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Description": "Specifies which of the primary and secondary slots an item can be placed in.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#slot-doc-data-eslottype-none",
+            "Variable": "slot"
+        },
+        {
+            "Key": "Can_Use_Underwater",
+            "Type": "Boolean",
+            "DefaultValueSwitch":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Slot",
+                            "Operation": "eq",
+                            "Comparand": "PRIMARY"
+                        }
+                    ],
+                    "Value": false
+                },
+                {
+                    "Value": true
+                }
+            ],
+            "Description": "If the item can be equipped while the player is swimming underwater.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#can-use-underwater-bool",
+            "Variable": "canUseUnderwater"
+        },
+        {
+            "Key": "Blueprints",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "The number of blueprints defined for this item. Blueprints are crafting recipes that either consume this item or produce this item.",
+            "Variable": "blueprints",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprints-int-0",
+            "CountForRegexGroup": "item-blueprints"
+        },
+        {
+            "Key": "Blueprint_(\\d+)_Type",
+            "Type": "SDG.Unturned.EBlueprintType, Assembly-CSharp",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "Required": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "item-blueprints",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "Determines which tab crafting recipe @item-blueprints appears under in the inventory.",
+            "Variable": "type",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-type-eblueprinttype"
+        },
+        {
+            "Key": "Blueprint_(\\d+)_Supplies",
+            "Type": "UInt8",
+            "KeyIsRegex": true,
+            "DefaultValue": 1,
+            "Minimum": 1,
+            "KeyGroups":
+            [
+                {
+                    "Name": "item-blueprints",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "Determines how many supplies are included in crafting recipe @item-blueprints.",
+            "Variable": "supplies",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supplies-uint8-0",
+            "CountForRegexGroup": "item-blueprint-supplies"
+        },
+        {
+            "Key": "Blueprint_(\\d+)_Supply_(\\d+)_ID",
+            "Type": "BlueprintSupplyId",
+            "KeyIsRegex": true,
+            "DefaultValue": 1,
+            "KeyGroups":
+            [
+                {
+                    "Name": "item-blueprints",
+                    "RegexGroup": 1
+                },
+                {
+                    "Name": "item-blueprint-supplies",
+                    "RegexGroup": 2
+                }
+            ],
+            "Description": "Determines the item for supply @item-blueprint-supplies in crafting recipe @item-blueprints.",
+            "Variable": "id",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supply-id-uint16"
+        },
     ],
     "Localization":
     [
@@ -62,6 +750,306 @@
     "Types":
     [
         {
+            "DisplayName": "Blueprint Type",
+            "Type": "SDG.Unturned.EBlueprintType, Assembly-CSharp",
+            "Description": "Determines which tab the crafting recipe appears under in the inventory.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#eblueprinttype-enumeration",
+            "Values":
+            [
+                {
+                    "Value": "TOOL",
+                    "Casing": "Tool",
+                    "Description": "Blueprint appears under the Tools tab."
+                },
+                {
+                    "Value": "APPAREL",
+                    "Casing": "Apparel",
+                    "Description": "Blueprint appears under the Apparel tab."
+                },
+                {
+                    "Value": "SUPPLY",
+                    "Casing": "Supply",
+                    "Description": "Blueprint appears under the Supplies tab."
+                },
+                {
+                    "Value": "GEAR",
+                    "Casing": "Gear",
+                    "Description": "Blueprint appears under the Gears tab."
+                },
+                {
+                    "Value": "AMMO",
+                    "Casing": "Ammo",
+                    "Description": "Blueprint appears under the Ammo tab."
+                },
+                {
+                    "Value": "BARRICADE",
+                    "Casing": "Barricade",
+                    "Description": "Blueprint appears under the Barricades tab."
+                },
+                {
+                    "Value": "STRUCTURE",
+                    "Casing": "Structure",
+                    "Description": "Blueprint appears under the Structures tab."
+                },
+                {
+                    "Value": "UTILITIES",
+                    "Casing": "Utilities",
+                    "Description": "Blueprint appears under the Utilities tab."
+                },
+                {
+                    "Value": "FURNITURE",
+                    "Casing": "Furniture",
+                    "Description": "Blueprint appears under the Furniture tab."
+                },
+                {
+                    "Value": "REPAIR",
+                    "Casing": "Repair",
+                    "Description": "Blueprint appears under the Repair tab."
+                }
+            ]
+        },
+        {
+            "DisplayName": "Slot Type",
+            "Type": "SDG.Unturned.ESlotType, Assembly-CSharp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eslottype.html#doc-data-eslottype",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "Can only be equipped from the inventory (ie. by a hotkey)."
+                },
+                {
+                    "Value": "PRIMARY",
+                    "Casing": "Primary",
+                    "Description": "Can only be equipped from the primary (1) slot."
+                },
+                {
+                    "Value": "SECONDARY",
+                    "Casing": "Secondary",
+                    "Description": "Can only be equipped from the secondary (2) slot."
+                },
+                {
+                    "Value": "TERTIARY",
+                    "Casing": "Tertiary",
+                    "Description": "Only used for NPCs.",
+                    "Deprecated": true
+                },
+                {
+                    "Value": "ANY",
+                    "Casing": "Any",
+                    "Description": "Can be equipped from the primary (1) slot, secondary (2) slot, or from the inventory (ie. by a hotkey)."
+                }
+            ]
+        },
+        {
+            "DisplayName": "Equippable Model Parent",
+            "Type": "SDG.Unturned.EEquipableModelParent, Assembly-CSharp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#doc-item-asset-intro-eequipablemodelparent",
+            "Values":
+            [
+                {
+                    "Value": "RightHook",
+                    "Description": "Item is attached to \"Right_Hook\", the player's right hand."
+                },
+                {
+                    "Value": "LeftHook",
+                    "Description": "Item is attached to \"Left_Hook\", the player's left hand."
+                },
+                {
+                    "Value": "Spine",
+                    "Description": "Item is attached to the player's spine."
+                },
+                {
+                    "Value": "SpineHook",
+                    "Description": "Item is attached to \"Spine_Hook\", an optional extra child bone of the player's Spine."
+                }
+            ]
+        },
+        {
+            "DisplayName": "Useable",
+            "Type": "SDG.Unturned.EUseableType, Assembly-CSharp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#euseabletype-enumeration",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "No useable type.",
+                    "CorrespondingType": null,
+                    "RequiredBaseType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "CLOTHING",
+                    "Casing": "Clothing",
+                    "Description": "An equippable clothing item that can be changed into by using the item.",
+                    "CorrespondingType": "SDG.Unturned.UseableClothing, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemClothingAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "GUN",
+                    "Casing": "Gun",
+                    "Description": "An equippable gun with optional attachments.",
+                    "CorrespondingType": "SDG.Unturned.UseableGun, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "CONSUMEABLE",
+                    "Casing": "Consumeable",
+                    "Description": "A consumable food, water, or medical item.",
+                    "CorrespondingType": "SDG.Unturned.UseableConsumeable, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemConsumeableAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "MELEE",
+                    "Casing": "Melee",
+                    "Description": "An equippable melee weapon or tool.",
+                    "CorrespondingType": "SDG.Unturned.UseableMelee, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemMeleeAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "FUEL",
+                    "Casing": "Fuel",
+                    "Description": "An equippable container that stores fuel.",
+                    "CorrespondingType": "SDG.Unturned.UseableFuel, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemFuelAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "CARJACK",
+                    "Casing": "Carjack",
+                    "Description": "An equippable tool used to move vehicles by hand.",
+                    "CorrespondingType": "SDG.Unturned.UseableCarjack, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemToolAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "BARRICADE",
+                    "Casing": "Barricade",
+                    "Description": "A placeable item that can go on many surfaces including vehicles.",
+                    "CorrespondingType": "SDG.Unturned.UseableBarricade, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "STRUCTURE",
+                    "Casing": "Structure",
+                    "Description": "A placeable item that can only go on the ground.",
+                    "CorrespondingType": "SDG.Unturned.UseableStructure, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemStructureAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "THROWABLE",
+                    "Casing": "Throwable",
+                    "Description": "An item that can be thrown such as a grenade.",
+                    "CorrespondingType": "SDG.Unturned.UseableThrowable, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemThrowableAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "GROWER",
+                    "Casing": "Grower",
+                    "Description": "An equippable item used to speed up the growth of farms, like fertilizer.",
+                    "CorrespondingType": "SDG.Unturned.UseableGrower, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemGrowerAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "OPTIC",
+                    "Casing": "Optic",
+                    "Description": "An item, such as binoculars, used to see things far away.",
+                    "CorrespondingType": "SDG.Unturned.UseableOptic, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemOpticAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "REFILL",
+                    "Casing": "Refill",
+                    "Description": "An equippable container that stores water.",
+                    "CorrespondingType": "SDG.Unturned.UseableRefill, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemRefillAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "FISHER",
+                    "Casing": "Fisher",
+                    "Description": "A fishing rod.",
+                    "CorrespondingType": "SDG.Unturned.UseableFisher, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemFisherAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "CLOUD",
+                    "Casing": "Cloud",
+                    "Description": "An item that modifies the player's gravity constant when held.",
+                    "CorrespondingType": "SDG.Unturned.UseableCloud, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemCloudAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "ARREST_START",
+                    "Casing": "Arrest_Start",
+                    "Description": "An item that palces a player under arrest, like handcuffs.",
+                    "CorrespondingType": "SDG.Unturned.UseableArrestStart, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemArrestStartAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "ARREST_END",
+                    "Casing": "Arrest_End",
+                    "Description": "An item that releases a player from being under arrest, like a key.",
+                    "CorrespondingType": "SDG.Unturned.UseableArrestEnd, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemArrestEndAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "DETONATOR",
+                    "Casing": "Detonator",
+                    "Description": "An item that detonates Charge barricades.",
+                    "CorrespondingType": "SDG.Unturned.UseableDetonator, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemDetonatorAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "FILTER",
+                    "Casing": "Filter",
+                    "Description": "An item that is used to refill gasmasks.",
+                    "CorrespondingType": "SDG.Unturned.UseableFilter, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemFilterAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "CARLOCKPICK",
+                    "Casing": "Carlockpick",
+                    "Description": "An item that can unlock locked cars.",
+                    "CorrespondingType": "SDG.Unturned.UseableCarlockpick, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemToolAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "BATTERY_VEHICLE",
+                    "Casing": "Battery_Vehicle",
+                    "Description": "An item used to replace an empty battery in a vehicle.",
+                    "CorrespondingType": "SDG.Unturned.UseableVehicleBattery, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemToolAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "TIRE",
+                    "Casing": "Tire",
+                    "Description": "An item used to replace missing tires on vehicles.",
+                    "CorrespondingType": "SDG.Unturned.UseableTire, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemTireAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "WALKIE_TALKIE",
+                    "Casing": "Walkie_Talkie",
+                    "Description": "An radio used to voice chat with players from far away.",
+                    "CorrespondingType": "SDG.Unturned.UseableWalkieTalkie, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "HOUSING_PLANNER",
+                    "Casing": "Housing_Planner",
+                    "Description": "An equippable item used to more easily place Structures.",
+                    "CorrespondingType": "SDG.Unturned.UseableHousingPlanner, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                },
+                {
+                    "Value": "VEHICLE_PAINT",
+                    "Casing": "Vehicle_Paint",
+                    "Description": "An equippable item used to change the primary color of paintable vehicles.",
+                    "CorrespondingType": "SDG.Unturned.UseableVehiclePaint, Assembly-CSharp",
+                    "RequiredBaseType": "SDG.Unturned.ItemVehiclePaintToolAsset, Assembly-CSharp"
+                }
+            ]
+        },
+        {
             "DisplayName": "Item Type",
             "Type": "SDG.Unturned.EItemType, Assembly-CSharp",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eitemtype.html",
@@ -69,201 +1057,553 @@
             [
                 {
                     "Value": "HAT",
-                    "Description": "A hat or helmet."
+                    "Casing": "Hat",
+                    "Description": "A hat or helmet.",
+                    "RequiredBaseType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "PANTS",
-                    "Description": "Pants with storage."
+                    "Casing": "Pants",
+                    "Description": "Pants with storage.",
+                    "RequiredBaseType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "SHIRT",
-                    "Description": "A shirt with storage."
+                    "Casing": "Shirt",
+                    "Description": "A shirt with storage.",
+                    "RequiredBaseType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "MASK",
-                    "Description": "A mask that covers the player's face or head."
+                    "Casing": "Mask",
+                    "Description": "A mask that covers the player's face or head.",
+                    "RequiredBaseType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "BACKPACK",
-                    "Description": "A backpack or bag with storage."
+                    "Casing": "Backpack",
+                    "Description": "A backpack or bag with storage.",
+                    "RequiredBaseType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "VEST",
-                    "Description": "A vest or overshirt with storage"
+                    "Casing": "Vest",
+                    "Description": "A vest or overshirt with storage",
+                    "RequiredBaseType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "GLASSES",
-                    "Description": "Glasses or eyewear."
+                    "Casing": "Glasses",
+                    "Description": "Glasses or eyewear.",
+                    "RequiredBaseType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "GUN",
-                    "Description": "An item that fires bullets or projectiles."
+                    "Casing": "Gun",
+                    "Description": "An item that fires bullets or projectiles.",
+                    "RequiredBaseType": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "SIGHT",
-                    "Description": "A sight or scope attachment equipped to a gun."
+                    "Casing": "Sight",
+                    "Description": "A sight or scope attachment equipped to a gun.",
+                    "RequiredBaseType": "SDG.Unturned.ItemSightAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "TACTICAL",
-                    "Description": "A tactical light, laser, rangefinder, or melee attachment equipped to a gun."
+                    "Casing": "Tactical",
+                    "Description": "A tactical light, laser, rangefinder, or melee attachment equipped to a gun.",
+                    "RequiredBaseType": "SDG.Unturned.ItemTacticalAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "GRIP",
-                    "Description": "A grip attachment equipped to a gun"
+                    "Casing": "Grip",
+                    "Description": "A grip attachment equipped to a gun",
+                    "RequiredBaseType": "SDG.Unturned.ItemGripAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "BARREL",
-                    "Description": "A suppressor or barrel attachment equipped to a gun."
+                    "Casing": "Barrel",
+                    "Description": "A suppressor or barrel attachment equipped to a gun.",
+                    "RequiredBaseType": "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "MAGAZINE",
-                    "Description": "An ammo/projectile magazine or clip attachment equipped to a gun."
+                    "Casing": "Magazine",
+                    "Description": "An ammo/projectile magazine or clip attachment equipped to a gun.",
+                    "RequiredBaseType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "FOOD",
-                    "Description": "Consumable food that can be eaten."
+                    "Casing": "Food",
+                    "Description": "Consumable food that can be eaten.",
+                    "RequiredBaseType": "SDG.Unturned.ItemFoodAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "WATER",
-                    "Description": "Consumable water that can be drank."
+                    "Casing": "Water",
+                    "Description": "Consumable water that can be drank.",
+                    "RequiredBaseType": "SDG.Unturned.ItemWaterAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "MEDICAL",
-                    "Description": "Consumable medical supplies that can be used on the player or other players."
+                    "Casing": "Medical",
+                    "Description": "Consumable medical supplies that can be used on the player or other players.",
+                    "RequiredBaseType": "SDG.Unturned.ItemMedicalAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "MELEE",
-                    "Description": "An item that can be used as a melee weapon, flashlight, or repair tool."
+                    "Casing": "Melee",
+                    "Description": "An item that can be used as a melee weapon, flashlight, or repair tool.",
+                    "RequiredBaseType": "SDG.Unturned.ItemMeleeAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "FUEL",
-                    "Description": "An item that can store and move fuel."
+                    "Casing": "Fuel",
+                    "Description": "An item that can store and move fuel.",
+                    "RequiredBaseType": "SDG.Unturned.ItemFuelAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "TOOL",
-                    "Description": "A generic tool like a lockpick, carjack, housing planner, etc."
+                    "Casing": "Tool",
+                    "Description": "A generic tool like a lockpick, carjack, housing planner, etc.",
+                    "RequiredBaseType": "SDG.Unturned.ItemToolAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "BARRICADE",
-                    "Description": "A placeable item that can usually be placed anywhere, including vehicles."
+                    "Casing": "Barricade",
+                    "Description": "A placeable item that can usually be placed anywhere, including vehicles.",
+                    "RequiredBaseType": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "STORAGE",
-                    "Description": "A barricade which can store items."
+                    "Casing": "Storage",
+                    "Description": "A barricade which can store items.",
+                    "RequiredBaseType": "SDG.Unturned.ItemStorageAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "BEACON",
-                    "Description": "A barricade that can spawn zombies in waves."
+                    "Casing": "Beacon",
+                    "Description": "A barricade that can spawn zombies in waves.",
+                    "RequiredBaseType": "SDG.Unturned.ItemBeaconAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "FARM",
-                    "Description": "A seed that can be planted on ground or special ground obejcts/placeables."
+                    "Casing": "Farm",
+                    "Description": "A seed that can be planted on ground or special ground obejcts/placeables.",
+                    "RequiredBaseType": "SDG.Unturned.ItemFarmAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "TRAP",
-                    "Description": "A barricade that acts as a trap that may or may not be explosive."
+                    "Casing": "Trap",
+                    "Description": "A barricade that acts as a trap that may or may not be explosive.",
+                    "RequiredBaseType": "SDG.Unturned.ItemTrapAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "STRUCTURE",
-                    "Description": "A placeable item that can not be placed on vehicles."
+                    "Casing": "Structure",
+                    "Description": "A placeable item that can not be placed on vehicles.",
+                    "RequiredBaseType": "SDG.Unturned.ItemStructureAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "SUPPLY",
-                    "Description": "A basic item that can not be held but may be used in crafting recipes or for other reasons."
+                    "Casing": "Supply",
+                    "Description": "A basic item that can not be held but may be used in crafting recipes or for other reasons.",
+                    "RequiredBaseType": "SDG.Unturned.ItemSupplyAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "THROWABLE",
-                    "Description": "A throwable grenade-like item that can explode, emit particles, and/or act as a flashbang."
+                    "Casing": "Throwable",
+                    "Description": "A throwable grenade-like item that can explode, emit particles, and/or act as a flashbang.",
+                    "RequiredBaseType": "SDG.Unturned.ItemThrowableAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "GROWER",
-                    "Description": "A fertilizer item that can be used on @FARM barricades."
+                    "Casing": "Grower",
+                    "Description": "A fertilizer item that can be used on @FARM barricades.",
+                    "RequiredBaseType": "SDG.Unturned.ItemGrowerAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "OPTIC",
-                    "Description": "A item that can be used to zoom in, such as binoculars. Using the item will cause a marker to be placed where the player is looking."
+                    "Casing": "Optic",
+                    "Description": "A item that can be used to zoom in, such as binoculars. Using the item will cause a marker to be placed where the player is looking.",
+                    "RequiredBaseType": "SDG.Unturned.ItemOpticAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "REFILL",
-                    "Description": "A bottle item used to drink and transport water."
+                    "Casing": "Refill",
+                    "Description": "A bottle item used to drink and transport water.",
+                    "RequiredBaseType": "SDG.Unturned.ItemRefillAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "FISHER",
-                    "Description": "A fishing rod item."
+                    "Casing": "Fisher",
+                    "Description": "A fishing rod item.",
+                    "RequiredBaseType": "SDG.Unturned.ItemFisherAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "CLOUD",
-                    "Description": "An item that modifies the player's gravity constant when held."
+                    "Casing": "Cloud",
+                    "Description": "An item that modifies the player's gravity constant when held.",
+                    "RequiredBaseType": "SDG.Unturned.ItemCloudAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "MAP",
-                    "Description": "An item that can enable the satellite or chart UI elements."
+                    "Casing": "Map",
+                    "Description": "An item that can enable the satellite or chart UI elements.",
+                    "RequiredBaseType": "SDG.Unturned.ItemMapAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "KEY",
-                    "Description": "An item that opens @BOX items from the Steam Marketplace."
+                    "Casing": "Key",
+                    "Description": "An item that opens @BOX items from the Steam Marketplace.",
+                    "RequiredBaseType": "SDG.Unturned.ItemKeyAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "BOX",
-                    "Description": "An item is opened by @KEY items from the Steam Marketplace."
+                    "Casing": "Box",
+                    "Description": "An item is opened by @KEY items from the Steam Marketplace.",
+                    "RequiredBaseType": "SDG.Unturned.ItemBoxAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "ARREST_START",
-                    "Description": "An item that is used to restrain a player."
+                    "Casing": "Arrest_Start",
+                    "Description": "An item that is used to restrain a player.",
+                    "RequiredBaseType": "SDG.Unturned.ItemArrestStartAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "ARREST_END",
-                    "Description": "An item that is used to release a player that is restrained."
+                    "Casing": "Arrest_End",
+                    "Description": "An item that is used to release a player that is restrained.",
+                    "RequiredBaseType": "SDG.Unturned.ItemArrestEndAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "TANK",
-                    "Description": "A barricade that can store either fuel or water."
+                    "Casing": "Tank",
+                    "Description": "A barricade that can store either fuel or water.",
+                    "RequiredBaseType": "SDG.Unturned.ItemTankAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "GENERATOR",
-                    "Description": "A barricade that produces electricity within a given area."
+                    "Casing": "Generator",
+                    "Description": "A barricade that produces electricity within a given area.",
+                    "RequiredBaseType": "SDG.Unturned.ItemGeneratorAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "DETONATOR",
-                    "Description": "An item used to detonate explosive charges."
+                    "Casing": "Detonator",
+                    "Description": "An item used to detonate explosive charges.",
+                    "RequiredBaseType": "SDG.Unturned.ItemDetonatorAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "CHARGE",
-                    "Description": "A barricade that is exploded using a @DETONATOR item."
+                    "Casing": "Charge",
+                    "Description": "A barricade that is exploded using a @DETONATOR item.",
+                    "RequiredBaseType": "SDG.Unturned.ItemChargeAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "LIBRARY",
-                    "Description": "A barricade that stores experience."
+                    "Casing": "Library",
+                    "Description": "A barricade that stores experience.",
+                    "RequiredBaseType": "SDG.Unturned.ItemLibraryAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "FILTER",
-                    "Description": "An item that keeps a radiation-proof @MASK item working while the player is in a radiated zone."
+                    "Casing": "Filter",
+                    "Description": "An item that keeps a radiation-proof @MASK item working while the player is in a radiated zone.",
+                    "RequiredBaseType": "SDG.Unturned.ItemFilterAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "SENTRY",
-                    "Description": "A storage barricade that fires on other players using it's equipped gun."
+                    "Casing": "Sentry",
+                    "Description": "A storage barricade that fires on other players using it's equipped gun.",
+                    "RequiredBaseType": "SDG.Unturned.ItemSentryAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "VEHICLE_REPAIR_TOOL",
-                    "Description": "Items that repair vehicles, currently just batteries."
+                    "Casing": "Vehicle_Repair_Tool",
+                    "Description": "Items that repair vehicles, currently just batteries.",
+                    "RequiredBaseType": "SDG.Unturned.ItemVehicleRepairToolAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "TIRE",
-                    "Description": "An item that can replace missing tires on vehicles."
+                    "Casing": "Tire",
+                    "Description": "An item that can replace missing tires on vehicles.",
+                    "RequiredBaseType": "SDG.Unturned.ItemTireAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "COMPASS",
-                    "Description": "An item that can enable the compass UI element."
+                    "Casing": "Compass",
+                    "Description": "An item that can enable the compass UI element.",
+                    "RequiredBaseType": "SDG.Unturned.ItemMapAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "OIL_PUMP",
-                    "Description": "An item that can gradually pump fuel from the ground."
+                    "Casing": "Oil_Pump",
+                    "Description": "An item that can gradually pump fuel from the ground.",
+                    "RequiredBaseType": "SDG.Unturned.ItemOilPumpAsset, Assembly-CSharp"
                 },
                 {
                     "Value": "VEHICLE_PAINT_TOOL",
-                    "Description": "An item that can paint vehicles a specific color."
+                    "Casing": "Vehicle_Paint_Tool",
+                    "Description": "An item that can paint vehicles a specific color.",
+                    "RequiredBaseType": "SDG.Unturned.ItemVehiclePaintToolAsset, Assembly-CSharp"
                 }
             ]
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Equip",
+            "RedirectableAssetKey": "EquipAudioClip",
+            "Description": "Sound played when the item is equipped.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#equip-audio-clip",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Can_Player_Equip",
+                    "Value": true
+                }
+            ],
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Variable": "equip"
+        },
+        {
+            "AssetName": "Animations",
+            "Description": "Contains all animations relavent to the item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#animations-prefab",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Can_Player_Equip",
+                    "Value": true
+                },
+                {
+                    "Key": "Pro",
+                    "Value": false
+                }
+            ],
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "animations",
+            "Animations":
+            [
+                {
+                    "Name": "Equip",
+                    "Required": true
+                },
+                {
+                    "Name": "Inspect"
+                },
+                {
+                    "Name": "Use"
+                },
+                {
+                    "Name": "Aid",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "SDG.Unturned.ItemConsumableAsset, Assembly-CSharp::Aid",
+                            "Value": true
+                        },
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableConsumeable, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Tug",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableFisher, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Cast",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableFisher, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Reel",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableFisher, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "UnjamChamber",
+                    "NameProperty": "SDG.Unturned.ItemGunAsset::Unjam_Chamber_Anim",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
+                        },
+                        {
+                            "Key": "SDG.Unturned.ItemGunAsset::Can_Ever_Jam",
+                            "Value": true
+                        }
+                    ]
+                },
+                {
+                    "Name": "Reload",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Hammer",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Aim_Start",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Aim_Stop",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Sprint_Start",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Sprint_Stop",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Attach_Start",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Attach_Stop",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Start_Swing",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableMelee, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Stop_Swing",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableMelee, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Weak",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableMelee, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Strong",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableMelee, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Refill",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableRefill, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Refill",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Useable",
+                            "Value": "SDG.Unturned.UseableRefill, Assembly-CSharp"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "AssetName": "Item",
+            "Description": "The object used for the dropped item, as well as the held item unless @EquipablePrefab is set. This is not required for shirts or pants.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#item-prefab",
+            "Variable": "item"
         }
     ]
 }

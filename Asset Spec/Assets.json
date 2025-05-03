@@ -1,127 +1,173 @@
 {
-    "AssetTypes": [
-        "SDG.Unturned.AirdropAsset",
-        "SDG.Unturned.AnimalAsset",
-        "SDG.Unturned.Asset",
-        "SDG.Unturned.CraftingBlacklistAsset",
-        "SDG.Unturned.DialogueAsset",
-        "SDG.Unturned.EffectAsset",
-        "SDG.Framework.Foliage.FoliageInfoAsset",
-        "SDG.Framework.Foliage.FoliageInfoCollectionAsset",
-        "SDG.Framework.Foliage.FoliageInstancedMeshInfoAsset",
-        "SDG.Framework.Foliage.FoliageObjectInfoAsset",
-        "SDG.Framework.Foliage.FoliageResourceInfoAsset",
-        "SDG.Unturned.ItemArrestEndAsset",
-        "SDG.Unturned.ItemArrestStartAsset",
-        "SDG.Unturned.ItemAsset",
-        "SDG.Unturned.ItemBackpackAsset",
-        "SDG.Unturned.ItemBagAsset",
-        "SDG.Unturned.ItemBarrelAsset",
-        "SDG.Unturned.ItemBarricadeAsset",
-        "SDG.Unturned.ItemBeaconAsset",
-        "SDG.Unturned.ItemBoxAsset",
-        "SDG.Unturned.ItemCaliberAsset",
-        "SDG.Unturned.ItemChargeAsset",
-        "SDG.Unturned.ItemClothingAsset",
-        "SDG.Unturned.ItemCloudAsset",
-        "SDG.Unturned.ItemConsumeableAsset",
-        "SDG.Unturned.ItemCurrencyAsset",
-        "SDG.Unturned.ItemDetonatorAsset",
-        "SDG.Unturned.ItemFarmAsset",
-        "SDG.Unturned.ItemFilterAsset",
-        "SDG.Unturned.ItemFisherAsset",
-        "SDG.Unturned.ItemFoodAsset",
-        "SDG.Unturned.ItemFuelAsset",
-        "SDG.Unturned.ItemGearAsset",
-        "SDG.Unturned.ItemGeneratorAsset",
-        "SDG.Unturned.ItemGlassesAsset",
-        "SDG.Unturned.ItemGripAsset",
-        "SDG.Unturned.ItemGrowerAsset",
-        "SDG.Unturned.ItemGunAsset",
-        "SDG.Unturned.ItemHatAsset",
-        "SDG.Unturned.ItemKeyAsset",
-        "SDG.Unturned.ItemLibraryAsset",
-        "SDG.Unturned.ItemMagazineAsset",
-        "SDG.Unturned.ItemMapAsset",
-        "SDG.Unturned.ItemMaskAsset",
-        "SDG.Unturned.ItemMedicalAsset",
-        "SDG.Unturned.ItemMeleeAsset",
-        "SDG.Unturned.ItemOilPumpAsset",
-        "SDG.Unturned.ItemOpticAsset",
-        "SDG.Unturned.ItemPantsAsset",
-        "SDG.Unturned.ItemPlaceableAsset",
-        "SDG.Unturned.ItemRefillAsset",
-        "SDG.Unturned.ItemSentryAsset",
-        "SDG.Unturned.ItemShirtAsset",
-        "SDG.Unturned.ItemSightAsset",
-        "SDG.Unturned.ItemStorageAsset",
-        "SDG.Unturned.ItemStructureAsset",
-        "SDG.Unturned.ItemSupplyAsset",
-        "SDG.Unturned.ItemTacticalAsset",
-        "SDG.Unturned.ItemTankAsset",
-        "SDG.Unturned.ItemThrowableAsset",
-        "SDG.Unturned.ItemTireAsset",
-        "SDG.Unturned.ItemToolAsset",
-        "SDG.Unturned.ItemTrapAsset",
-        "SDG.Unturned.ItemVehiclePaintToolAsset",
-        "SDG.Unturned.ItemVehicleRepairToolAsset",
-        "SDG.Unturned.ItemVestAsset",
-        "SDG.Unturned.ItemWaterAsset",
-        "SDG.Unturned.ItemWeaponAsset",
-        "SDG.Unturned.LandscapeMaterialAsset",
-        "SDG.Unturned.LevelAsset",
-        "SDG.Unturned.MaterialPaletteAsset",
-        "SDG.Unturned.MythicAsset",
-        "SDG.Unturned.NPCRewardsAsset",
-        "SDG.Unturned.ObjectAsset",
-        "SDG.Unturned.ObjectNPCAsset",
-        "SDG.Unturned.OutfitAsset",
-        "SDG.Unturned.PhysicsMaterialAsset",
-        "SDG.Unturned.PhysicsMaterialAssetBase",
-        "SDG.Unturned.PhysicsMaterialExtensionAsset",
-        "SDG.Unturned.QuestAsset",
-        "SDG.Unturned.RedirectorAsset",
-        "SDG.Unturned.ResourceAsset",
-        "SDG.Unturned.ServerListCurationAsset",
-        "SDG.Unturned.SkinAsset",
-        "SDG.Unturned.SpawnAsset",
-        "SDG.Unturned.StereoSongAsset",
-        "SDG.Unturned.VehicleAsset",
-        "SDG.Unturned.VehiclePhysicsProfileAsset",
-        "SDG.Unturned.VehicleRedirectorAsset",
-        "SDG.Unturned.VendorAsset",
-        "SDG.Unturned.WeatherAsset",
-        "SDG.Unturned.WeatherAssetBase",
-        "SDG.Unturned.ZombieDifficultyAsset"
-    ],
-    "UseableTypes": [
-        "SDG.Unturned.Useable",
-        "SDG.Unturned.UseableArrestEnd",
-        "SDG.Unturned.UseableArrestStart",
-        "SDG.Unturned.UseableBarricade",
-        "SDG.Unturned.UseableCarjack",
-        "SDG.Unturned.UseableCarlockpick",
-        "SDG.Unturned.UseableClothing",
-        "SDG.Unturned.UseableCloud",
-        "SDG.Unturned.UseableConsumeable",
-        "SDG.Unturned.UseableDetonator",
-        "SDG.Unturned.UseableFilter",
-        "SDG.Unturned.UseableFisher",
-        "SDG.Unturned.UseableFuel",
-        "SDG.Unturned.UseableGrower",
-        "SDG.Unturned.UseableGun",
-        "SDG.Unturned.UseableHousingPlanner",
-        "SDG.Unturned.UseableMelee",
-        "SDG.Unturned.UseableOptic",
-        "SDG.Unturned.UseableRefill",
-        "SDG.Unturned.UseableStructure",
-        "SDG.Unturned.UseableThrowable",
-        "SDG.Unturned.UseableTire",
-        "SDG.Unturned.UseableVehicleBattery",
-        "SDG.Unturned.UseableVehiclePaint",
-        "SDG.Unturned.UseableWalkieTalkie"
-    ],
-    "AssetAliases": {
+    "Types":
+    {
+        "FaceCount": 32,
+        "BeardCount": 16,
+        "HairCount": 23,
+        "EmissiveFaces": [ 14 ],
+        "FaceTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Faces/Face%20{0}.png",
+        "EmissiveFaceTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Faces/Face%20{0}/Texture.png",
+        "BeardTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Beards/Beard%20{0}.png",
+        "HairTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Hair/Hair%20{0}.png",
+        "SDG.Unturned.Asset, Assembly-CSharp":
+        {
+            "IsAbstract": true,
+            "SDG.Unturned.AirdropAsset, Assembly-CSharp": { },
+            "SDG.Unturned.AnimalAsset, Assembly-CSharp": { },
+            "SDG.Unturned.CraftingBlacklistAsset, Assembly-CSharp": { },
+            "SDG.Unturned.DialogueAsset, Assembly-CSharp": { },
+            "SDG.Unturned.EffectAsset, Assembly-CSharp": { },
+            "SDG.Framework.Foliage.FoliageInfoAsset, Assembly-CSharp":
+            {
+                "IsAbstract": true,
+                "SDG.Framework.Foliage.FoliageInstancedMeshInfoAsset, Assembly-CSharp": { },
+                "SDG.Framework.Foliage.FoliageObjectInfoAsset, Assembly-CSharp": { },
+                "SDG.Framework.Foliage.FoliageResourceInfoAsset, Assembly-CSharp": { }
+            },
+            "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp": { },
+            "SDG.Unturned.ItemAsset, Assembly-CSharp":
+            { 
+                "SDG.Unturned.ItemArrestEndAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemArrestStartAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemBoxAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp":
+                {
+                    "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp": { },
+                    "SDG.Unturned.ItemGripAsset, Assembly-CSharp": { },
+                    "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp": { },
+                    "SDG.Unturned.ItemSightAsset, Assembly-CSharp": { },
+                    "SDG.Unturned.ItemTacticalAsset, Assembly-CSharp": { }
+                },
+                "SDG.Unturned.ItemClothingAsset, Assembly-CSharp":
+                {
+                    "SDG.Unturned.ItemBagAsset, Assembly-CSharp":
+                    {
+                        "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemPantsAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemShirtAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemVestAsset, Assembly-CSharp": { }
+                    },
+                    "SDG.Unturned.ItemGearAsset, Assembly-CSharp":
+                    {
+                        "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemHatAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemMaskAsset, Assembly-CSharp": { }
+                    }
+                },
+                "SDG.Unturned.ItemCloudAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemDetonatorAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemFilterAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemFisherAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemFuelAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemGrowerAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemKeyAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemMapAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemOpticAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemPlaceableAsset, Assembly-CSharp":
+                {
+                    "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp":
+                    {
+                        "SDG.Unturned.ItemBeaconAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemChargeAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemFarmAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemGeneratorAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemLibraryAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemOilPumpAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemStorageAsset, Assembly-CSharp":
+                        {
+                            "SDG.Unturned.ItemSentryAsset, Assembly-CSharp": { }
+                        },
+                        "SDG.Unturned.ItemTankAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemTrapAsset, Assembly-CSharp": { }
+                    },
+                    "SDG.Unturned.ItemStructureAsset, Assembly-CSharp": { },
+                },
+                "SDG.Unturned.ItemRefillAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemSupplyAsset, Assembly-CSharp": { },
+                "SDG.Unturned.ItemToolAsset, Assembly-CSharp":
+                {
+                    "SDG.Unturned.ItemVehiclePaintToolAsset, Assembly-CSharp": { },
+                    "SDG.Unturned.ItemVehicleRepairToolAsset, Assembly-CSharp":
+                    {
+                        "SDG.Unturned.ItemTireAsset, Assembly-CSharp": { },
+                    }
+                },
+                "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp":
+                {
+                    "SDG.Unturned.ItemConsumeableAsset, Assembly-CSharp":
+                    {
+                        "SDG.Unturned.ItemFoodAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemMedicalAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemWaterAsset, Assembly-CSharp": { }
+                    },
+                    "SDG.Unturned.ItemGunAsset, Assembly-CSharp": { },
+                    "SDG.Unturned.ItemMeleeAsset, Assembly-CSharp": { },
+                    "SDG.Unturned.ItemThrowableAsset, Assembly-CSharp": { }
+                }
+            },
+            "SDG.Unturned.ItemCurrencyAsset, Assembly-CSharp": { },
+            "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp": { },
+            "SDG.Unturned.LevelAsset, Assembly-CSharp": { },
+            "SDG.Unturned.MaterialPaletteAsset, Assembly-CSharp": { },
+            "SDG.Unturned.MythicAsset, Assembly-CSharp": { },
+            "SDG.Unturned.NPCRewardsAsset, Assembly-CSharp": { },
+            "SDG.Unturned.ObjectAsset, Assembly-CSharp":
+            {
+                "SDG.Unturned.ObjectNPCAsset, Assembly-CSharp": { }
+            },
+            "SDG.Unturned.OutfitAsset, Assembly-CSharp": { },
+            "SDG.Unturned.PhysicsMaterialAssetBase, Assembly-CSharp":
+            {
+                "SDG.Unturned.PhysicsMaterialAsset, Assembly-CSharp": { },
+                "SDG.Unturned.PhysicsMaterialExtensionAsset, Assembly-CSharp": { }
+            },
+            "SDG.Unturned.QuestAsset, Assembly-CSharp": { },
+            "SDG.Unturned.RedirectorAsset, Assembly-CSharp": { },
+            "SDG.Unturned.ResourceAsset, Assembly-CSharp": { },
+            "SDG.Unturned.ServerListCurationAsset, Assembly-CSharp": { },
+            "SDG.Unturned.SkinAsset, Assembly-CSharp": { },
+            "SDG.Unturned.SpawnAsset, Assembly-CSharp": { },
+            "SDG.Unturned.StereoSongAsset, Assembly-CSharp": { },
+            "SDG.Unturned.VehicleAsset, Assembly-CSharp": { },
+            "SDG.Unturned.VehiclePhysicsProfileAsset, Assembly-CSharp": { },
+            "SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp": { },
+            "SDG.Unturned.VendorAsset, Assembly-CSharp": { },
+            "SDG.Unturned.WeatherAssetBase, Assembly-CSharp":
+            {
+                "SDG.Unturned.WeatherAsset, Assembly-CSharp": { }
+            },
+            "SDG.Unturned.ZombieDifficultyAsset, Assembly-CSharp": { }
+        },
+        "SDG.Unturned.Useable, Assembly-CSharp":
+        {
+            "SDG.Unturned.UseableArrestEnd, Assembly-CSharp": { },
+            "SDG.Unturned.UseableArrestStart, Assembly-CSharp": { },
+            "SDG.Unturned.UseableBarricade, Assembly-CSharp": { },
+            "SDG.Unturned.UseableCarjack, Assembly-CSharp": { },
+            "SDG.Unturned.UseableCarlockpick, Assembly-CSharp": { },
+            "SDG.Unturned.UseableClothing, Assembly-CSharp": { },
+            "SDG.Unturned.UseableCloud, Assembly-CSharp": { },
+            "SDG.Unturned.UseableConsumeable, Assembly-CSharp": { },
+            "SDG.Unturned.UseableDetonator, Assembly-CSharp": { },
+            "SDG.Unturned.UseableFilter, Assembly-CSharp": { },
+            "SDG.Unturned.UseableFisher, Assembly-CSharp": { },
+            "SDG.Unturned.UseableFuel, Assembly-CSharp": { },
+            "SDG.Unturned.UseableGrower, Assembly-CSharp": { },
+            "SDG.Unturned.UseableGun, Assembly-CSharp": { },
+            "SDG.Unturned.UseableHousingPlanner, Assembly-CSharp": { },
+            "SDG.Unturned.UseableMelee, Assembly-CSharp": { },
+            "SDG.Unturned.UseableOptic, Assembly-CSharp": { },
+            "SDG.Unturned.UseableRefill, Assembly-CSharp": { },
+            "SDG.Unturned.UseableStructure, Assembly-CSharp": { },
+            "SDG.Unturned.UseableThrowable, Assembly-CSharp": { },
+            "SDG.Unturned.UseableTire, Assembly-CSharp": { },
+            "SDG.Unturned.UseableVehicleBattery, Assembly-CSharp": { },
+            "SDG.Unturned.UseableVehiclePaint, Assembly-CSharp": { },
+            "SDG.Unturned.UseableWalkieTalkie, Assembly-CSharp": { }
+        }
+    },
+    "AssetAliases":
+    {
         "Hat": "SDG.Unturned.ItemHatAsset, Assembly-CSharp",
         "Pants": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp",
         "Shirt": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp",
@@ -190,33 +236,8 @@
         "Redirector": "SDG.Unturned.RedirectorAsset, Assembly-CSharp",
         "ServerCuration": "SDG.Unturned.ServerListCurationAsset, Assembly-CSharp"
     },
-    "UseableAliases": {
-        "Barricade": "SDG.Unturned.UseableBarricade, Assembly-CSharp",
-        "Battery_Vehicle": "SDG.Unturned.UseableVehicleBattery, Assembly-CSharp",
-        "Carjack": "SDG.Unturned.UseableCarjack, Assembly-CSharp",
-        "Clothing": "SDG.Unturned.UseableClothing, Assembly-CSharp",
-        "Consumeable": "SDG.Unturned.UseableConsumeable, Assembly-CSharp",
-        "Fisher": "SDG.Unturned.UseableFisher, Assembly-CSharp",
-        "Fuel": "SDG.Unturned.UseableFuel, Assembly-CSharp",
-        "Grower": "SDG.Unturned.UseableGrower, Assembly-CSharp",
-        "Gun": "SDG.Unturned.UseableGun, Assembly-CSharp",
-        "Melee": "SDG.Unturned.UseableMelee, Assembly-CSharp",
-        "Optic": "SDG.Unturned.UseableOptic, Assembly-CSharp",
-        "Refill": "SDG.Unturned.UseableRefill, Assembly-CSharp",
-        "Structure": "SDG.Unturned.UseableStructure, Assembly-CSharp",
-        "Throwable": "SDG.Unturned.UseableThrowable, Assembly-CSharp",
-        "Tire": "SDG.Unturned.UseableTire, Assembly-CSharp",
-        "Cloud": "SDG.Unturned.UseableCloud, Assembly-CSharp",
-        "Arrest_Start": "SDG.Unturned.UseableArrestStart, Assembly-CSharp",
-        "Arrest_End": "SDG.Unturned.UseableArrestEnd, Assembly-CSharp",
-        "Detonator": "SDG.Unturned.UseableDetonator, Assembly-CSharp",
-        "Filter": "SDG.Unturned.UseableFilter, Assembly-CSharp",
-        "Carlockpick": "SDG.Unturned.UseableCarlockpick, Assembly-CSharp",
-        "Walkie_Talkie": "SDG.Unturned.UseableWalkieTalkie, Assembly-CSharp",
-        "Housing_Planner": "SDG.Unturned.UseableHousingPlanner, Assembly-CSharp",
-        "Vehicle_Paint": "SDG.Unturned.UseableVehiclePaint, Assembly-CSharp"
-    },
-    "AssetCategories": {
+    "AssetCategories":
+    {
         "SDG.Unturned.AnimalAsset, Assembly-CSharp": "ANIMAL",
         "SDG.Unturned.DialogueAsset, Assembly-CSharp": "NPC",
         "SDG.Unturned.EffectAsset, Assembly-CSharp": "EFFECT",

@@ -1,4 +1,4 @@
-namespace LspServer.Files;
+namespace DanielWillett.UnturnedDataFileLspServer.Files;
 
 public readonly struct FileLineIndex
 {

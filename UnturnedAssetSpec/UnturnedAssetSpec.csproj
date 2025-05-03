@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>preview</LangVersion>
+
+		<RootNamespace>DanielWillett.UnturnedDataFileLspServer.Data</RootNamespace>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="../Asset Spec/**">
+			<Link>%(RecursiveDir)/Asset Spec/%(Filename)%(Extension)</Link>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="System.Text.Json" Version="4.7.2" />
+  </ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Properties\DiagnosticResources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>DiagnosticResources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\DiagnosticResources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>DiagnosticResources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+</Project>

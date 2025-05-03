@@ -79,20 +79,32 @@
                     "title": "A type that exists in the base game."
                 },
                 {
+                    "const": "TypeOrEnum",
+                    "title": "A type that exists in the base game, or an enum value, which is defined in ElementType."
+                },
+                {
                     "const": "Guid",
                     "title": "A Globally Unique Identifier (also called a UUID)."
                 },
                 {
                     "const": "AssetReference",
-                    "title": "A Globally Unique Identifier (also called a UUID)."
+                    "title": "A Globally Unique Identifier (also called a UUID) referencing another asset."
                 },
                 {
                     "const": "ContentReference",
                     "title": "A reference to a Unity object in the specified masterbundle. Exact same as MasterBundleReference."
                 },
                 {
+                    "const": "AudioReference",
+                    "title": "A reference to an AudioClip or OneShotAudioDefinition in the specified masterbundle using the same syntax as a MasterBundleReference."
+                },
+                {
                     "const": "MasterBundleReference",
-                    "title": "A reference to a Unity object in the specified masterbundle. Exact same as ContentReference."
+                    "title": "A reference to a Unity object in the specified masterbundle."
+                },
+                {
+                    "const": "MasterBundleReferenceString",
+                    "title": "A reference to a Unity object in the specified masterbundle, but the dictionary syntax isn't allowed."
                 },
                 {
                     "const": "FaceIndex",
@@ -121,6 +133,10 @@
                 {
                     "const": "Id",
                     "title": "A short ID, where ElementType is the category."
+                },
+                {
+                    "const": "BlueprintSupplyId",
+                    "title": "A short item ID, or 'this' (case insensitive) to reference the current item."
                 },
                 {
                     "const": "DateTime",
@@ -251,6 +267,10 @@
                 "DefaultValue": {
                     "description": "The default value for this property if applicable. If IncludedDefaultValue is used, this indicates the default value if the property is not included."
                 },
+                "DefaultValueSwitch": {
+                    "description": "Switches cases of default values.",
+                    "$ref": "#/$defs/switch"
+                },
                 "IncludedDefaultValue": {
                     "description": "The default value for this property if applicable. Indicates the default value if the property is included but not parsed correctly."
                 },
@@ -306,15 +326,16 @@
                     "items": {
                         "type": [ "object", "string" ],
                         "properties": {
-                            "key": {
+                            "Key": {
                                 "type": "string",
                                 "description": "The property that is required."
                             },
-                            "value": {
+                            "Value": {
                                 "type": [ "string", "array", "number", "null", "boolean" ],
                                 "description": "The value that is required or a list of allowed values."
                             }
-                        }
+                        },
+                        "required": [ "Key", "Value" ]
                     },
                     "description": "List of properties and optional values that should exist if this exists."
                 },
@@ -324,6 +345,92 @@
                 }
             },
             "required": [ "Key", "Type" ]
+        },
+        "condition": {
+            "type": "object",
+            "properties": {
+                "Variable": {
+                    "type": "string"
+                },
+                "Operation": {
+                    "type": "string",
+                    "enum": [ "lt", "gt", "lte", "gte", "eq", "neq", "contains", "starts with", "ends with", "matches", "contains-i", "starts with-i", "ends with-i", "assignable-to", "assignable-from" ]
+                },
+                "Comparand": {
+                    "type": [ "null", "string", "boolean", "number", "pattern" ]
+                }
+            },
+            "required": [ "Variable", "Operation", "Comparand" ]
+        },
+        "switch": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/switchCase"
+            },
+            "minItems": 1
+        },
+        "switchCase": {
+            "type": "object",
+            "oneOf": [
+                {
+                    "properties": {
+                        "And": {
+                            "type": "array",
+                            "items": {
+                                "oneOf":
+                                [
+                                    {
+                                        "$ref": "#/$defs/condition"
+                                    },
+                                    {
+                                        "$ref": "#/$defs/switchCase"
+                                    }
+                                ]
+                            }
+                        },
+                        "Or": {
+                            "type": "array",
+                            "items": {
+                                "oneOf":
+                                [
+                                    {
+                                        "$ref": "#/$defs/condition"
+                                    },
+                                    {
+                                        "$ref": "#/$defs/switchCase"
+                                    }
+                                ]
+                            }
+                        },
+                        "Value": {
+                            "type": [ "null", "string", "boolean", "number" ]
+                        }
+                    },
+                    "required": [ "Value" ]
+                },
+                {
+                    "properties": {
+                        "When": {
+                            "$ref": "#/$defs/condition"
+                        },
+                        "Cases": {
+                            "type": "array",
+                            "items": {
+                                "oneOf":
+                                [
+                                    {
+                                        "$ref": "#/$defs/condition"
+                                    },
+                                    {
+                                        "$ref": "#/$defs/switchCase"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "required": [ "Cases" ]
+                }
+            ]
         }
     },
     "properties": {
@@ -383,6 +490,10 @@
                         "type": "string",
                         "description": "The name of the asset in Unity."
                     },
+                    "RedirectableAssetKey": {
+                        "type": "string",
+                        "description": "The key of the redirect property for this asset."
+                    },
                     "SingleAssetNameOverride": {
                         "type": [ "string", "null" ],
                         "description": "If 'AssetNameIsRegex', the singular version of the asset name which would not be regex."
@@ -412,6 +523,24 @@
                                 }
                             }
                         }
+                    },
+                    "InclusiveWith": {
+                        "type": "array",
+                        "items": {
+                            "type": [ "object", "string" ],
+                            "properties": {
+                                "Key": {
+                                    "type": "string",
+                                    "description": "The property that is required."
+                                },
+                                "Value": {
+                                    "type": [ "string", "array", "number", "null", "boolean" ],
+                                    "description": "The value that is required or a list of allowed values."
+                                }
+                            },
+                            "required": [ "Key", "Value" ]
+                        },
+                        "description": "List of properties and optional values that should exist if this exists."
                     },
                     "Description": {
                         "type": "string",
@@ -447,6 +576,10 @@
                                     "type": "string",
                                     "description": "The name of the animation in Unity."
                                 },
+                                "NameProperty": {
+                                    "type": "string",
+                                    "description": "The name of a property that represents the actual name of this animation if it's present."
+                                },
                                 "Required": {
                                     "type": [ "string", "boolean" ],
                                     "description": "If the animation is required."
@@ -458,6 +591,24 @@
                                 "NameIsRegex": {
                                     "type": "boolean",
                                     "description": "If 'Name' is a regex expression to match properties."
+                                },
+                                "InclusiveWith": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": [ "object", "string" ],
+                                        "properties": {
+                                            "Key": {
+                                                "type": "string",
+                                                "description": "The property that is required."
+                                            },
+                                            "Value": {
+                                                "type": [ "string", "array", "number", "null", "boolean" ],
+                                                "description": "The value that is required or a list of allowed values."
+                                            }
+                                        },
+                                        "required": [ "Key", "Value" ]
+                                    },
+                                    "description": "List of properties and optional values that should exist if this exists."
                                 },
                                 "NameGroups": {
                                     "type": [ "array", "null" ],
@@ -522,6 +673,10 @@
                                 "Description": {
                                     "type": "string",
                                     "description": "Description of what the enum value does."
+                                },
+                                "Deprecated": {
+                                    "type": "boolean",
+                                    "description": "If this value shouldn't be used."
                                 }
                             },
                             "required": [ "Value" ]

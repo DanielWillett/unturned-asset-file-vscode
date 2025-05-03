@@ -1,7 +1,8 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 
-namespace LspServer.Files;
+namespace DanielWillett.UnturnedDataFileLspServer.Files;
 
 public class OpenedFile
 {

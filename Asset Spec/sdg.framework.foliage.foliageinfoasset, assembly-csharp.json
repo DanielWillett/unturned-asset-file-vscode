@@ -62,7 +62,7 @@
             "Type": "Float32",
             "DefaultValue": 1.0,
             "IncludedDefaultValue": 0.0,
-            "Minimum": "Min_Weight",
+            "Minimum": "@Min_Weight",
             "Maximum": 1.0,
             "Description": "The maximum weight of a terrain material to allow placement of foliage. The weight is a value from 0 to 1 which is multiplied by the density to determine how many foliage instances are placed.",
             "Variable": "maxSurfaceWeight",
@@ -73,7 +73,7 @@
             "Type": "Float32",
             "DefaultValue": 0.0,
             "Minimum": 0.0,
-            "Maximum": "Max_Angle",
+            "Maximum": "@Max_Angle",
             "Description": "The minimum terrain surface angle to allow placement of the foliage. This is the angle in degrees between the Y-axis and the angle of the terrain (where an angle of 0 would be flat ground).",
             "Variable": "minSurfaceAngle",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference"
@@ -83,7 +83,7 @@
             "Type": "Float32",
             "DefaultValue": 0.0,
             "Required": true,
-            "Minimum": "Min_Angle",
+            "Minimum": "@Min_Angle",
             "Maximum": 90.0,
             "Description": "The maximum terrain surface angle to allow placement of the foliage. This is the angle in degrees between the positive Y-axis and the angle of the terrain (where an angle of 0 would be flat ground).",
             "Variable": "maxSurfaceAngle",
@@ -93,7 +93,7 @@
             "Key": "Min_Rotation",
             "Type": "EulerRotation",
             "DefaultValue": "(0, 0, 0)",
-            "Maximum": "Max_Rotation",
+            "Maximum": "@Max_Rotation",
             "Description": "The minimum rotation offset from the terrain's rotaiton. A random rotation is chosen between @Min_Rotation and @Max_Rotation.",
             "Variable": "minRotation"
         },
@@ -101,7 +101,7 @@
             "Key": "Max_Rotation",
             "Type": "EulerRotation",
             "DefaultValue": "(0, 0, 0)",
-            "Minimum": "Min_Rotation",
+            "Minimum": "@Min_Rotation",
             "Description": "The maximum rotation offset from the terrain's rotaiton. A random rotation is chosen between @Min_Rotation and @Max_Rotation.",
             "Variable": "maxRotation"
         },
@@ -109,7 +109,7 @@
             "Key": "Min_Scale",
             "Type": "EulerRotation",
             "DefaultValue": "(1, 1, 1)",
-            "Maximum": "Max_Scale",
+            "Maximum": "@Max_Scale",
             "Description": "The minimum scale to draw the foliage at. A random scale is chosen between @Min_Scale and @Max_Scale.",
             "Variable": "minScale"
         },
@@ -117,7 +117,7 @@
             "Key": "Max_Scale",
             "Type": "EulerRotation",
             "DefaultValue": "(1, 1, 1)",
-            "Minimum": "Min_Scale",
+            "Minimum": "@Min_Scale",
             "Description": "The maximum scale to draw the foliage at. A random scale is chosen between @Min_Scale and @Max_Scale.",
             "Variable": "maxScale"
         }

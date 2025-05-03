@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LspServer", "LspServer\LspS
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "unturned-asset-file-vscode", "unturned-asset-file-vscode\unturned-asset-file-vscode.esproj", "{F7880541-C447-46A4-0172-816307FEDED5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnturnedAssetSpec", "UnturnedAssetSpec\UnturnedAssetSpec.csproj", "{EF3328B9-DA54-481B-8FB7-970D5B41F3AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{F7880541-C447-46A4-0172-816307FEDED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7880541-C447-46A4-0172-816307FEDED5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F7880541-C447-46A4-0172-816307FEDED5}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{EF3328B9-DA54-481B-8FB7-970D5B41F3AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF3328B9-DA54-481B-8FB7-970D5B41F3AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF3328B9-DA54-481B-8FB7-970D5B41F3AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF3328B9-DA54-481B-8FB7-970D5B41F3AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

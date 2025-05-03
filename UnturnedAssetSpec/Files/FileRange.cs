@@ -1,0 +1,80 @@
+using System;
+
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
+
+/// <summary>
+/// Range of a selection in a file.
+/// </summary>
+public struct FileRange : IEquatable<FileRange>, IComparable<FileRange>, IComparable
+{
+    /// <summary>
+    /// Index from one of the line the character is on.
+    /// </summary>
+    public FilePosition Start;
+
+    /// <summary>
+    /// Index from one of the character in its line.
+    /// </summary>
+    public FilePosition End;
+
+    public FileRange() { }
+
+    public FileRange(FilePosition start, FilePosition end)
+    {
+        Start = start;
+        End = end;
+    }
+
+    public FileRange(int startLine, int startCharacter, int endLine, int endCharacter)
+    {
+        Start.Line = startLine;
+        Start.Character = startCharacter;
+        End.Line = endLine;
+        End.Character = endCharacter;
+    }
+
+    public readonly bool Contains(FilePosition position)
+    {
+        return position.Line >= Start.Line
+               && position.Line <= End.Line
+               && (position.Line != Start.Line || position.Character >= Start.Character)
+               && (position.Line != End.Line || position.Character <= End.Character);
+    }
+
+    /// <inheritdoc />
+    public readonly bool Equals(FileRange other)
+    {
+        return Start == other.Start && End == other.End;
+    }
+
+    /// <inheritdoc />
+    public readonly override bool Equals(object? obj)
+    {
+        return obj is FileRange fp && Equals(fp);
+    }
+
+    /// <inheritdoc />
+    public readonly override int GetHashCode()
+    {
+        return ((Start.Line << 16) | (Start.Line >> 16)) ^ ((Start.Character << 16) | (Start.Character >> 16))
+                                                         ^ End.Line
+                                                         ^ End.Character;
+    }
+
+    /// <inheritdoc />
+    public readonly int CompareTo(FileRange other)
+    {
+        int num = Start.CompareTo(other.Start);
+        return num == 0 ? End.CompareTo(other.End) : num;
+    }
+
+    /// <inheritdoc />
+    public readonly int CompareTo(object obj) => obj is FileRange p ? CompareTo(p) : 1;
+
+    public static bool operator ==(FileRange left, FileRange right) => left.Start == right.Start && left.End == right.End;
+    public static bool operator !=(FileRange left, FileRange right) => left.Start != right.Start || left.End != right.End;
+    public static bool operator <(FileRange left, FileRange right) => left.Start == right.Start ? left.End < right.End : left.Start < right.Start;
+    public static bool operator >(FileRange left, FileRange right) => left.Start == right.Start ? left.End > right.End : left.Start > right.Start;
+    public static bool operator <=(FileRange left, FileRange right) => left.Start == right.Start ? left.End <= right.End : left.Start <= right.Start;
+    public static bool operator >=(FileRange left, FileRange right) => left.Start == right.Start ? left.End >= right.End : left.Start >= right.Start;
+}

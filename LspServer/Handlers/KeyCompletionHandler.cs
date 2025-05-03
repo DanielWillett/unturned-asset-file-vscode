@@ -1,6 +1,9 @@
-using LspServer.Completions;
-using LspServer.Files;
-using LspServer.Types;
+using DanielWillett.UnturnedDataFileLspServer.Completions;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Files;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
@@ -8,7 +11,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
-namespace LspServer.Handlers;
+namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 
 internal class KeyCompletionHandler : ICompletionHandler
 {
@@ -16,9 +19,9 @@ internal class KeyCompletionHandler : ICompletionHandler
     private readonly CompletionRegistrationOptions _completionRegistrationOptions;
     private readonly OpenedFileTracker _fileTracker;
 
-    private readonly AssetSpecDictionary _specDictionary;
+    private readonly AssetSpecDatabase _specDictionary;
 
-    public KeyCompletionHandler(ILogger<KeyCompletionHandler> logger, OpenedFileTracker fileTracker, AssetSpecDictionary specDictionary)
+    public KeyCompletionHandler(ILogger<KeyCompletionHandler> logger, OpenedFileTracker fileTracker, AssetSpecDatabase specDictionary)
     {
         _logger = logger;
         _fileTracker = fileTracker;
@@ -35,33 +38,31 @@ internal class KeyCompletionHandler : ICompletionHandler
 
     private void FindSpecProperties(ref KeyCompletionState state, List<CompletionItem> completions)
     {
-        if (state.Spec.ParentSpec != null)
+        InverseTypeHierarchy hierarchy = state.TypeHierarchy;
+        for (int i = -1; i < hierarchy.ParentTypes.Length; ++i)
         {
-            FindSpecProperties(ref state, completions);
-        }
-
-        if (state.Spec.Properties == null)
-            return;
-
-        foreach (AssetSpecProperty property in state.Spec.Properties)
-        {
-            if (property.Key == null)
+            QualifiedType type = i < 0 ? state.TypeHierarchy.Type : hierarchy.ParentTypes[i];
+            if (!_specDictionary.Types.TryGetValue(type, out AssetTypeInformation? info))
                 continue;
 
-            state.Property = property;
-            completions.Add(CreateCompletionItemForKey(in state));
-        }
-
-        foreach (AssetSpecProperty property in state.Spec.Properties)
-        {
-            if (property.Aliases == null)
-                continue;
-
-            foreach (string a in property.Aliases)
+            state.Alias = null;
+            foreach (SpecProperty property in info.Properties)
             {
+                if (property.Key == null)
+                    continue;
+
                 state.Property = property;
-                state.Alias = a;
                 completions.Add(CreateCompletionItemForKey(in state));
+            }
+
+            foreach (SpecProperty property in info.Properties)
+            {
+                foreach (string a in property.Aliases)
+                {
+                    state.Property = property;
+                    state.Alias = a;
+                    completions.Add(CreateCompletionItemForKey(in state));
+                }
             }
         }
     }
@@ -70,11 +71,11 @@ internal class KeyCompletionHandler : ICompletionHandler
     {
         TextEditOrInsertReplaceEdit? edit = null;
 
-        AssetSpecProperty property = state.Property;
+        SpecProperty property = state.Property;
         bool needsQuotes = state.Node is AssetFileKeyNode { IsQuoted: true } || property.Key.Any(char.IsWhiteSpace);
 
         string keyText = needsQuotes ? $"\"{property.Key}\"" : property.Key;
-        Position position = state.Position;
+        FilePosition position = state.Position;
         if (state is { IsOnNewLine: true, Node: not AssetFileListValueNode })
         {
             edit = TextEditOrInsertReplaceEdit.From(new TextEdit
@@ -98,7 +99,7 @@ internal class KeyCompletionHandler : ICompletionHandler
 
             edit = TextEditOrInsertReplaceEdit.From(new TextEdit
             {
-                NewText = keyText + (KnownTypes.IsFlag(property.Type) ? string.Empty : " "),
+                NewText = keyText + (property.Type.Equals(KnownTypes.Flag) ? string.Empty : " "),
                 Range = new Range(position.Line - 1, firstNonWhiteSpace, position.Line - 1, line.Length)
             });
         }
@@ -109,7 +110,7 @@ internal class KeyCompletionHandler : ICompletionHandler
             SortText = property.Key,
             InsertTextMode = InsertTextMode.AsIs,
             Kind = CompletionItemKind.Property,
-            LabelDetails = new CompletionItemLabelDetails { Description = property.Description, Detail = property.Type },
+            LabelDetails = new CompletionItemLabelDetails { Description = property.Description, Detail = property.Type.DisplayName },
             Deprecated = property.Deprecated,
             Tags = property.Deprecated ? new Container<CompletionItemTag>(CompletionItemTag.Deprecated) : null,
             Detail = " " + property.Type,
@@ -129,53 +130,37 @@ internal class KeyCompletionHandler : ICompletionHandler
         return item;
     }
 
-    public async Task<CompletionList> Handle(CompletionParams request, CancellationToken cancellationToken)
+    public Task<CompletionList> Handle(CompletionParams request, CancellationToken cancellationToken)
     {
-        Position position = request.Position;
-
-        ++position.Character;
-        ++position.Line;
-
-        _logger.LogInformation("Received completion: {0} @ {1}.", request.TextDocument.Uri, position);
+        _logger.LogInformation("Received completion: {0} @ {1}.", request.TextDocument.Uri, request.Position);
 
         if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))
         {
             _logger.LogInformation("File not found.");
-            return new CompletionList();
+            return Task.FromResult(new CompletionList());
         }
 
-        bool isOnNewLine = file.LineIndex.SliceLine(position.Line, endColumn: position.Character - 1).IsWhiteSpace();
+        FilePosition position = request.Position.ToFilePosition();
+        bool isOnNewLine = file.LineIndex.SliceLine(position.Line + 1, endColumn: position.Character - 1).IsWhiteSpace();
 
         AssetFileTree tree = file.Tree;
-        _logger.LogInformation("Tree: {0}.", tree.Root);
+
+        AssetFileType fileType = AssetFileType.FromFile(file.Tree, _specDictionary);
 
         AssetFileNode? activeNode = tree.GetNode(position);
-        _logger.LogInformation("Active node: {0}.", activeNode);
 
-        string? type = tree.GetType(out bool onlyClrType);
-        _logger.LogInformation("Type: {0}.", type);
-        AssetSpec? spec = (type == null ? null
-                              : await _specDictionary.GetAssetSpecAsync(type, onlyClrType, cancellationToken).ConfigureAwait(false)) ??
-                                await _specDictionary.GetAssetSpecAsync("SDG.Unturned.Asset, Assembly-CSharp", true, cancellationToken).ConfigureAwait(false);
-
-        AssetInformation information = await _specDictionary.GetAssetInformation(cancellationToken);
-
-        _logger.LogInformation("Spec: {0}.", spec?.Type);
-        if (spec == null)
-        {
-            return new CompletionList();
-        }
+        InverseTypeHierarchy hierarchy = _specDictionary.Information.GetParentTypes(fileType.Type);
 
         if (activeNode is AssetFileKeyNode || isOnNewLine && activeNode is not AssetFileListValueNode)
         {
-            KeyCompletionState state = new KeyCompletionState(activeNode, position, isOnNewLine, spec, information, null, null!, file);
+            KeyCompletionState state = new KeyCompletionState(activeNode, position, isOnNewLine, hierarchy, null, null!, file);
 
             List<CompletionItem> completions = new List<CompletionItem>();
             FindSpecProperties(ref state, completions);
-            return completions;
+            return Task.FromResult<CompletionList>(completions);
         }
 
-        return new CompletionList();
+        return Task.FromResult(new CompletionList());
     }
 
     CompletionRegistrationOptions IRegistration<CompletionRegistrationOptions, CompletionCapability>.GetRegistrationOptions(

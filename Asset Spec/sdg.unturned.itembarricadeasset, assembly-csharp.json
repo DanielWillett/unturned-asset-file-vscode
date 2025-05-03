@@ -17,7 +17,7 @@
         },
         {
             "Key": "PlacementPreviewPrefab",
-            "Type": "MasterBundleReference",
+            "Type": "MasterBundleReferenceString",
             "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "DefaultValue": null,
             "Variable": "placementPreviewRef",
@@ -25,7 +25,7 @@
         },
         {
             "Key": "PlacementAudioClip",
-            "Type": "MasterBundleReference",
+            "Type": "MasterBundleReferenceString",
             "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "DefaultValue": null,
             "Variable": "use",
@@ -34,7 +34,6 @@
         {
             "Key": "Build",
             "Type": "SDG.Unturned.EBuild, Assembly-CSharp",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Required": true,
             "Variable": "build",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
@@ -131,6 +130,7 @@
         },
         {
             "AssetName": "Use",
+            "RedirectableAssetKey": "PlacementAudioClip",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when the barricade is placed.",
             "Variable": "use"

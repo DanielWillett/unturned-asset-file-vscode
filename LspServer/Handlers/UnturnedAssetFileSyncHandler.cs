@@ -1,4 +1,4 @@
-using LspServer.Files;
+using DanielWillett.UnturnedDataFileLspServer.Files;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
@@ -7,7 +7,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;
 
-namespace LspServer.Handlers;
+namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
 {
     private readonly ILogger<UnturnedAssetFileSyncHandler> _logger;

@@ -1,7 +1,7 @@
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using System.Collections.Concurrent;
 
-namespace LspServer.Files;
+namespace DanielWillett.UnturnedDataFileLspServer.Files;
 
 internal class OpenedFileTracker
 {

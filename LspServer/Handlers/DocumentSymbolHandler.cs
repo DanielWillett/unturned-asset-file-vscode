@@ -1,4 +1,8 @@
-using LspServer.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Files;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
@@ -6,12 +10,12 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
-namespace LspServer.Handlers;
+namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 
 internal class DocumentSymbolHandler : IDocumentSymbolHandler
 {
     private readonly OpenedFileTracker _fileTracker;
-    private readonly AssetSpecDictionary _specDictionary;
+    private readonly AssetSpecDatabase _specDictionary;
     private readonly ILogger<DocumentSymbolHandler> _logger;
 
     /// <inheritdoc />
@@ -24,7 +28,7 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
         };
     }
 
-    public DocumentSymbolHandler(OpenedFileTracker fileTracker, AssetSpecDictionary specDictionary, ILogger<DocumentSymbolHandler> logger)
+    public DocumentSymbolHandler(OpenedFileTracker fileTracker, AssetSpecDatabase specDictionary, ILogger<DocumentSymbolHandler> logger)
     {
         _fileTracker = fileTracker;
         _specDictionary = specDictionary;
@@ -43,12 +47,7 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
 
         AssetFileTree tree = file.Tree;
 
-        string? type = tree.GetType(out bool onlyClrType);
-
-        AssetSpec? spec = (type == null ? null
-                              : await _specDictionary.GetAssetSpecAsync(type, onlyClrType, cancellationToken).ConfigureAwait(false)) ??
-                                await _specDictionary.GetAssetSpecAsync("SDG.Unturned.Asset, Assembly-CSharp", true, cancellationToken).ConfigureAwait(false);
-
+        AssetFileType type = AssetFileType.FromFile(tree, _specDictionary);
 
         List<SymbolInformationOrDocumentSymbol> symbols = new List<SymbolInformationOrDocumentSymbol>();
 
@@ -56,30 +55,30 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
         {
             if (node is AssetFileKeyNode keyNode)
             {
-                AssetSpecProperty? property = spec?.FindProperty(keyNode.Value);
-                if (property != null)
+                SpecProperty? property = _specDictionary.FindPropertyInfo(keyNode.Value, type);
+                if (property == null)
+                    continue;
+
+                Range range = node.Range.ToRange();
+                symbols.Add(new SymbolInformationOrDocumentSymbol(new DocumentSymbol
                 {
-                    Range range = new Range(node.Range.Start.Line - 1, node.Range.Start.Character - 1, node.Range.End.Line - 1, node.Range.End.Character - 1);
-                    symbols.Add(new SymbolInformationOrDocumentSymbol(new DocumentSymbol
-                    {
-                        Range = range,
-                        Kind = SymbolKind.Property,
-                        Deprecated = false,
-                        SelectionRange = range,
-                        Detail = property.Type,
-                        Name = property.Key
-                    }));
-                }
+                    Range = range,
+                    Kind = SymbolKind.Property,
+                    Deprecated = false,
+                    SelectionRange = range,
+                    Detail = property.Type.DisplayName,
+                    Name = property.Key
+                }));
             }
             else if (node is AssetFileStringValueNode strValue)
             {
                 string? propertyName = (strValue.Parent as AssetFileKeyValuePairNode)?.Key?.Value;
-                AssetSpecProperty? property = propertyName != null ? spec?.FindProperty(propertyName) : null;
-                Range range = new Range(node.Range.Start.Line - 1, node.Range.Start.Character - 1, node.Range.End.Line - 1, node.Range.End.Character - 1);
+                SpecProperty? property = propertyName == null ? null : _specDictionary.FindPropertyInfo(propertyName, type);
+                Range range = node.Range.ToRange();
                 symbols.Add(new SymbolInformationOrDocumentSymbol(new DocumentSymbol
                 {
                     Range = range,
-                    Kind = property?.GetSymbolKind() ?? SymbolKind.String,
+                    Kind = property?.Type?.GetSymbolKind() ?? SymbolKind.String,
                     Deprecated = false,
                     SelectionRange = range,
                     Name = strValue.Value
