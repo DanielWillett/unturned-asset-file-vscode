@@ -13,6 +13,7 @@
             "Required": true,
             "ElementType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
             "Description": "The object to spawn when this foliage is placed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "obj"
         },
         {
@@ -22,6 +23,7 @@
             "IncludedDefaultValue": 0.0,
             "Deprecated": true,
             "Description": "The distance around an object that needs to be clear for it to be placed. Not currently used by the game.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "obstructionRadius"
         }
     ]

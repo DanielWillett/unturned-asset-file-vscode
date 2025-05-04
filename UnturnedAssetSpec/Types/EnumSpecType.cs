@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -36,12 +37,7 @@ public class EnumSpecType : ISpecType, IEquatable<EnumSpecType>, IComparable<Enu
             return 0;
         }
 
-        if (other == null)
-        {
-            return -1;
-        }
-
-        return string.Compare(Type, other.Type, StringComparison.Ordinal);
+        return other == null ? 1 : string.Compare(Type, other.Type, StringComparison.Ordinal);
     }
 
     public bool Equals(ISpecType other) => other is EnumSpecType s && Equals(s);
@@ -53,7 +49,8 @@ public class EnumSpecType : ISpecType, IEquatable<EnumSpecType>, IComparable<Enu
     public override int GetHashCode() => Type.GetHashCode();
 }
 
-public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, IComparable<EnumSpecTypeValue>
+[DebuggerDisplay("{Value,nq}")]
+public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, IComparable, IComparable<EnumSpecTypeValue>
 {
     public required int Index { get; init; }
     public required EnumSpecType Type { get; init; }
@@ -68,10 +65,10 @@ public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, ICompa
     public IReadOnlyDictionary<string, string>? ExtendedData { get; init; }
     
     /// <inheritdoc />
-    public bool Equals(EnumSpecTypeValue other) => other.Index == Index;
+    public bool Equals(EnumSpecTypeValue other) => Index == other.Index;
 
     /// <inheritdoc />
-    public int CompareTo(EnumSpecTypeValue other) => other.Index.CompareTo(Index);
+    public int CompareTo(EnumSpecTypeValue other) => Index.CompareTo(other.Index);
 
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is EnumSpecTypeValue && Equals(obj);
@@ -81,4 +78,14 @@ public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, ICompa
 
     /// <inheritdoc />
     public override string ToString() => Value;
+
+    /// <inheritdoc />
+    public int CompareTo(object obj) => obj is EnumSpecTypeValue t ? CompareTo(t) : 1;
+
+    public static bool operator ==(EnumSpecTypeValue left, EnumSpecTypeValue right) => left.Index == right.Index;
+    public static bool operator !=(EnumSpecTypeValue left, EnumSpecTypeValue right) => left.Index != right.Index;
+    public static bool operator <(EnumSpecTypeValue left, EnumSpecTypeValue right) => left.Index < right.Index;
+    public static bool operator >(EnumSpecTypeValue left, EnumSpecTypeValue right) => left.Index > right.Index;
+    public static bool operator <=(EnumSpecTypeValue left, EnumSpecTypeValue right) => left.Index <= right.Index;
+    public static bool operator >=(EnumSpecTypeValue left, EnumSpecTypeValue right) => left.Index >= right.Index;
 }

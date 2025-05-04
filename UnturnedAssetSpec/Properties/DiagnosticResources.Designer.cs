@@ -151,6 +151,42 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown asset bundle version, expected a value between {0} and {1}..
+        /// </summary>
+        internal static string UNT1009 {
+            get {
+                return ResourceManager.GetString("UNT1009", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blueprint supply IDs that are the same as their containing asset can be replaced with &apos;This&apos;..
+        /// </summary>
+        internal static string UNT101 {
+            get {
+                return ResourceManager.GetString("UNT101", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paths should only use forward slashes to maintain compatibility with Unity and Unix-based operating systems..
+        /// </summary>
+        internal static string UNT1010 {
+            get {
+                return ResourceManager.GetString("UNT1010", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File path should match pattern &quot;{0}&quot;..
+        /// </summary>
+        internal static string UNT1011 {
+            get {
+                return ResourceManager.GetString("UNT1011", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected &apos;}&apos; at end of dictionary..
         /// </summary>
         internal static string UNT2001 {
@@ -192,6 +228,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string UNT2005 {
             get {
                 return ResourceManager.GetString("UNT2005", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown asset bundle version, expected a value between {0} and {1}..
+        /// </summary>
+        internal static string UNT2009 {
+            get {
+                return ResourceManager.GetString("UNT2009", resourceCulture);
             }
         }
     }

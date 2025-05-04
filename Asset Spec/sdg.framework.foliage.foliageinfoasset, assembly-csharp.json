@@ -21,21 +21,24 @@
             "Type": "Float32",
             "DefaultValue": 0.0,
             "Description": "Minimum change in the relative Y-position from the terrain's height (how far it is off the ground). A random value is chosen between @Min_Normal_Position_Offset and @Max_Normal_Position_Offset per foliage instance.",
-            "Variable": "minNormalPositionOffset"
+            "Variable": "minNormalPositionOffset",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
         },
         {
             "Key": "Max_Normal_Position_Offset",
             "Type": "Float32",
             "DefaultValue": 0.0,
             "Description": "Maximum change in the relative Y-position from the terrain's height (how far it is off the ground). A random value is chosen between @Min_Normal_Position_Offset and @Max_Normal_Position_Offset per foliage instance.",
-            "Variable": "maxNormalPositionOffset"
+            "Variable": "maxNormalPositionOffset",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
         },
         {
             "Key": "Normal_Rotation_Offset",
             "Type": "EulerRotation",
             "DefaultValue": "(0, 0, 0)",
             "Description": "The rotation offset of all foliage relative to the angle of the terrain.",
-            "Variable": "normalRotationOffset"
+            "Variable": "normalRotationOffset",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
         },
         {
             "Key": "Normal_Rotation_Alignment",
@@ -45,7 +48,8 @@
             "Minimum": 0,
             "Maximum": 1,
             "Description": "A value from 0 to 1 deterimining how close the rotation follows the angle of the terrain. A value of 1 means the rotation will be exactly the same as the terrain's angle, 0 means it's rotation will be (0, 0, 0). Other values will be linearly interpolated between (0, 0, 0) and the angle of the terrain.",
-            "Variable": "normalRotationAlignment"
+            "Variable": "normalRotationAlignment",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
         },
         {
             "Key": "Min_Weight",
@@ -95,7 +99,8 @@
             "DefaultValue": "(0, 0, 0)",
             "Maximum": "@Max_Rotation",
             "Description": "The minimum rotation offset from the terrain's rotaiton. A random rotation is chosen between @Min_Rotation and @Max_Rotation.",
-            "Variable": "minRotation"
+            "Variable": "minRotation",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
         },
         {
             "Key": "Max_Rotation",
@@ -103,7 +108,8 @@
             "DefaultValue": "(0, 0, 0)",
             "Minimum": "@Min_Rotation",
             "Description": "The maximum rotation offset from the terrain's rotaiton. A random rotation is chosen between @Min_Rotation and @Max_Rotation.",
-            "Variable": "maxRotation"
+            "Variable": "maxRotation",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
         },
         {
             "Key": "Min_Scale",
@@ -111,7 +117,8 @@
             "DefaultValue": "(1, 1, 1)",
             "Maximum": "@Max_Scale",
             "Description": "The minimum scale to draw the foliage at. A random scale is chosen between @Min_Scale and @Max_Scale.",
-            "Variable": "minScale"
+            "Variable": "minScale",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
         },
         {
             "Key": "Max_Scale",
@@ -119,7 +126,8 @@
             "DefaultValue": "(1, 1, 1)",
             "Minimum": "@Min_Scale",
             "Description": "The maximum scale to draw the foliage at. A random scale is chosen between @Min_Scale and @Max_Scale.",
-            "Variable": "maxScale"
+            "Variable": "maxScale",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
         }
     ]
 }

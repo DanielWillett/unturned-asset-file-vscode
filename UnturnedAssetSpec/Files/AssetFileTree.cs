@@ -170,7 +170,15 @@ public class AssetFileTree : IEnumerable<AssetFileNode>
 
         ISpecPropertyType<TValue>? propType = prop.Type?.As<TValue>();
 
-        SpecPropertyTypeParseContext ctx = new SpecPropertyTypeParseContext(node.Value, node, spec, null, property);
+        SpecPropertyTypeParseContext ctx = new SpecPropertyTypeParseContext
+        {
+            Database = spec,
+            FileType = AssetFileType.FromFile(this, spec),
+            BaseKey = property,
+            Node = node.Value,
+            Parent = node,
+            File = this
+        };
 
         return propType != null && propType.TryParseValue(in ctx, out value);
     }

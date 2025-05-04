@@ -51,6 +51,10 @@
                     "title": "Zero or more characters of UTF-16 text."
                 },
                 {
+                    "const": "FilePathString",
+                    "title": "Zero or more characters of UTF-16 text that represents a file path."
+                },
+                {
                     "const": "RichTextString",
                     "title": "Zero or more characters of UTF-16 text with rich-text tags supported."
                 },
@@ -135,6 +139,14 @@
                     "title": "A short ID, where ElementType is the category."
                 },
                 {
+                    "const": "NavId",
+                    "title": "An 8-bit unsigned integer referencing a navigation graph in a map."
+                },
+                {
+                    "const": "FlagId",
+                    "title": "A flag short ID."
+                },
+                {
                     "const": "BlueprintSupplyId",
                     "title": "A short item ID, or 'this' (case insensitive) to reference the current item."
                 },
@@ -179,12 +191,12 @@
                     "title": "A Vector3 euler rotation Key_X, Key_Y, Key_Z properties."
                 },
                 {
-                    "const": "List",
-                    "title": "A list of values."
+                    "const": "CommaDelimtedString",
+                    "title": "A comma-separated list of values in a string."
                 },
                 {
-                    "const": "Dictionary",
-                    "title": "A dictionary of values."
+                    "const": "List",
+                    "title": "A list of values."
                 },
                 {
                     "const": "MasterBundleName",
@@ -201,150 +213,227 @@
             ]
         },
         "datProperty": {
-            "type": "object",
-            "properties": {
-                "Key": {
-                    "description": "The key of the flag or property.",
-                    "type": "string"
-                },
-                "SingleKeyOverride": {
-                    "type": [ "string", "null" ],
-                    "description": "If 'KeyIsRegex', the singular version of the key which would not be regex (ex. Blade for Blade_#)."
-                },
-                "KeyIsRegex": {
-                    "type": "boolean",
-                    "description": "If 'Key' is a regex expression to match properties."
-                },
-                "KeyGroups": {
-                    "type": [ "array", "null" ],
-                    "description": "If 'KeyIsRegex', then this is a list of groups by name to match with other properties within the given regex group.",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "RegexGroup": {
-                                "type": "number",
-                                "description": "The regex group (starting from 1) that acts as the identifier for this group."
-                            },
-                            "Name": {
-                                "type": "string",
-                                "description": "Unique name of this group (amongst the this asset type's hierarchy)."
-                            }
-                        }
-                    }
-                },
-                "CountForRegexGroup": {
-                    "type": [ "string", "null" ],
-                    "description": "The regex-group for which this property is a count for."
-                },
-                "Aliases": {
-                    "description": "Other keys that can be used for the flag or property.",
-                    "type": "array",
-                    "items": { "type": "string" }
-                },
-                "Type": {
-                    "description": "The type of the property.",
-                    "$ref": "#/$defs/datPropertyType"
-                },
-                "ElementType": {
-                    "description": "The type of the elements of a List.",
-                    "$ref": "#/$defs/datPropertyType"
-                },
-                "SpecialTypes": {
-                    "description": "A special subset of element type, such as barricade or useable type.",
-                    "type": "array",
-                    "items": {
-                        "type": [ "string", "number", "null" ]
-                    }
-                },
-                "Required": {
-                    "description": "If this property is required.",
-                    "type": [ "string", "boolean" ]
-                },
-                "CanBeInMetadata": {
-                    "description": "If this property can be read from the Metadata section.",
-                    "type": "boolean"
-                },
-                "DefaultValue": {
-                    "description": "The default value for this property if applicable. If IncludedDefaultValue is used, this indicates the default value if the property is not included."
-                },
-                "DefaultValueSwitch": {
-                    "description": "Switches cases of default values.",
-                    "$ref": "#/$defs/switch"
-                },
-                "IncludedDefaultValue": {
-                    "description": "The default value for this property if applicable. Indicates the default value if the property is included but not parsed correctly."
-                },
-                "Description": {
-                    "description": "Short description of the property.",
-                    "type": "string"
-                },
-                "Variable": {
-                    "description": "Name of the variable in the C# class.",
-                    "type": "string"
-                },
-                "Docs": {
-                    "description": "Link to the Unturned modding docs when a page is available.",
-                    "type": [ "string", "null" ],
-                    "format": "uri"
-                },
-                "Markdown": {
-                    "description": "Longer markdown description of the property.",
-                    "type": [ "string", "null" ]
-                },
-                "Minimum": {
-                    "type": [ "number", "string", "null" ],
-                    "description": "Inclusive minimum value of the property. Can also be another property."
-                },
-                "Maximum": {
-                    "type": [ "number", "string", "null" ],
-                    "description": "Inclusive maximum value of the property. Can also be another property."
-                },
-                "MinimumExclusive": {
-                    "type": [ "number", "string", "null" ],
-                    "description": "Exclusive minimum value of the property. Can also be another property."
-                },
-                "MaximumExclusive": {
-                    "type": [ "number", "string", "null" ],
-                    "description": "Exclusive maximum value of the property. Can also be another property."
-                },
-                "Except": {
-                    "type": "array",
-                    "items": {
-                        "type": [ "number", "string" ]
-                    },
-                    "description": "Exceptions to the minimum/maximum range."
-                },
-                "ExclusiveWith": {
-                    "type": "array",
-                    "items": {
-                        "type": [ "string" ]
-                    },
-                    "description": "List of properties that should not co-exist with this property."
-                },
-                "InclusiveWith": {
-                    "type": "array",
-                    "items": {
-                        "type": [ "object", "string" ],
-                        "properties": {
-                            "Key": {
-                                "type": "string",
-                                "description": "The property that is required."
-                            },
-                            "Value": {
-                                "type": [ "string", "array", "number", "null", "boolean" ],
-                                "description": "The value that is required or a list of allowed values."
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "Key": {
+                            "description": "The key of the flag or property.",
+                            "type": "string"
+                        },
+                        "SingleKeyOverride": {
+                            "type": [ "string", "null" ],
+                            "description": "If 'KeyIsRegex', the singular version of the key which would not be regex (ex. Blade for Blade_#)."
+                        },
+                        "KeyIsRegex": {
+                            "type": "boolean",
+                            "description": "If 'Key' is a regex expression to match properties."
+                        },
+                        "KeyGroups": {
+                            "type": [ "array", "null" ],
+                            "description": "If 'KeyIsRegex', then this is a list of groups by name to match with other properties within the given regex group.",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "RegexGroup": {
+                                        "type": "number",
+                                        "description": "The regex group (starting from 1) that acts as the identifier for this group."
+                                    },
+                                    "Name": {
+                                        "type": "string",
+                                        "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                                    }
+                                }
                             }
                         },
-                        "required": [ "Key", "Value" ]
+                        "CountForRegexGroup": {
+                            "type": [ "string", "null" ],
+                            "description": "The regex-group for which this property is a count for."
+                        },
+                        "ValueRegexGroupReference": {
+                            "type": [ "string", "null" ],
+                            "description": "The 'Key regex-group[ RelatedKey...]' of which this property references, where key is a reference to another type."
+                        },
+                        "Aliases": {
+                            "description": "Other keys that can be used for the flag or property.",
+                            "type": "array",
+                            "items": { "type": "string" }
+                        },
+                        "Type": {
+                            "description": "The type of the property.",
+                            "$ref": "#/$defs/datPropertyType"
+                        },
+                        "ElementType": {
+                            "description": "The type of the elements of a List.",
+                            "$ref": "#/$defs/datPropertyType"
+                        },
+                        "SpecialTypes": {
+                            "description": "A special subset of element type, such as barricade or useable type.",
+                            "type": "array",
+                            "items": {
+                                "type": [ "string", "number", "null" ]
+                            }
+                        },
+                        "Required": {
+                            "description": "If this property is required.",
+                            "type": [ "string", "boolean" ]
+                        },
+                        "CanBeInMetadata": {
+                            "description": "If this property can be read from the Metadata section.",
+                            "type": "boolean"
+                        },
+                        "DefaultValue": {
+                            "description": "The default value for this property if applicable. If IncludedDefaultValue is used, this indicates the default value if the property is not included."
+                        },
+                        "DefaultValueSwitch": {
+                            "description": "Switches cases of default values.",
+                            "$ref": "#/$defs/switch"
+                        },
+                        "IncludedDefaultValue": {
+                            "description": "The default value for this property if applicable. Indicates the default value if the property is included but not parsed correctly."
+                        },
+                        "Description": {
+                            "description": "Short description of the property.",
+                            "type": "string"
+                        },
+                        "Variable": {
+                            "description": "Name of the variable in the C# class.",
+                            "type": "string"
+                        },
+                        "Docs": {
+                            "description": "Link to the Unturned modding docs when a page is available.",
+                            "type": [ "string", "null" ],
+                            "format": "uri"
+                        },
+                        "Markdown": {
+                            "description": "Longer markdown description of the property.",
+                            "type": [ "string", "null" ]
+                        },
+                        "Minimum": {
+                            "type": [ "number", "string", "null" ],
+                            "description": "Inclusive minimum value of the property. Can also be another property."
+                        },
+                        "Maximum": {
+                            "type": [ "number", "string", "null" ],
+                            "description": "Inclusive maximum value of the property. Can also be another property."
+                        },
+                        "MinimumExclusive": {
+                            "type": [ "number", "string", "null" ],
+                            "description": "Exclusive minimum value of the property. Can also be another property."
+                        },
+                        "MaximumExclusive": {
+                            "type": [ "number", "string", "null" ],
+                            "description": "Exclusive maximum value of the property. Can also be another property."
+                        },
+                        "Except": {
+                            "type": "array",
+                            "items": {
+                                "type": [ "number", "string" ]
+                            },
+                            "description": "Exceptions to the minimum/maximum range."
+                        },
+                        "ExclusiveWith": {
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": [ "string" ]
+                                    },
+                                    "description": "List of properties that should not co-exist with this property."
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": [ "object", "string" ],
+                                        "properties": {
+                                            "Key": {
+                                                "type": "string",
+                                                "description": "The property that shouldn't co-exist when its value equals Value."
+                                            },
+                                            "Value": {
+                                                "type": [ "string", "array", "number", "null", "boolean" ],
+                                                "description": "The value that Key can't be equal to. '*' = any value."
+                                            },
+                                            "Condition":
+                                            {
+                                                "oneOf": [
+                                                    {
+                                                        "$ref": "#/$defs/condition"
+                                                    },
+                                                    {
+                                                        "$ref": "#/$defs/switch"
+                                                    }
+                                                ],
+                                                "description": "Optional condition when this should be applied."
+                                            }
+                                        },
+                                        "required": [ "Key", "Value" ]
+                                    },
+                                    "description": "List of properties with values that should not co-exist with this property."
+                                }
+                            ]
+                        },
+                        "InclusiveWith": {
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": [ "string" ]
+                                    },
+                                    "description": "List of properties that should exist if this exists."
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": [ "object", "string" ],
+                                        "properties": {
+                                            "Key": {
+                                                "type": "string",
+                                                "description": "The property that is required."
+                                            },
+                                            "Value": {
+                                                "type": [ "string", "array", "number", "null", "boolean" ],
+                                                "description": "The value that is required or a list of allowed values. '*' = any value."
+                                            },
+                                            "Condition": {
+                                                "oneOf": [
+                                                    {
+                                                        "$ref": "#/$defs/condition"
+                                                    },
+                                                    {
+                                                        "$ref": "#/$defs/switch"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "required": [ "Key", "Value" ]
+                                    },
+                                    "description": "List of properties and optional values that should exist if this exists."
+                                }
+                            ]
+                        },
+                        "Deprecated": {
+                            "type": "boolean",
+                            "description": "If this property shouldn't be used anymore or was left in for legacy features."
+                        }
                     },
-                    "description": "List of properties and optional values that should exist if this exists."
+                    "required": [ "Key", "Type" ]
                 },
-                "Deprecated": {
-                    "type": "boolean",
-                    "description": "If this property shouldn't be used anymore or was left in for legacy features."
+                {
+                    "type": "object",
+                    "properties": {
+                        "Key": {
+                            "description": "The key of the flag or property in a parent type.",
+                            "type": "string"
+                        },
+                        "HideInherited": {
+                            "description": "If this property should be removed from this type when inherited from a parent.",
+                            "type": "boolean"
+                        }
+                    },
+                    "required": [ "Key", "HideInherited" ]
                 }
-            },
-            "required": [ "Key", "Type" ]
+            ]
         },
         "condition": {
             "type": "object",
@@ -354,7 +443,7 @@
                 },
                 "Operation": {
                     "type": "string",
-                    "enum": [ "lt", "gt", "lte", "gte", "eq", "neq", "contains", "starts with", "ends with", "matches", "contains-i", "starts with-i", "ends with-i", "assignable-to", "assignable-from" ]
+                    "enum": [ "lt", "gt", "lte", "gte", "eq", "neq", "contains", "starts with", "ends with", "matches", "contains-i", "eq-i", "starts with-i", "ends with-i", "assignable-to", "assignable-from", "included" ]
                 },
                 "Comparand": {
                     "type": [ "null", "string", "boolean", "number", "pattern" ]
@@ -684,6 +773,13 @@
                     },
                     "Properties": {
                         "description": "List of all properties that can be defined.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/$defs/datProperty"
+                        }
+                    },
+                    "Localization": {
+                        "description": "List of all localization properties that can be defined.",
                         "type": "array",
                         "items": {
                             "$ref": "#/$defs/datProperty"

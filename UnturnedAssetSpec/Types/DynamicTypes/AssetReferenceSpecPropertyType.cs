@@ -88,7 +88,4 @@ public sealed class AssetReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<Guid> other) => other is AssetReferenceSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => this as ISpecPropertyType<TValue>;
 }

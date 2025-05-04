@@ -1,5 +1,6 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    // "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.Asset, Assembly-CSharp",
     "DisplayName": "Asset",
     "Parent": null,
@@ -30,7 +31,8 @@
             "Type": "UInt16",
             "Variable": "id",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#body",
-            "Description": "Short ID unique to this asset's category."
+            "Description": "Short ID unique to this asset's category.",
+            "DefaultValue": 0
         },
         {
             "Key": "Ignore_NPOT",
@@ -51,37 +53,898 @@
         {
             "Key": "Master_Bundle_Override",
             "Type": "MasterBundleName",
-            "Description": "Override which .masterbundle file this asset uses."
+            "Description": "Override which .masterbundle file this asset uses.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
+            "DefaultValue": null
         },
         {
             "Key": "Exclude_From_Master_Bundle",
             "Type": "Flag",
-            "Description": "Indicates that this asset should skip loading from a master bundle and look for a legacy bundle instead."
+            "Description": "Indicates that this asset should skip loading from a master bundle and look for a legacy bundle instead.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
+            "DefaultValue": false
         },
         {
             "Key": "Bundle_Override_Path",
             "Type": "LegacyBundleName",
-            "Description": "Override which .unity3d file this asset uses."
+            "Description": "Override which .unity3d file this asset uses.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
+            "DefaultValue": null
         },
         {
             "Key": "Bundle_Path_Include_Filename",
             "Type": "Boolean",
-            "Description": "Includes the file name in the bundle path, so if you have an asset that isn't in it's own folder, use this property for the correct bundle path."
+            "Description": "Includes the file name in the bundle path, so if you have an asset that isn't in it's own folder, use this property for the correct bundle path.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
+            "DefaultValue": false
         },
         {
             "Key": "Asset_Bundle_Version",
             "Type": "AssetBundleVersion",
-            "Description": "Defines which asset bundle version to use for this asset's legacy bundle."
+            "Description": "Defines which asset bundle version to use for this asset's legacy bundle.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
+            "DefaultValue": 1
         },
         {
             "Key": "Enable_Shader_Consolidation",
             "Type": "Flag",
-            "Description": "Forces the game to replace shaders on this asset's models with the known in-game shaders."
+            "ExclusiveWith": [ "Disable_Shader_Consolidation" ],
+            "Description": "Forces the game to replace shaders on this asset's models with the known in-game shaders.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
+            "DefaultValueSwitch":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Asset_Bundle_Version",
+                            "Operation": "lt",
+                            "Comparand": 3
+                        },
+                        {
+                            "Variable": "Disable_Shader_Consolidation",
+                            "Operation": "eq",
+                            "Comparand": false
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ]
         },
         {
             "Key": "Disable_Shader_Consolidation",
             "Type": "Flag",
-            "Description": "Keeps the game from replacing shaders on this asset's models with the known in-game shaders. Requires that @Asset_Bundle_Version be >= 3."
+            "ExclusiveWith": [ "Enable_Shader_Consolidation" ],
+            "Description": "Keeps the game from replacing shaders on this asset's models with the known in-game shaders. Requires that @Asset_Bundle_Version be >= 3.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
+            "DefaultValueSwitch":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Asset_Bundle_Version",
+                            "Operation": "lt",
+                            "Comparand": 3
+                        },
+                        {
+                            "Variable": "Enable_Shader_Consolidation",
+                            "Operation": "eq",
+                            "Comparand": false
+                        }
+                    ],
+                    "Value": false
+                },
+                {
+                    "Value": true
+                }
+            ]
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.ENPCConditionType, Assembly-CSharp",
+            "DisplayName": "Condition Type",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+            "Values":
+            [
+                {
+                    "Value": "EXPERIENCE",
+                    "Casing": "Experience",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#experience",
+                    "Description": "Applies conditional logic to the player's current experience.",
+                    "ConditionType": "SDG.Unturned.NPCExperienceCondition, Assembly-CSharp"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ENPCLogicType, Assembly-CSharp",
+            "DisplayName": "Logic Operation",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "Description": "No logic."
+                },
+                {
+                    "Value": "LESS_THAN",
+                    "Casing": "Less_Than",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "Description": "Checks if some property is less than a given value.",
+                    "Operator": "<"
+                },
+                {
+                    "Value": "LESS_THAN_OR_EQUAL_TO",
+                    "Casing": "Less_Than_Or_Equal_To",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "Description": "Checks if some property is less than or equal to a given value.",
+                    "Operator": "<="
+                },
+                {
+                    "Value": "EQUAL",
+                    "Casing": "Equal",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "Description": "Checks if some property is equal to a given value.",
+                    "Operator": "=="
+                },
+                {
+                    "Value": "NOT_EQUAL",
+                    "Casing": "Not_Equal",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "Description": "Checks if some property is different than a given value.",
+                    "Operator": "!="
+                },
+                {
+                    "Value": "GREATER_THAN_OR_EQUAL_TO",
+                    "Casing": "Greater_Than_Or_Equal_To",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "Description": "Checks if some property is greater than or equal to a given value.",
+                    "Operator": ">="
+                },
+                {
+                    "Value": "GREATER_THAN",
+                    "Casing": "Greater_Than",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "Description": "Checks if some property is greater than a given value.",
+                    "Operator": ">"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ENPCQuestStatus, Assembly-CSharp",
+            "DisplayName": "Quest Status",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#quest",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#quest",
+                    "Description": "Quest is not currently active."
+                },
+                {
+                    "Value": "ACTIVE",
+                    "Casing": "Active",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#quest",
+                    "Description": "Quest is active but conditions are not met."
+                },
+                {
+                    "Value": "READY",
+                    "Casing": "Ready",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#quest",
+                    "Description": "Quest is active and conditions are met (or there are no conditions)."
+                },
+                {
+                    "Value": "COMPLETED",
+                    "Casing": "Completed",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#quest",
+                    "Description": "Quest has been completed at least once."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EPlayerSkillset, Assembly-CSharp",
+            "DisplayName": "Player Skillset",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "'Civillian' skillset."
+                },
+                {
+                    "Value": "FIRE",
+                    "Casing": "Fire",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "'Fire Fighter' skillset."
+                },
+                {
+                    "Value": "POLICE",
+                    "Casing": "Police",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "'Police Officer' skillset."
+                },
+                {
+                    "Value": "ARMY",
+                    "Casing": "Army",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "'Spec Ops' skillset."
+                },
+                {
+                    "Value": "FARM",
+                    "Casing": "Farm",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "'Farmer' skillset."
+                },
+                {
+                    "Value": "FISH",
+                    "Casing": "Fish",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "'Fisher' skillset."
+                },
+                {
+                    "Value": "CAMP",
+                    "Casing": "Camp",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "'Lumberjack' skillset."
+                },
+                {
+                    "Value": "WORK",
+                    "Casing": "Work",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "'Worker' skillset."
+                },
+                {
+                    "Value": "CHEF",
+                    "Casing": "Chef",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "'Chef' skillset."
+                },
+                {
+                    "Value": "THIEF",
+                    "Casing": "Thief",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "'Thief' skillset."
+                },
+                {
+                    "Value": "MEDIC",
+                    "Casing": "Medic",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "'Doctor' skillset."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EZombieSpeciality, Assembly-CSharp",
+            "DisplayName": "Zombie Speciality",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Any zombie speciality."
+                },
+                {
+                    "Value": "NORMAL",
+                    "Casing": "Normal",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Standard zombie."
+                },
+                {
+                    "Value": "MEGA",
+                    "Casing": "Mega",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Mega zombie."
+                },
+                {
+                    "Value": "CRAWLER",
+                    "Casing": "Crawler",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Crawler zombie."
+                },
+                {
+                    "Value": "SPRINTER",
+                    "Casing": "Sprinter",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Sprinter zombie."
+                },
+                {
+                    "Value": "FLANKER_FRIENDLY",
+                    "Casing": "Flanker_Friendly",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "A flanker zombie that isn't currently invisible."
+                },
+                {
+                    "Value": "FLANKER_STALK",
+                    "Casing": "Flanker_Stalk",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "A flanker zombie that is currently invisible."
+                },
+                {
+                    "Value": "BURNER",
+                    "Casing": "Burner",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "A burner zombie that spits fire."
+                },
+                {
+                    "Value": "ACID",
+                    "Casing": "Acid",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "An acid zombie that spits acid."
+                },
+                {
+                    "Value": "BOSS_ELECTRIC",
+                    "Casing": "Boss_Electric",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Electric elemental mega zombie."
+                },
+                {
+                    "Value": "BOSS_WIND",
+                    "Casing": "Boss_Wind",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Wind elemental mega zombie."
+                },
+                {
+                    "Value": "BOSS_FIRE",
+                    "Casing": "Boss_Fire",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Fire elemental mega zombie."
+                },
+                {
+                    "Value": "BOSS_ALL",
+                    "Casing": "Boss_ALL",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Boss elemental mega zombie."
+                },
+                {
+                    "Value": "BOSS_MAGMA",
+                    "Casing": "Boss_Magma",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Magma elemental mega zombie."
+                },
+                {
+                    "Value": "SPIRIT",
+                    "Casing": "Spirit",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Spirit zombie."
+                },
+                {
+                    "Value": "BOSS_SPIRIT",
+                    "Casing": "Boss_Spirit",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Spirit mega zombie."
+                },
+                {
+                    "Value": "BOSS_NUCLEAR",
+                    "Casing": "Boss_Nuclear",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Nuclear mega zombie."
+                },
+                {
+                    "Value": "DL_RED_VOLATILE",
+                    "Casing": "DL_Red_Volatile",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Crossover from Dying Light. Only spawns during night. Explodes into fire at dawn."
+                },
+                {
+                    "Value": "DL_BLUE_VOLATILE",
+                    "Casing": "DL_Blue_Volatile",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Crossover from Dying Light. Only spawns during night. Explodes into fire at dawn."
+                },
+                {
+                    "Value": "BOSS_ELVER_STOMPER",
+                    "Casing": "Boss_Elver_Stomper",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Elver endgame boss with reduced bullet damage and wind zombie stomping attacks."
+                },
+                {
+                    "Value": "BOSS_KUWAIT",
+                    "Casing": "Boss_Kuwait",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Kuwait final boss with increased rock throwing, damage players inside vehicle (turrets), and flashbangs."
+                },
+                {
+                    "Value": "BOSS_BUAK_ELECTRIC",
+                    "Casing": "Boss_Buak_Electric",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Electric elemental boss on Buak. Buak boss types have a red-eyed flashbang effect."
+                },
+                {
+                    "Value": "BOSS_BUAK_WIND",
+                    "Casing": "Boss_Buak_Wind",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Wind elemental boss on Buak. Buak boss types have a red-eyed flashbang effect."
+                },
+                {
+                    "Value": "BOSS_BUAK_FIRE",
+                    "Casing": "Boss_Buak_Fire",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Fire elemental boss on Buak. Buak boss types have a red-eyed flashbang effect."
+                },
+                {
+                    "Value": "BOSS_BUAK_FINAL",
+                    "Casing": "Boss_Buak_Final",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Final boss on Buak. Buak boss types have a red-eyed flashbang effect."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "DisplayName": "Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+            "Properties":
+            [
+                {
+                    "Key": "Type",
+                    "Type": "SDG.Unturned.ENPCConditionType, Assembly-CSharp",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "Required": true
+                },
+                {
+                    "Key": "Reset",
+                    "Type": "Flag",
+                    "Description": "Sets this condition back to default when met.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "DefaultValue": false,
+                    "Variable": "shouldReset"
+                },
+                {
+                    "Key": "Logic",
+                    "Type": "SDG.Unturned.ENPCLogicType, Assembly-CSharp",
+                    "Description": "Defines how to compare some property with a given value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "DefaultValue": "NONE",
+                    "Variable": "logicType"
+                },
+                {
+                    "Key": "UI_Requirements",
+                    "Type": "CommaDelimtedString",
+                    "ElementType": "Int32",
+                    "Description": "Comma-separated indexes of other conditions that must be met first before this condition will be visible in-game.",
+                    "ValueRegexGroupReference": "#Super #PreventSelfReference",
+                    "Minimum": 0,
+                    "DefaultValue": null,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "Variable": "uiRequirementIndices"
+                }
+            ],
+            "Localization":
+            [
+                {
+                    "Key": "#Empty",
+                    "Type": "String",
+                    "DefaultValue": "#Self.Key",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "Variable": "text"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCExperienceCondition, Assembly-CSharp",
+            "DisplayName": "Experience Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#experience",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "UInt32",
+                    "DefaultValue": 0,
+                    "Description": "Target experience.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#experience",
+                    "Required": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCReputationCondition, Assembly-CSharp",
+            "DisplayName": "Reputation Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#reputation",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int32",
+                    "DefaultValue": 0,
+                    "Description": "Target reputation.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#reputation",
+                    "Required": true
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCBoolFlagCondition, Assembly-CSharp",
+            "DisplayName": "Boolean Flag Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-bool",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The ID of the flag to check.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-bool",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Description": "The value to compare the flag to. Note that a value of 1 is stored in the flag as 'true' and all other values are considered 'false'.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-bool",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Allow_Unset",
+                    "Type": "Flag",
+                    "DefaultValue": false,
+                    "Description": "If this condition will be met if the flag has not been set.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-bool",
+                    "Required": false,
+                    "Variable": "allowUnset"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCShortFlagCondition, Assembly-CSharp",
+            "DisplayName": "Flag Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-short",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The ID of the flag to check.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-short",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Int16",
+                    "DefaultValue": 0,
+                    "Description": "The value to compare the flag to.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-short",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Allow_Unset",
+                    "Type": "Flag",
+                    "DefaultValue": false,
+                    "Description": "If this condition will be met if the flag has not been set.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-short",
+                    "Required": false,
+                    "Variable": "allowUnset"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCQuestCondition, Assembly-CSharp",
+            "DisplayName": "Quest Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#quest",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "GuidOrId",
+                    "ElementType": "SDG.Unturned.QuestAsset, Assembly-CSharp",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "The GUID or ID of the quest to check.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#quest",
+                    "Required": true,
+                    "Variable": "questGuid"
+                },
+                {
+                    "Key": "Status",
+                    "Type": "SDG.Unturned.ENPCQuestStatus, Assembly-CSharp",
+                    "DefaultValue": "NONE",
+                    "Description": "The value to compare the flag to.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#quest",
+                    "Required": true,
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Reset",
+                            "Value": true
+                        }
+                    ],
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Ignore_NPC",
+                    "Type": "Flag",
+                    "DefaultValue": false,
+                    "Description": "Allows the quest to be turned in without currently talking to an NPC.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#quest",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Reset",
+                            "Value": false
+                        }
+                    ],
+                    "Required": false,
+                    "Variable": "ignoreNPC"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCSkillsetCondition, Assembly-CSharp",
+            "DisplayName": "Skillset Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "SDG.Unturned.EPlayerSkillset, Assembly-CSharp",
+                    "DefaultValue": "NONE",
+                    "Description": "The skillset the player must have selected to meet this condition.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Required": true,
+                    "Variable": "skillset"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCItemCondition, Assembly-CSharp",
+            "DisplayName": "Item Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#item",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "GuidOrId",
+                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "The GUID or ID of the quest to check.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#item",
+                    "Required": true,
+                    "Variable": "itemGuid"
+                },
+                {
+                    "Key": "Amount",
+                    "Type": "UInt16",
+                    "DefaultValue": 0,
+                    "Description": "The GUID or ID of the quest to check.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#item",
+                    "Required": true,
+                    "Variable": "itemGuid"
+                },
+                {
+                    "Key": "Logic",
+                    "Type": "SDG.Unturned.ENPCLogicType, Assembly-CSharp",
+                    "Description": "Defines how to compare some property with a given value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+                    "DefaultValueSwitch":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Reset",
+                                    "Operation": "eq",
+                                    "Comparand": true
+                                }
+                            ],
+                            "Value": "GREATER_THAN_OR_EQUAL_TO"
+                        },
+                        {
+                            "Value": "NONE"
+                        }
+                    ],
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Reset",
+                            "Value": true,
+                            "Condition":
+                            {
+                                "Variable": "#Self.Value",
+                                "Operation": "neq",
+                                "Comparand": "GREATER_THAN_OR_EQUAL_TO"
+                            }
+                        }
+                    ],
+                    "Variable": "logicType"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCZombieKillsCondition, Assembly-CSharp",
+            "DisplayName": "Zombie Kills Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The flag to use to track zombie kills for this condition.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Int16",
+                    "DefaultValue": 0,
+                    "Description": "Target number of zombie kills.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Zombie",
+                    "Type": "SDG.Unturned.EZombieSpeciality, Assembly-CSharp",
+                    "DefaultValue": "NONE",
+                    "Description": "Type of zombie required.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Required": true,
+                    "Variable": "zombie"
+                },
+                {
+                    "Key": "Spawn_Quantity",
+                    "Type": "Int32",
+                    "DefaultValue": 1,
+                    "IncludedDefaultValue": 0,
+                    "Description": "Number of zombies to spawn when @Spawn is true when a player enters the referenced @Nav area.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Minimum": 1,
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Spawn",
+                            "Value": true
+                        },
+                        {
+                            "Key": "Nav",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Nav",
+                                "Operation": "neq",
+                                "Comparand": 255
+                            }
+                        }
+                    ],
+                    "Variable": "spawnQuantity"
+                },
+                {
+                    "Key": "Spawn",
+                    "Type": "Flag",
+                    "DefaultValue": false,
+                    "Description": "If the zombie should automatically spawn when a player with this condition enters the navigation graph referenced by @Nav.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "#Self",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Spawn_Quantity",
+                                "Operation": "gt",
+                                "Comparand": 0
+                            }
+                        },
+                        {
+                            "Key": "Nav",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Nav",
+                                "Operation": "neq",
+                                "Comparand": 255
+                            }
+                        }
+                    ],
+                    "Variable": "spawn"
+                },
+                {
+                    "Key": "Nav",
+                    "Type": "NavId",
+                    "DefaultValue": 255,
+                    "Description": "A reference to a navigation graph placed in the map editor. A value of 255 allows the zombie to be killed anywhere.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Variable": "nav"
+                },
+                {
+                    "Key": "Radius",
+                    "Type": "Float32",
+                    "DefaultValue": 512,
+                    "MinimumExclusive": 0.1,
+                    "Except": [ 0, -1 ],
+                    "Description": "The maximum distance around players where, when a zombie is killed, it will count towards this condition. Note that the @Nav property still has to be respected. Values <= 0.1 are considered infinite.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Variable": "sqrRadius"
+                },
+                {
+                    "Key": "MinRadius",
+                    "Type": "Float32",
+                    "DefaultValue": 0,
+                    "Description": "The minimum distance away a zombie must be when its killed to count towards this condition.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Variable": "sqrMinRadius"
+                },
+                {
+                    "Key": "LevelTableOverride",
+                    "Type": "Int32",
+                    "DefaultValue": -1,
+                    "Minimum": 1,
+                    "Except": [ -1 ],
+                    "Description": "ID of a zombie type shown in the level editor. This is the number listed in parenthesis in the zombie spawns tab of the map editor.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Variable": "sqrMinRadius"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCHordeKillsCondition, Assembly-CSharp",
+            "DisplayName": "Horde Beacons Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-horde",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The flag to use to track zombie kills for this condition.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-horde",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Int16",
+                    "DefaultValue": 0,
+                    "Description": "Target number of zombie kills.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-horde",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Zombie",
+                    "Type": "SDG.Unturned.EZombieSpeciality, Assembly-CSharp",
+                    "DefaultValue": "NONE",
+                    "Description": "Type of zombie required.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-horde",
+                    "Required": true,
+                    "Variable": "zombie"
+                }
+            ]
         }
     ]
 }

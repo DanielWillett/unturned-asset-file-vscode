@@ -67,7 +67,8 @@
                     "Description": "The index of the blueprint to blacklist, starting at 0.",
                     "Variable": "index",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
-                    "Required": true
+                    "Required": true,
+                    "ValueRegexGroupReference": "@Item item-blueprints"
                 }
             ]
         }

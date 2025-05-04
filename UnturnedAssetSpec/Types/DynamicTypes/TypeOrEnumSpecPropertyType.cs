@@ -29,11 +29,7 @@ public sealed class TypeOrEnumSpecPropertyType :
     public TypeOrEnumSpecPropertyType(QualifiedType elementType)
     {
         ElementType = elementType;
-        DisplayName = QualifiedType.ExtractParts(elementType.Type.AsSpan(), out ReadOnlySpan<char> c, out _)
-            ? c.ToString()
-            : elementType.Type;
-
-        DisplayName = $"Type (or {DisplayName})";
+        DisplayName = $"Type or {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
     }
 
     /// <inheritdoc />
@@ -126,7 +122,4 @@ public sealed class TypeOrEnumSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<QualifiedType> other) => other is TypeOrEnumSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => this as ISpecPropertyType<TValue>;
 }

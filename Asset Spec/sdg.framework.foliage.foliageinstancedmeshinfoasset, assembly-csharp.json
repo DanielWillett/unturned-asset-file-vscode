@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
-    "Type": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
+    "Type": "SDG.Framework.Foliage.FoliageInstancedMeshInfoAsset, Assembly-CSharp",
     "DisplayName": "Instanced Mesh Foliage",
     "Parent": "SDG.Framework.Foliage.FoliageInfoAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
@@ -13,6 +13,7 @@
             "Type": "ContentReference",
             "ElementType": "UnityEngine.Mesh, UnityEngine.CoreModule",
             "Description": "The mesh to spawn where foliage is expected to be visible.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "mesh"
         },
         {
@@ -21,6 +22,7 @@
             "Type": "ContentReference",
             "ElementType": "UnityEngine.Material, UnityEngine.CoreModule",
             "Description": "The material to render the mesh with.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "material"
         },
         {
@@ -28,6 +30,7 @@
             "Type": "Boolean",
             "DefaultValue": false,
             "Description": "If the foliage should cast shadows onto the ground.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "castShadows"
         },
         {
@@ -37,6 +40,7 @@
             "IncludedDefaultValue": false,
             "Deprecated": true,
             "Description": "Gradually fade out foliage as the distance from the player increases. This option is no longer supported by the game.",
+            "Docs": "https://github.com/SmartlyDressedGames/Unturned-3.x-Community/issues/4302",
             "Variable": "tileDither"
         },
         {
@@ -47,6 +51,7 @@
             "Minimum": 1,
             "Except": [ -1 ],
             "Description": "The maximum distance in foliage tiles from the player in which foliage will be drawn. Foliage tiles outside the player's foliage quality setting will not be rendered either way. -1 indicates an infinite range confined to the player's foliage quality setting.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "drawDistance"
         },
         {
@@ -55,6 +60,7 @@
             "DefaultValue": null,
             "ElementType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
             "Description": "The foliage to spawn during the Christmas holiday.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "christmasRedirect"
         },
         {
@@ -63,6 +69,7 @@
             "DefaultValue": null,
             "ElementType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
             "Description": "The foliage to spawn during the Halloween holiday.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "halloweenRedirect"
         }
     ]

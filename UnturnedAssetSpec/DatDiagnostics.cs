@@ -8,6 +8,11 @@ internal static class DatDiagnostics
 {
     /* Suggestions */
 
+    /// <summary>
+    /// Displayed when a blueprint ID could be replaced with 'this'.
+    /// </summary>
+    public static readonly DatDiagnostic UNT101 = new DatDiagnostic("UNT101", DatDiagnosticSeverity.Hint);
+
     /* Warnings */
 
     /// <summary>
@@ -50,6 +55,21 @@ internal static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT1008 = new DatDiagnostic("UNT1008", DatDiagnosticSeverity.Warning);
 
+    /// <summary>
+    /// Displayed when an asset bundle version is invalid in an asset file.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1009 = new DatDiagnostic("UNT1009", DatDiagnosticSeverity.Error);
+
+    /// <summary>
+    /// Displayed when an a file path uses a backslash.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1010 = new DatDiagnostic("UNT1010", DatDiagnosticSeverity.Error);
+
+    /// <summary>
+    /// Displayed when an a file path doesn't match a glob pattern.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1011 = new DatDiagnostic("UNT1011", DatDiagnosticSeverity.Error);
+
     /* Errors */
 
     /// <summary>
@@ -76,4 +96,10 @@ internal static class DatDiagnostics
     /// Displayed when a configured type can't be found.
     /// </summary>
     public static readonly DatDiagnostic UNT2005 = new DatDiagnostic("UNT2005", DatDiagnosticSeverity.Error);
+
+    /// <summary>
+    /// Displayed when an asset bundle version is invalid in a master bundle file.
+    /// </summary>
+    public static readonly DatDiagnostic UNT2009 = new DatDiagnostic("UNT2009", DatDiagnosticSeverity.Error);
+
 }

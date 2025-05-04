@@ -162,4 +162,19 @@
   <data name="UNT1008_Beard" xml:space="preserve">
     <value>There is not a face with this index, valid indexes include 0 through {0}.</value>
   </data>
+  <data name="UNT101" xml:space="preserve">
+    <value>Blueprint supply IDs that are the same as their containing asset can be replaced with 'This'.</value>
+  </data>
+  <data name="UNT2009" xml:space="preserve">
+    <value>Unknown asset bundle version, expected a value between {0} and {1}.</value>
+  </data>
+  <data name="UNT1009" xml:space="preserve">
+    <value>Unknown asset bundle version, expected a value between {0} and {1}.</value>
+  </data>
+  <data name="UNT1010" xml:space="preserve">
+    <value>Paths should only use forward slashes to maintain compatibility with Unity and Unix-based operating systems.</value>
+  </data>
+  <data name="UNT1011" xml:space="preserve">
+    <value>File path should match pattern "{0}".</value>
+  </data>
 </root>

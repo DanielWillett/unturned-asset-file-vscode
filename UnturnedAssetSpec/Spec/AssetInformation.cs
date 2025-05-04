@@ -29,13 +29,35 @@ public class AssetInformation
     public int BeardCount { get; set; } = 16;
     public int HairCount { get; set; } = 23;
 
+
 #nullable restore
 
+    public AssetBundleVersionInfo?[]? AssetBundleVersions { get; set; }
     public int[]? EmissiveFaces { get; set; }
     public string? FaceTextureTemplate { get; set; }
     public string? EmissiveFaceTextureTemplate { get; set; }
     public string? BeardTextureTemplate { get; set; }
     public string? HairTextureTemplate { get; set; }
+
+    public bool TryGetAssetBundleVersionInfo(int assetBundleVersion, out UnityEngineVersion version, out string displayName)
+    {
+        version = default;
+        displayName = null!;
+        if (AssetBundleVersions == null || assetBundleVersion < 0 || assetBundleVersion >= AssetBundleVersions.Length)
+        {
+            return false;
+        }
+
+        AssetBundleVersionInfo? info = AssetBundleVersions[assetBundleVersion];
+        if (info?.DisplayName == null || info.EndVersion.Status == null)
+        {
+            return false;
+        }
+
+        version = info.EndVersion;
+        displayName = info.DisplayName;
+        return true;
+    }
 
     public bool TryGetFaceUrl(int face, out string url)
     {
@@ -137,7 +159,7 @@ public class AssetInformation
         if (ParentTypes == null)
         {
             if (Types == null || Types.Count == 0)
-                return new InverseTypeHierarchy(type, Array.Empty<QualifiedType>(), false);
+                return new InverseTypeHierarchy(new TypeHierarchy { Type = type }, Array.Empty<QualifiedType>(), false);
 
             Stack<QualifiedType> typeStack = new Stack<QualifiedType>();
             Dictionary<QualifiedType, InverseTypeHierarchy> parentTypes = new Dictionary<QualifiedType, InverseTypeHierarchy>(96);
@@ -153,7 +175,7 @@ public class AssetInformation
 
         return ParentTypes.TryGetValue(type, out InverseTypeHierarchy? typeHierarchy)
             ? typeHierarchy
-            : new InverseTypeHierarchy(type, Array.Empty<QualifiedType>(), false);
+            : new InverseTypeHierarchy(new TypeHierarchy { Type = type }, Array.Empty<QualifiedType>(), false);
     }
 
     private static void RegenParentTypes(TypeHierarchy hierarchy, Stack<QualifiedType> typeStack, ref QualifiedType[]? arr, Dictionary<QualifiedType, InverseTypeHierarchy> parentTypes)
@@ -162,18 +184,27 @@ public class AssetInformation
             return;
 
         arr ??= typeStack.ToArray();
-        parentTypes[hierarchy.Type] = new InverseTypeHierarchy(hierarchy.Type, typeStack.ToArray(), true);
+        parentTypes[hierarchy.Type] = new InverseTypeHierarchy(hierarchy, typeStack.ToArray(), true);
         typeStack.Push(hierarchy.Type);
 
         foreach (TypeHierarchy h in hierarchy.ChildTypes.Values)
         {
             QualifiedType[]? arrNull = null;
+            h.HasDataFiles |= hierarchy.HasDataFiles;
+            h.Parent = hierarchy;
             RegenParentTypes(h, typeStack, ref arrNull, parentTypes);
         }
 
         typeStack.Pop();
     }
+
+    public class AssetBundleVersionInfo
+    {
+        public required UnityEngineVersion EndVersion { get; set; }
+        public required string DisplayName { get; set; }
+    }
 }
+
 
 public class TypeHierarchy
 {
@@ -181,10 +212,14 @@ public class TypeHierarchy
 
     public const string UseableBaseType = "SDG.Unturned.Useable, Assembly-CSharp";
 
+    public bool HasDataFiles { get; set; }
     public bool IsAbstract { get; set; }
 
     [JsonIgnore]
     public QualifiedType Type { get; set; }
+
+    [JsonIgnore]
+    public TypeHierarchy? Parent { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, TypeHierarchy>? ChildTypes { get; set; }
@@ -192,12 +227,14 @@ public class TypeHierarchy
 
 public class InverseTypeHierarchy
 {
-    public QualifiedType Type { get; set; }
+    public TypeHierarchy Hierarchy { get; }
+    public QualifiedType Type { get; }
     public QualifiedType[] ParentTypes { get; }
     public bool IsValid { get; }
-    public InverseTypeHierarchy(QualifiedType type, QualifiedType[] parentTypes, bool isValid)
+    public InverseTypeHierarchy(TypeHierarchy hierarchy, QualifiedType[] parentTypes, bool isValid)
     {
-        Type = type;
+        Hierarchy = hierarchy;
+        Type = hierarchy.Type;
         ParentTypes = parentTypes;
         IsValid = isValid;
     }

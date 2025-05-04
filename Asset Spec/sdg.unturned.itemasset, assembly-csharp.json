@@ -1,6 +1,5 @@
 {
-    // "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
-    "$schema": "./Asset%20Spec%20Schema.json",
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
     "Type": "SDG.Unturned.ItemAsset, Assembly-CSharp",
     "DisplayName": "Item",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",

@@ -180,14 +180,18 @@ public class AssetSpecDatabase
         }
         assetInfo.AssetCategories ??= new Dictionary<QualifiedType, string>(0);
         assetInfo.Types ??= new Dictionary<QualifiedType, TypeHierarchy>(0);
+        assetInfo.GetParentTypes(default);
         assetInfo.ParentTypes ??= new Dictionary<QualifiedType, InverseTypeHierarchy>(0);
 
         Information = assetInfo;
 
         Dictionary<QualifiedType, AssetTypeInformation> types = new Dictionary<QualifiedType, AssetTypeInformation>(assetInfo.ParentTypes.Count);
-        foreach (QualifiedType type in assetInfo.ParentTypes.Keys)
+        foreach (InverseTypeHierarchy type in assetInfo.ParentTypes.Values)
         {
-            string normalizedTypeName = type.Normalized.Type.ToLowerInvariant();
+            if (!type.Hierarchy.HasDataFiles)
+                continue;
+
+            string normalizedTypeName = type.Type.Normalized.Type.ToLowerInvariant();
             AssetTypeInformation? typeInfo;
             using (Stream? stream = await GetFileAsync(
                        $"https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/{Uri.EscapeDataString(normalizedTypeName)}.json",

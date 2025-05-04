@@ -1,16 +1,45 @@
 {
+    "AssetBundleVersions":
+    [
+        null,
+        {
+            "EndVersion": "5.5.3f1",
+            "DisplayName": "Unity 5.5"
+        },
+        {
+            "EndVersion": "2017.4.24f1",
+            "DisplayName": "Unity 2017 LTS"
+        },
+        {
+            "EndVersion": "2019.4.38f1",
+            "DisplayName": "Unity 2018-2019 LTS"
+        },
+        {
+            "EndVersion": "2020.3.38f1",
+            "DisplayName": "Unity 2020 LTS"
+        },
+        {
+            "EndVersion": "2021.3.29f1",
+            "DisplayName": "Unity 2021 LTS"
+        }
+    ],
+    "FaceCount": 32,
+    "BeardCount": 16,
+    "HairCount": 23,
+    "EmissiveFaces": [ 14 ],
+    "FaceTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Faces/Face%20{0}.png",
+    "EmissiveFaceTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Faces/Face%20{0}/Texture.png",
+    "BeardTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Beards/Beard%20{0}.png",
+    "HairTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Hair/Hair%20{0}.png",
     "Types":
-    {
-        "FaceCount": 32,
-        "BeardCount": 16,
-        "HairCount": 23,
-        "EmissiveFaces": [ 14 ],
-        "FaceTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Faces/Face%20{0}.png",
-        "EmissiveFaceTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Faces/Face%20{0}/Texture.png",
-        "BeardTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Beards/Beard%20{0}.png",
-        "HairTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Hair/Hair%20{0}.png",
+    {   
+        "SDG.Unturned.MasterBundleConfig, Assembly-CSharp":
+        {
+            "HasDataFiles": true
+        },
         "SDG.Unturned.Asset, Assembly-CSharp":
         {
+            "HasDataFiles": true,
             "IsAbstract": true,
             "SDG.Unturned.AirdropAsset, Assembly-CSharp": { },
             "SDG.Unturned.AnimalAsset, Assembly-CSharp": { },
@@ -80,7 +109,7 @@
                         "SDG.Unturned.ItemTankAsset, Assembly-CSharp": { },
                         "SDG.Unturned.ItemTrapAsset, Assembly-CSharp": { }
                     },
-                    "SDG.Unturned.ItemStructureAsset, Assembly-CSharp": { },
+                    "SDG.Unturned.ItemStructureAsset, Assembly-CSharp": { }
                 },
                 "SDG.Unturned.ItemRefillAsset, Assembly-CSharp": { },
                 "SDG.Unturned.ItemSupplyAsset, Assembly-CSharp": { },
@@ -89,7 +118,7 @@
                     "SDG.Unturned.ItemVehiclePaintToolAsset, Assembly-CSharp": { },
                     "SDG.Unturned.ItemVehicleRepairToolAsset, Assembly-CSharp":
                     {
-                        "SDG.Unturned.ItemTireAsset, Assembly-CSharp": { },
+                        "SDG.Unturned.ItemTireAsset, Assembly-CSharp": { }
                     }
                 },
                 "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp":

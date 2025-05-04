@@ -7,33 +7,23 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public readonly ref struct SpecPropertyTypeParseContext
 {
-    public AssetFileValueNode? Node { get; }
-    public AssetFileNode? Parent { get; }
-    public AssetSpecDatabase Database { get; }
-    public string? BaseKey { get; }
-    public AssetFileType FileType { get; }
+    public required AssetFileValueNode? Node { get; init; }
+    public required AssetFileNode? Parent { get; init; }
+    public required AssetSpecDatabase Database { get; init; }
+    public AssetFileTree? File { get; init; }
+    public string? BaseKey { get; init; }
+    public required AssetFileType FileType { get; init; }
 
     public ICollection<DatDiagnosticMessage>? Diagnostics { get; }
 
     public bool HasDiagnostics { get; }
 
-    public SpecPropertyTypeParseContext(
-        AssetFileValueNode? node,
-        AssetFileNode? parent,
-        AssetSpecDatabase database,
-        ICollection<DatDiagnosticMessage>? diagnostics,
-        string? baseKey,
-        AssetFileType fileType)
+    public SpecPropertyTypeParseContext(ICollection<DatDiagnosticMessage> diagnostics)
     {
-        if (diagnostics != null && diagnostics.IsReadOnly)
+        if (diagnostics is { IsReadOnly: true })
             throw new ArgumentException("Diagnostics collection is readonly.", nameof(diagnostics));
 
-        Node = node;
-        Parent = parent;
-        Database = database;
         Diagnostics = diagnostics;
-        BaseKey = baseKey;
-        FileType = fileType;
         HasDiagnostics = diagnostics != null;
     }
 

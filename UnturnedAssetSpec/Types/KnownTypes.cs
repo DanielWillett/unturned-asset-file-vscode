@@ -23,6 +23,12 @@ public static class KnownTypes
     public static ISpecPropertyType<long> Int64 => Int64SpecPropertyType.Instance;
 
     public static ISpecPropertyType<string> String => StringSpecPropertyType.Instance;
+
+    public static ISpecPropertyType<string> FilePathString(string? globPattern = null) =>
+        string.IsNullOrEmpty(globPattern)
+            ? FilePathStringSpecPropertyType.Instance
+            : new FilePathStringSpecPropertyType(globPattern);
+
     public static ISpecPropertyType<string> RichTextString => RichTextStringSpecPropertyType.Instance;
     public static ISpecPropertyType<char> Character => CharacterSpecPropertyType.Instance;
 
@@ -58,4 +64,6 @@ public static class KnownTypes
     public static ISpecPropertyType<BundleReference> ContentReference(QualifiedType elementType)
         => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.ContentReference);
     public static ISpecPropertyType<BundleReference> AudioReference => MasterBundleReferenceSpecPropertyType.AudioReference;
+
+    public static ISpecPropertyType<int> AssetBundleVersion => AssetBundleVersionSpecPropertyType.Instance;
 }
