@@ -6,6 +6,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class CommaDelimtedStringSpecPropertyType :
     BaseSpecPropertyType<string>,
     ISpecPropertyType<string>,
+    INestedSpecPropertyType
     IEquatable<CommaDelimtedStringSpecPropertyType>
 {
     private static readonly char[] Separators = [ ',' ];

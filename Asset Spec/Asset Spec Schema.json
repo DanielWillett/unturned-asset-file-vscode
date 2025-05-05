@@ -127,6 +127,10 @@
                     "title": "A Globally Unique Identifier (also called a UUID) referencing another asset."
                 },
                 {
+                    "const": "AssetReferenceString",
+                    "title": "A Globally Unique Identifier (also called a UUID) referencing another asset."
+                },
+                {
                     "const": "ContentReference",
                     "title": "A reference to a Unity object in the specified masterbundle. Exact same as MasterBundleReference."
                 },
@@ -173,6 +177,10 @@
                 {
                     "const": "NavId",
                     "title": "An 8-bit unsigned integer referencing a navigation graph in a map."
+                },
+                {
+                    "const": "SpawnpointId",
+                    "title": "An string ID referencing a spawnpoint node in a map."
                 },
                 {
                     "const": "FlagId",

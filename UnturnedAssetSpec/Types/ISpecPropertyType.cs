@@ -1,6 +1,7 @@
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
+
 public interface ISpecPropertyType : IEquatable<ISpecPropertyType>
 {
     string DisplayName { get; }
@@ -20,6 +21,10 @@ public interface IElementTypeSpecPropertyType : ISpecPropertyType
 {
     QualifiedType ElementType { get; }
 }
+public interface INestedSpecPropertyType : ISpecPropertyType
+{
+    void ResolveInnerTypes()
+}
 
 public enum SpecPropertyTypeKind
 {
@@ -28,5 +33,6 @@ public enum SpecPropertyTypeKind
     Boolean,
     Struct,
     Class,
-    Other
+    Other,
+    Enum
 }

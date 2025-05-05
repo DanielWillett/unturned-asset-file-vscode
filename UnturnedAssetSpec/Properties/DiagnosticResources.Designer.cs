@@ -205,6 +205,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enum value &quot;{0}&quot; isn&apos;t recognized. See documentation for a list of valid values..
+        /// </summary>
+        internal static string UNT1014 {
+            get {
+                return ResourceManager.GetString("UNT1014", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a type deriving from &apos;{0}&apos;..
+        /// </summary>
+        internal static string UNT1015 {
+            get {
+                return ResourceManager.GetString("UNT1015", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected &apos;}&apos; at end of dictionary..
         /// </summary>
         internal static string UNT2001 {

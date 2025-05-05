@@ -36,6 +36,7 @@ public static class OmniSharpAssetSpecExtensionsExtensions
             SpecPropertyTypeKind.Boolean => SymbolKind.Boolean,
             SpecPropertyTypeKind.Struct => SymbolKind.Struct,
             SpecPropertyTypeKind.Class => SymbolKind.Class,
+            SpecPropertyTypeKind.Enum => SymbolKind.EnumMember,
             _ => SymbolKind.String
         };
     }

@@ -1,4 +1,5 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -11,6 +12,7 @@ public class IdSpecPropertyType :
 {
     public EnumSpecTypeValue Category { get; }
 
+    public EquatableArray<QualifiedType> OtherElementTypes { get; }
     public QualifiedType ElementType { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -25,23 +27,44 @@ public class IdSpecPropertyType :
     /// <inheritdoc />
     public Type ValueType => typeof(ushort);
 
-    public IdSpecPropertyType(EnumSpecTypeValue category)
+    public IdSpecPropertyType(EnumSpecTypeValue category, string[]? specialTypes)
+        : this(
+            category,
+            default,
+            category == AssetCategory.None ? "Any ID" : $"{category.Casing} ID",
+            specialTypes
+        )
     {
         if (!category.Type.Equals(AssetCategory.TypeOf))
         {
             throw new ArgumentException("Expected asset category enum value.", nameof(category));
         }
-
-        Category = category;
-        ElementType = default;
-        DisplayName = category == AssetCategory.None ? "Any ID" : $"{category.Casing} ID";
     }
 
-    public IdSpecPropertyType(QualifiedType qualifiedType)
+    public IdSpecPropertyType(QualifiedType qualifiedType, string[]? specialTypes)
+        : this(
+            AssetCategory.None,
+            qualifiedType,
+            QualifiedType.ExtractTypeName(qualifiedType.Type.AsSpan()).ToString() + " ID",
+            specialTypes
+        )
     {
-        Category = AssetCategory.None;
-        ElementType = qualifiedType;
-        DisplayName = QualifiedType.ExtractTypeName(qualifiedType.Type.AsSpan()).ToString() + " ID";
+    }
+
+    private IdSpecPropertyType(EnumSpecTypeValue category, QualifiedType elementType, string displayName, string[]? specialTypes)
+    {
+        Category = category;
+        ElementType = elementType;
+        DisplayName = displayName;
+        if (specialTypes == null || specialTypes.Length == 0)
+        {
+            OtherElementTypes = new EquatableArray<QualifiedType>(0);
+            return;
+        }
+
+        OtherElementTypes = new EquatableArray<QualifiedType>(specialTypes.Length);
+        for (int i = 0; i < specialTypes.Length; ++i)
+            OtherElementTypes.Array[i] = new QualifiedType(specialTypes[i]);
     }
 
     /// <inheritdoc />
@@ -64,7 +87,7 @@ public class IdSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(IdSpecPropertyType other) => other != null && GetType() == other.GetType() && Category.Equals(other.Category);
+    public bool Equals(IdSpecPropertyType other) => other != null && GetType() == other.GetType() && Category.Equals(other.Category) && OtherElementTypes.Equals(other.OtherElementTypes);
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType other) => other is IdSpecPropertyType t && Equals(t);

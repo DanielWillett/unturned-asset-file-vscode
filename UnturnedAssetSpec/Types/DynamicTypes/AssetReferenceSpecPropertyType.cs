@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -11,6 +12,9 @@ public sealed class AssetReferenceSpecPropertyType :
     IElementTypeSpecPropertyType,
     IEquatable<AssetReferenceSpecPropertyType>
 {
+    
+    public EquatableArray<QualifiedType> OtherElementTypes { get; }
+    public bool CanParseDictionary { get; }
     public QualifiedType ElementType { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -25,17 +29,28 @@ public sealed class AssetReferenceSpecPropertyType :
     /// <inheritdoc />
     public Type ValueType => typeof(Guid);
 
-    public AssetReferenceSpecPropertyType(QualifiedType elementType)
+    public AssetReferenceSpecPropertyType(QualifiedType elementType, bool canParseDictionary, string[]? specialTypes)
     {
+        CanParseDictionary = canParseDictionary;
         if (elementType.Type == null || elementType.Equals(QualifiedType.AssetBaseType))
         {
             ElementType = QualifiedType.AssetBaseType;
             DisplayName = "Asset Reference";
+            OtherElementTypes = new EquatableArray<QualifiedType>(0);
         }
         else
         {
             ElementType = elementType;
             DisplayName = $"Asset Reference to {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
+            if (specialTypes == null || specialTypes.Length == 0)
+            {
+                OtherElementTypes = new EquatableArray<QualifiedType>(0);
+                return;
+            }
+
+            OtherElementTypes = new EquatableArray<QualifiedType>(specialTypes.Length);
+            for (int i = 0; i < specialTypes.Length; ++i)
+                OtherElementTypes.Array[i] = new QualifiedType(specialTypes[i]);
         }
     }
 
@@ -65,7 +80,7 @@ public sealed class AssetReferenceSpecPropertyType :
             return KnownTypeValueHelper.TryParseGuid(stringValue.Value, out value) || FailedToParse(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileDictionaryValueNode dictionary)
+        if (!CanParseDictionary || parse.Node is not AssetFileDictionaryValueNode dictionary)
         {
             return FailedToParse(in parse, out value);
         }
@@ -84,7 +99,7 @@ public sealed class AssetReferenceSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(AssetReferenceSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType);
+    public bool Equals(AssetReferenceSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType) && OtherElementTypes.Equals(other.OtherElementTypes);
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType other) => other is AssetReferenceSpecPropertyType t && Equals(t);

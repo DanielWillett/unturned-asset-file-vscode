@@ -58,27 +58,37 @@ internal static class DatDiagnostics
     /// <summary>
     /// Displayed when an asset bundle version is invalid in an asset file.
     /// </summary>
-    public static readonly DatDiagnostic UNT1009 = new DatDiagnostic("UNT1009", DatDiagnosticSeverity.Error);
+    public static readonly DatDiagnostic UNT1009 = new DatDiagnostic("UNT1009", DatDiagnosticSeverity.Warning);
 
     /// <summary>
     /// Displayed when an a file path uses a backslash.
     /// </summary>
-    public static readonly DatDiagnostic UNT1010 = new DatDiagnostic("UNT1010", DatDiagnosticSeverity.Error);
+    public static readonly DatDiagnostic UNT1010 = new DatDiagnostic("UNT1010", DatDiagnosticSeverity.Warning);
 
     /// <summary>
     /// Displayed when an a file path doesn't match a glob pattern.
     /// </summary>
-    public static readonly DatDiagnostic UNT1011 = new DatDiagnostic("UNT1011", DatDiagnosticSeverity.Error);
+    public static readonly DatDiagnostic UNT1011 = new DatDiagnostic("UNT1011", DatDiagnosticSeverity.Warning);
 
     /// <summary>
     /// Displayed when a legacy color is using an out of range value (should be 0-1).
     /// </summary>
-    public static readonly DatDiagnostic UNT1012 = new DatDiagnostic("UNT1012", DatDiagnosticSeverity.Error);
+    public static readonly DatDiagnostic UNT1012 = new DatDiagnostic("UNT1012", DatDiagnosticSeverity.Warning);
 
     /// <summary>
     /// Displayed when a NPC achievement ID isn't recognized.
     /// </summary>
-    public static readonly DatDiagnostic UNT1013 = new DatDiagnostic("UNT1013", DatDiagnosticSeverity.Error);
+    public static readonly DatDiagnostic UNT1013 = new DatDiagnostic("UNT1013", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// Displayed when a enum value isn't recognized.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1014 = new DatDiagnostic("UNT1014", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// Displayed when a type value isn't of the expected base type.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1015 = new DatDiagnostic("UNT1015", DatDiagnosticSeverity.Warning);
 
     /* Errors */
 

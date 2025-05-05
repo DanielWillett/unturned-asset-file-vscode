@@ -8,8 +8,10 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -21,6 +23,7 @@ public class AssetSpecDatabase : IDisposable
     public const string UnturnedName = "Unturned";
     public const string UnturnedAppId = "304930";
 
+    private SpecPropertyTypeConverter? _specPropertyTypeConverter;
     private JsonDocument? _statusJson;
 
     public string[]? NPCAchievementIds { get; private set; }
@@ -57,7 +60,7 @@ public class AssetSpecDatabase : IDisposable
     {
         UnturnedInstallDirectory = unturnedInstallDirectory;
     }
-
+    
     protected virtual void Dispose(bool disposing)
     {
         if (disposing)
@@ -117,10 +120,18 @@ public class AssetSpecDatabase : IDisposable
 
         string? assetType = null;
         int divIndex = property.IndexOf("::", 0, StringComparison.Ordinal);
+        bool local = false;
         if (divIndex >= 0 && divIndex < property.Length - 2)
         {
             if (divIndex != 0)
+            {
                 assetType = property.Substring(0, divIndex);
+                if (assetType.Equals("$local$", StringComparison.OrdinalIgnoreCase))
+                {
+                    assetType = null;
+                    local = true;
+                }
+            }
             property = property.Substring(divIndex + 2);
         }
 
@@ -135,7 +146,7 @@ public class AssetSpecDatabase : IDisposable
                 continue;
             }
 
-            List<SpecProperty> props = context == SpecPropertyContext.Localization ? info.LocalizationProperties : info.Properties;
+            List<SpecProperty> props = local || context == SpecPropertyContext.Localization ? info.LocalizationProperties : info.Properties;
             SpecProperty? prop = props.Find(p => p.Key.Equals(property, StringComparison.OrdinalIgnoreCase));
             prop ??= props.Find(p =>
             {
@@ -154,6 +165,11 @@ public class AssetSpecDatabase : IDisposable
             }
         }
 
+        if (!local && context == SpecPropertyContext.Property)
+        {
+            return FindPropertyInfo(property, fileType, SpecPropertyContext.Localization);
+        }
+
         return null;
     }
 
@@ -167,6 +183,8 @@ public class AssetSpecDatabase : IDisposable
             MaxDepth = 14,
             AllowTrailingCommas = true
         };
+
+        Options.Converters.Add(new SpecPropertyTypeConverter(this));
 
         Lazy<HttpClient> lazy = new Lazy<HttpClient>(LazyThreadSafetyMode.ExecutionAndPublication);
 

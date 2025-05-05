@@ -2,9 +2,10 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public interface ISpecType : IEquatable<ISpecType>, IComparable<ISpecType>
+public interface ISpecType : IEquatable<ISpecType>
 {
-    string Type { get; }
+    QualifiedType Parent { get; }
+    QualifiedType Type { get; }
     string DisplayName { get; }
     string? Docs { get; }
 }

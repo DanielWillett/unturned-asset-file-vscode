@@ -1,35 +1,24 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.Json.Serialization;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-[JsonConverter(typeof(AssetTypeInformationConverter))]
 [DebuggerDisplay("{DisplayName,nq}")]
-public sealed class AssetTypeInformation : ISpecType
+public sealed class CustomSpecType : ISpecType
 {
     public QualifiedType Type { get; internal set; }
-
-    public string Category { get; set; } = "NONE";
 
     public string? Docs { get; set; }
 
     public QualifiedType Parent { get; set; }
-
-    public ushort VanillaIdLimit { get; set; }
-
-    public bool RequireId { get; set; }
 
     public string DisplayName { get; set; } = string.Empty;
 
 #nullable disable
     public List<SpecProperty> Properties { get; set; }
     public List<SpecProperty> LocalizationProperties { get; set; }
-    public List<SpecBundleAsset> BundleAssets { get; set; }
-    public List<ISpecType> Types { get; set; }
 #nullable restore
 
     public bool Equals(AssetTypeInformation other) => other != null && Type.Equals(other.Type);

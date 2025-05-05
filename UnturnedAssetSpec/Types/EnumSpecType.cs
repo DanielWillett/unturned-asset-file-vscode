@@ -4,9 +4,9 @@ using System.Diagnostics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public class EnumSpecType : ISpecType, IEquatable<EnumSpecType>, IComparable<EnumSpecType>
+[DebuggerDisplay("{DisplayName,nq}")]
+public class EnumSpecType : ISpecType, IEquatable<EnumSpecType>
 {
-    string ISpecType.Type => Type.Type;
     public required QualifiedType Type { get; init; }
 
     public required string DisplayName { get; init; }
@@ -14,39 +14,16 @@ public class EnumSpecType : ISpecType, IEquatable<EnumSpecType>, IComparable<Enu
     public required string? Docs { get; init; }
 
     public required EnumSpecTypeValue[] Values { get; init; }
-    
-    public bool Equals(EnumSpecType other)
-    {
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
 
-        if (other == null)
-        {
-            return false;
-        }
-
-        return string.Equals(Type, other.Type, StringComparison.Ordinal);
-    }
-
-    public int CompareTo(EnumSpecType other)
-    {
-        if (ReferenceEquals(this, other))
-        {
-            return 0;
-        }
-
-        return other == null ? 1 : string.Compare(Type, other.Type, StringComparison.Ordinal);
-    }
+    public bool Equals(EnumSpecType other) => other != null && string.Equals(Type, other.Type, StringComparison.Ordinal);
 
     public bool Equals(ISpecType other) => other is EnumSpecType s && Equals(s);
-
-    public int CompareTo(ISpecType other) => other is EnumSpecType s ? CompareTo(s) : 1;
 
     public override bool Equals(object? obj) => obj is EnumSpecType s && Equals(s);
 
     public override int GetHashCode() => Type.GetHashCode();
+
+    public override string ToString() => Type.ToString();
 }
 
 [DebuggerDisplay("{Value,nq}")]

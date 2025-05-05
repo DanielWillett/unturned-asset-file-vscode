@@ -174,6 +174,8 @@ public class AssetTypeInformationConverter : JsonConverter<AssetTypeInformation?
         info.BundleAssets ??= new List<SpecBundleAsset>(0);
         info.Types ??= new List<ISpecType>(0);
 
+        info.DisplayName ??= QualifiedType.ExtractTypeName(info.Type.Type.AsSpan()).ToString();
+
         return info;
     }
 

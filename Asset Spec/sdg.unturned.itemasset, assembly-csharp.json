@@ -225,8 +225,8 @@
         {
             "Key": "Useable",
             "Type": "TypeOrEnum",
-            "ElementType": "SDG.Unturned.EUseableType, Assembly-CSharp",
-            "SpecialTypes": [ "SDG.Unturned.Useable, Assembly-CSharp" ],
+            "ElementType": "SDG.Unturned.Useable, Assembly-CSharp",
+            "SpecialTypes": [ "SDG.Unturned.EUseableType, Assembly-CSharp" ],
             "DefaultValue": null,
             "Description": "The type of Useable object to create when this item is equipped.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#useable-doc-item-asset-intro-euseabletype-none",

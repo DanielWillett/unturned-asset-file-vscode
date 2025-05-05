@@ -1,6 +1,5 @@
 {
-    // "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
-    "$schema": "./Asset Spec Schema.json",
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
     "Type": "SDG.Unturned.Asset, Assembly-CSharp",
     "DisplayName": "Asset",
     "Parent": null,
@@ -19,8 +18,8 @@
         },
         {
             "Key": "Type",
-            "Type": "Type",
-            "SpecialTypes": [ "SDG.Unturned.Asset, Assembly-CSharp" ],
+            "Type": "TypeOrEnum",
+            "ElementType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.AssetTypeAlias, UnturnedAssetSpec",
             "Description": "Type of Asset to create.",
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header",
@@ -1502,7 +1501,7 @@
                 },
                 {
                     "Key": "Object",
-                    "Type": "Guid",
+                    "Type": "AssetReferenceString",
                     "ElementType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "The object that needs to be destroyed.",
@@ -1533,7 +1532,7 @@
             [
                 {
                     "Key": "GUID",
-                    "Type": "Guid",
+                    "Type": "AssetReferenceString",
                     "ElementType": "SDG.Unturned.ItemCurrencyAsset, Assembly-CSharp",
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "The currency type to count.",
@@ -1579,7 +1578,7 @@
                 },
                 {
                     "Key": "Tree",
-                    "Type": "Guid",
+                    "Type": "AssetReferenceString",
                     "ElementType": "SDG.Unturned.ResourceAsset, Assembly-CSharp",
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "The resource that needs to be destroyed.",
@@ -1602,7 +1601,7 @@
             [
                 {
                     "Key": "GUID",
-                    "Type": "Guid",
+                    "Type": "AssetReferenceString",
                     "ElementType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp",
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "The weather type to look for.",
@@ -1634,7 +1633,7 @@
             [
                 {
                     "Key": "GUID",
-                    "Type": "Guid",
+                    "Type": "AssetReferenceString",
                     "ElementType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp",
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "The weather type to look for.",
@@ -1890,6 +1889,68 @@
                     "Casing": "Increment",
                     "Description": "Add the given value to the flag's old value.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ENPCOperationType, Assembly-CSharp",
+            "DisplayName": "Operation Type",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "Do nothing.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math"
+                },
+                {
+                    "Value": "ASSIGN",
+                    "Casing": "Assign",
+                    "Description": "Set the flag to the given value or other flag, disregarding its old value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math"
+                },
+                {
+                    "Value": "ADDITION",
+                    "Casing": "Addition",
+                    "Description": "Add the given value or other flag to the flag's old value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math"
+                },
+                {
+                    "Value": "SUBTRACTION",
+                    "Casing": "Subtraction",
+                    "Description": "Subtract the given value or other flag from the flag's old value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math"
+                },
+                {
+                    "Value": "MULTIPLICATION",
+                    "Casing": "Multiplication",
+                    "Description": "Multiply the given value or other flag by the flag's old value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math"
+                },
+                {
+                    "Value": "DIVISION",
+                    "Casing": "Division",
+                    "Description": "Divide the flag's old value by the given value or other flag.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math"
+                },
+                {
+                    "Value": "MODULO",
+                    "Casing": "Modulo",
+                    "Description": "Set the flag to the remainder of the old flag value divided by the given value or other flag.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math"
+                },
+                {
+                    "Value": "RANDOM_INCLUSIVE",
+                    "Casing": "Random_Inclusive",
+                    "Description": "Set the flag to a random value between the old flag value and the given value or other flag, including both values.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math"
+                },
+                {
+                    "Value": "RANDOM_EXCLUSIVE",
+                    "Casing": "Random_Exclusive",
+                    "Description": "Set the flag to a random value between the old flag value and the given value or other flag, including the old flag but not the new value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math"
                 }
             ]
         },
@@ -2259,7 +2320,8 @@
                 },
                 {
                     "Key": "Spawnpoint",
-                    "Type": "String",
+                    "Type": "SpawnpointId",
+                    "DefaultValue": null,
                     "Description": "The ID of the spawnpoint node to spawn the vehicle at in the map editor.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#vehicle",
                     "Required": true,
@@ -2268,10 +2330,280 @@
                 {
                     "Key": "PaintColor",
                     "Type": "Color32RGB",
+                    "DefaultValue": null,
                     "Description": "The ID of the spawnpoint node to spawn the vehicle at in the map editor.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#vehicle",
                     "Required": true,
                     "Variable": "spawnpoint"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCTeleportReward, Assembly-CSharp",
+            "DisplayName": "Teleport Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#teleport",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Spawnpoint",
+                    "Type": "SpawnpointId",
+                    "DefaultValue": null,
+                    "Description": "The ID of the spawnpoint node to teleport the player to in the map editor.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#teleport",
+                    "Required": true,
+                    "Variable": "spawnpoint"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCEventReward, Assembly-CSharp",
+            "DisplayName": "NPC Event Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#event",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "String",
+                    "DefaultValue": null,
+                    "Description": "Unique ID of the event to broadcast. This can be picked up by plugins or using the NPC Gloabl Event component.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mod-hooks.html#npc-global-event-hook",
+                    "Required": true,
+                    "Variable": "id"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCFlagMathReward, Assembly-CSharp",
+            "DisplayName": "Flag Math Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "A_ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "ID of the flag to apply math to.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math",
+                    "Required": true,
+                    "Variable": "flag_A_ID"
+                },
+                {
+                    "Key": "B_ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "ID of a flag to use as an operand, the value to be applied to flag @A_ID.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math",
+                    "Variable": "flag_B_ID",
+                    "ExclusiveWith": [ "B_Value" ],
+                    "Required": "#B_Value.Excluded"
+                },
+                {
+                    "Key": "B_Value",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "Value to use as an operand, the value to be applied to flag @A_ID, if @B_ID isn't specified.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math",
+                    "Variable": "defaultFlag_B_Value",
+                    "ExclusiveWith": [ "B_ID" ],
+                    "Required": "#B_ID.Excluded"
+                },
+                {
+                    "Key": "Operation",
+                    "Type": "SDG.Unturned.ENPCOperationType, Assembly-CSharp",
+                    "DefaultValue": "NONE",
+                    "Description": "Type of operation to perform on @A_ID.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math",
+                    "Variable": "operationType",
+                    "Required": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCCurrencyReward, Assembly-CSharp",
+            "DisplayName": "Currency Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#currency",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "GUID",
+                    "Type": "AssetReferenceString",
+                    "ElementType": "SDG.Unturned.ItemCurrencyAsset, Assembly-CSharp",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "Currency type to give the player.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#currency",
+                    "Required": true,
+                    "Variable": "currency"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "UInt32",
+                    "DefaultValue": 0,
+                    "Description": "Amount of currency to give the player.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#currency",
+                    "Required": true,
+                    "Variable": "value"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCHintReward, Assembly-CSharp",
+            "DisplayName": "Hint Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#hint",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Text",
+                    "Type": "RichTextString",
+                    "DefaultValue": "@$local$::Text",
+                    "IncludedDefaultValue": null,
+                    "Description": "Message to display on the hint popup. Better to store this value in localization instead.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#hint",
+                    "Variable": "text"
+                },
+                {
+                    "Key": "Duration",
+                    "Type": "Float32",
+                    "DefaultValue": 2,
+                    "Description": "Number of seconds the hint will stay visible for.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#hint",
+                    "Variable": "duration"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCPlayerSpawnpointReward, Assembly-CSharp",
+            "DisplayName": "Player Spawnpoint Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-spawnpoint",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "SpawnpointId",
+                    "DefaultValue": null,
+                    "Description": "The ID of the spawnpoint node to respawn the player at next time they die. Leave blank or exclude to reset the player's next spawnpoint back to a random one.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-spawnpoint",
+                    "Variable": "id"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCPlayerLifeHealthReward, Assembly-CSharp",
+            "DisplayName": "Health Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-health",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int32",
+                    "DefaultValue": 0,
+                    "Minimum": -100,
+                    "Maximum": 100,
+                    "Description": "Applies a change in health to the player, either positive or negative.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-health",
+                    "Variable": "value"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCPlayerLifeFoodReward, Assembly-CSharp",
+            "DisplayName": "Food Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-food",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int32",
+                    "DefaultValue": 0,
+                    "Minimum": -100,
+                    "Maximum": 100,
+                    "Description": "Applies a change in food to the player, either positive or negative.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-food",
+                    "Variable": "value"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCPlayerLifeWaterReward, Assembly-CSharp",
+            "DisplayName": "Water Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-water",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int32",
+                    "DefaultValue": 0,
+                    "Minimum": -100,
+                    "Maximum": 100,
+                    "Description": "Applies a change in water to the player, either positive or negative.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-water",
+                    "Variable": "value"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCPlayerLifeVirusReward, Assembly-CSharp",
+            "DisplayName": "Immunity Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-virus",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int32",
+                    "DefaultValue": 0,
+                    "Minimum": -100,
+                    "Maximum": 100,
+                    "Description": "Applies a change in immunity to the player, either positive or negative.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-virus",
+                    "Variable": "value"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCRewardsListAssetReward, Assembly-CSharp",
+            "DisplayName": "Reward List Import",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#rewards-list-asset",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "GUID",
+                    "Type": "AssetReferenceString",
+                    "ElementType": "SDG.Unturned.NPCRewardsAsset, Assembly-CSharp",
+                    "SpecialTypes": [ "SDG.Unturned.SpawnAsset, Assembly-CSharp" ],
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "A refernce to a reward list asset or a spawn table containing reward lists.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#rewards-list-asset",
+                    "Variable": "assetRef"
+                }
+            ]
+        },
+        // todo: continue here
+        {
+            "Type": "SDG.Unturned.NPCPlayerLifeStaminaReward, Assembly-CSharp",
+            "DisplayName": "Stamina Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-stamina",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int32",
+                    "DefaultValue": 0,
+                    "Minimum": -100,
+                    "Maximum": 100,
+                    "Description": "Applies a change in stamina to the player, either positive or negative.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-stamina",
+                    "Variable": "value"
                 }
             ]
         },

@@ -136,6 +136,11 @@ public class AssetInformation
         return IsAssignableTo(from, type);
     }
 
+    public bool IsAbstract(QualifiedType type)
+    {
+        return GetParentTypes(type).IsAbstract;
+    }
+
     public TypeHierarchy GetAssetHierarchy()
     {
         return GetHierarchy(TypeHierarchy.AssetBaseType);
@@ -233,10 +238,12 @@ public class InverseTypeHierarchy
     public QualifiedType Type { get; }
     public QualifiedType[] ParentTypes { get; }
     public bool IsValid { get; }
+    public bool IsAbstract { get; }
     public InverseTypeHierarchy(TypeHierarchy hierarchy, QualifiedType[] parentTypes, bool isValid)
     {
         Hierarchy = hierarchy;
         Type = hierarchy.Type;
+        IsAbstract = hierarchy.IsAbstract;
         ParentTypes = parentTypes;
         IsValid = isValid;
     }

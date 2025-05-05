@@ -14,8 +14,10 @@ public sealed class TypeOrEnumSpecPropertyType :
 {
     private AssetSpecDatabase? _cachedSpecDb;
     private ISpecType? _cachedType;
+    private ISpecType? _cachedEnum;
 
     public QualifiedType ElementType { get; }
+    public QualifiedType EnumType { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName { get; }
@@ -29,16 +31,18 @@ public sealed class TypeOrEnumSpecPropertyType :
     /// <inheritdoc />
     public Type ValueType => typeof(QualifiedType);
 
-    public TypeOrEnumSpecPropertyType(QualifiedType elementType)
+    public TypeOrEnumSpecPropertyType(QualifiedType elementType, QualifiedType enumType)
     {
         ElementType = elementType;
-        DisplayName = $"Type or {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
+        EnumType = enumType;
+        DisplayName = $"{QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()} or {QualifiedType.ExtractTypeName(enumType.Type.AsSpan()).ToString()}";
     }
 
     /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
     {
-        ISpecType? specType = null;
+        ISpecType? typeType = null;
+        ISpecType? enumType = null;
 
         if (_cachedSpecDb == parse.Database)
         {
@@ -46,22 +50,25 @@ public sealed class TypeOrEnumSpecPropertyType :
             {
                 if (_cachedSpecDb == parse.Database)
                 {
-                    specType = _cachedType;
+                    typeType = _cachedType;
+                    enumType = _cachedEnum;
                 }
             }
         }
 
-        if (specType == null)
+        if (typeType == null)
         {
-            specType = parse.Database.FindType(ElementType.Type, parse.FileType);
+            typeType = parse.Database.FindType(ElementType.Type, parse.FileType);
+            enumType = parse.Database.FindType(EnumType.Type, parse.FileType);
             lock (this)
             {
                 _cachedSpecDb = parse.Database;
-                _cachedType = specType;
+                _cachedType = typeType;
+                _cachedEnum = enumType;
             }
         }
 
-        if (specType is not EnumSpecType enumType)
+        if (enumType is not EnumSpecType fullEnumType)
         {
             if (parse.HasDiagnostics)
             {
@@ -89,9 +96,9 @@ public sealed class TypeOrEnumSpecPropertyType :
 
         string val = stringNode.Value;
 
-        if (val.IndexOf('.') >= 0)
+        if (val.IndexOf('.') < 0)
         {
-            EnumSpecTypeValue[] values = enumType.Values;
+            EnumSpecTypeValue[] values = fullEnumType.Values;
             bool found = false;
             for (int i = 0; i < values.Length; ++i)
             {
@@ -114,7 +121,38 @@ public sealed class TypeOrEnumSpecPropertyType :
             }
         }
 
-        return KnownTypeValueHelper.TryParseType(val, out value) || FailedToParse(in parse, out value);
+        if (!KnownTypeValueHelper.TryParseType(val, out value))
+        {
+            return FailedToParse(in parse, out value);
+        }
+
+        QualifiedType baseType = ElementType;
+
+        if (baseType.Type == null
+            || baseType.Type.Equals("*", StringComparison.Ordinal)
+            || baseType.Equals("System.Object, mscorlib"))
+        {
+            return true;
+        }
+
+        if (!parse.Database.Information.IsAssignableFrom(baseType, value)
+            || parse.Database.Information.IsAbstract(value))
+        {
+            if (parse.HasDiagnostics)
+            {
+                parse.Log(new DatDiagnosticMessage
+                {
+                    Diagnostic = DatDiagnostics.UNT1015,
+                    Message = string.Format(DiagnosticResources.UNT1015, QualifiedType.ExtractTypeName(baseType.Type.AsSpan()).ToString()),
+                    Range = stringNode.Range
+                });
+            }
+
+            value = default;
+            return false;
+        }
+
+        return true;
     }
 
     /// <inheritdoc />

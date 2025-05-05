@@ -1,6 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
 
@@ -15,6 +16,7 @@ public sealed class GuidOrIdSpecPropertyType :
     private AssetSpecDatabase? _cachedSpecDb;
     private ISpecType? _cachedType;
 
+    public EquatableArray<QualifiedType> OtherElementTypes { get; }
     public QualifiedType ElementType { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -29,10 +31,20 @@ public sealed class GuidOrIdSpecPropertyType :
     /// <inheritdoc />
     public Type ValueType => typeof(GuidOrId);
 
-    public GuidOrIdSpecPropertyType(QualifiedType elementType)
+    public GuidOrIdSpecPropertyType(QualifiedType elementType, string[]? specialTypes)
     {
         ElementType = elementType;
         DisplayName = $"Type or {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
+
+        if (specialTypes == null || specialTypes.Length == 0)
+        {
+            OtherElementTypes = new EquatableArray<QualifiedType>(0);
+            return;
+        }
+
+        OtherElementTypes = new EquatableArray<QualifiedType>(specialTypes.Length);
+        for (int i = 0; i < specialTypes.Length; ++i)
+            OtherElementTypes.Array[i] = new QualifiedType(specialTypes[i]);
     }
 
     /// <inheritdoc />
@@ -119,7 +131,7 @@ public sealed class GuidOrIdSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(GuidOrIdSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType);
+    public bool Equals(GuidOrIdSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType) && OtherElementTypes.Equals(other.OtherElementTypes);
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType other) => other is GuidOrIdSpecPropertyType t && Equals(t);
