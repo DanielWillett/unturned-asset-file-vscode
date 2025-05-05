@@ -20,6 +20,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty>
     /// <inheritdoc />
     public override SpecProperty Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
+        reader.Skip();
         return null;
     }
 

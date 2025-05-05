@@ -8,14 +8,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Types.DynamicTypes;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public sealed class FilePathStringSpecPropertyType :
     BaseSpecPropertyType<string>,
     ISpecPropertyType<string>,
     IEquatable<FilePathStringSpecPropertyType>
 {
-    public static FilePathStringSpecPropertyType Instance = new FilePathStringSpecPropertyType();
+    public static readonly FilePathStringSpecPropertyType Instance = new FilePathStringSpecPropertyType();
 
     private bool _hasPatternContext;
     private IPatternContext? _patternContext;
@@ -32,6 +32,9 @@ public sealed class FilePathStringSpecPropertyType :
     /// <inheritdoc />
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
+    /// <inheritdoc />
+    public Type ValueType => typeof(string);
+
     public FilePathStringSpecPropertyType(string? globPattern = null)
     {
         GlobPattern = globPattern;
@@ -41,14 +44,10 @@ public sealed class FilePathStringSpecPropertyType :
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
     {
         if (parse.Node == null)
-        {
             return MissingNode(in parse, out value);
-        }
 
         if (parse.Node is not AssetFileStringValueNode stringNode)
-        {
             return FailedToParse(in parse, out value);
-        }
 
         string val = stringNode.Value;
         if (parse.HasDiagnostics && val.IndexOf('\\') >= 0)
@@ -64,9 +63,7 @@ public sealed class FilePathStringSpecPropertyType :
         if (parse.HasDiagnostics && GlobPattern != null)
         {
             if (!_hasPatternContext)
-            {
                 BuildPatternContext(in parse);
-            }
             else if (_patternFailMessage != null)
             {
                 parse.Log(new DatDiagnosticMessage { Range = parse.Node!.Range, Diagnostic = DatDiagnostics.UNT2005, Message = _patternFailMessage });
@@ -114,7 +111,7 @@ public sealed class FilePathStringSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(FilePathStringSpecPropertyType other) => string.Equals(GlobPattern, other.GlobPattern, StringComparison.Ordinal);
+    public bool Equals(FilePathStringSpecPropertyType other) => other != null && string.Equals(GlobPattern, other.GlobPattern, StringComparison.Ordinal);
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType other) => other is FilePathStringSpecPropertyType t && Equals(t);
@@ -160,22 +157,20 @@ public sealed class FilePathStringSpecPropertyType :
         /// <inheritdoc />
         public override DirectoryInfoBase GetDirectory(string path)
         {
-            return path.Length == 0 ? this : new VirutalDirectoryInfo(path[0] == '/' ? FullName + path : (FullName + "/" + path));
+            return path.Length == 0 ? this : new VirutalDirectoryInfo(path[0] == '/' ? FullName + path : FullName + "/" + path);
         }
 
         /// <inheritdoc />
         public override FileInfoBase GetFile(string path)
         {
-            return path.Length == 0 ? new VirutalFileInfo(FullName + "/") : new VirutalFileInfo(path[0] == '/' ? FullName + path : (FullName + "/" + path));
+            return path.Length == 0 ? new VirutalFileInfo(FullName + "/") : new VirutalFileInfo(path[0] == '/' ? FullName + path : FullName + "/" + path);
         }
 
         public VirutalDirectoryInfo(string path)
         {
             FullName = path;
             if (path.Length == 0)
-            {
                 Name = string.Empty;
-            }
         }
     }
 #nullable restore

@@ -70,6 +70,16 @@ internal static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT1011 = new DatDiagnostic("UNT1011", DatDiagnosticSeverity.Error);
 
+    /// <summary>
+    /// Displayed when a legacy color is using an out of range value (should be 0-1).
+    /// </summary>
+    public static readonly DatDiagnostic UNT1012 = new DatDiagnostic("UNT1012", DatDiagnosticSeverity.Error);
+
+    /// <summary>
+    /// Displayed when a NPC achievement ID isn't recognized.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1013 = new DatDiagnostic("UNT1013", DatDiagnosticSeverity.Error);
+
     /* Errors */
 
     /// <summary>

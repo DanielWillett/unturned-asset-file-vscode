@@ -117,7 +117,7 @@
         {
             "Key": "Shared_Skin_Lookup_ID",
             "Type": "Id",
-            "ElementType": "ITEM",
+            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
             "DefaultValue": "@ID",
             "Description": "The item who's skins can be used for this item. Usually this is the same ID as the current item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#shared-skin-lookup-id-uint16",

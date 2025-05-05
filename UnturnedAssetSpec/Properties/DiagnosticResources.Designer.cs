@@ -187,6 +187,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This legacy color is expected to have components between 0 and 1. Using values outside this range may cause unexpected results or visual glitches..
+        /// </summary>
+        internal static string UNT1012 {
+            get {
+                return ResourceManager.GetString("UNT1012", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Achievement ID &quot;{0}&quot; either doesn&apos;t exist or isn&apos;t a valid NPC achievement..
+        /// </summary>
+        internal static string UNT1013 {
+            get {
+                return ResourceManager.GetString("UNT1013", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected &apos;}&apos; at end of dictionary..
         /// </summary>
         internal static string UNT2001 {

@@ -18,7 +18,7 @@ public class TypeDictionaryConverter<TValue> : JsonConverter<Dictionary<Qualifie
             throw new JsonException($"Unexpected token {reader.TokenType} reading Dictionary<QualifiedType, {typeof(TValue)}>.");
 
         Dictionary<QualifiedType, TValue> dict = new Dictionary<QualifiedType, TValue>();
-        while (reader.Read())
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
             if (reader.TokenType != JsonTokenType.PropertyName)
                 throw new JsonException($"Unexpected token {reader.TokenType} reading Dictionary<QualifiedType, {typeof(TValue)}>.");

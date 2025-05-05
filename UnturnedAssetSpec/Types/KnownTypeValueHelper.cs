@@ -304,4 +304,75 @@ public static class KnownTypeValueHelper
         return !string.IsNullOrEmpty(path);
     }
 
+    public static bool TryParseColorHex(string str, out Color32 value, bool allowAlpha)
+    {
+        if (string.IsNullOrEmpty(str))
+        {
+            value = Color32.Black;
+            return false;
+        }
+
+        int startIndex = str[0] == '#' ? 1 : 0;
+        bool alpha = false;
+        if (str.Length != 6 + startIndex)
+        {
+            if (str.Length != 8 + startIndex || !allowAlpha)
+            {
+                value = Color32.Black;
+                return false;
+            }
+
+            alpha = true;
+        }
+
+        if (!CharToHex(str, startIndex, out byte r)
+            || !CharToHex(str, startIndex + 2, out byte g)
+            || !CharToHex(str, startIndex + 4, out byte b))
+        {
+            value = Color32.Black;
+            return false;
+        }
+
+        byte a = 255;
+        if (alpha && !CharToHex(str, startIndex, out a))
+        {
+            value = Color32.Black;
+            return false;
+        }
+
+        value = new Color32(a, r, g, b);
+        return true;
+    }
+
+    private static bool CharToHex(string c, int ind, out byte val)
+    {
+        int c2 = c[ind];
+        byte b1;
+        if (c2 is > 96 and < 103)
+            b1 = (byte)((c2 - 87) * 0x10);
+        else if (c2 is > 64 and < 71)
+            b1 = (byte)((c2 - 55) * 0x10);
+        else if (c2 is > 47 and < 58)
+            b1 = (byte)((c2 - 48) * 0x10);
+        else
+        {
+            val = 0;
+            return false;
+        }
+
+        c2 = c[ind + 1];
+        if (c2 is > 96 and < 103)
+            val = (byte)(b1 + (c2 - 87));
+        else if (c2 is > 64 and < 71)
+            val = (byte)(b1 + (c2 - 55));
+        else if (c2 is > 47 and < 58)
+            val = (byte)(b1 + (c2 - 48));
+        else
+        {
+            val = 0;
+            return false;
+        }
+
+        return true;
+    }
 }

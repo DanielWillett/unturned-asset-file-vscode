@@ -177,4 +177,10 @@
   <data name="UNT1011" xml:space="preserve">
     <value>File path should match pattern "{0}".</value>
   </data>
+  <data name="UNT1012" xml:space="preserve">
+    <value>This legacy color is expected to have components between 0 and 1. Using values outside this range may cause unexpected results or visual glitches.</value>
+  </data>
+  <data name="UNT1013" xml:space="preserve">
+    <value>Achievement ID "{0}" either doesn't exist or isn't a valid NPC achievement.</value>
+  </data>
 </root>

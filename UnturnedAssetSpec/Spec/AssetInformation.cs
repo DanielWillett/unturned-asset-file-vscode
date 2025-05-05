@@ -38,6 +38,7 @@ public class AssetInformation
     public string? EmissiveFaceTextureTemplate { get; set; }
     public string? BeardTextureTemplate { get; set; }
     public string? HairTextureTemplate { get; set; }
+    public string? StatusJsonFallbackUrl { get; set; }
 
     public bool TryGetAssetBundleVersionInfo(int assetBundleVersion, out UnityEngineVersion version, out string displayName)
     {
@@ -150,7 +151,6 @@ public class AssetInformation
         if (Types == null || !Types.TryGetValue(baseType, out TypeHierarchy? hierarchy))
             return new TypeHierarchy();
 
-        hierarchy.ChildTypes ??= new Dictionary<string, TypeHierarchy>();
         return hierarchy;
     }
 
@@ -178,15 +178,21 @@ public class AssetInformation
             : new InverseTypeHierarchy(new TypeHierarchy { Type = type }, Array.Empty<QualifiedType>(), false);
     }
 
-    private static void RegenParentTypes(TypeHierarchy hierarchy, Stack<QualifiedType> typeStack, ref QualifiedType[]? arr, Dictionary<QualifiedType, InverseTypeHierarchy> parentTypes)
+    private static void RegenParentTypes(
+        TypeHierarchy hierarchy,
+        Stack<QualifiedType> typeStack,
+        ref QualifiedType[]? arr,
+        Dictionary<QualifiedType, InverseTypeHierarchy> parentTypes)
     {
-        if (hierarchy.ChildTypes == null || hierarchy.Type.IsNull)
+        if (hierarchy.Type.IsNull)
             return;
 
         arr ??= typeStack.ToArray();
         parentTypes[hierarchy.Type] = new InverseTypeHierarchy(hierarchy, typeStack.ToArray(), true);
-        typeStack.Push(hierarchy.Type);
+        if (hierarchy.ChildTypes is not { Count: > 0 })
+            return;
 
+        typeStack.Push(hierarchy.Type);
         foreach (TypeHierarchy h in hierarchy.ChildTypes.Values)
         {
             QualifiedType[]? arrNull = null;
@@ -205,7 +211,7 @@ public class AssetInformation
     }
 }
 
-
+[JsonConverter(typeof(TypeHierarchyConverter))]
 public class TypeHierarchy
 {
     public const string AssetBaseType = "SDG.Unturned.Asset, Assembly-CSharp";
@@ -214,15 +220,11 @@ public class TypeHierarchy
 
     public bool HasDataFiles { get; set; }
     public bool IsAbstract { get; set; }
-
-    [JsonIgnore]
     public QualifiedType Type { get; set; }
-
-    [JsonIgnore]
     public TypeHierarchy? Parent { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, TypeHierarchy>? ChildTypes { get; set; }
+#nullable disable
+    public IReadOnlyDictionary<QualifiedType, TypeHierarchy> ChildTypes { get; set; }
+#nullable restore
 }
 
 public class InverseTypeHierarchy

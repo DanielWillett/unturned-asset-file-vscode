@@ -91,6 +91,38 @@
                     "title": "A Globally Unique Identifier (also called a UUID)."
                 },
                 {
+                    "const": "Color32RGB",
+                    "title": "A color with red, green, and blue components."
+                },
+                {
+                    "const": "Color32RGBA",
+                    "title": "A color with red, green, blue, and alpha components."
+                },
+                {
+                    "const": "Color32RGBLegacy",
+                    "title": "A color with red, green, and blue components."
+                },
+                {
+                    "const": "Color32RGBALegacy",
+                    "title": "A color with red, green, blue, and alpha components."
+                },
+                {
+                    "const": "ColorRGB",
+                    "title": "A color with red, green, and blue components."
+                },
+                {
+                    "const": "ColorRGBA",
+                    "title": "A color with red, green, blue, and alpha components."
+                },
+                {
+                    "const": "ColorRGBLegacy",
+                    "title": "A color with red, green, and blue components."
+                },
+                {
+                    "const": "ColorRGBALegacy",
+                    "title": "A color with red, green, blue, and alpha components."
+                },
+                {
                     "const": "AssetReference",
                     "title": "A Globally Unique Identifier (also called a UUID) referencing another asset."
                 },
@@ -149,6 +181,10 @@
                 {
                     "const": "BlueprintSupplyId",
                     "title": "A short item ID, or 'this' (case insensitive) to reference the current item."
+                },
+                {
+                    "const": "NPCAchievementId",
+                    "title": "The ID of an achievement that can be given by NPCs."
                 },
                 {
                     "const": "DateTime",
@@ -263,6 +299,10 @@
                             "description": "The type of the property.",
                             "$ref": "#/$defs/datPropertyType"
                         },
+                        "SubtypeSwitch": {
+                            "description": "Indicates that the value of this property should change this object's type based on this property in the enum. The type should be a subtype of the current type.",
+                            "type": "string"
+                        },
                         "ElementType": {
                             "description": "The type of the elements of a List.",
                             "$ref": "#/$defs/datPropertyType"
@@ -344,7 +384,7 @@
                                 {
                                     "type": "array",
                                     "items": {
-                                        "type": [ "object", "string" ],
+                                        "type": "object",
                                         "properties": {
                                             "Key": {
                                                 "type": "string",
@@ -385,7 +425,7 @@
                                 {
                                     "type": "array",
                                     "items": {
-                                        "type": [ "object", "string" ],
+                                        "type": "object",
                                         "properties": {
                                             "Key": {
                                                 "type": "string",
@@ -443,7 +483,7 @@
                 },
                 "Operation": {
                     "type": "string",
-                    "enum": [ "lt", "gt", "lte", "gte", "eq", "neq", "contains", "starts with", "ends with", "matches", "contains-i", "eq-i", "starts with-i", "ends with-i", "assignable-to", "assignable-from", "included" ]
+                    "enum": [ "lt", "gt", "lte", "gte", "eq", "neq", "contains", "starts with", "ends with", "matches", "contains-i", "eq-i", "starts with-i", "ends with-i", "assignable-to", "assignable-from", "included", "is-type" ]
                 },
                 "Comparand": {
                     "type": [ "null", "string", "boolean", "number", "pattern" ]

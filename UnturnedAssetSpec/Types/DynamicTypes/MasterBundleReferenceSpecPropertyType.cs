@@ -3,7 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Types.DynamicTypes;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public sealed class MasterBundleReferenceSpecPropertyType :
     BaseSpecPropertyType<BundleReference>,
@@ -27,6 +27,9 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+
+    /// <inheritdoc />
+    public Type ValueType => typeof(BundleReference);
 
     private MasterBundleReferenceSpecPropertyType()
         : this(new QualifiedType("UnityEngine.AudioClip, UnityEngine.AudioModule"), MasterBundleReferenceType.AudioReference)
@@ -123,7 +126,7 @@ public sealed class MasterBundleReferenceSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(MasterBundleReferenceSpecPropertyType other) => ElementType.Equals(other.ElementType);
+    public bool Equals(MasterBundleReferenceSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType);
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType other) => other is MasterBundleReferenceSpecPropertyType t && Equals(t);

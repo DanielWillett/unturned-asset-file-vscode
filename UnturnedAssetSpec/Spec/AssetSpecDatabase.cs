@@ -1,18 +1,39 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
-public class AssetSpecDatabase
+public class AssetSpecDatabase : IDisposable
 {
+    public const string AssetFileUrl = "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/{0}.json";
+    private const string EmbeddedResourceLocation = "DanielWillett.UnturnedDataFileLspServer.Data..Asset_Spec.{0}.json";
+
+    public const string UnturnedName = "Unturned";
+    public const string UnturnedAppId = "304930";
+
+    private JsonDocument? _statusJson;
+
+    public string[]? NPCAchievementIds { get; private set; }
+    public Version? CurrentGameVersion { get; private set; }
+
+    /// <summary>
+    /// The status document from the game installation or online if necessary.
+    /// </summary>
+    /// <returns>A cached json document. Do not dispose this document after you're done.</returns>
+    public JsonDocument? StatusInformation => _statusJson;
+
+    public InstallDirUtility UnturnedInstallDirectory { get; }
+
     /// <summary>
     /// Allow downloading the latest version of files from the internet instead of using a possibly outdated embedded version.
     /// </summary>
@@ -29,6 +50,21 @@ public class AssetSpecDatabase
         Types = new Dictionary<QualifiedType, TypeHierarchy>(0),
         ParentTypes = new Dictionary<QualifiedType, InverseTypeHierarchy>(0)
     };
+
+    public AssetSpecDatabase() : this(new InstallDirUtility(UnturnedName, UnturnedAppId)) { }
+
+    public AssetSpecDatabase(InstallDirUtility unturnedInstallDirectory)
+    {
+        UnturnedInstallDirectory = unturnedInstallDirectory;
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Interlocked.Exchange(ref _statusJson, null)?.Dispose();
+        }
+    }
 
     public ISpecType? FindType(string type, AssetFileType fileType)
     {
@@ -125,20 +161,29 @@ public class AssetSpecDatabase
     {
         Options ??= new JsonSerializerOptions
         {
-            WriteIndented = true
+            WriteIndented = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            MaxDepth = 14,
+            AllowTrailingCommas = true
         };
+
+        Lazy<HttpClient> lazy = new Lazy<HttpClient>(LazyThreadSafetyMode.ExecutionAndPublication);
+
+        Task statusTask = DownloadStatusAsync(token);
 
         AssetInformation? assetInfo;
         using (Stream? stream = await GetFileAsync(
-            "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Assets.json",
-            "Assets"
-        ))
+            string.Format(AssetFileUrl, "Assets"),
+            "Assets",
+            lazy
+        ).ConfigureAwait(false))
         {
             if (stream != null)
             {
                 try
                 {
-                    assetInfo = await JsonSerializer.DeserializeAsync<AssetInformation>(stream, Options, token);
+                    assetInfo = await JsonSerializer.DeserializeAsync<AssetInformation>(stream, Options, token).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -155,12 +200,12 @@ public class AssetSpecDatabase
 
         if (assetInfo == null && UseInternet)
         {
-            using Stream? stream = await GetFileAsync(null, "Assets");
+            using Stream? stream = await GetFileAsync(null, "Assets", lazy).ConfigureAwait(false);
             if (stream != null)
             {
                 try
                 {
-                    assetInfo = await JsonSerializer.DeserializeAsync<AssetInformation>(stream, Options, token);
+                    assetInfo = await JsonSerializer.DeserializeAsync<AssetInformation>(stream, Options, token).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -180,89 +225,167 @@ public class AssetSpecDatabase
         }
         assetInfo.AssetCategories ??= new Dictionary<QualifiedType, string>(0);
         assetInfo.Types ??= new Dictionary<QualifiedType, TypeHierarchy>(0);
+
+        // custom type converter can't read property name
+        foreach (KeyValuePair<QualifiedType, TypeHierarchy> type in assetInfo.Types)
+        {
+            type.Value.Type = new QualifiedType(type.Key);
+        }
+
         assetInfo.GetParentTypes(default);
         assetInfo.ParentTypes ??= new Dictionary<QualifiedType, InverseTypeHierarchy>(0);
 
+
         Information = assetInfo;
 
+        await statusTask.ConfigureAwait(false);
+
         Dictionary<QualifiedType, AssetTypeInformation> types = new Dictionary<QualifiedType, AssetTypeInformation>(assetInfo.ParentTypes.Count);
+
+        if (assetInfo.ParentTypes.Count == 0)
+        {
+            return;
+        }
+
+        const int perThreadCount = 5;
+
+        Task[] tasks = new Task[(assetInfo.ParentTypes.Count - 1) / perThreadCount + 1];
+        List<InverseTypeHierarchy> toProcess = new List<InverseTypeHierarchy>(perThreadCount);
+        int taskIndex = 0;
         foreach (InverseTypeHierarchy type in assetInfo.ParentTypes.Values)
         {
             if (!type.Hierarchy.HasDataFiles)
                 continue;
 
-            string normalizedTypeName = type.Type.Normalized.Type.ToLowerInvariant();
-            AssetTypeInformation? typeInfo;
-            using (Stream? stream = await GetFileAsync(
-                       $"https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/{Uri.EscapeDataString(normalizedTypeName)}.json",
-                       normalizedTypeName
-                   ))
-            {
-                if (stream != null)
-                {
-                    try
-                    {
-                        typeInfo = await JsonSerializer.DeserializeAsync<AssetTypeInformation>(stream, Options, token);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log($"Error parsing {normalizedTypeName}.json file.");
-                        Log(ex.ToString());
-                        typeInfo = null;
-                    }
-                }
-                else
-                {
-                    typeInfo = null;
-                }
-            }
+            toProcess.Add(type);
+            if (toProcess.Count < perThreadCount)
+                continue;
 
-            if (typeInfo == null && UseInternet)
-            {
-                using Stream? stream = await GetFileAsync(null, normalizedTypeName);
-                if (stream != null)
-                {
-                    try
-                    {
-                        typeInfo = await JsonSerializer.DeserializeAsync<AssetTypeInformation>(stream, Options, token);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log($"Error parsing embedded {normalizedTypeName}.json file.");
-                        Log(ex.ToString());
-                    }
-                }
-            }
+            Deprocess(tasks, ref taskIndex, toProcess, lazy, types, token);
+            toProcess.Clear();
+        }
 
-            typeInfo ??= new AssetTypeInformation();
-            types[typeInfo.Type] = typeInfo;
+        if (toProcess.Count > 0)
+        {
+            Deprocess(tasks, ref taskIndex, toProcess, lazy, types, token);
+        }
+
+        await Task.WhenAll(new ArraySegment<Task>(tasks, 0, taskIndex)).ConfigureAwait(false);
+
+        if (lazy.IsValueCreated)
+        {
+            lazy.Value.Dispose();
         }
 
         Types = types;
+        return;
+
+
+        void Deprocess(Task[] tasks,
+            ref int taskIndex,
+            List<InverseTypeHierarchy> toProcess,
+            Lazy<HttpClient> lazy,
+            Dictionary<QualifiedType, AssetTypeInformation> types,
+            CancellationToken token)
+        {
+            InverseTypeHierarchy[] processList = toProcess.ToArray();
+            tasks[taskIndex] = Task.Run(async () =>
+            {
+                foreach (InverseTypeHierarchy type in processList)
+                {
+                    string normalizedTypeName = type.Type.Normalized.Type.ToLowerInvariant();
+                    AssetTypeInformation? typeInfo;
+
+                    using (Stream? stream = await GetFileAsync(
+                               string.Format(AssetFileUrl, Uri.EscapeDataString(normalizedTypeName)),
+                               normalizedTypeName,
+                               lazy
+                           ).ConfigureAwait(false))
+                    {
+                        if (stream != null)
+                        {
+                            try
+                            {
+                                typeInfo = await JsonSerializer.DeserializeAsync<AssetTypeInformation>(stream, Options, token).ConfigureAwait(false);
+                            }
+                            catch (Exception ex)
+                            {
+                                lock (this)
+                                {
+                                    Log($"Error parsing {normalizedTypeName}.json file.");
+                                    Log(ex.ToString());
+                                }
+                                typeInfo = null;
+                            }
+                        }
+                        else
+                        {
+                            typeInfo = null;
+                        }
+                    }
+
+                    if (typeInfo == null && UseInternet)
+                    {
+                        using Stream? stream = await GetFileAsync(null, normalizedTypeName, lazy).ConfigureAwait(false);
+                        if (stream != null)
+                        {
+                            try
+                            {
+                                typeInfo = await JsonSerializer.DeserializeAsync<AssetTypeInformation>(stream, Options, token).ConfigureAwait(false);
+                            }
+                            catch (Exception ex)
+                            {
+                                lock (this)
+                                {
+                                    Log($"Error parsing embedded {normalizedTypeName}.json file.");
+                                    Log(ex.ToString());
+                                }
+                            }
+                        }
+                    }
+
+                    typeInfo ??= new AssetTypeInformation();
+                    lock (types)
+                    {
+                        types[typeInfo.Type] = typeInfo;
+                    }
+                }
+            }, token);
+            ++taskIndex;
+        }
     }
 
-    protected virtual async Task<Stream?> GetFileAsync(string? url, string fallbackEmbeddedResource)
+    protected virtual async Task<Stream?> GetFileAsync(string? url, string fallbackEmbeddedResource, Lazy<HttpClient> httpClient)
     {
         if (!UseInternet || url == null)
             return GetEmbeddedStream(fallbackEmbeddedResource);
 
         try
         {
-            using HttpClient httpClient = new HttpClient();
-
             using HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, url);
 
-            using HttpResponseMessage response = await httpClient.SendAsync(msg, HttpCompletionOption.ResponseHeadersRead);
+            using HttpResponseMessage response = await httpClient.Value.SendAsync(msg, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
-            MemoryStream ms = new MemoryStream();
+            if (!response.IsSuccessStatusCode)
+            {
+                Log($"Error downloading \"{url}\": {response.StatusCode}: {response.ReasonPhrase}");
+            }
+            else
+            {
+                MemoryStream ms = new MemoryStream();
 
-            await response.Content.CopyToAsync(ms);
-            return ms;
+                await response.Content.CopyToAsync(ms).ConfigureAwait(false);
+                ms.Seek(0L, SeekOrigin.Begin);
+                return ms;
+            }
         }
         catch (Exception ex)
         {
-            Log($"Error downloading \"{url}\".");
-            Log(ex.ToString());
+            lock (this)
+            {
+                Log($"Error downloading \"{url}\".");
+                Log(ex.ToString());
+            }
         }
 
         return GetEmbeddedStream(fallbackEmbeddedResource);
@@ -271,7 +394,7 @@ public class AssetSpecDatabase
     private Stream? GetEmbeddedStream(string fallbackEmbeddedResource)
     {
         if (!fallbackEmbeddedResource.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-            fallbackEmbeddedResource = "DanielWillett.UnturnedDataFileLspServer.Data..Asset_Spec." + fallbackEmbeddedResource + ".json";
+            fallbackEmbeddedResource = string.Format(EmbeddedResourceLocation, fallbackEmbeddedResource);
 
         Stream? stream;
         try
@@ -279,22 +402,141 @@ public class AssetSpecDatabase
             stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(fallbackEmbeddedResource);
             if (stream == null)
             {
-                Log($"Couldn't find embedded resource \"{fallbackEmbeddedResource}\".");
+                lock (this)
+                    Log($"Couldn't find embedded resource \"{fallbackEmbeddedResource}\".");
             }
         }
         catch (Exception ex)
         {
-            Log($"Error finding embedded resource \"{fallbackEmbeddedResource}\".");
-            Log(ex.ToString());
+            lock (this)
+            {
+                Log($"Error finding embedded resource \"{fallbackEmbeddedResource}\".");
+                Log(ex.ToString());
+            }
             stream = null;
         }
 
         return stream;
     }
 
+    private async Task DownloadStatusAsync(CancellationToken token = default)
+    {
+        if (UnturnedInstallDirectory.TryGetInstallDirectory(out GameInstallDir installDir))
+        {
+            string statusPath = installDir.GetFile("Status.json");
+            if (File.Exists(statusPath))
+            {
+                try
+                {
+                    using FileStream fs = new FileStream(statusPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan);
+                    JsonDocument doc = await JsonDocument.ParseAsync(fs, new JsonDocumentOptions
+                    {
+                        AllowTrailingCommas = true,
+                        CommentHandling = JsonCommentHandling.Skip,
+                        MaxDepth = 6
+                    }, token).ConfigureAwait(false);
+
+                    if (Interlocked.CompareExchange(ref _statusJson, doc, null) != null)
+                    {
+                        doc.Dispose();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log("Error reading Status.json file from local install.");
+                    Log(ex.ToString());
+                }
+            }
+        }
+
+        JsonDocument? doc2 = _statusJson;
+        if (doc2 == null)
+        {
+            if (!UseInternet || string.IsNullOrEmpty(Information.StatusJsonFallbackUrl))
+            {
+                Log("Unable to read Status.json from local install, internet disabled.");
+                return;
+            }
+
+            try
+            {
+                using HttpClient client = new HttpClient();
+                using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, Information.StatusJsonFallbackUrl);
+                using HttpResponseMessage response = await client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, token);
+
+                JsonDocument doc = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync().ConfigureAwait(false), new JsonDocumentOptions
+                {
+                    AllowTrailingCommas = true,
+                    CommentHandling = JsonCommentHandling.Skip,
+                    MaxDepth = 6
+                }, token).ConfigureAwait(false);
+
+                if (Interlocked.CompareExchange(ref _statusJson, doc, null) != null)
+                {
+                    doc.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("Unable to read Status.json from internet.");
+                Log(ex.ToString());
+            }
+        }
+
+        JsonDocument? statusDoc = _statusJson;
+        if (statusDoc == null)
+        {
+            return;
+        }
+
+        if (statusDoc.RootElement.TryGetProperty("Achievements", out JsonElement achievementSection)
+            && achievementSection.ValueKind == JsonValueKind.Object
+            && achievementSection.TryGetProperty("NPC_Achievement_IDs", out JsonElement npcAchieveemnts)
+            && npcAchieveemnts.ValueKind == JsonValueKind.Array)
+        {
+            List<string> achievements = new List<string>();
+            foreach (JsonElement achievementId in npcAchieveemnts.EnumerateArray())
+            {
+                if (achievementId.ValueKind != JsonValueKind.String)
+                    continue;
+
+                achievements.Add(achievementId.GetString());
+            }
+
+            NPCAchievementIds = achievements.ToArray();
+        }
+
+        if (statusDoc.RootElement.TryGetProperty("Game", out JsonElement gameSection)
+            && gameSection.ValueKind == JsonValueKind.Object
+            && gameSection.TryGetProperty("Major_Version", out JsonElement majorSection)
+            && majorSection.ValueKind == JsonValueKind.Number
+            && gameSection.TryGetProperty("Minor_Version", out JsonElement minorSection)
+            && minorSection.ValueKind == JsonValueKind.Number
+            && gameSection.TryGetProperty("Patch_Version", out JsonElement patchSection)
+            && patchSection.ValueKind == JsonValueKind.Number
+            && majorSection.TryGetInt32(out int major)
+            && minorSection.TryGetInt32(out int minor)
+            && patchSection.TryGetInt32(out int patch))
+        {
+            CurrentGameVersion = new Version(3, major, minor, patch);
+        }
+    }
+
     protected virtual void Log(string msg)
     {
         Console.Write("AssetSpecDatabase >> ");
         Console.WriteLine(msg);
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~AssetSpecDatabase()
+    {
+        Dispose(false);
     }
 }

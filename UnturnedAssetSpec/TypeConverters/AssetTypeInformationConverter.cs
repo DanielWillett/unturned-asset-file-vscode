@@ -37,7 +37,7 @@ public class AssetTypeInformationConverter : JsonConverter<AssetTypeInformation?
 
         AssetTypeInformation info = new AssetTypeInformation();
         bool hadParent = false;
-        while (reader.Read())
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
             if (reader.TokenType != JsonTokenType.PropertyName)
                 throw new JsonException($"Unexpected token {reader.TokenType} reading AssetTypeInformation.");

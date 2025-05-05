@@ -158,6 +158,181 @@
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#experience",
                     "Description": "Applies conditional logic to the player's current experience.",
                     "ConditionType": "SDG.Unturned.NPCExperienceCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "REPUTATION",
+                    "Casing": "Reputation",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#reputation",
+                    "Description": "Applies conditional logic to the player's current reputation.",
+                    "ConditionType": "SDG.Unturned.NPCReputationCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "FLAG_BOOL",
+                    "Casing": "Flag_Bool",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-bool",
+                    "Description": "Compares the value of a flag to the value '1'.",
+                    "ConditionType": "SDG.Unturned.NPCBoolFlagCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "FLAG_SHORT",
+                    "Casing": "Flag_Short",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-short",
+                    "Description": "Compares the value of a flag to a signed 16-bit integer.",
+                    "ConditionType": "SDG.Unturned.NPCShortFlagCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "QUEST",
+                    "Casing": "Quest",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#quest",
+                    "Description": "Applies conditional logic to the player's status of a given quest, such as if they've completed it or if it's in progress.",
+                    "ConditionType": "SDG.Unturned.NPCQuestCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "SKILLSET",
+                    "Casing": "Skillset",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#skillset",
+                    "Description": "Applies conditional logic to a character's chosen skillset.",
+                    "ConditionType": "SDG.Unturned.NPCSkillsetCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "ITEM",
+                    "Casing": "Item",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#item",
+                    "Description": "Applies conditional logic to a count of how many of a specific item a player has in their inventory.",
+                    "ConditionType": "SDG.Unturned.NPCItemCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "KILLS_ZOMBIE",
+                    "Casing": "Kills_Zombie",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
+                    "Description": "Ensures the number of zombies a player has killed is at least a certain amount, with optional filters.",
+                    "ConditionType": "SDG.Unturned.NPCZombieKillsCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "KILLS_HORDE",
+                    "Casing": "Kills_Horde",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-horde",
+                    "Description": "Ensures the number of times a player has completed a Horde Beacon in a location is at least a certain amount.",
+                    "ConditionType": "SDG.Unturned.NPCHordeKillsCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "KILLS_ANIMAL",
+                    "Casing": "Kills_Animal",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-animal",
+                    "Description": "Ensures the number of times a player has killed a specific animal is at least a certain amount.",
+                    "ConditionType": "SDG.Unturned.NPCAnimalKillsCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "COMPARE_FLAGS",
+                    "Casing": "Compare_Flags",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#compare-flags",
+                    "Description": "Applies conditional logic to two different flag values. Boolean flags will have the value 1 for true, and false for all other values.",
+                    "ConditionType": "SDG.Unturned.NPCCompareFlagsCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "TIME_OF_DAY",
+                    "Casing": "Time_Of_Day",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#time-of-day",
+                    "Description": "Applies conditional logic to the number of seconds elapsed since midnight in the current day.",
+                    "ConditionType": "SDG.Unturned.NPCTimeOfDayCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "PLAYER_LIFE_HEALTH",
+                    "Casing": "Player_Life_Health",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-health",
+                    "Description": "Applies conditional logic to the player's current health stat.",
+                    "ConditionType": "SDG.Unturned.NPCPlayerLifeHealthCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "PLAYER_LIFE_FOOD",
+                    "Casing": "Player_Life_Food",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-food",
+                    "Description": "Applies conditional logic to the player's current food stat.",
+                    "ConditionType": "SDG.Unturned.NPCPlayerLifeFoodCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "PLAYER_LIFE_WATER",
+                    "Casing": "Player_Life_Water",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-water",
+                    "Description": "Applies conditional logic to the player's current water stat.",
+                    "ConditionType": "SDG.Unturned.NPCPlayerLifeWaterCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "PLAYER_LIFE_VIRUS",
+                    "Casing": "Player_Life_Virus",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-virus",
+                    "Description": "Applies conditional logic to the player's current immunity stat.",
+                    "ConditionType": "SDG.Unturned.NPCPlayerLifeVirusCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "HOLIDAY",
+                    "Casing": "Holiday",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#holiday",
+                    "Description": "Applies conditional logic to the active holiday.",
+                    "ConditionType": "SDG.Unturned.NPCHolidayCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "KILLS_PLAYER",
+                    "Casing": "Kills_Player",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-player",
+                    "Description": "Ensures the number of times a player has killed other players is at least a certain amount.",
+                    "ConditionType": "SDG.Unturned.NPCPlayerKillsCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "KILLS_OBJECT",
+                    "Casing": "Kills_Object",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-object",
+                    "Description": "Ensures the number of times a player has destroyed a specific object is at least a certain amount.",
+                    "ConditionType": "SDG.Unturned.NPCObjectKillsCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "CURRENCY",
+                    "Casing": "Currency",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#currency",
+                    "Description": "Applies conditional logic to the total amount of a type of currency a player has on them.",
+                    "ConditionType": "SDG.Unturned.NPCObjectKillsCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "KILLS_TREE",
+                    "Casing": "Kills_Tree",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-tree",
+                    "Description": "Ensures the number of times a player has destroyed a specific resource is at least a certain amount.",
+                    "ConditionType": "SDG.Unturned.NPCTreeKillsCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "WEATHER_STATUS",
+                    "Casing": "Weather_Status",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
+                    "Description": "Applies conditional logic to a specific type of weather's current status.",
+                    "ConditionType": "SDG.Unturned.NPCWeatherStatusCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "WEATHER_BLEND_ALPHA",
+                    "Casing": "Weather_Blend_Alpha",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-blend-alpha",
+                    "Description": "Applies conditional logic to the percentage a specific type of weather is faded in or out.",
+                    "ConditionType": "SDG.Unturned.NPCWeatherBlendAlphaCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "IS_FULL_MOON",
+                    "Casing": "Is_Full_Moon",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#is-full-moon",
+                    "Description": "Compares the current full moon state with the given boolean value.",
+                    "ConditionType": "SDG.Unturned.NPCIsFullMoonCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "DATE_COUNTER",
+                    "Casing": "Date_Counter",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#date-counter",
+                    "Description": "Applies conditional logic to the current amount of days within a fixed interval of days.",
+                    "ConditionType": "SDG.Unturned.NPCDateCounterCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "PLAYER_LIFE_STAMINA",
+                    "Casing": "Player_Life_Stamina",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-stamina",
+                    "Description": "Applies conditional logic to the player's current stamina stat.",
+                    "ConditionType": "SDG.Unturned.NPCPlayerLifeStaminaCondition, Assembly-CSharp"
                 }
             ]
         },
@@ -482,6 +657,94 @@
             ]
         },
         {
+            "Type": "SDG.Unturned.ENPCHoliday, Assembly-CSharp",
+            "DisplayName": "Holiday",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/enpcholiday.html",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/enpcholiday.html",
+                    "Description": "There is currently not a holiday active."
+                },
+                {
+                    "Value": "HALLOWEEN",
+                    "Casing": "Halloween",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/enpcholiday.html",
+                    "Description": "Active from October 20th to November 1st."
+                },
+                {
+                    "Value": "CHRISTMAS",
+                    "Casing": "Christmas",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/enpcholiday.html",
+                    "Description": "Active from December 7th to January 2nd."
+                },
+                {
+                    "Value": "APRIL_FOOLS",
+                    "Casing": "April_Fools",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/enpcholiday.html",
+                    "Description": "Active on April 1st."
+                },
+                {
+                    "Value": "VALENTINES",
+                    "Casing": "Valentines",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/enpcholiday.html",
+                    "Description": "Active on February 14th."
+                },
+                {
+                    "Value": "PRIDE_MONTH",
+                    "Casing": "Pride_Month",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/enpcholiday.html",
+                    "Description": "Active from June 1st to June 30th."
+                },
+                {
+                    "Value": "LUNAR_NEW_YEAR",
+                    "Casing": "Lunar_New_Year",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/enpcholiday.html",
+                    "Description": "Active during the current Lunar New Year, which varies each year."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ENPCWeatherStatus, Assembly-CSharp",
+            "DisplayName": "Weather Status",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
+            "Values":
+            [
+                {
+                    "Value": "Active",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
+                    "Description": "The weather is fading or fully faded in."
+                },
+                {
+                    "Value": "Transitioning_In",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
+                    "Description": "The weather is fading in."
+                },
+                {
+                    "Value": "Fully_Transitioned_In",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
+                    "Description": "The weather is fully faded in."
+                },
+                {
+                    "Value": "Transitioning_Out",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
+                    "Description": "The weather is fading out."
+                },
+                {
+                    "Value": "Fully_Transitioned_Out",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
+                    "Description": "The weather is fully faded out. This is basically the opposite of @Active."
+                },
+                {
+                    "Value": "Transitioning",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
+                    "Description": "The weather is fading in or out."
+                }
+            ]
+        },
+        {
             "Type": "SDG.Unturned.INPCCondition, Assembly-CSharp",
             "DisplayName": "Condition",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
@@ -491,7 +754,8 @@
                     "Key": "Type",
                     "Type": "SDG.Unturned.ENPCConditionType, Assembly-CSharp",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
-                    "Required": true
+                    "Required": true,
+                    "SubtypeSwitch": "ConditionType"
                 },
                 {
                     "Key": "Reset",
@@ -601,7 +865,6 @@
                     "DefaultValue": false,
                     "Description": "If this condition will be met if the flag has not been set.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-bool",
-                    "Required": false,
                     "Variable": "allowUnset"
                 }
             ]
@@ -637,7 +900,6 @@
                     "DefaultValue": false,
                     "Description": "If this condition will be met if the flag has not been set.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#flag-short",
-                    "Required": false,
                     "Variable": "allowUnset"
                 }
             ]
@@ -688,7 +950,6 @@
                             "Value": false
                         }
                     ],
-                    "Required": false,
                     "Variable": "ignoreNPC"
                 }
             ]
@@ -845,7 +1106,7 @@
                     "Key": "Spawn",
                     "Type": "Flag",
                     "DefaultValue": false,
-                    "Description": "If the zombie should automatically spawn when a player with this condition enters the navigation graph referenced by @Nav.",
+                    "Description": "If the zombie should automatically spawn when a player with this condition enters the navmesh referenced by @Nav.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
                     "InclusiveWith":
                     [
@@ -876,7 +1137,7 @@
                     "Key": "Nav",
                     "Type": "NavId",
                     "DefaultValue": 255,
-                    "Description": "A reference to a navigation graph placed in the map editor. A value of 255 allows the zombie to be killed anywhere.",
+                    "Description": "A reference to a navmesh placed in the map editor. A value of 255 allows the zombie to be killed anywhere.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
                     "Variable": "nav"
                 },
@@ -907,6 +1168,10 @@
                     "Description": "ID of a zombie type shown in the level editor. This is the number listed in parenthesis in the zombie spawns tab of the map editor.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-zombie",
                     "Variable": "sqrMinRadius"
+                },
+                {
+                    "Key": "Logic",
+                    "HideInherited": true
                 }
             ]
         },
@@ -921,7 +1186,7 @@
                     "Key": "ID",
                     "Type": "FlagId",
                     "DefaultValue": 0,
-                    "Description": "The flag to use to track zombie kills for this condition.",
+                    "Description": "The flag to use to track horde beacons for this condition.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-horde",
                     "Required": true,
                     "Variable": "id"
@@ -930,21 +1195,1085 @@
                     "Key": "Value",
                     "Type": "Int16",
                     "DefaultValue": 0,
-                    "Description": "Target number of zombie kills.",
+                    "Description": "Target number of horde beacons completed.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-horde",
                     "Required": true,
                     "Variable": "value"
                 },
                 {
-                    "Key": "Zombie",
-                    "Type": "SDG.Unturned.EZombieSpeciality, Assembly-CSharp",
-                    "DefaultValue": "NONE",
-                    "Description": "Type of zombie required.",
+                    "Key": "Nav",
+                    "Type": "NavId",
+                    "DefaultValue": 0,
+                    "Maximum": 254,
+                    "Description": "A reference to a navmesh placed in the map editor.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-horde",
                     "Required": true,
-                    "Variable": "zombie"
+                    "Variable": "nav"
+                },
+                {
+                    "Key": "Logic",
+                    "HideInherited": true
                 }
             ]
-        }
+        },
+        {
+            "Type": "SDG.Unturned.NPCAnimalKillsCondition, Assembly-CSharp",
+            "DisplayName": "Animal Kills Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-animal",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The flag to use to track animal kills for this condition.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-animal",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Int16",
+                    "DefaultValue": 0,
+                    "Description": "Target number of animal kills.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-animal",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Animal",
+                    "Type": "Id",
+                    "ElementType": "SDG.Unturned.AnimalAsset, Assembly-CSharp",
+                    "DefaultValue": 0,
+                    "Description": "A reference to a navmesh placed in the map editor.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-animal",
+                    "Required": true,
+                    "Variable": "animal"
+                },
+                {
+                    "Key": "Logic",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCCompareFlagsCondition, Assembly-CSharp",
+            "DisplayName": "Compare Flags Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#compare-flags",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "A_ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The left hand side flag to use to be compared in this condition.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#compare-flags",
+                    "Required": true,
+                    "Variable": "flag_A_ID"
+                },
+                {
+                    "Key": "B_ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The right hand side flag to use to be compared in this condition.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#compare-flags",
+                    "Required": true,
+                    "Variable": "flag_B_ID"
+                },
+                {
+                    "Key": "Allow_A_Unset",
+                    "Type": "Flag",
+                    "DefaultValue": false,
+                    "Description": "If this condition will be met if the flag for @A_ID has not been set.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#compare-flags",
+                    "Variable": "allowFlag_A_Unset"
+                },
+                {
+                    "Key": "Allow_B_Unset",
+                    "Type": "Flag",
+                    "DefaultValue": false,
+                    "Description": "If this condition will be met if the flag for @B_ID has not been set.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#compare-flags",
+                    "Variable": "allowFlag_B_Unset"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCTimeOfDayCondition, Assembly-CSharp",
+            "DisplayName": "Time-of-day Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#time-of-day",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Second",
+                    "Type": "Int32",
+                    "Minimum": 0,
+                    "Maximum": 86400,
+                    "DefaultValue": 0,
+                    "Description": "The target time as the number of seconds past midnight, from 0 to 86400.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#time-of-day",
+                    "Required": true,
+                    "Variable": "second"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCPlayerLifeHealthCondition, Assembly-CSharp",
+            "DisplayName": "Player Health Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-health",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int32",
+                    "Minimum": 0,
+                    "Maximum": 100,
+                    "DefaultValue": 0,
+                    "Description": "The target player health from 0 to 100.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-health",
+                    "Required": true,
+                    "Variable": "health"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCPlayerLifeFoodCondition, Assembly-CSharp",
+            "DisplayName": "Player Food Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-food",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int32",
+                    "Minimum": 0,
+                    "Maximum": 100,
+                    "DefaultValue": 0,
+                    "Description": "The target player food from 0 to 100.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-food",
+                    "Required": true,
+                    "Variable": "food"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCPlayerLifeWaterCondition, Assembly-CSharp",
+            "DisplayName": "Player Water Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-water",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int32",
+                    "Minimum": 0,
+                    "Maximum": 100,
+                    "DefaultValue": 0,
+                    "Description": "The target player water from 0 to 100.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-water",
+                    "Required": true,
+                    "Variable": "water"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCPlayerLifeVirusCondition, Assembly-CSharp",
+            "DisplayName": "Player Immunity Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-virus",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int32",
+                    "Minimum": 0,
+                    "Maximum": 100,
+                    "DefaultValue": 0,
+                    "Description": "The target player immunity from 0 to 100.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-virus",
+                    "Required": true,
+                    "Variable": "virus"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCHolidayCondition, Assembly-CSharp",
+            "DisplayName": "Holiday Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#holiday",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "SDG.Unturned.ENPCHoliday",
+                    "DefaultValue": "NONE",
+                    "MinimumExclusive": "NONE",
+                    "MaximumExclusive": "MAX",
+                    "Description": "The target holiday.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#holiday",
+                    "Required": true,
+                    "Variable": "holiday"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCPlayerKillsCondition, Assembly-CSharp",
+            "DisplayName": "Player Kills Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-player",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The flag to use to track player kills for this condition.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-player",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Int16",
+                    "DefaultValue": 0,
+                    "Description": "Target number of player kills.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-player",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Logic",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCObjectKillsCondition, Assembly-CSharp",
+            "DisplayName": "Object Destructions Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-object",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The flag to use to track object destructions for this condition.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-object",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Int16",
+                    "DefaultValue": 0,
+                    "Description": "Target number of object destructions.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-object",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Object",
+                    "Type": "Guid",
+                    "ElementType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "The object that needs to be destroyed.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-object",
+                    "Required": true,
+                    "Variable": "objectGuid"
+                },
+                {
+                    "Key": "Nav",
+                    "Type": "NavId",
+                    "DefaultValue": 255,
+                    "Description": "A reference to a navmesh placed in the map editor. A value of 255 allows the object to be destroyed anywhere.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-object",
+                    "Variable": "nav"
+                },
+                {
+                    "Key": "Logic",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCCurrencyCondition, Assembly-CSharp",
+            "DisplayName": "Currency Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#currency",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "GUID",
+                    "Type": "Guid",
+                    "ElementType": "SDG.Unturned.ItemCurrencyAsset, Assembly-CSharp",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "The currency type to count.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#currency",
+                    "Required": true,
+                    "Variable": "currency"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "UInt32",
+                    "DefaultValue": 0,
+                    "Description": "Target amount of currency.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#currency",
+                    "Required": true,
+                    "Variable": "value"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCTreeKillsCondition, Assembly-CSharp",
+            "DisplayName": "Resource Destructions Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-tree",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The flag to use to track resource destructions for this condition.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-tree",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Int16",
+                    "DefaultValue": 0,
+                    "Description": "Target number of resource destructions.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-tree",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Tree",
+                    "Type": "Guid",
+                    "ElementType": "SDG.Unturned.ResourceAsset, Assembly-CSharp",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "The resource that needs to be destroyed.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-tree",
+                    "Required": true,
+                    "Variable": "treeGuid"
+                },
+                {
+                    "Key": "Logic",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCWeatherStatusCondition, Assembly-CSharp",
+            "DisplayName": "Weather Status Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "GUID",
+                    "Type": "Guid",
+                    "ElementType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "The weather type to look for.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
+                    "Required": true,
+                    "Variable": "weather"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "SDG.Unturned.ENPCWeatherStatus, Assembly-CSharp",
+                    "DefaultValue": "Active",
+                    "Description": "Expected state of the expected weather.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCWeatherBlendAlphaCondition, Assembly-CSharp",
+            "DisplayName": "Weather Blend-Alpha Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-blend-alpha",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "GUID",
+                    "Type": "Guid",
+                    "ElementType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "The weather type to look for.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-blend-alpha",
+                    "Required": true,
+                    "Variable": "weather"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Float32",
+                    "DefaultValue": 0,
+                    "Minimum": 0,
+                    "Maximum": 1,
+                    "Description": "A percentage (0-1) of how far a weather type has transitioned in. For example: 100% when fully active, 0% when not active, somewhere in-between while transitioning in or out.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-blend-alpha",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCIsFullMoonCondition, Assembly-CSharp",
+            "DisplayName": "Full Moon Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#is-full-moon",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Boolean",
+                    "DefaultValue": true,
+                    "Description": "If having a full moon should satisfy this condition instead of not having one.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#is-full-moon",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Logic",
+                    "HideInherited": true
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCDateCounterCondition, Assembly-CSharp",
+            "DisplayName": "Date Counter Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#date-counter",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int64",
+                    "DefaultValue": 0,
+                    "Description": "Target day count.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#date-counter",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Divisor",
+                    "Type": "Int64",
+                    "DefaultValue": 0,
+                    "Description": "Divides the current day count by this number, then uses the remainder to compare with @Value. See the documentation for more info.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#date-counter",
+                    "Required": true,
+                    "Variable": "divisor"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCPlayerLifeStaminaCondition, Assembly-CSharp",
+            "DisplayName": "Player Stamina Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-stamina",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Int32",
+                    "Minimum": 0,
+                    "Maximum": 100,
+                    "DefaultValue": 0,
+                    "Description": "The target player stamina from 0 to 100.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-stamina",
+                    "Required": true,
+                    "Variable": "stamina"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ENPCRewardType, Assembly-CSharp",
+            "DisplayName": "Reward Type",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
+            "Values":
+            [
+                {
+                    "Value": "EXPERIENCE",
+                    "Casing": "Experience",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#experience",
+                    "Description": "Rewards the player with experience.",
+                    "RewardType": "SDG.Unturned.NPCExperienceReward, Assembly-CSharp"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "DisplayName": "Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
+            "Properties":
+            [
+                {
+                    "Key": "Type",
+                    "Type": "SDG.Unturned.ENPCRewardType, Assembly-CSharp",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
+                    "Required": true,
+                    "SubtypeSwitch": "RewardType"
+                },
+                {
+                    "Key": "GrantDelaySeconds",
+                    "Type": "Float32",
+                    "Description": "Adds a delay to when the reward will be granted.",
+                    "MinimumExclusive": 0,
+                    "Except": [ -1 ],
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
+                    "DefaultValue": -1,
+                    "Variable": "grantDelaySeconds"
+                },
+                {
+                    "Key": "GrantDelayApplyWhenInterrupted",
+                    "Type": "Boolean",
+                    "Description": "Indicates that the delay will be skipped and applied immediately when the player dies or disconnects.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
+                    "DefaultValue": false,
+                    "Variable": "grantDelayApplyWhenInterrupted"
+                }
+            ],
+            "Localization":
+            [
+                {
+                    "Key": "#Empty",
+                    "Type": "String",
+                    "DefaultValue": "#Self.Key",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
+                    "Variable": "text"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCExperienceReward, Assembly-CSharp",
+            "DisplayName": "Experience Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#experience",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "UInt32",
+                    "DefaultValue": 0,
+                    "Description": "The amount of experience to give the player.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#experience",
+                    "Required": true,
+                    "Variable": "value"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCReputationReward, Assembly-CSharp",
+            "DisplayName": "Reputation Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#reputation",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "UInt32",
+                    "DefaultValue": 0,
+                    "Description": "The amount of reputation to give the player.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#reputation",
+                    "Required": true,
+                    "Variable": "value"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCBoolFlagReward, Assembly-CSharp",
+            "DisplayName": "Boolean Flag Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-bool",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The ID of the flag to modify.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-bool",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Description": "The value to set the flag to. Note that 'true' is 1 and all other values are 'false' (defaulting to 0).",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-bool",
+                    "Required": true,
+                    "Variable": "value"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ENPCModificationType, Assembly-CSharp",
+            "DisplayName": "Flag Modification Type",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "Do nothing.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short"
+                },
+                {
+                    "Value": "ASSIGN",
+                    "Casing": "Assign",
+                    "Description": "Set the flag to the given value, disregarding its old value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short"
+                },
+                {
+                    "Value": "DECREMENT",
+                    "Casing": "Decrement",
+                    "Description": "Subtract the given value from the flag's old value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short"
+                },
+                {
+                    "Value": "INCREMENT",
+                    "Casing": "Increment",
+                    "Description": "Add the given value to the flag's old value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCShortFlagReward, Assembly-CSharp",
+            "DisplayName": "Flag Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The ID of the flag to modify.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Int16",
+                    "DefaultValue": false,
+                    "Description": "The value to modify the flag by.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short",
+                    "Required": true,
+                    "Variable": "value"
+                },
+                {
+                    "Key": "Modification",
+                    "Type": "SDG.Unturned.ENPCModificationType, Assembly-CSharp",
+                    "DefaultValue": "NONE",
+                    "Required": true,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short",
+                    "Description": "The operation to perform on the flag.",
+                    "Variable": "modificationType"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCRandomShortFlagReward, Assembly-CSharp",
+            "DisplayName": "Random Flag Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short-random",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "FlagId",
+                    "DefaultValue": 0,
+                    "Description": "The ID of the flag to modify.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short-random",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Min_Value",
+                    "Type": "Int16",
+                    "Maximum": "@Min_Value",
+                    "DefaultValue": false,
+                    "Description": "The inclusive minimum of the range of values to modify the flag by.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short-random",
+                    "Required": true,
+                    "Variable": "minValue"
+                },
+                {
+                    "Key": "Max_Value",
+                    "Type": "Int16",
+                    "DefaultValue": false,
+                    "Minimum": "@Min_Value",
+                    "Description": "The inclusive maximum of the range of values to modify the flag by.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short-random",
+                    "Required": true,
+                    "Variable": "maxValue"
+                },
+                {
+                    "Key": "Modification",
+                    "Type": "SDG.Unturned.ENPCModificationType, Assembly-CSharp",
+                    "DefaultValue": "NONE",
+                    "Required": true,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short-random",
+                    "Description": "The operation to perform on the flag.",
+                    "Variable": "modificationType"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCQuestReward, Assembly-CSharp",
+            "DisplayName": "Quest Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#quest",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "GuidOrId",
+                    "ElementType": "SDG.Unturned.QuestAsset, Assembly-CSharp",
+                    "DefaultValue": 0,
+                    "Description": "The quest to give the player.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#quest",
+                    "Required": true,
+                    "Variable": "questGuid"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCItemReward, Assembly-CSharp",
+            "DisplayName": "Item Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "GuidOrId",
+                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                    "DefaultValue": 0,
+                    "Description": "The item to give the player.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Required": true,
+                    "Variable": "itemGuid"
+                },
+                {
+                    "Key": "Amount",
+                    "Type": "UInt8",
+                    "DefaultValue": 0,
+                    "Required": true,
+                    "Description": "The number of items to spawn.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Variable": "amount"
+                },
+                {
+                    "Key": "Auto_Equip",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Required": true,
+                    "Description": "If the item should be equipped automatically if possible. Will only happen if there isn't already another item equipped.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Variable": "shouldAutoEquip"
+                },
+                {
+                    "Key": "Sight",
+                    "Type": "Id",
+                    "ElementType": "SDG.Unturned.ItemSightAsset, Assembly-CSharp",
+                    "DefaultValue": -1,
+                    "Minimum": -1,
+                    "Description": "The sight to use if the item is a gun, or -1 to use the default sight.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Variable": "sight",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "ID",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "ID",
+                                "Operation": "is-type",
+                                "Comparand": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "Tactical",
+                    "Type": "Id",
+                    "ElementType": "SDG.Unturned.ItemTacticalAsset, Assembly-CSharp",
+                    "DefaultValue": -1,
+                    "Minimum": -1,
+                    "Description": "The tactical to use if the item is a gun, or -1 to use the default tactical.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Variable": "tactical",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "ID",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "ID",
+                                "Operation": "is-type",
+                                "Comparand": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "Grip",
+                    "Type": "Id",
+                    "ElementType": "SDG.Unturned.ItemGripAsset, Assembly-CSharp",
+                    "DefaultValue": -1,
+                    "Minimum": -1,
+                    "Description": "The grip to use if the item is a gun, or -1 to use the default grip.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Variable": "grip",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "ID",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "ID",
+                                "Operation": "is-type",
+                                "Comparand": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "Barrel",
+                    "Type": "Id",
+                    "ElementType": "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp",
+                    "DefaultValue": -1,
+                    "Minimum": -1,
+                    "Description": "The barrel to use if the item is a gun, or -1 to use the default barrel.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Variable": "barrel",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "ID",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "ID",
+                                "Operation": "is-type",
+                                "Comparand": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "Magazine",
+                    "Type": "Id",
+                    "ElementType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp",
+                    "DefaultValue": -1,
+                    "Minimum": -1,
+                    "Description": "The magazine to use if the item is a gun, or -1 to use the default magazine.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Variable": "magazine",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "ID",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "ID",
+                                "Operation": "is-type",
+                                "Comparand": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "Ammo",
+                    "Type": "Int32",
+                    "DefaultValue": -1,
+                    "Minimum": 0,
+                    "Maximum": 255,
+                    "Except": [ -1 ],
+                    "Description": "The ammo count if the item is a gun, or -1 to use the default value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Variable": "magazine",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "ID",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "ID",
+                                "Operation": "is-type",
+                                "Comparand": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "Origin",
+                    "Type": "SDG.Unturned.EItemOrigin, Assembly-CSharp",
+                    "DefaultValue": "CRAFT",
+                    "Description": "The origin to spawn items with, which will change the quality and state of items when they're spawned in.",
+                    "Variable": "origin"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCRandomItemReward, Assembly-CSharp",
+            "DisplayName": "Random Item Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item-random",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "Id",
+                    "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+                    "DefaultValue": 0,
+                    "Description": "The spawn table to pull items from.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item-random",
+                    "Required": true,
+                    "Variable": "id"
+                },
+                {
+                    "Key": "Amount",
+                    "Type": "UInt8",
+                    "DefaultValue": 0,
+                    "Required": true,
+                    "Description": "The number of items to spawn.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Variable": "amount"
+                },
+                {
+                    "Key": "Auto_Equip",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Required": true,
+                    "Description": "If the item should be equipped automatically if possible. Will only happen if there isn't already another item equipped.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Variable": "shouldAutoEquip"
+                },
+                {
+                    "Key": "Origin",
+                    "Type": "SDG.Unturned.EItemOrigin, Assembly-CSharp",
+                    "DefaultValue": "CRAFT",
+                    "Description": "The origin to spawn items with, which will change the quality and state of items when they're spawned in.",
+                    "Variable": "origin"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCAchievementReward, Assembly-CSharp",
+            "DisplayName": "NPC Achievement Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#achievement",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "NPCAchievementId",
+                    "DefaultValue": "",
+                    "Description": "The achievement to be given to the player.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#achievement",
+                    "Required": true,
+                    "Variable": "id"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCVehicleReward, Assembly-CSharp",
+            "DisplayName": "Vehicle Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#vehicle",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type": "GuidOrId",
+                    "DefaultValue": 0,
+                    "ElementType": "SDG.Unturned.VehicleAsset, Assembly-CSharp",
+                    "Description": "The achievement to be given to the player.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#vehicle",
+                    "Required": true,
+                    "Variable": "VehicleGuid"
+                },
+                {
+                    "Key": "Spawnpoint",
+                    "Type": "String",
+                    "Description": "The ID of the spawnpoint node to spawn the vehicle at in the map editor.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#vehicle",
+                    "Required": true,
+                    "Variable": "spawnpoint"
+                },
+                {
+                    "Key": "PaintColor",
+                    "Type": "Color32RGB",
+                    "Description": "The ID of the spawnpoint node to spawn the vehicle at in the map editor.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#vehicle",
+                    "Required": true,
+                    "Variable": "spawnpoint"
+                }
+            ]
+        },
     ]
 }

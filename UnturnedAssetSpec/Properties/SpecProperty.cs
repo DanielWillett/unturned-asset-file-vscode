@@ -10,6 +10,7 @@ public class SpecProperty
     public string Key { get; set; }
     public string? Description { get; set; }
     public string? Markdown { get; set; }
+    public string? ElementType { get; set; }
     public string[] Aliases { get; set; }
     public bool CanBeInMetadata { get; set; }
     public bool Deprecated { get; set; }

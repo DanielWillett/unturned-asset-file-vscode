@@ -2,12 +2,16 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Types.DynamicTypes;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public sealed class BlueprintSupplyIdSpecPropertyType :
     IdSpecPropertyType,
     IEquatable<BlueprintSupplyIdSpecPropertyType>
 {
+    public static readonly BlueprintSupplyIdSpecPropertyType Instance = new BlueprintSupplyIdSpecPropertyType();
+
+    static BlueprintSupplyIdSpecPropertyType() { }
+
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string Type => "BlueprintSupplyId";
 
@@ -57,5 +61,5 @@ public sealed class BlueprintSupplyIdSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(BlueprintSupplyIdSpecPropertyType other) => Category.Equals(other.Category);
+    public bool Equals(BlueprintSupplyIdSpecPropertyType other) => other != null && Category.Equals(other.Category);
 }

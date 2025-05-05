@@ -77,7 +77,7 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
             xVal = xString.Value;
         }
 
-        if (!dict.TryGetValue(xKey, out AssetFileValueNode? yKeyObj)
+        if (!dict.TryGetValue(yKey, out AssetFileValueNode? yKeyObj)
             || yKeyObj is not AssetFileStringValueNode yString)
         {
             yBad = true;
@@ -87,7 +87,7 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
             yVal = yString.Value;
         }
 
-        if (!dict.TryGetValue(xKey, out AssetFileValueNode? zKeyObj)
+        if (!dict.TryGetValue(zKey, out AssetFileValueNode? zKeyObj)
             || zKeyObj is not AssetFileStringValueNode zString)
         {
             zBad = true;

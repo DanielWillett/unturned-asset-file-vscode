@@ -1,7 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using System;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Types.DynamicTypes;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public class IdSpecPropertyType :
     BaseSpecPropertyType<ushort>,
@@ -10,6 +10,8 @@ public class IdSpecPropertyType :
     IEquatable<IdSpecPropertyType>
 {
     public EnumSpecTypeValue Category { get; }
+
+    public QualifiedType ElementType { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName { get; }
@@ -20,6 +22,9 @@ public class IdSpecPropertyType :
     /// <inheritdoc />
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
 
+    /// <inheritdoc />
+    public Type ValueType => typeof(ushort);
+
     public IdSpecPropertyType(EnumSpecTypeValue category)
     {
         if (!category.Type.Equals(AssetCategory.TypeOf))
@@ -28,7 +33,15 @@ public class IdSpecPropertyType :
         }
 
         Category = category;
+        ElementType = default;
         DisplayName = category == AssetCategory.None ? "Any ID" : $"{category.Casing} ID";
+    }
+
+    public IdSpecPropertyType(QualifiedType qualifiedType)
+    {
+        Category = AssetCategory.None;
+        ElementType = qualifiedType;
+        DisplayName = QualifiedType.ExtractTypeName(qualifiedType.Type.AsSpan()).ToString() + " ID";
     }
 
     /// <inheritdoc />
@@ -39,7 +52,8 @@ public class IdSpecPropertyType :
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode || !KnownTypeValueHelper.TryParseUInt16(strValNode.Value, out value))
+        if (parse.Node is not AssetFileStringValueNode strValNode
+            || !KnownTypeValueHelper.TryParseUInt16(strValNode.Value, out value))
         {
             return FailedToParse(in parse, out value);
         }
@@ -50,13 +64,11 @@ public class IdSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(IdSpecPropertyType other) => GetType() == other.GetType() && Category.Equals(other.Category);
+    public bool Equals(IdSpecPropertyType other) => other != null && GetType() == other.GetType() && Category.Equals(other.Category);
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType other) => other is IdSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<ushort> other) => other is IdSpecPropertyType t && Equals(t);
-
-    QualifiedType IElementTypeSpecPropertyType.ElementType => new QualifiedType(Category.Value, true);
 }

@@ -1,5 +1,4 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types.DynamicTypes;
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;

@@ -3,7 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Types.DynamicTypes;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public sealed class AssetReferenceSpecPropertyType :
     BaseSpecPropertyType<Guid>,
@@ -21,6 +21,9 @@ public sealed class AssetReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+
+    /// <inheritdoc />
+    public Type ValueType => typeof(Guid);
 
     public AssetReferenceSpecPropertyType(QualifiedType elementType)
     {
@@ -81,7 +84,7 @@ public sealed class AssetReferenceSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(AssetReferenceSpecPropertyType other) => ElementType.Equals(other.ElementType);
+    public bool Equals(AssetReferenceSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType);
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType other) => other is AssetReferenceSpecPropertyType t && Equals(t);

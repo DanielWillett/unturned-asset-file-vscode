@@ -13,6 +13,7 @@ public class SpecTypeConverter : JsonConverter<ISpecType?>
         if (reader.TokenType == JsonTokenType.Null)
             return null;
 
+        reader.Skip();
         return null;
     }
 

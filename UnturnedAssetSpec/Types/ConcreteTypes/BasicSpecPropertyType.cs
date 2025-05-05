@@ -14,12 +14,15 @@ public abstract class BasicSpecPropertyType<TSpecPropertyType, TValue> :
     /// <inheritdoc />
     public abstract SpecPropertyTypeKind Kind { get; }
 
+    /// <inheritdoc />
+    public Type ValueType => typeof(TValue);
+
     private protected BasicSpecPropertyType() { }
 
     public bool Equals(ISpecPropertyType other) => other is BasicSpecPropertyType<TSpecPropertyType, TValue>;
     public bool Equals(ISpecPropertyType<TValue> other) => other is BasicSpecPropertyType<TSpecPropertyType, TValue>;
     
-    public bool Equals(BasicSpecPropertyType<TSpecPropertyType, TValue> other) => true;
+    public bool Equals(BasicSpecPropertyType<TSpecPropertyType, TValue> other) => other != null;
 
     /// <inheritdoc />
     public abstract bool TryParseValue(in SpecPropertyTypeParseContext parse, out TValue? value);

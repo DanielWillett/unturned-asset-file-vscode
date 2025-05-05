@@ -6,11 +6,11 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class TypeOrEnumSpecPropertyType :
-    BaseSpecPropertyType<QualifiedType>,
-    ISpecPropertyType<QualifiedType>,
+public sealed class GuidOrIdSpecPropertyType :
+    BaseSpecPropertyType<GuidOrId>,
+    ISpecPropertyType<GuidOrId>,
     IElementTypeSpecPropertyType,
-    IEquatable<TypeOrEnumSpecPropertyType>
+    IEquatable<GuidOrIdSpecPropertyType>
 {
     private AssetSpecDatabase? _cachedSpecDb;
     private ISpecType? _cachedType;
@@ -27,17 +27,18 @@ public sealed class TypeOrEnumSpecPropertyType :
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     /// <inheritdoc />
-    public Type ValueType => typeof(QualifiedType);
+    public Type ValueType => typeof(GuidOrId);
 
-    public TypeOrEnumSpecPropertyType(QualifiedType elementType)
+    public GuidOrIdSpecPropertyType(QualifiedType elementType)
     {
         ElementType = elementType;
         DisplayName = $"Type or {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out GuidOrId value)
     {
+        // todo: remember that [vehicle ]redirect assets need to work properly
         ISpecType? specType = null;
 
         if (_cachedSpecDb == parse.Database)
@@ -114,15 +115,15 @@ public sealed class TypeOrEnumSpecPropertyType :
             }
         }
 
-        return KnownTypeValueHelper.TryParseType(val, out value) || FailedToParse(in parse, out value);
+        return GuidOrId.TryParse(val, out value) || FailedToParse(in parse, out value);
     }
 
     /// <inheritdoc />
-    public bool Equals(TypeOrEnumSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType);
+    public bool Equals(GuidOrIdSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is TypeOrEnumSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType other) => other is GuidOrIdSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<QualifiedType> other) => other is TypeOrEnumSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType<GuidOrId> other) => other is GuidOrIdSpecPropertyType t && Equals(t);
 }

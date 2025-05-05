@@ -1,10 +1,148 @@
-using DanielWillett.UnturnedDataFileLspServer.Data.Types.DynamicTypes;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
+
 public static class KnownTypes
 {
+    private static readonly Dictionary<string, Func<ISpecPropertyType>> ConcreteTypes
+        = new Dictionary<string, Func<ISpecPropertyType>>(64, StringComparer.Ordinal)
+    {
+        { "Flag", () => Flag },
+        { "Boolean", () => Boolean },
+        { "FaceIndex", () => FaceIndex },
+        { "BeardIndex", () => BeardIndex },
+        { "HairIndex", () => HairIndex },
+        { "UInt8", () => UInt8 },
+        { "UInt16", () => UInt16 },
+        { "UInt32", () => UInt32 },
+        { "UInt64", () => UInt64 },
+        { "Int8", () => Int8 },
+        { "Int16", () => Int16 },
+        { "Int32", () => Int32 },
+        { "Int64", () => Int64 },
+        { "String", () => String },
+        { "RichTextString", () => RichTextString },
+        { "Character", () => Character },
+        { "Float32", () => Float32 },
+        { "Float64", () => Float64 },
+        { "Float128", () => Float128 },
+        { "Type", () => Type },
+        { "Guid", () => Guid },
+        { "Color32RGB", () => Color32RGB },
+        { "Color32RGBA", () => Color32RGBA },
+        { "Color32RGBLegacy", () => Color32RGBLegacy },
+        { "Color32RGBALegacy", () => Color32RGBALegacy },
+        { "ColorRGB", () => ColorRGB },
+        { "ColorRGBA", () => ColorRGBA },
+        { "ColorRGBLegacy", () => ColorRGBLegacy },
+        { "ColorRGBALegacy", () => ColorRGBALegacy },
+        { "AudioReference", () => AudioReference },
+        { "NavId", () => NavId },
+        { "FlagId", () => FlagId },
+        { "BlueprintSupplyId", () => BlueprintSupplyId },
+        { "NPCAchievementId", () => NPCAchievementId },
+        { "DateTime", () => DateTime },
+        { "Position", () => Position },
+        { "PositionOrLegacy", () => PositionOrLegacy },
+        { "LegacyPosition", () => LegacyPosition },
+        { "Scale", () => Scale },
+        { "ScaleOrLegacy", () => ScaleOrLegacy },
+        { "LegacyScale", () => LegacyScale },
+        { "EulerRotation", () => EulerRotation },
+        { "EulerRotationOrLegacy", () => EulerRotationOrLegacy },
+        { "LegacyEulerRotation", () => LegacyEulerRotation },
+        { "MasterBundleName", () => MasterBundleName },
+        { "LegacyBundleName", () => LegacyBundleName },
+        { "AssetBundleVersion", () => AssetBundleVersion },
+    };
+
+    public static ISpecPropertyType? GetType(string knownType, SpecProperty property)
+    {
+        if (string.IsNullOrEmpty(knownType))
+            return null;
+
+        if (ConcreteTypes.TryGetValue(knownType, out Func<ISpecPropertyType> func))
+        {
+            return func();
+        }
+
+        string? elementType = property.ElementType;
+        if (knownType.Equals("FilePathString", StringComparison.Ordinal))
+        {
+            return FilePathString(elementType);
+        }
+
+        if (knownType.Equals("TypeOrEnum", StringComparison.Ordinal))
+        {
+            return string.IsNullOrEmpty(elementType)
+                ? Type
+                : TypeOrEnum(new QualifiedType(elementType!));
+        }
+
+        if (knownType.Equals("AssetReference", StringComparison.Ordinal))
+        {
+            return AssetReference(string.IsNullOrEmpty(elementType)
+                ? new QualifiedType(TypeHierarchy.AssetBaseType)
+                : new QualifiedType(elementType!));
+        }
+
+        if (knownType.Equals("MasterBundleReference", StringComparison.Ordinal))
+        {
+            return MasterBundleReference(string.IsNullOrEmpty(elementType)
+                ? new QualifiedType("UnityEngine.Object, UnityEngine.CoreModule")
+                : new QualifiedType(elementType!));
+        }
+
+        if (knownType.Equals("MasterBundleReferenceString", StringComparison.Ordinal))
+        {
+            return MasterBundleReferenceString(string.IsNullOrEmpty(elementType)
+                ? new QualifiedType("UnityEngine.Object, UnityEngine.CoreModule")
+                : new QualifiedType(elementType!));
+        }
+
+        if (knownType.Equals("ContentReference", StringComparison.Ordinal))
+        {
+            return ContentReference(string.IsNullOrEmpty(elementType)
+                ? new QualifiedType("UnityEngine.Object, UnityEngine.CoreModule")
+                : new QualifiedType(elementType!));
+        }
+
+        if (knownType.Equals("GuidOrId", StringComparison.Ordinal))
+        {
+            return GuidOrId(string.IsNullOrEmpty(elementType)
+                ? new QualifiedType(TypeHierarchy.AssetBaseType)
+                : new QualifiedType(elementType!));
+        }
+
+        if (knownType.Equals("Id", StringComparison.Ordinal))
+        {
+            if (string.IsNullOrEmpty(elementType))
+            {
+                return Id(TypeHierarchy.AssetBaseType);
+            }
+
+            if (AssetCategory.TryParse(elementType, out EnumSpecTypeValue category))
+            {
+                return Id(category);
+            }
+
+            return Id(new QualifiedType(elementType!));
+        }
+
+        if (knownType.Equals("CommaDelimtedString", StringComparison.Ordinal))
+        {
+            return CommaDelimtedString(string.IsNullOrEmpty(elementType)
+                ? String
+                : GetType(elementType!, property) ?? String);
+        }
+
+        return null;
+    }
+
     public static ISpecPropertyType<bool> Flag => FlagSpecPropertyType.Instance;
 
     public static ISpecPropertyType<bool> Boolean => BooleanSpecPropertyType.Instance;
@@ -41,6 +179,42 @@ public static class KnownTypes
 
     public static ISpecPropertyType<Guid> Guid => GuidSpecPropertyType.Instance;
 
+    public static ISpecPropertyType<Color32> Color32RGB => Color32RGBSpecPropertyType.Instance;
+    public static ISpecPropertyType<Color32> Color32RGBA => Color32RGBASpecPropertyType.Instance;
+    public static ISpecPropertyType<Color32> Color32RGBLegacy => Color32RGBLegacySpecPropertyType.Instance;
+    public static ISpecPropertyType<Color32> Color32RGBALegacy => Color32RGBALegacySpecPropertyType.Instance;
+    public static ISpecPropertyType<Color> ColorRGB => ColorRGBSpecPropertyType.Instance;
+    public static ISpecPropertyType<Color> ColorRGBA => ColorRGBASpecPropertyType.Instance;
+    public static ISpecPropertyType<Color> ColorRGBLegacy => ColorRGBLegacySpecPropertyType.Instance;
+    public static ISpecPropertyType<Color> ColorRGBALegacy => ColorRGBALegacySpecPropertyType.Instance;
+
+    public static ISpecPropertyType<Guid> AssetReference(QualifiedType elementType)
+        => new AssetReferenceSpecPropertyType(elementType);
+    public static ISpecPropertyType<BundleReference> MasterBundleReference(QualifiedType elementType)
+        => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.MasterBundleReference);
+    public static ISpecPropertyType<BundleReference> MasterBundleReferenceString(QualifiedType elementType)
+        => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.MasterBundleReferenceString);
+    public static ISpecPropertyType<BundleReference> ContentReference(QualifiedType elementType)
+        => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.ContentReference);
+    public static ISpecPropertyType<BundleReference> AudioReference => MasterBundleReferenceSpecPropertyType.AudioReference;
+
+    public static ISpecPropertyType<GuidOrId> GuidOrId(QualifiedType elementType)
+        => new GuidOrIdSpecPropertyType(elementType);
+
+    public static ISpecPropertyType<ushort> Id(QualifiedType elementType)
+        => new IdSpecPropertyType(elementType);
+
+    public static ISpecPropertyType<ushort> Id(EnumSpecTypeValue assetCategory)
+        => new IdSpecPropertyType(assetCategory);
+
+    public static ISpecPropertyType<byte> NavId => NavIdSpecPropertyType.Instance;
+
+    public static ISpecPropertyType<ushort> FlagId => FlagIdSpecPropertyType.Instance;
+
+    public static ISpecPropertyType<ushort> BlueprintSupplyId => BlueprintSupplyIdSpecPropertyType.Instance;
+
+    public static ISpecPropertyType<string> NPCAchievementId => NPCAchievementIdSpecPropertyType.Instance;
+
     public static ISpecPropertyType<DateTime> DateTime => DateTimeSpecPropertyType.Instance;
 
     public static ISpecPropertyType<Vector3> Position => PositionSpecPropertyType.Instance;
@@ -55,15 +229,10 @@ public static class KnownTypes
     public static ISpecPropertyType<Vector3> EulerRotationOrLegacy => EulerRotationOrLegacySpecPropertyType.Instance;
     public static ISpecPropertyType<Vector3> LegacyEulerRotation => LegacyEulerRotationSpecPropertyType.Instance;
 
-    public static ISpecPropertyType<Guid> AssetReference(QualifiedType elementType)
-        => new AssetReferenceSpecPropertyType(elementType);
-    public static ISpecPropertyType<BundleReference> MasterBundleReference(QualifiedType elementType)
-        => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.MasterBundleReference);
-    public static ISpecPropertyType<BundleReference> MasterBundleReferenceString(QualifiedType elementType)
-        => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.MasterBundleReferenceString);
-    public static ISpecPropertyType<BundleReference> ContentReference(QualifiedType elementType)
-        => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.ContentReference);
-    public static ISpecPropertyType<BundleReference> AudioReference => MasterBundleReferenceSpecPropertyType.AudioReference;
+    public static ISpecPropertyType<string> CommaDelimtedString(ISpecPropertyType innerType)
+        => new CommaDelimtedStringSpecPropertyType(innerType ?? throw new ArgumentNullException(nameof(innerType)));
 
+    public static ISpecPropertyType<string> MasterBundleName => MasterBundleNameSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> LegacyBundleName => LegacyBundleNameSpecPropertyType.Instance;
     public static ISpecPropertyType<int> AssetBundleVersion => AssetBundleVersionSpecPropertyType.Instance;
 }

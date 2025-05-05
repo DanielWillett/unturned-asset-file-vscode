@@ -50,9 +50,10 @@ public abstract class BaseSpecPropertyType<TValue>
         return false;
     }
 
-    protected bool FailedToParse(in SpecPropertyTypeParseContext parse, out TValue? value)
+    protected bool FailedToParse(in SpecPropertyTypeParseContext parse, out TValue? value, AssetFileNode? node = null)
     {
-        if (parse.HasDiagnostics && parse.Node != null)
+        node ??= parse.Node;
+        if (parse.HasDiagnostics && node != null)
         {
             DatDiagnosticMessage message = new DatDiagnosticMessage
             {

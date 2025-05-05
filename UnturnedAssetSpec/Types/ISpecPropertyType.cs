@@ -5,6 +5,7 @@ public interface ISpecPropertyType : IEquatable<ISpecPropertyType>
 {
     string DisplayName { get; }
     string Type { get; }
+    Type ValueType { get; }
     SpecPropertyTypeKind Kind { get; }
     ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue>;
 }
