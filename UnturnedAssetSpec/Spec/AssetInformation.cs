@@ -39,6 +39,7 @@ public class AssetInformation
     public string? BeardTextureTemplate { get; set; }
     public string? HairTextureTemplate { get; set; }
     public string? StatusJsonFallbackUrl { get; set; }
+    public string? PlayerDashboardInventoryLocalizationFallbackUrl { get; set; }
 
     public bool TryGetAssetBundleVersionInfo(int assetBundleVersion, out UnityEngineVersion version, out string displayName)
     {

@@ -61,6 +61,9 @@ public static class KnownTypes
         { "MasterBundleName", () => MasterBundleName },
         { "LegacyBundleName", () => LegacyBundleName },
         { "AssetBundleVersion", () => AssetBundleVersion },
+        { "MapName", () => MapName },
+        { "ActionKey", () => ActionKey },
+        { "LocalizableString", () => LocalizableString }
     };
 
     public static ISpecPropertyType? GetType(string knownType, SpecProperty property, string? elementType)
@@ -278,4 +281,7 @@ public static class KnownTypes
     public static ISpecPropertyType<string> MasterBundleName => MasterBundleNameSpecPropertyType.Instance;
     public static ISpecPropertyType<string> LegacyBundleName => LegacyBundleNameSpecPropertyType.Instance;
     public static ISpecPropertyType<int> AssetBundleVersion => AssetBundleVersionSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> MapName => MapNameSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> ActionKey => ActionKeySpecPropertyType.Instance;
+    public static ISpecPropertyType<string> LocalizableString => LocalizableStringSpecPropertyType.Instance;
 }

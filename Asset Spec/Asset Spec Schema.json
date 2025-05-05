@@ -159,14 +159,6 @@
                     "title": "An index of a built-in hair texture."
                 },
                 {
-                    "const": "LegacyRewardList",
-                    "title": "A list of rewards following the layout of 'SDG.Unturned.INPCReward, Assembly-CSharp'."
-                },
-                {
-                    "const": "LegacyConditionList",
-                    "title": "A list of conditions following the layout of 'SDG.Unturned.INPCCondition, Assembly-CSharp'."
-                },
-                {
                     "const": "GuidOrId",
                     "title": "An asset GUID or short ID, where ElementType is the category or asset type."
                 },
@@ -253,6 +245,18 @@
                 {
                     "const": "AssetBundleVersion",
                     "title": "The version of an asset bundle or master bundle."
+                },
+                {
+                    "const": "MapName",
+                    "title": "The name/ID of a map."
+                },
+                {
+                    "const": "ActionKey",
+                    "title": "A key ending in _Button and _Button_Tooltip in PlayerDashboardInventory.dat."
+                },
+                {
+                    "const": "LocalizableString",
+                    "title": "A string that can be in the asset or localization file."
                 }
             ]
         },
@@ -290,6 +294,10 @@
                                 }
                             }
                         },
+                        "FileCrossRef": {
+                            "type": [ "string", "null" ],
+                            "description": "Designates a property that selects the cross-ref file for any properties starting with $cr$::"
+                        },
                         "CountForRegexGroup": {
                             "type": [ "string", "null" ],
                             "description": "The regex-group for which this property is a count for."
@@ -324,7 +332,17 @@
                         },
                         "Required": {
                             "description": "If this property is required.",
-                            "type": [ "string", "boolean" ]
+                            "oneOf": [
+                                {
+                                    "type": [ "string", "boolean" ]
+                                },
+                                {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
+                                }
+                            ]
                         },
                         "CanBeInMetadata": {
                             "description": "If this property can be read from the Metadata section.",
@@ -409,7 +427,7 @@
                                                         "$ref": "#/$defs/condition"
                                                     },
                                                     {
-                                                        "$ref": "#/$defs/switch"
+                                                        "$ref": "#/$defs/switchCase"
                                                     }
                                                 ],
                                                 "description": "Optional condition when this should be applied."
@@ -449,7 +467,7 @@
                                                         "$ref": "#/$defs/condition"
                                                     },
                                                     {
-                                                        "$ref": "#/$defs/switch"
+                                                        "$ref": "#/$defs/switchCase"
                                                     }
                                                 ]
                                             }
@@ -783,6 +801,10 @@
                     "DisplayName": {
                         "description": "Display name of the type.",
                         "type": "string"
+                    },
+                    "IsLegacyExpandedType": {
+                        "description": "If this type is expanded using same-level properties instead of a dictionary.",
+                        "type": [ "boolean", "null" ]
                     },
                     "Docs": {
                         "description": "Link to the Unturned modding docs when a page is available.",

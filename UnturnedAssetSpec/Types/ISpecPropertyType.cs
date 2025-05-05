@@ -1,4 +1,6 @@
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -23,7 +25,7 @@ public interface IElementTypeSpecPropertyType : ISpecPropertyType
 }
 public interface INestedSpecPropertyType : ISpecPropertyType
 {
-    void ResolveInnerTypes()
+    void ResolveInnerTypes(SpecProperty property, AssetSpecDatabase database, AssetTypeInformation assetFile);
 }
 
 public enum SpecPropertyTypeKind

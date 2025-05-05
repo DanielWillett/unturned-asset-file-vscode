@@ -4,16 +4,14 @@ using System.Text.Json;
 
 namespace UnturnedAssetSpecTests;
 
-public class StatusTests
+public class DownloadActionButtonsTest
 {
     private AssetSpecDatabase? _runner;
     
-    private static void AssertValidDoc(JsonDocument? doc)
+    private void AssertValidButtons()
     {
-        Assert.That(doc, Is.Not.Null);
-        doc.RootElement.GetProperty("Game").GetProperty("Major_Version");
-        doc.RootElement.GetProperty("Game").GetProperty("Minor_Version");
-        doc.RootElement.GetProperty("Game").GetProperty("Patch_Version");
+        Assert.That(_runner!.ValidActionButtons.Count, Is.Not.EqualTo(0));
+        Assert.That(_runner.ValidActionButtons, Does.Contain("Take"));
     }
 
     [Test]
@@ -28,8 +26,7 @@ public class StatusTests
 
         await _runner.InitializeAsync();
 
-        JsonDocument? doc = _runner.StatusInformation;
-        AssertValidDoc(doc);
+        AssertValidButtons();
     }
 
     [Test]
@@ -39,8 +36,7 @@ public class StatusTests
 
         await _runner.InitializeAsync();
 
-        JsonDocument? doc = _runner.StatusInformation;
-        AssertValidDoc(doc);
+        AssertValidButtons();
     }
 
     [Test]
@@ -50,11 +46,7 @@ public class StatusTests
 
         await _runner.InitializeAsync();
 
-        Assert.That(_runner.CurrentGameVersion, Is.Not.Null);
-        Assert.That(_runner.CurrentGameVersion.Major, Is.EqualTo(3));
-
-        Assert.That(_runner.NPCAchievementIds, Is.Not.Null);
-        Assert.That(_runner.NPCAchievementIds, Does.Contain("Soulcrystal"));
+        AssertValidButtons();
     }
 
     [TearDown]

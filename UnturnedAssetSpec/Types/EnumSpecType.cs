@@ -7,6 +7,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 [DebuggerDisplay("{DisplayName,nq}")]
 public class EnumSpecType : ISpecType, IEquatable<EnumSpecType>
 {
+
     public required QualifiedType Type { get; init; }
 
     public required string DisplayName { get; init; }
@@ -24,6 +25,7 @@ public class EnumSpecType : ISpecType, IEquatable<EnumSpecType>
     public override int GetHashCode() => Type.GetHashCode();
 
     public override string ToString() => Type.ToString();
+    QualifiedType ISpecType.Parent => QualifiedType.None;
 }
 
 [DebuggerDisplay("{Value,nq}")]

@@ -744,9 +744,42 @@
             ]
         },
         {
+            "Type": "SDG.Unturned.EItemOrigin, Assembly-CSharp",
+            "DisplayName": "Item Origin",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eitemorigin.html",
+            "Values":
+            [
+                {
+                    "Value": "WORLD",
+                    "Casing": "World",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eitemorigin.html",
+                    "Description": "The item was gotten from the world (item spawn, etc)."
+                },
+                {
+                    "Value": "ADMIN",
+                    "Casing": "Admin",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eitemorigin.html",
+                    "Description": "The item was gotten via an admin command or similar means."
+                },
+                {
+                    "Value": "CRAFT",
+                    "Casing": "Craft",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eitemorigin.html",
+                    "Description": "The item was crafted."
+                },
+                {
+                    "Value": "NATURE",
+                    "Casing": "Nature",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eitemorigin.html",
+                    "Description": "The item was found in nature, such as an animal or resource drop."
+                }
+            ]
+        },
+        {
             "Type": "SDG.Unturned.INPCCondition, Assembly-CSharp",
             "DisplayName": "Condition",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+            "IsLegacyExpandedType": true,
             "Properties":
             [
                 {
@@ -1751,6 +1784,167 @@
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#experience",
                     "Description": "Rewards the player with experience.",
                     "RewardType": "SDG.Unturned.NPCExperienceReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "REPUTATION",
+                    "Casing": "Reputation",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#reputation",
+                    "Description": "Rewards the player with reputation.",
+                    "RewardType": "SDG.Unturned.NPCReputationReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "FLAG_BOOL",
+                    "Casing": "Flag_Bool",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-bool",
+                    "Description": "Sets a flag to a boolean (true or false) value.",
+                    "RewardType": "SDG.Unturned.NPCBoolFlagReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "FLAG_SHORT",
+                    "Casing": "Flag_Short",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short",
+                    "Description": "Sets a flag to a signed 16-bit integer value.",
+                    "RewardType": "SDG.Unturned.NPCShortFlagReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "FLAG_SHORT_RANDOM",
+                    "Casing": "Flag_Short_Random",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-short-random",
+                    "Description": "Sets a flag to a random signed 16-bit integer value between two values.",
+                    "RewardType": "SDG.Unturned.NPCRandomShortFlagReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "QUEST",
+                    "Casing": "Quest",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#quest",
+                    "Description": "Adds a quest to the player.",
+                    "RewardType": "SDG.Unturned.NPCQuestReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "ITEM",
+                    "Casing": "Item",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
+                    "Description": "Gives the player one or more of a specific item.",
+                    "RewardType": "SDG.Unturned.NPCItemReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "ITEM_RANDOM",
+                    "Casing": "Item_Random",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item-random",
+                    "Description": "Gives the player one or more items from a spawn table.",
+                    "RewardType": "SDG.Unturned.NPCRandomItemReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "ACHIEVEMENT",
+                    "Casing": "Achievement",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#achievement",
+                    "Description": "Gives the player a Steam achievement.",
+                    "RewardType": "SDG.Unturned.NPCAchievementReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "VEHICLE",
+                    "Casing": "Vehicle",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#vehicle",
+                    "Description": "Spawns a vehicle.",
+                    "RewardType": "SDG.Unturned.NPCVehicleReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "TELEPORT",
+                    "Casing": "Teleport",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#teleport",
+                    "Description": "Teleports the player.",
+                    "RewardType": "SDG.Unturned.NPCTeleportReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "EVENT",
+                    "Casing": "Event",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#event",
+                    "Description": "Invokes an NPC event.",
+                    "RewardType": "SDG.Unturned.NPCEventReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "FLAG_MATH",
+                    "Casing": "Flag_Math",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math",
+                    "Description": "Applies math operations to a flag.",
+                    "RewardType": "SDG.Unturned.NPCFlagMathReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "CURRENCY",
+                    "Casing": "Currency",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#currency",
+                    "Description": "Gives the player currency items adding up to a specific value.",
+                    "RewardType": "SDG.Unturned.NPCCurrencyReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "HINT",
+                    "Casing": "Hint",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#hint",
+                    "Description": "Displays a message at the bottom of the player's HUD.",
+                    "RewardType": "SDG.Unturned.NPCHintReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "PLAYER_SPAWNPOINT",
+                    "Casing": "Player_Spawnpoint",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-spawnpoint",
+                    "Description": "Changes the location where the player will respawn next time they die.",
+                    "RewardType": "SDG.Unturned.NPCPlayerSpawnpointReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "PLAYER_LIFE_HEALTH",
+                    "Casing": "Player_Life_Health",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-health",
+                    "Description": "Adds to or subtracts from the player's health.",
+                    "RewardType": "SDG.Unturned.NPCPlayerLifeHealthReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "PLAYER_LIFE_FOOD",
+                    "Casing": "Player_Life_Food",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-food",
+                    "Description": "Adds to or subtracts from the player's food.",
+                    "RewardType": "SDG.Unturned.NPCPlayerLifeFoodReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "PLAYER_LIFE_WATER",
+                    "Casing": "Player_Life_Water",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-water",
+                    "Description": "Adds to or subtracts from the player's water.",
+                    "RewardType": "SDG.Unturned.NPCPlayerLifeWaterReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "PLAYER_LIFE_VIRUS",
+                    "Casing": "Player_Life_Virus",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-virus",
+                    "Description": "Adds to or subtracts from the player's immunity.",
+                    "RewardType": "SDG.Unturned.NPCPlayerLifeVirusReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "REWARDS_LIST_ASSET",
+                    "Casing": "Rewards_List_Asset",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#rewards-list-asset",
+                    "Description": "Imports a separately defined Reward List asset, or a Spawn Table of reward lists.",
+                    "RewardType": "SDG.Unturned.NPCRewardsListAssetReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "CUTSCENE_MODE",
+                    "Casing": "Cutscene_Mode",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#cutscene-mode",
+                    "Description": "Enables or disables 'cutscene mode' on the player, disabling the first-person view model.",
+                    "RewardType": "SDG.Unturned.NPCCutsceneModeReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "PLAYER_LIFE_STAMINA",
+                    "Casing": "Player_Life_Stamina",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-stamina",
+                    "Description": "Adds to or subtracts from the player's stamina.",
+                    "RewardType": "SDG.Unturned.NPCPlayerLifeStaminaReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "EFFECT",
+                    "Casing": "Effect",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
+                    "Description": "Spawns an effect.",
+                    "RewardType": "SDG.Unturned.NPCEffectReward, Assembly-CSharp"
                 }
             ]
         },
@@ -1758,6 +1952,7 @@
             "Type": "SDG.Unturned.INPCReward, Assembly-CSharp",
             "DisplayName": "Reward",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
+            "IsLegacyExpandedType": true,
             "Properties":
             [
                 {
@@ -2331,10 +2526,9 @@
                     "Key": "PaintColor",
                     "Type": "Color32RGB",
                     "DefaultValue": null,
-                    "Description": "The ID of the spawnpoint node to spawn the vehicle at in the map editor.",
+                    "Description": "The optional color of the vehicle.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#vehicle",
-                    "Required": true,
-                    "Variable": "spawnpoint"
+                    "Variable": "paintColor"
                 }
             ]
         },
@@ -2507,7 +2701,8 @@
                     "Maximum": 100,
                     "Description": "Applies a change in health to the player, either positive or negative.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-health",
-                    "Variable": "value"
+                    "Variable": "value",
+                    "Required": true
                 }
             ]
         },
@@ -2526,7 +2721,8 @@
                     "Maximum": 100,
                     "Description": "Applies a change in food to the player, either positive or negative.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-food",
-                    "Variable": "value"
+                    "Variable": "value",
+                    "Required": true
                 }
             ]
         },
@@ -2545,7 +2741,8 @@
                     "Maximum": 100,
                     "Description": "Applies a change in water to the player, either positive or negative.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-water",
-                    "Variable": "value"
+                    "Variable": "value",
+                    "Required": true
                 }
             ]
         },
@@ -2564,7 +2761,8 @@
                     "Maximum": 100,
                     "Description": "Applies a change in immunity to the player, either positive or negative.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-virus",
-                    "Variable": "value"
+                    "Variable": "value",
+                    "Required": true
                 }
             ]
         },
@@ -2583,11 +2781,29 @@
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "A refernce to a reward list asset or a spawn table containing reward lists.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#rewards-list-asset",
-                    "Variable": "assetRef"
+                    "Variable": "assetRef",
+                    "Required": true
                 }
             ]
         },
-        // todo: continue here
+        {
+            "Type": "SDG.Unturned.NPCCutsceneModeReward, Assembly-CSharp",
+            "DisplayName": "Cutscene Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#cutscene-mode",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "Value",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Description": "Whether or not cutscene mode should be active.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#cutscene-mode",
+                    "Variable": "value",
+                    "Required": true
+                }
+            ]
+        },
         {
             "Type": "SDG.Unturned.NPCPlayerLifeStaminaReward, Assembly-CSharp",
             "DisplayName": "Stamina Reward",
@@ -2603,9 +2819,55 @@
                     "Maximum": 100,
                     "Description": "Applies a change in stamina to the player, either positive or negative.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#player-life-stamina",
-                    "Variable": "value"
+                    "Variable": "value",
+                    "Required": true
                 }
             ]
         },
+        {
+            "Type": "SDG.Unturned.NPCEffectReward, Assembly-CSharp",
+            "DisplayName": "Effect Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Properties":
+            [
+                {
+                    "Key": "GUID",
+                    "Type": "AssetReferenceString",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "The effect to spawn.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
+                    "Variable": "AssetRef",
+                    "Required": true
+                },
+                {
+                    "Key": "Spawnpoint",
+                    "Type": "SpawnpointId",
+                    "DefaultValue": null,
+                    "Description": "The ID of the spawnpoint node to spawn the effect at in the map editor.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
+                    "Variable": "Spawnpoint",
+                    "Required": true
+                },
+                {
+                    "Key": "IsReliable",
+                    "Type": "Boolean",
+                    "DefaultValue": true,
+                    "Description": "Guarantees the effect is replicated in multiplayer, where it may be skipped because of packet loss.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
+                    "Variable": "IsReliable"
+                },
+                {
+                    "Key": "RelevantDistance",
+                    "Type": "Float32",
+                    "DefaultValue": -1,
+                    "MinimumExclusive": 0,
+                    "Except": [ -1 ],
+                    "Description": "Overrides the default relevant distance of 128m when in multiplayer.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
+                    "Variable": "OverrideRelevantDistance"
+                }
+            ]
+        }
     ]
 }

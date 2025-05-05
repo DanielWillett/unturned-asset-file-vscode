@@ -14,6 +14,7 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
 {
     private readonly bool _isCaseInsensitive;
 
+    public static readonly QualifiedType None = default;
     public static readonly QualifiedType AssetBaseType = new QualifiedType(TypeHierarchy.AssetBaseType);
     public static readonly QualifiedType UseableBaseType = new QualifiedType(TypeHierarchy.UseableBaseType);
 

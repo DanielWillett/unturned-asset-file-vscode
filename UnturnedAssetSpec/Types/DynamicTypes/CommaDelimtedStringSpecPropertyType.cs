@@ -1,4 +1,6 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -6,11 +8,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class CommaDelimtedStringSpecPropertyType :
     BaseSpecPropertyType<string>,
     ISpecPropertyType<string>,
-    INestedSpecPropertyType
+    INestedSpecPropertyType,
     IEquatable<CommaDelimtedStringSpecPropertyType>
 {
-    private static readonly char[] Separators = [ ',' ];
     private readonly ParseHandler _handler;
+    private static readonly char[] Separators = [ ',' ];
 
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName => "File Path";
@@ -23,6 +25,13 @@ public sealed class CommaDelimtedStringSpecPropertyType :
 
     /// <inheritdoc />
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+
+    /// <inheritdoc />
+    public void ResolveInnerTypes(SpecProperty property, AssetSpecDatabase database, AssetTypeInformation assetFile)
+    {
+        if (InnerType is UnresolvedSpecPropertyType unresolved)
+            unresolved.Resolve(property, database, assetFile);
+    }
 
     public ISpecPropertyType InnerType { get; }
 
@@ -51,7 +60,7 @@ public sealed class CommaDelimtedStringSpecPropertyType :
         if (parse.HasDiagnostics)
         {
             string[] split = val.Split(Separators, StringSplitOptions.RemoveEmptyEntries);
-
+            _ = _handler;
         }
 
         value = val;

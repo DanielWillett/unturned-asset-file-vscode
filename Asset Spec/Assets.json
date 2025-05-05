@@ -32,6 +32,7 @@
     "BeardTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Beards/Beard%20{0}.png",
     "HairTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Hair/Hair%20{0}.png",
     "StatusJsonFallbackUrl": "https://raw.githubusercontent.com/Unturned-Datamining/Unturned-Datamining/refs/heads/linux-client-preview/Status.json",
+    "PlayerDashboardInventoryLocalizationFallbackUrl": "https://raw.githubusercontent.com/Unturned-Datamining/Unturned-Datamining/refs/heads/linux-client-preview/Localization/English/Player/PlayerDashboardInventory.dat",
     "Types":
     {   
         "SDG.Unturned.MasterBundleConfig, Assembly-CSharp":

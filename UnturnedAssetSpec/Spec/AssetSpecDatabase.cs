@@ -1,4 +1,5 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
@@ -6,12 +7,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -23,7 +23,6 @@ public class AssetSpecDatabase : IDisposable
     public const string UnturnedName = "Unturned";
     public const string UnturnedAppId = "304930";
 
-    private SpecPropertyTypeConverter? _specPropertyTypeConverter;
     private JsonDocument? _statusJson;
 
     public string[]? NPCAchievementIds { get; private set; }
@@ -43,6 +42,7 @@ public class AssetSpecDatabase : IDisposable
     public bool UseInternet { get; set; } = true;
 
     public JsonSerializerOptions? Options { get; set; }
+    public IReadOnlyList<string> ValidActionButtons { get; set; }
 
     public IReadOnlyDictionary<QualifiedType, AssetTypeInformation> Types { get; private set; } = new Dictionary<QualifiedType, AssetTypeInformation>(0);
 
@@ -59,6 +59,7 @@ public class AssetSpecDatabase : IDisposable
     public AssetSpecDatabase(InstallDirUtility unturnedInstallDirectory)
     {
         UnturnedInstallDirectory = unturnedInstallDirectory;
+        ValidActionButtons = Array.Empty<string>();
     }
     
     protected virtual void Dispose(bool disposing)
@@ -97,7 +98,7 @@ public class AssetSpecDatabase : IDisposable
                 continue;
             }
 
-            ISpecType? t = info.Types.Find(p => p.Type.Equals(type, StringComparison.OrdinalIgnoreCase));
+            ISpecType? t = info.Types.Find(p => p.Type.Equals(type));
 
             if (t != null)
             {
@@ -119,17 +120,27 @@ public class AssetSpecDatabase : IDisposable
         }
 
         string? assetType = null;
-        int divIndex = property.IndexOf("::", 0, StringComparison.Ordinal);
-        bool local = false;
-        if (divIndex >= 0 && divIndex < property.Length - 2)
+        bool isLocal = false, isProp = false;
+        while (true)
         {
+            int divIndex = property.IndexOf("::", 0, StringComparison.Ordinal);
+            if (divIndex < 0 || divIndex >= property.Length - 2)
+                break;
+
             if (divIndex != 0)
             {
                 assetType = property.Substring(0, divIndex);
                 if (assetType.Equals("$local$", StringComparison.OrdinalIgnoreCase))
                 {
                     assetType = null;
-                    local = true;
+                    isLocal = true;
+                    isProp = false;
+                }
+                else if (assetType.Equals("$prop$", StringComparison.OrdinalIgnoreCase))
+                {
+                    assetType = null;
+                    isProp = true;
+                    isLocal = false;
                 }
             }
             property = property.Substring(divIndex + 2);
@@ -146,7 +157,7 @@ public class AssetSpecDatabase : IDisposable
                 continue;
             }
 
-            List<SpecProperty> props = local || context == SpecPropertyContext.Localization ? info.LocalizationProperties : info.Properties;
+            List<SpecProperty> props = isLocal || context == SpecPropertyContext.Localization && !isProp ? info.LocalizationProperties : info.Properties;
             SpecProperty? prop = props.Find(p => p.Key.Equals(property, StringComparison.OrdinalIgnoreCase));
             prop ??= props.Find(p =>
             {
@@ -165,9 +176,14 @@ public class AssetSpecDatabase : IDisposable
             }
         }
 
-        if (!local && context == SpecPropertyContext.Property)
+        if (!isLocal && context == SpecPropertyContext.Property)
         {
             return FindPropertyInfo(property, fileType, SpecPropertyContext.Localization);
+        }
+
+        if (!isProp && context == SpecPropertyContext.Localization)
+        {
+            return FindPropertyInfo(property, fileType, SpecPropertyContext.Property);
         }
 
         return null;
@@ -189,6 +205,7 @@ public class AssetSpecDatabase : IDisposable
         Lazy<HttpClient> lazy = new Lazy<HttpClient>(LazyThreadSafetyMode.ExecutionAndPublication);
 
         Task statusTask = DownloadStatusAsync(token);
+        Task downloadActionButtons = DownloadPlayerDashboardInventoryLocalizationAsync(token);
 
         AssetInformation? assetInfo;
         using (Stream? stream = await GetFileAsync(
@@ -257,6 +274,7 @@ public class AssetSpecDatabase : IDisposable
         Information = assetInfo;
 
         await statusTask.ConfigureAwait(false);
+        await downloadActionButtons.ConfigureAwait(false);
 
         Dictionary<QualifiedType, AssetTypeInformation> types = new Dictionary<QualifiedType, AssetTypeInformation>(assetInfo.ParentTypes.Count);
 
@@ -384,18 +402,13 @@ public class AssetSpecDatabase : IDisposable
 
             using HttpResponseMessage response = await httpClient.Value.SendAsync(msg, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                Log($"Error downloading \"{url}\": {response.StatusCode}: {response.ReasonPhrase}");
-            }
-            else
-            {
-                MemoryStream ms = new MemoryStream();
+            response.EnsureSuccessStatusCode();
 
-                await response.Content.CopyToAsync(ms).ConfigureAwait(false);
-                ms.Seek(0L, SeekOrigin.Begin);
-                return ms;
-            }
+            MemoryStream ms = new MemoryStream();
+
+            await response.Content.CopyToAsync(ms).ConfigureAwait(false);
+            ms.Seek(0L, SeekOrigin.Begin);
+            return ms;
         }
         catch (Exception ex)
         {
@@ -482,6 +495,8 @@ public class AssetSpecDatabase : IDisposable
                 using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, Information.StatusJsonFallbackUrl);
                 using HttpResponseMessage response = await client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, token);
 
+                response.EnsureSuccessStatusCode();
+
                 JsonDocument doc = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync().ConfigureAwait(false), new JsonDocumentOptions
                 {
                     AllowTrailingCommas = true,
@@ -537,6 +552,88 @@ public class AssetSpecDatabase : IDisposable
             && patchSection.TryGetInt32(out int patch))
         {
             CurrentGameVersion = new Version(3, major, minor, patch);
+        }
+    }
+
+    private async Task DownloadPlayerDashboardInventoryLocalizationAsync(CancellationToken token = default)
+    {
+        List<string> validButtons = new List<string>(24);
+        if (UnturnedInstallDirectory.TryGetInstallDirectory(out GameInstallDir installDir))
+        {
+            string localPath = installDir.GetFile(@"Localization\English\Player\PlayerDashboardInventory.dat");
+            if (File.Exists(localPath))
+            {
+                try
+                {
+                    using FileStream fs = new FileStream(localPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan);
+                    await ReadLocalizationFileAsync(fs, validButtons).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Log("Error reading PlayerDashboardInventory.dat file from local install.");
+                    Log(ex.ToString());
+                }
+            }
+        }
+
+        if (validButtons.Count == 0)
+        {
+            if (!UseInternet || string.IsNullOrEmpty(Information.PlayerDashboardInventoryLocalizationFallbackUrl))
+            {
+                Log("Unable to read PlayerDashboardInventory.dat from local install, internet disabled.");
+                return;
+            }
+
+            try
+            {
+                using HttpClient client = new HttpClient();
+                using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, Information.PlayerDashboardInventoryLocalizationFallbackUrl);
+                using HttpResponseMessage response = await client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, token);
+
+                response.EnsureSuccessStatusCode();
+
+                using Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                await ReadLocalizationFileAsync(stream, validButtons).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log("Unable to read PlayerDashboardInventory.dat from internet.");
+                Log(ex.ToString());
+            }
+        }
+
+        ValidActionButtons = validButtons.AsReadOnly();
+        return;
+
+        static async Task ReadLocalizationFileAsync(Stream stream, List<string> buttons)
+        {
+            buttons.Clear();
+            List<string> tooltips = new List<string>(24);
+            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true, 1024, leaveOpen: true))
+            {
+                while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
+                {
+                    if (line.Length == 0 || line[0] == '#' || line[0] == '/')
+                        continue;
+                    int space = line.IndexOf(' ');
+                    if (space <= 0)
+                        continue;
+
+                    ReadOnlySpan<char> key = line.AsSpan(0, space);
+                    if (key.EndsWith("_Button".AsSpan(), StringComparison.Ordinal) && key.Length > 7)
+                    {
+                        string button = key.Slice(0, key.Length - 7).ToString();
+                        if (!buttons.Contains(button))
+                            buttons.Add(button);
+                    }
+                    else if (key.EndsWith("_Button_Tooltip".AsSpan(), StringComparison.Ordinal) && key.Length > 15)
+                    {
+                        tooltips.Add(key.Slice(0, key.Length - 15).ToString());
+                    }
+                }
+            }
+
+            buttons.RemoveAll(x => !tooltips.Contains(x));
         }
     }
 

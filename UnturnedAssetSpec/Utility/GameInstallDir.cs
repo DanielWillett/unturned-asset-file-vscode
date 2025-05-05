@@ -16,6 +16,10 @@ public readonly struct GameInstallDir : IEquatable<GameInstallDir>
 
     public string GetFile(string relativePath)
     {
+        if (Path.DirectorySeparatorChar != '\\')
+        {
+            relativePath = relativePath.Replace('\\', Path.DirectorySeparatorChar);
+        }
         return Path.Combine(BaseFolder, relativePath);
     }
 

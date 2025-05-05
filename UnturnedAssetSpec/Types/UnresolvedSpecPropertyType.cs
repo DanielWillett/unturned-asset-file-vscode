@@ -45,15 +45,17 @@ internal sealed class UnresolvedSpecPropertyType : ISpecPropertyType, IEquatable
     /// <inheritdoc />
     public override string ToString() => DisplayName;
 
-    public ISpecPropertyType Resolve()
+    public ISpecPropertyType Resolve(SpecProperty property, AssetSpecDatabase database, AssetTypeInformation assetFile)
     {
         ISpecPropertyType? type = KnownTypes.GetType(Value, property, property.ElementType);
         if (type != null)
         {
+            if (type is INestedSpecPropertyType nested)
+                nested.ResolveInnerTypes(property, database, assetFile);
             return type;
         }
 
-
+        throw new TypeAccessException();
     }
 }
 

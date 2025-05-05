@@ -15,7 +15,7 @@ public sealed class BlueprintSupplyIdSpecPropertyType :
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string Type => "BlueprintSupplyId";
 
-    public BlueprintSupplyIdSpecPropertyType() : base(AssetCategory.Item) { }
+    public BlueprintSupplyIdSpecPropertyType() : base(AssetCategory.Item, null) { }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out ushort value)
