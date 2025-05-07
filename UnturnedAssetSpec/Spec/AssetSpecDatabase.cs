@@ -39,7 +39,7 @@ public class AssetSpecDatabase : IDisposable
     /// <summary>
     /// Allow downloading the latest version of files from the internet instead of using a possibly outdated embedded version.
     /// </summary>
-    public bool UseInternet { get; set; } = true;
+    public bool UseInternet { get; set; }
 
     public JsonSerializerOptions? Options { get; set; }
     public IReadOnlyList<string> ValidActionButtons { get; set; }
@@ -161,6 +161,11 @@ public class AssetSpecDatabase : IDisposable
             SpecProperty? prop = props.Find(p => p.Key.Equals(property, StringComparison.OrdinalIgnoreCase));
             prop ??= props.Find(p =>
             {
+                if (p.Aliases == null)
+                {
+                    return false;
+                }
+
                 for (int i = 0; i < p.Aliases.Length; ++i)
                 {
                     if (string.Equals(p.Aliases[i], property, StringComparison.OrdinalIgnoreCase))
@@ -203,9 +208,6 @@ public class AssetSpecDatabase : IDisposable
         Options.Converters.Add(new SpecPropertyTypeConverter(this));
 
         Lazy<HttpClient> lazy = new Lazy<HttpClient>(LazyThreadSafetyMode.ExecutionAndPublication);
-
-        Task statusTask = DownloadStatusAsync(token);
-        Task downloadActionButtons = DownloadPlayerDashboardInventoryLocalizationAsync(token);
 
         AssetInformation? assetInfo;
         using (Stream? stream = await GetFileAsync(
@@ -273,8 +275,8 @@ public class AssetSpecDatabase : IDisposable
 
         Information = assetInfo;
 
-        await statusTask.ConfigureAwait(false);
-        await downloadActionButtons.ConfigureAwait(false);
+        Task statusTask = DownloadStatusAsync(token);
+        Task downloadActionButtons = DownloadPlayerDashboardInventoryLocalizationAsync(token);
 
         Dictionary<QualifiedType, AssetTypeInformation> types = new Dictionary<QualifiedType, AssetTypeInformation>(assetInfo.ParentTypes.Count);
 
@@ -307,6 +309,9 @@ public class AssetSpecDatabase : IDisposable
         }
 
         await Task.WhenAll(new ArraySegment<Task>(tasks, 0, taskIndex)).ConfigureAwait(false);
+
+        await statusTask.ConfigureAwait(false);
+        await downloadActionButtons.ConfigureAwait(false);
 
         if (lazy.IsValueCreated)
         {

@@ -68,7 +68,18 @@
                     "Variable": "index",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
                     "Required": true,
-                    "ValueRegexGroupReference": "@Item item-blueprints"
+                    "ValueRegexGroupReference": "@Item item-blueprints",
+                    "ExclusiveWith": [ "BlueprintName" ]
+                },
+                {
+                    "Key": "BlueprintName",
+                    "Type": "String",
+                    "DefaultValue": null,
+                    "Description": "The name of the blueprint to blacklist.",
+                    "Variable": "blueprintName",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
+                    "Required": true,
+                    "ExclusiveWith": [ "Blueprint" ]
                 }
             ]
         }

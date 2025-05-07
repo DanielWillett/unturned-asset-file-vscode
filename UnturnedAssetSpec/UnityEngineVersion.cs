@@ -117,7 +117,8 @@ public readonly struct UnityEngineVersion : IEquatable<UnityEngineVersion>, ICom
             int hashCode = Major;
             hashCode = (hashCode * 397) ^ Minor;
             hashCode = (hashCode * 397) ^ Build;
-            hashCode = (hashCode * 397) ^ Status.GetHashCode();
+            if (!string.IsNullOrEmpty(Status))
+                hashCode = (hashCode * 397) ^ Status.GetHashCode();
             hashCode = (hashCode * 397) ^ Revision;
             return hashCode;
         }

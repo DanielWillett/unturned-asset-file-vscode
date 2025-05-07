@@ -9,6 +9,8 @@ using OmniSharp.Extensions.LanguageServer.Server;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server.WorkDone;
 
 namespace DanielWillett.UnturnedDataFileLspServer;
 
@@ -16,78 +18,135 @@ internal sealed class UnturnedAssetFileLspServer
 {
     public const string LanguageId = "unturned-data-file";
 
+    private static ILogger<UnturnedAssetFileLspServer> _logger;
+
     public static readonly TextDocumentSelector AssetFileSelector = new TextDocumentSelector(new TextDocumentFilter
     {
         Language = LanguageId,
         Pattern = "**/*.{dat,asset}"
     });
-
-    private static void ConfigureServices(IServiceCollection collection)
-    {
-        collection.AddSingleton<OpenedFileTracker>();
-    }
-
+    
     private static void Main(string[] args) => new UnturnedAssetFileLspServer().RunAsync(args).GetAwaiter().GetResult();
 
     private async Task RunAsync(string[] args)
     {
-        IServiceCollection serv = new ServiceCollection();
-
-        ConfigureServices(serv);
-
-        ILoggerFactory loggerFactory = LoggerFactory.Create(l => l
+        ILanguageServer server = await LanguageServer.From(bldr =>
+        {
+            Console.InputEncoding = Encoding.UTF8;
+            Console.OutputEncoding = Encoding.UTF8;
+            bldr.WithOutput(Console.OpenStandardOutput())
+                .WithInput(Console.OpenStandardInput())
+                .WithHandler<UnturnedAssetFileSyncHandler>()
+                .WithHandler<HoverHandler>()
+                .WithHandler<DocumentSymbolHandler>()
+                .WithHandler<KeyCompletionHandler>()
+                .WithServerInfo(new ServerInfo
+                {
+                    Name = "Unturned Data File LSP",
+                    Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(4)
+                })
+                .WithServices(serv =>
+                {
+                    serv.AddLogging(logr =>
+                    {
 #if DEBUG
-            .AddProvider(new FileLoggerProvider())
+                        //logr.AddProvider(new FileLoggerProvider());
 #endif
-            .AddLanguageProtocolLogging()
-            .SetMinimumLevel(LogLevel.Trace)
-        );
+                        logr.AddLanguageProtocolLogging()
+                            .SetMinimumLevel(LogLevel.Trace);
+                    })
+                    .AddSingleton<UnturnedAssetFileSyncHandler>()
+                    .AddSingleton<KeyCompletionHandler>()
+                    .AddSingleton<DocumentSymbolHandler>()
+                    .AddSingleton<HoverHandler>()
+                    .AddSingleton<OpenedFileTracker>()
+                    .AddSingleton<LspAssetSpecDatabase>()
+                    .AddTransient<AssetSpecDatabase>(sp => sp.GetRequiredService<LspAssetSpecDatabase>())
+                    .AddSingleton<LspInstallationEnvironment>()
+                    .AddSingleton<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
+                    .AddSingleton(new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    })
+                    .AddSingleton((object)new JsonReaderOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip })
+                    .AddSingleton((object)new JsonWriterOptions { Indented = true });
+                })
+                .OnInitialize(async (server, request, token) =>
+                {
+                    IWorkDoneObserver workDoneManager = server.WorkDoneManager.For(
+                        request,
+                        new WorkDoneProgressBegin
+                        {
+                            Message = "Downloading Unturned Asset Specs",
+                            Percentage = 10
+                        });
 
-        serv
-            .AddSingleton(loggerFactory)
-            .AddTransient(typeof(ILogger<>), typeof(Logger<>))
-            .AddSingleton<UnturnedAssetFileSyncHandler>()
-            .AddSingleton<KeyCompletionHandler>()
-            .AddSingleton<DocumentSymbolHandler>()
-            .AddSingleton<HoverHandler>()
-            .AddSingleton<OpenedFileTracker>()
-            .AddSingleton<LspAssetSpecDatabase>()
-            .AddTransient<AssetSpecDatabase>(sp => sp.GetRequiredService<LspAssetSpecDatabase>())
-            .AddSingleton(new JsonSerializerOptions
-            {
-                WriteIndented = true
-            })
-            .AddSingleton((object)new JsonReaderOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip })
-            .AddSingleton((object)new JsonWriterOptions { Indented = true })
-            .AddLanguageServer(bldr =>
-            {
-                Console.InputEncoding = Encoding.UTF8;
-                Console.OutputEncoding = Encoding.UTF8;
-                bldr.WithLoggerFactory(loggerFactory)
-                    .WithOutput(Console.OpenStandardOutput())
-                    .WithInput(Console.OpenStandardInput())
-                    .WithHandler<UnturnedAssetFileSyncHandler>()
-                    .WithHandler<HoverHandler>()
-                    .WithHandler<DocumentSymbolHandler>()
-                    .WithHandler<KeyCompletionHandler>();
+                    _initObserver = workDoneManager;
 
-                bldr.ServerInfo = new ServerInfo { Name = "Unturned Data File LSP", Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(4) };
-            });
+                    _logger = server.Services.GetRequiredService<ILogger<UnturnedAssetFileLspServer>>();
+
+                    LspAssetSpecDatabase db = await InitializeAssetSpecDatabase(server.Services, token);
+
+                    workDoneManager.OnNext(new WorkDoneProgressReport
+                    {
+                        Message = $"Found {db.Information.ParentTypes.Count} asset types",
+                        Percentage = 25
+                    });
+
+                    await Task.Delay(500, token);
+
+                    workDoneManager.OnNext(new WorkDoneProgressReport
+                    {
+                        Message = "Discovering Existing Assets",
+                        Percentage = 35
+                    });
+
+                    LspInstallationEnvironment env = InitializeInstallEnvironment(server.Services, token);
+
+                    workDoneManager.OnNext(new WorkDoneProgressReport
+                    {
+                        Message = $"Found {env.FileCount} file(s)",
+                        Percentage = 70
+                    });
+
+                    await Task.Delay(500, token);
+                })
+                .OnInitialized((_, _, _, _) =>
+                {
+                    _initObserver?.OnCompleted();
+                    _initObserver = null;
+
+                    _logger.LogInformation("LSP initialized.");
+
+                    return Task.CompletedTask;
+                });
+        });
+
+        await server.WaitForExit.ConfigureAwait(false);
+    }
+
+    private static IWorkDoneObserver? _initObserver;
+
+    private static async Task<LspAssetSpecDatabase> InitializeAssetSpecDatabase(IServiceProvider serviceProvider, CancellationToken token = default)
+    {
+        LspAssetSpecDatabase db = serviceProvider.GetRequiredService<LspAssetSpecDatabase>();
+
+        db.UseInternet = true;
+
+        await db.InitializeAsync(token).ConfigureAwait(false);
+        _logger.LogInformation("AssetSpecDatabase initialized.");
+
+        return db;
+    }
+
+    private static LspInstallationEnvironment InitializeInstallEnvironment(IServiceProvider serviceProvider, CancellationToken token = default)
+    {
+        LspInstallationEnvironment env = serviceProvider.GetRequiredService<LspInstallationEnvironment>();
         
-        IServiceProvider serviceProvider = serv.BuildServiceProvider(validateScopes: true);
+        env.Discover(token);
+        _logger.LogInformation("Installation environment initialized; {0} file(s) found.", env.FileCount);
 
-        ILogger<UnturnedAssetFileLspServer> logger = serviceProvider.GetRequiredService<ILogger<UnturnedAssetFileLspServer>>();
-
-        logger.LogInformation("Starting LSP server...");
-
-        await serviceProvider.GetRequiredService<LspAssetSpecDatabase>().InitializeAsync();
-
-        ILanguageServer languageServer = serviceProvider.GetRequiredService<ILanguageServer>();
-
-        await languageServer.Initialize(CancellationToken.None);
-
-        logger.LogInformation("LSP initialized...");
-        await languageServer.WaitForExit.ConfigureAwait(false);
+        return env;
     }
 }
 #if DEBUG

@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -119,6 +120,39 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Index = 10,
             Type = TypeOf
         };
+    }
+
+    public static bool HasFriendlyName(int category)
+    {
+        return category is 1 or 3 or 4 or 5 or 6 or 10;
+    }
+
+    /// <summary>
+    /// Gets the asset category from the given type, with special handling for redirector assets.
+    /// </summary>
+    /// <returns>The index of the type, or -1 if this type is a redirector asset.</returns>
+    public static int GetCategoryFromType(QualifiedType type, AssetSpecDatabase database)
+    {
+        if (type.Equals("SDG.Unturned.RedirectorAsset, Assembly-CSharp"))
+        {
+            return -1;
+        }
+
+        InverseTypeHierarchy typeHierarchy = database.Information.GetParentTypes(type);
+
+        QualifiedType[] types = typeHierarchy.ParentTypes;
+        for (int i = types.Length - 1; i >= 0; --i)
+        {
+            if (!database.Information.AssetCategories.TryGetValue(typeHierarchy.ParentTypes[i], out string category))
+                continue;
+
+            if (TryParse(category, out EnumSpecTypeValue categoryType))
+            {
+                return categoryType.Index;
+            }
+        }
+
+        return 0;
     }
 
     public static bool TryParse(string? str, out EnumSpecTypeValue category)

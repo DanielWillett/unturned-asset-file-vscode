@@ -45,6 +45,7 @@
             "IsAbstract": true,
             "SDG.Unturned.AirdropAsset, Assembly-CSharp": { },
             "SDG.Unturned.AnimalAsset, Assembly-CSharp": { },
+            "SDG.Unturned.CraftingAsset, Assembly-CSharp": { },
             "SDG.Unturned.CraftingBlacklistAsset, Assembly-CSharp": { },
             "SDG.Unturned.DialogueAsset, Assembly-CSharp": { },
             "SDG.Unturned.EffectAsset, Assembly-CSharp": { },
@@ -159,6 +160,7 @@
             "SDG.Unturned.SkinAsset, Assembly-CSharp": { },
             "SDG.Unturned.SpawnAsset, Assembly-CSharp": { },
             "SDG.Unturned.StereoSongAsset, Assembly-CSharp": { },
+            "SDG.Unturned.TagAsset, Assembly-CSharp": { },
             "SDG.Unturned.VehicleAsset, Assembly-CSharp": { },
             "SDG.Unturned.VehiclePhysicsProfileAsset, Assembly-CSharp": { },
             "SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp": { },
@@ -265,7 +267,8 @@
         "Vendor": "SDG.Unturned.VendorAsset, Assembly-CSharp",
         "RewardsList": "SDG.Unturned.NPCRewardsAsset, Assembly-CSharp",
         "Redirector": "SDG.Unturned.RedirectorAsset, Assembly-CSharp",
-        "ServerCuration": "SDG.Unturned.ServerListCurationAsset, Assembly-CSharp"
+        "ServerCuration": "SDG.Unturned.ServerListCurationAsset, Assembly-CSharp",
+        "Tag": "SDG.Unturned.TagAsset, Assembly-CSharp"
     },
     "AssetCategories":
     {

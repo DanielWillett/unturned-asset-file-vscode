@@ -15,6 +15,13 @@
             "Description": "Allows IDs to be less than 200 if this isn't the vanilla bundle."
         },
         {
+            "Key": "OneShotAudio",
+            "Type": "AudioReference",
+            "Description": "Specify an instance of OneShotAudioParameters for playing this effect.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
+            "Variable": "gore"
+        },
+        {
             "Key": "Gore",
             "Type": "Flag",
             "Description": "Prevents players with the gore option disabled from seeing particle emissions and splatter from this effect.",
@@ -220,8 +227,8 @@
         {
             "AssetName": "Effect",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
-            "Description": "The effect to spawn. UI effects should contain a Canvas component.",
-            "Required": true,
+            "Description": "The effect to spawn. UI effects should contain a Canvas component. May be null for audio-only effects.",
+            "Required": false,
             "Variable": "effect"
         },
         {

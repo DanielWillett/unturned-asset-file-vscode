@@ -12,11 +12,13 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 public class AssetFileTree : IEnumerable<AssetFileNode>
 {
+    private static readonly char[] ExpectedTypeChars = ['.', ','];
+
     private bool _hasMetadata;
     private bool _hasAsset;
     private bool _hasCategory;
     private bool _hasType;
-    private bool _typeCanBeAlias;
+    private bool _typeMustBeAssemblyQualifiedName;
     private bool _hasId;
     private ushort? _id;
     private bool _hasGuid;
@@ -259,21 +261,24 @@ public class AssetFileTree : IEnumerable<AssetFileNode>
     {
         if (_hasType)
         {
-            requireSystemType = _typeCanBeAlias;
+            requireSystemType = _typeMustBeAssemblyQualifiedName;
             return _type;
         }
 
+        QualifiedType qt;
+
         if (Metadata?.TryGetValue("Type", out AssetFileValueNode? value) is true && value is AssetFileStringValueNode typeNode)
         {
+            KnownTypeValueHelper.TryParseType(typeNode.Value, out qt);
             requireSystemType = true;
-            _typeCanBeAlias = true;
-            _type = QualifiedType.NormalizeType(typeNode.Value);
+            _typeMustBeAssemblyQualifiedName = true;
+            _type = qt;
             _hasType = true;
             return _type;
         }
 
         requireSystemType = false;
-        _typeCanBeAlias = false;
+        _typeMustBeAssemblyQualifiedName = false;
         if (!Asset.TryGetValue("Type", out value) || value is not AssetFileStringValueNode typeStrNode)
         {
             _type = null!;
@@ -281,12 +286,20 @@ public class AssetFileTree : IEnumerable<AssetFileNode>
             return _type;
         }
 
-        _type = typeStrNode.Value.IndexOf('.') != -1
-            ? QualifiedType.NormalizeType(typeStrNode.Value)
-            : typeStrNode.Value;
+        if (typeStrNode.Value.IndexOfAny(ExpectedTypeChars) == -1)
+        {
+            _type = typeStrNode.Value;
+            _hasType = true;
+            return _type;
+        }
+
+        KnownTypeValueHelper.TryParseType(typeStrNode.Value, out qt);
+        _type = qt;
         _hasType = true;
         return _type;
     }
+
+
 
     public static AssetFileTree Create(string filePath)
     {

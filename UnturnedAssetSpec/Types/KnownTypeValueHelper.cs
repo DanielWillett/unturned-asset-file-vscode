@@ -133,11 +133,49 @@ public static class KnownTypeValueHelper
             }
             else
             {
-                value = new QualifiedType(key + ", Assembly-CSharp");
+                value = new QualifiedType(key + ", Assembly-CSharp", true);
             }
         }
 
         value = new QualifiedType(key, true);
+        return true;
+    }
+
+    public static bool TryParseType(ReadOnlySpan<char> key, out QualifiedType value)
+    {
+        if (key.IsEmpty || key.IndexOfAny([ '\\', ':', '/' ]) >= 0)
+        {
+            value = default;
+            return false;
+        }
+
+        if (!QualifiedType.ExtractParts(key, out ReadOnlySpan<char> fullTypeName, out _))
+        {
+            if (fullTypeName.IsEmpty)
+            {
+                value = default;
+                return false;
+            }
+
+            Type systemType = typeof(object).Assembly.GetType(fullTypeName.ToString(), false, true);
+            if (systemType != null)
+            {
+                value = new QualifiedType(
+                    systemType.AssemblyQualifiedName != null
+                        ? QualifiedType.NormalizeType(systemType.AssemblyQualifiedName)
+                        : systemType.FullName ?? systemType.Name
+                );
+            }
+            else
+            {
+                Span<char> outStr = stackalloc char[key.Length + 17];
+                key.CopyTo(outStr);
+                ", Assembly-CSharp".AsSpan().CopyTo(outStr.Slice(key.Length));
+                value = new QualifiedType(outStr.ToString(), true);
+            }
+        }
+
+        value = new QualifiedType(key.ToString(), true);
         return true;
     }
 

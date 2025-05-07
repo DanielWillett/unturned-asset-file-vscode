@@ -1,7 +1,6 @@
-using System;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
