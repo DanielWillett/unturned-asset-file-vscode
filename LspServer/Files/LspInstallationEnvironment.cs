@@ -16,6 +16,13 @@ public class LspInstallationEnvironment : InstallationEnvironment
         {
             this.AddUnturnedSearchableDirectories(installDir);
         }
+
+        using IDisposable? scope = _logger.BeginScope("Source directories");
+        _logger.LogInformation("Source directories: ");
+        foreach (string dir in SourceDirectories)
+        {
+            _logger.LogInformation(dir);
+        }
     }
 
     protected override void Log(string fileName, string msg)

@@ -49,6 +49,20 @@ public class InstallationEnvironment : IDisposable
 
     public int FileCount => _fileCount;
 
+    public string[] SourceDirectories
+    {
+        get
+        {
+            lock (_fileSync)
+            {
+                string[] arr = new string[_sourceDirs.Count];
+                for (int i = 0; i < arr.Length; ++i)
+                    arr[i] = _sourceDirs[i].Path;
+                return arr;
+            }
+        }
+    }
+
     public InstallationEnvironment(AssetSpecDatabase database, params string[] sourceDirectories)
     {
         _fileSync = new FileEnumerable(this);

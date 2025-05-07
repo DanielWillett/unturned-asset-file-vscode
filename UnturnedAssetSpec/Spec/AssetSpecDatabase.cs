@@ -183,12 +183,12 @@ public class AssetSpecDatabase : IDisposable
 
         if (!isLocal && context == SpecPropertyContext.Property)
         {
-            return FindPropertyInfo(property, fileType, SpecPropertyContext.Localization);
+            return FindPropertyInfo("$prop$::" + property, fileType, SpecPropertyContext.Localization);
         }
 
         if (!isProp && context == SpecPropertyContext.Localization)
         {
-            return FindPropertyInfo(property, fileType, SpecPropertyContext.Property);
+            return FindPropertyInfo("$local$::" + property, fileType, SpecPropertyContext.Property);
         }
 
         return null;
