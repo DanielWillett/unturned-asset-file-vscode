@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 [DebuggerDisplay("{DisplayName,nq}")]
-public class EnumSpecType : ISpecType, IEquatable<EnumSpecType>
+public class EnumSpecType : ISpecType, IEquatable<EnumSpecType>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
+    private AutoCompleteResult[]? _valueResults;
 
     public required QualifiedType Type { get; init; }
 
@@ -25,6 +29,43 @@ public class EnumSpecType : ISpecType, IEquatable<EnumSpecType>
     public override int GetHashCode() => Type.GetHashCode();
 
     public override string ToString() => Type.ToString();
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        for (int i = 0; i < Values.Length; i++)
+        {
+            ref EnumSpecTypeValue value = ref Values[i];
+            if (!span.Equals(value.Value.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            dynamicValue = SpecDynamicValue.Enum(this, i);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
+
+    /// <inheritdoc />
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(AutoCompleteParameters parameters)
+    {
+        if (_valueResults != null)
+        {
+            return Task.FromResult(_valueResults);
+        }
+
+        AutoCompleteResult[] results = new AutoCompleteResult[Values.Length];
+        for (int i = 0; i < results.Length; ++i)
+        {
+            ref EnumSpecTypeValue val = ref Values[i];
+            results[i] = new AutoCompleteResult(val.Casing, val.Description);
+        }
+
+        _valueResults = results;
+        return Task.FromResult(results);
+    }
+
     QualifiedType ISpecType.Parent => QualifiedType.None;
 }
 

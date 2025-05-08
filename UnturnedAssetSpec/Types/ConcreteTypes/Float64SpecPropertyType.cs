@@ -1,8 +1,11 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class Float64SpecPropertyType : BasicSpecPropertyType<Float64SpecPropertyType, double>
+public sealed class Float64SpecPropertyType : BasicSpecPropertyType<Float64SpecPropertyType, double>, IStringParseableSpecPropertyType
 {
     public static readonly Float64SpecPropertyType Instance = new Float64SpecPropertyType();
 
@@ -17,6 +20,19 @@ public sealed class Float64SpecPropertyType : BasicSpecPropertyType<Float64SpecP
 
     /// <inheritdoc />
     public override string DisplayName => "Double-Precision Decimal";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (double.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double result))
+        {
+            dynamicValue = SpecDynamicValue.Float64(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out double value)

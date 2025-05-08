@@ -52,15 +52,4 @@ public class OpenedFile
         Uri = uri;
         _text = text;
     }
-
-    public int GetIndex(Position position)
-    {
-        int index = 0;
-        for (int i = 0; i < position.Line; i++)
-        {
-            index = _text.IndexOf('\n', index) + 1;
-        }
-
-        return index + position.Character;
-    }
 }

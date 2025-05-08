@@ -29,6 +29,25 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
     public bool IsNull => Type is null;
 
     /// <summary>
+    /// If this type name is already in the normalized form.
+    /// </summary>
+    public bool IsNormalized
+    {
+        get
+        {
+            if (Type == null || !ExtractParts(Type.AsSpan(), out ReadOnlySpan<char> typeName, out ReadOnlySpan<char> assemblyName))
+            {
+                return false;
+            }
+
+            int len = typeName.Length + assemblyName.Length + 2 /* ", " */;
+
+            // already normalized type name
+            return len == Type.Length;
+        }
+    }
+
+    /// <summary>
     /// Creates a normalized version of this type.
     /// </summary>
     public QualifiedType Normalized
@@ -76,6 +95,10 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
         Type = type;
     }
 
+    public string GetTypeName()
+    {
+        return ExtractTypeName(Type.AsSpan()).ToString();
+    }
 
     public static string NormalizeType(string type)
     {

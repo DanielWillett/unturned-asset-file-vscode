@@ -1,8 +1,11 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class UInt64SpecPropertyType : BasicSpecPropertyType<UInt64SpecPropertyType, ulong>
+public sealed class UInt64SpecPropertyType : BasicSpecPropertyType<UInt64SpecPropertyType, ulong>, IStringParseableSpecPropertyType
 {
     public static readonly UInt64SpecPropertyType Instance = new UInt64SpecPropertyType();
 
@@ -17,6 +20,19 @@ public sealed class UInt64SpecPropertyType : BasicSpecPropertyType<UInt64SpecPro
 
     /// <inheritdoc />
     public override string DisplayName => "Unsigned 64-Bit Integer";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (ulong.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out ulong result))
+        {
+            dynamicValue = SpecDynamicValue.UInt64(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out ulong value)

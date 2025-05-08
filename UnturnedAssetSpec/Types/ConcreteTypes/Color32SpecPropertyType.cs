@@ -1,5 +1,6 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -79,13 +80,26 @@ public sealed class Color32RGBALegacySpecPropertyType : Color32SpecPropertyType
     private protected override bool HasAlpha => true;
 }
 
-public abstract class Color32SpecPropertyType : BasicSpecPropertyType<Color32SpecPropertyType, Color32>
+public abstract class Color32SpecPropertyType : BasicSpecPropertyType<Color32SpecPropertyType, Color32>, IStringParseableSpecPropertyType
 {
     private protected abstract VectorTypeParseOptions Options { get; }
     private protected abstract bool HasAlpha { get; }
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (KnownTypeValueHelper.TryParseColorHex(span, out Color32 value, HasAlpha))
+        {
+            dynamicValue = new SpecDynamicConcreteValue<Color32>(value);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out Color32 value)
@@ -137,7 +151,7 @@ public abstract class Color32SpecPropertyType : BasicSpecPropertyType<Color32Spe
 
         if ((options & VectorTypeParseOptions.Composite) != 0 && parse.Node is AssetFileStringValueNode strValNode)
         {
-            return KnownTypeValueHelper.TryParseColorHex(strValNode.Value, out value, HasAlpha);
+            return KnownTypeValueHelper.TryParseColorHex(strValNode.Value.AsSpan(), out value, HasAlpha);
         }
 
         FailedToParse(in parse, out value);

@@ -1,8 +1,8 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using System;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -10,7 +10,8 @@ public sealed class AssetReferenceSpecPropertyType :
     BaseSpecPropertyType<Guid>,
     ISpecPropertyType<Guid>,
     IElementTypeSpecPropertyType,
-    IEquatable<AssetReferenceSpecPropertyType>
+    IEquatable<AssetReferenceSpecPropertyType>,
+    IStringParseableSpecPropertyType
 {
     
     public EquatableArray<QualifiedType> OtherElementTypes { get; }
@@ -28,6 +29,19 @@ public sealed class AssetReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public Type ValueType => typeof(Guid);
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (Guid.TryParse(stringValue ?? span.ToString(), out Guid result))
+        {
+            dynamicValue = new SpecDynamicConcreteValue<Guid>(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     public AssetReferenceSpecPropertyType(QualifiedType elementType, bool canParseDictionary, string[]? specialTypes)
     {

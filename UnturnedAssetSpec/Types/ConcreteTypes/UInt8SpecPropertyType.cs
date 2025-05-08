@@ -1,8 +1,11 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class UInt8SpecPropertyType : BasicSpecPropertyType<UInt8SpecPropertyType, byte>
+public sealed class UInt8SpecPropertyType : BasicSpecPropertyType<UInt8SpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly UInt8SpecPropertyType Instance = new UInt8SpecPropertyType();
 
@@ -17,6 +20,19 @@ public sealed class UInt8SpecPropertyType : BasicSpecPropertyType<UInt8SpecPrope
 
     /// <inheritdoc />
     public override string DisplayName => "Unsigned 8-Bit Integer";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (byte.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out byte result))
+        {
+            dynamicValue = SpecDynamicValue.UInt8(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out byte value)

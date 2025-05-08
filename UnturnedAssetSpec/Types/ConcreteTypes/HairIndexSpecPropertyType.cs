@@ -1,10 +1,11 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
 using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class HairIndexSpecPropertyType : BasicSpecPropertyType<HairIndexSpecPropertyType, byte>
+public sealed class HairIndexSpecPropertyType : BasicSpecPropertyType<HairIndexSpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly HairIndexSpecPropertyType Instance = new HairIndexSpecPropertyType();
 
@@ -19,6 +20,19 @@ public sealed class HairIndexSpecPropertyType : BasicSpecPropertyType<HairIndexS
 
     /// <inheritdoc />
     public override string DisplayName => "Hair (Index)";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (byte.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out byte result))
+        {
+            dynamicValue = SpecDynamicValue.UInt8(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out byte value)

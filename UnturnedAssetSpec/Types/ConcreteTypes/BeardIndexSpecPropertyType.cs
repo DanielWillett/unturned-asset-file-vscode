@@ -1,10 +1,11 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
 using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class BeardIndexSpecPropertyType : BasicSpecPropertyType<BeardIndexSpecPropertyType, byte>
+public sealed class BeardIndexSpecPropertyType : BasicSpecPropertyType<BeardIndexSpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly BeardIndexSpecPropertyType Instance = new BeardIndexSpecPropertyType();
 
@@ -19,6 +20,19 @@ public sealed class BeardIndexSpecPropertyType : BasicSpecPropertyType<BeardInde
 
     /// <inheritdoc />
     public override string DisplayName => "Beard (Index)";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (byte.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out byte result))
+        {
+            dynamicValue = SpecDynamicValue.UInt8(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out byte value)

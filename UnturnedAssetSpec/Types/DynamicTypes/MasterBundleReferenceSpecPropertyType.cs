@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -9,7 +10,8 @@ public sealed class MasterBundleReferenceSpecPropertyType :
     BaseSpecPropertyType<BundleReference>,
     ISpecPropertyType<BundleReference>,
     IElementTypeSpecPropertyType,
-    IEquatable<MasterBundleReferenceSpecPropertyType>
+    IEquatable<MasterBundleReferenceSpecPropertyType>,
+    IStringParseableSpecPropertyType
 {
     public static readonly MasterBundleReferenceSpecPropertyType AudioReference = new MasterBundleReferenceSpecPropertyType();
 
@@ -30,6 +32,19 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public Type ValueType => typeof(BundleReference);
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (KnownTypeValueHelper.TryParseMasterBundleReference(span, out string? name, out string path) && name != null)
+        {
+            dynamicValue = new SpecDynamicConcreteValue<BundleReference>(new BundleReference(name, path, ReferenceType));
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     private MasterBundleReferenceSpecPropertyType()
         : this(new QualifiedType("UnityEngine.AudioClip, UnityEngine.AudioModule"), MasterBundleReferenceType.AudioReference)

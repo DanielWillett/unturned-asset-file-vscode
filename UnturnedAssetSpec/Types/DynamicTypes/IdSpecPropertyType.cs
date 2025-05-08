@@ -1,6 +1,8 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -8,7 +10,8 @@ public class IdSpecPropertyType :
     BaseSpecPropertyType<ushort>,
     ISpecPropertyType<ushort>,
     IElementTypeSpecPropertyType,
-    IEquatable<IdSpecPropertyType>
+    IEquatable<IdSpecPropertyType>,
+    IStringParseableSpecPropertyType
 {
     public EnumSpecTypeValue Category { get; }
 
@@ -26,6 +29,19 @@ public class IdSpecPropertyType :
 
     /// <inheritdoc />
     public Type ValueType => typeof(ushort);
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (ushort.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out ushort result))
+        {
+            dynamicValue = SpecDynamicValue.UInt16(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     public IdSpecPropertyType(EnumSpecTypeValue category, string[]? specialTypes)
         : this(

@@ -1,9 +1,11 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class DateTimeSpecPropertyType : BasicSpecPropertyType<DateTimeSpecPropertyType, DateTime>
+public sealed class DateTimeSpecPropertyType : BasicSpecPropertyType<DateTimeSpecPropertyType, DateTime>, IStringParseableSpecPropertyType
 {
     public static readonly DateTimeSpecPropertyType Instance = new DateTimeSpecPropertyType();
 
@@ -14,10 +16,23 @@ public sealed class DateTimeSpecPropertyType : BasicSpecPropertyType<DateTimeSpe
     public override string Type => "DateTime";
 
     /// <inheritdoc />
-    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
 
     /// <inheritdoc />
     public override string DisplayName => "Timestamp (UTC)";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (DateTime.TryParse(stringValue ?? span.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime dt))
+        {
+            dynamicValue = new SpecDynamicConcreteValue<DateTime>(dt.ToUniversalTime());
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out DateTime value)

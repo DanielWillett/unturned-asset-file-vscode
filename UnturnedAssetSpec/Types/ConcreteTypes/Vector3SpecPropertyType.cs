@@ -1,15 +1,29 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
 using System.Numerics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3SpecPropertyType, Vector3>
+public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3SpecPropertyType, Vector3>, IStringParseableSpecPropertyType
 {
     private protected abstract VectorTypeParseOptions Options { get; }
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (KnownTypeValueHelper.TryParseVector3Components(span, out Vector3 value))
+        {
+            dynamicValue = new SpecDynamicConcreteValue<Vector3>(value);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out Vector3 value)
@@ -55,7 +69,7 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
 
         if ((options & VectorTypeParseOptions.Composite) != 0 && parse.Node is AssetFileStringValueNode strValNode)
         {
-            return KnownTypeValueHelper.TryParseVector3Components(strValNode.Value, out value);
+            return KnownTypeValueHelper.TryParseVector3Components(strValNode.Value.AsSpan(), out value);
         }
 
         return FailedToParse(in parse, out value);

@@ -1,8 +1,11 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class Int32SpecPropertyType : BasicSpecPropertyType<Int32SpecPropertyType, int>
+public sealed class Int32SpecPropertyType : BasicSpecPropertyType<Int32SpecPropertyType, int>, IStringParseableSpecPropertyType
 {
     public static readonly Int32SpecPropertyType Instance = new Int32SpecPropertyType();
 
@@ -17,6 +20,19 @@ public sealed class Int32SpecPropertyType : BasicSpecPropertyType<Int32SpecPrope
 
     /// <inheritdoc />
     public override string DisplayName => "Signed 32-Bit Integer";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (int.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out int result))
+        {
+            dynamicValue = SpecDynamicValue.Int32(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out int value)

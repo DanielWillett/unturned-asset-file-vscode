@@ -1,8 +1,11 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class NavIdSpecPropertyType : BasicSpecPropertyType<NavIdSpecPropertyType, byte>
+public sealed class NavIdSpecPropertyType : BasicSpecPropertyType<NavIdSpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly NavIdSpecPropertyType Instance = new NavIdSpecPropertyType();
 
@@ -17,6 +20,19 @@ public sealed class NavIdSpecPropertyType : BasicSpecPropertyType<NavIdSpecPrope
 
     /// <inheritdoc />
     public override string DisplayName => "Navmesh ID";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (sbyte.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out sbyte result))
+        {
+            dynamicValue = SpecDynamicValue.Int8(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out byte value)

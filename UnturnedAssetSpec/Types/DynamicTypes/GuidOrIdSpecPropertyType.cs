@@ -11,7 +11,8 @@ public sealed class GuidOrIdSpecPropertyType :
     BaseSpecPropertyType<GuidOrId>,
     ISpecPropertyType<GuidOrId>,
     IElementTypeSpecPropertyType,
-    IEquatable<GuidOrIdSpecPropertyType>
+    IEquatable<GuidOrIdSpecPropertyType>,
+    IStringParseableSpecPropertyType
 {
     private AssetSpecDatabase? _cachedSpecDb;
     private ISpecType? _cachedType;
@@ -30,6 +31,25 @@ public sealed class GuidOrIdSpecPropertyType :
 
     /// <inheritdoc />
     public Type ValueType => typeof(GuidOrId);
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (Guid.TryParse(stringValue ??= span.ToString(), out Guid result))
+        {
+            dynamicValue = new SpecDynamicConcreteValue<GuidOrId>(new GuidOrId(result));
+            return true;
+        }
+
+        if (ushort.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out ushort id))
+        {
+            dynamicValue = new SpecDynamicConcreteValue<GuidOrId>(id == 0 ? new GuidOrId(Guid.Empty) : new GuidOrId(id));
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     public GuidOrIdSpecPropertyType(QualifiedType elementType, string[]? specialTypes)
     {

@@ -208,10 +208,10 @@ public static class KnownTypeValueHelper
         return ContainsRichTextRegex.IsMatch(str);
     }
 
-    public static bool TryParseVector3Components(string str, out Vector3 value)
+    public static bool TryParseVector3Components(ReadOnlySpan<char> str, out Vector3 value)
     {
         // stolen from nelson
-        if (string.IsNullOrEmpty(str))
+        if (str.IsEmpty)
         {
             value = default;
             return false;
@@ -222,12 +222,14 @@ public static class KnownTypeValueHelper
         int endIndex;
         if (paren1 >= 0)
         {
-            int paren2 = str.IndexOf(')', paren1 + 2);
+            int paren2 = str.Slice(paren1 + 2).IndexOf(')');
             if (paren2 < 0)
             {
                 value = default;
                 return false;
             }
+
+            paren2 += paren1 + 2;
             startIndex = paren1 + 1;
             endIndex = paren2 - 1;
         }
@@ -237,33 +239,47 @@ public static class KnownTypeValueHelper
             endIndex = str.Length - 1;
         }
 
-        int comma1 = str.IndexOf(',', startIndex);
-        if (comma1 < 0 || comma1 + 2 > endIndex)
+        int comma1 = str.Slice(startIndex).IndexOf(',');
+        if (comma1 < 0)
         {
             value = default;
             return false;
         }
 
-        int comma2 = str.IndexOf(',', comma1 + 2);
-        if (comma2 < 0 || comma2 + 1 > endIndex)
+        comma1 += startIndex;
+        if (comma1 + 2 > endIndex)
         {
             value = default;
             return false;
         }
 
-        if (!float.TryParse(str.Substring(startIndex, comma1 - startIndex), out float x))
+        int comma2 = str.Slice(comma1 + 2).IndexOf(',');
+        if (comma2 < 0)
         {
             value = default;
             return false;
         }
 
-        if (!float.TryParse(str.Substring(comma1 + 1, comma2 - comma1 - 1), out float y))
+        comma2 += comma1 + 2;
+        if (comma2 + 1 > endIndex)
         {
             value = default;
             return false;
         }
 
-        if (!float.TryParse(str.Substring(comma2 + 1, endIndex - comma2), out float z))
+        if (!float.TryParse(str.Slice(startIndex, comma1 - startIndex).ToString(), out float x))
+        {
+            value = default;
+            return false;
+        }
+
+        if (!float.TryParse(str.Slice(comma1 + 1, comma2 - comma1 - 1).ToString(), out float y))
+        {
+            value = default;
+            return false;
+        }
+
+        if (!float.TryParse(str.Slice(comma2 + 1, endIndex - comma2).ToString(), out float z))
         {
             value = default;
             return false;
@@ -273,10 +289,10 @@ public static class KnownTypeValueHelper
         return true;
     }
 
-    public static bool TryParseVector2Components(string str, out Vector2 value)
+    public static bool TryParseVector2Components(ReadOnlySpan<char> str, out Vector2 value)
     {
         // stolen from nelson
-        if (string.IsNullOrEmpty(str))
+        if (str.IsEmpty)
         {
             value = default;
             return false;
@@ -286,13 +302,14 @@ public static class KnownTypeValueHelper
         int num2;
         if (paren1 >= 0)
         {
-            int paren2 = str.IndexOf(')', paren1 + 2);
+            int paren2 = str.Slice(paren1 + 2).IndexOf(')');
             if (paren2 < 0)
             {
                 value = default;
                 return false;
             }
 
+            paren2 += paren1 + 2;
             startIndex = paren1 + 1;
             num2 = paren2 - 1;
         }
@@ -302,20 +319,27 @@ public static class KnownTypeValueHelper
             num2 = str.Length - 1;
         }
 
-        int comma = str.IndexOf(',', startIndex);
-        if (comma < 0 || comma + 1 > num2)
+        int comma = str.Slice(startIndex).IndexOf(',');
+        if (comma < 0)
         {
             value = default;
             return false;
         }
 
-        if (!float.TryParse(str.Substring(startIndex, comma - startIndex), out float x))
+        comma += startIndex;
+        if (comma + 1 > num2)
         {
             value = default;
             return false;
         }
 
-        if (!float.TryParse(str.Substring(comma + 1, num2 - comma), out float y))
+        if (!float.TryParse(str.Slice(startIndex, comma - startIndex).ToString(), out float x))
+        {
+            value = default;
+            return false;
+        }
+
+        if (!float.TryParse(str.Slice(comma + 1, num2 - comma).ToString(), out float y))
         {
             value = default;
             return false;
@@ -342,9 +366,26 @@ public static class KnownTypeValueHelper
         return !string.IsNullOrEmpty(path);
     }
 
-    public static bool TryParseColorHex(string str, out Color32 value, bool allowAlpha)
+    public static bool TryParseMasterBundleReference(ReadOnlySpan<char> str, out string? name, out string path)
     {
-        if (string.IsNullOrEmpty(str))
+        int length = str.IndexOf(':');
+        if (length < 0)
+        {
+            name = string.Empty;
+            path = str.ToString();
+        }
+        else
+        {
+            name = str.Slice(0, length).ToString();
+            path = str.Slice(length + 1).ToString();
+        }
+
+        return !string.IsNullOrEmpty(path);
+    }
+
+    public static bool TryParseColorHex(ReadOnlySpan<char> str, out Color32 value, bool allowAlpha)
+    {
+        if (str.IsEmpty)
         {
             value = Color32.Black;
             return false;
@@ -382,7 +423,7 @@ public static class KnownTypeValueHelper
         return true;
     }
 
-    private static bool CharToHex(string c, int ind, out byte val)
+    private static bool CharToHex(ReadOnlySpan<char> c, int ind, out byte val)
     {
         int c2 = c[ind];
         byte b1;

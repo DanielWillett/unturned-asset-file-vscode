@@ -40,4 +40,17 @@ public static class OmniSharpAssetSpecExtensionsExtensions
             _ => SymbolKind.String
         };
     }
+    public static CompletionItemKind GetCompletionItemKind(this ISpecPropertyType type)
+    {
+        return type.Kind switch
+        {
+            SpecPropertyTypeKind.String => CompletionItemKind.Value,
+            SpecPropertyTypeKind.Number => CompletionItemKind.Value,
+            SpecPropertyTypeKind.Boolean => CompletionItemKind.Keyword,
+            SpecPropertyTypeKind.Struct => CompletionItemKind.Struct,
+            SpecPropertyTypeKind.Class => CompletionItemKind.Class,
+            SpecPropertyTypeKind.Enum => CompletionItemKind.EnumMember,
+            _ => CompletionItemKind.Value
+        };
+    }
 }

@@ -1,9 +1,10 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class GuidSpecPropertyType : BasicSpecPropertyType<GuidSpecPropertyType, Guid>
+public sealed class GuidSpecPropertyType : BasicSpecPropertyType<GuidSpecPropertyType, Guid>, IStringParseableSpecPropertyType
 {
     public static readonly GuidSpecPropertyType Instance = new GuidSpecPropertyType();
 
@@ -18,6 +19,19 @@ public sealed class GuidSpecPropertyType : BasicSpecPropertyType<GuidSpecPropert
 
     /// <inheritdoc />
     public override string DisplayName => "GUID";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (Guid.TryParse(stringValue ?? span.ToString(), out Guid result))
+        {
+            dynamicValue = new SpecDynamicConcreteValue<Guid>(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out Guid value)

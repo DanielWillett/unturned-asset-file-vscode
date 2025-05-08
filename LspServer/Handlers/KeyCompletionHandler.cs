@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
@@ -57,6 +58,9 @@ internal class KeyCompletionHandler : ICompletionHandler
 
             foreach (SpecProperty property in info.Properties)
             {
+                if (property.Aliases == null)
+                    continue;
+
                 foreach (string a in property.Aliases)
                 {
                     state.Property = property;
@@ -130,14 +134,14 @@ internal class KeyCompletionHandler : ICompletionHandler
         return item;
     }
 
-    public Task<CompletionList> Handle(CompletionParams request, CancellationToken cancellationToken)
+    public async Task<CompletionList> Handle(CompletionParams request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Received completion: {0} @ {1}.", request.TextDocument.Uri, request.Position);
 
         if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))
         {
             _logger.LogInformation("File not found.");
-            return Task.FromResult(new CompletionList());
+            return new CompletionList();
         }
 
         FilePosition position = request.Position.ToFilePosition();
@@ -151,16 +155,50 @@ internal class KeyCompletionHandler : ICompletionHandler
 
         InverseTypeHierarchy hierarchy = _specDictionary.Information.GetParentTypes(fileType.Type);
 
+        AssetFileKeyNode? key = activeNode as AssetFileKeyNode;
+        if (key == null && activeNode is AssetFileStringValueNode strValue)
+        {
+            key = (strValue.Parent as AssetFileKeyValuePairNode)?.Key;
+        }
+
+        if (key != null && _specDictionary.FindPropertyInfo(key.Value, fileType, SpecPropertyContext.Property) is { } property)
+        {
+            if (property.Type is not IAutoCompleteSpecPropertyType autoComplete)
+                return new CompletionList();
+
+            AutoCompleteParameters p = new AutoCompleteParameters(_specDictionary, tree, position, fileType, property);
+
+            AutoCompleteResult[] results = await autoComplete.GetAutoCompleteResults(p);
+            List<CompletionItem> completions = new List<CompletionItem>(results.Length);
+            CompletionItemKind kind = property.Type.GetCompletionItemKind();
+            for (int i = 0; i < results.Length; i++)
+            {
+                ref AutoCompleteResult result = ref results[i];
+
+                CompletionItem item = new CompletionItem
+                {
+                    Label = result.Text,
+                    InsertTextMode = InsertTextMode.AsIs,
+                    InsertText = result.Text,
+                    Detail = result.Description,
+                    Kind = kind
+                };
+                completions.Add(item);
+            }
+
+            return completions;
+        }
+        
         if (activeNode is AssetFileKeyNode || isOnNewLine && activeNode is not AssetFileListValueNode)
         {
             KeyCompletionState state = new KeyCompletionState(activeNode, position, isOnNewLine, hierarchy, null, null!, file);
 
             List<CompletionItem> completions = new List<CompletionItem>();
             FindSpecProperties(ref state, completions);
-            return Task.FromResult<CompletionList>(completions);
+            return completions;
         }
 
-        return Task.FromResult(new CompletionList());
+        return new CompletionList();
     }
 
     CompletionRegistrationOptions IRegistration<CompletionRegistrationOptions, CompletionCapability>.GetRegistrationOptions(

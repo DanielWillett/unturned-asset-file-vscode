@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -23,6 +24,12 @@ public interface IElementTypeSpecPropertyType : ISpecPropertyType
 {
     QualifiedType ElementType { get; }
 }
+
+public interface IStringParseableSpecPropertyType
+{
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue);
+}
+
 public interface INestedSpecPropertyType : ISpecPropertyType
 {
     void ResolveInnerTypes(SpecProperty property, AssetSpecDatabase database, AssetTypeInformation assetFile);

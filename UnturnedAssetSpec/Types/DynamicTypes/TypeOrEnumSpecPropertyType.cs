@@ -10,7 +10,8 @@ public sealed class TypeOrEnumSpecPropertyType :
     BaseSpecPropertyType<QualifiedType>,
     ISpecPropertyType<QualifiedType>,
     IElementTypeSpecPropertyType,
-    IEquatable<TypeOrEnumSpecPropertyType>
+    IEquatable<TypeOrEnumSpecPropertyType>,
+    IStringParseableSpecPropertyType
 {
     private AssetSpecDatabase? _cachedSpecDb;
     private ISpecType? _cachedType;
@@ -30,6 +31,29 @@ public sealed class TypeOrEnumSpecPropertyType :
 
     /// <inheritdoc />
     public Type ValueType => typeof(QualifiedType);
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (span.Equals("null".AsSpan(), StringComparison.OrdinalIgnoreCase))
+        {
+            dynamicValue = new SpecDynamicConcreteValue<QualifiedType>();
+            return true;
+        }
+
+        if (QualifiedType.ExtractParts(span, out _, out ReadOnlySpan<char> assemblyName) && assemblyName.Length > 0)
+        {
+            QualifiedType type = new QualifiedType(stringValue ?? span.ToString());
+            if (type.IsNormalized)
+            {
+                dynamicValue = new SpecDynamicConcreteValue<QualifiedType>(type);
+                return true;
+            }
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     public TypeOrEnumSpecPropertyType(QualifiedType elementType, QualifiedType enumType)
     {

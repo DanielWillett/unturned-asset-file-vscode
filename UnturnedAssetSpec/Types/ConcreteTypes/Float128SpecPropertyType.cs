@@ -1,8 +1,11 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class Float128SpecPropertyType : BasicSpecPropertyType<Float128SpecPropertyType, decimal>
+public sealed class Float128SpecPropertyType : BasicSpecPropertyType<Float128SpecPropertyType, decimal>, IStringParseableSpecPropertyType
 {
     public static readonly Float128SpecPropertyType Instance = new Float128SpecPropertyType();
 
@@ -17,6 +20,19 @@ public sealed class Float128SpecPropertyType : BasicSpecPropertyType<Float128Spe
 
     /// <inheritdoc />
     public override string DisplayName => "Decimal";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (decimal.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result))
+        {
+            dynamicValue = SpecDynamicValue.Float128(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out decimal value)

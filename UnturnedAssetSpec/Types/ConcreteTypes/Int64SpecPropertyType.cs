@@ -1,8 +1,11 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class Int64SpecPropertyType : BasicSpecPropertyType<Int64SpecPropertyType, long>
+public sealed class Int64SpecPropertyType : BasicSpecPropertyType<Int64SpecPropertyType, long>, IStringParseableSpecPropertyType
 {
     public static readonly Int64SpecPropertyType Instance = new Int64SpecPropertyType();
 
@@ -17,6 +20,19 @@ public sealed class Int64SpecPropertyType : BasicSpecPropertyType<Int64SpecPrope
 
     /// <inheritdoc />
     public override string DisplayName => "Signed 64-Bit Integer";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (long.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out long result))
+        {
+            dynamicValue = SpecDynamicValue.Int64(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out long value)

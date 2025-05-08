@@ -1,12 +1,15 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public sealed class FlagIdSpecPropertyType :
     BaseSpecPropertyType<ushort>,
     ISpecPropertyType<ushort>,
-    IEquatable<FlagIdSpecPropertyType>
+    IEquatable<FlagIdSpecPropertyType>,
+    IStringParseableSpecPropertyType
 {
     public static readonly FlagIdSpecPropertyType Instance = new FlagIdSpecPropertyType();
 
@@ -23,7 +26,20 @@ public sealed class FlagIdSpecPropertyType :
     
     /// <inheritdoc />
     public Type ValueType => typeof(ushort);
-    
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (ushort.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out ushort result))
+        {
+            dynamicValue = SpecDynamicValue.UInt16(result);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
+
     /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ushort value)
     {

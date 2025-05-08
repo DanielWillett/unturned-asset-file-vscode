@@ -1,8 +1,10 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class CharacterSpecPropertyType : BasicSpecPropertyType<CharacterSpecPropertyType, char>
+public sealed class CharacterSpecPropertyType : BasicSpecPropertyType<CharacterSpecPropertyType, char>, IStringParseableSpecPropertyType
 {
     public static readonly CharacterSpecPropertyType Instance = new CharacterSpecPropertyType();
 
@@ -32,5 +34,18 @@ public sealed class CharacterSpecPropertyType : BasicSpecPropertyType<CharacterS
         }
         
         return true;
+    }
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (span.Length == 1)
+        {
+            dynamicValue = new SpecDynamicConcreteValue<char>(span[0]);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
     }
 }

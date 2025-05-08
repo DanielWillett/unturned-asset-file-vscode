@@ -1,9 +1,10 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropertyType, bool>
+public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropertyType, bool>, IStringParseableSpecPropertyType
 {
     public static readonly FlagSpecPropertyType Instance = new FlagSpecPropertyType();
 
@@ -18,6 +19,30 @@ public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropert
 
     /// <inheritdoc />
     public override string DisplayName => "Flag";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (span.Equals("true".AsSpan(), StringComparison.InvariantCultureIgnoreCase))
+        {
+            dynamicValue = SpecDynamicValue.True;
+            return true;
+        }
+        if (span.Equals("false".AsSpan(), StringComparison.InvariantCultureIgnoreCase))
+        {
+            dynamicValue = SpecDynamicValue.False;
+            return true;
+        }
+
+        if (KnownTypeValueHelper.TryParseBoolean(stringValue ?? span.ToString(), out bool result))
+        {
+            dynamicValue = result ? SpecDynamicValue.True : SpecDynamicValue.False;
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out bool value)

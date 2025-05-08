@@ -1,8 +1,10 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class TypeSpecPropertyType : BasicSpecPropertyType<TypeSpecPropertyType, QualifiedType>
+public sealed class TypeSpecPropertyType : BasicSpecPropertyType<TypeSpecPropertyType, QualifiedType>, IStringParseableSpecPropertyType
 {
     public static readonly TypeSpecPropertyType Instance = new TypeSpecPropertyType();
 
@@ -17,6 +19,29 @@ public sealed class TypeSpecPropertyType : BasicSpecPropertyType<TypeSpecPropert
 
     /// <inheritdoc />
     public override string DisplayName => "Type";
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (span.Equals("null".AsSpan(), StringComparison.OrdinalIgnoreCase))
+        {
+            dynamicValue = new SpecDynamicConcreteValue<QualifiedType>(default);
+            return true;
+        }
+
+        if (QualifiedType.ExtractParts(span, out _, out ReadOnlySpan<char> assemblyName) && assemblyName.Length > 0)
+        {
+            QualifiedType type = new QualifiedType(stringValue ?? span.ToString());
+            if (type.IsNormalized)
+            {
+                dynamicValue = new SpecDynamicConcreteValue<QualifiedType>(type);
+                return true;
+            }
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
