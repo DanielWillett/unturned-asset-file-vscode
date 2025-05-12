@@ -26,7 +26,7 @@ public sealed class UInt16SpecPropertyType : BasicSpecPropertyType<UInt16SpecPro
     {
         if (ushort.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out ushort result))
         {
-            dynamicValue = SpecDynamicValue.UInt16(result);
+            dynamicValue = SpecDynamicValue.UInt16(result, this);
             return true;
         }
 

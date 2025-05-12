@@ -25,7 +25,7 @@ public sealed class TypeSpecPropertyType : BasicSpecPropertyType<TypeSpecPropert
     {
         if (span.Equals("null".AsSpan(), StringComparison.OrdinalIgnoreCase))
         {
-            dynamicValue = new SpecDynamicConcreteValue<QualifiedType>(default);
+            dynamicValue = new SpecDynamicConcreteValue<QualifiedType>(this);
             return true;
         }
 
@@ -34,7 +34,7 @@ public sealed class TypeSpecPropertyType : BasicSpecPropertyType<TypeSpecPropert
             QualifiedType type = new QualifiedType(stringValue ?? span.ToString());
             if (type.IsNormalized)
             {
-                dynamicValue = new SpecDynamicConcreteValue<QualifiedType>(type);
+                dynamicValue = new SpecDynamicConcreteValue<QualifiedType>(type, this);
                 return true;
             }
         }

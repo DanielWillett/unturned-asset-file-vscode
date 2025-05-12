@@ -26,7 +26,7 @@ public sealed class Int64SpecPropertyType : BasicSpecPropertyType<Int64SpecPrope
     {
         if (long.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out long result))
         {
-            dynamicValue = SpecDynamicValue.Int64(result);
+            dynamicValue = SpecDynamicValue.Int64(result, this);
             return true;
         }
 

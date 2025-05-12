@@ -25,7 +25,7 @@ public sealed class GuidSpecPropertyType : BasicSpecPropertyType<GuidSpecPropert
     {
         if (Guid.TryParse(stringValue ?? span.ToString(), out Guid result))
         {
-            dynamicValue = new SpecDynamicConcreteValue<Guid>(result);
+            dynamicValue = SpecDynamicValue.Guid(result, this);
             return true;
         }
 

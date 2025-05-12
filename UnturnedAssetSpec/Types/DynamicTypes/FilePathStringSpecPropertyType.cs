@@ -41,6 +41,19 @@ public sealed class FilePathStringSpecPropertyType :
     }
 
     /// <inheritdoc />
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (!TryParseValue(in parse, out string? val))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = val == null ? SpecDynamicValue.Null : new SpecDynamicConcreteValue<string>(val, this);
+        return true;
+    }
+
+    /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
     {
         if (parse.Node == null)

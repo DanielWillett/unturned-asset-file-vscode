@@ -26,7 +26,7 @@ public sealed class NavIdSpecPropertyType : BasicSpecPropertyType<NavIdSpecPrope
     {
         if (sbyte.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out sbyte result))
         {
-            dynamicValue = SpecDynamicValue.Int8(result);
+            dynamicValue = SpecDynamicValue.Int8(result, this);
             return true;
         }
 

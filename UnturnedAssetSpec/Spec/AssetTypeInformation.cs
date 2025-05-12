@@ -1,3 +1,4 @@
+using System;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -47,4 +48,30 @@ public sealed class AssetTypeInformation : ISpecType
 
     /// <inheritdoc />
     public override string ToString() => Type.ToString();
+
+    public SpecProperty? FindProperty(string propertyName, SpecPropertyContext context)
+    {
+        if (Properties != null && context is SpecPropertyContext.Property or SpecPropertyContext.Unspecified)
+        {
+            foreach (SpecProperty property in Properties)
+            {
+                if (property.Key.Equals(propertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return property;
+                }
+            }
+        }
+        if (LocalizationProperties != null && context is SpecPropertyContext.Localization or SpecPropertyContext.Unspecified)
+        {
+            foreach (SpecProperty property in LocalizationProperties)
+            {
+                if (property.Key.Equals(propertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return property;
+                }
+            }
+        }
+
+        return null;
+    }
 }

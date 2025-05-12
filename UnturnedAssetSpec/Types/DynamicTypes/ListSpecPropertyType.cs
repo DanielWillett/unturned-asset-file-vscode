@@ -1,6 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -28,6 +29,19 @@ public sealed class ListSpecPropertyType<TElementType> :
     {
         InnerType = innerType;
         DisplayName = "List of " + innerType.DisplayName;
+    }
+
+    /// <inheritdoc />
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (!TryParseValue(in parse, out EquatableArray<TElementType> val))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = new SpecDynamicConcreteValue<EquatableArray<TElementType>>(val, this);
+        return true;
     }
 
     /// <inheritdoc />

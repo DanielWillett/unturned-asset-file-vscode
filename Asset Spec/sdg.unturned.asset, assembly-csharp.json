@@ -810,7 +810,7 @@
                     "Type": "CommaDelimtedString",
                     "ElementType": "Int32",
                     "Description": "Comma-separated indexes of other conditions that must be met first before this condition will be visible in-game.",
-                    "ValueRegexGroupReference": "#Super #PreventSelfReference",
+                    "ValueRegexGroupReference": "#This.KeyGroups[-1]{PreventSelfReference=true}",
                     "Minimum": 0,
                     "DefaultValue": null,
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
@@ -820,7 +820,7 @@
             "Localization":
             [
                 {
-                    "Key": "#Empty",
+                    "Key": "#This.Key",
                     "Type": "String",
                     "DefaultValue": "#Self.Key",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
@@ -1143,7 +1143,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "#Self",
+                            "Key": "#Self.Key",
                             "Value": "*",
                             "Condition":
                             {
@@ -1984,7 +1984,7 @@
             "Localization":
             [
                 {
-                    "Key": "#Empty",
+                    "Key": "#This.Key",
                     "Type": "String",
                     "DefaultValue": "#Self.Key",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",

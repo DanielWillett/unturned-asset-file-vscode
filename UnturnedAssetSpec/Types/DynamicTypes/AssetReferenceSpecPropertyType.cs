@@ -35,7 +35,7 @@ public sealed class AssetReferenceSpecPropertyType :
     {
         if (Guid.TryParse(stringValue ?? span.ToString(), out Guid result))
         {
-            dynamicValue = new SpecDynamicConcreteValue<Guid>(result);
+            dynamicValue = SpecDynamicValue.Guid(result, this);
             return true;
         }
 
@@ -66,6 +66,19 @@ public sealed class AssetReferenceSpecPropertyType :
             for (int i = 0; i < specialTypes.Length; ++i)
                 OtherElementTypes.Array[i] = new QualifiedType(specialTypes[i]);
         }
+    }
+
+    /// <inheritdoc />
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (!TryParseValue(in parse, out Guid val))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = new SpecDynamicConcreteValue<Guid>(val, this);
+        return true;
     }
 
     /// <inheritdoc />

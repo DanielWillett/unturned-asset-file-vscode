@@ -2,7 +2,6 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
-using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -38,7 +37,7 @@ public sealed class MasterBundleReferenceSpecPropertyType :
     {
         if (KnownTypeValueHelper.TryParseMasterBundleReference(span, out string? name, out string path) && name != null)
         {
-            dynamicValue = new SpecDynamicConcreteValue<BundleReference>(new BundleReference(name, path, ReferenceType));
+            dynamicValue = new SpecDynamicConcreteValue<BundleReference>(new BundleReference(name, path, ReferenceType), this);
             return true;
         }
 
@@ -77,6 +76,19 @@ public sealed class MasterBundleReferenceSpecPropertyType :
             return;
 
         DisplayName += $" for {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
+    }
+
+    /// <inheritdoc />
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (!TryParseValue(in parse, out BundleReference val))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = new SpecDynamicConcreteValue<BundleReference>(val, this);
+        return true;
     }
 
     /// <inheritdoc />

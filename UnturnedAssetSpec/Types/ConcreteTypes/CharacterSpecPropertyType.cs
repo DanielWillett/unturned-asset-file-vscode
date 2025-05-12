@@ -41,7 +41,7 @@ public sealed class CharacterSpecPropertyType : BasicSpecPropertyType<CharacterS
     {
         if (span.Length == 1)
         {
-            dynamicValue = new SpecDynamicConcreteValue<char>(span[0]);
+            dynamicValue = new SpecDynamicConcreteValue<char>(span[0], this);
             return true;
         }
 

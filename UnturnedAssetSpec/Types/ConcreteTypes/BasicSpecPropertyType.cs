@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -13,6 +14,18 @@ public abstract class BasicSpecPropertyType<TSpecPropertyType, TValue> :
 {
     /// <inheritdoc />
     public abstract SpecPropertyTypeKind Kind { get; }
+
+    public virtual bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (!TryParseValue(in parse, out TValue? val))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = val == null ? SpecDynamicValue.Null : new SpecDynamicConcreteValue<TValue>(val, this);
+        return true;
+    }
 
     /// <inheritdoc />
     public Type ValueType => typeof(TValue);

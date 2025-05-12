@@ -1,7 +1,6 @@
-using System;
-using System.Threading.Tasks;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -12,6 +11,7 @@ public interface ISpecPropertyType : IEquatable<ISpecPropertyType>
     Type ValueType { get; }
     SpecPropertyTypeKind Kind { get; }
     ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue>;
+    bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value);
 }
 
 public interface ISpecPropertyType<TValue> : ISpecPropertyType, IEquatable<ISpecPropertyType<TValue>>

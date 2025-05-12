@@ -26,7 +26,7 @@ public sealed class Float128SpecPropertyType : BasicSpecPropertyType<Float128Spe
     {
         if (decimal.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result))
         {
-            dynamicValue = SpecDynamicValue.Float128(result);
+            dynamicValue = SpecDynamicValue.Float128(result, this);
             return true;
         }
 

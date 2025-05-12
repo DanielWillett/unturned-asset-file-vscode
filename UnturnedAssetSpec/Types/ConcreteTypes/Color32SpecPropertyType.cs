@@ -93,7 +93,7 @@ public abstract class Color32SpecPropertyType : BasicSpecPropertyType<Color32Spe
     {
         if (KnownTypeValueHelper.TryParseColorHex(span, out Color32 value, HasAlpha))
         {
-            dynamicValue = new SpecDynamicConcreteValue<Color32>(value);
+            dynamicValue = new SpecDynamicConcreteValue<Color32>(value, this);
             return true;
         }
 

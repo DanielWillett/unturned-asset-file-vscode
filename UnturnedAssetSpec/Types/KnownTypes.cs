@@ -49,6 +49,7 @@ public static class KnownTypes
         { "BlueprintSupplyId", () => BlueprintSupplyId },
         { "NPCAchievementId", () => NPCAchievementId },
         { "DateTime", () => DateTime },
+        { "DateTimeOffset", () => DateTimeOffset },
         { "Position", () => Position },
         { "PositionOrLegacy", () => PositionOrLegacy },
         { "LegacyPosition", () => LegacyPosition },
@@ -250,6 +251,7 @@ public static class KnownTypes
     public static ISpecPropertyType<string> NPCAchievementId => NPCAchievementIdSpecPropertyType.Instance;
 
     public static ISpecPropertyType<DateTime> DateTime => DateTimeSpecPropertyType.Instance;
+    public static ISpecPropertyType<DateTimeOffset> DateTimeOffset => DateTimeOffsetSpecPropertyType.Instance;
 
     public static ISpecPropertyType<Vector3> Position => PositionSpecPropertyType.Instance;
     public static ISpecPropertyType<Vector3> PositionOrLegacy => PositionOrLegacySpecPropertyType.Instance;

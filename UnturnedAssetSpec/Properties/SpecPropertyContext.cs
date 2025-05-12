@@ -2,8 +2,10 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 public enum SpecPropertyContext
 {
+    Unspecified,
     Property,
     Localization,
-    BundleAsset,
-    Type
+    CrossReferenceUnspecified,
+    CrossReferenceProperty,
+    CrossReferenceLocalization,
 }

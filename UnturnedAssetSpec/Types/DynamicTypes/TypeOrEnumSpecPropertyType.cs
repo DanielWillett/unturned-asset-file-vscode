@@ -37,7 +37,7 @@ public sealed class TypeOrEnumSpecPropertyType :
     {
         if (span.Equals("null".AsSpan(), StringComparison.OrdinalIgnoreCase))
         {
-            dynamicValue = new SpecDynamicConcreteValue<QualifiedType>();
+            dynamicValue = new SpecDynamicConcreteValue<QualifiedType>(this);
             return true;
         }
 
@@ -46,7 +46,7 @@ public sealed class TypeOrEnumSpecPropertyType :
             QualifiedType type = new QualifiedType(stringValue ?? span.ToString());
             if (type.IsNormalized)
             {
-                dynamicValue = new SpecDynamicConcreteValue<QualifiedType>(type);
+                dynamicValue = new SpecDynamicConcreteValue<QualifiedType>(type, this);
                 return true;
             }
         }
@@ -60,6 +60,19 @@ public sealed class TypeOrEnumSpecPropertyType :
         ElementType = elementType;
         EnumType = enumType;
         DisplayName = $"{QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()} or {QualifiedType.ExtractTypeName(enumType.Type.AsSpan()).ToString()}";
+    }
+
+    /// <inheritdoc />
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (!TryParseValue(in parse, out QualifiedType val))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = new SpecDynamicConcreteValue<QualifiedType>(val, this);
+        return true;
     }
 
     /// <inheritdoc />

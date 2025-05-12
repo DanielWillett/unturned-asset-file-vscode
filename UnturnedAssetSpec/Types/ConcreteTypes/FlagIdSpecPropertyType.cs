@@ -23,7 +23,7 @@ public sealed class FlagIdSpecPropertyType :
 
     /// <inheritdoc />
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
-    
+
     /// <inheritdoc />
     public Type ValueType => typeof(ushort);
 
@@ -32,12 +32,24 @@ public sealed class FlagIdSpecPropertyType :
     {
         if (ushort.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out ushort result))
         {
-            dynamicValue = SpecDynamicValue.UInt16(result);
+            dynamicValue = SpecDynamicValue.UInt16(result, this);
             return true;
         }
 
         dynamicValue = null!;
         return false;
+    }
+
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (!TryParseValue(in parse, out ushort val))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = new SpecDynamicConcreteValue<ushort>(val, this);
+        return true;
     }
 
     /// <inheritdoc />

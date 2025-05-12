@@ -26,7 +26,7 @@ public sealed class Float32SpecPropertyType : BasicSpecPropertyType<Float32SpecP
     {
         if (float.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out float result))
         {
-            dynamicValue = SpecDynamicValue.Float32(result);
+            dynamicValue = SpecDynamicValue.Float32(result, this);
             return true;
         }
 

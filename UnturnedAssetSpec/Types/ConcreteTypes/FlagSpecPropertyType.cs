@@ -25,18 +25,18 @@ public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropert
     {
         if (span.Equals("true".AsSpan(), StringComparison.InvariantCultureIgnoreCase))
         {
-            dynamicValue = SpecDynamicValue.True;
+            dynamicValue = SpecDynamicValue.Included;
             return true;
         }
         if (span.Equals("false".AsSpan(), StringComparison.InvariantCultureIgnoreCase))
         {
-            dynamicValue = SpecDynamicValue.False;
+            dynamicValue = SpecDynamicValue.Excluded;
             return true;
         }
 
         if (KnownTypeValueHelper.TryParseBoolean(stringValue ?? span.ToString(), out bool result))
         {
-            dynamicValue = result ? SpecDynamicValue.True : SpecDynamicValue.False;
+            dynamicValue = result ? SpecDynamicValue.Included : SpecDynamicValue.Excluded;
             return true;
         }
 

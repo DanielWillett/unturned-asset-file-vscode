@@ -509,7 +509,7 @@
                 },
                 "Operation": {
                     "type": "string",
-                    "enum": [ "lt", "gt", "lte", "gte", "eq", "neq", "contains", "starts with", "ends with", "matches", "contains-i", "eq-i", "starts with-i", "ends with-i", "assignable-to", "assignable-from", "included", "is-type" ]
+                    "enum": [ "lt", "gt", "lte", "gte", "eq", "neq", "contains", "starts with", "ends with", "matches", "contains-i", "eq-i", "neq-i", "starts with-i", "ends with-i", "assignable-to", "assignable-from", "included", "is-type" ]
                 },
                 "Comparand": {
                     "type": [ "null", "string", "boolean", "number", "pattern" ]

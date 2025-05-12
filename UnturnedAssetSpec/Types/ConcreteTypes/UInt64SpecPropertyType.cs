@@ -26,7 +26,7 @@ public sealed class UInt64SpecPropertyType : BasicSpecPropertyType<UInt64SpecPro
     {
         if (ulong.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out ulong result))
         {
-            dynamicValue = SpecDynamicValue.UInt64(result);
+            dynamicValue = SpecDynamicValue.UInt64(result, this);
             return true;
         }
 

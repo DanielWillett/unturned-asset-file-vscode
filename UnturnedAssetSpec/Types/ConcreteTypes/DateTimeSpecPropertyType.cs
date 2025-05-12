@@ -26,7 +26,7 @@ public sealed class DateTimeSpecPropertyType : BasicSpecPropertyType<DateTimeSpe
     {
         if (DateTime.TryParse(stringValue ?? span.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime dt))
         {
-            dynamicValue = new SpecDynamicConcreteValue<DateTime>(dt.ToUniversalTime());
+            dynamicValue = new SpecDynamicConcreteValue<DateTime>(dt.ToUniversalTime(), this);
             return true;
         }
 

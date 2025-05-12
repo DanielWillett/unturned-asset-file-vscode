@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
@@ -35,6 +34,28 @@ public readonly struct OneOrMore<T> : IEquatable<OneOrMore<T>>, IEquatable<T>
             Value = values[0];
         else
             Values = values;
+    }
+
+    public T First()
+    {
+        if (Values == null)
+            return Value;
+
+        if (Values.Length == 0)
+            throw new InvalidOperationException("No values in collection.");
+
+        return Values[0];
+    }
+
+    public T? FirstOrDefault()
+    {
+        if (Values == null)
+            return Value;
+
+        if (Values.Length == 0)
+            return default;
+
+        return Values[0];
     }
 
     public bool Contains(T value)

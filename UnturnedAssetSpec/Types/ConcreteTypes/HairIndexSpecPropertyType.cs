@@ -26,7 +26,7 @@ public sealed class HairIndexSpecPropertyType : BasicSpecPropertyType<HairIndexS
     {
         if (byte.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out byte result))
         {
-            dynamicValue = SpecDynamicValue.UInt8(result);
+            dynamicValue = SpecDynamicValue.UInt8(result, this);
             return true;
         }
 

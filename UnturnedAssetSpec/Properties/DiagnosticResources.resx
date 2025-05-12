@@ -186,6 +186,9 @@
   <data name="UNT1014" xml:space="preserve">
     <value>Enum value "{0}" isn't recognized. See documentation for a list of valid values.</value>
   </data>
+  <data name="UNT1014_Specific" xml:space="preserve">
+    <value>Enum value "{0}" of enum "{1}" isn't recognized. See documentation for a list of valid values.</value>
+  </data>
   <data name="UNT1015" xml:space="preserve">
     <value>Expected a type deriving from '{0}'.</value>
   </data>

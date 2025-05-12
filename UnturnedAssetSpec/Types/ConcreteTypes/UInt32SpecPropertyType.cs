@@ -26,7 +26,7 @@ public sealed class UInt32SpecPropertyType : BasicSpecPropertyType<UInt32SpecPro
     {
         if (uint.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out uint result))
         {
-            dynamicValue = SpecDynamicValue.UInt32(result);
+            dynamicValue = SpecDynamicValue.UInt32(result, this);
             return true;
         }
 

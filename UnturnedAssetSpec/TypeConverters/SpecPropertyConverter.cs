@@ -51,7 +51,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     public SpecPropertyConverter() : this(SpecPropertyContext.Property) { }
     public SpecPropertyConverter(SpecPropertyContext context)
     {
-        if (_context is not SpecPropertyContext.Property and not SpecPropertyContext.Localization)
+        if (context is not SpecPropertyContext.Property and not SpecPropertyContext.Localization)
             throw new ArgumentOutOfRangeException(nameof(context));
 
         _context = context;

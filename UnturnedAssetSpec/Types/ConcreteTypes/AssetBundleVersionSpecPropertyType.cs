@@ -29,7 +29,7 @@ public sealed class AssetBundleVersionSpecPropertyType : BasicSpecPropertyType<A
         if (int.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out int result)
             && result >= 0)
         {
-            dynamicValue = SpecDynamicValue.Int32(result);
+            dynamicValue = SpecDynamicValue.Int32(result, this);
             return true;
         }
 

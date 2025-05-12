@@ -152,39 +152,6 @@ public class AssetFileTree : IEnumerable<AssetFileNode>
         return _id;
     }
 
-    public bool TryGetProperty<TValue>(string property, AssetSpecDatabase spec, out TValue? value, out bool isDefault, SpecPropertyContext context = SpecPropertyContext.Property)
-        where TValue : IEquatable<TValue?>
-    {
-        AssetFileType type = AssetFileType.FromFile(this, spec);
-        SpecProperty? prop = spec.FindPropertyInfo(property, type, context);
-        value = default!;
-        isDefault = false;
-        if (prop == null)
-            return false;
-
-        if (!TryGetProperty(prop, out AssetFileKeyValuePairNode node))
-        {
-            IDefaultValue<TValue>? defaultValue = prop.DefaultValue?.As<TValue>();
-            value = defaultValue == null ? default : defaultValue.GetDefaultValue(this, spec);
-            isDefault = true;
-            return true;
-        }
-
-        ISpecPropertyType<TValue>? propType = prop.Type?.As<TValue>();
-
-        SpecPropertyTypeParseContext ctx = new SpecPropertyTypeParseContext
-        {
-            Database = spec,
-            FileType = AssetFileType.FromFile(this, spec),
-            BaseKey = property,
-            Node = node.Value,
-            Parent = node,
-            File = this
-        };
-
-        return propType != null && propType.TryParseValue(in ctx, out value);
-    }
-
     public bool TryGetProperty(SpecProperty property, out AssetFileKeyValuePairNode node)
     {
         bool hasValue;

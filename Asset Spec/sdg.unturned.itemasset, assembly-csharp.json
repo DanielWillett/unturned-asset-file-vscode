@@ -333,7 +333,7 @@
                                     "Comparand": "Seed"
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/Seeds.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/Seeds.asset"
                         },
                         {
                             "And":
@@ -344,7 +344,7 @@
                                     "Comparand": "Metal"
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/SmallMetal.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/SmallMetal.asset"
                         },
                         {
                             "Or":
@@ -360,7 +360,7 @@
                                     "Comparand": 1
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/LightMetalEquipment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/LightMetalEquipment.asset"
                         },
                         {
                             "Or":
@@ -376,10 +376,10 @@
                                     "Comparand": 2
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/MediumMetalEquipment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/MediumMetalEquipment.asset"
                         },
                         {
-                            "Value": "core.masterbundle::Sounds/Inventory/HeavyMetalEquipment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/HeavyMetalEquipment.asset"
                         }
                     ]
                 },
@@ -406,7 +406,7 @@
                                     "Comparand": 3
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/LightMetalEquipment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/LightMetalEquipment.asset"
                         },
                         {
                             "Or":
@@ -422,10 +422,10 @@
                                     "Comparand": 6
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/MediumMetalEquipment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/MediumMetalEquipment.asset"
                         },
                         {
-                            "Value": "core.masterbundle::Sounds/Inventory/HeavyMetalEquipment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/HeavyMetalEquipment.asset"
                         }
                     ]
                 },
@@ -438,7 +438,7 @@
                             "Comparand": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp"
                         }
                     ],
-                    "Value": "core.masterbundle::Sounds/Inventory/SmallGunAttachment.asset"
+                    "Value": "core.masterbundle:Sounds/Inventory/SmallGunAttachment.asset"
                 },
                 {
                     "When":
@@ -463,7 +463,7 @@
                                     "Comparand": 1
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/LightCloth.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/LightCloth.asset"
                         },
                         {
                             "Or":
@@ -479,10 +479,10 @@
                                     "Comparand": "UNCOMMON"
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/LightClothEquipment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/LightClothEquipment.asset"
                         },
                         {
-                            "Value": "core.masterbundle::Sounds/Inventory/MediumClothEquipment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/MediumClothEquipment.asset"
                         }
                     ]
                 },
@@ -514,7 +514,7 @@
                                     "Comparand": 2
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/LightGrab.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/LightGrab.asset"
                         },
                         {
                             "And":
@@ -525,7 +525,7 @@
                                     "Comparand": "Bow"
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/RoughGrab.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/RoughGrab.asset"
                         },
                         {
                             "And":
@@ -541,10 +541,10 @@
                                     "Comparand": 2
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/SmallGunAttachment"
+                            "Value": "core.masterbundle:Sounds/Inventory/SmallGunAttachment"
                         },
                         {
-                            "Value": "core.masterbundle::Sounds/Inventory/LargeGunAttachment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/LargeGunAttachment.asset"
                         }
                     ]
                 },
@@ -566,7 +566,7 @@
                                     "Comparand": "Metal"
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/SmallMetal.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/SmallMetal.asset"
                         },
                         {
                             "Or":
@@ -582,7 +582,7 @@
                                     "Comparand": 1
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/LightMetalEquipment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/LightMetalEquipment.asset"
                         },
                         {
                             "Or":
@@ -598,10 +598,10 @@
                                     "Comparand": 2
                                 }
                             ],
-                            "Value": "core.masterbundle::Sounds/Inventory/MediumMetalEquipment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/MediumMetalEquipment.asset"
                         },
                         {
-                            "Value": "core.masterbundle::Sounds/Inventory/HeavyMetalEquipment.asset"
+                            "Value": "core.masterbundle:Sounds/Inventory/HeavyMetalEquipment.asset"
                         }
                     ]
                 },
@@ -619,10 +619,10 @@
                             "Comparand": 2
                         }
                     ],
-                    "Value": "core.masterbundle::Sounds/Inventory/RoughGrab.asset"
+                    "Value": "core.masterbundle:Sounds/Inventory/RoughGrab.asset"
                 },
                 {
-                    "Value": "core.masterbundle::Sounds/Inventory/LightGrab.asset"
+                    "Value": "core.masterbundle:Sounds/Inventory/LightGrab.asset"
                 }
             ],
             "IncludedDefaultValue": null,
@@ -1500,7 +1500,7 @@
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-index-uint8-0",
                     "Description": "Index of the blueprint to reference in @($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).",
                     "Required": true,
-                    "FileCrossRef": "SDG.Unturned.Action::Source",
+                    "FileCrossRef": "SDG.Unturned.Action, Assembly-CSharp::Source",
                     "InclusiveWith":
                     [
                         {
@@ -1624,6 +1624,7 @@
                 {
                     "Key": "Source",
                     "Type": "Id",
+                    "ElementType": "ITEM",
                     "DefaultValue": "@SDG.Unturned.Asset, Assembly-CSharp::ID",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-source-uint16",
                     "Description": "The ID of the item action #(Self.KeyGroups[0])'s @Blueprints are referencing.",

@@ -17,7 +17,7 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
     {
         if (KnownTypeValueHelper.TryParseVector3Components(span, out Vector3 value))
         {
-            dynamicValue = new SpecDynamicConcreteValue<Vector3>(value);
+            dynamicValue = new SpecDynamicConcreteValue<Vector3>(value, this);
             return true;
         }
 

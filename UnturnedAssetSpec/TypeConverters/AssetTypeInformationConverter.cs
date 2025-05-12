@@ -85,10 +85,10 @@ public class AssetTypeInformationConverter : JsonConverter<AssetTypeInformation?
                     ctx = SpecPropertyContext.Property;
                 else if (reader.ValueTextEquals(LocalizationProperty.EncodedUtf8Bytes))
                     ctx = SpecPropertyContext.Localization;
-                else if (reader.ValueTextEquals(BundleAssetsProperty.EncodedUtf8Bytes))
-                    ctx = SpecPropertyContext.BundleAsset;
-                else if (reader.ValueTextEquals(TypesProperty.EncodedUtf8Bytes))
-                    ctx = SpecPropertyContext.Type;
+                // todo else if (reader.ValueTextEquals(BundleAssetsProperty.EncodedUtf8Bytes))
+                // todo     ctx = SpecPropertyContext.BundleAsset;
+                // todo else if (reader.ValueTextEquals(TypesProperty.EncodedUtf8Bytes))
+                // todo     ctx = SpecPropertyContext.Type;
                 else
                 {
                     DoRead(ref reader);
@@ -133,31 +133,31 @@ public class AssetTypeInformationConverter : JsonConverter<AssetTypeInformation?
                         info.LocalizationProperties = properties;
                         break;
 
-                    case SpecPropertyContext.BundleAsset:
-                        List<SpecBundleAsset> assets = new List<SpecBundleAsset>(16);
-                        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                        {
-                            SpecBundleAsset? asset = (SpecBundleAsset?)BundleAssetConverter.Read(ref reader, typeof(SpecBundleAsset), options);
-                            if (asset is { Key: not null, Type: not null })
-                                assets.Add(asset);
-                        }
-
-                        assets.Capacity = assets.Count;
-                        info.BundleAssets = assets;
-                        break;
-
-                    case SpecPropertyContext.Type:
-                        List<ISpecType> types = new List<ISpecType>(8);
-                        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                        {
-                            ISpecType? type = SpecTypeConverter.Read(ref reader, typeof(ISpecType), options);
-                            if (type != null)
-                                types.Add(type);
-                        }
-
-                        types.Capacity = types.Count;
-                        info.Types = types;
-                        break;
+                    // todo case SpecPropertyContext.BundleAsset:
+                    // todo     List<SpecBundleAsset> assets = new List<SpecBundleAsset>(16);
+                    // todo     while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    // todo     {
+                    // todo         SpecBundleAsset? asset = (SpecBundleAsset?)BundleAssetConverter.Read(ref reader, typeof(SpecBundleAsset), options);
+                    // todo         if (asset is { Key: not null, Type: not null })
+                    // todo             assets.Add(asset);
+                    // todo     }
+                    // todo 
+                    // todo     assets.Capacity = assets.Count;
+                    // todo     info.BundleAssets = assets;
+                    // todo     break;
+                    // todo 
+                    // todo case SpecPropertyContext.Type:
+                    // todo     List<ISpecType> types = new List<ISpecType>(8);
+                    // todo     while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    // todo     {
+                    // todo         ISpecType? type = SpecTypeConverter.Read(ref reader, typeof(ISpecType), options);
+                    // todo         if (type != null)
+                    // todo             types.Add(type);
+                    // todo     }
+                    // todo 
+                    // todo     types.Capacity = types.Count;
+                    // todo     info.Types = types;
+                    // todo     break;
                 }
             }
         }

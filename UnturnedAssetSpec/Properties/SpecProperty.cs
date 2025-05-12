@@ -11,11 +11,13 @@ public class SpecProperty
     public string? Description { get; set; }
     public string? Markdown { get; set; }
     public string? ElementType { get; set; }
+    public string? FileCrossRef { get; set; }
     public string[]? Aliases { get; set; }
     public string[]? SpecialTypes { get; set; }
     public bool CanBeInMetadata { get; set; }
     public bool Deprecated { get; set; }
 
-    public IDefaultValue? DefaultValue { get; set; }
+    public ISpecDynamicValue? DefaultValue { get; set; }
     public ISpecPropertyType Type { get; set; }
+    public ISpecType Owner { get; set; }
 }

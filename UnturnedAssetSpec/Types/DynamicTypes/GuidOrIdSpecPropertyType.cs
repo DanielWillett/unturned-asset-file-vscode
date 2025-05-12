@@ -37,13 +37,13 @@ public sealed class GuidOrIdSpecPropertyType :
     {
         if (Guid.TryParse(stringValue ??= span.ToString(), out Guid result))
         {
-            dynamicValue = new SpecDynamicConcreteValue<GuidOrId>(new GuidOrId(result));
+            dynamicValue = new SpecDynamicConcreteValue<GuidOrId>(new GuidOrId(result), this);
             return true;
         }
 
         if (ushort.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out ushort id))
         {
-            dynamicValue = new SpecDynamicConcreteValue<GuidOrId>(id == 0 ? new GuidOrId(Guid.Empty) : new GuidOrId(id));
+            dynamicValue = new SpecDynamicConcreteValue<GuidOrId>(id == 0 ? new GuidOrId(Guid.Empty) : new GuidOrId(id), this);
             return true;
         }
 
@@ -65,6 +65,19 @@ public sealed class GuidOrIdSpecPropertyType :
         OtherElementTypes = new EquatableArray<QualifiedType>(specialTypes.Length);
         for (int i = 0; i < specialTypes.Length; ++i)
             OtherElementTypes.Array[i] = new QualifiedType(specialTypes[i]);
+    }
+
+    /// <inheritdoc />
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (!TryParseValue(in parse, out GuidOrId val))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = new SpecDynamicConcreteValue<GuidOrId>(val, this);
+        return true;
     }
 
     /// <inheritdoc />

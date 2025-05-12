@@ -35,7 +35,7 @@ public class IdSpecPropertyType :
     {
         if (ushort.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out ushort result))
         {
-            dynamicValue = SpecDynamicValue.UInt16(result);
+            dynamicValue = SpecDynamicValue.UInt16(result, this);
             return true;
         }
 
@@ -81,6 +81,19 @@ public class IdSpecPropertyType :
         OtherElementTypes = new EquatableArray<QualifiedType>(specialTypes.Length);
         for (int i = 0; i < specialTypes.Length; ++i)
             OtherElementTypes.Array[i] = new QualifiedType(specialTypes[i]);
+    }
+
+    /// <inheritdoc />
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (!TryParseValue(in parse, out ushort val))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = new SpecDynamicConcreteValue<ushort>(val, this);
+        return true;
     }
 
     /// <inheritdoc />

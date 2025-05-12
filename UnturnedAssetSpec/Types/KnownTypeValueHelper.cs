@@ -191,6 +191,10 @@ public static class KnownTypeValueHelper
         value = value.ToUniversalTime();
         return success;
     }
+    public static bool TryParseDateTimeOffset(string key, out DateTimeOffset value)
+    {
+        return DateTimeOffset.TryParse(key, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out value);
+    }
 
 
     /// <summary>

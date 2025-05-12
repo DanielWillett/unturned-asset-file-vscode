@@ -26,7 +26,7 @@ public sealed class Float64SpecPropertyType : BasicSpecPropertyType<Float64SpecP
     {
         if (double.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double result))
         {
-            dynamicValue = SpecDynamicValue.Float64(result);
+            dynamicValue = SpecDynamicValue.Float64(result, this);
             return true;
         }
 

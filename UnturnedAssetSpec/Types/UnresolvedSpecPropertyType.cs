@@ -41,6 +41,11 @@ internal sealed class UnresolvedSpecPropertyType : ISpecPropertyType, IEquatable
     /// <inheritdoc />
     public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => null;
 
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        throw new NotSupportedException();
+    }
+
     /// <inheritdoc />
     public override string ToString() => DisplayName;
 

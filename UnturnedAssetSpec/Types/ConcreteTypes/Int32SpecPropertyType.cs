@@ -26,7 +26,7 @@ public sealed class Int32SpecPropertyType : BasicSpecPropertyType<Int32SpecPrope
     {
         if (int.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out int result))
         {
-            dynamicValue = SpecDynamicValue.Int32(result);
+            dynamicValue = SpecDynamicValue.Int32(result, this);
             return true;
         }
 
