@@ -90,7 +90,7 @@
             "ExclusiveWith": [ "Disable_Shader_Consolidation" ],
             "Description": "Forces the game to replace shaders on this asset's models with the known in-game shaders.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
-            "DefaultValueSwitch":
+            "DefaultValue":
             [
                 {
                     "And":
@@ -119,7 +119,7 @@
             "ExclusiveWith": [ "Enable_Shader_Consolidation" ],
             "Description": "Keeps the game from replacing shaders on this asset's models with the known in-game shaders. Requires that @Asset_Bundle_Version be >= 3.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
-            "DefaultValueSwitch":
+            "DefaultValue":
             [
                 {
                     "Or":
@@ -1039,7 +1039,7 @@
                     "Type": "SDG.Unturned.ENPCLogicType, Assembly-CSharp",
                     "Description": "Defines how to compare some property with a given value.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
-                    "DefaultValueSwitch":
+                    "DefaultValue":
                     [
                         {
                             "And":

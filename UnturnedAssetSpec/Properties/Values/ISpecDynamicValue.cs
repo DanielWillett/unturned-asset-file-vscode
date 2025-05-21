@@ -3,7 +3,10 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -12,13 +15,22 @@ public interface ISpecDynamicValue
     ISpecPropertyType? ValueType { get; }
     bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition);
     bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
+    void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options);
 }
 
+[Flags]
 public enum SpecDynamicValueContext
 {
-    Optional,
-    AssumeProperty,
-    AssumeBang
+    Optional = 0,
+    AssumeProperty = 1,
+    AssumeBang = 2,
+    AllowSwitchCase = 4,
+    AllowCondition = 8,
+    AllowSwitch = 16,
+    AllowConditionals = AllowSwitchCase | AllowSwitch | AllowCondition,
+
+
+    Default = Optional | AllowConditionals
 }
 
 public static class SpecDynamicValue
@@ -369,8 +381,13 @@ public static class SpecDynamicValue
         }
     }
 
-    public static ISpecDynamicValue Read(ref Utf8JsonReader reader, JsonSerializerOptions options, SpecDynamicValueContext context, ISpecPropertyType? expectedType = null)
+    public static ISpecDynamicValue Read(ref Utf8JsonReader reader, JsonSerializerOptions? options, SpecDynamicValueContext context = SpecDynamicValueContext.Default, ISpecPropertyType? expectedType = null)
     {
+        if (((int)context & 0b11) == 3)
+        {
+            throw new ArgumentOutOfRangeException(nameof(context), "More than one of [ AssumeProperty, AssumeBang ].");
+        }
+
         while (reader.TokenType == JsonTokenType.Comment && reader.Read()) ;
 
         switch (reader.TokenType)
@@ -379,7 +396,7 @@ public static class SpecDynamicValue
             case JsonTokenType.PropertyName:
                 string str = reader.GetString()!;
                 if (!TryParse(str, context, expectedType, out ISpecDynamicValue reference))
-                    throw new JsonException("Failed to parse ISpecDynamicValue from a string argument.");
+                    throw new JsonException("Failed to parse ISpecDynamicValue from a string value.");
 
                 return reference;
 
@@ -391,9 +408,65 @@ public static class SpecDynamicValue
                     ? throw new JsonException($"Failed to parse ISpecDynamicValue from an argument, expected type \"{type.Type}\" but was given type {t}.")
                     : throw new JsonException($"Failed to parse ISpecDynamicValue from an argument, expected type \"{type.Type}\".")
                 );
+
+            case JsonTokenType.StartArray:
+                if ((context & SpecDynamicValueContext.AllowSwitch) == 0)
+                    break;
+
+                Utf8JsonReader readerCopy = reader;
+                try
+                {
+                    SpecDynamicSwitchValue @switch = SpecDynamicSwitchValueConverter.ReadSwitch(ref readerCopy, options, expectedType)!;
+                    reader = readerCopy;
+
+                    return @switch;
+                }
+                catch (JsonException) { }
+
+                throw new JsonException("Failed to read switch statement when parsing ISpecDynamicValue from an array value.");
+
+            case JsonTokenType.StartObject:
+                if ((context & SpecDynamicValueContext.AllowCondition) != 0)
+                {
+                    readerCopy = reader;
+                    try
+                    {
+                        SpecCondition condition = SpecConditionConverter.ReadCondition(ref readerCopy, options);
+                        reader = readerCopy;
+
+                        return new ConditionSpecDynamicValue(condition);
+                    }
+                    catch (JsonException)
+                    {
+                        readerCopy = reader;
+                    }
+                }
+                if ((context & SpecDynamicValueContext.AllowSwitchCase) != 0)
+                {
+                    readerCopy = reader;
+                    try
+                    {
+                        SpecDynamicSwitchCaseValue @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref readerCopy, options, expectedType)!;
+                        reader = readerCopy;
+
+                        return @case;
+                    }
+                    catch (JsonException) { }
+                }
+
+                if ((context & (SpecDynamicValueContext.AllowCondition | SpecDynamicValueContext.AllowSwitchCase)) == 0)
+                    break;
+
+                if ((context & (SpecDynamicValueContext.AllowCondition | SpecDynamicValueContext.AllowSwitchCase)) == (SpecDynamicValueContext.AllowCondition | SpecDynamicValueContext.AllowSwitchCase))
+                    throw new JsonException("Failed to read condition or switch case when parsing ISpecDynamicValue from an object value.");
+
+                if ((context & SpecDynamicValueContext.AllowCondition) == SpecDynamicValueContext.AllowCondition)
+                    throw new JsonException("Failed to read condition when parsing ISpecDynamicValue from an object value.");
+
+                throw new JsonException("Failed to read switch case when parsing ISpecDynamicValue from an object value.");
         }
 
-        throw new JsonException($"Unexpected token type {reader.TokenType} when parsing ISpecDynamicValue from a string argument.");
+        throw new JsonException($"Unexpected token type {reader.TokenType} when parsing ISpecDynamicValue.");
     }
 
     public static ISpecDynamicValue ReadValue(ref Utf8JsonReader reader, ISpecPropertyType? expectedType, Func<Type?, ISpecPropertyType, ISpecDynamicValue> invalidTypeThrowHandler)

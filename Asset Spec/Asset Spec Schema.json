@@ -327,7 +327,7 @@
                             "description": "A special subset of element type, such as barricade or useable type.",
                             "type": "array",
                             "items": {
-                                "type": [ "string", "number", "null" ]
+                                "type": [ "string", "null" ]
                             }
                         },
                         "Required": {
@@ -349,14 +349,26 @@
                             "type": "boolean"
                         },
                         "DefaultValue": {
-                            "description": "The default value for this property if applicable. If IncludedDefaultValue is used, this indicates the default value if the property is not included."
-                        },
-                        "DefaultValueSwitch": {
-                            "description": "Switches cases of default values.",
-                            "$ref": "#/$defs/switch"
+                            "description": "The default value for this property if applicable. If IncludedDefaultValue is used, this indicates the default value if the property is not included.",
+                            "oneOf": [
+                                {
+                                    "type": [ "string", "number", "integer", "boolean", "null" ]
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
+                            ]
                         },
                         "IncludedDefaultValue": {
-                            "description": "The default value for this property if applicable. Indicates the default value if the property is included but not parsed correctly."
+                            "description": "The default value for this property if applicable. Indicates the default value if the property is included but not parsed correctly.",
+                            "oneOf": [
+                                {
+                                    "type": [ "string", "number", "integer", "boolean", "null" ]
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
+                            ]
                         },
                         "Description": {
                             "description": "Short description of the property.",
@@ -365,6 +377,10 @@
                         "Variable": {
                             "description": "Name of the variable in the C# class.",
                             "type": "string"
+                        },
+                        "Version": {
+                            "description": "Unturned version when this option was added.",
+                            "type": [ "string", "null" ]
                         },
                         "Docs": {
                             "description": "Link to the Unturned modding docs when a page is available.",
@@ -502,7 +518,7 @@
             ]
         },
         "condition": {
-            "type": "object",
+            "type": [ "object", "boolean", "string" ],
             "properties": {
                 "Variable": {
                     "type": "string"
@@ -530,32 +546,62 @@
                 {
                     "properties": {
                         "And": {
-                            "type": "array",
-                            "items": {
-                                "oneOf":
-                                [
-                                    {
-                                        "$ref": "#/$defs/condition"
-                                    },
-                                    {
-                                        "$ref": "#/$defs/switchCase"
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "oneOf":
+                                        [
+                                            {
+                                                "$ref": "#/$defs/condition"
+                                            },
+                                            {
+                                                "$ref": "#/$defs/switchCase"
+                                            }
+                                        ]
                                     }
-                                ]
-                            }
+                                },
+                                {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
+                                }
+                            ]
                         },
                         "Or": {
-                            "type": "array",
-                            "items": {
-                                "oneOf":
-                                [
-                                    {
-                                        "$ref": "#/$defs/condition"
-                                    },
-                                    {
-                                        "$ref": "#/$defs/switchCase"
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "oneOf":
+                                        [
+                                            {
+                                                "$ref": "#/$defs/condition"
+                                            },
+                                            {
+                                                "$ref": "#/$defs/switchCase"
+                                            }
+                                        ]
                                     }
-                                ]
-                            }
+                                },
+                                {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
+                                }
+                            ]
+                        },
+                        "Case": {
+                            "oneOf": [
+                                {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
+                                }
+                            ]
                         },
                         "Value": {
                             "type": [ "null", "string", "boolean", "number" ]
@@ -568,19 +614,39 @@
                         "When": {
                             "$ref": "#/$defs/condition"
                         },
+                        "Case": {
+                            "oneOf": [
+                                {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
+                                }
+                            ]
+                        },
                         "Cases": {
-                            "type": "array",
-                            "items": {
-                                "oneOf":
-                                [
-                                    {
-                                        "$ref": "#/$defs/condition"
-                                    },
-                                    {
-                                        "$ref": "#/$defs/switchCase"
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "oneOf":
+                                        [
+                                            {
+                                                "$ref": "#/$defs/condition"
+                                            },
+                                            {
+                                                "$ref": "#/$defs/switchCase"
+                                            }
+                                        ]
                                     }
-                                ]
-                            }
+                                },
+                                {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
+                                }
+                            ]
                         }
                     },
                     "required": [ "Cases" ]

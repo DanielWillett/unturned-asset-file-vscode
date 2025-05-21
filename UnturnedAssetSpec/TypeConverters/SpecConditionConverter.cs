@@ -38,15 +38,31 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
     /// <inheritdoc />
     public override SpecCondition Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        SpecCondition s = default;
-        if (reader.TokenType == JsonTokenType.Null)
-        {
-            return s;
-        }
+        return ReadCondition(ref reader, options);
+    }
 
-        if (reader.TokenType != JsonTokenType.StartObject)
+    public static SpecCondition ReadCondition(ref Utf8JsonReader reader, JsonSerializerOptions? options)
+    {
+        switch (reader.TokenType)
         {
-            throw new JsonException($"Unexpected token {reader.TokenType} while reading SpecCondition.");
+            case JsonTokenType.StartObject:
+                break;
+
+            case JsonTokenType.True:
+                // always true
+                return new SpecCondition(SpecDynamicValue.True, ConditionOperation.Equal, true);
+
+            case JsonTokenType.False:
+            case JsonTokenType.Null:
+                // always false
+                return new SpecCondition(SpecDynamicValue.False, ConditionOperation.Equal, true);
+
+            case JsonTokenType.String:
+                // check if property by this name is true
+                return new SpecCondition(SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, KnownTypes.Boolean), ConditionOperation.Equal, true);
+
+            default:
+                throw new JsonException($"Unexpected token {reader.TokenType} while reading SpecCondition.");
         }
 
         ISpecDynamicValue? variable = null;
@@ -103,6 +119,11 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
 
                 hasComparand = true;
             }
+            else
+            {
+                reader.Read();
+                reader.Skip();
+            }
         }
 
         if (variable == null)
@@ -123,22 +144,24 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
         return new SpecCondition(variable, operation.Value, comparand);
     }
 
-    private static ISpecDynamicValue ThrowInvalidType(Type? t, ISpecPropertyType type)
+    public static void Write(Utf8JsonWriter writer, SpecCondition value)
     {
-        if (t == null)
-            return ThrowInvalidType(type);
+        if (ReferenceEquals(SpecDynamicValue.True, value.Variable) && value is { Operation: ConditionOperation.Equal, Comparand: true })
+        {
+            writer.WriteBooleanValue(true);
+            return;
+        }
+        if (ReferenceEquals(SpecDynamicValue.False, value.Variable) && value is { Operation: ConditionOperation.Equal, Comparand: true })
+        {
+            writer.WriteBooleanValue(false);
+            return;
+        }
+        if (value.Variable is PropertyRef p && value is { Operation: ConditionOperation.Equal, Comparand: true })
+        {
+            writer.WriteStringValue(p.ToString());
+            return;
+        }
 
-        throw new JsonException($"Expected type {type.DisplayName} ({type.ValueType}) for 'Comparand' in SpecCondition but instead, {t} was given.");
-    }
-
-    private static ISpecDynamicValue ThrowInvalidType(ISpecPropertyType type)
-    {
-        throw new JsonException($"Expected type {type.DisplayName} ({type.ValueType}) for 'Comparand' in SpecCondition, but the given type couldn't be converted.");
-    }
-
-    /// <inheritdoc />
-    public override void Write(Utf8JsonWriter writer, SpecCondition value, JsonSerializerOptions options)
-    {
         writer.WriteStartObject();
 
         writer.WriteString(VariableProperty, value.Variable.ToString());
@@ -228,5 +251,24 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
         }
 
         writer.WriteEndObject();
+    }
+
+    private static ISpecDynamicValue ThrowInvalidType(Type? t, ISpecPropertyType type)
+    {
+        if (t == null)
+            return ThrowInvalidType(type);
+
+        throw new JsonException($"Expected type {type.DisplayName} ({type.ValueType}) for 'Comparand' in SpecCondition but instead, {t} was given.");
+    }
+
+    private static ISpecDynamicValue ThrowInvalidType(ISpecPropertyType type)
+    {
+        throw new JsonException($"Expected type {type.DisplayName} ({type.ValueType}) for 'Comparand' in SpecCondition, but the given type couldn't be converted.");
+    }
+
+    /// <inheritdoc />
+    public override void Write(Utf8JsonWriter writer, SpecCondition value, JsonSerializerOptions options)
+    {
+        Write(writer, value);
     }
 }

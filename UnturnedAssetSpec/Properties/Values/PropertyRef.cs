@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -85,6 +86,23 @@ public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
         value = default;
         return false;
     }
+
+    public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
+    {
+        string str = ToString();
+        if (StringHelper.ContainsWhitespace(str))
+        {
+            str = "@(" + str + ")";
+        }
+        else
+        {
+            str = "@" + str;
+        }
+
+        writer.WriteStringValue(str);
+    }
+
+    public override string ToString() => _info.PropertyName;
 }
 
 public readonly struct PropertyRefInfo
@@ -98,6 +116,19 @@ public readonly struct PropertyRefInfo
         PropertyName = property.Key;
         Context = SpecPropertyContext.Unspecified;
         Type = property.Owner.Type;
+    }
+
+    public override string ToString()
+    {
+        return Context switch
+        {
+            SpecPropertyContext.Property => "$prop$::" + PropertyName,
+            SpecPropertyContext.Localization => "local::" + PropertyName,
+            SpecPropertyContext.CrossReferenceLocalization => "$cr.local$::" + PropertyName,
+            SpecPropertyContext.CrossReferenceProperty => "$cr.prop$::" + PropertyName,
+            SpecPropertyContext.CrossReferenceUnspecified => "$cr$::" + PropertyName,
+            _ => PropertyName
+        };
     }
 
     public PropertyRefInfo(ReadOnlySpan<char> propertyName, string? originalString)
@@ -120,7 +151,7 @@ public readonly struct PropertyRefInfo
             Context = SpecPropertyContext.CrossReferenceLocalization;
             propertyName = propertyName.Slice(12);
         }
-        else if (propertyName.StartsWith("$cr.prop::".AsSpan(), StringComparison.Ordinal) && propertyName.Length > 11)
+        else if (propertyName.StartsWith("$cr.prop$::".AsSpan(), StringComparison.Ordinal) && propertyName.Length > 11)
         {
             Context = SpecPropertyContext.CrossReferenceProperty;
             propertyName = propertyName.Slice(11);

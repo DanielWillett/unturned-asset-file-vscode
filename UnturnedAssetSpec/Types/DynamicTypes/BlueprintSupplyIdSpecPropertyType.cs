@@ -1,5 +1,6 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -15,7 +16,7 @@ public sealed class BlueprintSupplyIdSpecPropertyType :
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string Type => "BlueprintSupplyId";
 
-    public BlueprintSupplyIdSpecPropertyType() : base(AssetCategory.Item, null) { }
+    public BlueprintSupplyIdSpecPropertyType() : base(AssetCategory.Item, OneOrMore<string>.Null) { }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out ushort value)

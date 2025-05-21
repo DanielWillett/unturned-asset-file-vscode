@@ -1,8 +1,9 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -69,5 +70,10 @@ public sealed class ThisBangRef : IEquatable<ISpecDynamicValue>, IEquatable<This
     {
         // todo;
         throw new NotImplementedException();
+    }
+
+    public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
+    {
+        writer.WriteStringValue("#This");
     }
 }

@@ -235,7 +235,7 @@
         {
             "Key": "Can_Player_Equip",
             "Type": "Boolean",
-            "DefaultValueSwitch":
+            "DefaultValue":
             [
                 {
                     "And":
@@ -313,7 +313,7 @@
         {
             "Key": "InventoryAudio",
             "Type": "AudioReference",
-            "DefaultValueSwitch":
+            "DefaultValue":
             [
                 {
                     "When":
@@ -641,7 +641,7 @@
         {
             "Key": "Can_Use_Underwater",
             "Type": "Boolean",
-            "DefaultValueSwitch":
+            "DefaultValue":
             [
                 {
                     "And":
@@ -717,7 +717,7 @@
             "Type": "Boolean",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#add-default-actions-bool",
             "Description": "Actions will be automatically created relevant to the current item, such as repairing, salvaging, and refilling ammo. Defaults to true when @Actions is 0.",
-            "DefaultValueSwitch":
+            "DefaultValue":
             [
                 {
                     "And":
@@ -786,7 +786,7 @@
         {
             "Key": "Should_Delete_At_Zero_Amount",
             "Type": "Boolean",
-            "DefaultValueSwitch":
+            "DefaultValue":
             [
                 {
                     "And":
@@ -1024,7 +1024,7 @@
                 {
                     "Key": "Prioritization",
                     "Type": "SDG.Unturned.ECraftingInputPrioritization, Assembly-CSharp",
-                    "DefaultValueSwitch":
+                    "DefaultValue":
                     [
                         {
                             "And":

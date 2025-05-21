@@ -17,7 +17,7 @@ public sealed class GuidOrIdSpecPropertyType :
     private AssetSpecDatabase? _cachedSpecDb;
     private ISpecType? _cachedType;
 
-    public EquatableArray<QualifiedType> OtherElementTypes { get; }
+    public OneOrMore<QualifiedType> OtherElementTypes { get; }
     public QualifiedType ElementType { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -51,20 +51,13 @@ public sealed class GuidOrIdSpecPropertyType :
         return false;
     }
 
-    public GuidOrIdSpecPropertyType(QualifiedType elementType, string[]? specialTypes)
+    public GuidOrIdSpecPropertyType(QualifiedType elementType, OneOrMore<string> specialTypes = default)
     {
         ElementType = elementType;
         DisplayName = $"Type or {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
-
-        if (specialTypes == null || specialTypes.Length == 0)
-        {
-            OtherElementTypes = new EquatableArray<QualifiedType>(0);
-            return;
-        }
-
-        OtherElementTypes = new EquatableArray<QualifiedType>(specialTypes.Length);
-        for (int i = 0; i < specialTypes.Length; ++i)
-            OtherElementTypes.Array[i] = new QualifiedType(specialTypes[i]);
+        OtherElementTypes = specialTypes
+            .Where(x => !string.IsNullOrEmpty(x))
+            .Select(x => new QualifiedType(x));
     }
 
     /// <inheritdoc />

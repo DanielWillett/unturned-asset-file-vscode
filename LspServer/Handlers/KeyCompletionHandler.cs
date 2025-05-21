@@ -58,7 +58,7 @@ internal class KeyCompletionHandler : ICompletionHandler
 
             foreach (SpecProperty property in info.Properties)
             {
-                if (property.Aliases == null)
+                if (property.Aliases.IsNull)
                     continue;
 
                 foreach (string a in property.Aliases)

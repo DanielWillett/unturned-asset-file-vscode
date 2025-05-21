@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -37,10 +38,13 @@ public sealed class PropertyBangRef : IEquatable<ISpecDynamicValue>, IEquatable<
 
     public override string ToString()
     {
-        if (Property.PropertyName.Equals("Self", StringComparison.Ordinal)
-            || Property.PropertyName.Equals("This", StringComparison.Ordinal))
+        if (Property.PropertyName.Equals("Self", StringComparison.Ordinal))
         {
-            return "\\" + Property;
+            return @"\Self";
+        }
+        if (Property.PropertyName.Equals("This", StringComparison.Ordinal))
+        {
+            return @"\This";
         }
 
         return Property.ToString();
@@ -79,5 +83,10 @@ public sealed class PropertyBangRef : IEquatable<ISpecDynamicValue>, IEquatable<
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
     {
         return Property.TryEvaluateValue(in ctx, out value, out isNull);
+    }
+
+    public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
+    {
+        Property.WriteToJsonWriter(writer, options);
     }
 }

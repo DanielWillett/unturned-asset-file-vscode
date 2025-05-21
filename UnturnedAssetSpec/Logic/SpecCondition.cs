@@ -44,6 +44,14 @@ public readonly struct SpecCondition : IEquatable<SpecCondition>
             return hashCode;
         }
     }
+
+    public override string ToString()
+    {
+        if (Operation == ConditionOperation.Included)
+            return $"{Variable} {Operation}";
+
+        return Comparand == null ? $"{Variable} {Operation} null" : $"{Variable} {Operation} {Comparand}";
+    }
 }
 
 public static class ConditionOperationExtensions

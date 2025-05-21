@@ -1,6 +1,5 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
-using System.Text.Json;
 
 namespace UnturnedAssetSpecTests;
 

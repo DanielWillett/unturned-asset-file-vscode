@@ -3,7 +3,6 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -67,7 +66,7 @@ public static class KnownTypes
         { "LocalizableString", () => LocalizableString }
     };
 
-    public static ISpecPropertyType? GetType(string knownType, SpecProperty property, string? elementType)
+    public static ISpecPropertyType? GetType(string knownType, SpecProperty property, string? elementType, OneOrMore<string> specialTypes)
     {
         if (string.IsNullOrEmpty(knownType))
             return null;
@@ -84,9 +83,10 @@ public static class KnownTypes
 
         if (knownType.Equals("TypeOrEnum", StringComparison.Ordinal))
         {
-            return string.IsNullOrEmpty(elementType) || property.SpecialTypes is not { Length: 1 }
+            string? elementType2 = specialTypes.FirstOrDefault();
+            return string.IsNullOrEmpty(elementType) || string.IsNullOrEmpty(elementType2)
                 ? Type
-                : TypeOrEnum(new QualifiedType(elementType!), new QualifiedType(property.SpecialTypes[0]));
+                : TypeOrEnum(new QualifiedType(elementType!), new QualifiedType(elementType2!));
         }
 
         if (knownType.Equals("AssetReference", StringComparison.Ordinal))
@@ -94,7 +94,7 @@ public static class KnownTypes
             return AssetReference(string.IsNullOrEmpty(elementType)
                 ? new QualifiedType(TypeHierarchy.AssetBaseType)
                 : new QualifiedType(elementType!),
-                property.SpecialTypes
+                specialTypes
             );
         }
 
@@ -102,7 +102,7 @@ public static class KnownTypes
         {
             return AssetReferenceString(string.IsNullOrEmpty(elementType)
                 ? new QualifiedType(TypeHierarchy.AssetBaseType)
-                : new QualifiedType(elementType!), property.SpecialTypes);
+                : new QualifiedType(elementType!), specialTypes);
         }
 
         if (knownType.Equals("MasterBundleReference", StringComparison.Ordinal))
@@ -130,40 +130,40 @@ public static class KnownTypes
         {
             return GuidOrId(string.IsNullOrEmpty(elementType)
                 ? new QualifiedType(TypeHierarchy.AssetBaseType)
-                : new QualifiedType(elementType!), property.SpecialTypes);
+                : new QualifiedType(elementType!), specialTypes);
         }
 
         if (knownType.Equals("Id", StringComparison.Ordinal))
         {
             if (string.IsNullOrEmpty(elementType))
             {
-                return Id(TypeHierarchy.AssetBaseType, property.SpecialTypes);
+                return Id(TypeHierarchy.AssetBaseType, specialTypes);
             }
 
             if (AssetCategory.TryParse(elementType, out EnumSpecTypeValue category))
             {
-                return Id(category, property.SpecialTypes);
+                return Id(category, specialTypes);
             }
 
-            return Id(new QualifiedType(elementType!), property.SpecialTypes);
+            return Id(new QualifiedType(elementType!), specialTypes);
         }
 
         if (knownType.Equals("CommaDelimtedString", StringComparison.Ordinal))
         {
-            string? elementType2 = property.SpecialTypes?.FirstOrDefault();
+            string? elementType2 = specialTypes.FirstOrDefault();
             return CommaDelimtedString(
                 string.IsNullOrEmpty(elementType)
                     ? String
-                    : GetType(elementType!, property, elementType2) ?? new UnresolvedSpecPropertyType(elementType!));
+                    : GetType(elementType!, property, elementType2, specialTypes.Remove(elementType2!)) ?? new UnresolvedSpecPropertyType(elementType!));
         }
 
         if (knownType.Equals("List", StringComparison.Ordinal))
         {
-            string? elementType2 = property.SpecialTypes?.FirstOrDefault();
+            string? elementType2 = specialTypes.FirstOrDefault();
             return List(
                 string.IsNullOrEmpty(elementType)
                     ? String
-                    : GetType(elementType!, property, elementType2) ?? new UnresolvedSpecPropertyType(elementType!));
+                    : GetType(elementType!, property, elementType2, specialTypes.Remove(elementType2!)) ?? new UnresolvedSpecPropertyType(elementType!));
         }
 
         Type? type = System.Type.GetType(knownType, false, false);
@@ -220,9 +220,9 @@ public static class KnownTypes
     public static ISpecPropertyType<Color> ColorRGBLegacy => ColorRGBLegacySpecPropertyType.Instance;
     public static ISpecPropertyType<Color> ColorRGBALegacy => ColorRGBALegacySpecPropertyType.Instance;
 
-    public static ISpecPropertyType<Guid> AssetReference(QualifiedType elementType, string[]? specialTypes = null)
+    public static ISpecPropertyType<Guid> AssetReference(QualifiedType elementType, OneOrMore<string> specialTypes = default)
         => new AssetReferenceSpecPropertyType(elementType, true, specialTypes);
-    public static ISpecPropertyType<Guid> AssetReferenceString(QualifiedType elementType, string[]? specialTypes = null)
+    public static ISpecPropertyType<Guid> AssetReferenceString(QualifiedType elementType, OneOrMore<string> specialTypes = default)
         => new AssetReferenceSpecPropertyType(elementType, false, specialTypes);
     public static ISpecPropertyType<BundleReference> MasterBundleReference(QualifiedType elementType)
         => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.MasterBundleReference);
@@ -232,13 +232,13 @@ public static class KnownTypes
         => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.ContentReference);
     public static ISpecPropertyType<BundleReference> AudioReference => MasterBundleReferenceSpecPropertyType.AudioReference;
 
-    public static ISpecPropertyType<GuidOrId> GuidOrId(QualifiedType elementType, string[]? specialTypes = null)
+    public static ISpecPropertyType<GuidOrId> GuidOrId(QualifiedType elementType, OneOrMore<string> specialTypes = default)
         => new GuidOrIdSpecPropertyType(elementType, specialTypes);
 
-    public static ISpecPropertyType<ushort> Id(QualifiedType elementType, string[]? specialTypes = null)
+    public static ISpecPropertyType<ushort> Id(QualifiedType elementType, OneOrMore<string> specialTypes = default)
         => new IdSpecPropertyType(elementType, specialTypes);
 
-    public static ISpecPropertyType<ushort> Id(EnumSpecTypeValue assetCategory, string[]? specialTypes = null)
+    public static ISpecPropertyType<ushort> Id(EnumSpecTypeValue assetCategory, OneOrMore<string> specialTypes = default)
         => new IdSpecPropertyType(assetCategory, specialTypes);
 
     public static ISpecPropertyType<byte> NavId => NavIdSpecPropertyType.Instance;

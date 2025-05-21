@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -44,6 +45,11 @@ public sealed class SpecDynamicConcreteNullValue :
         isNull = true;
         value = default;
         return true;
+    }
+
+    public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
+    {
+        writer.WriteNullValue();
     }
 }
 
@@ -142,6 +148,14 @@ public sealed class SpecDynamicConcreteEnumValue :
         return true;
     }
 
+    public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
+    {
+        if (Value < 0)
+            writer.WriteNullValue();
+        else
+            writer.WriteStringValue(Type.Values[Value].Value);
+    }
+
 
     public static implicit operator string?(SpecDynamicConcreteEnumValue v) => v.Value < 0 ? null : v.Type.Values[v.Value].Value;
 }
@@ -162,10 +176,10 @@ public abstract class SpecDynamicConcreteValue :
     }
 
     /// <inheritdoc />
-    public abstract bool Equals(SpecDynamicConcreteValue other);
+    public abstract bool Equals(SpecDynamicConcreteValue? other);
 
     /// <inheritdoc />
-    public bool Equals(ISpecDynamicValue other)
+    public bool Equals(ISpecDynamicValue? other)
     {
         if (other is SpecDynamicConcreteValue v && Equals(v))
             return true;
@@ -178,6 +192,8 @@ public abstract class SpecDynamicConcreteValue :
 
     public abstract bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition);
     public abstract bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
+
+    public abstract void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options);
 }
 
 public sealed class SpecDynamicConcreteValue<T> :
@@ -186,29 +202,31 @@ public sealed class SpecDynamicConcreteValue<T> :
     IEquatable<T>,
     ISpecDynamicValue where T : IEquatable<T>
 {
+    private T? _value;
+
     /// <summary>
     /// The value of this dynamic value.
     /// </summary>
-    public T? Value { get; }
+    public T? Value => _value;
 
     public SpecDynamicConcreteValue(T? value, ISpecPropertyType<T>? type) : base(value == null, type)
     {
-        Value = value;
+        _value = value;
     }
 
     public SpecDynamicConcreteValue(ISpecPropertyType<T>? type) : base(true, type)
     {
-        Value = default!;
+        _value = default!;
     }
 
     /// <inheritdoc />
-    public bool Equals(T other) => IsNull ? other == null : ValuesEqual(Value, other);
+    public bool Equals(T? other) => IsNull ? other == null : ValuesEqual(Value, other);
 
     /// <inheritdoc />
-    public bool Equals(SpecDynamicConcreteValue<T> other) => other != null && (IsNull ? other.IsNull : !other.IsNull && ValuesEqual(other.Value, Value));
+    public bool Equals(SpecDynamicConcreteValue<T>? other) => other != null && (IsNull ? other.IsNull : !other.IsNull && ValuesEqual(other.Value, Value));
 
     /// <inheritdoc />
-    public override bool Equals(SpecDynamicConcreteValue other) => other is SpecDynamicConcreteValue<T> b && Equals(b);
+    public override bool Equals(SpecDynamicConcreteValue? other) => other is SpecDynamicConcreteValue<T> b && Equals(b);
     
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj switch
@@ -256,8 +274,7 @@ public sealed class SpecDynamicConcreteValue<T> :
         }
         else
         {
-            T? v = Value;
-            value = Unsafe.As<T, TValue>(ref v!);
+            value = Unsafe.As<T, TValue>(ref _value!);
         }
         return true;
     }
@@ -273,11 +290,114 @@ public sealed class SpecDynamicConcreteValue<T> :
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool ValuesEqual(T? t1, T? t2)
     {
+        if (typeof(T).IsValueType)
+        {
+            return t1!.Equals(t2!);
+        }
+
         if (t1 == null)
         {
             return t2 == null;
         }
 
         return t2 != null && t1.Equals(t2);
+    }
+
+    public override void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
+    {
+        if (IsNull)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+
+        if (typeof(T) == typeof(bool))
+        {
+            bool v = Unsafe.As<T, bool>(ref _value!);
+            writer.WriteBooleanValue(v);
+        }
+        else if (typeof(T) == typeof(byte))
+        {
+            byte v = Unsafe.As<T, byte>(ref _value!);
+            writer.WriteNumberValue(v);
+        }
+        else if (typeof(T) == typeof(sbyte))
+        {
+            sbyte v = Unsafe.As<T, sbyte>(ref _value!);
+            writer.WriteNumberValue(v);
+        }
+        else if (typeof(T) == typeof(ushort))
+        {
+            ushort v = Unsafe.As<T, ushort>(ref _value!);
+            writer.WriteNumberValue(v);
+        }
+        else if (typeof(T) == typeof(short))
+        {
+            short v = Unsafe.As<T, short>(ref _value!);
+            writer.WriteNumberValue(v);
+        }
+        else if (typeof(T) == typeof(uint))
+        {
+            uint v = Unsafe.As<T, uint>(ref _value!);
+            writer.WriteNumberValue(v);
+        }
+        else if (typeof(T) == typeof(int))
+        {
+            int v = Unsafe.As<T, int>(ref _value!);
+            writer.WriteNumberValue(v);
+        }
+        else if (typeof(T) == typeof(ulong))
+        {
+            ulong v = Unsafe.As<T, ulong>(ref _value!);
+            writer.WriteNumberValue(v);
+        }
+        else if (typeof(T) == typeof(long))
+        {
+            long v = Unsafe.As<T, long>(ref _value!);
+            writer.WriteNumberValue(v);
+        }
+        else if (typeof(T) == typeof(float))
+        {
+            float v = Unsafe.As<T, float>(ref _value!);
+            writer.WriteNumberValue(v);
+        }
+        else if (typeof(T) == typeof(double))
+        {
+            double v = Unsafe.As<T, double>(ref _value!);
+            writer.WriteNumberValue(v);
+        }
+        else if (typeof(T) == typeof(decimal))
+        {
+            decimal v = Unsafe.As<T, decimal>(ref _value!);
+            writer.WriteNumberValue(v);
+        }
+        else if (typeof(T) == typeof(Guid))
+        {
+            Guid v = Unsafe.As<T, Guid>(ref _value!);
+            writer.WriteStringValue(v);
+        }
+        else if (typeof(T) == typeof(DateTime))
+        {
+            DateTime v = Unsafe.As<T, DateTime>(ref _value!);
+            writer.WriteStringValue(v);
+        }
+        else if (typeof(T) == typeof(DateTimeOffset))
+        {
+            DateTimeOffset v = Unsafe.As<T, DateTimeOffset>(ref _value!);
+            writer.WriteStringValue(v);
+        }
+        else if (typeof(T) == typeof(char))
+        {
+            char v = Unsafe.As<T, char>(ref _value!);
+            unsafe
+            {
+                ReadOnlySpan<char> span = new ReadOnlySpan<char>(&v, 1);
+                writer.WriteStringValue(span);
+            }
+        }
+        else
+        {
+            JsonSerializer.Serialize(writer, _value, options);
+        }
     }
 }

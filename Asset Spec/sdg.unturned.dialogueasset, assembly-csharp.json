@@ -323,7 +323,7 @@
             "Localization":
             [
                 {
-                    "Key": "#Empty",
+                    "Key": "#This.Key",
                     "Type": "RichTextString",
                     "Required": true,
                     "Description": "The text shown for response #(Self.KeyGroups[0]).",

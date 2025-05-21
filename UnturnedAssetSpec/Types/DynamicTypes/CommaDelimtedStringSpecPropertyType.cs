@@ -12,7 +12,6 @@ public sealed class CommaDelimtedStringSpecPropertyType :
     IEquatable<CommaDelimtedStringSpecPropertyType>
 {
     private readonly ParseHandler _handler;
-    private static readonly char[] Separators = [ ',' ];
 
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName => "File Path";
@@ -30,10 +29,10 @@ public sealed class CommaDelimtedStringSpecPropertyType :
     public void ResolveInnerTypes(SpecProperty property, AssetSpecDatabase database, AssetTypeInformation assetFile)
     {
         if (InnerType is UnresolvedSpecPropertyType unresolved)
-            unresolved.Resolve(property, database, assetFile);
+            InnerType = unresolved.Resolve(property, database, assetFile);
     }
 
-    public ISpecPropertyType InnerType { get; }
+    public ISpecPropertyType InnerType { get; private set; }
 
     public CommaDelimtedStringSpecPropertyType(ISpecPropertyType innerType)
     {
@@ -72,8 +71,7 @@ public sealed class CommaDelimtedStringSpecPropertyType :
         string val = stringNode.Value;
         if (parse.HasDiagnostics)
         {
-            string[] split = val.Split(Separators, StringSplitOptions.RemoveEmptyEntries);
-            _ = _handler;
+            _handler.ProcessDiagnostics(in parse, stringNode);
         }
 
         value = val;

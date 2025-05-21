@@ -26,7 +26,7 @@
             "Key": "Master_Bundle_Version",
             "Aliases": [ "Asset_Bundle_Version" ],
             "Type": "AssetBundleVersion",
-            "DefaultValueSwitch":
+            "DefaultValue":
             [
                 {
                     "And":

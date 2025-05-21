@@ -159,21 +159,7 @@ public class AssetSpecDatabase : IDisposable
 
             List<SpecProperty> props = isLocal || context == SpecPropertyContext.Localization && !isProp ? info.LocalizationProperties : info.Properties;
             SpecProperty? prop = props.Find(p => p.Key.Equals(property, StringComparison.OrdinalIgnoreCase));
-            prop ??= props.Find(p =>
-            {
-                if (p.Aliases == null)
-                {
-                    return false;
-                }
-
-                for (int i = 0; i < p.Aliases.Length; ++i)
-                {
-                    if (string.Equals(p.Aliases[i], property, StringComparison.OrdinalIgnoreCase))
-                        return true;
-                }
-
-                return false;
-            });
+            prop ??= props.Find(p => p.Aliases.Contains(property, StringComparison.OrdinalIgnoreCase));
 
             if (prop != null)
             {

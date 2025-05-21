@@ -15,7 +15,7 @@ public class IdSpecPropertyType :
 {
     public EnumSpecTypeValue Category { get; }
 
-    public EquatableArray<QualifiedType> OtherElementTypes { get; }
+    public OneOrMore<QualifiedType> OtherElementTypes { get; }
     public QualifiedType ElementType { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -43,7 +43,7 @@ public class IdSpecPropertyType :
         return false;
     }
 
-    public IdSpecPropertyType(EnumSpecTypeValue category, string[]? specialTypes)
+    public IdSpecPropertyType(EnumSpecTypeValue category, OneOrMore<string> specialTypes)
         : this(
             category,
             default,
@@ -57,7 +57,7 @@ public class IdSpecPropertyType :
         }
     }
 
-    public IdSpecPropertyType(QualifiedType qualifiedType, string[]? specialTypes)
+    public IdSpecPropertyType(QualifiedType qualifiedType, OneOrMore<string> specialTypes)
         : this(
             AssetCategory.None,
             qualifiedType,
@@ -67,20 +67,15 @@ public class IdSpecPropertyType :
     {
     }
 
-    private IdSpecPropertyType(EnumSpecTypeValue category, QualifiedType elementType, string displayName, string[]? specialTypes)
+    private IdSpecPropertyType(EnumSpecTypeValue category, QualifiedType elementType, string displayName, OneOrMore<string> specialTypes)
     {
         Category = category;
         ElementType = elementType;
         DisplayName = displayName;
-        if (specialTypes == null || specialTypes.Length == 0)
-        {
-            OtherElementTypes = new EquatableArray<QualifiedType>(0);
-            return;
-        }
 
-        OtherElementTypes = new EquatableArray<QualifiedType>(specialTypes.Length);
-        for (int i = 0; i < specialTypes.Length; ++i)
-            OtherElementTypes.Array[i] = new QualifiedType(specialTypes[i]);
+        OtherElementTypes = specialTypes
+            .Where(x => !string.IsNullOrEmpty(x))
+            .Select(x => new QualifiedType(x));
     }
 
     /// <inheritdoc />

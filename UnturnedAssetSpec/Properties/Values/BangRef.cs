@@ -2,7 +2,13 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -40,6 +46,66 @@ public abstract class BangRef : IBangRefTarget, IEquatable<BangRef>, IEquatable<
     string? IBangRefTarget.EvaluateKey(in FileEvaluationContext ctx) => Target.EvaluateKey(in ctx);
     ISpecDynamicValue? IBangRefTarget.EvaluateValue(in FileEvaluationContext ctx) => Target.EvaluateValue(in ctx);
     int IBangRefTarget.EvaluateKeyGroup(in FileEvaluationContext ctx, int index) => Target.EvaluateKeyGroup(in ctx, index);
+
+    public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
+    {
+        IIndexableBangRef? indexable = this as IIndexableBangRef;
+        IPropertiesBangRef? properties = this as IPropertiesBangRef;
+
+        if (indexable == null && properties == null)
+        {
+            string str = Target + "." + PropertyName;
+            str = StringHelper.ContainsWhitespace(str) ? "#(" + str + ")" : ("#" + str);
+            writer.WriteStringValue(str);
+            return;
+        }
+
+        StringBuilder bldr = new StringBuilder(Target.ToString());
+        bldr.Append('.')
+            .Append(PropertyName);
+
+        if (indexable != null)
+        {
+            bldr.Append('[')
+                .Append(indexable.Index)
+                .Append(']');
+        }
+
+        if (properties != null)
+        {
+            using IEnumerator<KeyValuePair<string, string>> props = properties.EnumerateProperties().GetEnumerator();
+            if (props.MoveNext())
+            {
+                bldr.Append('{');
+                bool needsComma = false;
+                do
+                {
+                    KeyValuePair<string, string> property = props.Current;
+                    if (needsComma)
+                        bldr.Append(',');
+                    else
+                        needsComma = true;
+                    bldr.Append(property.Key)
+                        .Append('=')
+                        .Append(property.Value);
+                } while (props.MoveNext());
+            }
+
+            bldr.Append('}');
+        }
+
+        if (StringHelper.ContainsWhitespace(bldr))
+        {
+            bldr.Insert(0, "#(");
+            bldr.Append(')');
+        }
+        else
+        {
+            bldr.Insert(0, '#');
+        }
+
+        writer.WriteStringValue(bldr.ToString());
+    }
 
     public override string ToString() => Target + "." + PropertyName;
 }
@@ -252,6 +318,11 @@ public sealed class KeyGroupsBangRef : BangRef, IEquatable<KeyGroupsBangRef>, II
             PreventSelfReference = value.Equals("true".AsSpan(), StringComparison.InvariantCultureIgnoreCase);
         }
     }
+
+    public IEnumerable<KeyValuePair<string, string>> EnumerateProperties()
+    {
+        yield return new KeyValuePair<string, string>(nameof(PreventSelfReference), PreventSelfReference ? "true" : "false");
+    }
 }
 
 public interface IIndexableBangRef : IBangRefTarget
@@ -262,4 +333,5 @@ public interface IIndexableBangRef : IBangRefTarget
 public interface IPropertiesBangRef : IBangRefTarget
 {
     void SetProperty(ReadOnlySpan<char> property, ReadOnlySpan<char> value);
+    IEnumerable<KeyValuePair<string, string>> EnumerateProperties();
 }

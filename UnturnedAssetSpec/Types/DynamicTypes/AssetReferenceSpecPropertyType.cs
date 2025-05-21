@@ -14,7 +14,7 @@ public sealed class AssetReferenceSpecPropertyType :
     IStringParseableSpecPropertyType
 {
     
-    public EquatableArray<QualifiedType> OtherElementTypes { get; }
+    public OneOrMore<QualifiedType> OtherElementTypes { get; }
     public bool CanParseDictionary { get; }
     public QualifiedType ElementType { get; }
 
@@ -43,28 +43,23 @@ public sealed class AssetReferenceSpecPropertyType :
         return false;
     }
 
-    public AssetReferenceSpecPropertyType(QualifiedType elementType, bool canParseDictionary, string[]? specialTypes)
+    public AssetReferenceSpecPropertyType(QualifiedType elementType, bool canParseDictionary, OneOrMore<string> specialTypes)
     {
         CanParseDictionary = canParseDictionary;
         if (elementType.Type == null || elementType.Equals(QualifiedType.AssetBaseType))
         {
             ElementType = QualifiedType.AssetBaseType;
             DisplayName = "Asset Reference";
-            OtherElementTypes = new EquatableArray<QualifiedType>(0);
+            OtherElementTypes = OneOrMore<QualifiedType>.Null;
         }
         else
         {
             ElementType = elementType;
             DisplayName = $"Asset Reference to {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
-            if (specialTypes == null || specialTypes.Length == 0)
-            {
-                OtherElementTypes = new EquatableArray<QualifiedType>(0);
-                return;
-            }
 
-            OtherElementTypes = new EquatableArray<QualifiedType>(specialTypes.Length);
-            for (int i = 0; i < specialTypes.Length; ++i)
-                OtherElementTypes.Array[i] = new QualifiedType(specialTypes[i]);
+            OtherElementTypes = specialTypes
+                .Where(x => !string.IsNullOrEmpty(x))
+                .Select(x => new QualifiedType(x));
         }
     }
 

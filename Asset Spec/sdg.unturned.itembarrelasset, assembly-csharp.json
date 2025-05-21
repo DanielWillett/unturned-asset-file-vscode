@@ -48,7 +48,7 @@
             "Description": "Multiplier to the maximum distance a gunshot can be heard as configured by the gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#gunshot-rolloff-distance-multiplier-float32",
             "Variable": "gunshotRolloffDistanceMultiplier",
-            "DefaultValueSwitch":
+            "DefaultValue":
             [
                 {
                     "And":

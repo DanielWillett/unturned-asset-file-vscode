@@ -51,15 +51,41 @@ internal sealed class UnresolvedSpecPropertyType : ISpecPropertyType, IEquatable
 
     public ISpecPropertyType Resolve(SpecProperty property, AssetSpecDatabase database, AssetTypeInformation assetFile)
     {
-        ISpecPropertyType? type = KnownTypes.GetType(Value, property, property.ElementType);
-        if (type != null)
+        if (property.Owner is ISpecPropertyType specPropertyType && Type.Equals(specPropertyType.Type, StringComparison.Ordinal))
         {
-            if (type is INestedSpecPropertyType nested)
-                nested.ResolveInnerTypes(property, database, assetFile);
-            return type;
+            return specPropertyType;
         }
 
-        throw new TypeAccessException();
+        if (TryResolveType(assetFile, database, out ISpecPropertyType propType))
+            return propType;
+
+        throw new Exception($"Failed to resolve type: \"{Type}\".");
+    }
+
+    private bool TryResolveType(ISpecType type, AssetSpecDatabase database, out ISpecPropertyType propType)
+    {
+        if (type is AssetTypeInformation nestedAssetType)
+        {
+            foreach (ISpecType t in nestedAssetType.Types)
+            {
+                if (TryResolveType(t, database, out propType))
+                    return true;
+            }
+
+            if (!nestedAssetType.Parent.IsNull && database.Types.TryGetValue(nestedAssetType.Parent, out AssetTypeInformation info))
+            {
+                if (TryResolveType(info, database, out propType))
+                    return true;
+            }
+        }
+        else if (type is ISpecPropertyType propertyType && type.Type.Equals(Value))
+        {
+            propType = propertyType;
+            return true;
+        }
+
+        propType = null!;
+        return false;
     }
 }
 

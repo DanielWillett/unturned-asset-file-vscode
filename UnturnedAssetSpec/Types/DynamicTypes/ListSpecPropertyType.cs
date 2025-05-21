@@ -2,13 +2,15 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public sealed class ListSpecPropertyType<TElementType> :
     BaseSpecPropertyType<EquatableArray<TElementType>>,
     ISpecPropertyType<EquatableArray<TElementType>>,
-    IEquatable<ListSpecPropertyType<TElementType>>
+    IEquatable<ListSpecPropertyType<TElementType>>,
+    INestedSpecPropertyType
     where TElementType : IEquatable<TElementType>
 {
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -18,7 +20,7 @@ public sealed class ListSpecPropertyType<TElementType> :
     public override string Type => "List";
 
     /// <inheritdoc />
-    public Type ValueType => typeof(string);
+    public Type ValueType => typeof(EquatableArray<TElementType>);
 
     /// <inheritdoc />
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
@@ -42,6 +44,11 @@ public sealed class ListSpecPropertyType<TElementType> :
 
         value = new SpecDynamicConcreteValue<EquatableArray<TElementType>>(val, this);
         return true;
+    }
+
+    public void ResolveInnerTypes(SpecProperty property, AssetSpecDatabase database, AssetTypeInformation assetFile)
+    {
+        
     }
 
     /// <inheritdoc />

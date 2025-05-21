@@ -1,32 +1,47 @@
-using System;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 [DebuggerDisplay("{DisplayName,nq}")]
-public sealed class CustomSpecType : ISpecType
+public sealed class CustomSpecType : ISpecType, ISpecPropertyType, IEquatable<CustomSpecType>
 {
     public QualifiedType Type { get; internal set; }
+
+    public Type ValueType => throw new NotImplementedException();
+
+    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+
+    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => null;
+
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        value = null!;
+        return false;
+    }
 
     public string? Docs { get; set; }
 
     public QualifiedType Parent { get; set; }
 
     public string DisplayName { get; set; } = string.Empty;
+    string ISpecPropertyType.Type => Type.Type;
 
 #nullable disable
     public List<SpecProperty> Properties { get; set; }
     public List<SpecProperty> LocalizationProperties { get; set; }
 #nullable restore
 
-    public bool Equals(AssetTypeInformation other) => other != null && Type.Equals(other.Type);
-    public bool Equals(ISpecType other) => other is AssetTypeInformation t && Type.Equals(t.Type);
-
     /// <inheritdoc />
-    public override bool Equals(object? obj) => obj is AssetTypeInformation ti && Equals(ti);
+    public bool Equals(CustomSpecType other) => other != null && Type.Equals(other.Type);
+    /// <inheritdoc />
+    public bool Equals(ISpecType other) => other is CustomSpecType t && Equals(t);
+    /// <inheritdoc />
+    public bool Equals(ISpecPropertyType other) => other is CustomSpecType t && Equals(t);
+    /// <inheritdoc />
+    public override bool Equals(object? obj) => obj is CustomSpecType t && Equals(t);
 
     /// <inheritdoc />
     public override int GetHashCode()
