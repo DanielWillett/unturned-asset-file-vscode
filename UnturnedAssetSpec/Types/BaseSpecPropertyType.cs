@@ -1,6 +1,6 @@
-using System;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
 using System.ComponentModel;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -14,6 +14,9 @@ public abstract class BaseSpecPropertyType<TValue>
 #pragma warning disable CS0693
     public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => this as ISpecPropertyType<TValue>;
 #pragma warning restore CS0693
+
+    public override string ToString() => Type;
+
     protected bool MissingNode(in SpecPropertyTypeParseContext parse, out TValue? value)
     {
         if (parse.HasDiagnostics && parse.Parent is AssetFileKeyValuePairNode { Key: { } key })

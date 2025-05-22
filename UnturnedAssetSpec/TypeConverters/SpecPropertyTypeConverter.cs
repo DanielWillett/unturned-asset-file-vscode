@@ -1,4 +1,3 @@
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Text.Json;
@@ -8,13 +7,6 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 public class SpecPropertyTypeConverter : JsonConverter<ISpecPropertyType>
 {
-    private readonly AssetSpecDatabase _specDatabase;
-
-    public SpecPropertyTypeConverter(AssetSpecDatabase specDatabase)
-    {
-        _specDatabase = specDatabase;
-    }
-
     /// <inheritdoc />
     public override ISpecPropertyType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -24,13 +16,19 @@ public class SpecPropertyTypeConverter : JsonConverter<ISpecPropertyType>
         string type = reader.GetString();
         if (string.IsNullOrWhiteSpace(type))
             throw new JsonException("Empty type while reading ISpecPropertyType.");
-
-        return new UnresolvedSpecPropertyType(type);
+        
+        return KnownTypes.GetType(type) ?? new UnresolvedSpecPropertyType(type);
     }
 
     /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, ISpecPropertyType value, JsonSerializerOptions options)
     {
-        return;
+        if (value == null)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+
+        writer.WriteStringValue(value.Type);
     }
 }

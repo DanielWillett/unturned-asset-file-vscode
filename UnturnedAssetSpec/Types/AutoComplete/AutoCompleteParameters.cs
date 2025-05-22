@@ -6,13 +6,13 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 
 public readonly struct AutoCompleteParameters
 {
-    public AssetSpecDatabase Database { get; }
+    public IAssetSpecDatabase Database { get; }
     public AssetFileTree File { get; }
     public FilePosition Position { get; }
     public AssetFileType FileType { get; }
     public SpecProperty Property { get; }
 
-    public AutoCompleteParameters(AssetSpecDatabase database, AssetFileTree file, FilePosition position, AssetFileType fileType, SpecProperty property)
+    public AutoCompleteParameters(IAssetSpecDatabase database, AssetFileTree file, FilePosition position, AssetFileType fileType, SpecProperty property)
     {
         Database = database;
         File = file;

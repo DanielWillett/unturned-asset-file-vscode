@@ -15,7 +15,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 internal class DocumentSymbolHandler : IDocumentSymbolHandler
 {
     private readonly OpenedFileTracker _fileTracker;
-    private readonly AssetSpecDatabase _specDictionary;
+    private readonly IAssetSpecDatabase _specDictionary;
     private readonly ILogger<DocumentSymbolHandler> _logger;
 
     /// <inheritdoc />
@@ -28,7 +28,7 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
         };
     }
 
-    public DocumentSymbolHandler(OpenedFileTracker fileTracker, AssetSpecDatabase specDictionary, ILogger<DocumentSymbolHandler> logger)
+    public DocumentSymbolHandler(OpenedFileTracker fileTracker, IAssetSpecDatabase specDictionary, ILogger<DocumentSymbolHandler> logger)
     {
         _fileTracker = fileTracker;
         _specDictionary = specDictionary;

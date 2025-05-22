@@ -127,7 +127,7 @@
         {
             "Key": "Splatter_Preload",
             "Type": "UInt8",
-            "DefaultValue": "=MUL(DIV(@Splatters @Splatter) @Preload)",
+            "DefaultValue": "=MUL(=DIV(@Splatters @Splatter) @Preload)",
             "IncludedDefaultValue": 0,
             "Description": "Number of splatter effects to cache and pool on startup. Note that @Preload has to be > 0 to preload splatters.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",

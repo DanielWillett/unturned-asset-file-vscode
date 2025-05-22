@@ -33,6 +33,265 @@
     "HairTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Hair/Hair%20{0}.png",
     "StatusJsonFallbackUrl": "https://raw.githubusercontent.com/Unturned-Datamining/Unturned-Datamining/refs/heads/linux-client-preview/Status.json",
     "PlayerDashboardInventoryLocalizationFallbackUrl": "https://raw.githubusercontent.com/Unturned-Datamining/Unturned-Datamining/refs/heads/linux-client-preview/Localization/English/Player/PlayerDashboardInventory.dat",
+    "SkillsLocalizationFallbackUrl": "https://raw.githubusercontent.com/Unturned-Datamining/Unturned-Datamining/refs/heads/linux-client-preview/Localization/English/Player/PlayerDashboardSkills.dat",
+    "SkillsetsLocalizationFallbackUrl": "https://raw.githubusercontent.com/Unturned-Datamining/Unturned-Datamining/refs/heads/linux-client-preview/Localization/English/Menu/Survivors/MenuSurvivorsCharacter.dat",
+    "Skillsets":
+    [
+        {
+            "Skillset": "NONE",
+            "Index": 0,
+            "Skills": []
+        },
+        {
+            "Skillset": "FIRE",
+            "Index": 1,
+            "Skills":
+            [
+                { "Speciality": 0, "Skill": 3 },
+                { "Speciality": 1, "Skill": 4 }
+            ]
+        },
+        {
+            "Skillset": "POLICE",
+            "Index": 2,
+            "Skills":
+            [
+                { "Speciality": 0, "Skill": 4 },
+                { "Speciality": 1, "Skill": 3 }
+            ]
+        },
+        {
+            "Skillset": "ARMY",
+            "Index": 3,
+            "Skills":
+            [
+                { "Speciality": 0, "Skill": 1 },
+                { "Speciality": 0, "Skill": 2 }
+            ]
+        },
+        {
+            "Skillset": "FARM",
+            "Index": 4,
+            "Skills":
+            [
+                { "Speciality": 2, "Skill": 5 },
+                { "Speciality": 1, "Skill": 6 }
+            ]
+        },
+        {
+            "Skillset": "FISH",
+            "Index": 5,
+            "Skills":
+            [
+                { "Speciality": 2, "Skill": 4 },
+                { "Speciality": 0, "Skill": 5 }
+            ]
+        },
+        {
+            "Skillset": "CAMP",
+            "Index": 6,
+            "Skills":
+            [
+                { "Speciality": 1, "Skill": 5 },
+                { "Speciality": 2, "Skill": 2 }
+            ]
+        },
+        {
+            "Skillset": "WORK",
+            "Index": 7,
+            "Skills":
+            [
+                { "Speciality": 2, "Skill": 1 },
+                { "Speciality": 2, "Skill": 7 },
+                { "Speciality": 2, "Skill": 6 }
+            ]
+        },
+        {
+            "Skillset": "CHEF",
+            "Index": 8,
+            "Skills":
+            [
+                { "Speciality": 2, "Skill": 3 },
+                { "Speciality": 1, "Skill": 1 }
+            ]
+        },
+        {
+            "Skillset": "THIEF",
+            "Index": 9,
+            "Skills":
+            [
+                { "Speciality": 0, "Skill": 6 },
+                { "Speciality": 1, "Skill": 0 }
+            ]
+        },
+        {
+            "Skillset": "MEDIC",
+            "Index": 10,
+            "Skills":
+            [
+                { "Speciality": 1, "Skill": 2 },
+                { "Speciality": 2, "Skill": 0 }
+            ]
+        }
+    ],
+    "Specialities":
+    [
+        {
+            "Speciality": "OFFENSE",
+            "Index": 0,
+            "Skills":
+            [
+                {
+                    "Skill": "OVERKILL",
+                    "Cost": 10,
+                    "Difficulty": 1,
+                    "Index": 0
+                },
+                {
+                    "Skill": "SHARPSHOOTER",
+                    "Cost": 10,
+                    "Difficulty": 1,
+                    "Index": 1,
+                    "LevelMultiplier": 0.4,
+                    "LevelMultiplierInverse": true
+                },
+                {
+                    "Skill": "DEXTERITY",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 2
+                },
+                {
+                    "Skill": "CARDIO",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 3
+                },
+                {
+                    "Skill": "EXERCISE",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 4
+                },
+                {
+                    "Skill": "DIVING",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 5
+                },
+                {
+                    "Skill": "PARKOUR",
+                    "Cost": 20,
+                    "Difficulty": 0.5,
+                    "Index": 6
+                }
+            ]
+        },
+        {
+            "Speciality": "DEFENSE",
+            "Index": 1,
+            "Skills":
+            [
+                {
+                    "Skill": "SNEAKYBEAKY",
+                    "Cost": 10,
+                    "Difficulty": 1,
+                    "Index": 0
+                },
+                {
+                    "Skill": "VITALITY",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 1
+                },
+                {
+                    "Skill": "IMMUNITY",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 2
+                },
+                {
+                    "Skill": "TOUGHNESS",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 3
+                },
+                {
+                    "Skill": "STRENGTH",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 4
+                },
+                {
+                    "Skill": "WARMBLOODED",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 5
+                },
+                {
+                    "Skill": "SURVIVAL",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 6
+                }
+            ]
+        },
+        {
+            "Speciality": "SUPPORT",
+            "Index": 2,
+            "Skills":
+            [
+                {
+                    "Skill": "HEALING",
+                    "Cost": 10,
+                    "Difficulty": 1,
+                    "Index": 0
+                },
+                {
+                    "Skill": "CRAFTING",
+                    "Cost": 20,
+                    "Difficulty": 1.5,
+                    "Index": 1
+                },
+                {
+                    "Skill": "OUTDOORS",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 2
+                },
+                {
+                    "Skill": "COOKING",
+                    "Cost": 20,
+                    "Difficulty": 1.5,
+                    "Index": 3
+                },
+                {
+                    "Skill": "FISHING",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 4
+                },
+                {
+                    "Skill": "AGRICULTURE",
+                    "Cost": 10,
+                    "Difficulty": 1,
+                    "Index": 5
+                },
+                {
+                    "Skill": "MECHANIC",
+                    "Cost": 10,
+                    "Difficulty": 0.5,
+                    "Index": 6
+                },
+                {
+                    "Skill": "ENGINEER",
+                    "Cost": 10,
+                    "Difficulty": 1.5,
+                    "Index": 7
+                }
+            ]
+        }
+    ],
     "Types":
     {   
         "SDG.Unturned.MasterBundleConfig, Assembly-CSharp":

@@ -2,7 +2,9 @@ using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -33,6 +35,8 @@ public class AssetInformation
 #nullable restore
 
     public AssetBundleVersionInfo?[]? AssetBundleVersions { get; set; }
+    public SkillsetInfo?[]? Skillsets { get; set; }
+    public SpecialityInfo?[]? Specialities { get; set; }
     public int[]? EmissiveFaces { get; set; }
     public string? FaceTextureTemplate { get; set; }
     public string? EmissiveFaceTextureTemplate { get; set; }
@@ -40,6 +44,8 @@ public class AssetInformation
     public string? HairTextureTemplate { get; set; }
     public string? StatusJsonFallbackUrl { get; set; }
     public string? PlayerDashboardInventoryLocalizationFallbackUrl { get; set; }
+    public string? SkillsLocalizationFallbackUrl { get; set; }
+    public string? SkillsetsLocalizationFallbackUrl { get; set; }
 
     public bool TryGetAssetBundleVersionInfo(int assetBundleVersion, out UnityEngineVersion version, out string displayName)
     {
@@ -210,6 +216,7 @@ public class AssetInformation
         typeStack.Pop();
     }
 
+    [DebuggerDisplay("{DisplayName} ({EndVersion,nq})")]
     public class AssetBundleVersionInfo
     {
         public required UnityEngineVersion EndVersion { get; set; }
@@ -218,6 +225,7 @@ public class AssetInformation
 }
 
 [JsonConverter(typeof(TypeHierarchyConverter))]
+[DebuggerDisplay("{Type.GetTypeName()}")]
 public class TypeHierarchy
 {
     public const string AssetBaseType = "SDG.Unturned.Asset, Assembly-CSharp";
@@ -233,6 +241,7 @@ public class TypeHierarchy
 #nullable restore
 }
 
+[DebuggerDisplay("{Type.GetTypeName()}")]
 public class InverseTypeHierarchy
 {
     public TypeHierarchy Hierarchy { get; }
@@ -248,4 +257,69 @@ public class InverseTypeHierarchy
         ParentTypes = parentTypes;
         IsValid = isValid;
     }
+}
+
+[DebuggerDisplay("{Skillset}")]
+public class SkillsetInfo
+{
+    public required string Skillset { get; set; }
+    public required int Index { get; set; }
+    public required SkillsetSkillInfo[] Skills { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? DisplayName { get; set; }
+}
+
+[DebuggerDisplay("{Speciality}:{Skill}")]
+public readonly struct SkillsetSkillInfo
+{
+    public int Speciality { get; }
+    public int Skill { get; }
+
+    [JsonConstructor]
+    public SkillsetSkillInfo(int speciality, int skill)
+    {
+        Speciality = speciality;
+        Skill = skill;
+    }
+
+    public override string ToString() => $"{Speciality.ToString(CultureInfo.InvariantCulture)}:{Skill.ToString(CultureInfo.InvariantCulture)}";
+}
+
+[DebuggerDisplay("{Speciality}")]
+public class SpecialityInfo
+{
+    public required string Speciality { get; set; }
+    public required int Index { get; set; }
+    public required SkillInfo[] Skills { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? DisplayName { get; set; }
+}
+
+[DebuggerDisplay("{Skill}")]
+public class SkillInfo
+{
+    public required string Skill { get; set; }
+    public required int Index { get; set; }
+    public required uint Cost { get; set; }
+    public required float Difficulty { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? DisplayName { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Description { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string?[]? Levels { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int MaximumLevel { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? LevelMultiplier { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool LevelMultiplierInverse { get; set; }
 }

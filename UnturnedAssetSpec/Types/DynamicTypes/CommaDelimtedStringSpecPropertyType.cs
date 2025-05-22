@@ -5,19 +5,19 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class CommaDelimtedStringSpecPropertyType :
+public sealed class CommaDelimitedStringSpecPropertyType :
     BaseSpecPropertyType<string>,
     ISpecPropertyType<string>,
-    INestedSpecPropertyType,
-    IEquatable<CommaDelimtedStringSpecPropertyType>
+    ISecondPassSpecPropertyType,
+    IEquatable<CommaDelimitedStringSpecPropertyType>
 {
-    private readonly ParseHandler _handler;
+    private ParseHandler? _handler;
 
     /// <inheritdoc cref="ISpecPropertyType" />
-    public override string DisplayName => "File Path";
+    public override string DisplayName => "Comma-Delimited List";
 
     /// <inheritdoc cref="ISpecPropertyType" />
-    public override string Type => "FilePathString";
+    public override string Type => "CommaDelimitedString";
 
     /// <inheritdoc />
     public Type ValueType => typeof(string);
@@ -25,21 +25,33 @@ public sealed class CommaDelimtedStringSpecPropertyType :
     /// <inheritdoc />
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
-    /// <inheritdoc />
-    public void ResolveInnerTypes(SpecProperty property, AssetSpecDatabase database, AssetTypeInformation assetFile)
-    {
-        if (InnerType is UnresolvedSpecPropertyType unresolved)
-            InnerType = unresolved.Resolve(property, database, assetFile);
-    }
-
     public ISpecPropertyType InnerType { get; private set; }
 
-    public CommaDelimtedStringSpecPropertyType(ISpecPropertyType innerType)
+    public CommaDelimitedStringSpecPropertyType(ISpecPropertyType innerType)
     {
         InnerType = innerType;
-        Type type = InnerType.ValueType;
-        type = typeof(ParseHandler<>).MakeGenericType(type);
-        _handler = (ParseHandler)Activator.CreateInstance(type, innerType);
+    }
+
+    /// <inheritdoc />
+    public ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile)
+    {
+        if (InnerType is ISecondPassSpecPropertyType unresolved)
+        {
+            InnerType = unresolved.Transform(property, database, assetFile);
+            _handler = null;
+        }
+
+        return this;
+    }
+
+    private bool TryCreateParser()
+    {
+        if (InnerType is ISecondPassSpecPropertyType)
+            return false;
+
+        Type type = typeof(ParseHandler<>).MakeGenericType(InnerType.ValueType);
+        _handler = (ParseHandler)Activator.CreateInstance(type, InnerType);
+        return true;
     }
 
     /// <inheritdoc />
@@ -71,7 +83,8 @@ public sealed class CommaDelimtedStringSpecPropertyType :
         string val = stringNode.Value;
         if (parse.HasDiagnostics)
         {
-            _handler.ProcessDiagnostics(in parse, stringNode);
+            if (_handler != null || TryCreateParser())
+                _handler!.ProcessDiagnostics(in parse, stringNode);
         }
 
         value = val;
@@ -79,13 +92,13 @@ public sealed class CommaDelimtedStringSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(CommaDelimtedStringSpecPropertyType other) => other != null && InnerType.Equals(other.InnerType);
+    public bool Equals(CommaDelimitedStringSpecPropertyType other) => other != null && InnerType.Equals(other.InnerType);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is CommaDelimtedStringSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType other) => other is CommaDelimitedStringSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<string> other) => other is CommaDelimtedStringSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType<string> other) => other is CommaDelimitedStringSpecPropertyType t && Equals(t);
 
     private abstract class ParseHandler
     {

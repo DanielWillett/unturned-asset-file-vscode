@@ -4,7 +4,9 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-internal sealed class UnresolvedSpecPropertyType : ISpecPropertyType, IEquatable<UnresolvedSpecPropertyType>
+internal sealed class UnresolvedSpecPropertyType :
+    IEquatable<UnresolvedSpecPropertyType>,
+    ISecondPassSpecPropertyType
 {
     public string Value { get; }
 
@@ -14,7 +16,7 @@ internal sealed class UnresolvedSpecPropertyType : ISpecPropertyType, IEquatable
     }
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is UnresolvedSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType? other) => other is UnresolvedSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
     public bool Equals(UnresolvedSpecPropertyType other) =>
@@ -30,7 +32,7 @@ internal sealed class UnresolvedSpecPropertyType : ISpecPropertyType, IEquatable
     public string DisplayName => "Unresolved Type";
 
     /// <inheritdoc />
-    public string Type => "";
+    public string Type => Value;
 
     /// <inheritdoc />
     public Type ValueType => throw new NotSupportedException();
@@ -46,12 +48,9 @@ internal sealed class UnresolvedSpecPropertyType : ISpecPropertyType, IEquatable
         throw new NotSupportedException();
     }
 
-    /// <inheritdoc />
-    public override string ToString() => DisplayName;
-
-    public ISpecPropertyType Resolve(SpecProperty property, AssetSpecDatabase database, AssetTypeInformation assetFile)
+    public ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile)
     {
-        if (property.Owner is ISpecPropertyType specPropertyType && Type.Equals(specPropertyType.Type, StringComparison.Ordinal))
+        if (property.Owner is ISpecPropertyType specPropertyType && Value.Equals(specPropertyType.Type, StringComparison.Ordinal))
         {
             return specPropertyType;
         }
@@ -59,12 +58,15 @@ internal sealed class UnresolvedSpecPropertyType : ISpecPropertyType, IEquatable
         if (TryResolveType(assetFile, database, out ISpecPropertyType propType))
             return propType;
 
-        throw new Exception($"Failed to resolve type: \"{Type}\".");
+        throw new SpecTypeResolveException($"Failed to resolve type: \"{Value}\".");
     }
 
-    private bool TryResolveType(ISpecType type, AssetSpecDatabase database, out ISpecPropertyType propType)
+    /// <inheritdoc />
+    public override string ToString() => DisplayName;
+
+    private bool TryResolveType(ISpecType type, IAssetSpecDatabase database, out ISpecPropertyType propType)
     {
-        if (type is AssetTypeInformation nestedAssetType)
+        if (type is AssetSpecType nestedAssetType)
         {
             foreach (ISpecType t in nestedAssetType.Types)
             {
@@ -72,7 +74,7 @@ internal sealed class UnresolvedSpecPropertyType : ISpecPropertyType, IEquatable
                     return true;
             }
 
-            if (!nestedAssetType.Parent.IsNull && database.Types.TryGetValue(nestedAssetType.Parent, out AssetTypeInformation info))
+            if (!nestedAssetType.Parent.IsNull && database.Types.TryGetValue(nestedAssetType.Parent, out AssetSpecType info))
             {
                 if (TryResolveType(info, database, out propType))
                     return true;
@@ -87,12 +89,4 @@ internal sealed class UnresolvedSpecPropertyType : ISpecPropertyType, IEquatable
         propType = null!;
         return false;
     }
-}
-
-public readonly struct SpecPropertyTypeResolveContext
-{
-    public SpecProperty Property { get; init; }
-    public ITypeInformation Type { get; init; }
-    public AssetTypeInformation File { get; init; }
-    public AssetSpecDatabase Database { get; init; }
 }

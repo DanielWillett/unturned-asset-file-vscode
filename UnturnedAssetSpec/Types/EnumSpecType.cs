@@ -1,6 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,32 +9,30 @@ using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-[DebuggerDisplay("{DisplayName,nq}")]
-public class EnumSpecType : ISpecType, ISpecPropertyType<int>, IEquatable<EnumSpecType>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
+[DebuggerDisplay("Enum: {Type.GetTypeName()}")]
+public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<EnumSpecType>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
     private AutoCompleteResult[]? _valueResults;
 
-    public Type ValueType => typeof(string);
-
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Enum;
-
     public required QualifiedType Type { get; init; }
-
     public required string DisplayName { get; init; }
-
     public required string? Docs { get; init; }
-
     public required EnumSpecTypeValue[] Values { get; init; }
+    public required OneOrMore<KeyValuePair<string, object?>> ExtendedData { get; init; }
+
+#nullable disable
+    public AssetSpecType Owner { get; set; }
+#nullable restore
 
     string ISpecPropertyType.Type => Type.Type;
+    public Type ValueType => typeof(string);
+    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Enum;
     QualifiedType ISpecType.Parent => QualifiedType.None;
 
-    public bool Equals(EnumSpecType other) => other != null && string.Equals(Type, other.Type, StringComparison.Ordinal);
-
-    public bool Equals(ISpecType other) => other is EnumSpecType s && Equals(s);
-
-    public bool Equals(ISpecPropertyType other) => other is EnumSpecType s && Equals(s);
-    public bool Equals(ISpecPropertyType<int> other) => other is EnumSpecType s && Equals(s);
+    public bool Equals(EnumSpecType? other) => other != null && string.Equals(Type, other.Type, StringComparison.Ordinal);
+    public bool Equals(ISpecType? other) => other is EnumSpecType s && Equals(s);
+    public bool Equals(ISpecPropertyType? other) => other is EnumSpecType s && Equals(s);
+    public bool Equals(ISpecPropertyType<string>? other) => other is EnumSpecType s && Equals(s);
 
     public override bool Equals(object? obj) => obj is EnumSpecType s && Equals(s);
 
@@ -51,6 +50,18 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<int>, IEquatable<EnumSp
         }
 
         value = SpecDynamicValue.Enum(this, index);
+        return true;
+    }
+
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out string value)
+    {
+        if (!TryParseValue(in parse, out int index))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = Values[index].Value;
         return true;
     }
 
@@ -185,7 +196,7 @@ public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, ICompa
     public string? Description { get; init; }
     public bool Deprecated { get; init; }
 
-    public IReadOnlyDictionary<string, string>? ExtendedData { get; init; }
+    public required OneOrMore<KeyValuePair<string, object?>> ExtendedData { get; init; }
     
     /// <inheritdoc />
     public bool Equals(EnumSpecTypeValue other) => Index == other.Index;

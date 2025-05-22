@@ -42,7 +42,7 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
 
     private enum NextValueType { None = -1, Metadata, Asset, Guid, Id, Type, AssetCategory }
 
-    public DiscoveredDatFile(string fileName, ReadOnlySpan<char> text, AssetSpecDatabase database, ICollection<DatDiagnosticMessage>? diagMessages, Action<string, string>? log)
+    public DiscoveredDatFile(string fileName, ReadOnlySpan<char> text, IAssetSpecDatabase database, ICollection<DatDiagnosticMessage>? diagMessages, Action<string, string>? log)
     {
         FilePath = fileName;
 

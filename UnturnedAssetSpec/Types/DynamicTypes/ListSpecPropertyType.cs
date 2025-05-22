@@ -1,16 +1,15 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
-using System;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public sealed class ListSpecPropertyType<TElementType> :
     BaseSpecPropertyType<EquatableArray<TElementType>>,
     ISpecPropertyType<EquatableArray<TElementType>>,
-    IEquatable<ListSpecPropertyType<TElementType>>,
-    INestedSpecPropertyType
+    IEquatable<ListSpecPropertyType<TElementType>>
     where TElementType : IEquatable<TElementType>
 {
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -44,11 +43,6 @@ public sealed class ListSpecPropertyType<TElementType> :
 
         value = new SpecDynamicConcreteValue<EquatableArray<TElementType>>(val, this);
         return true;
-    }
-
-    public void ResolveInnerTypes(SpecProperty property, AssetSpecDatabase database, AssetTypeInformation assetFile)
-    {
-        
     }
 
     /// <inheritdoc />
@@ -105,4 +99,40 @@ public sealed class ListSpecPropertyType<TElementType> :
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<EquatableArray<TElementType>> other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
+}
+
+internal sealed class UnresolvedListSpecPropertyType :
+    IEquatable<UnresolvedListSpecPropertyType>,
+    ISecondPassSpecPropertyType
+{
+    public ISecondPassSpecPropertyType InnerType { get; }
+
+    public string DisplayName => "List";
+    public string Type => "List";
+    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+    public Type ValueType => throw new NotSupportedException();
+
+    public UnresolvedListSpecPropertyType(ISecondPassSpecPropertyType innerType)
+    {
+        InnerType = innerType ?? throw new ArgumentNullException(nameof(innerType));
+    }
+
+    public bool Equals(UnresolvedListSpecPropertyType other) => other != null && InnerType.Equals(other.InnerType);
+    public bool Equals(ISpecPropertyType other) => other is UnresolvedListSpecPropertyType l && Equals(l);
+    public override bool Equals(object? obj) => obj is UnresolvedListSpecPropertyType l && Equals(l);
+    public override int GetHashCode() => InnerType.GetHashCode();
+    public override string ToString() => $"Unresolved List of {InnerType.Type}";
+
+    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => null;
+
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        value = null!;
+        return false;
+    }
+
+    public ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile)
+    {
+        return KnownTypes.List(InnerType.Transform(property, database, assetFile));
+    }
 }

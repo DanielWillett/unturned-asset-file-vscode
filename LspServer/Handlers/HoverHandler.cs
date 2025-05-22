@@ -14,7 +14,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 internal class HoverHandler : IHoverHandler
 {
     private readonly OpenedFileTracker _fileTracker;
-    private readonly AssetSpecDatabase _specDictionary;
+    private readonly IAssetSpecDatabase _specDictionary;
 
     /// <inheritdoc />
     HoverRegistrationOptions IRegistration<HoverRegistrationOptions, HoverCapability>.GetRegistrationOptions(
@@ -26,7 +26,7 @@ internal class HoverHandler : IHoverHandler
         };
     }
 
-    public HoverHandler(OpenedFileTracker fileTracker, AssetSpecDatabase specDictionary)
+    public HoverHandler(OpenedFileTracker fileTracker, IAssetSpecDatabase specDictionary)
     {
         _fileTracker = fileTracker;
         _specDictionary = specDictionary;

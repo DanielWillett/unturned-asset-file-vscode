@@ -9,7 +9,7 @@ public class LspInstallationEnvironment : InstallationEnvironment
 {
     private readonly ILogger<LspInstallationEnvironment> _logger;
 
-    public LspInstallationEnvironment(AssetSpecDatabase database, ILogger<LspInstallationEnvironment> logger) : base(database)
+    public LspInstallationEnvironment(IAssetSpecDatabase database, ILogger<LspInstallationEnvironment> logger) : base(database)
     {
         _logger = logger;
         if (database.UnturnedInstallDirectory.TryGetInstallDirectory(out GameInstallDir installDir))

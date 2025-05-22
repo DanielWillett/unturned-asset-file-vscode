@@ -66,7 +66,7 @@ public static class KnownTypes
         { "LocalizableString", () => LocalizableString }
     };
 
-    public static ISpecPropertyType? GetType(string knownType, SpecProperty property, string? elementType, OneOrMore<string> specialTypes)
+    public static ISpecPropertyType? GetType(string knownType)
     {
         if (string.IsNullOrEmpty(knownType))
             return null;
@@ -74,6 +74,27 @@ public static class KnownTypes
         if (ConcreteTypes.TryGetValue(knownType, out Func<ISpecPropertyType> func))
         {
             return func();
+        }
+
+        Type? type = System.Type.GetType(knownType, false, false);
+        if (type != null && typeof(ISpecPropertyType).IsAssignableFrom(type) && !typeof(ISecondPassSpecPropertyType).IsAssignableFrom(type))
+        {
+            return (ISpecPropertyType)Activator.CreateInstance(type);
+        }
+
+        return null;
+    }
+
+    public static ISpecPropertyType? GetType(string knownType, SpecProperty property, string? elementType, OneOrMore<string> specialTypes, bool resolvedOnly = false)
+    {
+        if (string.IsNullOrEmpty(knownType))
+            return null;
+
+        ISpecPropertyType? t = GetType(knownType);
+
+        if (t != null)
+        {
+            return t;
         }
 
         if (knownType.Equals("FilePathString", StringComparison.Ordinal))
@@ -84,9 +105,9 @@ public static class KnownTypes
         if (knownType.Equals("TypeOrEnum", StringComparison.Ordinal))
         {
             string? elementType2 = specialTypes.FirstOrDefault();
-            return string.IsNullOrEmpty(elementType) || string.IsNullOrEmpty(elementType2)
+            return string.IsNullOrEmpty(elementType)
                 ? Type
-                : TypeOrEnum(new QualifiedType(elementType!), new QualifiedType(elementType2!));
+                : TypeOrEnum(elementType2 == null ? default : new QualifiedType(elementType2), new QualifiedType(elementType!));
         }
 
         if (knownType.Equals("AssetReference", StringComparison.Ordinal))
@@ -148,10 +169,25 @@ public static class KnownTypes
             return Id(new QualifiedType(elementType!), specialTypes);
         }
 
-        if (knownType.Equals("CommaDelimtedString", StringComparison.Ordinal))
+        if (knownType.Equals("DefaultableId", StringComparison.Ordinal))
+        {
+            if (string.IsNullOrEmpty(elementType))
+            {
+                return DefaultableId(TypeHierarchy.AssetBaseType, specialTypes);
+            }
+
+            if (AssetCategory.TryParse(elementType, out EnumSpecTypeValue category))
+            {
+                return DefaultableId(category, specialTypes);
+            }
+
+            return DefaultableId(new QualifiedType(elementType!), specialTypes);
+        }
+
+        if (knownType.Equals("CommaDelimitedString", StringComparison.Ordinal))
         {
             string? elementType2 = specialTypes.FirstOrDefault();
-            return CommaDelimtedString(
+            return CommaDelimitedString(
                 string.IsNullOrEmpty(elementType)
                     ? String
                     : GetType(elementType!, property, elementType2, specialTypes.Remove(elementType2!)) ?? new UnresolvedSpecPropertyType(elementType!));
@@ -160,16 +196,24 @@ public static class KnownTypes
         if (knownType.Equals("List", StringComparison.Ordinal))
         {
             string? elementType2 = specialTypes.FirstOrDefault();
-            return List(
-                string.IsNullOrEmpty(elementType)
-                    ? String
-                    : GetType(elementType!, property, elementType2, specialTypes.Remove(elementType2!)) ?? new UnresolvedSpecPropertyType(elementType!));
+
+            ISpecPropertyType? resolvedElementType = string.IsNullOrEmpty(elementType)
+                ? String
+                : GetType(elementType!, property, elementType2, specialTypes.Remove(elementType2!), resolvedOnly);
+
+            if (resolvedOnly && resolvedElementType == null)
+            {
+                return null;
+            }
+
+            return List(resolvedElementType ?? new UnresolvedSpecPropertyType(elementType!));
         }
 
-        Type? type = System.Type.GetType(knownType, false, false);
-        if (type != null && typeof(ISpecPropertyType).IsAssignableFrom(type))
+        if (knownType.Equals("SkillLevel", StringComparison.Ordinal))
         {
-            return (ISpecPropertyType)Activator.CreateInstance(type);
+            return specialTypes.FirstOrDefault() is { } skillProperty
+                ? SkillLevel(skillProperty)
+                : UInt8;
         }
 
         return null;
@@ -241,6 +285,12 @@ public static class KnownTypes
     public static ISpecPropertyType<ushort> Id(EnumSpecTypeValue assetCategory, OneOrMore<string> specialTypes = default)
         => new IdSpecPropertyType(assetCategory, specialTypes);
 
+    public static ISpecPropertyType<int> DefaultableId(QualifiedType elementType, OneOrMore<string> specialTypes = default)
+        => new DefaultableIdSpecPropertyType(elementType, specialTypes);
+
+    public static ISpecPropertyType<int> DefaultableId(EnumSpecTypeValue assetCategory, OneOrMore<string> specialTypes = default)
+        => new DefaultableIdSpecPropertyType(assetCategory, specialTypes);
+
     public static ISpecPropertyType<byte> NavId => NavIdSpecPropertyType.Instance;
     public static ISpecPropertyType<string> SpawnpointId => SpawnpointIdSpecPropertyType.Instance;
 
@@ -265,8 +315,8 @@ public static class KnownTypes
     public static ISpecPropertyType<Vector3> EulerRotationOrLegacy => EulerRotationOrLegacySpecPropertyType.Instance;
     public static ISpecPropertyType<Vector3> LegacyEulerRotation => LegacyEulerRotationSpecPropertyType.Instance;
 
-    public static ISpecPropertyType<string> CommaDelimtedString(ISpecPropertyType innerType)
-        => new CommaDelimtedStringSpecPropertyType(innerType ?? throw new ArgumentNullException(nameof(innerType)));
+    public static ISpecPropertyType<string> CommaDelimitedString(ISpecPropertyType innerType)
+        => new CommaDelimitedStringSpecPropertyType(innerType ?? throw new ArgumentNullException(nameof(innerType)));
 
     public static ISpecPropertyType<EquatableArray<TValue>> List<TValue>(ISpecPropertyType<TValue> innerType) where TValue : IEquatable<TValue>
         => new ListSpecPropertyType<TValue>(innerType ?? throw new ArgumentNullException(nameof(innerType)));
@@ -275,6 +325,11 @@ public static class KnownTypes
     {
         if (innerType == null)
             throw new ArgumentNullException(nameof(innerType));
+
+        if (innerType is ISecondPassSpecPropertyType secondPassType)
+        {
+            return new UnresolvedListSpecPropertyType(secondPassType);
+        }
 
         Type type = typeof(ListSpecPropertyType<>).MakeGenericType(innerType.ValueType);
         return (ISpecPropertyType)Activator.CreateInstance(type, innerType);
@@ -286,4 +341,7 @@ public static class KnownTypes
     public static ISpecPropertyType<string> MapName => MapNameSpecPropertyType.Instance;
     public static ISpecPropertyType<string> ActionKey => ActionKeySpecPropertyType.Instance;
     public static ISpecPropertyType<string> LocalizableString => LocalizableStringSpecPropertyType.Instance;
+
+    public static ISpecPropertyType<byte> SkillLevel(string skillsetOrPropertyName)
+        => new SkillLevelSpecPropertyType(skillsetOrPropertyName);
 }

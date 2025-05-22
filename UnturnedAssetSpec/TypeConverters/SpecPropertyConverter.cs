@@ -1,28 +1,20 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 {
     private static readonly JsonEncodedText KeyProperty = JsonEncodedText.Encode("Key");
-
-    private static readonly JsonEncodedText HideInheritedProperty = JsonEncodedText.Encode("HideInherited");
-
     private static readonly JsonEncodedText SingleKeyOverrideProperty = JsonEncodedText.Encode("SingleKeyOverride");
-
     private static readonly JsonEncodedText KeyIsRegexProperty = JsonEncodedText.Encode("KeyIsRegex");
-
     private static readonly JsonEncodedText KeyGroupsProperty = JsonEncodedText.Encode("KeyGroups");
     private static readonly JsonEncodedText KeyGroupsRegexGroupProperty = JsonEncodedText.Encode("RegexGroup");
     private static readonly JsonEncodedText KeyGroupsNameProperty = JsonEncodedText.Encode("Name");
-
     private static readonly JsonEncodedText FileCrossRefProperty = JsonEncodedText.Encode("FileCrossRef");
     private static readonly JsonEncodedText CountForRegexGroupProperty = JsonEncodedText.Encode("CountForRegexGroup");
     private static readonly JsonEncodedText ValueRegexGroupReferenceProperty = JsonEncodedText.Encode("ValueRegexGroupReference");
@@ -47,6 +39,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     private static readonly JsonEncodedText ExclusiveWithProperty = JsonEncodedText.Encode("ExclusiveWith");
     private static readonly JsonEncodedText InclusiveWithProperty = JsonEncodedText.Encode("InclusiveWith");
     private static readonly JsonEncodedText DeprecatedProperty = JsonEncodedText.Encode("Deprecated");
+
+    private static readonly JsonEncodedText HideInheritedProperty = JsonEncodedText.Encode("HideInherited");
 
     private static readonly JsonEncodedText[] Properties =
     [
@@ -95,6 +89,10 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
     /// <inheritdoc />
     public override SpecProperty? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return ReadProperty(ref reader, options);
+    }
+    public static SpecProperty? ReadProperty(ref Utf8JsonReader reader, JsonSerializerOptions? options)
     {
         if (reader.TokenType == JsonTokenType.Null)
         {
@@ -234,11 +232,25 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                             break;
 
                         case JsonTokenType.String:
-                            property.RequiredCondition = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, expectedType: KnownTypes.Boolean);
+                            try
+                            {
+                                property.RequiredCondition = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, expectedType: KnownTypes.Boolean);
+                            }
+                            catch (Exception ex)
+                            {
+                                throw new JsonException($"Failed to read property \"{RequiredProperty.ToString()}\" while reading SpecProperty.", ex);
+                            }
                             break;
 
                         case JsonTokenType.StartObject:
-                            property.RequiredCondition = SpecDynamicValue.Read(ref reader, options, expectedType: KnownTypes.Boolean);
+                            try
+                            {
+                                property.RequiredCondition = SpecDynamicValue.Read(ref reader, options, expectedType: KnownTypes.Boolean);
+                            }
+                            catch (Exception ex)
+                            {
+                                throw new JsonException($"Failed to read property \"{RequiredProperty.ToString()}\" while reading SpecProperty.", ex);
+                            }
                             break;
 
                         default:
@@ -264,6 +276,12 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     reader.Skip();
                     break;
 
+                case 28: // HideInherited
+                    if (reader.TokenType is not JsonTokenType.True and not JsonTokenType.False)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+                    isHidingInherited = reader.TokenType == JsonTokenType.True;
+                    break;
+
                 default:
                     reader.Skip();
                     break;
@@ -273,24 +291,45 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
         if (typeStr == null)
         {
-            // todo hide child exception
+            if (isHidingInherited)
+            {
+                property.Type = HideInheritedPropertyType.Instance;
+                return property;
+            }
+
             throw new JsonException($"Missing {TypeProperty.ToString()} property while reading SpecProperty.");
         }
 
         ISpecPropertyType? propertyType = KnownTypes.GetType(typeStr, property, elementTypeStr, specialTypes);
         propertyType ??= new UnresolvedSpecPropertyType(typeStr);
 
+        property.Type = propertyType;
+
         if (defaultValueReader.TokenType != JsonTokenType.None && propertyType is not UnresolvedSpecPropertyType)
         {
-            property.DefaultValue = ReadDefaultValue(ref defaultValueReader, options, propertyType);
+            try
+            {
+                property.DefaultValue = ReadDefaultValue(ref defaultValueReader, options, propertyType);
+            }
+            catch (Exception ex)
+            {
+                throw new JsonException($"Failed to read property \"{DefaultValueProperty.ToString()}\" while reading SpecProperty.", ex);
+            }
         }
 
         if (includedDefaultValueReader.TokenType != JsonTokenType.None && propertyType is not UnresolvedSpecPropertyType)
         {
-            property.IncludedDefaultValue = ReadDefaultValue(ref defaultValueReader, options, propertyType);
+            try
+            {
+                property.IncludedDefaultValue = ReadDefaultValue(ref includedDefaultValueReader, options, propertyType);
+            }
+            catch (Exception ex)
+            {
+                throw new JsonException($"Failed to read property \"{IncludedDefaultValueProperty.ToString()}\" while reading SpecProperty.", ex);
+            }
         }
 
-        return null;
+        return property;
     }
 
     private static void ReadKeyGroups(ref Utf8JsonReader reader, SpecProperty property)
@@ -423,6 +462,34 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, SpecProperty? value, JsonSerializerOptions options)
     {
+        WriteProperty(writer, value, options);
+    }
 
+    public static void WriteProperty(Utf8JsonWriter writer, SpecProperty? property, JsonSerializerOptions options)
+    {
+        if (property == null)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+
+        if (property.IsHidden)
+        {
+            writer.WriteStartObject();
+
+            writer.WriteString(KeyProperty, property.Key);
+            writer.WriteBoolean(HideInheritedProperty, true);
+
+            writer.WriteEndObject();
+            return;
+        }
+
+        writer.WriteStartObject();
+
+        writer.WriteString(KeyProperty, property.Key);
+
+        // todo
+
+        writer.WriteEndObject();
     }
 }

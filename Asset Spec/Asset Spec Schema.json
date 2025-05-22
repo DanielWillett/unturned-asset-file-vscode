@@ -167,6 +167,10 @@
                     "title": "A short ID, where ElementType is the category."
                 },
                 {
+                    "const": "DefaultableId",
+                    "title": "A short ID, where ElementType is the category. A negative value is treated as a 'default' value (such as the default attachment for a gun)."
+                },
+                {
                     "const": "NavId",
                     "title": "An 8-bit unsigned integer referencing a navigation graph in a map."
                 },
@@ -227,7 +231,7 @@
                     "title": "A Vector3 euler rotation Key_X, Key_Y, Key_Z properties."
                 },
                 {
-                    "const": "CommaDelimtedString",
+                    "const": "CommaDelimitedString",
                     "title": "A comma-separated list of values in a string."
                 },
                 {
@@ -257,6 +261,10 @@
                 {
                     "const": "LocalizableString",
                     "title": "A string that can be in the asset or localization file."
+                },
+                {
+                    "const": "SkillLevel",
+                    "title": "The level of a skill, where the special type is the skill name, the property containing the skill name, or two properties separated by a colon containing the speciality and skill indices."
                 }
             ]
         },
@@ -333,9 +341,6 @@
                         "Required": {
                             "description": "If this property is required.",
                             "oneOf": [
-                                {
-                                    "type": [ "string", "boolean" ]
-                                },
                                 {
                                     "$ref": "#/$defs/condition"
                                 },
@@ -877,11 +882,15 @@
                         "type": [ "string", "null" ],
                         "format": "uri"
                     },
+                    "Parent": {
+                        "description": "Parent type of this type.",
+                        "type": "string"
+                    },
                     "Values": {
                         "description": "List of enum values.",
                         "type": "array",
                         "items": { 
-                            "type": "object",
+                            "type": [ "object", "string" ],
                             "properties": {
                                 "Value": {
                                     "type": "string",
@@ -890,6 +899,10 @@
                                 "Casing": {
                                     "type": "string",
                                     "description": "The proper-case version of 'Value'."
+                                },
+                                "CorrespondingType": {
+                                    "type": "string",
+                                    "description": "Matches this enum to a CLR type in a TypeOrEnum property."
                                 },
                                 "RequiredBaseType": {
                                     "type": "string",
@@ -902,6 +915,11 @@
                                 "Deprecated": {
                                     "type": "boolean",
                                     "description": "If this value shouldn't be used."
+                                },
+                                "Docs": {
+                                    "description": "Link to the Unturned modding docs when a page is available.",
+                                    "type": [ "string", "null" ],
+                                    "format": "uri"
                                 }
                             },
                             "required": [ "Value" ]

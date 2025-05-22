@@ -1,6 +1,8 @@
-using System;
-using System.Globalization;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -14,7 +16,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
         DisplayName = "Asset Category",
         Type = "SDG.Unturned.EAssetType, Assembly-CSharp",
         Docs = "https://docs.smartlydressedgames.com/en/stable/data/enum/eassettype.html",
-        Values = new EnumSpecTypeValue[11]
+        Values = new EnumSpecTypeValue[11],
+        ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
     };
 
     public static readonly EnumSpecTypeValue None;
@@ -38,7 +41,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Casing = "None",
             Description = "Doesn't fall into a legacy category. In this case short IDs are not used.",
             Index = 0,
-            Type = TypeOf
+            Type = TypeOf,
+            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[1] = Item = new EnumSpecTypeValue
         {
@@ -46,7 +50,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Casing = "Item",
             Description = "Any item.",
             Index = 1,
-            Type = TypeOf
+            Type = TypeOf,
+            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[2] = Effect = new EnumSpecTypeValue
         {
@@ -54,7 +59,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Casing = "Effect",
             Description = "Any world effect or UI.",
             Index = 2,
-            Type = TypeOf
+            Type = TypeOf,
+            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[3] = Object = new EnumSpecTypeValue
         {
@@ -62,7 +68,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Casing = "Object",
             Description = "Any level object or NPC.",
             Index = 3,
-            Type = TypeOf
+            Type = TypeOf,
+            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[4] = Resource = new EnumSpecTypeValue
         {
@@ -70,7 +77,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Casing = "Resource",
             Description = "A resource that can spawn on the map and be harvested.",
             Index = 4,
-            Type = TypeOf
+            Type = TypeOf,
+            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[5] = Vehicle = new EnumSpecTypeValue
         {
@@ -78,7 +86,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Casing = "Vehicle",
             Description = "Any vehicle.",
             Index = 5,
-            Type = TypeOf
+            Type = TypeOf,
+            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[6] = Animal = new EnumSpecTypeValue
         {
@@ -86,7 +95,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Casing = "Animal",
             Description = "Any animal.",
             Index = 6,
-            Type = TypeOf
+            Type = TypeOf,
+            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[7] = Mythic = new EnumSpecTypeValue
         {
@@ -94,7 +104,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Casing = "Mythic",
             Description = "A mythical cosmetic effect.",
             Index = 7,
-            Type = TypeOf
+            Type = TypeOf,
+            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[8] = Skin = new EnumSpecTypeValue
         {
@@ -102,7 +113,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Casing = "Skin",
             Description = "An item or vehicle skin.",
             Index = 8,
-            Type = TypeOf
+            Type = TypeOf,
+            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[9] = Spawn = new EnumSpecTypeValue
         {
@@ -110,7 +122,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Casing = "Spawn",
             Description = "An asset spawn for a map.",
             Index = 9,
-            Type = TypeOf
+            Type = TypeOf,
+            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[10] = NPC = new EnumSpecTypeValue
         {
@@ -118,7 +131,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Casing = "NPC",
             Description = "A dialogue, quest, or vendor configuration.",
             Index = 10,
-            Type = TypeOf
+            Type = TypeOf,
+            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
         };
     }
 
@@ -131,7 +145,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
     /// Gets the asset category from the given type, with special handling for redirector assets.
     /// </summary>
     /// <returns>The index of the type, or -1 if this type is a redirector asset.</returns>
-    public static int GetCategoryFromType(QualifiedType type, AssetSpecDatabase database)
+    public static int GetCategoryFromType(QualifiedType type, IAssetSpecDatabase database)
     {
         if (type.Equals("SDG.Unturned.RedirectorAsset, Assembly-CSharp"))
         {
@@ -243,6 +257,16 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
                 if (str.Equals("MYTHIC", StringComparison.OrdinalIgnoreCase))
                 {
                     category = Mythic;
+                    return true;
+                }
+
+                break;
+
+            case 'A':
+            case 'a':
+                if (str.Equals("ANIMAL", StringComparison.OrdinalIgnoreCase))
+                {
+                    category = Animal;
                     return true;
                 }
 

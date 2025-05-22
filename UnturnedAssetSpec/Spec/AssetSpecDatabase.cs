@@ -4,7 +4,9 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
@@ -15,7 +17,50 @@ using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
-public class AssetSpecDatabase : IDisposable
+public interface IAssetSpecDatabase
+{
+    /// <summary>
+    /// List of achievements available for NPCs to grant.
+    /// </summary>
+    string[]? NPCAchievementIds { get; }
+
+    /// <summary>
+    /// Live or installed version of the game.
+    /// </summary>
+    Version? CurrentGameVersion { get; }
+
+    /// <summary>
+    /// The Status.json file hosted by Unturned.
+    /// </summary>
+    JsonDocument? StatusInformation { get; }
+
+    /// <summary>
+    /// Where Unturned is currently installed, if it is.
+    /// </summary>
+    InstallDirUtility UnturnedInstallDirectory { get; }
+
+    /// <summary>
+    /// Information about the asset type hierarchy and other relevant information.
+    /// </summary>
+    AssetInformation Information { get; }
+
+    /// <summary>
+    /// List of valid translation keys for blueprint action buttons.
+    /// </summary>
+    IReadOnlyList<string> ValidActionButtons { get; }
+
+    /// <summary>
+    /// List of asset files by their type.
+    /// </summary>
+    IReadOnlyDictionary<QualifiedType, AssetSpecType> Types { get; }
+    
+    /// <summary>
+    /// Initialize the database.
+    /// </summary>
+    Task InitializeAsync(CancellationToken token = default);
+}
+
+public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 {
     public const string AssetFileUrl = "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/{0}.json";
     private const string EmbeddedResourceLocation = "DanielWillett.UnturnedDataFileLspServer.Data..Asset_Spec.{0}.json";
@@ -41,10 +86,13 @@ public class AssetSpecDatabase : IDisposable
     /// </summary>
     public bool UseInternet { get; set; }
 
+    // for debugging
+    public bool MultiThreaded { get; set; } = true;
+
     public JsonSerializerOptions? Options { get; set; }
     public IReadOnlyList<string> ValidActionButtons { get; set; }
 
-    public IReadOnlyDictionary<QualifiedType, AssetTypeInformation> Types { get; private set; } = new Dictionary<QualifiedType, AssetTypeInformation>(0);
+    public IReadOnlyDictionary<QualifiedType, AssetSpecType> Types { get; private set; } = new Dictionary<QualifiedType, AssetSpecType>(0);
 
     public AssetInformation Information { get; private set; } = new AssetInformation
     {
@@ -70,116 +118,6 @@ public class AssetSpecDatabase : IDisposable
         }
     }
 
-    public ISpecType? FindType(string type, AssetFileType fileType)
-    {
-        type = QualifiedType.NormalizeType(type);
-        if (AssetCategory.TypeOf.Type.Equals(type))
-        {
-            return AssetCategory.TypeOf;
-        }
-
-        string? assetType = null;
-        int divIndex = type.IndexOf("::", 0, StringComparison.Ordinal);
-        if (divIndex >= 0 && divIndex < type.Length - 2)
-        {
-            if (divIndex != 0)
-                assetType = type.Substring(0, divIndex);
-            type = type.Substring(divIndex + 2);
-        }
-
-        InverseTypeHierarchy hierarchy = Information.GetParentTypes(assetType != null ? new QualifiedType(assetType) : fileType.Type);
-
-        for (int i = -1; i < hierarchy.ParentTypes.Length; ++i)
-        {
-            QualifiedType qt = i < 0 ? hierarchy.Type : hierarchy.ParentTypes[hierarchy.ParentTypes.Length - i - 1];
-
-            if (!Types.TryGetValue(qt, out AssetTypeInformation info))
-            {
-                continue;
-            }
-
-            ISpecType? t = info.Types.Find(p => p.Type.Equals(type));
-
-            if (t != null)
-            {
-                return t;
-            }
-        }
-
-        return null;
-    }
-
-    public SpecProperty? FindPropertyInfo(string property, AssetFileType fileType, SpecPropertyContext context = SpecPropertyContext.Property)
-    {
-        if (context is not SpecPropertyContext.Localization and not SpecPropertyContext.Property)
-            throw new ArgumentOutOfRangeException(nameof(context));
-
-        if (!fileType.IsValid)
-        {
-            return null;
-        }
-
-        string? assetType = null;
-        bool isLocal = false, isProp = false;
-        while (true)
-        {
-            int divIndex = property.IndexOf("::", 0, StringComparison.Ordinal);
-            if (divIndex < 0 || divIndex >= property.Length - 2)
-                break;
-
-            if (divIndex != 0)
-            {
-                assetType = property.Substring(0, divIndex);
-                if (assetType.Equals("$local$", StringComparison.OrdinalIgnoreCase))
-                {
-                    assetType = null;
-                    isLocal = true;
-                    isProp = false;
-                }
-                else if (assetType.Equals("$prop$", StringComparison.OrdinalIgnoreCase))
-                {
-                    assetType = null;
-                    isProp = true;
-                    isLocal = false;
-                }
-            }
-            property = property.Substring(divIndex + 2);
-        }
-
-        InverseTypeHierarchy hierarchy = Information.GetParentTypes(assetType != null ? new QualifiedType(assetType) : fileType.Type);
-
-        for (int i = -1; i < hierarchy.ParentTypes.Length; ++i)
-        {
-            QualifiedType type = i < 0 ? hierarchy.Type : hierarchy.ParentTypes[hierarchy.ParentTypes.Length - i - 1];
-
-            if (!Types.TryGetValue(type, out AssetTypeInformation info))
-            {
-                continue;
-            }
-
-            List<SpecProperty> props = isLocal || context == SpecPropertyContext.Localization && !isProp ? info.LocalizationProperties : info.Properties;
-            SpecProperty? prop = props.Find(p => p.Key.Equals(property, StringComparison.OrdinalIgnoreCase));
-            prop ??= props.Find(p => p.Aliases.Contains(property, StringComparison.OrdinalIgnoreCase));
-
-            if (prop != null)
-            {
-                return prop;
-            }
-        }
-
-        if (!isLocal && context == SpecPropertyContext.Property)
-        {
-            return FindPropertyInfo("$prop$::" + property, fileType, SpecPropertyContext.Localization);
-        }
-
-        if (!isProp && context == SpecPropertyContext.Localization)
-        {
-            return FindPropertyInfo("$local$::" + property, fileType, SpecPropertyContext.Property);
-        }
-
-        return null;
-    }
-
     public async Task InitializeAsync(CancellationToken token = default)
     {
         Options ??= new JsonSerializerOptions
@@ -191,7 +129,7 @@ public class AssetSpecDatabase : IDisposable
             AllowTrailingCommas = true
         };
 
-        Options.Converters.Add(new SpecPropertyTypeConverter(this));
+        Options.Converters.Add(new SpecPropertyTypeConverter());
 
         Lazy<HttpClient> lazy = new Lazy<HttpClient>(LazyThreadSafetyMode.ExecutionAndPublication);
 
@@ -246,6 +184,7 @@ public class AssetSpecDatabase : IDisposable
             foreach (KeyValuePair<string, QualifiedType> kvp in aliases)
                 assetInfo.AssetAliases.Add(kvp.Key, kvp.Value);
         }
+
         assetInfo.AssetCategories ??= new Dictionary<QualifiedType, string>(0);
         assetInfo.Types ??= new Dictionary<QualifiedType, TypeHierarchy>(0);
 
@@ -259,19 +198,19 @@ public class AssetSpecDatabase : IDisposable
         assetInfo.ParentTypes ??= new Dictionary<QualifiedType, InverseTypeHierarchy>(0);
 
 
-        Information = assetInfo;
-
         Task statusTask = DownloadStatusAsync(token);
         Task downloadActionButtons = DownloadPlayerDashboardInventoryLocalizationAsync(token);
+        await DownloadSkillLocalization(assetInfo, token);
 
-        Dictionary<QualifiedType, AssetTypeInformation> types = new Dictionary<QualifiedType, AssetTypeInformation>(assetInfo.ParentTypes.Count);
+        Information = assetInfo;
+        Dictionary<QualifiedType, AssetSpecType> types = new Dictionary<QualifiedType, AssetSpecType>(assetInfo.ParentTypes.Count);
 
         if (assetInfo.ParentTypes.Count == 0)
         {
             return;
         }
 
-        const int perThreadCount = 5;
+        int perThreadCount = MultiThreaded ? 5 : assetInfo.ParentTypes.Count;
 
         Task[] tasks = new Task[(assetInfo.ParentTypes.Count - 1) / perThreadCount + 1];
         List<InverseTypeHierarchy> toProcess = new List<InverseTypeHierarchy>(perThreadCount);
@@ -304,15 +243,21 @@ public class AssetSpecDatabase : IDisposable
             lazy.Value.Dispose();
         }
 
+        Dictionary<QualifiedType, int> passes = new Dictionary<QualifiedType, int>(types.Count * 4);
+
+        AssetSpecDatabaseWrapper wrapper = new AssetSpecDatabaseWrapper(this, types);
+
+        PerformSecondPass(types, passes, wrapper);
+        PerformThirdPass(types, passes);
+
         Types = types;
         return;
-
 
         void Deprocess(Task[] tasks,
             ref int taskIndex,
             List<InverseTypeHierarchy> toProcess,
             Lazy<HttpClient> lazy,
-            Dictionary<QualifiedType, AssetTypeInformation> types,
+            Dictionary<QualifiedType, AssetSpecType> types,
             CancellationToken token)
         {
             InverseTypeHierarchy[] processList = toProcess.ToArray();
@@ -321,7 +266,7 @@ public class AssetSpecDatabase : IDisposable
                 foreach (InverseTypeHierarchy type in processList)
                 {
                     string normalizedTypeName = type.Type.Normalized.Type.ToLowerInvariant();
-                    AssetTypeInformation? typeInfo;
+                    AssetSpecType? typeInfo;
 
                     using (Stream? stream = await GetFileAsync(
                                string.Format(AssetFileUrl, Uri.EscapeDataString(normalizedTypeName)),
@@ -333,7 +278,7 @@ public class AssetSpecDatabase : IDisposable
                         {
                             try
                             {
-                                typeInfo = await JsonSerializer.DeserializeAsync<AssetTypeInformation>(stream, Options, token).ConfigureAwait(false);
+                                typeInfo = await JsonSerializer.DeserializeAsync<AssetSpecType>(stream, Options, token).ConfigureAwait(false);
                             }
                             catch (Exception ex)
                             {
@@ -358,7 +303,7 @@ public class AssetSpecDatabase : IDisposable
                         {
                             try
                             {
-                                typeInfo = await JsonSerializer.DeserializeAsync<AssetTypeInformation>(stream, Options, token).ConfigureAwait(false);
+                                typeInfo = await JsonSerializer.DeserializeAsync<AssetSpecType>(stream, Options, token).ConfigureAwait(false);
                             }
                             catch (Exception ex)
                             {
@@ -371,14 +316,322 @@ public class AssetSpecDatabase : IDisposable
                         }
                     }
 
-                    typeInfo ??= new AssetTypeInformation();
-                    lock (types)
+                    typeInfo ??= new AssetSpecType();
+
+                    if (typeInfo.Type.IsNull)
                     {
-                        types[typeInfo.Type] = typeInfo;
+                        Log($"Missing type in {normalizedTypeName}.json file.");
+                    }
+                    else
+                    {
+                        lock (types)
+                        {
+                            types[typeInfo.Type] = typeInfo;
+                        }
                     }
                 }
             }, token);
             ++taskIndex;
+        }
+    }
+
+    public void ForEachTypeInHierarchyWhile(ISpecType type, Func<ISpecType, bool> each)
+    {
+        ForEachTypeInHierarchyWhile(type, Types, each, false);
+    }
+
+    private static void ForEachTypeInHierarchyWhile(ISpecType type, IReadOnlyDictionary<QualifiedType, AssetSpecType> types, Func<ISpecType, bool> each, bool reversed = false, bool skipSelf = false)
+    {
+        if (skipSelf && type.Parent.IsNull)
+            return;
+
+        if (type is AssetSpecType specType)
+        {
+            if (reversed && !specType.Parent.IsNull)
+            {
+                Stack<AssetSpecType> stack = new Stack<AssetSpecType>(4);
+                for (AssetSpecType? assetType = specType; assetType != null; types.TryGetValue(assetType.Parent, out assetType))
+                {
+                    if (skipSelf && ReferenceEquals(assetType, specType))
+                        continue;
+                    stack.Push(assetType);
+                }
+                while (stack.Count > 0)
+                {
+                    if (!each(stack.Pop()))
+                        return;
+                }
+            }
+            else
+            {
+                for (AssetSpecType? assetType = specType; assetType != null; types.TryGetValue(assetType.Parent, out assetType))
+                {
+                    if (skipSelf && ReferenceEquals(assetType, specType))
+                        continue;
+                    if (!each(assetType))
+                        return;
+                }
+            }
+        }
+        else if (!reversed || type.Parent.IsNull)
+        {
+            if (!skipSelf && !each(type) || type.Parent.IsNull)
+                return;
+
+            ISpecType? parentType = type;
+            while (!parentType.Parent.IsNull)
+            {
+                QualifiedType parent = parentType.Parent;
+                for (AssetSpecType? assetType = type.Owner; assetType != null; types.TryGetValue(assetType.Parent, out assetType))
+                {
+                    parentType = Array.Find(assetType.Types, t => t.Type.Equals(parent));
+                    if (parentType != null)
+                        break;
+                }
+
+                if (parentType == null || !each(parentType))
+                    return;
+            }
+        }
+        else
+        {
+            Stack<ISpecType> stack = new Stack<ISpecType>(2);
+            if (!skipSelf)
+                stack.Push(type);
+            ISpecType? parentType = type;
+            while (!parentType.Parent.IsNull)
+            {
+                QualifiedType parent = parentType.Parent;
+                for (AssetSpecType? assetType = type.Owner; assetType != null; types.TryGetValue(assetType.Parent, out assetType))
+                {
+                    parentType = Array.Find(assetType.Types, t => t.Type.Equals(parent));
+                    if (parentType != null)
+                        break;
+                }
+
+                if (parentType == null)
+                    return;
+
+                stack.Push(parentType);
+            }
+            while (stack.Count > 0)
+            {
+                if (!each(stack.Pop()))
+                    return;
+            }
+        }
+    }
+
+    private static void ForEachPropertyWhile(ISpecType type, Func<SpecProperty, bool> each)
+    {
+        switch (type)
+        {
+            case AssetSpecType s:
+                foreach (SpecProperty property in s.Properties)
+                {
+                    if (!each(property))
+                        return;
+                }
+                foreach (SpecProperty property in s.LocalizationProperties)
+                {
+                    if (!each(property))
+                        return;
+                }
+                break;
+
+            case CustomSpecType c:
+                foreach (SpecProperty property in c.Properties)
+                {
+                    if (!each(property))
+                        return;
+                }
+                foreach (SpecProperty property in c.LocalizationProperties)
+                {
+                    if (!each(property))
+                        return;
+                }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Replaces properties with unresolved types with the correct types.
+    /// </summary>
+    private void PerformSecondPass(Dictionary<QualifiedType, AssetSpecType> types, Dictionary<QualifiedType, int> passes, AssetSpecDatabaseWrapper wrapper)
+    {
+        const int pass = 2;
+        foreach (AssetSpecType info in types.Values)
+        {
+            ForEachTypeInHierarchyWhile(info, types, t =>
+            {
+                Run(t, passes, wrapper);
+                return true;
+            }, reversed: true);
+            foreach (CustomSpecType type in info.Types.OfType<CustomSpecType>())
+            {
+                ForEachTypeInHierarchyWhile(type, types, t =>
+                {
+                    Run(t, passes, wrapper);
+                    return true;
+                }, reversed: true);
+            }
+        }
+
+        return;
+        void Run(ISpecType info, Dictionary<QualifiedType, int> passes, AssetSpecDatabaseWrapper wrapper)
+        {
+            if (passes.TryGetValue(info.Type, out int v) && v >= pass)
+                return;
+
+            passes[info.Type] = pass;
+
+            ForEachPropertyWhile(info, prop =>
+            {
+                if (prop.Type is not ISecondPassSpecPropertyType s)
+                    return true;
+
+                try
+                {
+                    prop.Type = s.Transform(prop, wrapper, info.Owner);
+                }
+                catch (Exception ex)
+                {
+                    Log($"Failed to perform second pass on property \"{prop.Key}\" in type \"{prop.Owner.Type}\"");
+                    Log(ex.ToString());
+                }
+
+                return true;
+            });
+        }
+    }
+
+    /// <summary>
+    /// Copies properties from parent types up to the current object.
+    /// </summary>
+    private void PerformThirdPass(Dictionary<QualifiedType, AssetSpecType> types, Dictionary<QualifiedType, int> passes)
+    {
+        const int pass = 3;
+        foreach (AssetSpecType info in types.Values)
+        {
+            ForEachTypeInHierarchyWhile(info, types, t =>
+            {
+                Run(t, types, passes);
+                return true;
+            }, reversed: true);
+            foreach (CustomSpecType type in info.Types.OfType<CustomSpecType>())
+            {
+                ForEachTypeInHierarchyWhile(type, types, t =>
+                {
+                    Run(t, types, passes);
+                    return true;
+                }, reversed: true);
+            }
+        }
+
+        return;
+        void Run(ISpecType info, Dictionary<QualifiedType, AssetSpecType> types, Dictionary< QualifiedType, int> passes)
+        {
+            if (passes.TryGetValue(info.Type, out int v) && v >= pass)
+                return;
+
+            passes[info.Type] = pass;
+
+            ForEachTypeInHierarchyWhile(info, types, t =>
+            {
+                SpecProperty[]
+                    props0 = info.GetProperties(SpecPropertyContext.Property),
+                    local0 = info.GetProperties(SpecPropertyContext.Localization),
+                    asset0 = info.GetProperties(SpecPropertyContext.BundleAsset),
+                    props1 = t.GetProperties(SpecPropertyContext.Property),
+                    local1 = t.GetProperties(SpecPropertyContext.Localization),
+                    asset1 = t.GetProperties(SpecPropertyContext.BundleAsset);
+
+                info.SetProperties(Merge(info, props0, props1), SpecPropertyContext.Property);
+                info.SetProperties(Merge(info, local0, local1), SpecPropertyContext.Localization);
+                info.SetProperties(Merge(info, asset0, asset1), SpecPropertyContext.BundleAsset);
+                return false;
+
+                SpecProperty[] Merge(ISpecType owner, SpecProperty[] p0, SpecProperty[] p1)
+                {
+                    if (p1.Length == 0)
+                        return p0;
+
+                    if (p1 is SpecBundleAsset[] bundles)
+                    {
+                        List<SpecBundleAsset> newProperties = new List<SpecBundleAsset>(p0.Length + p1.Length);
+                        newProperties.AddRange((SpecBundleAsset[])p0);
+
+                        foreach (SpecBundleAsset prop in bundles)
+                        {
+                            int existingIndex = newProperties.FindIndex(x => ReferenceEquals(x.Owner, owner) && string.Equals(x.Key, prop.Key, StringComparison.Ordinal));
+                            if (existingIndex != -1 && !ReferenceEquals(newProperties[existingIndex].Type, HideInheritedPropertyType.Instance))
+                            {
+                                Log($"Parent bundle asset {prop.Owner.Type.GetTypeName()}.{prop.Key} hidden by a duplicate bundle asset present in {owner.Type.GetTypeName()}.");
+                                continue;
+                            }
+
+                            SpecBundleAsset clone = (SpecBundleAsset)prop.Clone();
+                            clone.Owner = owner;
+                            clone.Parent = prop;
+                            if (existingIndex == -1)
+                            {
+                                newProperties.Add(clone);
+                            }
+                            else
+                            {
+                                clone.IsHidden = true;
+                                newProperties[existingIndex] = clone;
+                            }
+                        }
+
+                        // ReSharper disable once CoVariantArrayConversion
+                        return newProperties.ToArray();
+                    }
+                    else
+                    {
+                        List<SpecProperty> newProperties = new List<SpecProperty>(p0.Length + p1.Length);
+                        newProperties.AddRange(p0);
+
+                        foreach (SpecProperty prop in p1)
+                        {
+                            int existingIndex = newProperties.FindIndex(x => ReferenceEquals(x.Owner, owner) && string.Equals(x.Key, prop.Key, StringComparison.Ordinal));
+                            if (existingIndex != -1 && !ReferenceEquals(newProperties[existingIndex].Type, HideInheritedPropertyType.Instance))
+                            {
+                                Log($"Parent property {prop.Owner.Type.GetTypeName()}.{prop.Key} hidden by a duplicate property present in {owner.Type.GetTypeName()}.");
+                                continue;
+                            }
+
+                            SpecProperty clone = (SpecProperty)prop.Clone();
+                            clone.Owner = owner;
+                            clone.Parent = prop;
+                            if (existingIndex == -1)
+                            {
+                                newProperties.Add(clone);
+                            }
+                            else
+                            {
+                                clone.IsHidden = true;
+                                newProperties[existingIndex] = clone;
+                            }
+                        }
+
+                        return newProperties.ToArray();
+                    }
+                }
+            }, skipSelf: true);
+
+            ForEachPropertyWhile(info, prop =>
+            {
+                if (!ReferenceEquals(prop.Type, HideInheritedPropertyType.Instance))
+                    return true;
+
+                Log(prop.Owner.Parent.IsNull
+                    ? $"Property {prop.Owner.Type}.{prop.Key} hides a property but doesn't define a parent."
+                    : $"There is not a property in a parent type that can be hidden by {prop.Owner.Type}.{prop.Key}."
+                );
+
+                return true;
+            });
         }
     }
 
@@ -628,6 +881,262 @@ public class AssetSpecDatabase : IDisposable
         }
     }
 
+    private async Task DownloadSkillLocalization(AssetInformation assetInfo, CancellationToken token = default)
+    {
+        HttpClient? client = null;
+        try
+        {
+            bool success = false;
+            if (assetInfo.Skillsets != null)
+            {
+                if (UnturnedInstallDirectory.TryGetInstallDirectory(out GameInstallDir installDir))
+                {
+                    string localPath = installDir.GetFile(@"Localization\English\Menu\Survivors\MenuSurvivorsCharacter.dat");
+                    if (File.Exists(localPath))
+                    {
+                        try
+                        {
+                            using FileStream fs = new FileStream(localPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan);
+                            await ReadSkillsetsFileAsync(fs, assetInfo).ConfigureAwait(false);
+                            success = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log("Error reading MenuSurvivorsCharacter.dat file from local install.");
+                            Log(ex.ToString());
+                        }
+                    }
+                }
+
+                if (!success)
+                {
+                    if (!UseInternet || string.IsNullOrEmpty(Information.SkillsetsLocalizationFallbackUrl))
+                    {
+                        Log("Unable to read MenuSurvivorsCharacter.dat from local install, internet disabled.");
+                        return;
+                    }
+
+                    try
+                    {
+                        client = new HttpClient();
+                        using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, Information.SkillsetsLocalizationFallbackUrl);
+                        using HttpResponseMessage response = await client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, token);
+
+                        response.EnsureSuccessStatusCode();
+
+                        using Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                        await ReadSkillsetsFileAsync(stream, assetInfo).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("Unable to read MenuSurvivorsCharacter.dat from internet.");
+                        Log(ex.ToString());
+                    }
+                }
+            }
+
+            success = false;
+            if (assetInfo.Specialities != null)
+            {
+                if (UnturnedInstallDirectory.TryGetInstallDirectory(out GameInstallDir installDir))
+                {
+                    string localPath = installDir.GetFile(@"Localization\English\Player\PlayerDashboardSkills.dat");
+                    if (File.Exists(localPath))
+                    {
+                        try
+                        {
+                            using FileStream fs = new FileStream(localPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan);
+                            await ReadSkillsFileAsync(fs, assetInfo).ConfigureAwait(false);
+                            success = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log("Error reading PlayerDashboardSkills.dat file from local install.");
+                            Log(ex.ToString());
+                        }
+                    }
+                }
+
+                if (!success)
+                {
+                    if (!UseInternet || string.IsNullOrEmpty(Information.SkillsLocalizationFallbackUrl))
+                    {
+                        Log("Unable to read PlayerDashboardSkills.dat from local install, internet disabled.");
+                        return;
+                    }
+
+                    try
+                    {
+                        client ??= new HttpClient();
+                        using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, Information.SkillsLocalizationFallbackUrl);
+                        using HttpResponseMessage response = await client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, token);
+
+                        response.EnsureSuccessStatusCode();
+
+                        using Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                        await ReadSkillsFileAsync(stream, assetInfo).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("Unable to read PlayerDashboardSkills.dat from internet.");
+                        Log(ex.ToString());
+                    }
+                }
+            }
+        }
+        finally
+        {
+            client?.Dispose();
+        }
+
+        return;
+
+        static async Task ReadSkillsetsFileAsync(Stream stream, AssetInformation assetInfo)
+        {
+            using StreamReader reader = new StreamReader(stream, Encoding.UTF8, true, 1024, leaveOpen: true);
+            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
+            {
+                if (line.Length == 0 || line[0] == '#' || line[0] == '/')
+                    continue;
+                int space = line.IndexOf(' ');
+                if (space <= 0 || space >= line.Length - 1)
+                    continue;
+
+                ReadOnlySpan<char> key = line.AsSpan(0, space);
+                if (key.StartsWith("Skillset_".AsSpan(), StringComparison.Ordinal)
+                    && key.Length > 9
+                    && int.TryParse(key.Slice(9).ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out int skillsetIndex))
+                {
+                    SkillsetInfo? info = Array.Find(assetInfo.Skillsets!, x => x != null && x.Index == skillsetIndex);
+                    string dn = line.AsSpan(space + 1).Trim().ToString();
+                    if (info != null && !string.IsNullOrEmpty(dn))
+                        info.DisplayName = dn;
+                }
+            }
+        }
+        static async Task ReadSkillsFileAsync(Stream stream, AssetInformation assetInfo)
+        {
+            using StreamReader reader = new StreamReader(stream, Encoding.UTF8, true, 1024, leaveOpen: true);
+            List<string?> levels = new List<string?>(7);
+            int lastSpec = -1, lastSkill = -1;
+            while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
+            {
+                if (line.Length == 0 || line[0] == '#' || line[0] == '/')
+                    continue;
+                int space = line.IndexOf(' ');
+                if (space <= 0 || space >= line.Length - 1)
+                    continue;
+
+                ReadOnlySpan<char> key = line.AsSpan(0, space);
+                if (!key.StartsWith("Speciality_".AsSpan(), StringComparison.Ordinal) || key.Length <= 11)
+                    continue;
+
+                int digitEnd = 11;
+                while (digitEnd < key.Length && char.IsDigit(key[digitEnd]))
+                    ++digitEnd;
+
+                if (digitEnd == 11 || !int.TryParse(key.Slice(11, digitEnd - 11).ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out int specialityIndex))
+                    continue;
+
+                SpecialityInfo? speciality = Array.Find(assetInfo.Specialities!, x => x != null && x.Index == specialityIndex);
+                if (speciality == null)
+                    continue;
+
+                string value = line.AsSpan(space + 1).Trim().ToString();
+                if (string.IsNullOrEmpty(value))
+                    continue;
+
+                ReadOnlySpan<char> extra = key.Slice(digitEnd);
+
+                if (extra.Equals("_Tooltip".AsSpan(), StringComparison.Ordinal))
+                {
+                    speciality.DisplayName = value;
+                }
+                else if (!extra.StartsWith("_Skill_".AsSpan(), StringComparison.Ordinal) && extra.Length > 7 || speciality.Skills == null)
+                    continue;
+                
+                digitEnd = 7;
+                while (digitEnd < extra.Length && char.IsDigit(extra[digitEnd]))
+                    ++digitEnd;
+
+                if (digitEnd == 7 || !int.TryParse(extra.Slice(7, digitEnd - 7).ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out int skillIndex))
+                    continue;
+
+                SkillInfo? skill = Array.Find(speciality.Skills, x => x != null && x.Index == skillIndex);
+                if (skill == null)
+                    continue;
+
+                extra = extra.Slice(digitEnd);
+                if (extra.IsEmpty)
+                {
+                    skill.DisplayName = value;
+                }
+                else if (extra.Equals("_Tooltip".AsSpan(), StringComparison.Ordinal))
+                {
+                    skill.Description = value;
+                }
+                else if (extra.Equals("_Levels_V2".AsSpan(), StringComparison.Ordinal))
+                {
+                    CheckLevels();
+                    skill.Levels = [ value ];
+                }
+                else if (!extra.StartsWith("_Level_".AsSpan(), StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                digitEnd = 7;
+                while (digitEnd < extra.Length && char.IsDigit(extra[digitEnd]))
+                    ++digitEnd;
+
+                if (digitEnd == 7 || !int.TryParse(extra.Slice(7, digitEnd - 7).ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out int levelIndex) || levelIndex < 1)
+                    continue;
+                --levelIndex;
+
+                if (lastSkill != -1 && lastSkill != skillIndex || lastSpec != -1 && lastSpec != specialityIndex)
+                {
+                    CheckLevels();
+                }
+
+                lastSkill = skillIndex;
+                lastSpec = specialityIndex;
+                if (levels.Count <= levelIndex)
+                {
+                    for (int i = levels.Count; i < levelIndex; ++i)
+                        levels.Add(null);
+                    levels.Add(value);
+                }
+                else
+                {
+                    levels[levelIndex] = value;
+                }
+            }
+
+            CheckLevels();
+            return;
+
+            void CheckLevels()
+            {
+                if (lastSkill != -1 && lastSpec != -1 && levels.Count > 0)
+                {
+                    SpecialityInfo? speciality = Array.Find(assetInfo.Specialities!, x => x != null && x.Index == lastSpec);
+                    SkillInfo? skill = speciality?.Skills == null ? null : Array.Find(speciality.Skills, x => x != null && x.Index == lastSkill);
+                    if (skill != null)
+                    {
+                        while (levels.Count > 0 && levels[levels.Count - 1] == null)
+                            levels.RemoveAt(levels.Count - 1);
+                        skill.Levels = levels.ToArray();
+                        skill.MaximumLevel = skill.Levels.Length;
+                    }
+                }
+
+                levels.Clear();
+                lastSkill = -1;
+                lastSpec = -1;
+            }
+        }
+    }
+
     protected virtual void Log(string msg)
     {
         Console.Write("AssetSpecDatabase >> ");
@@ -644,5 +1153,138 @@ public class AssetSpecDatabase : IDisposable
     ~AssetSpecDatabase()
     {
         Dispose(false);
+    }
+
+    private class AssetSpecDatabaseWrapper : IAssetSpecDatabase
+    {
+        private readonly AssetSpecDatabase _db;
+
+        public AssetSpecDatabaseWrapper(AssetSpecDatabase db, IReadOnlyDictionary<QualifiedType, AssetSpecType> types)
+        {
+            _db = db;
+            Types = types;
+        }
+
+        public string[]? NPCAchievementIds => _db.NPCAchievementIds;
+        public Version? CurrentGameVersion => _db.CurrentGameVersion;
+        public JsonDocument? StatusInformation => _db.StatusInformation;
+        public InstallDirUtility UnturnedInstallDirectory => _db.UnturnedInstallDirectory;
+        public AssetInformation Information => _db.Information;
+        public IReadOnlyList<string> ValidActionButtons => _db.ValidActionButtons;
+        public IReadOnlyDictionary<QualifiedType, AssetSpecType> Types { get; }
+        public Task InitializeAsync(CancellationToken token = default) => _db.InitializeAsync(token);
+    }
+}
+
+public static class AssetSpecDatabaseExtensions
+{
+    public static ISpecType? FindType(this IAssetSpecDatabase db, string type, AssetFileType fileType)
+    {
+        type = QualifiedType.NormalizeType(type);
+        if (AssetCategory.TypeOf.Type.Equals(type))
+        {
+            return AssetCategory.TypeOf;
+        }
+
+        string? assetType = null;
+        int divIndex = type.IndexOf("::", 0, StringComparison.Ordinal);
+        if (divIndex >= 0 && divIndex < type.Length - 2)
+        {
+            if (divIndex != 0)
+                assetType = type.Substring(0, divIndex);
+            type = type.Substring(divIndex + 2);
+        }
+
+        InverseTypeHierarchy hierarchy = db.Information.GetParentTypes(assetType != null ? new QualifiedType(assetType) : fileType.Type);
+
+        for (int i = -1; i < hierarchy.ParentTypes.Length; ++i)
+        {
+            QualifiedType qt = i < 0 ? hierarchy.Type : hierarchy.ParentTypes[hierarchy.ParentTypes.Length - i - 1];
+
+            if (!db.Types.TryGetValue(qt, out AssetSpecType info))
+            {
+                continue;
+            }
+
+            ISpecType? t = Array.Find(info.Types, p => p.Type.Equals(type));
+
+            if (t != null)
+            {
+                return t;
+            }
+        }
+
+        return null;
+    }
+
+    public static SpecProperty? FindPropertyInfo(this IAssetSpecDatabase db, string property, AssetFileType fileType, SpecPropertyContext context = SpecPropertyContext.Property)
+    {
+        if (context is not SpecPropertyContext.Localization and not SpecPropertyContext.Property)
+            throw new ArgumentOutOfRangeException(nameof(context));
+
+        if (!fileType.IsValid)
+        {
+            return null;
+        }
+
+        string? assetType = null;
+        bool isLocal = false, isProp = false;
+        while (true)
+        {
+            int divIndex = property.IndexOf("::", 0, StringComparison.Ordinal);
+            if (divIndex < 0 || divIndex >= property.Length - 2)
+                break;
+
+            if (divIndex != 0)
+            {
+                assetType = property.Substring(0, divIndex);
+                if (assetType.Equals("$local$", StringComparison.OrdinalIgnoreCase))
+                {
+                    assetType = null;
+                    isLocal = true;
+                    isProp = false;
+                }
+                else if (assetType.Equals("$prop$", StringComparison.OrdinalIgnoreCase))
+                {
+                    assetType = null;
+                    isProp = true;
+                    isLocal = false;
+                }
+            }
+            property = property.Substring(divIndex + 2);
+        }
+
+        InverseTypeHierarchy hierarchy = db.Information.GetParentTypes(assetType != null ? new QualifiedType(assetType) : fileType.Type);
+
+        for (int i = -1; i < hierarchy.ParentTypes.Length; ++i)
+        {
+            QualifiedType type = i < 0 ? hierarchy.Type : hierarchy.ParentTypes[hierarchy.ParentTypes.Length - i - 1];
+
+            if (!db.Types.TryGetValue(type, out AssetSpecType info))
+            {
+                continue;
+            }
+
+            SpecProperty[] props = isLocal || context == SpecPropertyContext.Localization && !isProp ? info.LocalizationProperties : info.Properties;
+            SpecProperty? prop = Array.Find(props, p => p.Key.Equals(property, StringComparison.OrdinalIgnoreCase));
+            prop ??= Array.Find(props, p => p.Aliases.Contains(property, StringComparison.OrdinalIgnoreCase));
+
+            if (prop != null)
+            {
+                return prop;
+            }
+        }
+
+        if (!isLocal && context == SpecPropertyContext.Property)
+        {
+            return db.FindPropertyInfo("$prop$::" + property, fileType, SpecPropertyContext.Localization);
+        }
+
+        if (!isProp && context == SpecPropertyContext.Localization)
+        {
+            return db.FindPropertyInfo("$local$::" + property, fileType, SpecPropertyContext.Property);
+        }
+
+        return null;
     }
 }

@@ -19,7 +19,7 @@ public sealed class ThisBangRef : IEquatable<ISpecDynamicValue>, IEquatable<This
     private ThisBangRef() { }
 
     public ISpecPropertyType ValueType => KnownTypes.Flag;
-    public bool EvaluateCondition(in SpecCondition condition, AssetSpecDatabase specDatabase)
+    public bool EvaluateCondition(in SpecCondition condition, IAssetSpecDatabase specDatabase)
     {
         return condition.Operation.Evaluate(true, condition.Comparand is true, specDatabase.Information);
     }

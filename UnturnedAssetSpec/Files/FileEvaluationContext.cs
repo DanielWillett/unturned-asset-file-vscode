@@ -13,9 +13,9 @@ public readonly struct FileEvaluationContext
     public readonly AssetFileType FileType;
     public readonly IWorkspaceEnvironment Workspace;
     public readonly InstallationEnvironment Environment;
-    public readonly AssetSpecDatabase Information;
+    public readonly IAssetSpecDatabase Information;
 
-    public FileEvaluationContext(SpecProperty self, ISpecType @this, AssetFileTree file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, AssetSpecDatabase information)
+    public FileEvaluationContext(SpecProperty self, ISpecType @this, AssetFileTree file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information)
     {
         Self = self;
         This = @this;

@@ -90,9 +90,9 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
         _isCaseInsensitive = isCaseInsensitive;
     }
 
-    public QualifiedType(string type)
+    public QualifiedType(string? type)
     {
-        Type = type;
+        Type = type!;
     }
 
     public string GetTypeName()
@@ -359,6 +359,6 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
 
     public static implicit operator string(QualifiedType type) => type.Type;
 
-    public static implicit operator QualifiedType(string type) => new QualifiedType(type);
-    public static implicit operator QualifiedType(Type type) => new QualifiedType(type.AssemblyQualifiedName ?? type.FullName ?? type.Name);
+    public static implicit operator QualifiedType(string? type) => new QualifiedType(type!);
+    public static implicit operator QualifiedType(Type? type) => type == null ? None : new QualifiedType(type.AssemblyQualifiedName ?? type.FullName ?? type.Name);
 }

@@ -90,6 +90,11 @@ internal static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT1015 = new DatDiagnostic("UNT1015", DatDiagnosticSeverity.Warning);
 
+    /// <summary>
+    /// Skill level is not a valid level for a skill.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1016 = new DatDiagnostic("UNT1016", DatDiagnosticSeverity.Warning);
+
     /* Errors */
 
     /// <summary>

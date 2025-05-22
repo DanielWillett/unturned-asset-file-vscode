@@ -4,7 +4,7 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public interface ISpecPropertyType : IEquatable<ISpecPropertyType>
+public interface ISpecPropertyType : IEquatable<ISpecPropertyType?>
 {
     string DisplayName { get; }
     string Type { get; }
@@ -14,7 +14,7 @@ public interface ISpecPropertyType : IEquatable<ISpecPropertyType>
     bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value);
 }
 
-public interface ISpecPropertyType<TValue> : ISpecPropertyType, IEquatable<ISpecPropertyType<TValue>>
+public interface ISpecPropertyType<TValue> : ISpecPropertyType, IEquatable<ISpecPropertyType<TValue>?>
     where TValue : IEquatable<TValue>
 {
     bool TryParseValue(in SpecPropertyTypeParseContext parse, out TValue? value);
@@ -27,12 +27,12 @@ public interface IElementTypeSpecPropertyType : ISpecPropertyType
 
 public interface IStringParseableSpecPropertyType
 {
-    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue);
+    bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue);
 }
 
-public interface INestedSpecPropertyType : ISpecPropertyType
+public interface ISecondPassSpecPropertyType : ISpecPropertyType
 {
-    void ResolveInnerTypes(SpecProperty property, AssetSpecDatabase database, AssetTypeInformation assetFile);
+    ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile);
 }
 
 public enum SpecPropertyTypeKind

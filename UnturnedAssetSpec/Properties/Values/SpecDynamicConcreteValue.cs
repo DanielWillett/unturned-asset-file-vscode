@@ -130,22 +130,25 @@ public sealed class SpecDynamicConcreteEnumValue :
 
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
     {
-        if (typeof(TValue) != typeof(int))
+        isNull = Value < 0;
+        if (typeof(TValue) == typeof(string))
         {
-            throw new ArgumentException("Invalid type, expected int.");
+            value = isNull
+                ? default
+                : SpecDynamicEquationTreeValueHelpers.As<string, TValue>(Type.Values[Value].Value);
+            return true;
         }
 
-        isNull = Value < 0;
-        if (isNull)
+        if (typeof(TValue) == typeof(int))
         {
-            value = default!;
+            value = isNull
+                ? default
+                : SpecDynamicEquationTreeValueHelpers.As<int, TValue>(Value);
+            return true;
         }
-        else
-        {
-            int v = Value;
-            value = Unsafe.As<int, TValue>(ref v);
-        }
-        return true;
+
+        value = default;
+        return false;
     }
 
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)

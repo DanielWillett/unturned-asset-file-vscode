@@ -2,17 +2,22 @@ using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 [JsonConverter(typeof(SpecPropertyConverter))]
-public class SpecProperty
+[DebuggerDisplay("{Key}")]
+public class SpecProperty : IEquatable<SpecProperty>, ICloneable
 {
     /// <summary>
     /// The key of the flag or property.
     /// </summary>
     public required string Key { get; set; }
+
+    public bool IsHidden { get; internal set; }
 
     /// <summary>
     /// The type of the property.
@@ -100,5 +105,92 @@ public class SpecProperty
     /// </summary>
     public OneOrMore<RegexKeyGroup> KeyGroups { get; set; }
 
-    public ISpecType? Owner { get; set; }
+#nullable disable
+    /// <summary>
+    /// The type that this property is a part of.
+    /// </summary>
+    public ISpecType Owner { get; set; }
+
+#nullable restore
+
+    /// <summary>
+    /// The property overridden by this one.
+    /// </summary>
+    public SpecProperty? Parent { get; internal set; }
+
+    public override string ToString()
+    {
+        return Owner != null ? Owner.Type.Type + "." + Key : Key;
+    }
+
+    public bool Equals(SpecProperty? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        if (string.Equals(Key, other.Key, StringComparison.Ordinal)
+              || !Type.Equals(other.Type)
+              || !string.Equals(SingleKeyOverride, other.SingleKeyOverride, StringComparison.Ordinal)
+              || !string.Equals(Description, other.Description, StringComparison.Ordinal)
+              || !string.Equals(Markdown, other.Markdown, StringComparison.Ordinal)
+              || !string.Equals(FileCrossRef, other.FileCrossRef, StringComparison.Ordinal)
+              || !string.Equals(CountForRegexGroup, other.CountForRegexGroup, StringComparison.Ordinal)
+              || !string.Equals(ValueRegexGroupReference, other.ValueRegexGroupReference, StringComparison.Ordinal)
+              || !string.Equals(SubtypeSwitch, other.SubtypeSwitch, StringComparison.Ordinal)
+              || !Aliases.Equals(other.Aliases, StringComparison.Ordinal)
+              || CanBeInMetadata != other.CanBeInMetadata
+              || KeyIsRegex != other.KeyIsRegex
+              || Deprecated != other.Deprecated
+              || !EqualityComparer<Version?>.Default.Equals(Version, other.Version)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(RequiredCondition, other.RequiredCondition)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(DefaultValue, other.DefaultValue)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(IncludedDefaultValue, other.IncludedDefaultValue)
+              || !KeyGroups.Equals(other.KeyGroups)
+              || !EqualityComparer<ISpecType?>.Default.Equals(Owner, other.Owner))
+        {
+            return false;
+        }
+
+        return other is not SpecBundleAsset ba2 || this is SpecBundleAsset ba;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is SpecProperty p && Equals(p);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            // ReSharper disable NonReadonlyMemberInGetHashCode
+            return (Key.GetHashCode() * 397) ^ Type.GetHashCode();
+            // ReSharper restore NonReadonlyMemberInGetHashCode
+        }
+    }
+
+    /// <inheritdoc />
+    public object Clone() => new SpecProperty
+    {
+        Key = Key,
+        IsHidden = IsHidden,
+        Type = Type,
+        SingleKeyOverride = SingleKeyOverride,
+        Description = Description,
+        Markdown = Markdown,
+        FileCrossRef = FileCrossRef,
+        CountForRegexGroup = CountForRegexGroup,
+        ValueRegexGroupReference = ValueRegexGroupReference,
+        SubtypeSwitch = SubtypeSwitch,
+        Aliases = Aliases,
+        CanBeInMetadata = CanBeInMetadata,
+        KeyIsRegex = KeyIsRegex,
+        Deprecated = Deprecated,
+        Version = Version,
+        RequiredCondition = RequiredCondition,
+        DefaultValue = DefaultValue,
+        IncludedDefaultValue = IncludedDefaultValue,
+        KeyGroups = KeyGroups,
+        Owner = Owner
+    };
 }

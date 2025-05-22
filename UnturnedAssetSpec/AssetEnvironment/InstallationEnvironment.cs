@@ -31,7 +31,7 @@ public class InstallationEnvironment : IDisposable
     }
 
     private readonly FileEnumerable _fileSync;
-    private readonly AssetSpecDatabase _database;
+    private readonly IAssetSpecDatabase _database;
     private readonly List<SourceDirectory> _sourceDirs;
     private readonly Action<string, string> _logAction;
     private int _previousCount = 112;
@@ -63,7 +63,7 @@ public class InstallationEnvironment : IDisposable
         }
     }
 
-    public InstallationEnvironment(AssetSpecDatabase database, params string[] sourceDirectories)
+    public InstallationEnvironment(IAssetSpecDatabase database, params string[] sourceDirectories)
     {
         _fileSync = new FileEnumerable(this);
 

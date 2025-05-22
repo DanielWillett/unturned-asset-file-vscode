@@ -8,4 +8,5 @@ public enum SpecPropertyContext
     CrossReferenceUnspecified,
     CrossReferenceProperty,
     CrossReferenceLocalization,
+    BundleAsset
 }

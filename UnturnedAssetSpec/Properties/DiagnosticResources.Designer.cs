@@ -232,6 +232,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Level {0} is not a valid level for the {1} skill..
+        /// </summary>
+        internal static string UNT1016 {
+            get {
+                return ResourceManager.GetString("UNT1016", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected &apos;}&apos; at end of dictionary..
         /// </summary>
         internal static string UNT2001 {

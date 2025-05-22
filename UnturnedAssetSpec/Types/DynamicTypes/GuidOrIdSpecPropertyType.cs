@@ -14,7 +14,7 @@ public sealed class GuidOrIdSpecPropertyType :
     IEquatable<GuidOrIdSpecPropertyType>,
     IStringParseableSpecPropertyType
 {
-    private AssetSpecDatabase? _cachedSpecDb;
+    private IAssetSpecDatabase? _cachedSpecDb;
     private ISpecType? _cachedType;
 
     public OneOrMore<QualifiedType> OtherElementTypes { get; }
@@ -24,7 +24,7 @@ public sealed class GuidOrIdSpecPropertyType :
     public override string DisplayName { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
-    public override string Type => "TypeOrEnum";
+    public override string Type => "GuidOrId";
 
     /// <inheritdoc />
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
@@ -54,7 +54,7 @@ public sealed class GuidOrIdSpecPropertyType :
     public GuidOrIdSpecPropertyType(QualifiedType elementType, OneOrMore<string> specialTypes = default)
     {
         ElementType = elementType;
-        DisplayName = $"Type or {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
+        DisplayName = elementType.IsNull ? "GUID or ID" : $"GUID or ID ({elementType.GetTypeName()})";
         OtherElementTypes = specialTypes
             .Where(x => !string.IsNullOrEmpty(x))
             .Select(x => new QualifiedType(x));
@@ -160,8 +160,8 @@ public sealed class GuidOrIdSpecPropertyType :
     public bool Equals(GuidOrIdSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType) && OtherElementTypes.Equals(other.OtherElementTypes);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is GuidOrIdSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType? other) => other is GuidOrIdSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<GuidOrId> other) => other is GuidOrIdSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType<GuidOrId>? other) => other is GuidOrIdSpecPropertyType t && Equals(t);
 }

@@ -13,7 +13,7 @@ public sealed class TypeOrEnumSpecPropertyType :
     IEquatable<TypeOrEnumSpecPropertyType>,
     IStringParseableSpecPropertyType
 {
-    private AssetSpecDatabase? _cachedSpecDb;
+    private IAssetSpecDatabase? _cachedSpecDb;
     private ISpecType? _cachedType;
     private ISpecType? _cachedEnum;
 
@@ -59,7 +59,7 @@ public sealed class TypeOrEnumSpecPropertyType :
     {
         ElementType = elementType;
         EnumType = enumType;
-        DisplayName = $"{QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()} or {QualifiedType.ExtractTypeName(enumType.Type.AsSpan()).ToString()}";
+        DisplayName = elementType.IsNull ? $"Type or {enumType.GetTypeName()}" : $"{elementType.GetTypeName()} or {enumType.GetTypeName()}";
     }
 
     /// <inheritdoc />
@@ -196,8 +196,8 @@ public sealed class TypeOrEnumSpecPropertyType :
     public bool Equals(TypeOrEnumSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is TypeOrEnumSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType? other) => other is TypeOrEnumSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<QualifiedType> other) => other is TypeOrEnumSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType<QualifiedType>? other) => other is TypeOrEnumSpecPropertyType t && Equals(t);
 }

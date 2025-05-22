@@ -66,7 +66,7 @@ internal sealed class UnturnedAssetFileLspServer
                         .AddSingleton<HoverHandler>()
                         .AddSingleton<OpenedFileTracker>()
                         .AddSingleton<LspAssetSpecDatabase>()
-                        .AddTransient<AssetSpecDatabase>(sp => sp.GetRequiredService<LspAssetSpecDatabase>())
+                        .AddTransient<IAssetSpecDatabase, LspAssetSpecDatabase>()
                         .AddSingleton<LspInstallationEnvironment>()
                         .AddSingleton<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
                         .AddSingleton(new JsonSerializerOptions

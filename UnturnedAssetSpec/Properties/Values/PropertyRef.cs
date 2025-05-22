@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
@@ -245,7 +246,7 @@ public readonly struct PropertyRefInfo
             return prop.DefaultValue;
         }
 
-        SpecPropertyTypeParseContext parse = new SpecPropertyTypeParseContext
+        SpecPropertyTypeParseContext parse = new SpecPropertyTypeParseContext(ctx)
         {
             Database = ctx.Information,
             FileType = ctx.FileType,

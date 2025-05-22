@@ -7,9 +7,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public readonly ref struct SpecPropertyTypeParseContext
 {
+    public readonly FileEvaluationContext EvaluationContext;
+
     public required AssetFileValueNode? Node { get; init; }
     public required AssetFileNode? Parent { get; init; }
-    public required AssetSpecDatabase Database { get; init; }
+    public required IAssetSpecDatabase Database { get; init; }
     public AssetFileTree? File { get; init; }
     public string? BaseKey { get; init; }
     public required AssetFileType FileType { get; init; }
@@ -17,6 +19,11 @@ public readonly ref struct SpecPropertyTypeParseContext
     public ICollection<DatDiagnosticMessage>? Diagnostics { get; }
 
     public bool HasDiagnostics { get; }
+
+    public SpecPropertyTypeParseContext(FileEvaluationContext evalContext)
+    {
+        EvaluationContext = evalContext;
+    }
 
     public SpecPropertyTypeParseContext(ICollection<DatDiagnosticMessage> diagnostics)
     {

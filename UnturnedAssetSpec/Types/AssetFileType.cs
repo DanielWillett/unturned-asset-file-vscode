@@ -8,13 +8,13 @@ public readonly struct AssetFileType : IEquatable<AssetFileType>
 {
 #nullable disable
     public QualifiedType Type { get; }
-    public AssetTypeInformation Information { get; }
+    public AssetSpecType Information { get; }
 #nullable restore
     public string? Alias { get; }
 
     public bool IsValid => Information is not null;
 
-    public AssetFileType(AssetTypeInformation information, string? alias)
+    public AssetFileType(AssetSpecType information, string? alias)
     {
         Type = information.Type;
         Alias = alias;
@@ -28,7 +28,7 @@ public readonly struct AssetFileType : IEquatable<AssetFileType>
         Information = null;
     }
 
-    public static AssetFileType FromFile(AssetFileTree file, AssetSpecDatabase spec)
+    public static AssetFileType FromFile(AssetFileTree file, IAssetSpecDatabase spec)
     {
         string? type = file.GetType(out bool systemType);
         if (type == null)
@@ -41,7 +41,7 @@ public readonly struct AssetFileType : IEquatable<AssetFileType>
             qt = new QualifiedType(type);
         }
 
-        spec.Types.TryGetValue(qt, out AssetTypeInformation? info);
+        spec.Types.TryGetValue(qt, out AssetSpecType? info);
         return info != null ? new AssetFileType(info, null) : new AssetFileType(qt, null);
     }
 

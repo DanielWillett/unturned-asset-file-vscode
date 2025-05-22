@@ -21,7 +21,7 @@ public sealed class PropertyBangRef : IEquatable<ISpecDynamicValue>, IEquatable<
 
     public ISpecPropertyType ValueType => KnownTypes.String;
 
-    public bool EvaluateCondition(in SpecCondition condition, AssetSpecDatabase specDatabase)
+    public bool EvaluateCondition(in SpecCondition condition, IAssetSpecDatabase specDatabase)
     {
         return condition.Operation.Evaluate(Property.PropertyName, condition.Comparand as string, specDatabase.Information);
     }

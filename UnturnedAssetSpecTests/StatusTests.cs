@@ -24,7 +24,7 @@ public class StatusTests
             Assert.Inconclusive("Game not installed where it's expected.");
         }
 
-        _runner = new AssetSpecDatabase { UseInternet = false };
+        _runner = new AssetSpecDatabase { UseInternet = false, MultiThreaded = false };
 
         await _runner.InitializeAsync();
 

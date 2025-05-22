@@ -20,9 +20,9 @@ internal class KeyCompletionHandler : ICompletionHandler
     private readonly CompletionRegistrationOptions _completionRegistrationOptions;
     private readonly OpenedFileTracker _fileTracker;
 
-    private readonly AssetSpecDatabase _specDictionary;
+    private readonly IAssetSpecDatabase _specDictionary;
 
-    public KeyCompletionHandler(ILogger<KeyCompletionHandler> logger, OpenedFileTracker fileTracker, AssetSpecDatabase specDictionary)
+    public KeyCompletionHandler(ILogger<KeyCompletionHandler> logger, OpenedFileTracker fileTracker, IAssetSpecDatabase specDictionary)
     {
         _logger = logger;
         _fileTracker = fileTracker;
@@ -43,7 +43,7 @@ internal class KeyCompletionHandler : ICompletionHandler
         for (int i = -1; i < hierarchy.ParentTypes.Length; ++i)
         {
             QualifiedType type = i < 0 ? state.TypeHierarchy.Type : hierarchy.ParentTypes[i];
-            if (!_specDictionary.Types.TryGetValue(type, out AssetTypeInformation? info))
+            if (!_specDictionary.Types.TryGetValue(type, out AssetSpecType? info))
                 continue;
 
             state.Alias = null;
