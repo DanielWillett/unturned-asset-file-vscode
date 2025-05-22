@@ -198,8 +198,8 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         assetInfo.ParentTypes ??= new Dictionary<QualifiedType, InverseTypeHierarchy>(0);
 
 
-        Task statusTask = DownloadStatusAsync(token);
-        Task downloadActionButtons = DownloadPlayerDashboardInventoryLocalizationAsync(token);
+        Task statusTask = DownloadStatusAsync(assetInfo, token);
+        Task downloadActionButtons = DownloadPlayerDashboardInventoryLocalizationAsync(assetInfo, token);
         await DownloadSkillLocalization(assetInfo, token);
 
         Information = assetInfo;
@@ -694,7 +694,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         return stream;
     }
 
-    private async Task DownloadStatusAsync(CancellationToken token = default)
+    private async Task DownloadStatusAsync(AssetInformation assetInfo, CancellationToken token = default)
     {
         if (UnturnedInstallDirectory.TryGetInstallDirectory(out GameInstallDir installDir))
         {
@@ -727,7 +727,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         JsonDocument? doc2 = _statusJson;
         if (doc2 == null)
         {
-            if (!UseInternet || string.IsNullOrEmpty(Information.StatusJsonFallbackUrl))
+            if (!UseInternet || string.IsNullOrEmpty(assetInfo.StatusJsonFallbackUrl))
             {
                 Log("Unable to read Status.json from local install, internet disabled.");
                 return;
@@ -736,7 +736,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             try
             {
                 using HttpClient client = new HttpClient();
-                using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, Information.StatusJsonFallbackUrl);
+                using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, assetInfo.StatusJsonFallbackUrl);
                 using HttpResponseMessage response = await client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, token);
 
                 response.EnsureSuccessStatusCode();
@@ -799,7 +799,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         }
     }
 
-    private async Task DownloadPlayerDashboardInventoryLocalizationAsync(CancellationToken token = default)
+    private async Task DownloadPlayerDashboardInventoryLocalizationAsync(AssetInformation assetInfo, CancellationToken token = default)
     {
         List<string> validButtons = new List<string>(24);
         if (UnturnedInstallDirectory.TryGetInstallDirectory(out GameInstallDir installDir))
@@ -822,7 +822,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
         if (validButtons.Count == 0)
         {
-            if (!UseInternet || string.IsNullOrEmpty(Information.PlayerDashboardInventoryLocalizationFallbackUrl))
+            if (!UseInternet || string.IsNullOrEmpty(assetInfo.PlayerDashboardInventoryLocalizationFallbackUrl))
             {
                 Log("Unable to read PlayerDashboardInventory.dat from local install, internet disabled.");
                 return;
@@ -831,7 +831,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             try
             {
                 using HttpClient client = new HttpClient();
-                using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, Information.PlayerDashboardInventoryLocalizationFallbackUrl);
+                using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, assetInfo.PlayerDashboardInventoryLocalizationFallbackUrl);
                 using HttpResponseMessage response = await client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, token);
 
                 response.EnsureSuccessStatusCode();
@@ -910,7 +910,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
                 if (!success)
                 {
-                    if (!UseInternet || string.IsNullOrEmpty(Information.SkillsetsLocalizationFallbackUrl))
+                    if (!UseInternet || string.IsNullOrEmpty(assetInfo.SkillsetsLocalizationFallbackUrl))
                     {
                         Log("Unable to read MenuSurvivorsCharacter.dat from local install, internet disabled.");
                         return;
@@ -919,7 +919,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                     try
                     {
                         client = new HttpClient();
-                        using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, Information.SkillsetsLocalizationFallbackUrl);
+                        using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, assetInfo.SkillsetsLocalizationFallbackUrl);
                         using HttpResponseMessage response = await client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, token);
 
                         response.EnsureSuccessStatusCode();
@@ -959,7 +959,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
                 if (!success)
                 {
-                    if (!UseInternet || string.IsNullOrEmpty(Information.SkillsLocalizationFallbackUrl))
+                    if (!UseInternet || string.IsNullOrEmpty(assetInfo.SkillsLocalizationFallbackUrl))
                     {
                         Log("Unable to read PlayerDashboardSkills.dat from local install, internet disabled.");
                         return;
@@ -968,7 +968,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                     try
                     {
                         client ??= new HttpClient();
-                        using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, Information.SkillsLocalizationFallbackUrl);
+                        using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, assetInfo.SkillsLocalizationFallbackUrl);
                         using HttpResponseMessage response = await client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, token);
 
                         response.EnsureSuccessStatusCode();
