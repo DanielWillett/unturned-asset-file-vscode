@@ -63,7 +63,7 @@
             "DefaultValue": 0.0,
             "Description": "The median number of seconds the splatters will stay alive.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
-            "Minimum": "Splatter_Lifetime_Spread",
+            "Minimum": "@Splatter_Lifetime_Spread",
             "Except": [ 0.0 ],
             "Variable": "splatterLifetime"
         },
@@ -75,7 +75,7 @@
             "Description": "The radius around @Splatter_Lifetime that the actual lifetime could be for each splatter in seconds. For example, if @Splatter_Lifetime is 5 and @Splatter_Lifetime_Spread is 1, the lifetime could be anywhere between 4 and 6 seconds.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
             "Minimum": 0,
-            "Maximum": "Splatter_Lifetime",
+            "Maximum": "@Splatter_Lifetime",
             "Variable": "splatterLifetimeSpread"
         },
         {
@@ -84,7 +84,7 @@
             "DefaultValue": 0.0,
             "Description": "The median number of seconds the effect will stay alive.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
-            "Minimum": "Lifetime_Spread",
+            "Minimum": "@Lifetime_Spread",
             "Except": [ 0.0 ],
             "Variable": "splatterLifetime"
         },
@@ -96,7 +96,7 @@
             "Description": "The radius around @Lifetime that the actual lifetime could be for the effect in seconds. For example, if @Lifetime is 5 and @Lifetime_Spread is 1, the lifetime could be anywhere between 4 and 6 seconds.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
             "Minimum": 0,
-            "Maximum": "Lifetime",
+            "Maximum": "@Lifetime",
             "Variable": "splatterLifetimeSpread"
         },
         {

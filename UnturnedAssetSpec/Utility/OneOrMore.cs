@@ -965,7 +965,7 @@ public struct OneOrMoreEnumerator<T> : IEnumerator<T>
     public bool MoveNext()
     {
         ++_index;
-        return _index >= _container.Length;
+        return _index < _container.Length;
     }
 
     /// <inheritdoc />

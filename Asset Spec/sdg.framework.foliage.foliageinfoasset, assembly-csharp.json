@@ -56,7 +56,7 @@
             "Type": "Float32",
             "DefaultValue": 0.0,
             "Minimum": 0.0,
-            "Maximum": "Max_Weight",
+            "Maximum": "@Max_Weight",
             "Description": "The minimum weight of a terrain material to allow placement of foliage. The weight is a value from 0 to 1 which is multiplied by the density to determine how many foliage instances are placed.",
             "Variable": "minSurfaceWeight",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference"

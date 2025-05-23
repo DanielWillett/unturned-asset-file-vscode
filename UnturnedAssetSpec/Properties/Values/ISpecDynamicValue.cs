@@ -1,12 +1,12 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using GuidOrId = DanielWillett.UnturnedDataFileLspServer.Data.Types.GuidOrId;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -16,6 +16,11 @@ public interface ISpecDynamicValue
     bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition);
     bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
     void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options);
+}
+
+public interface ISecondPassSpecDynamicValue : ISpecDynamicValue
+{
+    ISpecDynamicValue Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile);
 }
 
 [Flags]

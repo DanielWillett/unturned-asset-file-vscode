@@ -38,6 +38,9 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
     /// <inheritdoc />
     public async Task<SymbolInformationOrDocumentSymbolContainer?> Handle(DocumentSymbolParams request, CancellationToken cancellationToken)
     {
+        // todo:
+        await Task.CompletedTask;
+
         _logger.LogInformation("Document symbol received.");
 
         if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))

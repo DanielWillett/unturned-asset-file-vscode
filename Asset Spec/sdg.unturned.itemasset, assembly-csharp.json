@@ -1145,7 +1145,6 @@
                     [
                         {
                             "Key": "Product",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "#Self.Value",
@@ -1158,7 +1157,6 @@
                     [
                         {
                             "Key": "Product",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "#Self.Value",
@@ -1198,7 +1196,6 @@
                     [
                         {
                             "Key": "Outputs",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Outputs",
@@ -1220,7 +1217,6 @@
                     [
                         {
                             "Key": "Outputs",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Outputs",
@@ -1241,7 +1237,6 @@
                     [
                         {
                             "Key": "Outputs",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Outputs",
@@ -1273,7 +1268,6 @@
                     [
                         {
                             "Key": "Tool",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Tool",
@@ -1303,7 +1297,6 @@
                     [
                         {
                             "Key": "Skill",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Skill",
@@ -1330,7 +1323,6 @@
                     [
                         {
                             "Key": "Level",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Level",
@@ -1351,7 +1343,6 @@
                     [
                         {
                             "Key": "Type",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Or":
@@ -1384,7 +1375,6 @@
                     [
                         {
                             "Key": "Type",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Or":
@@ -1497,7 +1487,7 @@
                 {
                     "Key": "Index",
                     "Type": "UInt8",
-                    "MaximumExclusive": "$cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints",
+                    "MaximumExclusive": "@$cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-index-uint8-0",
                     "Description": "Index of the blueprint to reference in @($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).",
                     "Required": true,
@@ -1541,7 +1531,7 @@
                     "Type": "UInt8",
                     "DefaultValue": 0,
                     "FileCrossRef": "Source",
-                    "Maximum": "$cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints",
+                    "Maximum": "@$cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprints-uint8-0",
                     "Description": "Number of blueprints action #(Self.KeyGroups[0]) will reference.",
                     "CountForRegexGroup": "item-action-blueprints"

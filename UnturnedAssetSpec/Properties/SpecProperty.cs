@@ -1,3 +1,4 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -33,6 +34,16 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
     /// Short description of the property.
     /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Name of the C# variable storing the value of this property.
+    /// </summary>
+    public string? Variable { get; set; }
+
+    /// <summary>
+    /// Link to the SDG modding docs relating to this property.
+    /// </summary>
+    public string? Docs { get; set; }
 
     /// <summary>
     /// Longer markdown description of the property.
@@ -101,9 +112,49 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
     public ISpecDynamicValue? IncludedDefaultValue { get; set; }
 
     /// <summary>
+    /// The minimum allowed value.
+    /// </summary>
+    public ISpecDynamicValue? MinimumValue { get; set; }
+
+    /// <summary>
+    /// If <see cref="MinimumValue"/> is an exclusive minimum.
+    /// </summary>
+    public bool IsMinimumValueExclusive { get; set; }
+
+    /// <summary>
+    /// The minimum allowed value.
+    /// </summary>
+    public ISpecDynamicValue? MaximumValue { get; set; }
+
+    /// <summary>
+    /// If <see cref="MaximumValue"/> is an exclusive maximum.
+    /// </summary>
+    public bool IsMaximumValueExclusive { get; set; }
+
+    /// <summary>
+    /// A blacklist of allowed values, or a whitelist of allowed values outside the minimum and/or maximum.
+    /// </summary>
+    public OneOrMore<ISpecDynamicValue> Exceptions { get; set; }
+
+    /// <summary>
+    /// If <see cref="Exceptions"/> should be treated as a whitelist of allowed values outside the minimum and/or maximum values instead of a blacklist.
+    /// </summary>
+    public bool ExceptionsAreWhitelist { get; set; }
+
+    /// <summary>
     /// If <see cref="KeyIsRegex"/> is <see langword="true"/>, then this is a list of groups by name to match with other properties within the given regex group.
     /// </summary>
     public OneOrMore<RegexKeyGroup> KeyGroups { get; set; }
+
+    /// <summary>
+    /// Properties that must also exist if this property exists.
+    /// </summary>
+    public InclusionCondition? InclusiveProperties { get; set; }
+
+    /// <summary>
+    /// Properties that shouldn't exist if this property exists.
+    /// </summary>
+    public InclusionCondition? ExclusiveProperties { get; set; }
 
 #nullable disable
     /// <summary>
@@ -117,6 +168,31 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
     /// The property overridden by this one.
     /// </summary>
     public SpecProperty? Parent { get; internal set; }
+
+    internal void ProcessValues(Func<ISpecDynamicValue, ISpecDynamicValue?> process)
+    {
+        if (RequiredCondition != null)
+            RequiredCondition = process(RequiredCondition);
+        if (DefaultValue != null)
+            DefaultValue = process(DefaultValue);
+        if (IncludedDefaultValue != null)
+            IncludedDefaultValue = process(IncludedDefaultValue);
+        if (MinimumValue != null)
+            MinimumValue = process(MinimumValue);
+        if (MaximumValue != null)
+            MaximumValue = process(MaximumValue);
+
+        foreach (ISpecDynamicValue value in Exceptions)
+        {
+            ISpecDynamicValue? newValue = process(value);
+            if (ReferenceEquals(newValue, value))
+                continue;
+
+            Exceptions = Exceptions.Remove(value);
+            if (newValue != null)
+                Exceptions = Exceptions.Add(newValue);
+        }
+    }
 
     public override string ToString()
     {

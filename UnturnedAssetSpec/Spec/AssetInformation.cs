@@ -266,17 +266,17 @@ public class SkillsetInfo
     public required int Index { get; set; }
     public required SkillsetSkillInfo[] Skills { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? DisplayName { get; set; }
 }
 
 [DebuggerDisplay("{Speciality}:{Skill}")]
-public readonly struct SkillsetSkillInfo
+public struct SkillsetSkillInfo
 {
-    public int Speciality { get; }
-    public int Skill { get; }
+    public int Speciality { get; set; }
+    public int Skill { get; set; }
 
-    [JsonConstructor]
+    public SkillsetSkillInfo() { }
     public SkillsetSkillInfo(int speciality, int skill)
     {
         Speciality = speciality;
@@ -293,7 +293,7 @@ public class SpecialityInfo
     public required int Index { get; set; }
     public required SkillInfo[] Skills { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? DisplayName { get; set; }
 }
 
@@ -305,21 +305,21 @@ public class SkillInfo
     public required uint Cost { get; set; }
     public required float Difficulty { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? DisplayName { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Description { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string?[]? Levels { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int MaximumLevel { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? LevelMultiplier { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool LevelMultiplierInverse { get; set; }
 }

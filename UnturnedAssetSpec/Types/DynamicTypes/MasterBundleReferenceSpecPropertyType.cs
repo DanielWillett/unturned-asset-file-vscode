@@ -9,7 +9,7 @@ public sealed class MasterBundleReferenceSpecPropertyType :
     BaseSpecPropertyType<BundleReference>,
     ISpecPropertyType<BundleReference>,
     IElementTypeSpecPropertyType,
-    IEquatable<MasterBundleReferenceSpecPropertyType>,
+    IEquatable<MasterBundleReferenceSpecPropertyType?>,
     IStringParseableSpecPropertyType
 {
     public static readonly MasterBundleReferenceSpecPropertyType AudioReference = new MasterBundleReferenceSpecPropertyType();
@@ -153,13 +153,13 @@ public sealed class MasterBundleReferenceSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(MasterBundleReferenceSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType);
+    public bool Equals(MasterBundleReferenceSpecPropertyType? other) => other != null && ElementType.Equals(other.ElementType);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is MasterBundleReferenceSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType? other) => other is MasterBundleReferenceSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<BundleReference> other) => other is MasterBundleReferenceSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType<BundleReference>? other) => other is MasterBundleReferenceSpecPropertyType t && Equals(t);
 }
 
 public enum MasterBundleReferenceType

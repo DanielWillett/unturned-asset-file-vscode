@@ -9,7 +9,8 @@ public sealed class CommaDelimitedStringSpecPropertyType :
     BaseSpecPropertyType<string>,
     ISpecPropertyType<string>,
     ISecondPassSpecPropertyType,
-    IEquatable<CommaDelimitedStringSpecPropertyType>
+    IEquatable<CommaDelimitedStringSpecPropertyType>,
+    IDisposable
 {
     private ParseHandler? _handler;
 
@@ -38,6 +39,8 @@ public sealed class CommaDelimitedStringSpecPropertyType :
         if (InnerType is ISecondPassSpecPropertyType unresolved)
         {
             InnerType = unresolved.Transform(property, database, assetFile);
+            if (unresolved is IDisposable disp)
+                disp.Dispose();
             _handler = null;
         }
 
@@ -166,5 +169,11 @@ public sealed class CommaDelimitedStringSpecPropertyType :
                 lastIndex = commaIndex;
             }
         }
+    }
+
+    public void Dispose()
+    {
+        if (InnerType is ISecondPassSpecPropertyType and IDisposable disp)
+            disp.Dispose();
     }
 }

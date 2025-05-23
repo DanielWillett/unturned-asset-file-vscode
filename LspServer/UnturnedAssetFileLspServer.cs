@@ -19,7 +19,7 @@ internal sealed class UnturnedAssetFileLspServer
 {
     public const string LanguageId = "unturned-data-file";
 
-    private static ILogger<UnturnedAssetFileLspServer> _logger;
+    private static ILogger<UnturnedAssetFileLspServer> _logger = null!;
 
     public static readonly TextDocumentSelector AssetFileSelector = new TextDocumentSelector(new TextDocumentFilter
     {
@@ -27,9 +27,7 @@ internal sealed class UnturnedAssetFileLspServer
         Pattern = "**/*.{dat,asset}"
     });
     
-    private static void Main(string[] args) => new UnturnedAssetFileLspServer().RunAsync(args).GetAwaiter().GetResult();
-
-    private async Task RunAsync(string[] args)
+    private static async Task Main()
     {
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
@@ -73,8 +71,8 @@ internal sealed class UnturnedAssetFileLspServer
                         {
                             WriteIndented = true
                         })
-                        .AddSingleton((object)new JsonReaderOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip })
-                        .AddSingleton((object)new JsonWriterOptions { Indented = true });
+                        .AddSingleton(typeof(JsonReaderOptions), new JsonReaderOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip })
+                        .AddSingleton(typeof(JsonWriterOptions), new JsonWriterOptions { Indented = true });
                 })
                 .OnInitialize(async (server, request, token) =>
                 {
@@ -90,7 +88,7 @@ internal sealed class UnturnedAssetFileLspServer
 
                     _logger = server.Services.GetRequiredService<ILogger<UnturnedAssetFileLspServer>>();
 
-                    LspAssetSpecDatabase db = await InitializeAssetSpecDatabase(server.Services, token);
+                    LspAssetSpecDatabase db = await InitializeAssetSpecDatabaseAsync(server.Services, token);
 
                     workDoneManager.OnNext(new WorkDoneProgressReport
                     {
@@ -132,7 +130,7 @@ internal sealed class UnturnedAssetFileLspServer
 
     private static IWorkDoneObserver? _initObserver;
 
-    private static async Task<LspAssetSpecDatabase> InitializeAssetSpecDatabase(IServiceProvider serviceProvider, CancellationToken token = default)
+    private static async Task<LspAssetSpecDatabase> InitializeAssetSpecDatabaseAsync(IServiceProvider serviceProvider, CancellationToken token = default)
     {
         LspAssetSpecDatabase db = serviceProvider.GetRequiredService<LspAssetSpecDatabase>();
 

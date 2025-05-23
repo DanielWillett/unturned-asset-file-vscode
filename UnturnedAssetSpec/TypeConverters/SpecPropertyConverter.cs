@@ -75,18 +75,6 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         HideInheritedProperty               // 28
     ];
 
-
-    public SpecPropertyContext Context { get; }
-
-    public SpecPropertyConverter() : this(SpecPropertyContext.Unspecified) { }
-    public SpecPropertyConverter(SpecPropertyContext context)
-    {
-        if (context is not SpecPropertyContext.Property and not SpecPropertyContext.Localization and not SpecPropertyContext.Unspecified)
-            throw new ArgumentOutOfRangeException(nameof(context));
-
-        Context = context;
-    }
-
     /// <inheritdoc />
     public override SpecProperty? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -118,8 +106,17 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         OneOrMore<string> specialTypes = OneOrMore<string>.Null;
         SpecProperty property = new SpecProperty { Key = null!, Type = null! };
 
-        Utf8JsonReader defaultValueReader = default,
-            includedDefaultValueReader = default;
+        Utf8JsonReader
+            defaultValueReader = default,
+            includedDefaultValueReader = defaultValueReader,
+            minimumValue = defaultValueReader,
+            maximumValue = defaultValueReader,
+            exceptValue = defaultValueReader,
+            exclusiveWithValue = defaultValueReader,
+            inclusiveWithValue = defaultValueReader;
+
+        bool minimumIsExclusive = false,
+            maximumIsExclusive = false;
 
         while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
@@ -276,6 +273,73 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     reader.Skip();
                     break;
 
+                case 16: // Description
+                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+                    property.Description = reader.GetString();
+                    break;
+
+                case 17: // Variable
+                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+                    property.Variable = reader.GetString();
+                    break;
+
+                case 18: // Docs
+                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+                    property.Docs = reader.GetString();
+                    break;
+
+                case 19: // Markdown
+                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+                    property.Markdown = reader.GetString();
+                    break;
+
+                case 20: // Minimum
+                    minimumValue = reader.TokenType == JsonTokenType.Null ? default : reader;
+                    minimumIsExclusive = false;
+                    reader.Skip();
+                    break;
+
+                case 21: // Maximum
+                    maximumValue = reader.TokenType == JsonTokenType.Null ? default : reader;
+                    maximumIsExclusive = false;
+                    reader.Skip();
+                    break;
+
+                case 22: // MinimumExclusive
+                    minimumValue = reader.TokenType == JsonTokenType.Null ? default : reader;
+                    minimumIsExclusive = true;
+                    reader.Skip();
+                    break;
+
+                case 23: // MaximumExclusive
+                    maximumValue = reader.TokenType == JsonTokenType.Null ? default : reader;
+                    maximumIsExclusive = true;
+                    reader.Skip();
+                    break;
+
+                case 24: // Except
+                    exceptValue = reader;
+                    reader.Skip();
+                    break;
+
+                case 25: // ExclusiveWith
+                    property.ExclusiveProperties = InclusionConditionConverter.ReadCondition(ref reader, options);
+                    break;
+
+                case 26: // InclusiveWith
+                    property.InclusiveProperties = InclusionConditionConverter.ReadCondition(ref reader, options);
+                    break;
+
+                case 27: // Deprecated
+                    if (reader.TokenType is not JsonTokenType.True and not JsonTokenType.False)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+                    property.Deprecated = reader.TokenType == JsonTokenType.True;
+                    break;
+
                 case 28: // HideInherited
                     if (reader.TokenType is not JsonTokenType.True and not JsonTokenType.False)
                         ThrowUnexpectedToken(reader.TokenType, propType);
@@ -305,31 +369,144 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
         property.Type = propertyType;
 
-        if (defaultValueReader.TokenType != JsonTokenType.None && propertyType is not UnresolvedSpecPropertyType)
+        if (defaultValueReader.TokenType != JsonTokenType.None)
         {
-            try
-            {
-                property.DefaultValue = ReadDefaultValue(ref defaultValueReader, options, propertyType);
-            }
-            catch (Exception ex)
-            {
-                throw new JsonException($"Failed to read property \"{DefaultValueProperty.ToString()}\" while reading SpecProperty.", ex);
-            }
+            property.DefaultValue = ReadValue(propertyType, ref defaultValueReader, SpecDynamicValueContext.AllowSwitch, options, in DefaultValueProperty);
         }
 
-        if (includedDefaultValueReader.TokenType != JsonTokenType.None && propertyType is not UnresolvedSpecPropertyType)
+        if (includedDefaultValueReader.TokenType != JsonTokenType.None)
         {
-            try
+            property.IncludedDefaultValue = ReadValue(propertyType, ref includedDefaultValueReader, SpecDynamicValueContext.AllowSwitch, options, in IncludedDefaultValueProperty);
+        }
+
+        if (minimumValue.TokenType != JsonTokenType.None)
+        {
+            property.MinimumValue = ReadValue(
+                propertyType,
+                ref minimumValue,
+                SpecDynamicValueContext.AllowSwitch,
+                options,
+                minimumIsExclusive ? MinimumExclusiveProperty : MinimumProperty
+            );
+            property.ExceptionsAreWhitelist = true;
+        }
+
+        if (maximumValue.TokenType != JsonTokenType.None)
+        {
+            property.MaximumValue = ReadValue(
+                propertyType,
+                ref maximumValue,
+                SpecDynamicValueContext.AllowSwitch,
+                options,
+                maximumIsExclusive ? MaximumExclusiveProperty : MaximumProperty
+            );
+            property.ExceptionsAreWhitelist = true;
+        }
+
+        if (exceptValue.TokenType != JsonTokenType.None)
+        {
+            if (exceptValue.TokenType != JsonTokenType.StartArray)
             {
-                property.IncludedDefaultValue = ReadDefaultValue(ref includedDefaultValueReader, options, propertyType);
+                property.Exceptions = new OneOrMore<ISpecDynamicValue>(
+                    ReadValue(
+                        propertyType,
+                        ref exceptValue,
+                        SpecDynamicValueContext.AllowSwitch,
+                        options,
+                        in ExceptProperty
+                    )
+                );
             }
-            catch (Exception ex)
+            else
             {
-                throw new JsonException($"Failed to read property \"{IncludedDefaultValueProperty.ToString()}\" while reading SpecProperty.", ex);
+                Utf8JsonReader rTemp = exceptValue;
+                if (rTemp.Read())
+                {
+                    switch (rTemp.TokenType)
+                    {
+                        case JsonTokenType.EndArray:
+                            property.Exceptions = OneOrMore<ISpecDynamicValue>.Null;
+                            break;
+
+                        case JsonTokenType.StartObject:
+                            property.Exceptions = new OneOrMore<ISpecDynamicValue>(ReadValue(
+                                propertyType,
+                                ref exceptValue,
+                                SpecDynamicValueContext.AllowSwitch,
+                                options,
+                                in ExceptProperty
+                            ));
+                            break;
+
+                        default:
+                            property.Exceptions = ReadExceptionList(propertyType, ref rTemp, options);
+                            break;
+                    }
+                }
             }
+        }
+        else
+        {
+            property.Exceptions = OneOrMore<ISpecDynamicValue>.Null;
         }
 
         return property;
+    }
+
+    private static OneOrMore<ISpecDynamicValue> ReadExceptionList(
+        ISpecPropertyType propertyType,
+        ref Utf8JsonReader reader,
+        JsonSerializerOptions? options)
+    {
+        OneOrMore<ISpecDynamicValue> list = OneOrMore<ISpecDynamicValue>.Null;
+
+        if (reader.TokenType == JsonTokenType.StartArray)
+        {
+            if (!reader.Read() || reader.TokenType == JsonTokenType.EndArray)
+                return list;
+        }
+            
+        do
+        {
+            list = list.Add(ReadValue(
+                propertyType,
+                ref reader,
+                SpecDynamicValueContext.AllowSwitch,
+                options,
+                in ExceptProperty)
+            );
+        }
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray);
+
+        return list;
+    }
+
+    private static ISpecDynamicValue ReadValue(
+        ISpecPropertyType propertyType,
+        ref Utf8JsonReader reader,
+        SpecDynamicValueContext context,
+        JsonSerializerOptions? options,
+        in JsonEncodedText property)
+    {
+        if (propertyType is UnresolvedSpecPropertyType unresolvedSpecPropertyType)
+        {
+            return new UnresolvedDynamicValue(
+                unresolvedSpecPropertyType,
+                JsonDocument.ParseValue(ref reader),
+                options,
+                $"SpecProperty.\"{property.ToString()}\"",
+                context
+            );
+        }
+
+        try
+        {
+            return SpecDynamicValue.Read(ref reader, options, context, propertyType);
+        }
+        catch (Exception ex)
+        {
+            throw new JsonException($"Failed to read property \"{property.ToString()}\" while reading SpecProperty.", ex);
+        }
     }
 
     private static void ReadKeyGroups(ref Utf8JsonReader reader, SpecProperty property)
@@ -441,13 +618,6 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         }
 
         return array;
-    }
-
-    private static ISpecDynamicValue ReadDefaultValue(
-        ref Utf8JsonReader reader, JsonSerializerOptions? options, ISpecPropertyType? expectedPropertyType
-    )
-    {
-        return SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowSwitch, expectedPropertyType);
     }
 
     private static void ThrowUnexpectedToken(JsonTokenType tokenType, int propType)

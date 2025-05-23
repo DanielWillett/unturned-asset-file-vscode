@@ -1,12 +1,10 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Transactions;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
@@ -105,24 +103,19 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                 if (propType != -1)
                     throw new JsonException($"Failed to read ISpecType property {Properties[propType].ToString()}.");
 
-                // extra properties
-                if (key != null)
-                {
-                    if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
-                    {
-                        extraData = extraData.Add(new KeyValuePair<string, object?>(key, extraValue));
-                    }
-                }
-                else
-                {
-                    reader.Skip();
-                }
-
                 continue;
             }
 
             switch (propType)
             {
+                case -1:
+                    // extra properties
+                    if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
+                    {
+                        extraData = extraData.Add(new KeyValuePair<string, object?>(key!, extraValue));
+                    }
+                    break;
+
                 case 0: // Type
                     if (reader.TokenType is not JsonTokenType.String)
                         ThrowUnexpectedToken(reader.TokenType, propType);
@@ -311,24 +304,19 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                 if (propType != -1)
                     throw new JsonException($"Failed to read enum value property {EnumProperties[propType].ToString()}.");
 
-                // extra properties
-                if (key != null)
-                {
-                    if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
-                    {
-                        extraData = extraData.Add(new KeyValuePair<string, object?>(key, extraValue));
-                    }
-                }
-                else
-                {
-                    reader.Skip();
-                }
-
                 continue;
             }
 
             switch (propType)
             {
+                case -1:
+                    // extra properties
+                    if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
+                    {
+                        extraData = extraData.Add(new KeyValuePair<string, object?>(key!, extraValue));
+                    }
+                    break;
+
                 case 0: // Value
                     if (reader.TokenType is not JsonTokenType.String)
                         ThrowUnexpectedTokenEnumValue(reader.TokenType, propType);

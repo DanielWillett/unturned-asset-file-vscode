@@ -1,6 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,24 +12,25 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
 {
     private static readonly JsonEncodedText[] Operations =
     [
-        JsonEncodedText.Encode("lt"), 
-        JsonEncodedText.Encode("gt"), 
-        JsonEncodedText.Encode("lte"), 
-        JsonEncodedText.Encode("gte"), 
-        JsonEncodedText.Encode("eq"), 
-        JsonEncodedText.Encode("neq"), 
-        JsonEncodedText.Encode("contains"), 
-        JsonEncodedText.Encode("starts with"), 
-        JsonEncodedText.Encode("ends with"), 
-        JsonEncodedText.Encode("matches"), 
-        JsonEncodedText.Encode("contains-i"), 
-        JsonEncodedText.Encode("eq-i"), 
-        JsonEncodedText.Encode("starts with-i"), 
-        JsonEncodedText.Encode("ends with-i"), 
-        JsonEncodedText.Encode("assignable-to"), 
-        JsonEncodedText.Encode("assignable-from"), 
-        JsonEncodedText.Encode("included"), 
-        JsonEncodedText.Encode("is-type")
+        JsonEncodedText.Encode("lt"),               // LessThan
+        JsonEncodedText.Encode("gt"),               // GreaterThan
+        JsonEncodedText.Encode("lte"),              // LessThanOrEqual
+        JsonEncodedText.Encode("gte"),              // GreaterThanOrEqual
+        JsonEncodedText.Encode("eq"),               // Equal
+        JsonEncodedText.Encode("neq"),              // NotEqual
+        JsonEncodedText.Encode("neq-i"),            // NotEqualCaseInsensitive
+        JsonEncodedText.Encode("contains"),         // Containing
+        JsonEncodedText.Encode("starts with"),      // StartingWith
+        JsonEncodedText.Encode("ends with"),        // EndingWith
+        JsonEncodedText.Encode("matches"),          // Matching
+        JsonEncodedText.Encode("contains-i"),       // ContainingCaseInsensitive
+        JsonEncodedText.Encode("eq-i"),             // EqualCaseInsensitive
+        JsonEncodedText.Encode("starts with-i"),    // StartingWithCaseInsensitive
+        JsonEncodedText.Encode("ends with-i"),      // EndingWithCaseInsensitive
+        JsonEncodedText.Encode("assignable-to"),    // AssignableTo
+        JsonEncodedText.Encode("assignable-from"),  // AssignableFrom
+        JsonEncodedText.Encode("included"),         // Included
+        JsonEncodedText.Encode("is-type")           // ReferenceIsOfType
     ];
 
     private static readonly JsonEncodedText VariableProperty = JsonEncodedText.Encode("Variable");
@@ -69,8 +71,6 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
         ConditionOperation? operation = null;
         bool hasComparand = false;
         object? comparand = null;
-        Utf8JsonReader valueReader = default;
-        bool hasValueReader = false;
 
         while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
@@ -103,20 +103,12 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
             }
             else if (reader.ValueTextEquals(ComparandProperty.EncodedUtf8Bytes))
             {
-                if (!reader.Read())
+                if (!reader.Read() || !JsonHelper.TryReadGenericValue(ref reader, out object? obj))
+                {
                     throw new JsonException("Failed to read 'Comparand' in SpecCondition.");
-
-                if (variable != null)
-                {
-                    comparand = SpecDynamicValue.ReadValue(ref reader, variable.ValueType, ThrowInvalidType);
-                    hasValueReader = false;
-                }
-                else
-                {
-                    valueReader = reader;
-                    hasValueReader = true;
                 }
 
+                comparand = obj;
                 hasComparand = true;
             }
             else
@@ -131,12 +123,6 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
 
         if (!operation.HasValue)
             throw new JsonException("Missing 'Operation' while reading SpecCondition.");
-
-        if (hasValueReader)
-        {
-            comparand = SpecDynamicValue.ReadValue(ref valueReader, variable.ValueType, ThrowInvalidType);
-            hasComparand = true;
-        }
 
         if (!hasComparand)
             throw new JsonException("Missing 'Comparand' while reading SpecCondition.");
@@ -169,101 +155,9 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
 
         writer.WritePropertyName(ComparandProperty);
 
-        if (value.Comparand == null)
-        {
-            writer.WriteNullValue();
-        }
-        else if (value.Comparand is IConvertible c)
-        {
-            TypeCode typeCode = c.GetTypeCode();
-            switch (typeCode)
-            {
-                case TypeCode.Empty:
-                case TypeCode.Object:
-                case TypeCode.DBNull:
-                case (TypeCode)17:
-                default:
-                    writer.WriteNullValue();
-                    break;
-                case TypeCode.Boolean:
-                    writer.WriteBooleanValue((bool)value.Comparand);
-                    break;
-                case TypeCode.Char:
-                    writer.WriteStringValue(value.Comparand.ToString());
-                    break;
-                case TypeCode.SByte:
-                    writer.WriteNumberValue((sbyte)value.Comparand);
-                    break;
-                case TypeCode.Byte:
-                    writer.WriteNumberValue((byte)value.Comparand);
-                    break;
-                case TypeCode.Int16:
-                    writer.WriteNumberValue((short)value.Comparand);
-                    break;
-                case TypeCode.UInt16:
-                    writer.WriteNumberValue((ushort)value.Comparand);
-                    break;
-                case TypeCode.Int32:
-                    writer.WriteNumberValue((int)value.Comparand);
-                    break;
-                case TypeCode.UInt32:
-                    writer.WriteNumberValue((uint)value.Comparand);
-                    break;
-                case TypeCode.Int64:
-                    writer.WriteNumberValue((long)value.Comparand);
-                    break;
-                case TypeCode.UInt64:
-                    writer.WriteNumberValue((ulong)value.Comparand);
-                    break;
-                case TypeCode.Single:
-                    writer.WriteNumberValue((float)value.Comparand);
-                    break;
-                case TypeCode.Double:
-                    writer.WriteNumberValue((double)value.Comparand);
-                    break;
-                case TypeCode.Decimal:
-                    writer.WriteNumberValue((decimal)value.Comparand);
-                    break;
-                case TypeCode.DateTime:
-                    writer.WriteStringValue((DateTime)value.Comparand);
-                    break;
-                case TypeCode.String:
-                    writer.WriteStringValue((string)value.Comparand);
-                    break;
-            }
-        }
-        else
-        {
-            switch (value.Comparand)
-            {
-                case Guid g:
-                    writer.WriteStringValue(g);
-                    break;
-
-                case DateTimeOffset dt:
-                    writer.WriteStringValue(dt);
-                    break;
-
-                default:
-                    writer.WriteStringValue(value.Comparand.ToString());
-                    break;
-            }
-        }
+        JsonHelper.WriteGenericValue(writer, value.Comparand);
 
         writer.WriteEndObject();
-    }
-
-    private static ISpecDynamicValue ThrowInvalidType(Type? t, ISpecPropertyType type)
-    {
-        if (t == null)
-            return ThrowInvalidType(type);
-
-        throw new JsonException($"Expected type {type.DisplayName} ({type.ValueType}) for 'Comparand' in SpecCondition but instead, {t} was given.");
-    }
-
-    private static ISpecDynamicValue ThrowInvalidType(ISpecPropertyType type)
-    {
-        throw new JsonException($"Expected type {type.DisplayName} ({type.ValueType}) for 'Comparand' in SpecCondition, but the given type couldn't be converted.");
     }
 
     /// <inheritdoc />

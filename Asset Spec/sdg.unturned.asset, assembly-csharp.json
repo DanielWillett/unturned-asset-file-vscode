@@ -811,7 +811,6 @@
                     "ElementType": "Int32",
                     "Description": "Comma-separated indexes of other conditions that must be met first before this condition will be visible in-game.",
                     "ValueRegexGroupReference": "#This.KeyGroups[-1]{PreventSelfReference=true}",
-                    "Minimum": 0,
                     "DefaultValue": null,
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "uiRequirementIndices"
@@ -1123,7 +1122,6 @@
                         },
                         {
                             "Key": "Nav",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Nav",
@@ -1143,23 +1141,24 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "#Self.Key",
-                            "Value": "*",
-                            "Condition":
-                            {
-                                "Variable": "Spawn_Quantity",
-                                "Operation": "gt",
-                                "Comparand": 0
-                            }
-                        },
-                        {
                             "Key": "Nav",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Nav",
                                 "Operation": "neq",
                                 "Comparand": 255
+                            }
+                        }
+                    ],
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Spawn",
+                            "Condition":
+                            {
+                                "Variable": "Spawn_Quantity",
+                                "Operation": "lte",
+                                "Comparand": 0
                             }
                         }
                     ],
@@ -2298,7 +2297,6 @@
                     [
                         {
                             "Key": "ID",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "ID",
@@ -2320,7 +2318,6 @@
                     [
                         {
                             "Key": "ID",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "ID",
@@ -2342,7 +2339,6 @@
                     [
                         {
                             "Key": "ID",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "ID",
@@ -2364,7 +2360,6 @@
                     [
                         {
                             "Key": "ID",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "ID",
@@ -2386,7 +2381,6 @@
                     [
                         {
                             "Key": "ID",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "ID",
@@ -2410,7 +2404,6 @@
                     [
                         {
                             "Key": "ID",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "ID",

@@ -9,7 +9,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class ListSpecPropertyType<TElementType> :
     BaseSpecPropertyType<EquatableArray<TElementType>>,
     ISpecPropertyType<EquatableArray<TElementType>>,
-    IEquatable<ListSpecPropertyType<TElementType>>
+    IEquatable<ListSpecPropertyType<TElementType>?>
     where TElementType : IEquatable<TElementType>
 {
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -92,18 +92,19 @@ public sealed class ListSpecPropertyType<TElementType> :
     }
 
     /// <inheritdoc />
-    public bool Equals(ListSpecPropertyType<TElementType> other) => other != null && InnerType.Equals(other.InnerType);
+    public bool Equals(ListSpecPropertyType<TElementType>? other) => other != null && InnerType.Equals(other.InnerType);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
+    public bool Equals(ISpecPropertyType? other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<EquatableArray<TElementType>> other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
+    public bool Equals(ISpecPropertyType<EquatableArray<TElementType>>? other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
 }
 
 internal sealed class UnresolvedListSpecPropertyType :
-    IEquatable<UnresolvedListSpecPropertyType>,
-    ISecondPassSpecPropertyType
+    IEquatable<UnresolvedListSpecPropertyType?>,
+    ISecondPassSpecPropertyType,
+    IDisposable
 {
     public ISecondPassSpecPropertyType InnerType { get; }
 
@@ -117,11 +118,16 @@ internal sealed class UnresolvedListSpecPropertyType :
         InnerType = innerType ?? throw new ArgumentNullException(nameof(innerType));
     }
 
-    public bool Equals(UnresolvedListSpecPropertyType other) => other != null && InnerType.Equals(other.InnerType);
-    public bool Equals(ISpecPropertyType other) => other is UnresolvedListSpecPropertyType l && Equals(l);
+    public bool Equals(UnresolvedListSpecPropertyType? other) => other != null && InnerType.Equals(other.InnerType);
+    public bool Equals(ISpecPropertyType? other) => other is UnresolvedListSpecPropertyType l && Equals(l);
     public override bool Equals(object? obj) => obj is UnresolvedListSpecPropertyType l && Equals(l);
     public override int GetHashCode() => InnerType.GetHashCode();
     public override string ToString() => $"Unresolved List of {InnerType.Type}";
+    public void Dispose()
+    {
+        if (InnerType is IDisposable d)
+            d.Dispose();
+    }
 
     public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => null;
 

@@ -405,18 +405,53 @@
                             "description": "Inclusive maximum value of the property. Can also be another property."
                         },
                         "MinimumExclusive": {
-                            "type": [ "number", "string", "null" ],
+                            "oneOf": [
+                                {
+                                    "type": [ "string", "number", "integer", "boolean", "null" ]
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
+                            ],
                             "description": "Exclusive minimum value of the property. Can also be another property."
                         },
                         "MaximumExclusive": {
-                            "type": [ "number", "string", "null" ],
+                            "oneOf": [
+                                {
+                                    "type": [ "string", "number", "integer", "boolean", "null" ]
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
+                            ],
                             "description": "Exclusive maximum value of the property. Can also be another property."
                         },
                         "Except": {
-                            "type": "array",
-                            "items": {
-                                "type": [ "number", "string" ]
-                            },
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "oneOf": [
+                                            {
+                                                "type": [ "string", "number", "integer", "boolean", "null" ]
+                                            },
+                                            {
+                                                "$ref": "#/$defs/switch"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "oneOf": [
+                                        {
+                                            "type": [ "string", "number", "integer", "boolean", "null" ]
+                                        },
+                                        {
+                                            "$ref": "#/$defs/switch"
+                                        }
+                                    ]
+                                }
+                            ],
                             "description": "Exceptions to the minimum/maximum range."
                         },
                         "ExclusiveWith": {
@@ -454,7 +489,7 @@
                                                 "description": "Optional condition when this should be applied."
                                             }
                                         },
-                                        "required": [ "Key", "Value" ]
+                                        "required": [ "Key" ]
                                     },
                                     "description": "List of properties with values that should not co-exist with this property."
                                 }

@@ -79,24 +79,19 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
                 if (propType != -1)
                     throw new JsonException($"Failed to read AssetSpecType property {Properties[propType].ToString()}.");
 
-                // extra properties
-                if (key != null)
-                {
-                    if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
-                    {
-                        type.ExtendedData = type.ExtendedData.Add(new KeyValuePair<string, object?>(key, extraValue));
-                    }
-                }
-                else
-                {
-                    reader.Skip();
-                }
-
                 continue;
             }
 
             switch (propType)
             {
+                case -1:
+                    // extra properties
+                    if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
+                    {
+                        type.ExtendedData = type.ExtendedData.Add(new KeyValuePair<string, object?>(key!, extraValue));
+                    }
+                    break;
+
                 case 0: // Type
                     if (reader.TokenType is not JsonTokenType.String)
                         ThrowUnexpectedToken(reader.TokenType, propType);

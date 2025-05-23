@@ -248,7 +248,8 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         AssetSpecDatabaseWrapper wrapper = new AssetSpecDatabaseWrapper(this, types);
 
         PerformSecondPass(types, passes, wrapper);
-        PerformThirdPass(types, passes);
+        PerformThirdPass(types, passes, wrapper);
+        PerformFourthPass(types, passes);
 
         Types = types;
         return;
@@ -493,6 +494,8 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                 try
                 {
                     prop.Type = s.Transform(prop, wrapper, info.Owner);
+                    if (s is IDisposable disp)
+                        disp.Dispose();
                 }
                 catch (Exception ex)
                 {
@@ -506,11 +509,69 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     }
 
     /// <summary>
-    /// Copies properties from parent types up to the current object.
+    /// Replaces values with unresolved values with the correct values.
     /// </summary>
-    private void PerformThirdPass(Dictionary<QualifiedType, AssetSpecType> types, Dictionary<QualifiedType, int> passes)
+    private void PerformThirdPass(Dictionary<QualifiedType, AssetSpecType> types, Dictionary<QualifiedType, int> passes, AssetSpecDatabaseWrapper wrapper)
     {
         const int pass = 3;
+        foreach (AssetSpecType info in types.Values)
+        {
+            ForEachTypeInHierarchyWhile(info, types, t =>
+            {
+                Run(t, passes, wrapper);
+                return true;
+            }, reversed: true);
+            foreach (CustomSpecType type in info.Types.OfType<CustomSpecType>())
+            {
+                ForEachTypeInHierarchyWhile(type, types, t =>
+                {
+                    Run(t, passes, wrapper);
+                    return true;
+                }, reversed: true);
+            }
+        }
+
+        return;
+        void Run(ISpecType info, Dictionary<QualifiedType, int> passes, AssetSpecDatabaseWrapper wrapper)
+        {
+            if (passes.TryGetValue(info.Type, out int v) && v >= pass)
+                return;
+
+            passes[info.Type] = pass;
+
+            ForEachPropertyWhile(info, prop =>
+            {
+                prop.ProcessValues(value =>
+                {
+                    if (value is not ISecondPassSpecDynamicValue s)
+                        return value;
+
+                    try
+                    {
+                        value = s.Transform(prop, wrapper, info.Owner);
+                        if (s is IDisposable disp)
+                            disp.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log($"Failed to perform second pass on property \"{prop.Key}\" in type \"{prop.Owner.Type}\"");
+                        Log(ex.ToString());
+                    }
+
+                    return value;
+                });
+
+                return true;
+            });
+        }
+    }
+
+    /// <summary>
+    /// Copies properties from parent types up to the current object.
+    /// </summary>
+    private void PerformFourthPass(Dictionary<QualifiedType, AssetSpecType> types, Dictionary<QualifiedType, int> passes)
+    {
+        const int pass = 4;
         foreach (AssetSpecType info in types.Values)
         {
             ForEachTypeInHierarchyWhile(info, types, t =>
