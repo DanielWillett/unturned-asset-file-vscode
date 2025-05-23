@@ -159,7 +159,7 @@ public static class ConditionOperationExtensions
 
     public static bool EvaluateNulls(this ConditionOperation op, bool valueIsNull, bool comparandIsNull)
     {
-        if (!valueIsNull && !valueIsNull)
+        if (!valueIsNull && !comparandIsNull)
             throw new ArgumentException("Expected at least one null value.");
 
         if (op == ConditionOperation.Included)

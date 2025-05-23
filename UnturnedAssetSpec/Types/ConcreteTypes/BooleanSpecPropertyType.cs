@@ -1,10 +1,12 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
+using System.Threading.Tasks;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecPropertyType, bool>, IStringParseableSpecPropertyType
+public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecPropertyType, bool>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
     public static readonly BooleanSpecPropertyType Instance = new BooleanSpecPropertyType();
 
@@ -72,5 +74,16 @@ public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecP
 
         value = true;
         return true;
+    }
+
+    private static readonly Task<AutoCompleteResult[]> BooleanResults = Task.FromResult(new AutoCompleteResult[]
+    {
+        new AutoCompleteResult("true"),
+        new AutoCompleteResult("false")
+    });
+
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(AutoCompleteParameters parameters)
+    {
+        return BooleanResults;
     }
 }

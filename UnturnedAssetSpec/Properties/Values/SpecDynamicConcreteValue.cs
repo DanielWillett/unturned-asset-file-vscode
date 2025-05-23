@@ -1,12 +1,12 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -281,12 +281,13 @@ public sealed class SpecDynamicConcreteValue<T> :
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
     {
+        isNull = IsNull;
         if (typeof(TValue) != typeof(T))
         {
-            throw new ArgumentException("Invalid type, expected int.");
+            value = default!;
+            return false;
         }
 
-        isNull = IsNull;
         if (isNull)
         {
             value = default!;

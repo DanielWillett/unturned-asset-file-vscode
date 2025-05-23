@@ -30,6 +30,12 @@ public readonly struct FileLineIndex
         _indices = indices;
     }
 
+    public char GetChar(int line, int column)
+    {
+        ReadOnlySpan<char> fullLine = SliceLine(line, column, column + 1);
+        return fullLine.IsEmpty ? ' ' : fullLine[0];
+    }
+
     public ReadOnlySpan<char> SliceLine(int line, int startColumn = 1, int endColumn = -1)
     {
         return SliceLine(line, out _, out _, startColumn, endColumn);
@@ -52,7 +58,11 @@ public readonly struct FileLineIndex
             : _indices[lineIndex + 1]) - 1;
 
         if (lineEnd > 0 && _text[lineEnd - 1] != '\r')
+        {
             ++lineEnd;
+            if (lineEnd >= _text.Length && _text[lineEnd - 1] != '\n')
+                ++lineEnd;
+        }
 
         if (lineIndex >= 0)
         {

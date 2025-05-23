@@ -14869,12 +14869,12 @@ var require_client = __commonJS({
       CloseAction2[CloseAction2["DoNotRestart"] = 1] = "DoNotRestart";
       CloseAction2[CloseAction2["Restart"] = 2] = "Restart";
     })(CloseAction || (exports2.CloseAction = CloseAction = {}));
-    var State;
-    (function(State2) {
-      State2[State2["Stopped"] = 1] = "Stopped";
-      State2[State2["Starting"] = 3] = "Starting";
-      State2[State2["Running"] = 2] = "Running";
-    })(State || (exports2.State = State = {}));
+    var State2;
+    (function(State3) {
+      State3[State3["Stopped"] = 1] = "Stopped";
+      State3[State3["Starting"] = 3] = "Starting";
+      State3[State3["Running"] = 2] = "Running";
+    })(State2 || (exports2.State = State2 = {}));
     var SuspendMode;
     (function(SuspendMode2) {
       SuspendMode2["off"] = "off";
@@ -15077,11 +15077,11 @@ var require_client = __commonJS({
       getPublicState() {
         switch (this.$state) {
           case ClientState.Starting:
-            return State.Starting;
+            return State2.Starting;
           case ClientState.Running:
-            return State.Running;
+            return State2.Running;
           default:
-            return State.Stopped;
+            return State2.Stopped;
         }
       }
       get initializeResult() {
@@ -17999,13 +17999,13 @@ var AssetPropertiesViewProvider = class {
   onDidChangeTreeData = this._onDidChangeTreeData.event;
   async refresh() {
     const txtDoc = vscode.window.activeTextEditor;
-    if (txtDoc == void 0 || !isDatFile(txtDoc.document.uri)) {
-      if (this.propertyValues.length == 0)
+    if (txtDoc === void 0 || !isDatFile(txtDoc.document.uri)) {
+      if (this.propertyValues.length === 0)
         return false;
       this.propertyValues = [];
     } else {
       const result = await getClient().sendRequest(DiscoverAssetProperties, { document: txtDoc.document.uri.toString() });
-      if (this.propertyValues.length == result.length && result.every((prop, i) => this.propertyValues[i].property == prop))
+      if (this.propertyValues.length === result.length && result.every((prop, i) => this.propertyValues[i].property === prop))
         return false;
       this.propertyValues = result.map((prop) => new AssetPropertyViewItem(prop));
     }
@@ -18037,6 +18037,9 @@ var AssetPropertyViewItem = class extends vscode.TreeItem {
   }
 };
 function getName(property) {
+  if (property.value === null) {
+    return `${property.key} = [no value]`;
+  }
   switch (typeof property.value) {
     case "undefined":
     case "function":
@@ -18055,7 +18058,7 @@ function getName(property) {
 // src/extension.ts
 var import_node = __toESM(require_node3());
 var client;
-var textDocChangeEventSub;
+var eventSubs = [];
 var assetPropertiesViewProvider;
 function getClient() {
   if (client == void 0) {
@@ -18096,19 +18099,24 @@ async function activate(context) {
     if (assetPropertiesViewProvider)
       await assetPropertiesViewProvider.refresh();
   });
-  textDocChangeEventSub = import_vscode.default.window.onDidChangeActiveTextEditor(() => {
+  eventSubs.push(import_vscode.default.window.onDidChangeActiveTextEditor(() => {
     return import_vscode.default.commands.executeCommand("unturnedDataFile.assetProperties.refreshAssetProperties");
-  });
+  }));
   if (client) {
+    eventSubs.push(client.onDidChangeState(async (event) => {
+      if (event.newState != import_node.State.Running)
+        return;
+      await import_vscode.default.window.showInformationMessage("LSP initialized.");
+      if (assetPropertiesViewProvider && import_vscode.default.window.activeTextEditor != null)
+        await assetPropertiesViewProvider.refresh();
+    }));
     client.start();
   }
 }
 async function deactivate() {
   console.log("Deactivating...");
-  if (textDocChangeEventSub) {
-    textDocChangeEventSub.dispose();
-    textDocChangeEventSub = void 0;
-  }
+  eventSubs.forEach((f) => f.dispose());
+  eventSubs = [];
   if (assetPropertiesViewProvider) {
     assetPropertiesViewProvider = void 0;
   }

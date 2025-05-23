@@ -1,5 +1,5 @@
 import * as path from 'path';
-import vscode from 'vscode';
+import vscode, { tasks } from 'vscode';
 import { Trace } from 'vscode-jsonrpc';
 import * as fs from 'fs'
 
@@ -9,12 +9,13 @@ import {
   LanguageClient,
   LanguageClientOptions,
   ServerOptions,
+  State,
   TransportKind
 } from 'vscode-languageclient/node';
 
 let client: LanguageClient | undefined;
 
-let textDocChangeEventSub: vscode.Disposable | undefined;
+let eventSubs: vscode.Disposable[] = [];
 
 let assetPropertiesViewProvider: AssetPropertiesViewProvider | undefined;
 
@@ -68,11 +69,23 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 			await assetPropertiesViewProvider.refresh();
 	});
 
-	textDocChangeEventSub = vscode.window.onDidChangeActiveTextEditor(() => {
+	eventSubs.push(vscode.window.onDidChangeActiveTextEditor(() => {
 		return vscode.commands.executeCommand('unturnedDataFile.assetProperties.refreshAssetProperties');
-	});
+	}));
 
 	if (client) {
+
+		eventSubs.push(client.onDidChangeState(async event => {
+
+			if (event.newState != State.Running)
+				return;
+
+			await vscode.window.showInformationMessage("LSP initialized.");
+
+			if (assetPropertiesViewProvider && vscode.window.activeTextEditor != null)
+				await assetPropertiesViewProvider.refresh();
+		}));
+
 		client.start();
 	}
 }
@@ -80,10 +93,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 export async function deactivate(): Promise<void> {
 
 	console.log("Deactivating...");
-	if (textDocChangeEventSub) {
-		textDocChangeEventSub.dispose();
-		textDocChangeEventSub = undefined;
-	}
+
+	eventSubs.forEach(f => f.dispose());
+	eventSubs = [];
 
 	if (assetPropertiesViewProvider) {
 		assetPropertiesViewProvider = undefined;

@@ -17,15 +17,15 @@ export class AssetPropertiesViewProvider implements vscode.TreeDataProvider<Asse
     async refresh(): Promise<boolean> {
         const txtDoc = vscode.window.activeTextEditor;
 
-        if (txtDoc == undefined || !path.isDatFile(txtDoc.document.uri)) {
-            if (this.propertyValues.length == 0)
+        if (txtDoc === undefined || !path.isDatFile(txtDoc.document.uri)) {
+            if (this.propertyValues.length === 0)
                 return false;
 
             this.propertyValues = [];
         }
         else {
             const result = await ext.getClient().sendRequest(DiscoverAssetProperties, { document: txtDoc.document.uri.toString() });
-            if (this.propertyValues.length == result.length && result.every((prop, i) => this.propertyValues[i].property == prop))
+            if (this.propertyValues.length === result.length && result.every((prop, i) => this.propertyValues[i].property === prop))
                 return false;
 
             this.propertyValues = result.map(prop => new AssetPropertyViewItem(prop));
@@ -74,6 +74,10 @@ class AssetPropertyViewItem extends vscode.TreeItem {
 
 function getName(property: AssetProperty): string {
 
+    if (property.value === null) {
+        return `${property.key} = [no value]`;
+    }
+
     switch (typeof (property.value)) {
         case "undefined":
         case "function":
@@ -84,9 +88,9 @@ function getName(property: AssetProperty): string {
         case "number":
         case "boolean":
         case "string":
-            return `${property.key} = \"${property.value.toString()}\"`
+            return `${property.key} = \"${property.value.toString()}\"`;
 
         default:
-            return `${property.key} = ${JSON.stringify(property.value)}`
+            return `${property.key} = ${JSON.stringify(property.value)}`;
     }
 }

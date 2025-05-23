@@ -73,7 +73,7 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
     /// <summary>
     /// Other keys that can be used for the flag or property.
     /// </summary>
-    public OneOrMore<string> Aliases { get; set; }
+    public OneOrMore<string> Aliases { get; set; } = OneOrMore<string>.Null;
 
     /// <summary>
     /// If this property can be read from the Metadata section.
@@ -139,7 +139,7 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
     /// <summary>
     /// A blacklist of allowed values, or a whitelist of allowed values outside the minimum and/or maximum.
     /// </summary>
-    public OneOrMore<ISpecDynamicValue> Exceptions { get; set; }
+    public OneOrMore<ISpecDynamicValue> Exceptions { get; set; } = OneOrMore<ISpecDynamicValue>.Null;
 
     /// <summary>
     /// If <see cref="Exceptions"/> should be treated as a whitelist of allowed values outside the minimum and/or maximum values instead of a blacklist.
@@ -149,7 +149,7 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
     /// <summary>
     /// If <see cref="KeyIsRegex"/> is <see langword="true"/>, then this is a list of groups by name to match with other properties within the given regex group.
     /// </summary>
-    public OneOrMore<RegexKeyGroup> KeyGroups { get; set; }
+    public OneOrMore<RegexKeyGroup> KeyGroups { get; set; } = OneOrMore<RegexKeyGroup>.Null;
 
     /// <summary>
     /// Properties that must also exist if this property exists.

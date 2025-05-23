@@ -16,6 +16,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 
 internal class KeyCompletionHandler : ICompletionHandler
 {
+    private static readonly Container<string> CommitKeys = new Container<string>("\t");
+    private static readonly Container<string> FlagCommitKeys = new Container<string>(" ", "\t");
+
     private readonly ILogger<KeyCompletionHandler> _logger;
     private readonly CompletionRegistrationOptions _completionRegistrationOptions;
     private readonly OpenedFileTracker _fileTracker;
@@ -39,41 +42,36 @@ internal class KeyCompletionHandler : ICompletionHandler
 
     private void FindSpecProperties(ref KeyCompletionState state, List<CompletionItem> completions)
     {
-        InverseTypeHierarchy hierarchy = state.TypeHierarchy;
-        for (int i = -1; i < hierarchy.ParentTypes.Length; ++i)
+        if (!_specDictionary.Types.TryGetValue(state.TypeHierarchy.Type, out AssetSpecType? info))
+            return;
+
+        state.Alias = null;
+        foreach (SpecProperty property in info.Properties)
         {
-            QualifiedType type = i < 0 ? state.TypeHierarchy.Type : hierarchy.ParentTypes[i];
-            if (!_specDictionary.Types.TryGetValue(type, out AssetSpecType? info))
+            if (property.Key == null || property.IsHidden)
                 continue;
 
-            state.Alias = null;
-            foreach (SpecProperty property in info.Properties)
-            {
-                if (property.Key == null)
-                    continue;
+            state.Property = property;
+            completions.Add(CreateCompletionItemForKey(in state));
+        }
 
+        foreach (SpecProperty property in info.Properties)
+        {
+            if (property.Aliases.IsNull || property.IsHidden)
+                continue;
+
+            foreach (string a in property.Aliases)
+            {
                 state.Property = property;
+                state.Alias = a;
                 completions.Add(CreateCompletionItemForKey(in state));
-            }
-
-            foreach (SpecProperty property in info.Properties)
-            {
-                if (property.Aliases.IsNull)
-                    continue;
-
-                foreach (string a in property.Aliases)
-                {
-                    state.Property = property;
-                    state.Alias = a;
-                    completions.Add(CreateCompletionItemForKey(in state));
-                }
             }
         }
     }
 
     private static CompletionItem CreateCompletionItemForKey(in KeyCompletionState state)
     {
-        TextEditOrInsertReplaceEdit? edit = null;
+        TextEditOrInsertReplaceEdit? edit;
 
         SpecProperty property = state.Property;
         bool needsQuotes = state.Node is AssetFileKeyNode { IsQuoted: true } || property.Key.Any(char.IsWhiteSpace);
@@ -114,10 +112,10 @@ internal class KeyCompletionHandler : ICompletionHandler
             SortText = property.Key,
             InsertTextMode = InsertTextMode.AsIs,
             Kind = CompletionItemKind.Property,
-            LabelDetails = new CompletionItemLabelDetails { Description = property.Description, Detail = property.Type.DisplayName },
+            LabelDetails = new CompletionItemLabelDetails { Description = property.Description, Detail = ": " + property.Type.DisplayName },
             Deprecated = property.Deprecated,
             Tags = property.Deprecated ? new Container<CompletionItemTag>(CompletionItemTag.Deprecated) : null,
-            Detail = " " + property.Type,
+            Detail = property.Type.DisplayName,
             Documentation =
                 property.Markdown != null
                 ? new StringOrMarkupContent(new MarkupContent
@@ -127,7 +125,7 @@ internal class KeyCompletionHandler : ICompletionHandler
                 })
                 : property.Description != null ? new StringOrMarkupContent(property.Description) : null,
             InsertTextFormat = InsertTextFormat.PlainText,
-            CommitCharacters = new Container<string>(" ", "\t"),
+            CommitCharacters = property.Type.Equals(KnownTypes.Flag) ? FlagCommitKeys : CommitKeys,
             TextEdit = edit
         };
 
@@ -145,7 +143,13 @@ internal class KeyCompletionHandler : ICompletionHandler
         }
 
         FilePosition position = request.Position.ToFilePosition();
-        bool isOnNewLine = file.LineIndex.SliceLine(position.Line + 1, endColumn: position.Character - 1).IsWhiteSpace();
+
+        FileLineIndex lineIndex = file.LineIndex;
+        while (position.Character > 1 && char.IsWhiteSpace(lineIndex.GetChar(position.Line, position.Character - 1)))
+            --position.Character;
+
+        ReadOnlySpan<char> line = lineIndex.SliceLine(position.Line, endColumn: position.Character - 1);
+        bool isOnNewLine = line.IsWhiteSpace();
 
         AssetFileTree tree = file.File;
 
@@ -161,7 +165,7 @@ internal class KeyCompletionHandler : ICompletionHandler
             key = (strValue.Parent as AssetFileKeyValuePairNode)?.Key;
         }
 
-        if (key != null && _specDictionary.FindPropertyInfo(key.Value, fileType, SpecPropertyContext.Property) is { } property)
+        if (key != null && _specDictionary.FindPropertyInfo(key.Value, fileType, SpecPropertyContext.Property) is { } property && position.Character >= key.Range.End.Character)
         {
             if (property.Type is not IAutoCompleteSpecPropertyType autoComplete)
                 return new CompletionList();
