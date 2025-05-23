@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LspServer": {
+      "commandName": "Project",
+      "hotReloadEnabled": false
+    }
+  }
+}

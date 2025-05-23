@@ -28,7 +28,6 @@
             "Key": "Message_(\\d+)",
             "Type": "SDG.Unturned.DialogueMessage, Assembly-CSharp",
             "KeyIsRegex": true,
-            "DefaultValue": 0,
             "KeyGroups":
             [
                 {
@@ -53,7 +52,6 @@
             "Key": "Response_(\\d+)",
             "Type": "SDG.Unturned.DialogueResponse, Assembly-CSharp",
             "KeyIsRegex": true,
-            "DefaultValue": 0,
             "KeyGroups":
             [
                 {

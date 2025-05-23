@@ -20,6 +20,17 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 public interface IAssetSpecDatabase
 {
     /// <summary>
+    /// If the internet should be used to download the latest data.
+    /// </summary>
+    /// <remarks>Defaults to <see langword="false"/>.</remarks>
+    bool UseInternet { get; set; }
+
+    /// <summary>
+    /// JSON options used to read files.
+    /// </summary>
+    JsonSerializerOptions? Options { get; set; }
+
+    /// <summary>
     /// List of achievements available for NPCs to grant.
     /// </summary>
     string[]? NPCAchievementIds { get; }
@@ -1224,6 +1235,18 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         {
             _db = db;
             Types = types;
+        }
+
+        public bool UseInternet
+        {
+            get => _db.UseInternet;
+            set => _db.UseInternet = value;
+        }
+
+        public JsonSerializerOptions? Options
+        {
+            get => _db.Options;
+            set => _db.Options = value;
         }
 
         public string[]? NPCAchievementIds => _db.NPCAchievementIds;

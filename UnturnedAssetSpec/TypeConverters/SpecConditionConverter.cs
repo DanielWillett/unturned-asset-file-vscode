@@ -20,13 +20,13 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
         JsonEncodedText.Encode("neq"),              // NotEqual
         JsonEncodedText.Encode("neq-i"),            // NotEqualCaseInsensitive
         JsonEncodedText.Encode("contains"),         // Containing
-        JsonEncodedText.Encode("starts with"),      // StartingWith
-        JsonEncodedText.Encode("ends with"),        // EndingWith
+        JsonEncodedText.Encode("starts-with"),      // StartingWith
+        JsonEncodedText.Encode("ends-with"),        // EndingWith
         JsonEncodedText.Encode("matches"),          // Matching
         JsonEncodedText.Encode("contains-i"),       // ContainingCaseInsensitive
         JsonEncodedText.Encode("eq-i"),             // EqualCaseInsensitive
-        JsonEncodedText.Encode("starts with-i"),    // StartingWithCaseInsensitive
-        JsonEncodedText.Encode("ends with-i"),      // EndingWithCaseInsensitive
+        JsonEncodedText.Encode("starts-with-i"),    // StartingWithCaseInsensitive
+        JsonEncodedText.Encode("ends-with-i"),      // EndingWithCaseInsensitive
         JsonEncodedText.Encode("assignable-to"),    // AssignableTo
         JsonEncodedText.Encode("assignable-from"),  // AssignableFrom
         JsonEncodedText.Encode("included"),         // Included

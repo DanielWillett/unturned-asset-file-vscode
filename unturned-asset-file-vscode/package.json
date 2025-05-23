@@ -33,7 +33,34 @@
         "scopeName": "source.unturned-data-file",
         "path": "./syntaxes/unturned-data-file.tmLanguage.json"
       }
-    ]
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "unturnedDataFile.assetProperties",
+          "name": "Asset Properties"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
+        "title": "Refresh Asset Properties",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
+          "when": "view == unturnedDataFile.assetProperties",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

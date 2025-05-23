@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Files;
@@ -29,9 +30,13 @@ internal sealed class UnturnedAssetFileLspServer
     
     private static async Task Main()
     {
+        string logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "log.txt");
+        if (File.Exists(logPath))
+            File.WriteAllBytes(logPath, ReadOnlySpan<byte>.Empty);
+
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
-            .WriteTo.File(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "log.txt"))
+            .WriteTo.File(logPath)
             .MinimumLevel.Debug()
             .CreateLogger();
 
@@ -63,8 +68,7 @@ internal sealed class UnturnedAssetFileLspServer
                         .AddSingleton<DocumentSymbolHandler>()
                         .AddSingleton<HoverHandler>()
                         .AddSingleton<OpenedFileTracker>()
-                        .AddSingleton<LspAssetSpecDatabase>()
-                        .AddTransient<IAssetSpecDatabase, LspAssetSpecDatabase>()
+                        .AddSingleton<IAssetSpecDatabase, LspAssetSpecDatabase>()
                         .AddSingleton<LspInstallationEnvironment>()
                         .AddSingleton<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
                         .AddSingleton(new JsonSerializerOptions
@@ -88,7 +92,7 @@ internal sealed class UnturnedAssetFileLspServer
 
                     _logger = server.Services.GetRequiredService<ILogger<UnturnedAssetFileLspServer>>();
 
-                    LspAssetSpecDatabase db = await InitializeAssetSpecDatabaseAsync(server.Services, token);
+                    IAssetSpecDatabase db = await InitializeAssetSpecDatabaseAsync(server.Services, token);
 
                     workDoneManager.OnNext(new WorkDoneProgressReport
                     {
@@ -130,15 +134,17 @@ internal sealed class UnturnedAssetFileLspServer
 
     private static IWorkDoneObserver? _initObserver;
 
-    private static async Task<LspAssetSpecDatabase> InitializeAssetSpecDatabaseAsync(IServiceProvider serviceProvider, CancellationToken token = default)
+    private static async Task<IAssetSpecDatabase> InitializeAssetSpecDatabaseAsync(IServiceProvider serviceProvider, CancellationToken token = default)
     {
-        LspAssetSpecDatabase db = serviceProvider.GetRequiredService<LspAssetSpecDatabase>();
+        IAssetSpecDatabase db = serviceProvider.GetRequiredService<IAssetSpecDatabase>();
 
         db.UseInternet = true;
 
         _logger.LogInformation("Initializing asset specs...");
         await db.InitializeAsync(token).ConfigureAwait(false);
         _logger.LogInformation("AssetSpecDatabase initialized.");
+
+        _logger.LogInformation(JsonSerializer.Serialize(db.Information, db.Options));
 
         return db;
     }
