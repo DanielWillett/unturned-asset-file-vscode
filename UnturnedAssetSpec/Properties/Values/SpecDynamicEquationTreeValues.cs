@@ -175,6 +175,7 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
     }
 
     public abstract bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
+    public abstract bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value);
 
     private bool EvaluateCondition<T>(in FileEvaluationContext ctx, in SpecCondition condition, T value) where T : IConvertible
     {
@@ -344,6 +345,51 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
         };
 
         return SpecDynamicEquationTreeValueHelpers.TryConvert(v, isNull, out value, out isNull);
+    }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = null;
+
+        if (!TryGetArgumentValue(in ctx, 0, out double leftNum, out bool leftIsNull)
+            || !TryGetArgumentValue(in ctx, 1, out double rightNum, out bool rightIsNull))
+            return false;
+
+        if (leftIsNull && rightIsNull)
+            return true;
+        
+        if (leftIsNull)
+            leftNum = 0;
+        if (rightIsNull)
+            rightNum = 0;
+
+        double v = Operation switch
+        {
+            SpecDynamicEquationTreeBinaryOperation.Add => leftNum + rightNum,
+            SpecDynamicEquationTreeBinaryOperation.Subtract => leftNum - rightNum,
+            SpecDynamicEquationTreeBinaryOperation.Multiply => leftNum * rightNum,
+            SpecDynamicEquationTreeBinaryOperation.Divide => leftNum / rightNum,
+            SpecDynamicEquationTreeBinaryOperation.Minimum => Math.Min(leftNum, rightNum),
+            SpecDynamicEquationTreeBinaryOperation.Maximum => Math.Max(leftNum, rightNum),
+            SpecDynamicEquationTreeBinaryOperation.Average => (leftNum + rightNum) / 2d,
+            _ => leftNum
+        };
+
+        if (ValueType.ValueType == typeof(double))
+        {
+            value = v;
+            return true;
+        }
+
+        try
+        {
+            value = Convert.ChangeType(v, ValueType.ValueType, CultureInfo.InvariantCulture);
+            return true;
+        }
+        catch (InvalidCastException)
+        {
+            return false;
+        }
     }
 
     public override ISpecDynamicValue GetArgument(int index)

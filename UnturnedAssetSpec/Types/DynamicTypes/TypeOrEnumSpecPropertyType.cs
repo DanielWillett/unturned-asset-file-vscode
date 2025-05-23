@@ -2,7 +2,6 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
-using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -14,7 +13,6 @@ public sealed class TypeOrEnumSpecPropertyType :
     IStringParseableSpecPropertyType
 {
     private IAssetSpecDatabase? _cachedSpecDb;
-    private ISpecType? _cachedType;
     private ISpecType? _cachedEnum;
 
     public QualifiedType ElementType { get; }
@@ -78,7 +76,6 @@ public sealed class TypeOrEnumSpecPropertyType :
     /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
     {
-        ISpecType? typeType = null;
         ISpecType? enumType = null;
 
         if (_cachedSpecDb == parse.Database)
@@ -87,25 +84,19 @@ public sealed class TypeOrEnumSpecPropertyType :
             {
                 if (_cachedSpecDb == parse.Database)
                 {
-                    typeType = _cachedType;
                     enumType = _cachedEnum;
                 }
             }
         }
 
-        if (typeType == null)
+        enumType ??= EnumType.IsNull ? null : parse.Database.FindType(EnumType.Type, parse.FileType);
+        lock (this)
         {
-            typeType = parse.Database.FindType(ElementType.Type, parse.FileType);
-            enumType = parse.Database.FindType(EnumType.Type, parse.FileType);
-            lock (this)
-            {
-                _cachedSpecDb = parse.Database;
-                _cachedType = typeType;
-                _cachedEnum = enumType;
-            }
+            _cachedSpecDb = parse.Database;
+            _cachedEnum = enumType;
         }
 
-        if (enumType is not EnumSpecType fullEnumType)
+        if (enumType is not IStringParseableSpecPropertyType fullEnumType)
         {
             if (parse.HasDiagnostics)
             {
@@ -135,26 +126,11 @@ public sealed class TypeOrEnumSpecPropertyType :
 
         if (val.IndexOf('.') < 0)
         {
-            EnumSpecTypeValue[] values = fullEnumType.Values;
-            bool found = false;
-            for (int i = 0; i < values.Length; ++i)
+            if (fullEnumType.TryParse(val.AsSpan(), val, out ISpecDynamicValue enumVal) && enumVal is ICorrespondingTypeSpecDynamicValue correspondingTypeProvider)
             {
-                ref EnumSpecTypeValue enumVal = ref values[i];
-                if (enumVal.CorrespondingType.IsNull || !string.Equals(enumVal.Value, val, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                val = enumVal.CorrespondingType.Type;
-                found = true;
-                break;
-            }
-
-            if (!found && int.TryParse(val, NumberStyles.Any, CultureInfo.InvariantCulture, out int index) && index >= 0 && index < values.Length)
-            {
-                string? type = values[index].CorrespondingType.Type;
-                if (type != null)
-                    val = type;
+                QualifiedType correspondingType = correspondingTypeProvider.GetCorrespondingType(parse.Database);
+                if (!correspondingType.IsNull)
+                    val = correspondingType.Type;
             }
         }
 

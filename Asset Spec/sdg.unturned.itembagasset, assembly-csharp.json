@@ -14,7 +14,8 @@
             "Description": "Number of columns of storage in this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/bag-asset.html#width-uint8-0",
             "Variable": "width",
-            "DefaultValue": 0
+            "DefaultValue": 0,
+            "Priority": 2
         },
         {
             "Key": "Height",
@@ -22,7 +23,8 @@
             "Description": "Number of rows of storage in this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/bag-asset.html#height-uint8-0",
             "Variable": "height",
-            "DefaultValue": 0
+            "DefaultValue": 0,
+            "Priority": 2
         }
     ]
 }

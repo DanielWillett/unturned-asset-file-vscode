@@ -1,4 +1,11 @@
+import { Uri } from 'vscode';
+import { RequestType } from 'vscode-languageclient';
 
+export const DiscoverAssetProperties = new RequestType<DiscoverAssetPropertiesParams, AssetProperty[], void>('unturnedDataFile/assetProperties');
+
+export interface DiscoverAssetPropertiesParams {
+    readonly document: string
+}
 
 export interface AssetProperty {
 

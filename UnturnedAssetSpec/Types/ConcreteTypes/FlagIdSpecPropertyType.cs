@@ -8,7 +8,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class FlagIdSpecPropertyType :
     BaseSpecPropertyType<ushort>,
     ISpecPropertyType<ushort>,
-    IEquatable<FlagIdSpecPropertyType>,
+    IEquatable<FlagIdSpecPropertyType?>,
     IStringParseableSpecPropertyType
 {
     public static readonly FlagIdSpecPropertyType Instance = new FlagIdSpecPropertyType();
@@ -68,11 +68,11 @@ public sealed class FlagIdSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(FlagIdSpecPropertyType other) => other != null;
+    public bool Equals(FlagIdSpecPropertyType? other) => other != null;
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is FlagIdSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType? other) => other is FlagIdSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<ushort> other) => other is FlagIdSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType<ushort>? other) => other is FlagIdSpecPropertyType t && Equals(t);
 }

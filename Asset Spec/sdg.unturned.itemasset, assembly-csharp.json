@@ -13,7 +13,8 @@
             "Key": "Bypass_ID_Limit",
             "Type": "Flag",
             "DefaultValue": false,
-            "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle."
+            "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle.",
+            "Priority": -1
         },
         {
             "Key": "Pro",
@@ -21,7 +22,8 @@
             "DefaultValue": false,
             "Description": "Indicates an item on the Steam Marketplace.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#pro-flag",
-            "Variable": "isPro"
+            "Variable": "isPro",
+            "Priority": -1
         },
         {
             "Key": "Instantiated_Item_Name_Override",
@@ -29,7 +31,8 @@
             "DefaultValue": "@ID",
             "Description": "The GameObject name of the item when held or spawned in-game. By default this is the @ID of the item but may be changed for sharing animations.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#instantiated-item-name-override-string",
-            "Variable": "instantiatedItemName"
+            "Variable": "instantiatedItemName",
+            "Priority": -1
         },
         {
             "Key": "Type",
@@ -37,7 +40,8 @@
             "Required": true,
             "Description": "The type of item to create.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#type-doc-data-eitemtype",
-            "Variable": "type"
+            "Variable": "type",
+            "Priority": 2
         },
         {
             "Key": "Econ_Icon_Use_Id",
@@ -52,7 +56,8 @@
             "DefaultValue": false,
             "Description": "Instructs the item icon generator to use the item's ID to lookup an icon instead of it's @GUID or special path.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#pro-flag",
-            "Variable": "econIconUseId"
+            "Variable": "econIconUseId",
+            "Priority": -1
         },
         {
             "Key": "Size_X",
@@ -87,7 +92,8 @@
             ],
             "Description": "Overrides the orthoganal size of the camera that captures the item icon. This is half of the vertical height of the camera's view.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#size-z-float32-1",
-            "Variable": "iconCameraOrthographicSize"
+            "Variable": "iconCameraOrthographicSize",
+            "Priority": -1
         },
         {
             "Key": "Use_Auto_Icon_Measurements",
@@ -112,7 +118,8 @@
             ],
             "Description": "Overrides the orthoganal size of the camera that captures the economy icon. This is half of the vertical height of the camera's view.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#size2-z-float32-1",
-            "Variable": "econIconCameraOrthographicSize"
+            "Variable": "econIconCameraOrthographicSize",
+            "Priority": -1
         },
         {
             "Key": "Shared_Skin_Lookup_ID",
@@ -121,7 +128,8 @@
             "DefaultValue": "@ID",
             "Description": "The item who's skins can be used for this item. Usually this is the same ID as the current item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#shared-skin-lookup-id-uint16",
-            "Variable": "sharedSkinLookupID"
+            "Variable": "sharedSkinLookupID",
+            "Priority": -1
         },
         {
             "Key": "Shared_Skin_Apply_Visuals",
@@ -129,7 +137,8 @@
             "DefaultValue": true,
             "Description": "Should visuals (such as the item skin) be applied when @Shared_Skin_Lookup_ID is a different item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#shared-skin-apply-visuals-bool-true",
-            "Variable": "SharedSkinShouldApplyVisuals"
+            "Variable": "SharedSkinShouldApplyVisuals",
+            "Priority": -1
         },
         {
             "Key": "Amount",
@@ -186,7 +195,8 @@
             "ExclusiveWith": [ "Backward" ],
             "Description": "Which of the player's bone the item will be attached to.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#equipablemodelparent-eequipablemodelparent",
-            "Variable": "EquipableModelParent"
+            "Variable": "EquipableModelParent",
+            "Priority": -1
         },
         {
             "Key": "Backward",
@@ -204,7 +214,8 @@
             "DefaultValue": true,
             "Description": "If the model of the item should be mirrored for left handed characters.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#left-handed-characters-mirror-equipable-bool-true",
-            "Variable": "shouldLeftHandedCharactersMirrorEquippedItem"
+            "Variable": "shouldLeftHandedCharactersMirrorEquippedItem",
+            "Priority": -1
         },
         {
             "Key": "Use_Auto_Stat_Descriptions",
@@ -220,7 +231,8 @@
             "DefaultValue": true,
             "Description": "If first-person animations should procedurally be given extra inertia to improve low-quality animations.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#procedurally-animate-inertia-bool-true",
-            "Variable": "shouldProcedurallyAnimateInertia"
+            "Variable": "shouldProcedurallyAnimateInertia",
+            "Priority": -1
         },
         {
             "Key": "Useable",

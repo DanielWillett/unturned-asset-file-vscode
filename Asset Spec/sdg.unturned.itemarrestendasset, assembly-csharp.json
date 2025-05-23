@@ -16,7 +16,8 @@
             "DefaultValue": 0,
             "Description": "The ID of the item to unlock.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/arrest-end-asset.html#property-descriptions",
-            "Variable": "recover"
+            "Variable": "recover",
+            "Priority": 2
         }
     ],
     "BundleAssets":

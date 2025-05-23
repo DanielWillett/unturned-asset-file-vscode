@@ -14,7 +14,9 @@ import {
 
 let client: LanguageClient | undefined;
 
-var textDocChangeEventSub: vscode.Disposable | undefined;
+let textDocChangeEventSub: vscode.Disposable | undefined;
+
+let assetPropertiesViewProvider: AssetPropertiesViewProvider | undefined;
 
 export function getClient(): LanguageClient {
 	if (client == undefined) {
@@ -54,19 +56,20 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		client = new LanguageClient('unturned-data-file-lsp', "Unturned Data File format LSP", serverOptions, clientOptions);
 	}
 
-	const assetPropertiesViewProvider = new AssetPropertiesViewProvider();
+	assetPropertiesViewProvider = new AssetPropertiesViewProvider();
 
 	vscode.window.registerTreeDataProvider(
 		'unturnedDataFile.assetProperties',
 		assetPropertiesViewProvider
 	);
 
-	vscode.commands.registerCommand('unturnedDataFile.assetProperties.refreshAssetProperties', () => {
-		assetPropertiesViewProvider.refresh();
+	vscode.commands.registerCommand('unturnedDataFile.assetProperties.refreshAssetProperties', async () => {
+		if (assetPropertiesViewProvider)
+			await assetPropertiesViewProvider.refresh();
 	});
 
-	textDocChangeEventSub = vscode.window.onDidChangeActiveTextEditor(function (event) {
-		vscode.commands.executeCommand('unturnedDataFile.assetProperties.refreshAssetProperties');
+	textDocChangeEventSub = vscode.window.onDidChangeActiveTextEditor(() => {
+		return vscode.commands.executeCommand('unturnedDataFile.assetProperties.refreshAssetProperties');
 	});
 
 	if (client) {
@@ -76,15 +79,20 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
 export async function deactivate(): Promise<void> {
 
-	await vscode.window.showErrorMessage("Closing...");
+	console.log("Deactivating...");
 	if (textDocChangeEventSub) {
 		textDocChangeEventSub.dispose();
 		textDocChangeEventSub = undefined;
+	}
+
+	if (assetPropertiesViewProvider) {
+		assetPropertiesViewProvider = undefined;
 	}
 
 	if (client) {
 		await client.stop();
 		client = undefined;
 	}
-	await vscode.window.showErrorMessage("Done");
+
+	console.log("Done deactivating.");
 }

@@ -13,7 +13,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class FilePathStringSpecPropertyType :
     BaseSpecPropertyType<string>,
     ISpecPropertyType<string>,
-    IEquatable<FilePathStringSpecPropertyType>
+    IEquatable<FilePathStringSpecPropertyType?>
 {
     public static readonly FilePathStringSpecPropertyType Instance = new FilePathStringSpecPropertyType();
 
@@ -124,13 +124,13 @@ public sealed class FilePathStringSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(FilePathStringSpecPropertyType other) => other != null && string.Equals(GlobPattern, other.GlobPattern, StringComparison.Ordinal);
+    public bool Equals(FilePathStringSpecPropertyType? other) => other != null && string.Equals(GlobPattern, other.GlobPattern, StringComparison.Ordinal);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is FilePathStringSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType? other) => other is FilePathStringSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<string> other) => other is FilePathStringSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType<string>? other) => other is FilePathStringSpecPropertyType t && Equals(t);
 
 #nullable disable
     private class VirutalFileInfo : FileInfoBase

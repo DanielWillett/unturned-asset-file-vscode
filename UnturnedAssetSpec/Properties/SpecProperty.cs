@@ -91,6 +91,11 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
     public bool Deprecated { get; set; }
 
     /// <summary>
+    /// Sort priority (descending).
+    /// </summary>
+    public int Priority { get; set; }
+
+    /// <summary>
     /// Unturned version when this option was added.
     /// </summary>
     public Version? Version { get; set; }

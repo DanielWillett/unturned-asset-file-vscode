@@ -157,7 +157,7 @@ public class AssetFileDictionaryValueNode : AssetFileBlockValueNode
             return true;
         }
 
-        value = null;
+        value = null!;
         return false;
     }
 

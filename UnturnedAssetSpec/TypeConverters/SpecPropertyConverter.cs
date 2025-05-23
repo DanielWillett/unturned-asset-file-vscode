@@ -39,6 +39,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     private static readonly JsonEncodedText ExclusiveWithProperty = JsonEncodedText.Encode("ExclusiveWith");
     private static readonly JsonEncodedText InclusiveWithProperty = JsonEncodedText.Encode("InclusiveWith");
     private static readonly JsonEncodedText DeprecatedProperty = JsonEncodedText.Encode("Deprecated");
+    private static readonly JsonEncodedText PriorityProperty = JsonEncodedText.Encode("Priority");
 
     private static readonly JsonEncodedText HideInheritedProperty = JsonEncodedText.Encode("HideInherited");
 
@@ -72,7 +73,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         ExclusiveWithProperty,              // 25
         InclusiveWithProperty,              // 26
         DeprecatedProperty,                 // 27
-        HideInheritedProperty               // 28
+        HideInheritedProperty,              // 28
+        PriorityProperty                    // 29
     ];
 
     /// <inheritdoc />
@@ -111,9 +113,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             includedDefaultValueReader = defaultValueReader,
             minimumValue = defaultValueReader,
             maximumValue = defaultValueReader,
-            exceptValue = defaultValueReader,
-            exclusiveWithValue = defaultValueReader,
-            inclusiveWithValue = defaultValueReader;
+            exceptValue = defaultValueReader;
 
         bool minimumIsExclusive = false,
             maximumIsExclusive = false;
@@ -344,6 +344,19 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     if (reader.TokenType is not JsonTokenType.True and not JsonTokenType.False)
                         ThrowUnexpectedToken(reader.TokenType, propType);
                     isHidingInherited = reader.TokenType == JsonTokenType.True;
+                    break;
+
+                case 29: // Priority
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        property.Priority = 0;
+                        break;
+                    }
+
+                    int priority = 0;
+                    if (reader.TokenType is not JsonTokenType.Number || !reader.TryGetInt32(out priority))
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+                    property.Priority = priority;
                     break;
 
                 default:

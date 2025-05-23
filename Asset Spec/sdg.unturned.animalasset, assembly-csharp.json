@@ -14,7 +14,8 @@
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Allows IDs to be less than 50 if this isn't the vanilla bundle.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
+            "Priority": -1
         },
         {
             "Key": "Speed_Run",

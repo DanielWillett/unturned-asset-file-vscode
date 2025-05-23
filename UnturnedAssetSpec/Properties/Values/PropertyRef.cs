@@ -87,6 +87,17 @@ public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
         value = default;
         return false;
     }
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        ISpecDynamicValue? val = GetValue(in ctx);
+        if (val != null)
+        {
+            return val.TryEvaluateValue(in ctx, out value);
+        }
+
+        value = null;
+        return false;
+    }
 
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
     {
@@ -246,17 +257,14 @@ public readonly struct PropertyRefInfo
             return prop.DefaultValue;
         }
 
-        SpecPropertyTypeParseContext parse = new SpecPropertyTypeParseContext(ctx)
-        {
-            Database = ctx.Information,
-            FileType = ctx.FileType,
-            BaseKey = prop.Key,
-            Node = node.Value,
-            Parent = node,
-            File = ctx.File
-        };
+        SpecPropertyTypeParseContext parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(ctx, prop, node, node.Value);
 
-        return prop.Type.TryParseValue(in parse, out ISpecDynamicValue? value) ? value : null;
+        if (prop.Type.TryParseValue(in parse, out ISpecDynamicValue? value))
+        {
+            return value;
+        }
+
+        return prop.IncludedDefaultValue ?? prop.DefaultValue;
     }
 
     private ISpecDynamicValue? CrossReference(in FileEvaluationContext ctx, PropertyRefInfo crossReferencePropertyInfo, SpecProperty? crossReferenceProperty)

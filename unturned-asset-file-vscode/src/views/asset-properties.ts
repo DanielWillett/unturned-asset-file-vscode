@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import * as path from '../util/path'
 import * as ext from '../extension'
 
-import { AssetProperty } from '../data/asset-property'
+import { AssetProperty, DiscoverAssetProperties } from '../data/asset-property'
 
 export class AssetPropertiesViewProvider implements vscode.TreeDataProvider<AssetPropertyViewItem> {
 
@@ -24,7 +24,11 @@ export class AssetPropertiesViewProvider implements vscode.TreeDataProvider<Asse
             this.propertyValues = [];
         }
         else {
-            //await ext.getClient().sendRequest()
+            const result = await ext.getClient().sendRequest(DiscoverAssetProperties, { document: txtDoc.document.uri.toString() });
+            if (this.propertyValues.length == result.length && result.every((prop, i) => this.propertyValues[i].property == prop))
+                return false;
+
+            this.propertyValues = result.map(prop => new AssetPropertyViewItem(prop));
         }
 
         this._onDidChangeTreeData.fire();
@@ -58,11 +62,31 @@ class AssetPropertyViewItem extends vscode.TreeItem {
     property: AssetProperty;
 
     constructor(property: AssetProperty) {
-        super(property.key, vscode.TreeItemCollapsibleState.None);
+        super(getName(property), vscode.TreeItemCollapsibleState.None);
         this.property = property;
     }
 
     resolve(): void {
         this.tooltip = this.property.markdown ?? this.property.description ?? this.property.key;
+    }
+
+}
+
+function getName(property: AssetProperty): string {
+
+    switch (typeof (property.value)) {
+        case "undefined":
+        case "function":
+        case "symbol":
+            return `${property.key} = [no value]`;
+
+        case "bigint":
+        case "number":
+        case "boolean":
+        case "string":
+            return `${property.key} = \"${property.value.toString()}\"`
+
+        default:
+            return `${property.key} = ${JSON.stringify(property.value)}`
     }
 }

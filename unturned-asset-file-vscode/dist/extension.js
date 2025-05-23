@@ -199,7 +199,7 @@ var require_messages = __commonJS({
       }
     };
     exports2.RequestType0 = RequestType0;
-    var RequestType = class extends AbstractMessageSignature {
+    var RequestType2 = class extends AbstractMessageSignature {
       constructor(method, _parameterStructures = ParameterStructures.auto) {
         super(method, 1);
         this._parameterStructures = _parameterStructures;
@@ -208,7 +208,7 @@ var require_messages = __commonJS({
         return this._parameterStructures;
       }
     };
-    exports2.RequestType = RequestType;
+    exports2.RequestType = RequestType2;
     var RequestType1 = class extends AbstractMessageSignature {
       constructor(method, _parameterStructures = ParameterStructures.auto) {
         super(method, 1);
@@ -219,12 +219,12 @@ var require_messages = __commonJS({
       }
     };
     exports2.RequestType1 = RequestType1;
-    var RequestType2 = class extends AbstractMessageSignature {
+    var RequestType22 = class extends AbstractMessageSignature {
       constructor(method) {
         super(method, 2);
       }
     };
-    exports2.RequestType2 = RequestType2;
+    exports2.RequestType2 = RequestType22;
     var RequestType3 = class extends AbstractMessageSignature {
       constructor(method) {
         super(method, 3);
@@ -17988,6 +17988,10 @@ function isDatFile(uri) {
   return path2.endsWith(".dat") || path2.endsWith(".asset");
 }
 
+// src/data/asset-property.ts
+var import_vscode_languageclient = __toESM(require_main4());
+var DiscoverAssetProperties = new import_vscode_languageclient.RequestType("unturnedDataFile/assetProperties");
+
 // src/views/asset-properties.ts
 var AssetPropertiesViewProvider = class {
   propertyValues = [];
@@ -18000,6 +18004,10 @@ var AssetPropertiesViewProvider = class {
         return false;
       this.propertyValues = [];
     } else {
+      const result = await getClient().sendRequest(DiscoverAssetProperties, { document: txtDoc.document.uri.toString() });
+      if (this.propertyValues.length == result.length && result.every((prop, i) => this.propertyValues[i].property == prop))
+        return false;
+      this.propertyValues = result.map((prop) => new AssetPropertyViewItem(prop));
     }
     this._onDidChangeTreeData.fire();
     return true;
@@ -18018,11 +18026,37 @@ var AssetPropertiesViewProvider = class {
     return item;
   }
 };
+var AssetPropertyViewItem = class extends vscode.TreeItem {
+  property;
+  constructor(property) {
+    super(getName(property), vscode.TreeItemCollapsibleState.None);
+    this.property = property;
+  }
+  resolve() {
+    this.tooltip = this.property.markdown ?? this.property.description ?? this.property.key;
+  }
+};
+function getName(property) {
+  switch (typeof property.value) {
+    case "undefined":
+    case "function":
+    case "symbol":
+      return `${property.key} = [no value]`;
+    case "bigint":
+    case "number":
+    case "boolean":
+    case "string":
+      return `${property.key} = "${property.value.toString()}"`;
+    default:
+      return `${property.key} = ${JSON.stringify(property.value)}`;
+  }
+}
 
 // src/extension.ts
 var import_node = __toESM(require_node3());
 var client;
 var textDocChangeEventSub;
+var assetPropertiesViewProvider;
 function getClient() {
   if (client == void 0) {
     throw new Error("Uninitialized.");
@@ -18053,32 +18087,36 @@ async function activate(context) {
     };
     client = new import_node.LanguageClient("unturned-data-file-lsp", "Unturned Data File format LSP", serverOptions, clientOptions);
   }
-  const assetPropertiesViewProvider = new AssetPropertiesViewProvider();
+  assetPropertiesViewProvider = new AssetPropertiesViewProvider();
   import_vscode.default.window.registerTreeDataProvider(
     "unturnedDataFile.assetProperties",
     assetPropertiesViewProvider
   );
-  import_vscode.default.commands.registerCommand("unturnedDataFile.assetProperties.refreshAssetProperties", () => {
-    assetPropertiesViewProvider.refresh();
+  import_vscode.default.commands.registerCommand("unturnedDataFile.assetProperties.refreshAssetProperties", async () => {
+    if (assetPropertiesViewProvider)
+      await assetPropertiesViewProvider.refresh();
   });
-  textDocChangeEventSub = import_vscode.default.window.onDidChangeActiveTextEditor(function(event) {
-    import_vscode.default.commands.executeCommand("unturnedDataFile.assetProperties.refreshAssetProperties");
+  textDocChangeEventSub = import_vscode.default.window.onDidChangeActiveTextEditor(() => {
+    return import_vscode.default.commands.executeCommand("unturnedDataFile.assetProperties.refreshAssetProperties");
   });
   if (client) {
     client.start();
   }
 }
 async function deactivate() {
-  await import_vscode.default.window.showErrorMessage("Closing...");
+  console.log("Deactivating...");
   if (textDocChangeEventSub) {
     textDocChangeEventSub.dispose();
     textDocChangeEventSub = void 0;
+  }
+  if (assetPropertiesViewProvider) {
+    assetPropertiesViewProvider = void 0;
   }
   if (client) {
     await client.stop();
     client = void 0;
   }
-  await import_vscode.default.window.showErrorMessage("Done");
+  console.log("Done deactivating.");
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

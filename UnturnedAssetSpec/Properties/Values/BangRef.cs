@@ -41,6 +41,7 @@ public abstract class BangRef : IBangRefTarget, IEquatable<BangRef>, IEquatable<
 
     public abstract bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition);
     public abstract bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
+    public abstract bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value);
 
     bool IBangRefTarget.EvaluateIsIncluded(in FileEvaluationContext ctx) => Target.EvaluateIsIncluded(in ctx);
     string? IBangRefTarget.EvaluateKey(in FileEvaluationContext ctx) => Target.EvaluateKey(in ctx);
@@ -151,6 +152,12 @@ public sealed class IncludedBangRef : BangRef, IEquatable<IncludedBangRef>
         value = Unsafe.As<bool, TValue>(ref v);
         return true;
     }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = Target.EvaluateIsIncluded(in ctx);
+        return true;
+    }
 }
 
 public sealed class ExcludedBangRef : BangRef, IEquatable<ExcludedBangRef>
@@ -194,6 +201,12 @@ public sealed class ExcludedBangRef : BangRef, IEquatable<ExcludedBangRef>
         value = Unsafe.As<bool, TValue>(ref v);
         return true;
     }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = !Target.EvaluateIsIncluded(in ctx);
+        return true;
+    }
 }
 
 public sealed class KeyBangRef : BangRef, IEquatable<KeyBangRef>
@@ -230,6 +243,12 @@ public sealed class KeyBangRef : BangRef, IEquatable<KeyBangRef>
         isNull = v == null;
         return true;
     }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = Target.EvaluateKey(in ctx);
+        return value != null;
+    }
 }
 
 public sealed class ValueBangRef : BangRef, IEquatable<ValueBangRef>
@@ -256,6 +275,11 @@ public sealed class ValueBangRef : BangRef, IEquatable<ValueBangRef>
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
     {
         return Target.TryEvaluateValue(in ctx, out value!, out isNull);
+    }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        return Target.TryEvaluateValue(in ctx, out value);
     }
 }
 
@@ -291,14 +315,20 @@ public sealed class KeyGroupsBangRef : BangRef, IEquatable<KeyGroupsBangRef>, II
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
     {
-        isNull = false;
+        int v = Target.EvaluateKeyGroup(in ctx, Index);
+        if (v < 0)
+        {
+            value = default!;
+            isNull = true;
+            return true;
+        }
 
+        isNull = false;
         if (typeof(TValue) != typeof(int))
         {
             if (typeof(TValue) == typeof(string))
             {
-                string vStr = Target.EvaluateKeyGroup(in ctx, Index).ToString();
-                value = Unsafe.As<string, TValue>(ref vStr);
+                value = SpecDynamicEquationTreeValueHelpers.As<string, TValue>(v.ToString());
                 return true;
             }
 
@@ -306,8 +336,20 @@ public sealed class KeyGroupsBangRef : BangRef, IEquatable<KeyGroupsBangRef>, II
             return false;
         }
 
-        int v = Target.EvaluateKeyGroup(in ctx, Index);
         value = Unsafe.As<int, TValue>(ref v);
+        return true;
+    }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        int v = Target.EvaluateKeyGroup(in ctx, Index);
+        if (v < 0)
+        {
+            value = null;
+            return true;
+        }
+
+        value = v;
         return true;
     }
 

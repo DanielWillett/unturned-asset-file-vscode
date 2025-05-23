@@ -60,6 +60,6 @@ public class StatusTests
     [TearDown]
     public void TearDown()
     {
-        _runner.Dispose();
+        _runner?.Dispose();
     }
 }

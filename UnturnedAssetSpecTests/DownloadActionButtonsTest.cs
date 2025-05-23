@@ -51,6 +51,6 @@ public class DownloadActionButtonsTest
     [TearDown]
     public void TearDown()
     {
-        _runner.Dispose();
+        _runner?.Dispose();
     }
 }

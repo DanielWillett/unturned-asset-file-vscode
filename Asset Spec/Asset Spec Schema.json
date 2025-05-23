@@ -310,6 +310,10 @@
                             "type": [ "string", "null" ],
                             "description": "The regex-group for which this property is a count for."
                         },
+                        "Priority": {
+                            "type": [ "integer", "null" ],
+                            "description": "The sorting priority of this property when displayed (descending)."
+                        },
                         "ValueRegexGroupReference": {
                             "type": [ "string", "null" ],
                             "description": "The 'Key regex-group[ RelatedKey...]' of which this property references, where key is a reference to another type."

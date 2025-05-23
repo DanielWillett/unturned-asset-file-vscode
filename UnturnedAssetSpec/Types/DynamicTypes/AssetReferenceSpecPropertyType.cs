@@ -10,7 +10,7 @@ public sealed class AssetReferenceSpecPropertyType :
     BaseSpecPropertyType<Guid>,
     ISpecPropertyType<Guid>,
     IElementTypeSpecPropertyType,
-    IEquatable<AssetReferenceSpecPropertyType>,
+    IEquatable<AssetReferenceSpecPropertyType?>,
     IStringParseableSpecPropertyType
 {
     
@@ -121,11 +121,11 @@ public sealed class AssetReferenceSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(AssetReferenceSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType) && OtherElementTypes.Equals(other.OtherElementTypes);
+    public bool Equals(AssetReferenceSpecPropertyType? other) => other != null && ElementType.Equals(other.ElementType) && OtherElementTypes.Equals(other.OtherElementTypes);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is AssetReferenceSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType? other) => other is AssetReferenceSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<Guid> other) => other is AssetReferenceSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType<Guid>? other) => other is AssetReferenceSpecPropertyType t && Equals(t);
 }

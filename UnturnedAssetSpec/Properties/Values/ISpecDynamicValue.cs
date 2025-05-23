@@ -15,7 +15,14 @@ public interface ISpecDynamicValue
     ISpecPropertyType? ValueType { get; }
     bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition);
     bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
+    bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value);
+
     void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options);
+}
+
+public interface ICorrespondingTypeSpecDynamicValue : ISpecDynamicValue
+{
+    QualifiedType GetCorrespondingType(IAssetSpecDatabase database);
 }
 
 public interface ISecondPassSpecDynamicValue : ISpecDynamicValue

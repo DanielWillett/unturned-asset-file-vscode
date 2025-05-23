@@ -15,7 +15,8 @@
             "DefaultValue": 0,
             "Description": "Number of times a player has to lean to release themselves when restrained.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/arrest-start-asset.html#property-descriptions",
-            "Variable": "strength"
+            "Variable": "strength",
+            "Priority": 2
         }
     ],
     "BundleAssets":

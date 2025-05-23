@@ -50,6 +50,16 @@ public class SpecDynamicSwitchValue :
         return match.Value.TryEvaluateValue(in ctx, out value, out isNull);
     }
 
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        SpecDynamicSwitchCaseValue? match = TryMatchCase(in ctx);
+        if (match != null)
+            return match.Value.TryEvaluateValue(in ctx, out value);
+
+        value = null;
+        return false;
+    }
+
     private SpecDynamicSwitchCaseValue? TryMatchCase(in FileEvaluationContext ctx)
     {
         foreach (SpecDynamicSwitchCaseValue @case in Cases)
@@ -183,6 +193,11 @@ public sealed class SpecDynamicSwitchCaseValue : ISpecDynamicValue, IEquatable<I
         return Value.TryEvaluateValue(in ctx, out value, out isNull);
     }
 
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        return Value.TryEvaluateValue(in ctx, out value);
+    }
+
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options = null)
     {
         SpecDynamicSwitchCaseValueConverter.WriteCase(writer, this, options);
@@ -221,7 +236,7 @@ public sealed class SpecDynamicSwitchCaseValue : ISpecDynamicValue, IEquatable<I
 
     public bool Equals(ISpecDynamicValue? other) => other is SpecDynamicSwitchCaseValue v && Equals(v);
     public override bool Equals(object? obj) => obj is SpecDynamicSwitchCaseValue v && Equals(v);
-    public override string ToString() => Conditions == null ? $"{Operation} Case [1 case]" : $"{Operation} Case [{Conditions.Length} cases]";
+    public override string ToString() => Conditions.IsSingle ? $"{Operation} Case [1 case]" : $"{Operation} Case [{Conditions.Length} cases]";
     public override int GetHashCode()
     {
         unchecked

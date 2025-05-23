@@ -58,6 +58,19 @@ public sealed class SelfBangRef : IEquatable<ISpecDynamicValue>, IEquatable<Self
         return false;
     }
 
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        PropertyRefInfo info = new PropertyRefInfo(ctx.Self);
+        ISpecDynamicValue? val = info.GetValue(in ctx, ctx.Self, default, null);
+        if (val != null)
+        {
+            return val.TryEvaluateValue(in ctx, out value);
+        }
+
+        value = null;
+        return false;
+    }
+
     public bool EvaluateIsIncluded(in FileEvaluationContext ctx)
     {
         return ctx.File.TryGetProperty(ctx.Self, out _);

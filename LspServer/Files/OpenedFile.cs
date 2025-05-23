@@ -1,16 +1,16 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using OmniSharp.Extensions.LanguageServer.Protocol;
-using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Files;
 
-public class OpenedFile
+public class OpenedFile : IWorkspaceFile
 {
     private string _text;
     private AssetFileTree? _tree;
     private FileLineIndex _index;
 
-    public AssetFileTree Tree
+    public AssetFileTree File
     {
         get
         {
@@ -52,4 +52,6 @@ public class OpenedFile
         Uri = uri;
         _text = text;
     }
+
+    void IDisposable.Dispose() { }
 }

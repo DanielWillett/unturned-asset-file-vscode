@@ -13,6 +13,7 @@ using Serilog;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 
 namespace DanielWillett.UnturnedDataFileLspServer;
 
@@ -56,6 +57,7 @@ internal sealed class UnturnedAssetFileLspServer
                 .WithHandler<HoverHandler>()
                 .WithHandler<DocumentSymbolHandler>()
                 .WithHandler<KeyCompletionHandler>()
+                .WithHandler<DiscoverAssetPropertiesHandler>()
                 .WithServerInfo(new ServerInfo
                 {
                     Name = "Unturned Data File LSP",
@@ -69,6 +71,7 @@ internal sealed class UnturnedAssetFileLspServer
                         .AddSingleton<HoverHandler>()
                         .AddSingleton<OpenedFileTracker>()
                         .AddSingleton<IAssetSpecDatabase, LspAssetSpecDatabase>()
+                        .AddSingleton<IWorkspaceEnvironment, LspWorkspaceEnvironment>()
                         .AddSingleton<LspInstallationEnvironment>()
                         .AddSingleton<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
                         .AddSingleton(new JsonSerializerOptions
@@ -144,7 +147,7 @@ internal sealed class UnturnedAssetFileLspServer
         await db.InitializeAsync(token).ConfigureAwait(false);
         _logger.LogInformation("AssetSpecDatabase initialized.");
 
-        _logger.LogInformation(JsonSerializer.Serialize(db.Information, db.Options));
+        //_logger.LogInformation(JsonSerializer.Serialize(db.Information, db.Options));
 
         return db;
     }

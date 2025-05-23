@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 using System.Collections.Generic;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -20,18 +21,32 @@ public readonly ref struct SpecPropertyTypeParseContext
 
     public bool HasDiagnostics { get; }
 
-    public SpecPropertyTypeParseContext(FileEvaluationContext evalContext)
+    public SpecPropertyTypeParseContext(ICollection<DatDiagnosticMessage> diagnostics) : this(default, diagnostics)
     {
-        EvaluationContext = evalContext;
+
     }
 
-    public SpecPropertyTypeParseContext(ICollection<DatDiagnosticMessage> diagnostics)
+    public SpecPropertyTypeParseContext(FileEvaluationContext evalContext, ICollection<DatDiagnosticMessage>? diagnostics)
     {
         if (diagnostics is { IsReadOnly: true })
             throw new ArgumentException("Diagnostics collection is readonly.", nameof(diagnostics));
 
         Diagnostics = diagnostics;
         HasDiagnostics = diagnostics != null;
+        EvaluationContext = evalContext;
+    }
+
+    public static SpecPropertyTypeParseContext FromFileEvaluationContext(FileEvaluationContext evalContext, SpecProperty property, AssetFileNode? parentNode, AssetFileValueNode? valueNode, ICollection<DatDiagnosticMessage>? diagnostics = null)
+    {
+        return new SpecPropertyTypeParseContext(evalContext, diagnostics)
+        {
+            Parent = parentNode,
+            Node = valueNode,
+            Database = evalContext.Information,
+            FileType = evalContext.FileType,
+            BaseKey = property.Key,
+            File = evalContext.File
+        };
     }
 
     public void Log(DatDiagnosticMessage message)

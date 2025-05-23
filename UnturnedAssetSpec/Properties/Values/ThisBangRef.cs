@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Text.Json;
+using NotSupportedException = System.NotSupportedException;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -38,38 +39,41 @@ public sealed class ThisBangRef : IEquatable<ISpecDynamicValue>, IEquatable<This
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
-        // todo;
-        throw new NotImplementedException();
+        return condition.Operation.EvaluateNulls(false, condition.Comparand == null);
     }
 
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
     {
-        // todo;
-        throw new NotImplementedException();
+        value = default;
+        isNull = true;
+        return false;
+    }
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = null;
+        return false;
     }
 
     public bool EvaluateIsIncluded(in FileEvaluationContext ctx)
     {
-        // todo;
-        throw new NotImplementedException();
+        return ctx.File.TryGetProperty(ctx.Self, out _);
     }
 
-    public string? EvaluateKey(in FileEvaluationContext ctx)
+    public string EvaluateKey(in FileEvaluationContext ctx)
     {
-        // todo;
-        throw new NotImplementedException();
+        return ctx.Self.Key;
     }
 
     public ISpecDynamicValue? EvaluateValue(in FileEvaluationContext ctx)
     {
-        // todo;
-        throw new NotImplementedException();
+        ctx.TryGetValue(out ISpecDynamicValue? value);
+        return value;
     }
 
     public int EvaluateKeyGroup(in FileEvaluationContext ctx, int index)
     {
         // todo;
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)

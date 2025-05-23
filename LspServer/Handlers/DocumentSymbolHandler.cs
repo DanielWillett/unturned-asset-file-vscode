@@ -48,7 +48,7 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
             return new SymbolInformationOrDocumentSymbolContainer();
         }
 
-        AssetFileTree tree = file.Tree;
+        AssetFileTree tree = file.File;
 
         AssetFileType type = AssetFileType.FromFile(tree, _specDictionary);
 

@@ -1,6 +1,6 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
 using System.ComponentModel;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -8,7 +8,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public abstract class BasicSpecPropertyType<TSpecPropertyType, TValue> :
     BaseSpecPropertyType<TValue>,
     ISpecPropertyType<TValue>,
-    IEquatable<BasicSpecPropertyType<TSpecPropertyType, TValue>>
+    IEquatable<BasicSpecPropertyType<TSpecPropertyType, TValue>?>
     where TSpecPropertyType : BasicSpecPropertyType<TSpecPropertyType, TValue>
     where TValue : IEquatable<TValue>
 {
@@ -32,10 +32,10 @@ public abstract class BasicSpecPropertyType<TSpecPropertyType, TValue> :
 
     private protected BasicSpecPropertyType() { }
 
-    public bool Equals(ISpecPropertyType other) => other is BasicSpecPropertyType<TSpecPropertyType, TValue>;
-    public bool Equals(ISpecPropertyType<TValue> other) => other is BasicSpecPropertyType<TSpecPropertyType, TValue>;
+    public bool Equals(ISpecPropertyType? other) => other is BasicSpecPropertyType<TSpecPropertyType, TValue>;
+    public bool Equals(ISpecPropertyType<TValue>? other) => other is BasicSpecPropertyType<TSpecPropertyType, TValue>;
     
-    public bool Equals(BasicSpecPropertyType<TSpecPropertyType, TValue> other) => other != null;
+    public bool Equals(BasicSpecPropertyType<TSpecPropertyType, TValue>? other) => other != null;
 
     /// <inheritdoc />
     public abstract bool TryParseValue(in SpecPropertyTypeParseContext parse, out TValue? value);

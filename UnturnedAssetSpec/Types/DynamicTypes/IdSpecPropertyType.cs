@@ -10,7 +10,7 @@ public class IdSpecPropertyType :
     BaseSpecPropertyType<ushort>,
     ISpecPropertyType<ushort>,
     IElementTypeSpecPropertyType,
-    IEquatable<IdSpecPropertyType>,
+    IEquatable<IdSpecPropertyType?>,
     IStringParseableSpecPropertyType
 {
     public EnumSpecTypeValue Category { get; }
@@ -111,11 +111,11 @@ public class IdSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(IdSpecPropertyType other) => other != null && GetType() == other.GetType() && Category.Equals(other.Category) && OtherElementTypes.Equals(other.OtherElementTypes);
+    public bool Equals(IdSpecPropertyType? other) => other != null && GetType() == other.GetType() && Category.Equals(other.Category) && OtherElementTypes.Equals(other.OtherElementTypes);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is IdSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType? other) => other is IdSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<ushort> other) => other is IdSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType<ushort>? other) => other is IdSpecPropertyType t && Equals(t);
 }

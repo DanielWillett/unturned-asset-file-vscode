@@ -18,10 +18,12 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
     public static readonly QualifiedType AssetBaseType = new QualifiedType(TypeHierarchy.AssetBaseType);
     public static readonly QualifiedType UseableBaseType = new QualifiedType(TypeHierarchy.UseableBaseType);
 
+#nullable disable
     /// <summary>
     /// Underlying string storing the type.
     /// </summary>
     public string Type { get; }
+#nullable restore
 
     /// <summary>
     /// If this qualified type is <see langword="default"/>.
@@ -86,13 +88,15 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
 
     internal QualifiedType(string type, bool isCaseInsensitive)
     {
-        Type = type;
+        if (!string.IsNullOrEmpty(type))
+            Type = type;
         _isCaseInsensitive = isCaseInsensitive;
     }
 
     public QualifiedType(string? type)
     {
-        Type = type!;
+        if (!string.IsNullOrEmpty(type))
+            Type = type!;
     }
 
     public string GetTypeName()

@@ -71,8 +71,12 @@ public sealed class PropertyBangRef : IEquatable<ISpecDynamicValue>, IEquatable<
 
     public int EvaluateKeyGroup(in FileEvaluationContext context, int index)
     {
-        // todo;
-        throw new NotImplementedException();
+        SpecProperty? property = Property.ResolveProperty(in context);
+        if (property is not { KeyIsRegex: true })
+            return -1;
+
+        // todo:
+        return -1;
     }
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
@@ -83,6 +87,11 @@ public sealed class PropertyBangRef : IEquatable<ISpecDynamicValue>, IEquatable<
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
     {
         return Property.TryEvaluateValue(in ctx, out value, out isNull);
+    }
+
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        return Property.TryEvaluateValue(in ctx, out value);
     }
 
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)

@@ -49,6 +49,18 @@ public sealed class ConditionSpecDynamicValue : ISpecDynamicValue, IEquatable<IS
         return true;
     }
 
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        if (!TryEvaluateValue<bool>(in ctx, out bool val, out bool isNull))
+        {
+            value = null;
+            return false;
+        }
+
+        value = isNull ? null : val;
+        return true;
+    }
+
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
     {
         SpecConditionConverter.Write(writer, Condition);

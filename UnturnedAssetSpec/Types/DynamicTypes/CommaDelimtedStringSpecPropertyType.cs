@@ -9,7 +9,7 @@ public sealed class CommaDelimitedStringSpecPropertyType :
     BaseSpecPropertyType<string>,
     ISpecPropertyType<string>,
     ISecondPassSpecPropertyType,
-    IEquatable<CommaDelimitedStringSpecPropertyType>,
+    IEquatable<CommaDelimitedStringSpecPropertyType?>,
     IDisposable
 {
     private ParseHandler? _handler;
@@ -95,13 +95,13 @@ public sealed class CommaDelimitedStringSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(CommaDelimitedStringSpecPropertyType other) => other != null && InnerType.Equals(other.InnerType);
+    public bool Equals(CommaDelimitedStringSpecPropertyType? other) => other != null && InnerType.Equals(other.InnerType);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType other) => other is CommaDelimitedStringSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType? other) => other is CommaDelimitedStringSpecPropertyType t && Equals(t);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<string> other) => other is CommaDelimitedStringSpecPropertyType t && Equals(t);
+    public bool Equals(ISpecPropertyType<string>? other) => other is CommaDelimitedStringSpecPropertyType t && Equals(t);
 
     private abstract class ParseHandler
     {

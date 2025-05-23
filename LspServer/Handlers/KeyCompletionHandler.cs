@@ -147,9 +147,9 @@ internal class KeyCompletionHandler : ICompletionHandler
         FilePosition position = request.Position.ToFilePosition();
         bool isOnNewLine = file.LineIndex.SliceLine(position.Line + 1, endColumn: position.Character - 1).IsWhiteSpace();
 
-        AssetFileTree tree = file.Tree;
+        AssetFileTree tree = file.File;
 
-        AssetFileType fileType = AssetFileType.FromFile(file.Tree, _specDictionary);
+        AssetFileType fileType = AssetFileType.FromFile(file.File, _specDictionary);
 
         AssetFileNode? activeNode = tree.GetNode(position);
 

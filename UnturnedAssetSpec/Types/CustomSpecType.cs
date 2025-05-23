@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -146,6 +147,11 @@ public class CustomSpecTypeInstance : IEquatable<CustomSpecTypeInstance>, ISpecD
 
         value = SpecDynamicEquationTreeValueHelpers.As<CustomSpecTypeInstance, TValue>(this);
         isNull = false;
+        return true;
+    }
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = this;
         return true;
     }
 

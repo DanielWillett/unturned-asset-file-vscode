@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -47,6 +48,12 @@ public sealed class SpecDynamicConcreteNullValue :
         return true;
     }
 
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = null;
+        return true;
+    }
+
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
     {
         writer.WriteNullValue();
@@ -57,7 +64,7 @@ public sealed class SpecDynamicConcreteNullValue :
 public sealed class SpecDynamicConcreteEnumValue :
     IEquatable<SpecDynamicConcreteEnumValue>,
     IEquatable<ISpecDynamicValue>,
-    ISpecDynamicValue
+    ICorrespondingTypeSpecDynamicValue
 {
     public EnumSpecType Type { get; }
     public int Value { get; }
@@ -151,6 +158,12 @@ public sealed class SpecDynamicConcreteEnumValue :
         return false;
     }
 
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = Value < 0 ? null : Type.Values[Value].Value;
+        return false;
+    }
+
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
     {
         if (Value < 0)
@@ -158,6 +171,8 @@ public sealed class SpecDynamicConcreteEnumValue :
         else
             writer.WriteStringValue(Type.Values[Value].Value);
     }
+
+    public QualifiedType GetCorrespondingType(IAssetSpecDatabase database) => Value < 0 ? QualifiedType.None : Type.Values[Value].CorrespondingType;
 
 
     public static implicit operator string?(SpecDynamicConcreteEnumValue v) => v.Value < 0 ? null : v.Type.Values[v.Value].Value;
@@ -195,6 +210,7 @@ public abstract class SpecDynamicConcreteValue :
 
     public abstract bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition);
     public abstract bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
+    public abstract bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value);
 
     public abstract void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options);
 }
@@ -279,6 +295,12 @@ public sealed class SpecDynamicConcreteValue<T> :
         {
             value = Unsafe.As<T, TValue>(ref _value!);
         }
+        return true;
+    }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = IsNull ? null : _value;
         return true;
     }
 

@@ -40,9 +40,9 @@ internal class HoverHandler : IHoverHandler
             return Task.FromResult<Hover?>(null);
         }
 
-        AssetFileTree tree = file.Tree;
+        AssetFileTree tree = file.File;
 
-        AssetFileType fileType = AssetFileType.FromFile(file.Tree, _specDictionary);
+        AssetFileType fileType = AssetFileType.FromFile(file.File, _specDictionary);
 
         AssetFileNode? node = tree.GetNode(request.Position.ToFilePosition());
 

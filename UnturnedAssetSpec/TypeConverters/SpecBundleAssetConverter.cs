@@ -11,12 +11,12 @@ public class SpecBundleAssetConverter : JsonConverter<SpecBundleAsset>
     public override SpecBundleAsset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         reader.Skip();
-        return null;
+        return null!;
     }
 
     /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, SpecBundleAsset value, JsonSerializerOptions options)
     {
-
+        
     }
 }

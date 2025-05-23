@@ -1,7 +1,9 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -46,5 +48,32 @@ public readonly struct FileEvaluationContext
         Workspace = self.Workspace;
         Environment = self.Environment;
         Information = self.Information;
+    }
+
+    public bool TryGetValue(out ISpecDynamicValue? value, ICollection<DatDiagnosticMessage>? diagnostics = null)
+    {
+        return TryGetValue(out value, out _, diagnostics);
+    }
+
+    public bool TryGetValue(out ISpecDynamicValue value, out AssetFileKeyValuePairNode? node, ICollection<DatDiagnosticMessage>? diagnostics = null)
+    {
+        if (diagnostics is { IsReadOnly: true })
+            throw new ArgumentException("Diagnostics collection is readonly.", nameof(diagnostics));
+
+        if (!File.TryGetProperty(Self, out node))
+        {
+            value = Self.DefaultValue!;
+            return value != null;
+        }
+
+        SpecPropertyTypeParseContext parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(this, Self, node, node.Value, diagnostics);
+            
+        if (Self.Type.TryParseValue(in parse, out value))
+        {
+            return true;
+        }
+
+        value = Self.IncludedDefaultValue ?? Self.DefaultValue!;
+        return value != null;
     }
 }

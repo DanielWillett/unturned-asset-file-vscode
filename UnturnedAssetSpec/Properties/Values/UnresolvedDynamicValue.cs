@@ -47,6 +47,12 @@ internal class UnresolvedDynamicValue : ISecondPassSpecDynamicValue, IDisposable
         return false;
     }
 
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = null;
+        return false;
+    }
+
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
     {
         _document.WriteTo(writer);
