@@ -1,15 +1,20 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
+namespace DanielWillett.UnturnedDataFileLspServer.Data;
 
 /// <summary>
 /// A GUID or Legacy ID reference to an asset.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 20)]
+[JsonConverter(typeof(GuidOrIdConverter))]
 public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable<GuidOrId>
 {
+    public static readonly GuidOrId Empty = default;
+
     /// <summary>
     /// The GUID, if <see cref="IsId"/> is <see langword="false"/>.
     /// </summary>

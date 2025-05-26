@@ -13,7 +13,7 @@ public sealed class UnityEngineVersionConverter : JsonConverter<UnityEngineVersi
             return default;
 
         if (reader.TokenType != JsonTokenType.String)
-            throw new JsonException($"Unexpected token {reader.TokenType} parsing UnityEngineVersion.");
+            throw new JsonException($"Unexpected token {reader.TokenType} while parsing UnityEngineVersion.");
 
         return UnityEngineVersion.Parse(reader.GetString()!);
     }

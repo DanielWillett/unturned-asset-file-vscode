@@ -33,6 +33,29 @@ public struct FileRange : IEquatable<FileRange>, IComparable<FileRange>, ICompar
         End.Character = endCharacter;
     }
 
+    public void Deconstruct(out FilePosition start, out FilePosition end)
+    {
+        start = Start;
+        end = End;
+    }
+
+    public void Deconstruct(out int startLine, out int startCharacter, out int endLine, out int endCharacter)
+    {
+        startLine = Start.Line;
+        startCharacter = Start.Character;
+        endLine = End.Line;
+        endCharacter = End.Character;
+    }
+
+    public void Encapsulate(FileRange otherRange)
+    {
+        Start.Line = Math.Min(Start.Line, otherRange.Start.Line);
+        Start.Character = Math.Min(Start.Character, otherRange.Start.Character);
+
+        End.Line = Math.Max(End.Line, otherRange.End.Line);
+        End.Character = Math.Max(End.Character, otherRange.End.Character);
+    }
+
     public readonly bool Contains(FilePosition position)
     {
         return position.Line >= Start.Line
@@ -77,4 +100,9 @@ public struct FileRange : IEquatable<FileRange>, IComparable<FileRange>, ICompar
     public static bool operator >(FileRange left, FileRange right) => left.Start == right.Start ? left.End > right.End : left.Start > right.Start;
     public static bool operator <=(FileRange left, FileRange right) => left.Start == right.Start ? left.End <= right.End : left.Start <= right.Start;
     public static bool operator >=(FileRange left, FileRange right) => left.Start == right.Start ? left.End >= right.End : left.Start >= right.Start;
+    
+    public static implicit operator FileRange((FilePosition start, FilePosition end) tuple) => new FileRange(tuple.start, tuple.end);
+
+    public static implicit operator FileRange((int startLine, int startCharacter, int endLine, int endCharacter) tuple)
+        => new FileRange(tuple.startLine, tuple.startCharacter, tuple.endLine, tuple.endCharacter);
 }

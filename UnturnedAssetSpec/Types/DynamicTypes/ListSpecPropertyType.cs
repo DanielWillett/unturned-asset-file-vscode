@@ -9,7 +9,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class ListSpecPropertyType<TElementType> :
     BaseSpecPropertyType<EquatableArray<TElementType>>,
     ISpecPropertyType<EquatableArray<TElementType>>,
-    IEquatable<ListSpecPropertyType<TElementType>?>
+    IEquatable<ListSpecPropertyType<TElementType>?>,
+    IElementTypeSpecPropertyType
     where TElementType : IEquatable<TElementType>
 {
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -25,6 +26,8 @@ public sealed class ListSpecPropertyType<TElementType> :
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     public ISpecPropertyType<TElementType> InnerType { get; }
+
+    string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
 
     public ListSpecPropertyType(ISpecPropertyType<TElementType> innerType)
     {

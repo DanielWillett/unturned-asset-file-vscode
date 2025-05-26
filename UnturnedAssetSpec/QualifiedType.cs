@@ -1,9 +1,9 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using System;
 using System.Text.Json.Serialization;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
+namespace DanielWillett.UnturnedDataFileLspServer.Data;
 
 /// <summary>
 /// Comparable assembly-qualified type with proper equality checking.
@@ -38,9 +38,7 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
         get
         {
             if (Type == null || !ExtractParts(Type.AsSpan(), out ReadOnlySpan<char> typeName, out ReadOnlySpan<char> assemblyName))
-            {
                 return false;
-            }
 
             int len = typeName.Length + assemblyName.Length + 2 /* ", " */;
 
@@ -50,6 +48,21 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
     }
 
     /// <summary>
+    /// If this type should be case-insensitive.
+    /// </summary>
+    public bool IsCaseInsensitive => _isCaseInsensitive;
+
+    /// <summary>
+    /// The case-sensitive version of this type.
+    /// </summary>
+    public QualifiedType CaseSensitive => _isCaseInsensitive ? new QualifiedType(Type, false) : this;
+
+    /// <summary>
+    /// The case-sensitive version of this type.
+    /// </summary>
+    public QualifiedType CaseInsensitive => _isCaseInsensitive ? this : new QualifiedType(Type, true);
+
+    /// <summary>
     /// Creates a normalized version of this type.
     /// </summary>
     public QualifiedType Normalized
@@ -57,9 +70,7 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
         get
         {
             if (Type == null || !ExtractParts(Type.AsSpan(), out ReadOnlySpan<char> typeName, out ReadOnlySpan<char> assemblyName))
-            {
                 return this;
-            }
 
             int len = typeName.Length + assemblyName.Length + 2 /* ", " */;
 
@@ -147,9 +158,7 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
     public static ReadOnlySpan<char> ExtractTypeName(ReadOnlySpan<char> assemblyQualifiedTypeName)
     {
         if (!ExtractParts(assemblyQualifiedTypeName, out ReadOnlySpan<char> fullTypeName, out _) && fullTypeName.IsEmpty)
-        {
             fullTypeName = assemblyQualifiedTypeName;
-        }
 
         for (int i = fullTypeName.Length - 2; i >= 0; --i)
         {

@@ -13,7 +13,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class FilePathStringSpecPropertyType :
     BaseSpecPropertyType<string>,
     ISpecPropertyType<string>,
-    IEquatable<FilePathStringSpecPropertyType?>
+    IEquatable<FilePathStringSpecPropertyType?>,
+    IElementTypeSpecPropertyType
 {
     public static readonly FilePathStringSpecPropertyType Instance = new FilePathStringSpecPropertyType();
 
@@ -34,6 +35,8 @@ public sealed class FilePathStringSpecPropertyType :
 
     /// <inheritdoc />
     public Type ValueType => typeof(string);
+
+    string? IElementTypeSpecPropertyType.ElementType => GlobPattern;
 
     public FilePathStringSpecPropertyType(string? globPattern = null)
     {

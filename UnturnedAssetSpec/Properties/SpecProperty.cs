@@ -11,7 +11,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 [JsonConverter(typeof(SpecPropertyConverter))]
 [DebuggerDisplay("{Key}")]
-public class SpecProperty : IEquatable<SpecProperty>, ICloneable
+public class SpecProperty : IEquatable<SpecProperty?>, ICloneable
 {
     /// <summary>
     /// The key of the flag or property.
@@ -94,6 +94,11 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
     /// Sort priority (descending).
     /// </summary>
     public int Priority { get; set; }
+
+    /// <summary>
+    /// Unique ID linking multiple properties that are usually kept together (no whitespace).
+    /// </summary>
+    public string? SimilarGrouping { get; set; }
 
     /// <summary>
     /// Unturned version when this option was added.
@@ -209,7 +214,8 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        if (string.Equals(Key, other.Key, StringComparison.Ordinal)
+        if (!string.Equals(Key, other.Key, StringComparison.Ordinal)
+              || IsHidden != other.IsHidden
               || !Type.Equals(other.Type)
               || !string.Equals(SingleKeyOverride, other.SingleKeyOverride, StringComparison.Ordinal)
               || !string.Equals(Description, other.Description, StringComparison.Ordinal)
@@ -227,7 +233,21 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(DefaultValue, other.DefaultValue)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(IncludedDefaultValue, other.IncludedDefaultValue)
               || !KeyGroups.Equals(other.KeyGroups)
-              || !EqualityComparer<ISpecType?>.Default.Equals(Owner, other.Owner))
+              || !EqualityComparer<ISpecType?>.Default.Equals(Owner, other.Owner)
+              || Priority != other.Priority
+              || !string.Equals(Docs, other.Docs, StringComparison.Ordinal)
+              || !Exceptions.Equals(other.Exceptions)
+              || ExceptionsAreWhitelist != other.ExceptionsAreWhitelist
+              || !EqualityComparer<InclusionCondition?>.Default.Equals(ExclusiveProperties, other.ExclusiveProperties)
+              || !EqualityComparer<InclusionCondition?>.Default.Equals(InclusiveProperties, other.InclusiveProperties)
+              || IsMaximumValueExclusive != other.IsMaximumValueExclusive
+              || IsMinimumValueExclusive != other.IsMinimumValueExclusive
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(MaximumValue, other.MaximumValue)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(MinimumValue, other.MinimumValue)
+              || !EqualityComparer<SpecProperty?>.Default.Equals(Parent, other.Parent)
+              || !string.Equals(Variable, other.Variable, StringComparison.Ordinal)
+              || !string.Equals(SimilarGrouping, other.SimilarGrouping, StringComparison.Ordinal)
+              )
         {
             return false;
         }
@@ -251,7 +271,7 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
     }
 
     /// <inheritdoc />
-    public object Clone() => new SpecProperty
+    public virtual object Clone() => new SpecProperty
     {
         Key = Key,
         IsHidden = IsHidden,
@@ -272,6 +292,19 @@ public class SpecProperty : IEquatable<SpecProperty>, ICloneable
         DefaultValue = DefaultValue,
         IncludedDefaultValue = IncludedDefaultValue,
         KeyGroups = KeyGroups,
-        Owner = Owner
+        Owner = Owner,
+        Priority = Priority,
+        Docs = Docs,
+        Exceptions = Exceptions,
+        ExceptionsAreWhitelist = ExceptionsAreWhitelist,
+        ExclusiveProperties = ExclusiveProperties,
+        InclusiveProperties = InclusiveProperties,
+        IsMaximumValueExclusive = IsMaximumValueExclusive,
+        IsMinimumValueExclusive = IsMinimumValueExclusive,
+        MaximumValue = MaximumValue,
+        MinimumValue = MinimumValue,
+        Parent = Parent,
+        Variable = Variable,
+        SimilarGrouping = SimilarGrouping
     };
 }

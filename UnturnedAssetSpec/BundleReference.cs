@@ -1,8 +1,11 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
+using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;
 
+[JsonConverter(typeof(BundleReferenceConverter))]
 public readonly struct BundleReference : IEquatable<BundleReference>, IComparable<BundleReference>
 {
     public readonly string Name;

@@ -353,7 +353,7 @@ public static class KnownTypeValueHelper
         return true;
     }
 
-    public static bool TryParseMasterBundleReference(string str, out string? name, out string path)
+    public static bool TryParseMasterBundleReference(string str, out string name, out string path)
     {
         int length = str.IndexOf(':');
         if (length < 0)
@@ -370,7 +370,7 @@ public static class KnownTypeValueHelper
         return !string.IsNullOrEmpty(path);
     }
 
-    public static bool TryParseMasterBundleReference(ReadOnlySpan<char> str, out string? name, out string path)
+    public static bool TryParseMasterBundleReference(ReadOnlySpan<char> str, out string name, out string path)
     {
         int length = str.IndexOf(':');
         if (length < 0)

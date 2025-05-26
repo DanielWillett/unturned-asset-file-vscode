@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -10,10 +11,22 @@ using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, string>, IStringParseableSpecPropertyType, IEquatable<AssetTypeAlias>, IAutoCompleteSpecPropertyType
+public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, string>, IStringParseableSpecPropertyType, IEquatable<AssetTypeAlias>, IAutoCompleteSpecPropertyType, ISpecType
 {
-    /// <inheritdoc />
+    QualifiedType ISpecType.Type => Type;
+
+    /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName => "Asset Type";
+
+    public string Docs => "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header";
+
+    public AssetSpecType Owner { get => throw new NotSupportedException(); set { } }
+
+    public OneOrMore<KeyValuePair<string, object?>> ExtendedData => OneOrMore<KeyValuePair<string, object?>>.Null;
+
+    public SpecProperty? FindProperty(string propertyName, SpecPropertyContext context) => null;
+
+    public QualifiedType Parent => QualifiedType.None;
 
     /// <inheritdoc />
     public override string Type => "DanielWillett.UnturnedDataFileLspServer.Data.Types.AssetTypeAlias, UnturnedAssetSpec";
@@ -66,6 +79,9 @@ public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, strin
     }
 
     public bool Equals(AssetTypeAlias? other) => other != null;
+    public bool Equals(ISpecType? other) => other is AssetTypeAlias;
+    public override bool Equals(object? obj) => obj is AssetTypeAlias;
+    public override int GetHashCode() => 0;
 
     public Task<AutoCompleteResult[]> GetAutoCompleteResults(AutoCompleteParameters parameters)
     {
@@ -79,6 +95,7 @@ public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, strin
 
         return Task.FromResult(results);
     }
+
 }
 
 public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatable<AssetTypeAliasValue?>, IEquatable<ISpecDynamicValue?>

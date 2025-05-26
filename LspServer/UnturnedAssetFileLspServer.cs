@@ -1,8 +1,9 @@
-using System.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using DanielWillett.UnturnedDataFileLspServer.Handlers;
+using DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
+using DanielWillett.UnturnedDataFileLspServer.Protocol;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
@@ -13,7 +14,6 @@ using Serilog;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 
 namespace DanielWillett.UnturnedDataFileLspServer;
 
@@ -58,11 +58,14 @@ internal sealed class UnturnedAssetFileLspServer
                 .WithHandler<DocumentSymbolHandler>()
                 .WithHandler<KeyCompletionHandler>()
                 .WithHandler<DiscoverAssetPropertiesHandler>()
+                .WithHandler<GetAssetPropertyAddLocationHandler>()
                 .WithServerInfo(new ServerInfo
                 {
                     Name = "Unturned Data File LSP",
                     Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(4)
                 })
+                // used to add custom json converters
+                .WithSerializer(new UnturnedLspSerializer())
                 .WithServices(serv =>
                 {
                     serv.AddSingleton<UnturnedAssetFileSyncHandler>()

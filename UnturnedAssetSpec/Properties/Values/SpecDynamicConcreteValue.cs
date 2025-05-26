@@ -161,7 +161,7 @@ public sealed class SpecDynamicConcreteEnumValue :
     public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
     {
         value = Value < 0 ? null : Type.Values[Value].Value;
-        return false;
+        return true;
     }
 
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)

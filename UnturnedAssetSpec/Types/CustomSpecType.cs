@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -104,13 +103,36 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
     }
 }
 
+/// <summary>
+/// An object represented by a <see cref="CustomSpecType"/>.
+/// </summary>
 public class CustomSpecTypeInstance : IEquatable<CustomSpecTypeInstance>, ISpecDynamicValue
 {
+    private readonly List<CustomSpecTypeProperty> _properties;
+    
     public CustomSpecType Type { get; }
+
+    public IReadOnlyList<CustomSpecTypeProperty> Properties { get; }
 
     public CustomSpecTypeInstance(CustomSpecType type)
     {
         Type = type ?? throw new ArgumentNullException(nameof(type));
+        _properties = new List<CustomSpecTypeProperty>();
+        Properties = _properties.AsReadOnly();
+    }
+
+    public ISpecDynamicValue? this[string key]
+    {
+        get
+        {
+            foreach (CustomSpecTypeProperty p in _properties)
+            {
+                if (p.Property.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
+                    return p.Value;
+            }
+
+            return null;
+        }
     }
 
     public bool Equals(CustomSpecTypeInstance other) => Equals(other, StringComparison.Ordinal);
@@ -123,7 +145,6 @@ public class CustomSpecTypeInstance : IEquatable<CustomSpecTypeInstance>, ISpecD
 
         return Type.Equals(other.Type);
     }
-
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
@@ -149,6 +170,7 @@ public class CustomSpecTypeInstance : IEquatable<CustomSpecTypeInstance>, ISpecD
         isNull = false;
         return true;
     }
+
     public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
     {
         value = this;
@@ -159,10 +181,31 @@ public class CustomSpecTypeInstance : IEquatable<CustomSpecTypeInstance>, ISpecD
     {
         writer.WriteStartObject();
 
-        // todo
+        foreach (CustomSpecTypeProperty p in _properties)
+        {
+            if (p.Value == null)
+                continue;
+
+            writer.WritePropertyName(p.Property.Key);
+            p.Value.WriteToJsonWriter(writer, options);
+        }
 
         writer.WriteEndObject();
     }
 
     ISpecPropertyType ISpecDynamicValue.ValueType => Type;
+}
+
+public struct CustomSpecTypeProperty
+{
+    public ISpecDynamicValue? Value { get; }
+    public SpecProperty Property { get; }
+    public string Key { get; }
+
+    public CustomSpecTypeProperty(ISpecDynamicValue? value, SpecProperty property, string key)
+    {
+        Value = value;
+        Property = property;
+        Key = key;
+    }
 }

@@ -10,6 +10,7 @@ public class IdSpecPropertyType :
     BaseSpecPropertyType<ushort>,
     ISpecPropertyType<ushort>,
     IElementTypeSpecPropertyType,
+    ISpecialTypesSpecPropertyType,
     IEquatable<IdSpecPropertyType?>,
     IStringParseableSpecPropertyType
 {
@@ -42,6 +43,9 @@ public class IdSpecPropertyType :
         dynamicValue = null!;
         return false;
     }
+
+    string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
+    OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
 
     public IdSpecPropertyType(EnumSpecTypeValue category, OneOrMore<string> specialTypes)
         : this(

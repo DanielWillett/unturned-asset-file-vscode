@@ -50,6 +50,14 @@
           "light": "resources/light/refresh.svg",
           "dark": "resources/dark/refresh.svg"
         }
+      },
+      {
+        "command": "unturnedDataFile.cursorMoveTo",
+        "title": "Move Cursor To"
+      },
+      {
+        "command": "unturnedDataFile.addProperty",
+        "title": "Add Property"
       }
     ],
     "menus": {
@@ -58,6 +66,12 @@
           "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
           "when": "view == unturnedDataFile.assetProperties",
           "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
+          "when": "editorLangId == unturned-data-file"
         }
       ]
     }

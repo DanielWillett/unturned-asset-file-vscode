@@ -167,7 +167,7 @@ public class AssetFileTree : IEnumerable<AssetFileNode>
                 }
                 else hasValue = true;
             }
-            else if (property.Key != "GUID")
+            else if (!property.Key.Equals("GUID", StringComparison.OrdinalIgnoreCase))
             {
                 hasValue = Asset.TryGetValue(property, out node);
             }

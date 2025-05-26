@@ -1,10 +1,8 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -160,6 +158,9 @@ public class AssetInformation
 
     public TypeHierarchy GetHierarchy(QualifiedType baseType)
     {
+        if (baseType.IsCaseInsensitive)
+            baseType = baseType.CaseSensitive;
+
         if (Types == null || !Types.TryGetValue(baseType, out TypeHierarchy? hierarchy))
             return new TypeHierarchy();
 
@@ -168,6 +169,9 @@ public class AssetInformation
 
     public InverseTypeHierarchy GetParentTypes(QualifiedType type)
     {
+        if (type.IsCaseInsensitive)
+            type = type.CaseSensitive;
+
         if (ParentTypes == null)
         {
             if (Types == null || Types.Count == 0)

@@ -9,6 +9,7 @@ public sealed class CommaDelimitedStringSpecPropertyType :
     BaseSpecPropertyType<string>,
     ISpecPropertyType<string>,
     ISecondPassSpecPropertyType,
+    IElementTypeSpecPropertyType,
     IEquatable<CommaDelimitedStringSpecPropertyType?>,
     IDisposable
 {
@@ -27,6 +28,8 @@ public sealed class CommaDelimitedStringSpecPropertyType :
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     public ISpecPropertyType InnerType { get; private set; }
+
+    string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
 
     public CommaDelimitedStringSpecPropertyType(ISpecPropertyType innerType)
     {

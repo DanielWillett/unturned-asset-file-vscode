@@ -11,6 +11,7 @@ public sealed class GuidOrIdSpecPropertyType :
     BaseSpecPropertyType<GuidOrId>,
     ISpecPropertyType<GuidOrId>,
     IElementTypeSpecPropertyType,
+    ISpecialTypesSpecPropertyType,
     IEquatable<GuidOrIdSpecPropertyType>,
     IStringParseableSpecPropertyType
 {
@@ -31,6 +32,9 @@ public sealed class GuidOrIdSpecPropertyType :
 
     /// <inheritdoc />
     public Type ValueType => typeof(GuidOrId);
+
+    string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
+    OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)

@@ -4,7 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;
 
-internal static class DatDiagnostics
+public static class DatDiagnostics
 {
     /* Suggestions */
 

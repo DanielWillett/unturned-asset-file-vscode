@@ -10,6 +10,7 @@ public class DefaultableIdSpecPropertyType :
     BaseSpecPropertyType<int>,
     ISpecPropertyType<int>,
     IElementTypeSpecPropertyType,
+    ISpecialTypesSpecPropertyType,
     IEquatable<DefaultableIdSpecPropertyType>,
     IStringParseableSpecPropertyType
 {
@@ -29,6 +30,9 @@ public class DefaultableIdSpecPropertyType :
 
     /// <inheritdoc />
     public Type ValueType => typeof(int);
+
+    string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
+    OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)

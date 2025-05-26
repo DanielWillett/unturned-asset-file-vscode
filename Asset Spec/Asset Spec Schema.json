@@ -4,11 +4,18 @@
     "title": "Asset Property Specification",
     "description": "Defines what properties are available in asset files.",
     "type": "object",
-    "$defs": {
-        "datPropertyType": {
-            "anyOf": [
+    "$defs":
+    {
+        "datPropertyType":
+        {
+            "anyOf":
+            [
                 {
-                    "type": [ "string", "object" ]
+                    "type":
+                    [
+                        "string",
+                        "object"
+                    ]
                 },
                 {
                     "const": "Flag",
@@ -268,83 +275,137 @@
                 }
             ]
         },
-        "datProperty": {
-            "oneOf": [
+        "datProperty":
+        {
+            "oneOf":
+            [
                 {
                     "type": "object",
-                    "properties": {
-                        "Key": {
+                    "properties":
+                    {
+                        "Key":
+                        {
                             "description": "The key of the flag or property.",
                             "type": "string"
                         },
-                        "SingleKeyOverride": {
-                            "type": [ "string", "null" ],
+                        "SingleKeyOverride":
+                        {
+                            "type":
+                            [
+                                "string",
+                                "null"
+                            ],
                             "description": "If 'KeyIsRegex', the singular version of the key which would not be regex (ex. Blade for Blade_#)."
                         },
-                        "KeyIsRegex": {
+                        "KeyIsRegex":
+                        {
                             "type": "boolean",
                             "description": "If 'Key' is a regex expression to match properties."
                         },
-                        "KeyGroups": {
-                            "type": [ "array", "null" ],
+                        "KeyGroups":
+                        {
+                            "type":
+                            [
+                                "array",
+                                "null"
+                            ],
                             "description": "If 'KeyIsRegex', then this is a list of groups by name to match with other properties within the given regex group.",
-                            "items": {
+                            "items":
+                            {
                                 "type": "object",
-                                "properties": {
-                                    "RegexGroup": {
+                                "properties":
+                                {
+                                    "RegexGroup":
+                                    {
                                         "type": "number",
                                         "description": "The regex group (starting from 1) that acts as the identifier for this group."
                                     },
-                                    "Name": {
+                                    "Name":
+                                    {
                                         "type": "string",
                                         "description": "Unique name of this group (amongst the this asset type's hierarchy)."
                                     }
                                 }
                             }
                         },
-                        "FileCrossRef": {
-                            "type": [ "string", "null" ],
+                        "FileCrossRef":
+                        {
+                            "type":
+                            [
+                                "string",
+                                "null"
+                            ],
                             "description": "Designates a property that selects the cross-ref file for any properties starting with $cr$::"
                         },
-                        "CountForRegexGroup": {
-                            "type": [ "string", "null" ],
+                        "CountForRegexGroup":
+                        {
+                            "type":
+                            [
+                                "string",
+                                "null"
+                            ],
                             "description": "The regex-group for which this property is a count for."
                         },
-                        "Priority": {
-                            "type": [ "integer", "null" ],
+                        "Priority":
+                        {
+                            "type":
+                            [
+                                "integer",
+                                "null"
+                            ],
                             "description": "The sorting priority of this property when displayed (descending)."
                         },
-                        "ValueRegexGroupReference": {
-                            "type": [ "string", "null" ],
+                        "ValueRegexGroupReference":
+                        {
+                            "type":
+                            [
+                                "string",
+                                "null"
+                            ],
                             "description": "The 'Key regex-group[ RelatedKey...]' of which this property references, where key is a reference to another type."
                         },
-                        "Aliases": {
+                        "Aliases":
+                        {
                             "description": "Other keys that can be used for the flag or property.",
                             "type": "array",
-                            "items": { "type": "string" }
+                            "items":
+                            {
+                                "type": "string"
+                            }
                         },
-                        "Type": {
+                        "Type":
+                        {
                             "description": "The type of the property.",
                             "$ref": "#/$defs/datPropertyType"
                         },
-                        "SubtypeSwitch": {
+                        "SubtypeSwitch":
+                        {
                             "description": "Indicates that the value of this property should change this object's type based on this property in the enum. The type should be a subtype of the current type.",
                             "type": "string"
                         },
-                        "ElementType": {
+                        "ElementType":
+                        {
                             "description": "The type of the elements of a List.",
                             "$ref": "#/$defs/datPropertyType"
                         },
-                        "SpecialTypes": {
+                        "SpecialTypes":
+                        {
                             "description": "A special subset of element type, such as barricade or useable type.",
                             "type": "array",
-                            "items": {
-                                "type": [ "string", "null" ]
+                            "items":
+                            {
+                                "type":
+                                [
+                                    "string",
+                                    "null"
+                                ]
                             }
                         },
-                        "Required": {
+                        "Required":
+                        {
                             "description": "If this property is required.",
-                            "oneOf": [
+                            "oneOf":
+                            [
                                 {
                                     "$ref": "#/$defs/condition"
                                 },
@@ -353,65 +414,122 @@
                                 }
                             ]
                         },
-                        "CanBeInMetadata": {
+                        "CanBeInMetadata":
+                        {
                             "description": "If this property can be read from the Metadata section.",
                             "type": "boolean"
                         },
-                        "DefaultValue": {
+                        "DefaultValue":
+                        {
                             "description": "The default value for this property if applicable. If IncludedDefaultValue is used, this indicates the default value if the property is not included.",
-                            "oneOf": [
+                            "oneOf":
+                            [
                                 {
-                                    "type": [ "string", "number", "integer", "boolean", "null" ]
+                                    "type":
+                                    [
+                                        "string",
+                                        "number",
+                                        "integer",
+                                        "boolean",
+                                        "null"
+                                    ]
                                 },
                                 {
                                     "$ref": "#/$defs/switch"
                                 }
                             ]
                         },
-                        "IncludedDefaultValue": {
+                        "IncludedDefaultValue":
+                        {
                             "description": "The default value for this property if applicable. Indicates the default value if the property is included but not parsed correctly.",
-                            "oneOf": [
+                            "oneOf":
+                            [
                                 {
-                                    "type": [ "string", "number", "integer", "boolean", "null" ]
+                                    "type":
+                                    [
+                                        "string",
+                                        "number",
+                                        "integer",
+                                        "boolean",
+                                        "null"
+                                    ]
                                 },
                                 {
                                     "$ref": "#/$defs/switch"
                                 }
                             ]
                         },
-                        "Description": {
+                        "Description":
+                        {
                             "description": "Short description of the property.",
                             "type": "string"
                         },
-                        "Variable": {
+                        "Variable":
+                        {
                             "description": "Name of the variable in the C# class.",
                             "type": "string"
                         },
-                        "Version": {
+                        "Version":
+                        {
                             "description": "Unturned version when this option was added.",
-                            "type": [ "string", "null" ]
+                            "type":
+                            [
+                                "string",
+                                "null"
+                            ]
                         },
-                        "Docs": {
+                        "Docs":
+                        {
                             "description": "Link to the Unturned modding docs when a page is available.",
-                            "type": [ "string", "null" ],
+                            "type":
+                            [
+                                "string",
+                                "null"
+                            ],
                             "format": "uri"
                         },
-                        "Markdown": {
+                        "Markdown":
+                        {
                             "description": "Longer markdown description of the property.",
-                            "type": [ "string", "null" ]
+                            "type":
+                            [
+                                "string",
+                                "null"
+                            ]
                         },
-                        "Minimum": {
-                            "type": [ "number", "string", "null" ],
+                        "Minimum":
+                        {
+                            "type":
+                            [
+                                "number",
+                                "string",
+                                "null"
+                            ],
                             "description": "Inclusive minimum value of the property. Can also be another property."
                         },
-                        "Maximum": {
-                            "type": [ "number", "string", "null" ],
+                        "Maximum":
+                        {
+                            "type":
+                            [
+                                "number",
+                                "string",
+                                "null"
+                            ],
                             "description": "Inclusive maximum value of the property. Can also be another property."
                         },
-                        "MinimumExclusive": {
-                            "oneOf": [
+                        "MinimumExclusive":
+                        {
+                            "oneOf":
+                            [
                                 {
-                                    "type": [ "string", "number", "integer", "boolean", "null" ]
+                                    "type":
+                                    [
+                                        "string",
+                                        "number",
+                                        "integer",
+                                        "boolean",
+                                        "null"
+                                    ]
                                 },
                                 {
                                     "$ref": "#/$defs/switch"
@@ -419,10 +537,19 @@
                             ],
                             "description": "Exclusive minimum value of the property. Can also be another property."
                         },
-                        "MaximumExclusive": {
-                            "oneOf": [
+                        "MaximumExclusive":
+                        {
+                            "oneOf":
+                            [
                                 {
-                                    "type": [ "string", "number", "integer", "boolean", "null" ]
+                                    "type":
+                                    [
+                                        "string",
+                                        "number",
+                                        "integer",
+                                        "boolean",
+                                        "null"
+                                    ]
                                 },
                                 {
                                     "$ref": "#/$defs/switch"
@@ -430,14 +557,25 @@
                             ],
                             "description": "Exclusive maximum value of the property. Can also be another property."
                         },
-                        "Except": {
-                            "oneOf": [
+                        "Except":
+                        {
+                            "oneOf":
+                            [
                                 {
                                     "type": "array",
-                                    "items": {
-                                        "oneOf": [
+                                    "items":
+                                    {
+                                        "oneOf":
+                                        [
                                             {
-                                                "type": [ "string", "number", "integer", "boolean", "null" ]
+                                                "type":
+                                                [
+                                                    "string",
+                                                    "number",
+                                                    "integer",
+                                                    "boolean",
+                                                    "null"
+                                                ]
                                             },
                                             {
                                                 "$ref": "#/$defs/switch"
@@ -446,9 +584,17 @@
                                     }
                                 },
                                 {
-                                    "oneOf": [
+                                    "oneOf":
+                                    [
                                         {
-                                            "type": [ "string", "number", "integer", "boolean", "null" ]
+                                            "type":
+                                            [
+                                                "string",
+                                                "number",
+                                                "integer",
+                                                "boolean",
+                                                "null"
+                                            ]
                                         },
                                         {
                                             "$ref": "#/$defs/switch"
@@ -458,31 +604,49 @@
                             ],
                             "description": "Exceptions to the minimum/maximum range."
                         },
-                        "ExclusiveWith": {
-                            "oneOf": [
+                        "ExclusiveWith":
+                        {
+                            "oneOf":
+                            [
                                 {
                                     "type": "array",
-                                    "items": {
-                                        "type": [ "string" ]
+                                    "items":
+                                    {
+                                        "type":
+                                        [
+                                            "string"
+                                        ]
                                     },
                                     "description": "List of properties that should not co-exist with this property."
                                 },
                                 {
                                     "type": "array",
-                                    "items": {
+                                    "items":
+                                    {
                                         "type": "object",
-                                        "properties": {
-                                            "Key": {
+                                        "properties":
+                                        {
+                                            "Key":
+                                            {
                                                 "type": "string",
                                                 "description": "The property that shouldn't co-exist when its value equals Value."
                                             },
-                                            "Value": {
-                                                "type": [ "string", "array", "number", "null", "boolean" ],
+                                            "Value":
+                                            {
+                                                "type":
+                                                [
+                                                    "string",
+                                                    "array",
+                                                    "number",
+                                                    "null",
+                                                    "boolean"
+                                                ],
                                                 "description": "The value that Key can't be equal to. '*' = any value."
                                             },
                                             "Condition":
                                             {
-                                                "oneOf": [
+                                                "oneOf":
+                                                [
                                                     {
                                                         "$ref": "#/$defs/condition"
                                                     },
@@ -493,36 +657,58 @@
                                                 "description": "Optional condition when this should be applied."
                                             }
                                         },
-                                        "required": [ "Key" ]
+                                        "required":
+                                        [
+                                            "Key"
+                                        ]
                                     },
                                     "description": "List of properties with values that should not co-exist with this property."
                                 }
                             ]
                         },
-                        "InclusiveWith": {
-                            "oneOf": [
+                        "InclusiveWith":
+                        {
+                            "oneOf":
+                            [
                                 {
                                     "type": "array",
-                                    "items": {
-                                        "type": [ "string" ]
+                                    "items":
+                                    {
+                                        "type":
+                                        [
+                                            "string"
+                                        ]
                                     },
                                     "description": "List of properties that should exist if this exists."
                                 },
                                 {
                                     "type": "array",
-                                    "items": {
+                                    "items":
+                                    {
                                         "type": "object",
-                                        "properties": {
-                                            "Key": {
+                                        "properties":
+                                        {
+                                            "Key":
+                                            {
                                                 "type": "string",
                                                 "description": "The property that is required."
                                             },
-                                            "Value": {
-                                                "type": [ "string", "array", "number", "null", "boolean" ],
+                                            "Value":
+                                            {
+                                                "type":
+                                                [
+                                                    "string",
+                                                    "array",
+                                                    "number",
+                                                    "null",
+                                                    "boolean"
+                                                ],
                                                 "description": "The value that is required or a list of allowed values. '*' = any value."
                                             },
-                                            "Condition": {
-                                                "oneOf": [
+                                            "Condition":
+                                            {
+                                                "oneOf":
+                                                [
                                                     {
                                                         "$ref": "#/$defs/condition"
                                                     },
@@ -532,68 +718,144 @@
                                                 ]
                                             }
                                         },
-                                        "required": [ "Key", "Value" ]
+                                        "required":
+                                        [
+                                            "Key",
+                                            "Value"
+                                        ]
                                     },
                                     "description": "List of properties and optional values that should exist if this exists."
                                 }
                             ]
                         },
-                        "Deprecated": {
+                        "Deprecated":
+                        {
                             "type": "boolean",
                             "description": "If this property shouldn't be used anymore or was left in for legacy features."
+                        },
+                        "SimilarGrouping":
+                        {
+                            "type":
+                            [
+                                "string",
+                                "null"
+                            ],
+                            "description": "Unique ID linking multiple properties that are usually kept together (no whitespace)."
                         }
                     },
-                    "required": [ "Key", "Type" ]
+                    "required":
+                    [
+                        "Key",
+                        "Type"
+                    ]
                 },
                 {
                     "type": "object",
-                    "properties": {
-                        "Key": {
+                    "properties":
+                    {
+                        "Key":
+                        {
                             "description": "The key of the flag or property in a parent type.",
                             "type": "string"
                         },
-                        "HideInherited": {
+                        "HideInherited":
+                        {
                             "description": "If this property should be removed from this type when inherited from a parent.",
                             "type": "boolean"
                         }
                     },
-                    "required": [ "Key", "HideInherited" ]
+                    "required":
+                    [
+                        "Key",
+                        "HideInherited"
+                    ]
                 }
             ]
         },
-        "condition": {
-            "type": [ "object", "boolean", "string" ],
-            "properties": {
-                "Variable": {
+        "condition":
+        {
+            "type":
+            [
+                "object",
+                "boolean",
+                "string"
+            ],
+            "properties":
+            {
+                "Variable":
+                {
                     "type": "string"
                 },
-                "Operation": {
+                "Operation":
+                {
                     "type": "string",
-                    "enum": [ "lt", "gt", "lte", "gte", "eq", "neq", "contains", "starts-with", "ends-with", "matches", "contains-i", "eq-i", "neq-i", "starts-with-i", "ends-with-i", "assignable-to", "assignable-from", "included", "is-type" ]
+                    "enum":
+                    [
+                        "lt",
+                        "gt",
+                        "lte",
+                        "gte",
+                        "eq",
+                        "neq",
+                        "contains",
+                        "starts-with",
+                        "ends-with",
+                        "matches",
+                        "contains-i",
+                        "eq-i",
+                        "neq-i",
+                        "starts-with-i",
+                        "ends-with-i",
+                        "assignable-to",
+                        "assignable-from",
+                        "included",
+                        "is-type"
+                    ]
                 },
-                "Comparand": {
-                    "type": [ "null", "string", "boolean", "number", "pattern" ]
+                "Comparand":
+                {
+                    "type":
+                    [
+                        "null",
+                        "string",
+                        "boolean",
+                        "number",
+                        "pattern"
+                    ]
                 }
             },
-            "required": [ "Variable", "Operation", "Comparand" ]
+            "required":
+            [
+                "Variable",
+                "Operation",
+                "Comparand"
+            ]
         },
-        "switch": {
+        "switch":
+        {
             "type": "array",
-            "items": {
+            "items":
+            {
                 "$ref": "#/$defs/switchCase"
             },
             "minItems": 1
         },
-        "switchCase": {
+        "switchCase":
+        {
             "type": "object",
-            "oneOf": [
+            "oneOf":
+            [
                 {
-                    "properties": {
-                        "And": {
-                            "oneOf": [
+                    "properties":
+                    {
+                        "And":
+                        {
+                            "oneOf":
+                            [
                                 {
                                     "type": "array",
-                                    "items": {
+                                    "items":
+                                    {
                                         "oneOf":
                                         [
                                             {
@@ -613,11 +875,14 @@
                                 }
                             ]
                         },
-                        "Or": {
-                            "oneOf": [
+                        "Or":
+                        {
+                            "oneOf":
+                            [
                                 {
                                     "type": "array",
-                                    "items": {
+                                    "items":
+                                    {
                                         "oneOf":
                                         [
                                             {
@@ -637,8 +902,10 @@
                                 }
                             ]
                         },
-                        "Case": {
-                            "oneOf": [
+                        "Case":
+                        {
+                            "oneOf":
+                            [
                                 {
                                     "$ref": "#/$defs/condition"
                                 },
@@ -647,19 +914,33 @@
                                 }
                             ]
                         },
-                        "Value": {
-                            "type": [ "null", "string", "boolean", "number" ]
+                        "Value":
+                        {
+                            "type":
+                            [
+                                "null",
+                                "string",
+                                "boolean",
+                                "number"
+                            ]
                         }
                     },
-                    "required": [ "Value" ]
+                    "required":
+                    [
+                        "Value"
+                    ]
                 },
                 {
-                    "properties": {
-                        "When": {
+                    "properties":
+                    {
+                        "When":
+                        {
                             "$ref": "#/$defs/condition"
                         },
-                        "Case": {
-                            "oneOf": [
+                        "Case":
+                        {
+                            "oneOf":
+                            [
                                 {
                                     "$ref": "#/$defs/condition"
                                 },
@@ -668,11 +949,14 @@
                                 }
                             ]
                         },
-                        "Cases": {
-                            "oneOf": [
+                        "Cases":
+                        {
+                            "oneOf":
+                            [
                                 {
                                     "type": "array",
-                                    "items": {
+                                    "items":
+                                    {
                                         "oneOf":
                                         [
                                             {
@@ -693,199 +977,339 @@
                             ]
                         }
                     },
-                    "required": [ "Cases" ]
+                    "required":
+                    [
+                        "Cases"
+                    ]
                 }
             ]
         }
     },
-    "properties": {
-        "Type": {
+    "properties":
+    {
+        "Type":
+        {
             "description": "Assembly-qualified name of the asset type.",
             "type": "string"
         },
-        "Category": {
+        "Category":
+        {
             "description": "Category of the asset, if any.",
             "type": "string",
-            "enum": [ "NONE", "ITEM", "EFFECT", "OBJECT", "RESOURCE", "VEHICLE", "ANIMAL", "MYTHIC", "SKIN", "SPAWN", "NPC" ]
+            "enum":
+            [
+                "NONE",
+                "ITEM",
+                "EFFECT",
+                "OBJECT",
+                "RESOURCE",
+                "VEHICLE",
+                "ANIMAL",
+                "MYTHIC",
+                "SKIN",
+                "SPAWN",
+                "NPC"
+            ]
         },
-        "DisplayName": {
+        "DisplayName":
+        {
             "description": "Display name of the type of asset.",
             "type": "string"
         },
-        "Parent": {
+        "Parent":
+        {
             "description": "Assembly-qualified name of the parent asset type, or null for Asset.",
-            "type": [ "string", "null" ]
+            "type":
+            [
+                "string",
+                "null"
+            ]
         },
-        "Docs": {
+        "Docs":
+        {
             "description": "Link to the Unturned modding docs when a page is available.",
-            "type": [ "string", "null" ],
+            "type":
+            [
+                "string",
+                "null"
+            ],
             "format": "uri"
         },
-        "VanillaIdLimit": {
+        "VanillaIdLimit":
+        {
             "description": "The first ID that isn't reserved by vanilla. 0 if this doesn't apply.",
             "type": "number",
             "minimum": 0,
             "maximum": 65535
         },
-        "RequireId": {
+        "RequireId":
+        {
             "description": "If this type requires a non-zero unique ID.",
             "type": "boolean"
         },
-        "Properties": {
+        "Properties":
+        {
             "description": "List of all properties that can be defined.",
             "type": "array",
-            "items": {
+            "items":
+            {
                 "$ref": "#/$defs/datProperty"
             }
         },
-        "Localization": {
+        "Localization":
+        {
             "description": "List of all localization properties that can be defined.",
             "type": "array",
-            "items": {
+            "items":
+            {
                 "$ref": "#/$defs/datProperty"
             }
         },
-        "BundleAssets": {
+        "BundleAssets":
+        {
             "description": "List of all assets loaded from Unity bundles with an expected name.",
             "type": "array",
-            "items": {
+            "items":
+            {
                 "type": "object",
-                "properties": {
-                    "AssetName": {
+                "properties":
+                {
+                    "AssetName":
+                    {
                         "type": "string",
                         "description": "The name of the asset in Unity."
                     },
-                    "RedirectableAssetKey": {
+                    "RedirectableAssetKey":
+                    {
                         "type": "string",
                         "description": "The key of the redirect property for this asset."
                     },
-                    "SingleAssetNameOverride": {
-                        "type": [ "string", "null" ],
+                    "SingleAssetNameOverride":
+                    {
+                        "type":
+                        [
+                            "string",
+                            "null"
+                        ],
                         "description": "If 'AssetNameIsRegex', the singular version of the asset name which would not be regex."
                     },
-                    "AssetNameIsRegex": {
+                    "AssetNameIsRegex":
+                    {
                         "type": "boolean",
                         "description": "If 'AssetName' is a regex expression to match properties."
                     },
-                    "Docs": {
+                    "Docs":
+                    {
                         "description": "Link to the Unturned modding docs when a page is available.",
-                        "type": [ "string", "null" ],
+                        "type":
+                        [
+                            "string",
+                            "null"
+                        ],
                         "format": "uri"
                     },
-                    "AssetNameGroups": {
-                        "type": [ "array", "null" ],
+                    "AssetNameGroups":
+                    {
+                        "type":
+                        [
+                            "array",
+                            "null"
+                        ],
                         "description": "If 'AssetNameIsRegex', then this is a list of groups by name to match with other properties within the given regex group.",
-                        "items": {
+                        "items":
+                        {
                             "type": "object",
-                            "properties": {
-                                "RegexGroup": {
+                            "properties":
+                            {
+                                "RegexGroup":
+                                {
                                     "type": "number",
                                     "description": "The regex group (starting from 1) that acts as the identifier for this group."
                                 },
-                                "Name": {
+                                "Name":
+                                {
                                     "type": "string",
                                     "description": "Unique name of this group (amongst the this asset type's hierarchy)."
                                 }
                             }
                         }
                     },
-                    "InclusiveWith": {
+                    "InclusiveWith":
+                    {
                         "type": "array",
-                        "items": {
-                            "type": [ "object", "string" ],
-                            "properties": {
-                                "Key": {
+                        "items":
+                        {
+                            "type":
+                            [
+                                "object",
+                                "string"
+                            ],
+                            "properties":
+                            {
+                                "Key":
+                                {
                                     "type": "string",
                                     "description": "The property that is required."
                                 },
-                                "Value": {
-                                    "type": [ "string", "array", "number", "null", "boolean" ],
+                                "Value":
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "array",
+                                        "number",
+                                        "null",
+                                        "boolean"
+                                    ],
                                     "description": "The value that is required or a list of allowed values."
                                 }
                             },
-                            "required": [ "Key", "Value" ]
+                            "required":
+                            [
+                                "Key",
+                                "Value"
+                            ]
                         },
                         "description": "List of properties and optional values that should exist if this exists."
                     },
-                    "Description": {
+                    "Description":
+                    {
                         "type": "string",
                         "description": "Description of what the prefab does."
                     },
-                    "Deprecated": {
+                    "Deprecated":
+                    {
                         "type": "boolean",
                         "description": "If the prefab is no longer used or has been swapped for newer prefab features."
                     },
-                    "Required": {
-                        "type": [ "string", "boolean" ],
+                    "Required":
+                    {
+                        "type":
+                        [
+                            "string",
+                            "boolean"
+                        ],
                         "description": "If the prefab is required to exist (or doesn't make sense to not exist)."
                     },
-                    "Type": {
+                    "Type":
+                    {
                         "type": "string",
                         "description": "The fully qualified type of unity asset to load."
                     },
-                    "AnimationComponentFindArgument": {
-                        "type": [ "string", "null" ],
-                        "description": "The child GameObject that should have the Animation component attached." 
+                    "AnimationComponentFindArgument":
+                    {
+                        "type":
+                        [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The child GameObject that should have the Animation component attached."
                     },
-                    "Variable": {
+                    "Variable":
+                    {
                         "description": "Name of the variable in the C# class.",
                         "type": "string"
                     },
-                    "Animations": {
+                    "Animations":
+                    {
                         "type": "array",
                         "description": "List of animations that can be available on the Animation component.",
-                        "items": {
+                        "items":
+                        {
                             "type": "object",
-                            "properties": {
-                                "Name": {
+                            "properties":
+                            {
+                                "Name":
+                                {
                                     "type": "string",
                                     "description": "The name of the animation in Unity."
                                 },
-                                "NameProperty": {
+                                "NameProperty":
+                                {
                                     "type": "string",
                                     "description": "The name of a property that represents the actual name of this animation if it's present."
                                 },
-                                "Required": {
-                                    "type": [ "string", "boolean" ],
+                                "Required":
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "boolean"
+                                    ],
                                     "description": "If the animation is required."
                                 },
-                                "SingleNameOverride": {
-                                    "type": [ "string", "null" ],
+                                "SingleNameOverride":
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "null"
+                                    ],
                                     "description": "If 'NameIsRegex', the singular version of the name which would not be regex."
                                 },
-                                "NameIsRegex": {
+                                "NameIsRegex":
+                                {
                                     "type": "boolean",
                                     "description": "If 'Name' is a regex expression to match properties."
                                 },
-                                "InclusiveWith": {
+                                "InclusiveWith":
+                                {
                                     "type": "array",
-                                    "items": {
-                                        "type": [ "object", "string" ],
-                                        "properties": {
-                                            "Key": {
+                                    "items":
+                                    {
+                                        "type":
+                                        [
+                                            "object",
+                                            "string"
+                                        ],
+                                        "properties":
+                                        {
+                                            "Key":
+                                            {
                                                 "type": "string",
                                                 "description": "The property that is required."
                                             },
-                                            "Value": {
-                                                "type": [ "string", "array", "number", "null", "boolean" ],
+                                            "Value":
+                                            {
+                                                "type":
+                                                [
+                                                    "string",
+                                                    "array",
+                                                    "number",
+                                                    "null",
+                                                    "boolean"
+                                                ],
                                                 "description": "The value that is required or a list of allowed values."
                                             }
                                         },
-                                        "required": [ "Key", "Value" ]
+                                        "required":
+                                        [
+                                            "Key",
+                                            "Value"
+                                        ]
                                     },
                                     "description": "List of properties and optional values that should exist if this exists."
                                 },
-                                "NameGroups": {
-                                    "type": [ "array", "null" ],
+                                "NameGroups":
+                                {
+                                    "type":
+                                    [
+                                        "array",
+                                        "null"
+                                    ],
                                     "description": "If 'NameIsRegex', then this is a list of groups by name to match with other properties within the given regex group.",
-                                    "items": {
+                                    "items":
+                                    {
                                         "type": "object",
-                                        "properties": {
-                                            "RegexGroup": {
+                                        "properties":
+                                        {
+                                            "RegexGroup":
+                                            {
                                                 "type": "number",
                                                 "description": "The regex group (starting from 1) that acts as the identifier for this group."
                                             },
-                                            "Name": {
+                                            "Name":
+                                            {
                                                 "type": "string",
                                                 "description": "Unique name of this group (amongst the this asset type's hierarchy)."
                                             }
@@ -898,83 +1322,124 @@
                 }
             }
         },
-        "Types": {
+        "Types":
+        {
             "description": "List of related custom types.",
             "type": "array",
-            "items": {
+            "items":
+            {
                 "type": "object",
-                "properties": {
-                    "Type": {
+                "properties":
+                {
+                    "Type":
+                    {
                         "description": "Fully qualified type name.",
                         "type": "string"
                     },
-                    "DisplayName": {
+                    "DisplayName":
+                    {
                         "description": "Display name of the type.",
                         "type": "string"
                     },
-                    "IsLegacyExpandedType": {
+                    "IsLegacyExpandedType":
+                    {
                         "description": "If this type is expanded using same-level properties instead of a dictionary.",
-                        "type": [ "boolean", "null" ]
+                        "type":
+                        [
+                            "boolean",
+                            "null"
+                        ]
                     },
-                    "Docs": {
+                    "Docs":
+                    {
                         "description": "Link to the Unturned modding docs when a page is available.",
-                        "type": [ "string", "null" ],
+                        "type":
+                        [
+                            "string",
+                            "null"
+                        ],
                         "format": "uri"
                     },
-                    "Parent": {
+                    "Parent":
+                    {
                         "description": "Parent type of this type.",
                         "type": "string"
                     },
-                    "Values": {
+                    "Values":
+                    {
                         "description": "List of enum values.",
                         "type": "array",
-                        "items": { 
-                            "type": [ "object", "string" ],
-                            "properties": {
-                                "Value": {
+                        "items":
+                        {
+                            "type":
+                            [
+                                "object",
+                                "string"
+                            ],
+                            "properties":
+                            {
+                                "Value":
+                                {
                                     "type": "string",
                                     "description": "The name of the enum field."
                                 },
-                                "Casing": {
+                                "Casing":
+                                {
                                     "type": "string",
                                     "description": "The proper-case version of 'Value'."
                                 },
-                                "CorrespondingType": {
+                                "CorrespondingType":
+                                {
                                     "type": "string",
                                     "description": "Matches this enum to a CLR type in a TypeOrEnum property."
                                 },
-                                "RequiredBaseType": {
+                                "RequiredBaseType":
+                                {
                                     "type": "string",
                                     "description": "The required type of this asset to use this value (also matches subtypes)."
                                 },
-                                "Description": {
+                                "Description":
+                                {
                                     "type": "string",
                                     "description": "Description of what the enum value does."
                                 },
-                                "Deprecated": {
+                                "Deprecated":
+                                {
                                     "type": "boolean",
                                     "description": "If this value shouldn't be used."
                                 },
-                                "Docs": {
+                                "Docs":
+                                {
                                     "description": "Link to the Unturned modding docs when a page is available.",
-                                    "type": [ "string", "null" ],
+                                    "type":
+                                    [
+                                        "string",
+                                        "null"
+                                    ],
                                     "format": "uri"
                                 }
                             },
-                            "required": [ "Value" ]
+                            "required":
+                            [
+                                "Value"
+                            ]
                         }
                     },
-                    "Properties": {
+                    "Properties":
+                    {
                         "description": "List of all properties that can be defined.",
                         "type": "array",
-                        "items": {
+                        "items":
+                        {
                             "$ref": "#/$defs/datProperty"
                         }
                     },
-                    "Localization": {
+                    "Localization":
+                    {
                         "description": "List of all localization properties that can be defined.",
                         "type": "array",
-                        "items": {
+                        "items":
+                        {
                             "$ref": "#/$defs/datProperty"
                         }
                     }
@@ -982,5 +1447,10 @@
             }
         }
     },
-    "required": [ "Type", "DisplayName", "Parent" ]
+    "required":
+    [
+        "Type",
+        "DisplayName",
+        "Parent"
+    ]
 }

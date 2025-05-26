@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -10,13 +11,17 @@ public sealed class TypeOrEnumSpecPropertyType :
     ISpecPropertyType<QualifiedType>,
     IElementTypeSpecPropertyType,
     IEquatable<TypeOrEnumSpecPropertyType>,
-    IStringParseableSpecPropertyType
+    IStringParseableSpecPropertyType,
+    ISpecialTypesSpecPropertyType
 {
     private IAssetSpecDatabase? _cachedSpecDb;
     private ISpecType? _cachedEnum;
 
     public QualifiedType ElementType { get; }
     public QualifiedType EnumType { get; }
+
+    string IElementTypeSpecPropertyType.ElementType => EnumType;
+    OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => new OneOrMore<string?>(ElementType);
 
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName { get; }

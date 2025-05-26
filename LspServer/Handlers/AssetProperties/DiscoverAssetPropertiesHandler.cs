@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -52,7 +53,6 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
         {
             SpecProperty property = properties[i];
             FileEvaluationContext propContext = new FileEvaluationContext(in context, property);
-            PropertyRefInfo propInfo = new PropertyRefInfo(property);
 
             AssetProperty prop = new AssetProperty
             {
@@ -68,7 +68,7 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
 
             if (val != null && val.TryEvaluateValue(in propContext, out object? value))
             {
-                prop.Value = value;
+                prop.Value = value is QualifiedType { IsNormalized: false } qt ? qt.Normalized : value;
             }
             if (lineNode != null)
             {

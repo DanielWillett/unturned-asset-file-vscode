@@ -1,6 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -22,7 +23,11 @@ public interface ISpecPropertyType<TValue> : ISpecPropertyType, IEquatable<ISpec
 
 public interface IElementTypeSpecPropertyType : ISpecPropertyType
 {
-    QualifiedType ElementType { get; }
+    string? ElementType { get; }
+}
+public interface ISpecialTypesSpecPropertyType : ISpecPropertyType
+{
+    OneOrMore<string?> SpecialTypes { get; }
 }
 
 public interface IStringParseableSpecPropertyType

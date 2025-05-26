@@ -1,6 +1,5 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -31,6 +30,8 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public Type ValueType => typeof(BundleReference);
+
+    string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
@@ -94,19 +95,6 @@ public sealed class MasterBundleReferenceSpecPropertyType :
     /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out BundleReference value)
     {
-        InverseTypeHierarchy parents = parse.Database.Information.GetParentTypes(ElementType);
-        if (!parents.IsValid)
-        {
-            parse.Log(new DatDiagnosticMessage
-            {
-                Diagnostic = DatDiagnostics.UNT2005,
-                Message = string.Format(DiagnosticResources.UNT2005, $"MasterBundleReference<{QualifiedType.ExtractTypeName(ElementType.Type.AsSpan()).ToString()}>"),
-                Range = parse.Node?.Range ?? parse.Parent?.Range ?? default
-            });
-            value = default;
-            return false;
-        }
-
         if (parse.Node == null)
         {
             return MissingNode(in parse, out value);
@@ -114,18 +102,18 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 
         if (parse.Node is AssetFileStringValueNode stringValue)
         {
-            if (!KnownTypeValueHelper.TryParseMasterBundleReference(stringValue.Value, out string? name, out string path))
+            if (!KnownTypeValueHelper.TryParseMasterBundleReference(stringValue.Value, out string name, out string path))
             {
                 return FailedToParse(in parse, out value);
             }
 
-            if (string.IsNullOrEmpty(name))
-            {
-                // todo: check if in master bundle if name is null
-                name = "<<current master bundle>>";
-            }
+            //if (string.IsNullOrEmpty(name))
+            //{
+            //    // todo: check if in master bundle if name is null
+            //    name = "<<current master bundle>>";
+            //}
 
-            value = new BundleReference(name!, path, ReferenceType);
+            value = new BundleReference(name, path, ReferenceType);
             return true;
         }
 
@@ -138,17 +126,14 @@ public sealed class MasterBundleReferenceSpecPropertyType :
         string nameProperty = ReferenceType == MasterBundleReferenceType.ContentReference ? "Name" : "MasterBundle";
         string pathProperty = ReferenceType == MasterBundleReferenceType.ContentReference ? "Path" : "AssetPath";
 
-        if (!dictionary.TryGetValue(nameProperty, out AssetFileValueNode? nameNode) || nameNode is not AssetFileStringValueNode nameValue)
-        {
-            return MissingProperty(in parse, nameProperty, out value);
-        }
+        dictionary.TryGetValue(nameProperty, out AssetFileValueNode? nameNode);
 
         if (!dictionary.TryGetValue(pathProperty, out AssetFileValueNode? pathNode) || pathNode is not AssetFileStringValueNode pathValue)
         {
             return MissingProperty(in parse, pathProperty, out value);
         }
 
-        value = new BundleReference(nameValue.Value, pathValue.Value, ReferenceType);
+        value = new BundleReference((nameNode as AssetFileStringValueNode)?.Value ?? string.Empty, pathValue.Value, ReferenceType);
         return true;
     }
 
@@ -164,6 +149,7 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 
 public enum MasterBundleReferenceType
 {
+    Unspecified,
     MasterBundleReference,
     MasterBundleReferenceString,
     ContentReference,

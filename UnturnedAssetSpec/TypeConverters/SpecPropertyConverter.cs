@@ -40,6 +40,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     private static readonly JsonEncodedText InclusiveWithProperty = JsonEncodedText.Encode("InclusiveWith");
     private static readonly JsonEncodedText DeprecatedProperty = JsonEncodedText.Encode("Deprecated");
     private static readonly JsonEncodedText PriorityProperty = JsonEncodedText.Encode("Priority");
+    private static readonly JsonEncodedText SimilarGroupingProperty = JsonEncodedText.Encode("SimilarGrouping");
 
     private static readonly JsonEncodedText HideInheritedProperty = JsonEncodedText.Encode("HideInherited");
 
@@ -74,7 +75,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         InclusiveWithProperty,              // 26
         DeprecatedProperty,                 // 27
         HideInheritedProperty,              // 28
-        PriorityProperty                    // 29
+        PriorityProperty,                   // 29
+        SimilarGroupingProperty             // 30
     ];
 
     /// <inheritdoc />
@@ -357,6 +359,12 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     if (reader.TokenType is not JsonTokenType.Number || !reader.TryGetInt32(out priority))
                         ThrowUnexpectedToken(reader.TokenType, propType);
                     property.Priority = priority;
+                    break;
+
+                case 30: // SimilarGrouping
+                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+                    property.SimilarGrouping = reader.GetString();
                     break;
 
                 default:
@@ -671,7 +679,179 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
         writer.WriteString(KeyProperty, property.Key);
 
-        // todo
+        writer.WriteString(TypeProperty, property.Type.Type);
+        if (property.Type is IElementTypeSpecPropertyType { ElementType: { Length: > 0 } elementType })
+        {
+            writer.WriteString(ElementTypeProperty, elementType);
+        }
+        if (property.Type is ISpecialTypesSpecPropertyType specialTypes)
+        {
+            bool hasHeader = false;
+            foreach (string? type in specialTypes.SpecialTypes)
+            {
+                if (string.IsNullOrEmpty(type))
+                    continue;
+
+                if (!hasHeader)
+                {
+                    writer.WriteStartArray(SpecialTypesProperty);
+                    hasHeader = true;
+                }
+
+                writer.WriteStringValue(type);
+            }
+
+            if (hasHeader)
+                writer.WriteEndArray();
+        }
+
+        if (property.Description != null)
+        {
+            writer.WriteString(DescriptionProperty, property.Description);
+        }
+        
+        if (property.Markdown != null)
+        {
+            writer.WriteString(MarkdownProperty, property.Markdown);
+        }
+        
+        if (property.Docs != null)
+        {
+            writer.WriteString(DocsProperty, property.Docs);
+        }
+        
+        if (property.RequiredCondition != null)
+        {
+            writer.WritePropertyName(RequiredProperty);
+            property.RequiredCondition.WriteToJsonWriter(writer, options);
+        }
+
+        if (property.CanBeInMetadata)
+        {
+            writer.WriteBoolean(CanBeInMetadataProperty, true);
+        }
+
+        if (property.DefaultValue != null)
+        {
+            writer.WritePropertyName(DefaultValueProperty);
+            property.DefaultValue.WriteToJsonWriter(writer, options);
+        }
+        if (property.IncludedDefaultValue != null)
+        {
+            writer.WritePropertyName(IncludedDefaultValueProperty);
+            property.IncludedDefaultValue.WriteToJsonWriter(writer, options);
+        }
+
+        if (property.SingleKeyOverride != null)
+        {
+            writer.WriteString(SingleKeyOverrideProperty, property.SingleKeyOverride);
+        }
+
+        if (property.KeyIsRegex)
+        {
+            writer.WriteBoolean(KeyIsRegexProperty, true);
+
+            writer.WriteStartArray(KeyGroupsProperty);
+
+            foreach (RegexKeyGroup grp in property.KeyGroups)
+            {
+                writer.WriteStartObject();
+
+                writer.WriteString(KeyGroupsNameProperty, grp.Name);
+                writer.WriteNumber(KeyGroupsRegexGroupProperty, grp.Group);
+
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+        }
+        
+        if (property.Priority != 0)
+        {
+            writer.WriteNumber(PriorityProperty, property.Priority);
+        }
+
+        if (property.SimilarGrouping != null)
+        {
+            writer.WriteString(SimilarGroupingProperty, property.SimilarGrouping);
+        }
+
+        if (property.Deprecated)
+        {
+            writer.WriteBoolean(DeprecatedProperty, true);
+        }
+
+        if (property.FileCrossRef != null)
+        {
+            writer.WriteString(FileCrossRefProperty, property.FileCrossRef);
+        }
+
+        if (property.CountForRegexGroup != null)
+        {
+            writer.WriteString(CountForRegexGroupProperty, property.CountForRegexGroup);
+        }
+
+        if (property.ValueRegexGroupReference != null)
+        {
+            writer.WriteString(ValueRegexGroupReferenceProperty, property.ValueRegexGroupReference);
+        }
+
+        if (!property.Aliases.IsNull)
+        {
+            writer.WriteStartArray(AliasesProperty);
+            foreach (string alias in property.Aliases)
+            {
+                writer.WriteStringValue(alias);
+            }
+            writer.WriteEndArray();
+        }
+
+        if (property.SubtypeSwitch != null)
+        {
+            writer.WriteString(SubtypeSwitchProperty, property.SubtypeSwitch);
+        }
+
+        if (property.ExceptionsAreWhitelist)
+        {
+            if (property.MinimumValue != null)
+            {
+                writer.WritePropertyName(property.IsMinimumValueExclusive ? MinimumExclusiveProperty : MinimumProperty);
+                property.MinimumValue.WriteToJsonWriter(writer, options);
+            }
+            if (property.MaximumValue != null)
+            {
+                writer.WritePropertyName(property.IsMaximumValueExclusive ? MaximumExclusiveProperty : MaximumProperty);
+                property.MaximumValue.WriteToJsonWriter(writer, options);
+            }
+        }
+
+        if (!property.Exceptions.IsNull)
+        {
+            writer.WriteStartArray(ExceptProperty);
+
+            foreach (ISpecDynamicValue exception in property.Exceptions)
+            {
+                exception.WriteToJsonWriter(writer, options);
+            }
+
+            writer.WriteEndArray();
+        }
+
+        if (property.InclusiveProperties != null)
+        {
+            writer.WritePropertyName(InclusiveWithProperty);
+            InclusionConditionConverter.WriteCondition(writer, property.InclusiveProperties, options);
+        }
+        if (property.ExclusiveProperties != null)
+        {
+            writer.WritePropertyName(ExclusiveWithProperty);
+            InclusionConditionConverter.WriteCondition(writer, property.ExclusiveProperties, options);
+        }
+
+        if (property.Variable != null)
+        {
+            writer.WriteString(VariableProperty, property.Variable);
+        }
 
         writer.WriteEndObject();
     }

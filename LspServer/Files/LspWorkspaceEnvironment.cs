@@ -29,7 +29,7 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment
 
         try
         {
-            return new OpenedFile(uri, File.ReadAllText(datFile.FilePath, Encoding.UTF8));
+            return new OpenedFile(uri, File.ReadAllText(datFile.FilePath, Encoding.UTF8), _logger);
         }
         catch (Exception ex)
         {

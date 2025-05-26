@@ -17,12 +17,20 @@ public struct FilePosition : IEquatable<FilePosition>, IComparable<FilePosition>
     /// </summary>
     public int Character;
 
+    public bool IsInvalid => Line <= 0 || Character <= 0;
+
     public FilePosition() { }
 
     public FilePosition(int line, int character)
     {
         Line = line;
         Character = character;
+    }
+
+    public void Deconstruct(out int line, out int character)
+    {
+        line = Line;
+        character = Character;
     }
 
     /// <inheritdoc />
@@ -56,4 +64,9 @@ public struct FilePosition : IEquatable<FilePosition>, IComparable<FilePosition>
     public static bool operator >(FilePosition left, FilePosition right) => left.Line == right.Line ? left.Character > right.Character : left.Line > right.Line;
     public static bool operator <=(FilePosition left, FilePosition right) => left.Line == right.Line ? left.Character <= right.Character : left.Line <= right.Line;
     public static bool operator >=(FilePosition left, FilePosition right) => left.Line == right.Line ? left.Character >= right.Character : left.Line >= right.Line;
+
+    public static implicit operator FilePosition((int line, int character) tuple) => new FilePosition(tuple.line, tuple.character);
+
+    public override string ToString() => IsInvalid ? "Invalid File Position" : $"L{Line} C{Character}";
+
 }

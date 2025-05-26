@@ -10,6 +10,7 @@ public sealed class AssetReferenceSpecPropertyType :
     BaseSpecPropertyType<Guid>,
     ISpecPropertyType<Guid>,
     IElementTypeSpecPropertyType,
+    ISpecialTypesSpecPropertyType,
     IEquatable<AssetReferenceSpecPropertyType?>,
     IStringParseableSpecPropertyType
 {
@@ -29,6 +30,9 @@ public sealed class AssetReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public Type ValueType => typeof(Guid);
+
+    string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
+    OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)

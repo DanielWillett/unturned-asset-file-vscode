@@ -88,7 +88,7 @@ internal class KeyCompletionHandler : ICompletionHandler
         }
         else
         {
-            ReadOnlySpan<char> line = state.File.LineIndex.SliceLine(position.Line);
+            ReadOnlySpan<char> line = ReadOnlySpan<char>.Empty;// todo: state.File.LineIndex.SliceLine(position.Line);
             int firstNonWhiteSpace = 0;
             for (int i = 0; i < line.Length; ++i)
             {
@@ -144,11 +144,12 @@ internal class KeyCompletionHandler : ICompletionHandler
 
         FilePosition position = request.Position.ToFilePosition();
 
-        FileLineIndex lineIndex = file.LineIndex;
-        while (position.Character > 1 && char.IsWhiteSpace(lineIndex.GetChar(position.Line, position.Character - 1)))
-            --position.Character;
+        // todo
+        //FileLineIndex lineIndex = default;// file.LineIndex;
+        //while (position.Character > 1 && char.IsWhiteSpace(lineIndex.GetChar(position.Line, position.Character - 1)))
+        //    --position.Character;
 
-        ReadOnlySpan<char> line = lineIndex.SliceLine(position.Line, endColumn: position.Character - 1);
+        ReadOnlySpan<char> line = ReadOnlySpan<char>.Empty;// lineIndex.SliceLine(position.Line, endColumn: position.Character - 1);
         bool isOnNewLine = line.IsWhiteSpace();
 
         AssetFileTree tree = file.File;

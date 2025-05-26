@@ -7,7 +7,10 @@ using System.Linq;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class SkillLevelSpecPropertyType : BasicSpecPropertyType<SkillLevelSpecPropertyType, byte>, IStringParseableSpecPropertyType
+public sealed class SkillLevelSpecPropertyType :
+    BasicSpecPropertyType<SkillLevelSpecPropertyType, byte>,
+    IStringParseableSpecPropertyType,
+    IElementTypeSpecPropertyType
 {
     private ISpecDynamicValue? _skillValue;
     private ISpecDynamicValue? _specialityIndexValue;
@@ -21,14 +24,16 @@ public sealed class SkillLevelSpecPropertyType : BasicSpecPropertyType<SkillLeve
         SkillsetOrProperty = skillsetOrProperty;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="ISpecPropertyType" />
     public override string Type => "SkillLevel";
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName => "Skillset Level";
+
+    string IElementTypeSpecPropertyType.ElementType => SkillsetOrProperty;
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)

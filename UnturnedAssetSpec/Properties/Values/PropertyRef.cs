@@ -294,7 +294,7 @@ public readonly struct PropertyRefInfo
         }
         else if (crossRef.TryEvaluateValue(in ctx, out ushort id, out isNull) && !isNull && id != 0
                  && crossRef is IElementTypeSpecPropertyType elementType
-                 && AssetCategory.TryParse(elementType.ElementType.Type, out EnumSpecTypeValue assetCategory))
+                 && AssetCategory.TryParse(elementType.ElementType, out EnumSpecTypeValue assetCategory))
         {
             referenceFile = ctx.Environment.FindFile(id, assetCategory);
         }
@@ -307,7 +307,7 @@ public readonly struct PropertyRefInfo
                 referenceFile = ctx.Environment.FindFile(guidOrId.Guid);
             }
             else if (crossRef is IElementTypeSpecPropertyType elementType2
-                     && AssetCategory.TryParse(elementType2.ElementType.Type, out assetCategory))
+                     && AssetCategory.TryParse(elementType2.ElementType, out assetCategory))
             {
                 referenceFile = ctx.Environment.FindFile(guidOrId.Id, assetCategory);
             }

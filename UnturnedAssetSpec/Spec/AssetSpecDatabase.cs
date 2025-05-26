@@ -1270,6 +1270,11 @@ public static class AssetSpecDatabaseExtensions
             return AssetCategory.TypeOf;
         }
 
+        if (Type.GetType(type, false, false) is { } specifiedType && typeof(ISpecType).IsAssignableFrom(specifiedType))
+        {
+            return (ISpecType)Activator.CreateInstance(specifiedType);
+        }
+
         string? assetType = null;
         int divIndex = type.IndexOf("::", 0, StringComparison.Ordinal);
         if (divIndex >= 0 && divIndex < type.Length - 2)
