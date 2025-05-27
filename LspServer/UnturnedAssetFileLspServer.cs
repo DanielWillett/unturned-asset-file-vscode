@@ -28,16 +28,23 @@ internal sealed class UnturnedAssetFileLspServer
         Language = LanguageId,
         Pattern = "**/*.{dat,asset}"
     });
-    
+
+    public static string DebugPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "UnturnedDatLSP");
+
     private static async Task Main()
     {
-        string logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "log.txt");
+#if DEBUG
+        string logPath = Path.Combine(DebugPath, "log.txt");
         if (File.Exists(logPath))
             File.WriteAllBytes(logPath, ReadOnlySpan<byte>.Empty);
-
+        else
+            Directory.CreateDirectory(DebugPath);
+#endif
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
+#if DEBUG
             .WriteTo.File(logPath)
+#endif
             .MinimumLevel.Debug()
             .CreateLogger();
 

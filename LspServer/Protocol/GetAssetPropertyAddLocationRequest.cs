@@ -4,13 +4,13 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Text.Json.Serialization;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
+namespace DanielWillett.UnturnedDataFileLspServer.Protocol;
 
 
-[Parallel, Method("unturnedDataFile/getAddProperty")]
+[Parallel, Method("unturnedDataFile/getAddProperty", Direction.ClientToServer)]
 public interface IGetAssetPropertyAddLocationHandler : IJsonRpcRequestHandler<GetAssetPropertyAddLocationParams, GetAssetPropertyAddLocationResponse>;
 
-[Parallel, Method("unturnedDataFile/getAddProperty")]
+[Parallel, Method("unturnedDataFile/getAddProperty", Direction.ClientToServer)]
 public class GetAssetPropertyAddLocationParams : IRequest<GetAssetPropertyAddLocationResponse>
 {
     [JsonPropertyName("document")]

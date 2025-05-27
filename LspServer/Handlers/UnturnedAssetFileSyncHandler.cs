@@ -1,15 +1,20 @@
 using DanielWillett.UnturnedDataFileLspServer.Files;
+using DanielWillett.UnturnedDataFileLspServer.Protocol;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
 {
     private readonly OpenedFileTracker _fileTracker;
+    private readonly ILanguageServerFacade _langServer;
+    private readonly ILogger<UnturnedAssetFileSyncHandler> _logger;
 
     private readonly TextDocumentChangeRegistrationOptions _changeRegistrationOptions;
     private readonly TextDocumentOpenRegistrationOptions _openRegistrationOptions;
@@ -18,11 +23,13 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
 
     public event Action<OpenedFile>? ContentUpdated;
 
-    public UnturnedAssetFileSyncHandler(OpenedFileTracker fileTracker)
+    public UnturnedAssetFileSyncHandler(OpenedFileTracker fileTracker, ILanguageServerFacade langServer, ILogger<UnturnedAssetFileSyncHandler> logger)
     {
         const TextDocumentSyncKind syncKind = TextDocumentSyncKind.Incremental;
 
         _fileTracker = fileTracker;
+        _langServer = langServer;
+        _logger = logger;
         _changeRegistrationOptions = new TextDocumentChangeRegistrationOptions
         {
             DocumentSelector = UnturnedAssetFileLspServer.AssetFileSelector,
@@ -85,8 +92,7 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
             u => _fileTracker.CreateFile(u, request.TextDocument.Text),
             (_, v) =>
             {
-                //lock (v.EditLock)
-                    //v.Text = request.TextDocument.Text;
+                v.SetFullText(request.TextDocument.Text);
                 return v;
             }
         );
@@ -103,40 +109,79 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
         if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))
             return Unit.Task;
 
-        file.UpdateText(request, (file, request) =>
+        try
         {
-            foreach (TextDocumentContentChangeEvent change in request.ContentChanges)
+            file.UpdateText(request, (file, request) =>
             {
-                if (change.Range == null)
+                foreach (TextDocumentContentChangeEvent change in request.ContentChanges)
                 {
-                    file.SetFullText(change.Text);
-                    continue;
-                }
+                    if (change.Range == null)
+                    {
+                        file.SetFullText(change.Text);
+                        continue;
+                    }
 
-                if (string.IsNullOrEmpty(change.Text))
-                {
-                    file.RemoveText(change.Range.ToFileRange());
+                    if (string.IsNullOrEmpty(change.Text))
+                    {
+                        file.RemoveText(change.Range.ToFileRange());
+                    }
+                    else if (change.Range.IsEmpty())
+                    {
+                        file.InsertText(change.Range.Start.ToFilePosition(), change.Text);
+                    }
+                    else
+                    {
+                        file.ReplaceText(change.Range.ToFileRange(), change.Text);
+                    }
                 }
-                else if (change.Range.IsEmpty())
-                {
-                    file.InsertText(change.Range.Start.ToFilePosition(), change.Text);
-                }
-                else
-                {
-                    file.ReplaceText(change.Range.ToFileRange(), change.Text);
-                }
-            }
-        });
+            });
+        }
+        catch
+        {
+            if (file.IsFaulted)
+                RequestFileContent(file.Uri);
+            throw;
+        }
 
         ContentUpdated?.Invoke(file);
         return Unit.Task;
+    }
+
+    private void RequestFileContent(DocumentUri document)
+    {
+        Task.Run(async () =>
+        {
+            _logger.LogWarning("Had to request file content for {0}.", document.GetFileSystemPath());
+            GetDocumentContentResponse response = await _langServer.General.SendRequest(new GetDocumentContentParams
+            {
+                Document = document
+            }, CancellationToken.None);
+
+            if (response.Text == null)
+            {
+                _logger.LogError("File not found or couldn't be read.");
+            }
+
+            if (_fileTracker.Files.TryGetValue(document, out OpenedFile? file))
+            {
+                file.SetFullText(response.Text);
+                _logger.LogWarning("File text updated.");
+            }
+            else
+            {
+                _logger.LogError("File already closed.");
+            }
+        });
     }
 
     /// <inheritdoc />
     public Task<Unit> Handle(DidCloseTextDocumentParams request, CancellationToken cancellationToken)
     {
         //_logger.LogInformation("Received didCloseTextDocument: {0}", request.TextDocument.Uri);
-        _fileTracker.Files.Remove(request.TextDocument.Uri, out _);
+        if (_fileTracker.Files.Remove(request.TextDocument.Uri, out OpenedFile? file))
+        {
+            file.Dispose();
+        }
         return Unit.Task;
     }
 

@@ -32,7 +32,7 @@ public class OpenedFileTests
     [Test]
     public void ValidIndex([Values(true, false)] bool trailingNewLine, [Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(trailingNewLine, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(trailingNewLine, newLine), _logger, obsessivelyValidate: true);
 
         runner.AssertFileHasValidIndex();
     }
@@ -40,7 +40,7 @@ public class OpenedFileTests
     [Test]
     public void GetPosition([Values(true, false)] bool trailingNewLine, [Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(trailingNewLine, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(trailingNewLine, newLine), _logger, obsessivelyValidate: true);
 
         // start of document
         FilePosition pos = runner.GetPosition(0, clampCharacter: false);
@@ -70,13 +70,13 @@ public class OpenedFileTests
     [Test]
     public void UpdateText([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
             file.InsertText((2, 1), $"Test Line{newLine}")
                 .InsertText((2, 1), "Test ")
-                .RemoveText(((2, 1), (2, 14)))
+                .RemoveText(((2, 1), (2, 15)))
                 .ReplaceText(((1, 6), (1, 37)), "00000000000000000000000000000000")
                 .ReplaceText(((1, 6), (1, 37)), "1111111111111111")
                 .ReplaceText(((1, 6), (1, 21)), "2222222222222222222222222222222222222222222222222222222222222222")
@@ -91,7 +91,7 @@ public class OpenedFileTests
     [Test]
     public void StitchOneLine([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -109,7 +109,7 @@ public class OpenedFileTests
     [Test]
     public void StitchOneLineFromBegin([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -127,7 +127,7 @@ public class OpenedFileTests
     [Test]
     public void StitchOneLineFromEnd([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -145,7 +145,7 @@ public class OpenedFileTests
     [Test]
     public void StitchTwoLines([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -164,7 +164,7 @@ public class OpenedFileTests
     [Test]
     public void StitchTwoLinesEmptyStart([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -183,7 +183,7 @@ public class OpenedFileTests
     [Test]
     public void StitchTwoLinesEmptyEnd([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -202,7 +202,7 @@ public class OpenedFileTests
     [Test]
     public void RemoveOneEmptyLineByRemovingSameLineNewline([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -220,7 +220,7 @@ public class OpenedFileTests
     [Test]
     public void RemoveOneEmptyLineByRemovingPreviousLineNewline([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -238,7 +238,7 @@ public class OpenedFileTests
     [Test]
     public void StitchManyLines([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -256,7 +256,7 @@ public class OpenedFileTests
     [Test]
     public void StitchManyLinesEmptyStart([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -274,7 +274,7 @@ public class OpenedFileTests
     [Test]
     public void StitchManyLinesEmptyEnd([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -292,7 +292,7 @@ public class OpenedFileTests
     [Test]
     public void RemoveTwoEmptyLines([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -310,7 +310,7 @@ public class OpenedFileTests
     [Test]
     public void RemoveManyEmptyLines([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -328,7 +328,7 @@ public class OpenedFileTests
     [Test]
     public void InsertTextToOneLine([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -346,7 +346,7 @@ public class OpenedFileTests
     [Test]
     public void InsertTextToOneLineAtBegin([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -364,7 +364,7 @@ public class OpenedFileTests
     [Test]
     public void InsertTextToOneLineAtEnd([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -382,7 +382,7 @@ public class OpenedFileTests
     [Test]
     public void InsertTwoLines([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -400,7 +400,7 @@ public class OpenedFileTests
     [Test]
     public void InsertTwoLinesBeginEmpty([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -418,7 +418,7 @@ public class OpenedFileTests
     [Test]
     public void InsertTwoLinesEndEmpty([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -436,7 +436,7 @@ public class OpenedFileTests
     [Test]
     public void InsertManyLines([Values("\n", "\r\n")] string newLine)
     {
-        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger);
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
 
         runner.UpdateText(file =>
         {
@@ -445,6 +445,347 @@ public class OpenedFileTests
         });
 
         Assert.That(runner.GetFullText(), Does.Contain($"{newLine}Type Supply{newLine}NotType Gun{newLine}Test Property{newLine}Name Arrest_End{newLine}"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceOneLine([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // same length
+            // replace 'Type Arrest_End' with 'Type Abcdef_End'
+            file.ReplaceText(((2, 6), (2, 12)), "Abcdef");
+
+            // shorter
+            // replace 'Type Abcdef_End' with 'Type Item_End'
+            file.ReplaceText(((2, 6), (2, 12)), "Item");
+
+            // longer
+            // replace 'Type Item_End' with 'Type LongItem_End'
+            file.ReplaceText(((2, 6), (2, 10)), "LongItem");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"GUID cb4352c6fcb044c2b58e6edfa5644904{newLine}Type LongItem_End{newLine}Rarity Uncommon"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceBeginningOfLine([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // same length
+            // replace 'GUID' with 'ABCD'
+            file.ReplaceText(((1, 1), (1, 5)), "ABCD");
+
+            // shorter
+            // replace 'ABCD' with 'ABC'
+            file.ReplaceText(((1, 1), (1, 5)), "ABC");
+
+            // longer
+            // replace 'ABC' with 'ABCDEF'
+            file.ReplaceText(((1, 1), (1, 4)), "ABCDEF");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"ABCDEF cb4352c6fcb044c2b58e6edfa5644904{newLine}Type Arrest_End"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceEndOfLine([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // same length
+            // replace 'Arrest_End' with 'Abcdef_Ghi'
+            file.ReplaceText(((2, 6), (2, 16)), "Abcdef_Ghi");
+
+            // shorter
+            // replace 'Abcdef_Ghi' with 'Xyz'
+            file.ReplaceText(((2, 6), (2, 16)), "Xyz");
+
+            // longer
+            // replace 'Xyz' with 'Qrstuvwxyzabc'
+            file.ReplaceText(((2, 6), (2, 9)), "Qrstuvwxyzabc");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}Type Qrstuvwxyzabc{newLine}"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceFullLine([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // same length
+            // replace 'Rarity Uncommon' with 'Abcdef Ghijklmn'
+            file.ReplaceText(((3, 1), (3, 16)), "Abcdef Ghijklmn");
+
+            // shorter
+            // replace 'Abcdef Ghijklmn' with 'Opqrst'
+            file.ReplaceText(((3, 1), (3, 16)), "Opqrst");
+
+            // longer
+            // replace 'Opqrst' with 'Abcdef Ghijklmnopqrst'
+            file.ReplaceText(((3, 1), (3, 7)), "Abcdef Ghijklmnopqrst");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}Abcdef Ghijklmnopqrst{newLine}"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceOneLineToTwo([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // replace 'Arrest_' with 'Item\nOtherType ' to change type to Item and add a new property: 'OtherType End'
+            file.ReplaceText(((2, 6), (2, 13)), $"Item{newLine}OtherType ");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}Type Item{newLine}OtherType End{newLine}"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceOneLineToMany([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // replace 'Arrest_' with 'Item\nA B\nC D\nOtherType ' to change type to Item and add new properties: 'A B', 'C D', and 'OtherType End'
+            file.ReplaceText(((2, 6), (2, 13)), $"Item{newLine}A B{newLine}C D{newLine}OtherType ");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}Type Item{newLine}A B{newLine}C D{newLine}OtherType End{newLine}"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceTwoLinesToOne([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // replace 'Arrest_End\nRarity ' with 'Very' to change type to Type to 'VeryUncommon'
+            file.ReplaceText(((2, 6), (3, 8)), "Very");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}Type VeryUncommon{newLine}Useable Arrest_End{newLine}"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceManyLinesToOne([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // replace 'Arrest_End\nRarity Uncommon\nUseable Arrest_End\nID ' with '2' to change type to Type to '21196'
+            file.ReplaceText(((2, 6), (5, 4)), "2");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}Type 21196{newLine}{newLine}Size_X 1"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceManyLinesToTwo([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // replace 'Arrest_End\nRarity Uncommon\nUseable Arrest_End\nID ' with 'Gun\nNum 2' to change type to Type to 'Gun' and 'Num' to '21196'
+            file.ReplaceText(((2, 6), (5, 4)), $"Gun{newLine}Num 2");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}Type Gun{newLine}Num 21196{newLine}{newLine}Size_X 1"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceWithNewLineBefore([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // replace 'Type Arrest_End' with '\nNewLine' to remove type and add 'NewLine' on another line
+            file.ReplaceText(((2, 1), (2, 16)), $"{newLine}NewLine");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}{newLine}NewLine{newLine}"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceWithNewLineAfter([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // replace 'Type Arrest_End' with 'NewLine\n' to remove type and add 'NewLine' on the same line, plus an empty line after
+            file.ReplaceText(((2, 1), (2, 16)), $"NewLine{newLine}");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}NewLine{newLine}{newLine}"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceManyLinesToMany([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // replace 'Arrest_End\nRarity Uncommon\nUseable Arrest_End\nID ' with 'Gun\nA B\nC D\nNum 2' to change type to Type to 'Gun' and 'Num' to '21196', and add 2 props
+            file.ReplaceText(((2, 6), (5, 4)), $"Gun{newLine}A B{newLine}C D{newLine}Num 2");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}Type Gun{newLine}A B{newLine}C D{newLine}Num 21196{newLine}{newLine}Size_X 1"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceTwoLinesToTwo([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // replace 'Arrest_End\nID ' with 'Gun\nNum 2' to change type to Type to 'Gun' and 'Num' to '21196'
+            file.ReplaceText(((4, 9), (5, 4)), $"Gun{newLine}Num 2");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}Useable Gun{newLine}Num 21196{newLine}{newLine}Size_X 1"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceTwoLinesToMany([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // replace 'Arrest_End\nID ' with 'Gun\nA B\nC D\nNum 2' to change type to Type to 'Gun' and 'Num' to '21196', and add 2 props
+            file.ReplaceText(((4, 9), (5, 4)), $"Gun{newLine}A B{newLine}C D{newLine}Num 2");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"{newLine}Useable Gun{newLine}A B{newLine}C D{newLine}Num 21196{newLine}{newLine}Size_X 1"));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void ReplaceWholeFile([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), WriteBasicDatFile(true, newLine), _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            file.ReplaceText(((1, 1), (17, 2)), "a");
+        });
+
+        Assert.That(runner.GetFullText(), Has.Length.EqualTo(1));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void InsertOnOneLineFile()
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), "a", _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            file.InsertText((1, 2), "b");
+        });
+
+        Assert.That(runner.GetFullText(), Has.Length.EqualTo(2));
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
+    [Test]
+    public void InsertOnNewLine([Values("\n", "\r\n")] string newLine)
+    {
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), "a", _logger, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            file.ReplaceText(((1, 1), (1, 2)), "a")
+                .InsertText((1, 2), newLine)
+                .InsertText((2, 1), "b");
+        });
+
+        Assert.That(runner.GetFullText(), Does.Contain($"a{newLine}b"));
 
         runner.AssertFileHasValidIndex();
 

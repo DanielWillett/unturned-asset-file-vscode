@@ -1,10 +1,21 @@
+
+#if DEBUG
+
+// The 'virtual file system' is used to check that files are being synced properly,
+// and just writes the LSP's version of the file to the desktop every time it updates.
+#define KEEP_VIRTUAL_FILE_SYSTEM
+
+#endif
+
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 // ReSharper disable LocalizableElement
 
@@ -16,7 +27,16 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 [DebuggerDisplay("{Uri} - {LineCount, nq} L, {_contentSegment.Count,nq} C")]
 public class OpenedFile : IWorkspaceFile
 {
+
+#if KEEP_VIRTUAL_FILE_SYSTEM
+    private readonly string _virtualFile;
+    private readonly string _editsFile;
+#endif
+
     private readonly ILogger _logger;
+
+    private readonly bool _obsessivelyValidate;
+
     private AssetFileTree? _tree;
 
     internal object EditLock = new object();
@@ -32,7 +52,10 @@ public class OpenedFile : IWorkspaceFile
 
     private ArraySegment<char> _contentSegment;
 
-    private bool _isFaulted;
+    public bool IsFaulted { get; private set; }
+#if KEEP_VIRTUAL_FILE_SYSTEM
+    private readonly bool _useVirtualFiles;
+#endif
 
     public string GetFullText()
     {
@@ -53,9 +76,17 @@ public class OpenedFile : IWorkspaceFile
             if (tree != null)
                 return tree;
 
-            DatTokenizer tokenizer = new DatTokenizer(new ReadOnlySpan<char>(_content, _contentSegment.Offset, _contentSegment.Count));
-            tree = AssetFileTree.Create(ref tokenizer);
-            _tree = tree;
+            lock (EditLock)
+            {
+                tree = _tree;
+                if (tree != null)
+                    return tree;
+
+                DatTokenizer tokenizer = new DatTokenizer(new ReadOnlySpan<char>(_content, _contentSegment.Offset, _contentSegment.Count));
+                tree = AssetFileTree.Create(ref tokenizer);
+                _tree = tree;
+            }
+
             return tree;
         }
     }
@@ -77,15 +108,93 @@ public class OpenedFile : IWorkspaceFile
     }
 
 #pragma warning disable CS8618, CS9264
-    public OpenedFile(DocumentUri uri, ReadOnlySpan<char> text, ILogger logger)
+    public OpenedFile(DocumentUri uri, ReadOnlySpan<char> text, ILogger logger, bool obsessivelyValidate = false, bool useVirtualFiles = false)
     {
         _logger = logger;
+        _obsessivelyValidate = obsessivelyValidate;
         Uri = uri;
+
+#if KEEP_VIRTUAL_FILE_SYSTEM
+        _useVirtualFiles = useVirtualFiles;
+        _virtualFile = Path.Combine(UnturnedAssetFileLspServer.DebugPath, Path.GetFileName(uri.GetFileSystemPath()) + ".txt");
+        _editsFile = Path.Combine(UnturnedAssetFileLspServer.DebugPath, Path.GetFileName(uri.GetFileSystemPath()) + ".edits.txt");
+        if (useVirtualFiles)
+            System.IO.File.WriteAllText(_editsFile, ReadOnlySpan<char>.Empty);
+#endif
 
         SetFullText(text);
         IndexTextIntl();
     }
 #pragma warning restore CS8618, CS9264
+
+#if KEEP_VIRTUAL_FILE_SYSTEM
+    private void UpdateVirtualFile()
+    {
+        if (!_useVirtualFiles)
+            return;
+
+        lock (_virtualFile)
+        {
+            byte[] utf8 = Encoding.UTF8.GetBytes(_content, _contentSegment.Offset, _contentSegment.Count);
+            using FileStream fs = new FileStream(
+                _virtualFile,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.Read,
+                utf8.Length,
+                FileOptions.SequentialScan
+            );
+
+            fs.Write(utf8, 0, utf8.Length);
+        }
+    }
+
+    private void WriteEdit(string edit)
+    {
+        if (!_useVirtualFiles)
+            return;
+
+        lock (_editsFile)
+        {
+            byte[] utf8 = Encoding.UTF8.GetBytes(edit + Environment.NewLine);
+            using FileStream fs = new FileStream(
+                _editsFile,
+                FileMode.Append,
+                FileAccess.Write,
+                FileShare.Read,
+                utf8.Length,
+                FileOptions.SequentialScan
+            );
+
+            fs.Write(utf8, 0, utf8.Length);
+        }
+    }
+
+#endif
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void CheckValidate()
+    {
+        if (!_obsessivelyValidate)
+            return;
+
+#if DEBUG
+        try
+        {
+            AssertFileHasValidIndex();
+        }
+        catch (Exception ex)
+        {
+#if KEEP_VIRTUAL_FILE_SYSTEM
+            WriteEdit($"^ Error: {ex.Message}");
+#endif
+            throw;
+        }
+#else
+        AssertFileHasValidIndex();
+#endif
+    }
+
 
     /// <summary>
     /// Sets the full text of the document and updates any necessary caches.
@@ -96,12 +205,13 @@ public class OpenedFile : IWorkspaceFile
         {
             lock (EditLock)
             {
-                _isFaulted = false;
+                IsFaulted = false;
                 if (!SetFullTextIntl(text))
                     return;
 
-                _tree = null;
                 IndexTextIntl();
+                InvalidateText();
+                CheckValidate();
             }
             
             if (_lineCount > 0)
@@ -125,6 +235,14 @@ public class OpenedFile : IWorkspaceFile
         return true;
     }
 
+    private void InvalidateText()
+    {
+        _tree = null;
+#if KEEP_VIRTUAL_FILE_SYSTEM
+        UpdateVirtualFile();
+#endif
+    }
+
     /// <summary>
     /// Apply incremental updates to this document.
     /// </summary>
@@ -142,6 +260,7 @@ public class OpenedFile : IWorkspaceFile
                 fileUpdate(file, state);
                 broadcast = _hasChanged;
                 range = _changeRange;
+                InvalidateText();
             }
 
             if (broadcast)
@@ -166,6 +285,7 @@ public class OpenedFile : IWorkspaceFile
                 fileUpdate(file);
                 broadcast = _hasChanged;
                 range = _changeRange;
+                InvalidateText();
             }
 
             if (broadcast)
@@ -206,7 +326,7 @@ public class OpenedFile : IWorkspaceFile
             return default;
 
         LineInfo line = _lines[lineNum];
-        int length = includeNewLine ? Math.Abs(line.Length) : line.ContentLength;
+        int length = includeNewLine ? line.Length : line.ContentLength;
         return new ArraySegment<char>(_content, line.StartIndex, length);
     }
 
@@ -228,7 +348,7 @@ public class OpenedFile : IWorkspaceFile
         int characterIndex = position.Character - 1;
         if (!clamp)
         {                             // shouldnt be >=, includes first newline but not second if present
-            if (characterIndex < 0 || characterIndex > Math.Abs(line.Length))
+            if (characterIndex < 0 || characterIndex > line.Length)
                 return -1;
         }
         else
@@ -238,7 +358,7 @@ public class OpenedFile : IWorkspaceFile
             else
             {
                 if (characterIndex > line.ContentLength)
-                    characterIndex = Math.Abs(line.Length);
+                    characterIndex = line.Length;
             }
         }
 
@@ -262,8 +382,8 @@ public class OpenedFile : IWorkspaceFile
     private FilePosition GetPositionIntl(int index, bool clampCharacter = true, bool clampLine = false)
     {
         // binary search
-        int low = 0, high = _lineCount;
-        if (high == 0)
+        int low = 0, high = _lineCount - 1;
+        if (high == -1)
             return new FilePosition(-1, -1);
 
         if (clampLine && index <= 0 || index == 0)
@@ -282,7 +402,7 @@ public class OpenedFile : IWorkspaceFile
                     break;
                 mid = low;
             }
-            else if (index >= line.StartIndex + Math.Abs(line.Length))
+            else if (index >= line.StartIndex + line.Length)
             {
                 low = mid + 1;
                 if (low <= high)
@@ -313,13 +433,15 @@ public class OpenedFile : IWorkspaceFile
 
     private int GetLineIndexIntl(int charIndex)
     {
-        int low = 0, high = _lineCount;
-        if (high == 0)
+        int low = 0, high = _lineCount - 1;
+        if (high == -1)
             return -1;
 
         if (charIndex == 0)
             return 0;
 
+        if (charIndex == _contentSegment.Count)
+            return high;
 
         while (low <= high)
         {
@@ -331,7 +453,7 @@ public class OpenedFile : IWorkspaceFile
                 high = mid - 1;
                 continue;
             }
-            if (charIndex >= line.StartIndex + Math.Abs(line.Length))
+            if (charIndex >= line.StartIndex + line.Length)
             {
                 low = mid + 1;
                 continue;
@@ -366,24 +488,32 @@ public class OpenedFile : IWorkspaceFile
                 if (l0.Length != l1.Length)
                     throw new Exception($"Line {i + 1} has wrong length: {l0.Length}, expected {l1.Length}.");
 
-                if (l1.Length is > -2 and <= 0)
+                if (l1.Length < 0 || l1.Length == 0 && i != index.Length - 1)
                 {
                     // last line may not have a newline
                     if (i != index.Length - 1 || l1.Length != 0)
-                        throw new Exception($"Invalid length of line {i + 1}: {Math.Abs(l1.Length)} ({l1.Length})");
+                        throw new Exception($"Invalid length of line {i + 1}: {l1.Length}");
                 }
 
                 if (i > 0)
                 {
-                    int end = newIndex[i - 1].StartIndex + Math.Abs(newIndex[i - 1].Length);
+                    int end = newIndex[i - 1].StartIndex + newIndex[i - 1].Length;
                     if (end != l1.StartIndex)
                         throw new Exception($"Previous line {i} does not end at this line ({i + 1})'s start index. This line starts at {l1.StartIndex} but should start at {end}.");
                 }
                 else if (l1.StartIndex != 0)
                     throw new Exception("Line 1 should start at index 0.");
+
+                if (l1.ContentLength > l1.Length)
+                    throw new Exception($"Line {i + 1} content length is longer than length.");
+                if (l1.ContentLength != l1.Length && _content[l1.StartIndex + l1.ContentLength] is not '\n' and not '\r')
+                    throw new Exception($"Line {i + 1} content length is not correct.");
+
+                if (l1.ContentLength == l1.Length && i != index.Length - 1)
+                    throw new Exception($"Line {i + 1} doesn't include newline characters and isn't the last line.");
             }
 
-            if (newIndex[^1].StartIndex + Math.Abs(newIndex[^1].Length) != _contentSegment.Count)
+            if (newIndex[^1].StartIndex + newIndex[^1].Length != _contentSegment.Count)
             {
                 throw new Exception($"Last line ({newIndex.Length}) should end at the end of the file content.");
             }
@@ -392,9 +522,9 @@ public class OpenedFile : IWorkspaceFile
 
     public void IndexTextIntl()
     {
-        int lines = _content.AsSpan().Count('\n');
+        int lines = _contentSegment.AsSpan().Count('\n');
 
-        LineInfo[] lineArray = GrowLines(lines + 1);
+        LineInfo[] lineArray = GrowLines(lines + 1, copy: false);
         _lineCount = 0;
 
         int lastLine = 0;
@@ -411,58 +541,91 @@ public class OpenedFile : IWorkspaceFile
 
             line.StartIndex = lastLine;
             line.Length = i - lastLine + 1;
+            line.ContentLength = line.Length - (hasReset ? 2 : 1);
             lastLine = i + 1;
-            if (hasReset)
-                line.Length = -line.Length;
             ++lineIndex;
         }
 
-        if (lastLine != size - 1)
+        if (lastLine != size - 1 || lastLine == 0)
         {
             bool hasReset = size > 1 && _content[size - 1] == '\r';
             ref LineInfo line = ref lineArray[lineIndex];
             line.StartIndex = lastLine;
             line.Length = size - lastLine;
-            if (hasReset)
-                line.Length = -line.Length;
+            line.ContentLength = line.Length - (hasReset ? 1 : 0);
         }
 
         _lineCount = lineIndex + 1;
     }
 
-    private LineInfo[] GrowLines(int lines)
+    private LineInfo[] GrowLines(int lines, bool copy = true)
     {
+        int startIndex = 0;
         if (_lines == null)
+        {
             _lines = new LineInfo[lines + 4];
+        }
         else if (_lines.Length < lines)
-            _lines = new LineInfo[Math.Max(lines + 4, (int)Math.Ceiling(_lines.Length * 1.5))];
+        {
+            LineInfo[] newLines = new LineInfo[Math.Max(lines + 4, (int)Math.Ceiling(_lines.Length * 1.5))];
+            if (copy)
+            {
+                Array.Copy(_lines, newLines, _lineCount);
+                startIndex = _lineCount;
+            }
+
+            _lines = newLines;
+        }
+
+#if DEBUG
+        for (int i = startIndex; i < _lines.Length; i++)
+        {
+            ref LineInfo l = ref _lines[i];
+            l._file = this;
+        }
+#endif
 
         return _lines;
     }
 
-    void IDisposable.Dispose() { }
+    public void Dispose()
+    {
+#if KEEP_VIRTUAL_FILE_SYSTEM
+        lock (_virtualFile)
+        {
+            System.IO.File.Delete(_virtualFile);
+        }
 
-    [DebuggerDisplay("Start: {StartIndex,nq}, Length: {System.Math.Abs(Length),nq} (Has \\r: {Length < 0,nq})")]
+        lock (_editsFile)
+        {
+            System.IO.File.Delete(_editsFile);
+        }
+#endif
+    }
+
+#if !DEBUG
+    [DebuggerDisplay("Start: {StartIndex,nq}, Length: {Length,nq} (Content: {ContentLength,nq})")]
+#else
+    [DebuggerDisplay("Start: {StartIndex,nq}, Length: {Length,nq} (Content: {ContentLength,nq}): {System.MemoryExtensions.AsSpan(_file._content, StartIndex, Length).ToString()}")]
+#endif
     private struct LineInfo
     {
         public int StartIndex;
-
-        /// <summary>
-        /// Negative if has \r character.
-        /// </summary>
         public int Length;
+        public int ContentLength;
 
-        
-        public readonly int ContentLength
+#if DEBUG
+        // ReSharper disable once InconsistentNaming
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        internal OpenedFile _file;
+#endif
+
+        internal void AddLength(int l)
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Length < 0 ? -Length - 2 : Length - 1;
+            Length += l;
+            ContentLength += l;
         }
 
-        public void AddLength(int amt)
-        {
-            Length += amt * Math.Sign(Length);
-        }
     }
 
     public readonly struct OpenedFileUpdater
@@ -483,14 +646,25 @@ public class OpenedFile : IWorkspaceFile
         /// </summary>
         public OpenedFileUpdater InsertText(FilePosition position, ReadOnlySpan<char> text)
         {
+#if KEEP_VIRTUAL_FILE_SYSTEM
+            _file.WriteEdit($"file.InsertText(({position.Line}, {position.Character}), \"{Escape(text)}\");");
+#endif
             int charIndex = _file.GetIndexIntl(position, clamp: true);
-            return InsertText(charIndex, text);
+            return InsertTextIntl(charIndex, text);
         }
 
         /// <summary>
         /// Inserts text at after specific character in the document.
         /// </summary>
-        public unsafe OpenedFileUpdater InsertText(int charIndex, ReadOnlySpan<char> text)
+        public OpenedFileUpdater InsertText(int charIndex, ReadOnlySpan<char> text)
+        {
+#if KEEP_VIRTUAL_FILE_SYSTEM
+            _file.WriteEdit($"file.InsertText({charIndex}, \"{Escape(text)}\");");
+#endif
+            return InsertTextIntl(charIndex, text);
+        }
+
+        private unsafe OpenedFileUpdater InsertTextIntl(int charIndex, ReadOnlySpan<char> text)
         {
             if (text.Length == 0)
             {
@@ -518,6 +692,7 @@ public class OpenedFile : IWorkspaceFile
             }
 
             _file._contentSegment = new ArraySegment<char>(_file._content, offset, count + text.Length);
+            _file.CheckValidate();
             return this;
         }
 
@@ -526,18 +701,29 @@ public class OpenedFile : IWorkspaceFile
         /// </summary>
         public OpenedFileUpdater RemoveText(FileRange range)
         {
+#if KEEP_VIRTUAL_FILE_SYSTEM
+            _file.WriteEdit($"file.RemoveText((({range.Start.Line}, {range.Start.Character}), ({range.End.Line}, {range.End.Character})));");
+#endif
             if (range.Start == range.End)
                 return this;
 
             int startIndex = _file.GetIndexIntl(range.Start, true);
             int endIndex = _file.GetIndexIntl(range.End, true);
-            return RemoveText(startIndex, endIndex);
+            return RemoveTextIntl(startIndex, endIndex);
         }
 
         /// <summary>
         /// Removes text between and including two specific characters in the document.
         /// </summary>
-        public unsafe OpenedFileUpdater RemoveText(int startIndex, int endIndex)
+        public OpenedFileUpdater RemoveText(int startIndex, int endIndex)
+        {
+#if KEEP_VIRTUAL_FILE_SYSTEM
+            _file.WriteEdit($"file.RemoveText({startIndex}, {endIndex});");
+#endif
+            return RemoveTextIntl(startIndex, endIndex);
+        }
+
+        private unsafe OpenedFileUpdater RemoveTextIntl(int startIndex, int endIndex)
         {
             if (endIndex < startIndex)
                 throw new InvalidOperationException("Expected start index to come before or be the same as the end index.");
@@ -558,6 +744,7 @@ public class OpenedFile : IWorkspaceFile
             }
 
             _file._contentSegment = new ArraySegment<char>(_file._content, offset, count - (int)ct);
+            _file.CheckValidate();
             return this;
         }
 
@@ -566,20 +753,31 @@ public class OpenedFile : IWorkspaceFile
         /// </summary>
         public OpenedFileUpdater ReplaceText(FileRange range, ReadOnlySpan<char> text)
         {
+#if KEEP_VIRTUAL_FILE_SYSTEM
+            _file.WriteEdit($"file.ReplaceText((({range.Start.Line}, {range.Start.Character}), ({range.End.Line}, {range.End.Character})), \"{Escape(text)}\");");
+#endif
+            int startIndex = _file.GetIndexIntl(range.Start, true);
             if (range.Start == range.End)
             {
-                return InsertText(range.Start, text);
+                return InsertTextIntl(startIndex, text);
             }
 
-            int startIndex = _file.GetIndexIntl(range.Start, true);
             int endIndex = _file.GetIndexIntl(range.End, true);
-            return ReplaceText(startIndex, endIndex, text);
+            return ReplaceTextIntl(startIndex, endIndex, text);
         }
 
         /// <summary>
         /// Removes text between two specific characters in the document.
         /// </summary>
-        public unsafe OpenedFileUpdater ReplaceText(int startIndex, int endIndex, ReadOnlySpan<char> text)
+        public OpenedFileUpdater ReplaceText(int startIndex, int endIndex, ReadOnlySpan<char> text)
+        {
+#if KEEP_VIRTUAL_FILE_SYSTEM
+            _file.WriteEdit($"file.RemoveText({startIndex}, {endIndex}, \"{Escape(text)}\");");
+#endif
+            return ReplaceTextIntl(startIndex, endIndex, text);
+        }
+
+        private unsafe OpenedFileUpdater ReplaceTextIntl(int startIndex, int endIndex, ReadOnlySpan<char> text)
         {
             if (text.IsEmpty)
             {
@@ -625,6 +823,7 @@ public class OpenedFile : IWorkspaceFile
             }
 
             _file._contentSegment = new ArraySegment<char>(_file._content, offset, newSize);
+            _file.CheckValidate();
             return this;
         }
 
@@ -651,7 +850,9 @@ public class OpenedFile : IWorkspaceFile
 
         private void IndexTextRemoval(int index, ReadOnlySpan<char> text)
         {
-            Console.WriteLine($"Removed \"{text.ToString().Replace("\r", "\\r").Replace("\n", "\\n")}\".");
+#if DEBUG
+            _file._logger.LogDebug("Removed \"{0}\".", text.ToString().Replace("\r", "\\r").Replace("\n", "\\n"));
+#endif
 
             int firstNewLineIndex = text.IndexOf('\n');
             int lastNewLineIndex = firstNewLineIndex == -1 ? -1 : text.LastIndexOf('\n');
@@ -683,11 +884,13 @@ public class OpenedFile : IWorkspaceFile
             int lastLine = firstLine + linesToCut;
 
             ref LineInfo startPartialLine = ref _file._lines[firstLine];
+            int originalNewLineLength = startPartialLine.Length - startPartialLine.ContentLength;
             LineInfo endPartialLine = _file._lines[lastLine];
 
-            int nextLineLength = Math.Abs(endPartialLine.Length) - (text.Length - lastNewLineIndex - 1) + Math.Abs(startPartialLine.Length) - firstNewLineIndex - 1;
+            int nextLineLength = endPartialLine.Length - (text.Length - lastNewLineIndex - 1) + startPartialLine.Length - firstNewLineIndex - 1;
 
-            startPartialLine.Length = nextLineLength * Math.Sign(endPartialLine.Length);
+            startPartialLine.Length = nextLineLength;
+            startPartialLine.ContentLength = nextLineLength - originalNewLineLength;
             CutLines(firstLine + 1, linesToCut);
             for (int i = firstLine + 1; i < _file._lineCount; ++i)
                 _file._lines[i].StartIndex -= text.Length;
@@ -695,7 +898,9 @@ public class OpenedFile : IWorkspaceFile
         
         private void IndexTextAddition(int index, ReadOnlySpan<char> text)
         {
-            Console.WriteLine($"Added \"{text.ToString().Replace("\r", "\\r").Replace("\n", "\\n")}\".");
+#if DEBUG
+            _file._logger.LogDebug("Added \"{0}\".", text.ToString().Replace("\r", "\\r").Replace("\n", "\\n"));
+#endif
 
             int firstNewLineIndex = text.IndexOf('\n');
             int lastNewLineIndex = firstNewLineIndex == -1 ? -1 : text.LastIndexOf('\n');
@@ -727,16 +932,15 @@ public class OpenedFile : IWorkspaceFile
             _file.GrowLines(_file._lineCount + linesToInsert);
 
             ref LineInfo startPartialLine = ref _file._lines[firstLine];
-            int originalNewLineSign = Math.Sign(startPartialLine.Length);
+            int originalNewLineLength = startPartialLine.Length - startPartialLine.ContentLength;
 
-            ShiftDownLines(firstLine + 1, linesToInsert);
+            ShiftLines(firstLine + 1, linesToInsert);
 
             int startLineLength = index - startPartialLine.StartIndex + firstNewLineIndex + 1;
-            int endLineLength = text.Length - lastNewLineIndex - 1 + Math.Abs(startPartialLine.Length) - (index - startPartialLine.StartIndex);
+            int endLineLength = text.Length - lastNewLineIndex - 1 + startPartialLine.Length - (index - startPartialLine.StartIndex);
 
             startPartialLine.Length = startLineLength;
-            if (firstNewLineIndex > 0 && text[firstNewLineIndex - 1] == '\r')
-                startPartialLine.Length = -startPartialLine.Length;
+            startPartialLine.ContentLength = startLineLength - (firstNewLineIndex > 0 && text[firstNewLineIndex - 1] == '\r' ? 2 : 1);
 
             int lastNewLine = firstNewLineIndex;
             for (int i = 1; i < linesToInsert; ++i)
@@ -750,15 +954,15 @@ public class OpenedFile : IWorkspaceFile
 
                 newLine.StartIndex = lastNewLine + 1 + index;
                 newLine.Length = nextNewLine - lastNewLine;
-                if (text[nextNewLine - 1] == '\r')
-                    newLine.Length = -newLine.Length;
+                newLine.ContentLength = newLine.Length - (text[nextNewLine - 1] == '\r' ? 2 : 1);
 
                 lastNewLine = nextNewLine;
             }
 
             ref LineInfo lastLine = ref _file._lines[firstLine + linesToInsert];
             lastLine.StartIndex = lastNewLine + 1 + index;
-            lastLine.Length = endLineLength * originalNewLineSign;
+            lastLine.Length = endLineLength;
+            lastLine.ContentLength = endLineLength - originalNewLineLength;
 
             for (int i = firstLine + linesToInsert + 1; i < _file._lineCount; ++i)
                 _file._lines[i].StartIndex += text.Length;
@@ -766,16 +970,149 @@ public class OpenedFile : IWorkspaceFile
 
         private void IndexTextReplacement(int index, ReadOnlySpan<char> oldText, ReadOnlySpan<char> newText)
         {
-            if (newText.Length != oldText.Length)
+#if DEBUG
+            _file._logger.LogDebug("Replaced \"{0}\" -> \"{1}\".",
+                oldText.ToString().Replace("\r", "\\r").Replace("\n", "\\n"),
+                newText.ToString().Replace("\r", "\\r").Replace("\n", "\\n")
+            );
+#endif
+
+            int changeInLength = newText.Length - oldText.Length;
+
+            int firstRemovedNewLineIndex = oldText.IndexOf('\n');
+            int lastRemovedNewLineIndex = firstRemovedNewLineIndex == -1 ? -1 : oldText.LastIndexOf('\n');
+            int firstAddedNewLineIndex = newText.IndexOf('\n');
+            int lastAddedNewLineIndex = firstAddedNewLineIndex == -1 ? -1 : newText.LastIndexOf('\n');
+
+            int firstLine = _file.GetLineIndexIntl(index);
+            int endLine = _file.GetLineIndexIntl(index + oldText.Length);
+            if (firstLine == -1 || endLine == -1)
+                _file.ThrowInvalidState();
+
+            // edit consists of only a single line
+            if (firstRemovedNewLineIndex == -1 && lastAddedNewLineIndex == -1)
             {
-                //PushIndices(index, newText.Length - oldText.Length);
+                if (changeInLength == 0)
+                    return;
+
+                _file._lines[firstLine].AddLength(changeInLength);
+                for (int i = firstLine + 1; i < _file._lineCount; ++i)
+                    _file._lines[i].StartIndex += changeInLength;
+                return;
             }
 
-            Console.WriteLine($"Replaced \"{oldText.ToString().Replace("\r", "\\r").Replace("\n", "\\n")}\" -> \"{newText.ToString().Replace("\r", "\\r").Replace("\n", "\\n")}\".");
+            ref LineInfo startPartialLine = ref _file._lines[firstLine];
+
+            if (firstAddedNewLineIndex == -1)
+            {
+                //   from:
+                // abcdef\r\n
+                // abcd[ghij\r\n
+                // klmn\r\n
+                // opqr]efgh\r\n
+
+                //   to:
+                // -> abcdef\r\n
+                //    abcd[xyz]efgh\r\n
+
+                int linesToRemove = firstRemovedNewLineIndex == lastRemovedNewLineIndex ? 1 : oldText.Count('\n');
+
+                LineInfo endPartialLine = _file._lines[endLine];
+
+                startPartialLine.Length = index - startPartialLine.StartIndex + newText.Length +
+                                          (endPartialLine.Length - (oldText.Length - lastRemovedNewLineIndex - 1));
+                startPartialLine.ContentLength = startPartialLine.Length - (endPartialLine.Length - endPartialLine.ContentLength);
+
+                CutLines(firstLine + 1, linesToRemove);
+                for (int i = firstLine + 1; i < _file._lineCount; ++i)
+                    _file._lines[i].StartIndex += changeInLength;
+            }
+            else
+            {
+                //   from:
+                // abcdef\r\n
+                // abcd[ghij\r\n
+                // klmn\r\n
+                // opqr]efgh\r\n
+                //
+                //   or:
+                // abcdef\r\n
+                // abcd[ghi]efgh\r\n
+
+                //   to:
+                // -> abcdef\r\n
+                //    abcd[xyz\r\n
+                //    pqrs\r\n
+                //    mnop]efgh\r\n
+
+                LineInfo endPartialLine = _file._lines[endLine];
+
+                int linesToAdd = firstAddedNewLineIndex == lastAddedNewLineIndex ? 1 : newText.Count('\n');
+
+                int linesToRemove;
+                if (firstRemovedNewLineIndex == -1)
+                    linesToRemove = 0;
+                else
+                    linesToRemove = firstRemovedNewLineIndex == lastRemovedNewLineIndex ? 1 : oldText.Count('\n');
+
+                int endLineLength;
+                if (firstRemovedNewLineIndex == -1)
+                {
+                    endLineLength = startPartialLine.Length - oldText.Length - (index - startPartialLine.StartIndex);
+                }
+                else
+                {
+                    endLineLength = endPartialLine.Length - (oldText.Length - lastRemovedNewLineIndex - 1);
+                }
+
+                endLineLength += newText.Length - lastAddedNewLineIndex - 1;
+
+                startPartialLine.Length = index - startPartialLine.StartIndex + firstAddedNewLineIndex + 1;
+                startPartialLine.ContentLength = startPartialLine.Length
+                                                 - (firstAddedNewLineIndex > 0 && newText[firstAddedNewLineIndex - 1] == '\r' ? 2 : 1);
+
+                if (linesToAdd > linesToRemove)
+                {
+                    _file.GrowLines(_file._lineCount + linesToAdd - linesToRemove);
+                }
+
+                ShiftLines(firstLine + 1, linesToAdd - linesToRemove);
+
+                int lastNewLine = firstAddedNewLineIndex;
+                for (int i = 1; i < linesToAdd; ++i)
+                {
+                    ref LineInfo newLine = ref _file._lines[firstLine + i];
+
+                    int offset = lastNewLine + 1;
+                    int nextNewLine = i != linesToAdd - 1 ? newText.Slice(offset).IndexOf('\n') + offset : lastAddedNewLineIndex;
+                    if (nextNewLine == offset - 1)
+                        _file.ThrowInvalidState();
+
+                    newLine.StartIndex = lastNewLine + 1 + index;
+                    newLine.Length = nextNewLine - lastNewLine;
+                    newLine.ContentLength = newLine.Length - (newText[nextNewLine - 1] == '\r' ? 2 : 1);
+
+                    lastNewLine = nextNewLine;
+                }
+
+                ref LineInfo lastLine = ref _file._lines[firstLine + linesToAdd];
+                lastLine.StartIndex = lastNewLine + 1 + index;
+                lastLine.Length = endLineLength;
+                lastLine.ContentLength = endLineLength - (endPartialLine.Length - endPartialLine.ContentLength);
+
+                if (changeInLength == 0)
+                    return;
+
+                for (int i = firstLine + linesToAdd + 1; i < _file._lineCount; ++i)
+                    _file._lines[i].StartIndex += changeInLength;
+            }
         }
 
         private void CutLines(int index, int ct)
         {
+            if (ct == 0)
+                return;
+
             if (index - ct != _file._lineCount)
             {
                 Array.Copy(_file._lines, index + ct, _file._lines, index, _file._lineCount - index - ct);
@@ -783,8 +1120,14 @@ public class OpenedFile : IWorkspaceFile
             _file._lineCount -= ct;
         }
 
-        private void ShiftDownLines(int index, int by)
+        private void ShiftLines(int index, int by)
         {
+            if (by == 0)
+                return;
+
+            if (by < 0)
+                index -= by;
+
             if (index != _file._lineCount)
             {
                 Array.Copy(_file._lines, index, _file._lines, index + by, _file._lineCount - index);
@@ -792,11 +1135,26 @@ public class OpenedFile : IWorkspaceFile
             _file._lineCount += by;
         }
 
+#if KEEP_VIRTUAL_FILE_SYSTEM
+        private static string Escape(ReadOnlySpan<char> text)
+        {
+            return text.ToString()
+                .Replace("\\", "\\\\")
+                .Replace("\a", "\\a")
+                .Replace("\b", "\\b")
+                .Replace("\f", "\\f")
+                .Replace("\n", "\\n")
+                .Replace("\r", "\\r")
+                .Replace("\t", "\\t")
+                .Replace("\v", "\\v")
+                .Replace("\"", "\\\"");
+        }
+#endif
     }
 
     private void ThrowInvalidState()
     {
-        _isFaulted = true;
+        IsFaulted = true;
         SetFullTextIntl(_contentSegment);
         throw new InvalidOperationException("File is corrupted.");
     }

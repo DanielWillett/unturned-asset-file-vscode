@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Files;
 
-internal class OpenedFileTracker
+internal class OpenedFileTracker : IDisposable
 {
     private readonly ILogger<OpenedFileTracker> _logger;
     public ConcurrentDictionary<DocumentUri, OpenedFile> Files { get; } = new ConcurrentDictionary<DocumentUri, OpenedFile>();
@@ -16,6 +16,14 @@ internal class OpenedFileTracker
 
     public OpenedFile CreateFile(DocumentUri uri, ReadOnlySpan<char> text)
     {
-        return new OpenedFile(uri, text, _logger);
+        return new OpenedFile(uri, text, _logger, useVirtualFiles: true);
+    }
+
+    public void Dispose()
+    {
+        foreach (OpenedFile file in Files.Values)
+        {
+            file.Dispose();
+        }
     }
 }

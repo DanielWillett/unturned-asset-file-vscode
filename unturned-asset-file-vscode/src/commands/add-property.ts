@@ -1,5 +1,5 @@
 import { commands, Position, Range, window } from 'vscode';
-import { DiscoverAssetProperties } from '../data/add-property';
+import { DiscoverAssetProperties } from '../jsonrpc/add-property';
 import { getAssetPropertiesViewProvider, getClient, languageId } from '../extension';
 
 export async function addProperty(propertyKey: string)

@@ -199,7 +199,7 @@ var require_messages = __commonJS({
       }
     };
     exports2.RequestType0 = RequestType0;
-    var RequestType3 = class extends AbstractMessageSignature {
+    var RequestType4 = class extends AbstractMessageSignature {
       constructor(method, _parameterStructures = ParameterStructures.auto) {
         super(method, 1);
         this._parameterStructures = _parameterStructures;
@@ -208,7 +208,7 @@ var require_messages = __commonJS({
         return this._parameterStructures;
       }
     };
-    exports2.RequestType = RequestType3;
+    exports2.RequestType = RequestType4;
     var RequestType1 = class extends AbstractMessageSignature {
       constructor(method, _parameterStructures = ParameterStructures.auto) {
         super(method, 1);
@@ -231,12 +231,12 @@ var require_messages = __commonJS({
       }
     };
     exports2.RequestType3 = RequestType32;
-    var RequestType4 = class extends AbstractMessageSignature {
+    var RequestType42 = class extends AbstractMessageSignature {
       constructor(method) {
         super(method, 4);
       }
     };
-    exports2.RequestType4 = RequestType4;
+    exports2.RequestType4 = RequestType42;
     var RequestType5 = class extends AbstractMessageSignature {
       constructor(method) {
         super(method, 5);
@@ -17977,7 +17977,7 @@ __export(extension_exports, {
 module.exports = __toCommonJS(extension_exports);
 var import_fs = require("fs");
 var import_path2 = require("path");
-var import_vscode4 = require("vscode");
+var import_vscode5 = require("vscode");
 var import_node = __toESM(require_node3());
 
 // src/views/asset-properties.ts
@@ -17992,7 +17992,7 @@ function isDatFile(uri) {
   return path.endsWith(".dat") || path.endsWith(".asset");
 }
 
-// src/data/asset-property.ts
+// src/jsonrpc/asset-property.ts
 var import_vscode_languageclient = __toESM(require_main4());
 var DiscoverAssetProperties = new import_vscode_languageclient.RequestType("unturnedDataFile/assetProperties");
 
@@ -18084,7 +18084,7 @@ function getName(property) {
 // src/commands/add-property.ts
 var import_vscode2 = require("vscode");
 
-// src/data/add-property.ts
+// src/jsonrpc/add-property.ts
 var import_vscode_languageclient2 = __toESM(require_main4());
 var DiscoverAssetProperties2 = new import_vscode_languageclient2.RequestType("unturnedDataFile/getAddProperty");
 
@@ -18138,6 +18138,21 @@ async function refreshAssetProperties() {
   await getAssetPropertiesViewProvider().refresh();
 }
 
+// src/jsonrpc/get-document-text.ts
+var import_vscode4 = require("vscode");
+var import_vscode_languageclient3 = __toESM(require_main4());
+var GetDocumentText = new import_vscode_languageclient3.RequestType("unturnedDataFile/getDocumentContent");
+async function handleGetDocumentText(e) {
+  try {
+    const bytes = await import_vscode4.workspace.fs.readFile(import_vscode4.Uri.file(e.document));
+    const decoder = new TextDecoder();
+    return { text: decoder.decode(bytes) };
+  } catch (e2) {
+    console.error(e2);
+    return { text: void 0 };
+  }
+}
+
 // src/extension.ts
 var languageId = "unturned-data-file";
 var client;
@@ -18158,7 +18173,7 @@ function getAssetPropertiesViewProvider() {
 async function activate(context) {
   const dllPath = context.asAbsolutePath((0, import_path2.join)("..", "LspServer", "bin", "Debug", "net9.0", "LspServer.dll"));
   if (!(0, import_fs.existsSync)(dllPath)) {
-    await import_vscode4.window.showErrorMessage('LSP executible not found at "' + dllPath + '".');
+    await import_vscode5.window.showErrorMessage('LSP executible not found at "' + dllPath + '".');
     client = void 0;
   } else {
     let serverOptions = {
@@ -18174,31 +18189,32 @@ async function activate(context) {
       ],
       synchronize: {
         configurationSection: "unturned-data-file-lsp",
-        fileEvents: import_vscode4.workspace.createFileSystemWatcher("**/*.{dat,asset}")
+        fileEvents: import_vscode5.workspace.createFileSystemWatcher("**/*.{dat,asset}")
       }
     };
     client = new import_node.LanguageClient("unturned-data-file-lsp", "Unturned Data File format LSP", serverOptions, clientOptions);
   }
   assetPropertiesViewProvider = new AssetPropertiesViewProvider();
-  registrations.push(import_vscode4.window.registerTreeDataProvider(
+  registrations.push(import_vscode5.window.registerTreeDataProvider(
     "unturnedDataFile.assetProperties",
     assetPropertiesViewProvider
   ));
-  registrations.push(import_vscode4.commands.registerCommand("unturnedDataFile.assetProperties.refreshAssetProperties", refreshAssetProperties));
-  registrations.push(import_vscode4.commands.registerCommand("unturnedDataFile.cursorMoveTo", cursorMoveTo));
-  registrations.push(import_vscode4.commands.registerCommand("unturnedDataFile.addProperty", addProperty));
-  registrations.push(import_vscode4.window.onDidChangeActiveTextEditor(() => {
-    return import_vscode4.commands.executeCommand("unturnedDataFile.assetProperties.refreshAssetProperties");
+  registrations.push(import_vscode5.commands.registerCommand("unturnedDataFile.assetProperties.refreshAssetProperties", refreshAssetProperties));
+  registrations.push(import_vscode5.commands.registerCommand("unturnedDataFile.cursorMoveTo", cursorMoveTo));
+  registrations.push(import_vscode5.commands.registerCommand("unturnedDataFile.addProperty", addProperty));
+  registrations.push(import_vscode5.window.onDidChangeActiveTextEditor(() => {
+    return import_vscode5.commands.executeCommand("unturnedDataFile.assetProperties.refreshAssetProperties");
   }));
   if (client) {
     registrations.push(client.onDidChangeState(async (event) => {
       if (event.newState !== import_node.State.Running) {
         return;
       }
-      await import_vscode4.window.showInformationMessage("LSP initialized.");
-      await import_vscode4.commands.executeCommand("unturnedDataFile.assetProperties.refreshAssetProperties");
+      await import_vscode5.window.showInformationMessage("LSP initialized.");
+      await import_vscode5.commands.executeCommand("unturnedDataFile.assetProperties.refreshAssetProperties");
     }));
     client.start();
+    registrations.push(client.onRequest(GetDocumentText, handleGetDocumentText));
   }
 }
 async function deactivate() {

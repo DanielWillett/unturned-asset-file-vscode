@@ -15,7 +15,8 @@ import
 import { getClient } from '../extension';
 import { isDatFile } from '../util/path';
 
-import { AssetProperty, DiscoverAssetProperties } from '../data/asset-property';
+import { DiscoverAssetProperties } from '../jsonrpc/asset-property';
+import { AssetProperty } from '../spec/asset-property';
 
 export class AssetPropertiesViewProvider implements TreeDataProvider<AssetPropertyViewItem>
 {

@@ -10,6 +10,9 @@ import { addProperty } from './commands/add-property';
 import { cursorMoveTo } from './commands/cursor-move-to';
 import { refreshAssetProperties } from './commands/refresh-asset-properties';
 
+// request handlers
+import { GetDocumentText, handleGetDocumentText } from './jsonrpc/get-document-text';
+
 
 export const languageId = "unturned-data-file";
 
@@ -92,7 +95,6 @@ export async function activate(context: ExtensionContext): Promise<void>
 
     if (client)
     {
-
         registrations.push(client.onDidChangeState(async event =>
         {
 
@@ -106,6 +108,8 @@ export async function activate(context: ExtensionContext): Promise<void>
         }));
 
         client.start();
+
+        registrations.push(client.onRequest(GetDocumentText, handleGetDocumentText));
     }
 }
 
