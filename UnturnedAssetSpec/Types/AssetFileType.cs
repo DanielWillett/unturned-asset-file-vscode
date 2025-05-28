@@ -28,6 +28,12 @@ public readonly struct AssetFileType : IEquatable<AssetFileType>
         Information = null;
     }
 
+    public static AssetFileType FromAsset(IAssetSpecDatabase spec)
+    {
+        spec.Types.TryGetValue(QualifiedType.AssetBaseType, out AssetSpecType? info);
+        return info != null ? new AssetFileType(info, null) : new AssetFileType(QualifiedType.AssetBaseType, null);
+    }
+
     public static AssetFileType FromFile(AssetFileTree file, IAssetSpecDatabase spec)
     {
         string? type = file.GetType(out bool systemType);

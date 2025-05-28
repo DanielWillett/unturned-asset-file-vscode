@@ -34,8 +34,8 @@
                     "Key": "Weight",
                     "Type": "Float32",
                     "DefaultValue": 1,
-                    "Description": "The foliage to spawn.",
-                    "Variable": "asset"
+                    "Description": "A value relative to other weights that determines how often this asset will be chosen. The percentage chance can be calculated by dividing this asset's weight by the sum of all assets' weights.",
+                    "Variable": "weight"
                 }
             ]
         }

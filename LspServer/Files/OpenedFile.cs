@@ -3,7 +3,7 @@
 
 // The 'virtual file system' is used to check that files are being synced properly,
 // and just writes the LSP's version of the file to the desktop every time it updates.
-#define KEEP_VIRTUAL_FILE_SYSTEM
+//#define KEEP_VIRTUAL_FILE_SYSTEM
 
 #endif
 
@@ -11,11 +11,15 @@ using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+#if DEBUG
+using System.ComponentModel;
+#endif
+#if KEEP_VIRTUAL_FILE_SYSTEM
 using System.Text;
+#endif
 
 // ReSharper disable LocalizableElement
 
@@ -217,7 +221,6 @@ public class OpenedFile : IWorkspaceFile
             if (_lineCount > 0)
                 BroadcastUpdate(FullRange);
         }
-
     }
 
     private bool SetFullTextIntl(ReadOnlySpan<char> text)

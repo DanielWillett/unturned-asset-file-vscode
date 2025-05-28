@@ -64,8 +64,7 @@
         {
             "Key": "Max_Weight",
             "Type": "Float32",
-            "DefaultValue": 1.0,
-            "IncludedDefaultValue": 0.0,
+            "DefaultValue": 0.0,
             "Minimum": "@Min_Weight",
             "Maximum": 1.0,
             "Description": "The maximum weight of a terrain material to allow placement of foliage. The weight is a value from 0 to 1 which is multiplied by the density to determine how many foliage instances are placed.",
@@ -114,7 +113,7 @@
         {
             "Key": "Min_Scale",
             "Type": "EulerRotation",
-            "DefaultValue": "(1, 1, 1)",
+            "DefaultValue": "(0, 0, 0)",
             "Maximum": "@Max_Scale",
             "Description": "The minimum scale to draw the foliage at. A random scale is chosen between @Min_Scale and @Max_Scale.",
             "Variable": "minScale",
@@ -123,7 +122,7 @@
         {
             "Key": "Max_Scale",
             "Type": "EulerRotation",
-            "DefaultValue": "(1, 1, 1)",
+            "DefaultValue": "(0, 0, 0)",
             "Minimum": "@Min_Scale",
             "Description": "The maximum scale to draw the foliage at. A random scale is chosen between @Min_Scale and @Max_Scale.",
             "Variable": "maxScale",

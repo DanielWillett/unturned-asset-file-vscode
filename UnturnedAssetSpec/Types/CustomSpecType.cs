@@ -12,14 +12,17 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 [DebuggerDisplay("Type: {Type.GetTypeName()}")]
 public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<CustomSpecTypeInstance>, IEquatable<CustomSpecType>
 {
+    // example value could be Condition for Conditions
+    public const string PluralBaseKeyProperty = "PluralBaseKey";
+
     public required QualifiedType Type { get; init; }
     public required string DisplayName { get; init; }
     public required QualifiedType Parent { get; init; }
     public required SpecProperty[] Properties { get; set; }
     public required SpecProperty[] LocalizationProperties { get; set; }
     public required string? Docs { get; init; }
+    public required bool IsLegacyExpandedType { get; init; }
     public required OneOrMore<KeyValuePair<string, object?>> ExtendedData { get; init; }
-
 
     public Type ValueType => typeof(CustomSpecTypeInstance);
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
@@ -58,8 +61,99 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
 
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out CustomSpecTypeInstance? value)
     {
-        // todo
+        return TryParseValue(in parse, out value, CustomSpecTypeParseOptions.Object);
+    }
+
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out CustomSpecTypeInstance? value, CustomSpecTypeParseOptions options)
+    {
         value = null;
+        if (options == CustomSpecTypeParseOptions.Legacy && !IsLegacyExpandedType)
+            return false;
+
+        if (parse.Node is not AssetFileDictionaryValueNode dictionary || options == CustomSpecTypeParseOptions.Legacy && parse.BaseKey == null)
+        {
+            if (parse.HasDiagnostics)
+            {
+                parse.Log(new DatDiagnosticMessage
+                {
+                    Diagnostic = DatDiagnostics.UNT1005,
+                    Message = string.Format(DiagnosticResources.UNT1005, parse.EvaluationContext.Self.Key),
+                    Range = parse.Node?.Range ?? default
+                });
+            }
+
+            value = null;
+            return false;
+        }
+
+        List<CustomSpecTypeProperty> properties = new List<CustomSpecTypeProperty>(Properties.Length);
+        if (options == CustomSpecTypeParseOptions.Legacy)
+        {
+            string baseKey = parse.BaseKey!;
+
+            foreach (SpecProperty property in Properties)
+            {
+                string fullKey = property.Key;
+                if (fullKey.Length == 0 || fullKey.Equals("#This.Key", StringComparison.OrdinalIgnoreCase))
+                    fullKey = baseKey;
+                else
+                    fullKey = baseKey + "_" + fullKey;
+
+                if (!dictionary.TryGetValue(fullKey, out AssetFileKeyValuePairNode kvp))
+                {
+                    properties.Add(new CustomSpecTypeProperty(null, property, fullKey));
+                }
+                else
+                {
+                    SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(
+                        new FileEvaluationContext(in parse.EvaluationContext, property),
+                        parse.Diagnostics)
+                    {
+                        Database = parse.Database,
+                        FileType = parse.FileType,
+                        Node = kvp.Value,
+                        Parent = kvp,
+                        BaseKey = fullKey,
+                        File = parse.File
+                    };
+
+                    if (!property.Type.TryParseValue(in context, out ISpecDynamicValue? propertyValue))
+                        propertyValue = null;
+
+                    properties.Add(new CustomSpecTypeProperty(propertyValue, property, fullKey));
+                }
+            }
+        }
+        else
+        {
+            foreach (SpecProperty property in Properties)
+            {
+                if (!dictionary.TryGetValue(property.Key, out AssetFileKeyValuePairNode kvp))
+                {
+                    properties.Add(new CustomSpecTypeProperty(null, property, property.Key));
+                    continue;
+                }
+
+                SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(
+                    new FileEvaluationContext(in parse.EvaluationContext, property),
+                    parse.Diagnostics)
+                {
+                    Database = parse.Database,
+                    FileType = parse.FileType,
+                    Node = kvp.Value,
+                    Parent = kvp,
+                    BaseKey = property.Key,
+                    File = parse.File
+                };
+
+                if (!property.Type.TryParseValue(in context, out ISpecDynamicValue? propertyValue))
+                    propertyValue = null;
+
+                properties.Add(new CustomSpecTypeProperty(propertyValue, property, property.Key));
+            }
+        }
+
+        value = new CustomSpecTypeInstance(this, properties);
         return false;
     }
 
@@ -103,6 +197,12 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
     }
 }
 
+public enum CustomSpecTypeParseOptions
+{
+    Object,
+    Legacy
+}
+
 /// <summary>
 /// An object represented by a <see cref="CustomSpecType"/>.
 /// </summary>
@@ -114,10 +214,10 @@ public class CustomSpecTypeInstance : IEquatable<CustomSpecTypeInstance>, ISpecD
 
     public IReadOnlyList<CustomSpecTypeProperty> Properties { get; }
 
-    public CustomSpecTypeInstance(CustomSpecType type)
+    public CustomSpecTypeInstance(CustomSpecType type, List<CustomSpecTypeProperty> properties)
     {
         Type = type ?? throw new ArgumentNullException(nameof(type));
-        _properties = new List<CustomSpecTypeProperty>();
+        _properties = properties;
         Properties = _properties.AsReadOnly();
     }
 

@@ -135,53 +135,23 @@
                 },
                 {
                     "Key": "Conditions",
-                    "Type": "UInt8",
-                    "Required": true,
-                    "Description": "The number of conditions that must be met for message #(Self.KeyGroups[0]) to be shown.",
+                    "Type": "LegacyCompatibleList",
+                    "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                    "DefaultValue": null,
+                    "Description": "Conditions that must be met for message #(Self.KeyGroups[0]) to be shown.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "conditions",
                     "CountForRegexGroup": "dialogue-message-conditions"
                 },
                 {
-                    "Key": "Condition_(\\d)",
-                    "Type": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                    "Required": true,
-                    "KeyIsRegex": true,
-                    "KeyGroups":
-                    [
-                        {
-                            "Name": "dialogue-message-conditions",
-                            "RegexGroup": 1
-                        }
-                    ],
-                    "Description": "A condition that must be met for message #(Self.KeyGroups[0]) to be shown.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
-                    "Variable": "conditions"
-                },
-                {
-                    "Key": "Reward",
-                    "Type": "UInt8",
-                    "Required": true,
-                    "Description": "The number of rewards applied before viewing message #(Self.KeyGroups[0]).",
+                    "Key": "Rewards",
+                    "Type": "LegacyCompatibleList",
+                    "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                    "DefaultValue": null,
+                    "Description": "Rewards applied before viewing message #(Self.KeyGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "rewards",
                     "CountForRegexGroup": "dialogue-message-rewards"
-                },
-                {
-                    "Key": "Reward_(\\d)",
-                    "Type": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
-                    "Required": true,
-                    "KeyIsRegex": true,
-                    "KeyGroups":
-                    [
-                        {
-                            "Name": "dialogue-message-rewards",
-                            "RegexGroup": 1
-                        }
-                    ],
-                    "Description": "A reward applied before viewing message #(Self.KeyGroups[0]).",
-                    "Variable": "rewards"
                 }
             ],
             "Localization":
@@ -272,53 +242,23 @@
                 },
                 {
                     "Key": "Conditions",
-                    "Type": "UInt8",
-                    "DefaultValue": 0,
-                    "Description": "The number of conditions that must be met for response #(Self.KeyGroups[0]) to be shown.",
+                    "Type": "LegacyCompatibleList",
+                    "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                    "DefaultValue": null,
+                    "Description": "Conditions that must be met for response #(Self.KeyGroups[0]) to be shown.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "conditions",
                     "CountForRegexGroup": "dialogue-message-conditions"
                 },
                 {
-                    "Key": "Condition_(\\d)",
-                    "Type": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                    "Required": true,
-                    "KeyIsRegex": true,
-                    "KeyGroups":
-                    [
-                        {
-                            "Name": "dialogue-response-conditions",
-                            "RegexGroup": 1
-                        }
-                    ],
-                    "Description": "A condition that must be met for response #(Self.KeyGroups[0]) to be shown.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
-                    "Variable": "conditions"
-                },
-                {
                     "Key": "Rewards",
-                    "Type": "UInt8",
-                    "DefaultValue": 0,
-                    "Description": "The number of rewards applied before viewing response #(Self.KeyGroups[0]).",
+                    "Type": "LegacyCompatibleList",
+                    "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                    "DefaultValue": null,
+                    "Description": "Rewards applied before viewing response #(Self.KeyGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "rewards",
                     "CountForRegexGroup": "dialogue-response-rewards"
-                },
-                {
-                    "Key": "Reward_(\\d)",
-                    "Type": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
-                    "Required": true,
-                    "KeyIsRegex": true,
-                    "KeyGroups":
-                    [
-                        {
-                            "Name": "dialogue-response-rewards",
-                            "RegexGroup": 1
-                        }
-                    ],
-                    "Description": "A reward applied before viewing response #(Self.KeyGroups[0]).",
-                    "Variable": "rewards"
                 }
             ],
             "Localization":

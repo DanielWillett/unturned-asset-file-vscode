@@ -209,6 +209,11 @@ public static class KnownTypes
             return List(resolvedElementType ?? new UnresolvedSpecPropertyType(elementType!));
         }
 
+        if (knownType.Equals("LegacyCompatibleList", StringComparison.Ordinal))
+        {
+            return LegacyCompatibleList(elementType);
+        }
+
         if (knownType.Equals("SkillLevel", StringComparison.Ordinal))
         {
             return specialTypes.FirstOrDefault() is { } skillProperty
@@ -344,4 +349,9 @@ public static class KnownTypes
 
     public static ISpecPropertyType<byte> SkillLevel(string skillsetOrPropertyName)
         => new SkillLevelSpecPropertyType(skillsetOrPropertyName);
+
+    public static ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>> LegacyCompatibleList(ISpecType type)
+        => new LegacyCompatibleListSpecPropertyType(type);
+    public static ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>> LegacyCompatibleList(QualifiedType type)
+        => new LegacyCompatibleListSpecPropertyType(type);
 }

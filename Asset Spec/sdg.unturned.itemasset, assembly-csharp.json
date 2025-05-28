@@ -1417,53 +1417,21 @@
                 },
                 {
                     "Key": "Conditions",
-                    "Type": "UInt8",
-                    "Required": true,
-                    "Description": "The number of conditions that must be met for blueprint #(Self.KeyGroups[0]) to be visible and craftable.",
+                    "Type": "LegacyCompatibleList",
+                    "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                    "Description": "Conditions that must be met for blueprint #(Self.KeyGroups[0]) to be visible and craftable.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "questConditionsList",
                     "CountForRegexGroup": "item-blueprints-conditions"
                 },
                 {
-                    "Key": "Condition_(\\d)",
-                    "Type": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                    "Required": true,
-                    "KeyIsRegex": true,
-                    "KeyGroups":
-                    [
-                        {
-                            "Name": "item-blueprints-conditions",
-                            "RegexGroup": 1
-                        }
-                    ],
-                    "Description": "A condition that must be met for blueprint #(Self.KeyGroups[0]) to be visible and craftable.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
-                    "Variable": "questConditionsList"
-                },
-                {
                     "Key": "Rewards",
-                    "Type": "UInt8",
-                    "Required": true,
-                    "Description": "The number of rewards applied after crafting blueprint #(Self.KeyGroups[0]).",
+                    "Type": "LegacyCompatibleList",
+                    "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                    "Description": "Rewards applied after crafting blueprint #(Self.KeyGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "questRewardsList",
                     "CountForRegexGroup": "item-blueprints-rewards"
-                },
-                {
-                    "Key": "Reward_(\\d)",
-                    "Type": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
-                    "Required": true,
-                    "KeyIsRegex": true,
-                    "KeyGroups":
-                    [
-                        {
-                            "Name": "item-blueprints-rewards",
-                            "RegexGroup": 1
-                        }
-                    ],
-                    "Description": "A reward applied after crafting blueprint #(Self.KeyGroups[0]).",
-                    "Variable": "questRewardsList"
                 },
                 {
                     "Key": "Searchable",

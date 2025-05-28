@@ -1284,11 +1284,22 @@ public static class AssetSpecDatabaseExtensions
             type = type.Substring(divIndex + 2);
         }
 
+        if (assetType == null)
+        {
+            foreach (ISpecType t in fileType.Information.Types)
+            {
+                if (!t.Type.Equals(type))
+                    continue;
+
+                return t;
+            }
+        }
+
         InverseTypeHierarchy hierarchy = db.Information.GetParentTypes(assetType != null ? new QualifiedType(assetType) : fileType.Type);
 
-        for (int i = -1; i < hierarchy.ParentTypes.Length; ++i)
+        for (int i = 0; i < hierarchy.ParentTypes.Length; ++i)
         {
-            QualifiedType qt = i < 0 ? hierarchy.Type : hierarchy.ParentTypes[hierarchy.ParentTypes.Length - i - 1];
+            QualifiedType qt = hierarchy.ParentTypes[hierarchy.ParentTypes.Length - i - 1];
 
             if (!db.Types.TryGetValue(qt, out AssetSpecType info))
             {

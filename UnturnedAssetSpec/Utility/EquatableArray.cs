@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -8,9 +7,16 @@ public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>> where T
 {
     public readonly T[] Array;
 
+    public static EquatableArray<T> Empty => new EquatableArray<T>(System.Array.Empty<T>());
+
     public EquatableArray(T[] array)
     {
         Array = array;
+    }
+
+    public EquatableArray(List<T> list)
+    {
+        Array = list.Count == 0 ? System.Array.Empty<T>() : list.ToArray();
     }
 
     public EquatableArray(T[] array, int length)

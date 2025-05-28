@@ -986,6 +986,24 @@ public struct OneOrMoreEnumerator<T> : IEnumerator<T>
 public static class OneOrMoreExtensions
 {
     /// <summary>
+    /// Attempts to get a value from a <see cref="OneOrMore{T}"/> acting as a dictionary.
+    /// </summary>
+    public static bool TryGetValue<TKey, TValue>(this OneOrMore<KeyValuePair<TKey, TValue>> dictionary, TKey key, out TValue value)
+    {
+        foreach (KeyValuePair<TKey, TValue> pair in dictionary)
+        {
+            if (!EqualityComparer<TKey>.Default.Equals(pair.Key, key))
+                continue;
+            
+            value = pair.Value;
+            return true;
+        }
+
+        value = default!;
+        return false;
+    }
+
+    /// <summary>
     /// Check if a string is contained in this container based on a string comparison type.
     /// </summary>
     [Pure]

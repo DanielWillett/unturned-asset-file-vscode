@@ -247,7 +247,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
             Properties = properties,
             LocalizationProperties = localProperties,
             Docs = docs,
-            ExtendedData = extraData
+            ExtendedData = extraData,
+            IsLegacyExpandedType = isExpanded
         };
 
         foreach (SpecProperty prop in properties)

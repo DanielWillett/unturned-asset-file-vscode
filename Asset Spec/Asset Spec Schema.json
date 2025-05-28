@@ -272,6 +272,10 @@
                 {
                     "const": "SkillLevel",
                     "title": "The level of a skill, where the special type is the skill name, the property containing the skill name, or two properties separated by a colon containing the speciality and skill indices."
+                },
+                {
+                    "const": "LegacyCompatibleList",
+                    "title": "List of a custom type, or a legacy list (such as a condition or reward list). The custom type should be entered as the ElementType."
                 }
             ]
         },

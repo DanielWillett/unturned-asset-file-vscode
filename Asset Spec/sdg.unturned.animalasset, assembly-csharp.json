@@ -75,7 +75,8 @@
             "DefaultValue": 0,
             "Description": "The short ID of the meat item dropped by the animal. 2-4 meat items will be dropped.",
             "Variable": "meat",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops",
+            "ExclusiveWith": [ "Reward_ID" ]
         },
         {
             "Key": "Pelt",
@@ -84,7 +85,8 @@
             "DefaultValue": 0,
             "Description": "The short ID of the pelt item dropped by the animal. 2-4 pelt items will be dropped.",
             "Variable": "pelt",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops",
+            "ExclusiveWith": [ "Reward_ID" ]
         },
         {
             "Key": "Reward_ID",
@@ -93,7 +95,8 @@
             "DefaultValue": 0,
             "Description": "The short ID of a spawn table to use for the animal drops. A random amount of items between @Reward_Min and @Reward_Max will be dropped. Pelt and Meat are ignored if this is set.",
             "Variable": "rewardID",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops",
+            "ExclusiveWith": [ "Meat", "Pelt" ]
         },
         {
             "Key": "Reward_Min",
@@ -235,6 +238,7 @@
         {
             "Type": "SDG.Unturned.EAnimalBehaviour, Assembly-CSharp",
             "DisplayName": "Animal Behavior Type",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
             "Values":
             [
                 {

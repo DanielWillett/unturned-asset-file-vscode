@@ -58,7 +58,7 @@
             "Key": "Christmas_Redirect",
             "Type": "AssetReference",
             "DefaultValue": null,
-            "ElementType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
+            "ElementType": "SDG.Framework.Foliage.FoliageInstancedMeshInfoAsset, Assembly-CSharp",
             "Description": "The foliage to spawn during the Christmas holiday.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "christmasRedirect"
@@ -67,7 +67,7 @@
             "Key": "Halloween_Redirect",
             "Type": "AssetReference",
             "DefaultValue": null,
-            "ElementType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
+            "ElementType": "SDG.Framework.Foliage.FoliageInstancedMeshInfoAsset, Assembly-CSharp",
             "Description": "The foliage to spawn during the Halloween holiday.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "halloweenRedirect"
