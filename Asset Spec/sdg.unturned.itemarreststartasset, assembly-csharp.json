@@ -13,7 +13,7 @@
             "Key": "Strength",
             "Type": "UInt16",
             "DefaultValue": 0,
-            "Description": "Number of times a player has to lean to release themselves when restrained.",
+            "Description": "Number of times a player has to lean to release themselves when restrained. If excluded or left at 0, the item will not be broken by leaning.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/arrest-start-asset.html#property-descriptions",
             "Variable": "strength",
             "Priority": 2

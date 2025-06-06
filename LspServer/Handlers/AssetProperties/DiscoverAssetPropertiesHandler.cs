@@ -40,7 +40,7 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
             return Task.FromResult(Empty);
         }
 
-        FileEvaluationContext context = new FileEvaluationContext(null!, fileType.Information, file.File, _environment, _installEnvironment, _spec);
+        FileEvaluationContext context = new FileEvaluationContext(null!, fileType.Information, file.File, _environment, _installEnvironment, _spec, file);
 
         List<SpecProperty> properties = fileType.Information.Properties
             .Where(x => !x.Deprecated)

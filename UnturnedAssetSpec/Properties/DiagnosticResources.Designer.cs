@@ -241,6 +241,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unexpected amount supplied for an item ID or GUID..
+        /// </summary>
+        internal static string UNT1017 {
+            get {
+                return ResourceManager.GetString("UNT1017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected &apos;}&apos; at end of dictionary..
         /// </summary>
         internal static string UNT2001 {
@@ -291,6 +300,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string UNT2009 {
             get {
                 return ResourceManager.GetString("UNT2009", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A GUID is required for this asset..
+        /// </summary>
+        internal static string UNT2010 {
+            get {
+                return ResourceManager.GetString("UNT2010", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A legacy ID is required for this asset..
+        /// </summary>
+        internal static string UNT2011 {
+            get {
+                return ResourceManager.GetString("UNT2011", resourceCulture);
             }
         }
     }

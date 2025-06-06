@@ -1,17 +1,29 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
+public interface IIndexableBangRef : IBangRefTarget
+{
+    int Index { get; set; }
+}
+
+public interface IPropertiesBangRef : IBangRefTarget
+{
+    void SetProperty(ReadOnlySpan<char> property, ReadOnlySpan<char> value);
+    IEnumerable<KeyValuePair<string, string>> EnumerateProperties();
+}
+
+/// <summary>
+/// References a special property of a target, such as the file name or if the target is included or not.
+/// </summary>
 public abstract class BangRef : IBangRefTarget, IEquatable<BangRef>, IEquatable<ISpecDynamicValue>
 {
     public IBangRefTarget Target { get; }
@@ -367,13 +379,77 @@ public sealed class KeyGroupsBangRef : BangRef, IEquatable<KeyGroupsBangRef>, II
     }
 }
 
-public interface IIndexableBangRef : IBangRefTarget
+public sealed class AssetNameBangRef : BangRef, IEquatable<AssetNameBangRef>
 {
-    int Index { get; set; }
-}
+    public AssetNameBangRef(IBangRefTarget target) : base(target, KnownTypes.String)
+    {
+        if (target is not ThisBangRef)
+            throw new ArgumentException("AssetName can only be used with #This.");
+    }
 
-public interface IPropertiesBangRef : IBangRefTarget
-{
-    void SetProperty(ReadOnlySpan<char> property, ReadOnlySpan<char> value);
-    IEnumerable<KeyValuePair<string, string>> EnumerateProperties();
+    public override string PropertyName => "AssetName";
+
+    public override bool Equals(BangRef other) => other is AssetNameBangRef b && Equals(b);
+
+    public bool Equals(AssetNameBangRef other) => base.Equals(other);
+
+    public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
+    {
+        TryEvaluateValue(in ctx, out string? assetName, out bool isNull);
+
+        if (condition.Comparand is not string str)
+        {
+            if (condition.Comparand == null)
+                return condition.Operation.EvaluateNulls(isNull, true);
+            str = condition.Comparand.ToString();
+        }
+
+        return isNull
+            ? condition.Operation.EvaluateNulls(true, false)
+            : condition.Operation.Evaluate(assetName, str, ctx.Information.Information);
+    }
+
+    public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
+    {
+        isNull = false;
+
+        if (typeof(TValue) != typeof(string))
+        {
+            value = default!;
+            return false;
+        }
+
+        try
+        {
+            string? name = ctx.OpenedFile.AssetName;
+            if (string.IsNullOrEmpty(name))
+            {
+                name = null;
+                isNull = true;
+            }
+            value = Unsafe.As<string?, TValue>(ref name);
+            return true;
+        }
+        catch
+        {
+            value = default!;
+            isNull = true;
+            return true;
+        }
+    }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        try
+        {
+            string? name = ctx.OpenedFile.AssetName;
+            value = string.IsNullOrEmpty(name) ? null : name;
+            return true;
+        }
+        catch
+        {
+            value = null;
+            return true;
+        }
+    }
 }

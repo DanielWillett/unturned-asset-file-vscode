@@ -173,7 +173,7 @@ internal class KeyCompletionHandler : ICompletionHandler
 
             AutoCompleteParameters p = new AutoCompleteParameters(_specDictionary, tree, position, fileType, property);
 
-            AutoCompleteResult[] results = await autoComplete.GetAutoCompleteResults(p);
+            AutoCompleteResult[] results = await autoComplete.GetAutoCompleteResults(new InClassName(p));
             List<CompletionItem> completions = new List<CompletionItem>(results.Length);
             CompletionItemKind kind = property.Type.GetCompletionItemKind();
             for (int i = 0; i < results.Length; i++)

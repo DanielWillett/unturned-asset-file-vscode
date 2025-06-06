@@ -5,6 +5,9 @@ using System.Text.RegularExpressions;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// Various methods to parse primitive types in the same manner as Unturned does.
+/// </summary>
 public static class KnownTypeValueHelper
 {
     public static bool TryParseBoolean(string key, out bool value)
@@ -99,7 +102,7 @@ public static class KnownTypeValueHelper
         return true;
     }
 
-    public static readonly char[] InvalidTypeChars =
+    private static readonly char[] InvalidTypeChars =
     [
         '\\',
         ':',
@@ -143,7 +146,7 @@ public static class KnownTypeValueHelper
 
     public static bool TryParseType(ReadOnlySpan<char> key, out QualifiedType value)
     {
-        if (key.IsEmpty || key.IndexOfAny([ '\\', ':', '/' ]) >= 0)
+        if (key.IsEmpty || key.IndexOfAny(InvalidTypeChars.AsSpan()) >= 0)
         {
             value = default;
             return false;
@@ -198,9 +201,8 @@ public static class KnownTypeValueHelper
 
 
     /// <summary>
-    /// Regular expression to remove all rich text.
+    /// Regular expression to check for basic rich text.
     /// </summary>
-    /// <remarks>Does not include &lt;#ffffff&gt; colors.</remarks>
     private static readonly Regex ContainsRichTextRegex =
         new Regex(
             """\<\/{0,1}(?:(?:color=\"{0,1}[#a-z]{0,9}\"{0,1})|(?:color)|(?:#.{3,8})|(?:[ib]))\>""",
@@ -456,6 +458,119 @@ public static class KnownTypeValueHelper
             return false;
         }
 
+        return true;
+    }
+
+    public static bool TryParseGuidOrId(ReadOnlySpan<char> span, out GuidOrId guidOrId)
+    {
+        return TryParseGuidOrId(span, null, out guidOrId);
+    }
+
+    public static bool TryParseGuidOrId(string span, out GuidOrId guidOrId)
+    {
+        return TryParseGuidOrId(span.AsSpan(), span, out guidOrId);
+    }
+
+    public static bool TryParseGuidOrId(ReadOnlySpan<char> span, string? stringValue, out GuidOrId guidOrId, string assetCategory = "NONE")
+    {
+        if (span.Length == 1 && span[0] == '0')
+        {
+            guidOrId = GuidOrId.Empty;
+            return true;
+        }
+
+        guidOrId = GuidOrId.Empty;
+
+        if (span.IsEmpty)
+            return false;
+
+        int index = span.IndexOf(':');
+        if (index > 0)
+        {
+            if (!AssetCategory.TryParse(span.Slice(0, index), out EnumSpecTypeValue category))
+            {
+                return false;
+            }
+
+            if (category == AssetCategory.None)
+            {
+                guidOrId = GuidOrId.Empty;
+                return true;
+            }
+
+            if (index < span.Length - 1 && ushort.TryParse(span.Slice(index + 1).ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort id))
+            {
+                guidOrId = id == 0 ? GuidOrId.Empty : new GuidOrId(id, category);
+                return true;
+            }
+        }
+        else
+        {
+            if (AssetCategory.TryParse(assetCategory, out EnumSpecTypeValue category)
+                && category != AssetCategory.None
+                && ushort.TryParse(stringValue ?? span.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort id))
+            {
+                guidOrId = id == 0 ? GuidOrId.Empty : new GuidOrId(id, category);
+                return true;
+            }
+
+            if (Guid.TryParse(stringValue ?? span.ToString(), out Guid guid))
+            {
+                guidOrId = new GuidOrId(guid);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static bool TryParseItemString(ReadOnlySpan<char> input, string? stringInput, out GuidOrId assetRef, out int amount, GuidOrId assetContext)
+    {
+        // this
+        // this x 2
+        // 15
+        // 15 x 3
+        assetRef = GuidOrId.Empty;
+        amount = 1;
+
+        ReadOnlySpan<char> itemString = input;
+        int index = input.IndexOf('x');
+        if (index >= 0)
+        {
+            itemString = input.Slice(0, index);
+            if (index == input.Length - 1)
+            {
+                return false;
+            }
+
+            string number = input.Slice(index + 1).ToString();
+            if (!int.TryParse(number, NumberStyles.Integer, CultureInfo.InvariantCulture, out amount))
+            {
+                return false;
+            }
+
+            amount = Math.Max(amount, 1);
+        }
+        else
+        {
+            index = input.IndexOf('X');
+            if (index >= 0)
+            {
+                return false;
+            }
+        }
+
+        if (TryParseGuidOrId(itemString, itemString.Length == input.Length ? stringInput : null, out assetRef, "ITEM"))
+        {
+            return true;
+        }
+
+        if (!itemString.Trim().Equals("this".AsSpan(), StringComparison.InvariantCultureIgnoreCase))
+        {
+            return false;
+        }
+
+        assetRef = assetContext;
         return true;
     }
 }

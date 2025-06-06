@@ -13,11 +13,14 @@ public sealed class ListSpecPropertyType<TElementType> :
     IElementTypeSpecPropertyType
     where TElementType : IEquatable<TElementType>
 {
+
+    public bool AllowSingle { get; }
+
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
-    public override string Type => "List";
+    public override string Type => AllowSingle ? "ListOrSingle" : "List";
 
     /// <inheritdoc />
     public Type ValueType => typeof(EquatableArray<TElementType>);
@@ -29,10 +32,11 @@ public sealed class ListSpecPropertyType<TElementType> :
 
     string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
 
-    public ListSpecPropertyType(ISpecPropertyType<TElementType> innerType)
+    public ListSpecPropertyType(ISpecPropertyType<TElementType> innerType, bool allowSingle)
     {
         InnerType = innerType;
         DisplayName = "List of " + innerType.DisplayName;
+        AllowSingle = allowSingle;
     }
 
     /// <inheritdoc />
@@ -58,7 +62,17 @@ public sealed class ListSpecPropertyType<TElementType> :
 
         if (parse.Node is not AssetFileListValueNode listNode)
         {
-            return FailedToParse(in parse, out value);
+            if (!AllowSingle)
+                return FailedToParse(in parse, out value);
+
+            if (!TryParseElement(parse.Node, parse.Parent, in parse, out TElementType element))
+            {
+                value = EquatableArray<TElementType>.Empty;
+                return false;
+            }
+
+            value = new EquatableArray<TElementType>(new TElementType[] { element });
+            return true;
         }
 
         EquatableArray<TElementType> eqArray = new EquatableArray<TElementType>(listNode.Elements.Count);
@@ -67,13 +81,7 @@ public sealed class ListSpecPropertyType<TElementType> :
         int index = 0;
         foreach (AssetFileValueNode node in listNode.Elements)
         {
-            SpecPropertyTypeParseContext context = parse with
-            {
-                Node = node,
-                Parent = listNode
-            };
-
-            if (!InnerType.TryParseValue(in context, out TElementType? element) || element == null)
+            if (!TryParseElement(node, listNode, in parse, out TElementType element))
             {
                 value = eqArray;
                 parsedAll = false;
@@ -82,6 +90,7 @@ public sealed class ListSpecPropertyType<TElementType> :
             {
                 eqArray.Array[index] = element;
             }
+
             ++index;
         }
 
@@ -92,6 +101,17 @@ public sealed class ListSpecPropertyType<TElementType> :
 
         value = eqArray;
         return parsedAll;
+    }
+
+    private bool TryParseElement(AssetFileValueNode node, AssetFileNode? parent, in SpecPropertyTypeParseContext parse, out TElementType element)
+    {
+        SpecPropertyTypeParseContext context = parse with
+        {
+            Node = node,
+            Parent = parent
+        };
+
+        return InnerType.TryParseValue(in context, out element!) && element != null;
     }
 
     /// <inheritdoc />
@@ -111,14 +131,16 @@ internal sealed class UnresolvedListSpecPropertyType :
 {
     public ISecondPassSpecPropertyType InnerType { get; }
 
+    public bool AllowSingle { get; }
     public string DisplayName => "List";
-    public string Type => "List";
+    public string Type => AllowSingle ? "ListOrSingle" : "List";
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
     public Type ValueType => throw new NotSupportedException();
 
-    public UnresolvedListSpecPropertyType(ISecondPassSpecPropertyType innerType)
+    public UnresolvedListSpecPropertyType(ISecondPassSpecPropertyType innerType, bool allowSingle)
     {
         InnerType = innerType ?? throw new ArgumentNullException(nameof(innerType));
+        AllowSingle = allowSingle;
     }
 
     public bool Equals(UnresolvedListSpecPropertyType? other) => other != null && InnerType.Equals(other.InnerType);
@@ -142,6 +164,6 @@ internal sealed class UnresolvedListSpecPropertyType :
 
     public ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile)
     {
-        return KnownTypes.List(InnerType.Transform(property, database, assetFile));
+        return KnownTypes.List(InnerType.Transform(property, database, assetFile), AllowSingle);
     }
 }

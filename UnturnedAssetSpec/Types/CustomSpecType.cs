@@ -21,7 +21,12 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
     public required SpecProperty[] Properties { get; set; }
     public required SpecProperty[] LocalizationProperties { get; set; }
     public required string? Docs { get; init; }
-    public required bool IsLegacyExpandedType { get; init; }
+    public bool IsLegacyExpandedType { get; init; }
+
+    /// <summary>
+    /// A type used to parse this object as a string value.
+    /// </summary>
+    public string? StringParsableType { get; init; }
     public required OneOrMore<KeyValuePair<string, object?>> ExtendedData { get; init; }
 
     public Type ValueType => typeof(CustomSpecTypeInstance);
@@ -72,6 +77,46 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
 
         if (parse.Node is not AssetFileDictionaryValueNode dictionary || options == CustomSpecTypeParseOptions.Legacy && parse.BaseKey == null)
         {
+            if (!string.IsNullOrEmpty(StringParsableType) && parse.Node is AssetFileStringValueNode stringValue)
+            {
+                ISpecPropertyType? type = KnownTypes.GetType(StringParsableType!, null, OneOrMore<string>.Null, resolvedOnly: true);
+                if (type == null)
+                {
+                    if (parse.HasDiagnostics)
+                    {
+                        parse.Log(new DatDiagnosticMessage
+                        {
+                            Diagnostic = DatDiagnostics.UNT2005,
+                            Message = string.Format(DiagnosticResources.UNT2005, StringParsableType),
+                            Range = stringValue.Range
+                        });
+                    }
+                }
+                else if (!type.TryParseValue(in parse, out ISpecDynamicValue v))
+                {
+                    return false;
+                }
+                else if (v is not CustomSpecTypeInstance i || !i.Type.Equals(this))
+                {
+                    if (parse.HasDiagnostics)
+                    {
+                        parse.Log(new DatDiagnosticMessage
+                        {
+                            Diagnostic = DatDiagnostics.UNT2004,
+                            Message = string.Format(DiagnosticResources.UNT2004, stringValue.Value, StringParsableType),
+                            Range = stringValue.Range
+                        });
+                    }
+
+                    return false;
+                }
+                else
+                {
+                    value = i;
+                    return true;
+                }
+            }
+
             if (parse.HasDiagnostics)
             {
                 parse.Log(new DatDiagnosticMessage

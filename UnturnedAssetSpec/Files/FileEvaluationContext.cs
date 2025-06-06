@@ -13,11 +13,12 @@ public readonly struct FileEvaluationContext
     public readonly ISpecType This;
     public readonly AssetFileTree File;
     public readonly AssetFileType FileType;
+    public readonly IWorkspaceFile OpenedFile;
     public readonly IWorkspaceEnvironment Workspace;
     public readonly InstallationEnvironment Environment;
     public readonly IAssetSpecDatabase Information;
 
-    public FileEvaluationContext(SpecProperty self, ISpecType @this, AssetFileTree file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information)
+    public FileEvaluationContext(SpecProperty self, ISpecType @this, AssetFileTree file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information, IWorkspaceFile openedFile)
     {
         Self = self;
         This = @this;
@@ -26,11 +27,13 @@ public readonly struct FileEvaluationContext
         Workspace = workspace;
         Environment = environment;
         Information = information;
+        OpenedFile = openedFile;
     }
 
     public FileEvaluationContext(in FileEvaluationContext self, SpecProperty newProperty)
     {
         Self = newProperty;
+        OpenedFile = self.OpenedFile;
         This = newProperty.Owner;
         File = self.File;
         FileType = self.FileType;
@@ -39,11 +42,12 @@ public readonly struct FileEvaluationContext
         Information = self.Information;
     }
 
-    public FileEvaluationContext(in FileEvaluationContext self, AssetFileTree file)
+    public FileEvaluationContext(in FileEvaluationContext self, AssetFileTree file, IWorkspaceFile openedFile)
     {
         Self = null!;
         This = null!;
         File = file;
+        OpenedFile = openedFile;
         FileType = AssetFileType.FromFile(file, self.Information);
         Workspace = self.Workspace;
         Environment = self.Environment;

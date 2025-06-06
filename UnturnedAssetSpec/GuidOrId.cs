@@ -1,4 +1,5 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -11,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data;
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 20)]
 [JsonConverter(typeof(GuidOrIdConverter))]
-public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable<GuidOrId>
+public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable<GuidOrId>, IEquatable<ushort>, IEquatable<Guid>
 {
     public static readonly GuidOrId Empty = default;
 
@@ -26,6 +27,12 @@ public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable
     /// </summary>
     [FieldOffset(0)]
     public readonly ushort Id;
+
+    /// <summary>
+    /// The <see cref="AssetCategory"/> of the <see cref="Id"/>.
+    /// </summary>
+    [FieldOffset(2)]
+    public readonly byte Category;
 
     /// <summary>
     /// Whether or not the value is a legacy ID.
@@ -49,14 +56,36 @@ public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable
         IsId = true;
     }
 
+    public GuidOrId(ushort id, in EnumSpecTypeValue category)
+    {
+        Id = id;
+        Category = (byte)category.Index;
+        IsId = true;
+    }
+
     /// <inheritdoc />
-    public override string ToString() => IsId ? Id.ToString(CultureInfo.InvariantCulture) : Guid.ToString("N");
+    public override string ToString()
+    {
+        if (!IsId)
+            return Guid.ToString("N");
+
+        if (Category == 0 || Category >= AssetCategory.TypeOf.Values.Length)
+            return Id.ToString(CultureInfo.InvariantCulture);
+
+        return $"{AssetCategory.TypeOf.Values[Category].Value}:{Id.ToString(CultureInfo.InvariantCulture)}";
+    }
 
     /// <inheritdoc />
     public int CompareTo(object? obj) => obj is GuidOrId i ? CompareTo(i) : 1;
 
     /// <inheritdoc />
-    public bool Equals(GuidOrId other) => IsId == other.IsId && (IsId ? Id == other.Id : Guid == other.Guid);
+    public bool Equals(GuidOrId other) => IsId == other.IsId && (IsId ? Id == other.Id && Category == other.Category : Guid == other.Guid);
+
+    public bool Equals(ushort id) => IsId && Id == id;
+
+    public bool Equals(ushort id, in EnumSpecTypeValue assetCategory) => IsId && Id == id && Category == assetCategory.Index;
+
+    public bool Equals(Guid guid) => !IsId && Guid == guid;
 
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is GuidOrId other && Equals(other);

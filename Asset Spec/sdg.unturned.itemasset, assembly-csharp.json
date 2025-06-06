@@ -41,6 +41,15 @@
             "Description": "The type of item to create.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#type-doc-data-eitemtype",
             "Variable": "type",
+            "Priority": 99
+        },
+        {
+            "Key": "Rarity",
+            "Type": "SDG.Unturned.EItemRarity, Assembly-CSharp",
+            "DefaultValue": "COMMON",
+            "Description": "Indicates how rare the item is, which influences it's name's color.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#rarity-doc-data-eitemrarity-common",
+            "Variable": "rarity",
             "Priority": 2
         },
         {
@@ -154,6 +163,7 @@
             "Type": "UInt8",
             "DefaultValue": 1,
             "Minimum": 1,
+            "Maximum": "@Count_Max",
             "Description": "Minimum number of items to spawn in a stackable item (like a magazine or ammo crate) when spawning naturally.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#count-min-uint8-1",
             "Variable": "countMin"
@@ -162,7 +172,7 @@
             "Key": "Count_Max",
             "Type": "UInt8",
             "DefaultValue": 1,
-            "Minimum": 1,
+            "Minimum": "@Count_Min",
             "Description": "Maximum number of items to spawn in a stackable item (like a magazine or ammo crate) when spawning naturally.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#count-max-uint8-1",
             "Variable": "countMax"
@@ -237,12 +247,13 @@
         {
             "Key": "Useable",
             "Type": "TypeOrEnum",
-            "ElementType": "SDG.Unturned.Useable, Assembly-CSharp",
-            "SpecialTypes": [ "SDG.Unturned.EUseableType, Assembly-CSharp" ],
+            "ElementType": "SDG.Unturned.EUseableType, Assembly-CSharp",
+            "SpecialTypes": [ "SDG.Unturned.Useable, Assembly-CSharp" ],
             "DefaultValue": null,
             "Description": "The type of Useable object to create when this item is equipped.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#useable-doc-item-asset-intro-euseabletype-none",
-            "Variable": "useable"
+            "Variable": "useable",
+            "Priority": 95
         },
         {
             "Key": "Can_Player_Equip",
@@ -310,6 +321,7 @@
         {
             "Key": "EquipablePrefab",
             "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "DefaultValue": null,
             "InclusiveWith":
             [
@@ -676,59 +688,29 @@
         },
         {
             "Key": "Blueprints",
-            "Type": "UInt8",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.Blueprint, Assembly-CSharp",
             "DefaultValue": 0,
-            "Description": "The number of blueprints defined for this item. Blueprints are crafting recipes that either consume this item or produce this item.",
+            "Description": "Blueprints defined for this item. Blueprints are crafting recipes that either consume this item or produce this item.",
             "Variable": "blueprints",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprints-int-0",
             "CountForRegexGroup": "item-blueprints"
         },
         {
-            "Key": "Blueprint_(\\d)",
-            "Type": "SDG.Unturned.Blueprint, Assembly-CSharp",
-            "Required": true,
-            "KeyIsRegex": true,
-            "KeyGroups":
-            [
-                {
-                    "Name": "item-blueprints",
-                    "RegexGroup": 1
-                }
-            ],
-            "Variable": "blueprints",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html",
-            "Description": "A blueprint defined for this item. Blueprints are crafting recipes that either consume this item or produce this item."
-        },
-        {
             "Key": "Actions",
-            "Type": "UInt8",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.Action, Assembly-CSharp",
             "DefaultValue": 0,
-            "Description": "The number of context menu actions defined for this item.",
+            "Description": "Context menu actions defined for this item.",
             "Variable": "actions",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#actions-int-0",
             "CountForRegexGroup": "item-actions"
         },
         {
-            "Key": "Action_(\\d)",
-            "Type": "SDG.Unturned.Action, Assembly-CSharp",
-            "Required": true,
-            "KeyIsRegex": true,
-            "KeyGroups":
-            [
-                {
-                    "Name": "item-actions",
-                    "RegexGroup": 1
-                }
-            ],
-            "Variable": "action",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html",
-            "Description": "A context menu actions defined for this item."
-        },
-        {
             "Key": "Add_Default_Actions",
             "Type": "Boolean",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#add-default-actions-bool",
-            "Description": "Actions will be automatically created relevant to the current item, such as repairing, salvaging, and refilling ammo. Defaults to true when @Actions is 0.",
+            "Description": "Actions will be automatically created relevant to the current item, such as repairing, salvaging, and refilling ammo.",
             "DefaultValue":
             [
                 {
@@ -736,14 +718,14 @@
                     [
                         {
                             "Variable": "Actions",
-                            "Operation": "eq",
-                            "Comparand": 0
+                            "Operation": "included",
+                            "Comparand": null
                         }
                     ],
-                    "Value": true
+                    "Value": false
                 },
                 {
-                    "Value": false
+                    "Value": true
                 }
             ]
         },
@@ -801,7 +783,7 @@
             "DefaultValue":
             [
                 {
-                    "And":
+                    "Or":
                     [
                         {
                             "Variable": "Type",
@@ -810,14 +792,14 @@
                         },
                         {
                             "Variable": "Delete_Empty",
-                            "Operation": "eq",
-                            "Comparand": false
+                            "Operation": "included",
+                            "Comparand": null
                         }
                     ],
-                    "Value": false
+                    "Value": true
                 },
                 {
-                    "Value": true
+                    "Value": false
                 }
             ],
             "ExclusiveWith": [ "Delete_Empty" ],
@@ -829,7 +811,7 @@
             "Key": "Delete_Empty",
             "Type": "Flag",
             "ExclusiveWith": [ "Should_Delete_At_Zero_Amount" ],
-            "DefaultValue": false,
+            "DefaultValue": "@Should_Delete_At_Zero_Amount",
             "InclusiveWith":
             [
                 {
@@ -867,7 +849,7 @@
             "DisplayName": "Blueprint Type",
             "Type": "SDG.Unturned.EBlueprintType, Assembly-CSharp",
             "Description": "Determines which tab the crafting recipe appears under in the inventory.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#eblueprinttype-enumeration",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#doc-item-asset-blueprints-eblueprinttype-enumeration",
             "Values":
             [
                 {
@@ -923,6 +905,27 @@
             ]
         },
         {
+            "DisplayName": "Blueprint Operation",
+            "Type": "SDG.Unturned.EBlueprintOperation, Assembly-CSharp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#doc-item-asset-blueprints-eblueprintoperation-enumeration",
+            "Description": "Controls what a blueprint does with input items.",
+            "Values":
+            [
+                {
+                    "Value": "None",
+                    "Description": "No special modification to input items."
+                },
+                {
+                    "Value": "RepairTargetItem",
+                    "Description": "Restore target input item to full quality."
+                },
+                {
+                    "Value": "FillTargetItem",
+                    "Description": "Transfer amount from input items to target item."
+                }
+            ]
+        },
+        {
             "DisplayName": "Slot Type",
             "Type": "SDG.Unturned.ESlotType, Assembly-CSharp",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eslottype.html#doc-data-eslottype",
@@ -959,16 +962,40 @@
         {
             "DisplayName": "Crafting Input Prioritization",
             "Type": "SDG.Unturned.ECraftingInputPrioritization, Assembly-CSharp",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supply-prioritization-enum",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#doc-item-asset-blueprints-inputitem-ecraftinginputprioritization-enumeration",
             "Values":
             [
                 {
                     "Value": "LowestAmount",
-                    "Description": "Consumes items with the lowest amount first."
+                    "Description": "Sort items with lowest 'amount' to front of list."
+                },
+                {
+                    "Value": "HighestAmount",
+                    "Description": "Sort items with highest 'amount' to front of list."
                 },
                 {
                     "Value": "LowestQuality",
-                    "Description": "Consumes items with the lowest quality first."
+                    "Description": "Sort items with lowest 'quality' to front of list."
+                },
+                {
+                    "Value": "HighestQuality",
+                    "Description": "Sort items with highest 'quality' to front of list."
+                }
+            ]
+        },
+        {
+            "DisplayName": "Crafting Input Counting Method",
+            "Type": "SDG.Unturned.ECraftingInputCountingMethod, Assembly-CSharp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#doc-item-asset-blueprints-inputitem-ecraftinginputcountingmethod-enumeration",
+            "Values":
+            [
+                {
+                    "Value": "TotalItems",
+                    "Description": "Sum up number of items found, ignoring amount."
+                },
+                {
+                    "Value": "TotalAmount",
+                    "Description": "Sum up 'amount' of each item, optionally counting zero as one."
                 }
             ]
         },
@@ -981,57 +1008,92 @@
                 {
                     "Value": "NONE",
                     "Casing": "None",
-                    "Description": "No special skills are required."
+                    "Description": "No special skills are required.",
+                    "Skill": "NONE"
                 },
                 {
                     "Value": "CRAFT",
                     "Casing": "Craft",
-                    "Description": "The 'Crafting' skill is required."
+                    "Description": "The 'Crafting' skill is required.",
+                    "Skill": "CRAFTING"
                 },
                 {
                     "Value": "COOK",
                     "Casing": "Cook",
-                    "Description": "The 'Cooking' skill is required."
+                    "Description": "The 'Cooking' skill is required.",
+                    "Skill": "COOKING"
                 },
                 {
                     "Value": "REPAIR",
                     "Casing": "Repair",
-                    "Description": "The 'Engineer' skill is required."
+                    "Description": "The 'Engineer' skill is required.",
+                    "Skill": "ENGINEER"
                 }
             ]
         },
         {
             "Type": "SDG.Unturned.BlueprintSupply, Assembly-CSharp",
             "DisplayName": "Blueprint Supply",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supplies-uint8-0",
-            "IsLegacyExpandedType": true,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html",
+            "StringParsableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.BlueprintSupplyStringParseableSpecPropertyType, UnturnedAssetSpec",
             "Properties":
             [
                 {
                     "Key": "ID",
-                    "ElementType": "ITEM",
-                    "Type": "BlueprintSupplyId",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supply-id-uint16",
-                    "Description": "The ID of the item that is consumed.",
+                    "Type": "BlueprintId",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#doc-item-asset-blueprints-inputitem-id",
+                    "Description": "The item that is consumed, or 'this' to refer to the current item.",
                     "Required": true,
                     "DefaultValue": 0,
                     "Variable": "ItemRef"
                 },
                 {
                     "Key": "Critical",
-                    "Type": "Flag",
+                    "Type": "Boolean",
                     "DefaultValue": false,
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supply-critical-flag",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#critical-bool-false",
                     "Description": "The player has to already have this supply to see the blueprint.",
                     "Variable": "isCritical"
                 },
                 {
-                    "Key": "AllowEmpty",
+                    "Key": "CountEmptyAsOne",
                     "Type": "Boolean",
                     "DefaultValue": false,
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supply-allowempty-bool-false",
-                    "Description": "Items with a zero amount like empty magazines are treated as having an amount of 1.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#countemptyasone-bool-false",
+                    "Description": "The player has to already have this supply to see the blueprint.",
                     "Variable": "ShouldCountEmptyAsOne"
+                },
+                {
+                    "Key": "AllowEmpty",
+                    "Type": "Boolean",
+                    "DefaultValue": 
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "CountEmptyAsOne",
+                                    "Operation": "eq",
+                                    "Comparand": true
+                                }
+                            ],
+                            "Value": true
+                        },
+                        {
+                            "Value": false
+                        }
+                    ],
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#allowempty-bool-false",
+                    "Description": "Items with a zero amount like empty magazines are treated as having an amount of 1.",
+                    "Variable": "ShouldIncludeEmptyAmount"
+                },
+                {
+                    "Key": "Delete",
+                    "Type": "Boolean",
+                    "DefaultValue": true,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#delete-bool-true",
+                    "Description": "The player has to already have this supply to see the blueprint.",
+                    "Variable": "ShouldConsume"
                 },
                 {
                     "Key": "Prioritization",
@@ -1042,9 +1104,9 @@
                             "And":
                             [
                                 {
-                                    "Variable": "SDG.Unturned.Blueprint, Assembly-CSharp::Blueprint_#(Self.KeyGroups[0])_Type",
+                                    "Variable": "SDG.Unturned.Blueprint, Assembly-CSharp::Operation",
                                     "Operation": "eq",
-                                    "Comparand": "AMMO"
+                                    "Comparand": "FillTargetItem"
                                 }
                             ],
                             "Value": "LowestAmount"
@@ -1053,40 +1115,84 @@
                             "Value": "LowestQuality"
                         }
                     ],
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supply-allowempty-bool-false",
-                    "Description": "Items with a zero amount like empty magazines are treated as having an amount of 1.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#prioritization-ecraftinginputprioritization",
+                    "Description": "Determines which items are consumed first when fulfilling blueprints.",
                     "Variable": "Prioritization"
                 },
                 {
+                    "Key": "CountingMethod",
+                    "Type": "SDG.Unturned.ECraftingInputCountingMethod, Assembly-CSharp",
+                    "DefaultValue":
+                    [
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "Delete",
+                                    "Operation": "eq",
+                                    "Comparand": false
+                                },
+                                {
+                                    "Variable": "SDG.Unturned.Blueprint, Assembly-CSharp::Operation",
+                                    "Operation": "neq",
+                                    "Comparand": "FillTargetItem"
+                                }
+                            ],
+                            "Value": "TotalItems"
+                        },
+                        {
+                            "Value": "TotalAmount"
+                        }
+                    ],
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#countingmethod-ecraftinginputcountingmethod",
+                    "Description": "Determines how the available amount of this input is calculated.",
+                    "Variable": "CountingMethod"
+                },
+                {
                     "Key": "Amount",
-                    "Type": "UInt8",
+                    "Type": "Int32",
                     "Minimum": 1,
                     "DefaultValue": 1,
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supply-amount-uint8-0",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#amount-uint8-1",
                     "Variable": "amount"
+                },
+                {
+                    "Key": "AllowFull",
+                    "Type": "Boolean",
+                    "DefaultValue": true,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#delete-bool-true",
+                    "Description": "If false, items with an 'amount' greather than or equal to their maximum amount are ignored. Otherwise, they are eligible (default).",
+                    "Variable": "ShouldExcludeFullAmount"
+                },
+                {
+                    "Key": "AllowMaxQuality",
+                    "Type": "Boolean",
+                    "DefaultValue": true,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#delete-bool-true",
+                    "Description": "If true, items with quality of 100% are eligible (default). Otherwise, they are ignored.",
+                    "Variable": "ShouldIncludeMaxQuality"
                 }
             ]
         },
         {
             "Type": "SDG.Unturned.BlueprintOutput, Assembly-CSharp",
             "DisplayName": "Blueprint Output",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-outputs-uint8-0",
-            "IsLegacyExpandedType": true,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_outputitem.html",
+            "StringParsableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.BlueprintOutputStringParseableSpecPropertyType, UnturnedAssetSpec",
             "Properties":
             [
                 {
                     "Key": "ID",
-                    "ElementType": "ITEM",
-                    "Type": "Id",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-output-id-uint16-0",
-                    "Description": "The ID of the item that is consumed.",
+                    "Type": "BlueprintId",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_outputitem.html#doc-item-asset-blueprints-outputitem-id",
+                    "Description": "The item that is produced, or 'this' to refer to the current item.",
                     "Required": true,
                     "DefaultValue": 0,
                     "Variable": "ItemRef"
                 },
                 {
                     "Key": "Amount",
-                    "Type": "UInt8",
+                    "Type": "Int32",
                     "Description": "Number of the items refernced by @ID to give the player upon crafting.",
                     "Minimum": 1,
                     "DefaultValue": 1,
@@ -1107,203 +1213,53 @@
             "Type": "SDG.Unturned.Blueprint, Assembly-CSharp",
             "DisplayName": "Blueprint",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html",
-            "IsLegacyExpandedType": true,
             "Properties":
             [
                 {
                     "Key": "Type",
                     "Type": "SDG.Unturned.EBlueprintType, Assembly-CSharp",
-                    "Description": "Determines which tab blueprint #(Self.KeyGroups[0]) appears under in the inventory. Use CategoryTags and Operation instead.",
-                    "Required": true,
+                    "Description": "Determines which tab this blueprint appears under in the inventory. Use CategoryTags and Operation instead.",
+                    "DefaultValue": "NONE",
                     "Deprecated": true,
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-type-eblueprinttype",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#type-eblueprinttype",
                     "Variable": "type"
                 },
                 {
-                    "Key": "Supplies",
-                    "Type": "UInt8",
-                    "DefaultValue": 1,
-                    "Minimum": 1,
-                    "Description": "Number of input items defined for blueprint #(Self.KeyGroups[0]).",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supplies-uint8-0",
+                    "Key": "InputItems",
+                    "Type": "ListOrSingle",
+                    "ElementType": "SDG.Unturned.BlueprintSupply, Assembly-CSharp",
+                    "DefaultValue": null,
+                    "Description": "Input items defined for this blueprint.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#inputitems-list-of-doc-item-asset-blueprints-inputitem",
                     "CountForRegexGroup": "item-blueprints-supplies",
                     "Variable": "supplies"
                 },
                 {
-                    "Key": "Supply_(\\d)",
-                    "Type": "SDG.Unturned.BlueprintSupply, Assembly-CSharp",
-                    "Required": true,
-                    "KeyIsRegex": true,
-                    "KeyGroups":
-                    [
-                        {
-                            "Name": "item-blueprints-supplies",
-                            "RegexGroup": 1
-                        }
-                    ],
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supply-id-uint16",
-                    "Description": "An input item defined for blueprint #(Self.KeyGroups[0]).",
-                    "Variable": "supplies"
-                },
-                {
-                    "Key": "Ouptuts",
-                    "Type": "UInt8",
-                    "DefaultValue": 0,
-                    "Minimum": 1,
-                    "Description": "Number of outputs defined for blueprint #(Self.KeyGroups[0]). If @Outputs is 0, a legacy definition using @Product and @Products is expected.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supplies-uint8-0",
+                    "Key": "OutputItems",
+                    "Type": "ListOrSingle",
+                    "ElementType": "SDG.Unturned.BlueprintOutput, Assembly-CSharp",
+                    "DefaultValue": null,
+                    "Description": "Output items defined for this blueprint.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#outputitems-list-of-doc-item-asset-blueprints-outputitem",
                     "CountForRegexGroup": "item-blueprints-outputs",
-                    "InclusiveWith":
-                    [
-                        {
-                            "Key": "Product",
-                            "Condition":
-                            {
-                                "Variable": "#Self.Value",
-                                "Operation": "eq",
-                                "Comparand": 0
-                            }
-                        }
-                    ],
-                    "ExclusiveWith":
-                    [
-                        {
-                            "Key": "Product",
-                            "Condition":
-                            {
-                                "Variable": "#Self.Value",
-                                "Operation": "neq",
-                                "Comparand": 0
-                            }
-                        }
-                    ],
                     "Variable": "outputs"
                 },
                 {
-                    "Key": "Output_(\\d)",
-                    "Type": "SDG.Unturned.BlueprintOutput, Assembly-CSharp",
-                    "Required": true,
-                    "KeyIsRegex": true,
-                    "KeyGroups":
-                    [
-                        {
-                            "Name": "item-blueprints-outputs",
-                            "RegexGroup": 1
-                        }
-                    ],
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-supply-id-uint16",
-                    "Description": "An output item defined for blueprint #(Self.KeyGroups[0]).",
-                    "Variable": "outputs"
+                    "Key": "Effect",
+                    "Type": "BcAssetReference",
+                    "ElementType": "EFFECT",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "Reference to an effect that will be spawned when this blueprint is crafted.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#effect-asset-pointer-to-doc-assets-effect",
+                    "Variable": "effectAssetRef"
                 },
                 {
-                    "Key": "Product",
-                    "Type": "Id",
-                    "ElementType": "ITEM",
-                    "DefaultValue": "@SDG.Unturned.Asset, Assembly-CSharp::ID",
-                    "Except": [ 0 ],
-                    "Description": "Output item for blueprint #(Self.KeyGroups[0]).",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-product-uint16",
-                    "Variable": "id",
-                    "ExclusiveWith":
-                    [
-                        {
-                            "Key": "Outputs",
-                            "Condition":
-                            {
-                                "Variable": "Outputs",
-                                "Operation": "gt",
-                                "Comparand": 0
-                            }
-                        }
-                    ]
-                },
-                {
-                    "Key": "Products",
-                    "Type": "UInt8",
-                    "DefaultValue": 1,
-                    "Minimum": 1,
-                    "Description": "Number of the output items defined in @Product to give upon crafting blueprint #(Self.KeyGroups[0]).",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-products-uint8-1",
-                    "Variable": "amount",
-                    "ExclusiveWith":
-                    [
-                        {
-                            "Key": "Outputs",
-                            "Condition":
-                            {
-                                "Variable": "Outputs",
-                                "Operation": "gt",
-                                "Comparand": 0
-                            }
-                        }
-                    ]
-                },
-                {
-                    "Key": "Origin",
-                    "Type": "SDG.Unturned.EItemOrigin, Assembly-CSharp",
-                    "DefaultValue": "CRAFT",
-                    "Description": "Origin of the items given, which determines how full the item is.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-origin-doc-data-eitemorigin-craft",
-                    "Variable": "origin",
-                    "ExclusiveWith":
-                    [
-                        {
-                            "Key": "Outputs",
-                            "Condition":
-                            {
-                                "Variable": "Outputs",
-                                "Operation": "gt",
-                                "Comparand": 0
-                            }
-                        }
-                    ]
-                },
-                {
-                    "Key": "Tool",
-                    "Type": "Id",
-                    "ElementType": "ITEM",
-                    "DefaultValue": 0,
-                    "Description": "ID of an item that must be present in the recipe but not consumed, such as a saw. Should use ShouldConsume=false instead.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-tool-uint16-0",
-                    "Deprecated": true,
-                    "Variable": "tool"
-                },
-                {
-                    "Key": "Tool_Critical",
-                    "Type": "Flag",
-                    "DefaultValue": false,
-                    "Description": "The player has to already have this tool to see blueprint #(Self.KeyGroups[0]). Should use Critical=true instead.",
-                    "Deprecated": true,
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-tool-critical-flag",
-                    "Variable": "toolCritical",
-                    "InclusiveWith":
-                    [
-                        {
-                            "Key": "Tool",
-                            "Condition":
-                            {
-                                "Variable": "Tool",
-                                "Operation": "neq",
-                                "Comparand": 0
-                            }
-                        }
-                    ]
-                },
-                {
-                    "Key": "Build",
-                    "Type": "GuidOrId",
-                    "DefaultValue": 0,
-                    "Description": "Reference to an effect that will be spawned when blueprint #(Self.KeyGroups[0]) is crafted.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-build-doc-data-guid-or-uint16",
-                    "Variable": "BuildEffectGuid"
-                },
-                {
-                    "Key": "Level",
+                    "Key": "Skill_Level",
                     "Type": "SkillLevel",
                     "DefaultValue": 0,
                     "SpecialTypes": [ "Skill" ],
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-level-uint8-0",
-                    "Description": "The level of @Skill needed to craft blueprint #(Self.KeyGroups[0]).",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#skill-level-int32-0",
+                    "Description": "The level of @Skill needed to craft this blueprint.",
                     "Variable": "level",
                     "InclusiveWith":
                     [
@@ -1320,24 +1276,24 @@
                 },
                 {
                     "Key": "Skill",
-                    "Type": "SDG.Unturned.EBlueprintSkill, Assembly-CSharp",
+                    "Type": "BlueprintSkill",
                     "DefaultValue": "NONE",
                     "Required":
                     {
-                        "Variable": "Level",
+                        "Variable": "Skill_Level",
                         "Operation": "gt",
                         "Comparand": 0
                     },
-                    "Variable": "skill",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-skill-eblueprintskill-none",
-                    "Description": "The type of skill needed to craft blueprint #(Self.KeyGroups[0]) with a level of @Level.",
+                    "Variable": "SkillIndex",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#skill-eblueprintskill-none",
+                    "Description": "The type of skill needed to craft this blueprint with a level of @Skill_Level.",
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Level",
+                            "Key": "Skill_Level",
                             "Condition":
                             {
-                                "Variable": "Level",
+                                "Variable": "Skill_Level",
                                 "Operation": "gt",
                                 "Comparand": 0
                             }
@@ -1345,65 +1301,25 @@
                     ]
                 },
                 {
-                    "Key": "State_Transfer",
-                    "Type": "Flag",
+                    "Key": "StateTransfer",
+                    "Type": "Boolean",
                     "DefaultValue": false,
                     "Variable": "transferState",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-state-transfer-flag",
-                    "Description": "Transfers special states of some items to the output, like fuel level, gun info, amount, quality, etc.",
-                    "ExclusiveWith":
-                    [
-                        {
-                            "Key": "Type",
-                            "Condition":
-                            {
-                                "Or":
-                                [
-                                    {
-                                        "Variable": "Type",
-                                        "Operation": "eq",
-                                        "Comparand": "AMMO"
-                                    },
-                                    {
-                                        "Variable": "Type",
-                                        "Operation": "eq",
-                                        "Comparand": "REPAIR"
-                                    }
-                                ],
-                                "Value": true
-                            }
-                        }
-                    ]
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#statetransfer-bool-false",
+                    "Description": "Transfers special states of some items to the output, like fuel level, gun info, amount, quality, etc."
                 },
                 {
-                    "Key": "State_Transfer_Delete_Attachments",
+                    "Key": "StateTransfer_DeleteAttachments",
                     "Type": "Boolean",
                     "DefaultValue": false,
                     "Variable": "withoutAttachments",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-state-transfer-delete-attachments-bool-false",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#statetransfer-deleteattachments-bool-false",
                     "Description": "Prevents attachments from being transferred when @State_Transfer is enabled.",
-                    "InclusiveWith": [ "State_Transfer" ],
-                    "ExclusiveWith":
+                    "InclusiveWith":
                     [
                         {
-                            "Key": "Type",
-                            "Condition":
-                            {
-                                "Or":
-                                [
-                                    {
-                                        "Variable": "Type",
-                                        "Operation": "eq",
-                                        "Comparand": "AMMO"
-                                    },
-                                    {
-                                        "Variable": "Type",
-                                        "Operation": "eq",
-                                        "Comparand": "REPAIR"
-                                    }
-                                ],
-                                "Value": true
-                            }
+                            "Key": "StateTransfer",
+                            "Value": true
                         }
                     ]
                 },
@@ -1412,14 +1328,14 @@
                     "Type": "MapName",
                     "DefaultValue": null,
                     "Variable": "map",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-map-string",
-                    "Description": "A map name where blueprint #(Self.KeyGroups[0]) will only be visible on. Ignored if left blank."
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#map-string",
+                    "Description": "A map name where this blueprint will only be visible on. Ignored if left blank."
                 },
                 {
                     "Key": "Conditions",
                     "Type": "LegacyCompatibleList",
                     "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                    "Description": "Conditions that must be met for blueprint #(Self.KeyGroups[0]) to be visible and craftable.",
+                    "Description": "Conditions that must be met for this blueprint to be visible and craftable.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "questConditionsList",
                     "CountForRegexGroup": "item-blueprints-conditions"
@@ -1428,7 +1344,7 @@
                     "Key": "Rewards",
                     "Type": "LegacyCompatibleList",
                     "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                    "Description": "Rewards applied after crafting blueprint #(Self.KeyGroups[0]).",
+                    "Description": "Rewards applied after crafting this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "questRewardsList",
                     "CountForRegexGroup": "item-blueprints-rewards"
@@ -1438,8 +1354,226 @@
                     "Type": "Boolean",
                     "DefaultValue": true,
                     "Variable": "canBeVisibleWhenSearchedWithoutRequiredItems",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-searchable-bool-true",
-                    "Description": "Used to make blueprints #(Self.KeyGroups[0]) not visible by search when missing critical items."
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#searchable-bool-true",
+                    "Description": "Used to make this blueprint not visible by search when missing critical items."
+                },
+                {
+                    "Key": "VisibleWithUnmetConditions",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Variable": "CanBeVisibleWithUnmetConditions",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#visiblewithunmetconditions-bool-false",
+                    "Description": "Makes this blueprint visible in the crafting menu even when conditions aren't met."
+                },
+                {
+                    "Key": "Name",
+                    "Type": "String",
+                    "DefaultValue": null,
+                    "Variable": "Name",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#name-string",
+                    "Description": "Case-sensitive unique identifier for this blueprint. Used to reference blueprints from other assets or options, such as @(SDG.Unturned.ItemAsset, Assembly-CSharp::Actions)."
+                },
+                {
+                    "Key": "RequiresNearbyCraftingTags",
+                    "Type": "List",
+                    "ElementType": "AssetReference",
+                    "SpecialTypes": [ "SDG.Unturned.TagAsset, Assembly-CSharp" ],
+                    "IncludeedDefaultValue": null,
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "RequiresHeat",
+                                    "Operation": "eq",
+                                    "Comparand": true
+                                }
+                            ],
+                            "Value": [ "20f30322bbcc4b01a4f116d22b24c21a" ]
+                        },
+                        {
+                            "Value": null
+                        }
+                    ],
+                    "Variable": "RequiresNearbyCraftingTags",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#requiresnearbycraftingtags-list-of-asset-pointer-to-doc-assets-tag",
+                    "Description": "List of tags that all need to be available nearby to craft this blueprint."
+                },
+                {
+                    "Key": "TargetItem",
+                    "Type": "BlueprintSupplyIdString",
+                    "DefaultValue": "@SDG.Unturned.Asset::GUID",
+                    "Description": "The item that gets repaired or filled, defaulting to the item this blueprint is defined in.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#operation-eblueprintoperation-none",
+                    "Variable": "TargetItem"
+                },
+                {
+                    "Key": "CategoryTag",
+                    "Type": "AssetReference",
+                    "ElementType": "SDG.Unturned.TagAsset, Assembly-CSharp",
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "TOOL"
+                                }
+                            ],
+                            "Value": "ad1804b6945145f3b308738b0b8ea447"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "APPAREL"
+                                }
+                            ],
+                            "Value": "ebe755533bdd42d1871c3ac66b89530f"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "SUPPLY"
+                                }
+                            ],
+                            "Value": "d089feb7e43f40c5a7dfcefc36998cfb"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "GEAR"
+                                }
+                            ],
+                            "Value": "cdb2df24b76d4c6e9d8411c940d8337f"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "AMMO"
+                                }
+                            ],
+                            "Value": "d739926736374e5ba34b4ac6ffbb5c8f"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "BARRICADE"
+                                }
+                            ],
+                            "Value": "31a59b5fec3f4ec5b2887b1ce4acb029"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "STRUCTURE"
+                                }
+                            ],
+                            "Value": "71d9e182c18b4aad8e87778e4f621995"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "UTILITIES"
+                                }
+                            ],
+                            "Value": "bfac6026305f4737a95fd275ebff65a6"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "FURNITURE"
+                                }
+                            ],
+                            "Value": "b0c6cc0a8b4346be89aef697ecdb8e46"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "REPAIR"
+                                }
+                            ],
+                            "Value": "732ee6ffeb18418985cf4f9fde33dd11"
+                        },
+                        {
+                            "Value": "00000000000000000000000000000000"
+                        }
+                    ],
+                    "Description": "Determines which category this blueprint falls under.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#categorytag-asset-pointer-to-doc-assets-tag",
+                    "Variable": "_categoryTagRef"
+                },
+                {
+                    "Key": "RequiresHeat",
+                    "Type": "Boolean",
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Skill",
+                                    "Operation": "eq-i",
+                                    "Comparand": "COOKING"
+                                },
+                                {
+                                    "Variable": "Skill_Level",
+                                    "Operation": "gt",
+                                    "Comparand": 0
+                                }
+                            ],
+                            "Value": true
+                        },
+                        {
+                            "Value": false
+                        }
+                    ],
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "RequiresNearbyCraftingTags",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "RequiresNearbyCraftingTags",
+                                "Operation": "included",
+                                "Comparand": null
+                            }
+                        }
+                    ],
+                    "Deprecated": true,
+                    "Description": "If included and @RequiresNearbyCraftingTags is exlcuded, adds the heat tag to @RequiresNearbyCraftingTags.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#requiresnearbycraftingtags-list-of-asset-pointer-to-doc-assets-tag",
+                    "Variable": "TargetItem"
                 }
             ]
         },
@@ -1454,40 +1588,6 @@
                     "Casing": "Blueprint",
                     "Description": "An action that links to a defined blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#doc-item-asset-actions-action-blueprints"
-                }
-            ]
-        },
-        {
-            "Type": "SDG.Unturned.ActionBlueprint, Assembly-CSharp",
-            "DisplayName": "Action Blueprint Reference",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-index-uint8-0",
-            "IsLegacyExpandedType": true,
-            "Properties":
-            [
-                {
-                    "Key": "Index",
-                    "Type": "UInt8",
-                    "MaximumExclusive": "@$cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-index-uint8-0",
-                    "Description": "Index of the blueprint to reference in @($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).",
-                    "Required": true,
-                    "FileCrossRef": "SDG.Unturned.Action, Assembly-CSharp::Source",
-                    "InclusiveWith":
-                    [
-                        {
-                            "Key": "$cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprint_#(Self.Value)_Type",
-                            "Value": "*"
-                        }
-                    ],
-                    "Variable": "Index"
-                },
-                {
-                    "Key": "Link",
-                    "Type": "Flag",
-                    "DefaultValue": false,
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-link-flag",
-                    "Description": "Performing this action will take the player to the crafting menu instead of fully crafting the blueprint.",
-                    "Variable": "isLink"
                 }
             ]
         },
@@ -1507,99 +1607,91 @@
                     "Required": true
                 },
                 {
-                    "Key": "Blueprints",
-                    "Type": "UInt8",
-                    "DefaultValue": 0,
-                    "FileCrossRef": "Source",
-                    "Maximum": "@$cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprints-uint8-0",
-                    "Description": "Number of blueprints action #(Self.KeyGroups[0]) will reference.",
-                    "CountForRegexGroup": "item-action-blueprints"
+                    "Key": "BlueprintName",
+                    "Type": "String",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-name-string",
+                    "Description": "The @(SDG.Unturned.Blueprint, Assembly-CSharp::Name) of the blueprint this action references.",
+                    "Variable": "blueprintName",
+                    "Required": true
                 },
                 {
-                    "Key": "Blueprint_(\\d)",
-                    "Type": "SDG.Unturned.ActionBlueprint, Assembly-CSharp",
-                    "Required": true,
-                    "KeyIsRegex": true,
-                    "KeyGroups":
-                    [
-                        {
-                            "Name": "item-action-blueprints",
-                            "RegexGroup": 1
-                        }
-                    ],
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#doc-item-asset-actions-action-blueprint-index",
-                    "Description": "A blueprint action #(Self.KeyGroups[0]) will perform."
+                    "Key": "BlueprintOwner",
+                    "Type": "AssetReference",
+                    "DefaultValue": "@SDG.Unturned.Asset, Assembly-CSharp::GUID",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-source-uint16",
+                    "Description": "The asset this action's @BlueprintName is on, defaulting to this item.",
+                    "Variable": "blueprintOwnerRef"
                 },
                 {
-                    "Key": "Key",
+                    "Key": "BlueprintLink",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-link-flag",
+                    "Description": "Pressing this action will take the user to the crafting menu instead of instantly crafting the item.",
+                    "Variable": "isLink"
+                },
+                {
+                    "Key": "CommonTextId",
                     "Type": "ActionKey",
                     "DefaultValue": null,
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-key-string",
                     "Description": "The key of a pre-existing button name in the PlayerDashboardInventory.dat localization file.",
                     "Variable": "key",
-                    "ExclusiveWith": [ "Text", "Tooltip" ]
+                    "ExclusiveWith": [ "TextId", "TooltipId" ]
                 },
                 {
-                    "Key": "Text",
-                    "Type": "LocalizableString",
+                    "Key": "TextId",
+                    "Type": "LocalizableTargetString",
                     "DefaultValue": null,
                     "Required":
                     {
-                        "And":
+                        "Or":
                         [
                             {
-                                "Variable": "Key",
+                                "Variable": "CommonTextId",
                                 "Operation": "eq",
                                 "Comparand": null
                             },
                             {
-                                "Variable": "$local$::Text",
+                                "Variable": "CommonTextId",
                                 "Operation": "eq",
-                                "Comparand": null
+                                "Comparand": ""
                             }
                         ],
-                        "Value": null
+                        "Value": true
                     },
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-text-string",
-                    "Description": "Name of the button in the context menu for action #(Self.KeyGroups[0]).",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#doc-item-asset-actions-action-text",
+                    "Description": "Name of the button in the context menu for this action.",
                     "Variable": "text",
-                    "InclusiveWith": [ "Tooltip" ]
+                    "ExclusiveWith": [ "CommonTextId" ],
+                    "InclusiveWith": [ "TooltipId" ]
                 },
                 {
-                    "Key": "Tooltip",
-                    "Type": "LocalizableString",
+                    "Key": "TooltipId",
+                    "Type": "LocalizableTargetString",
                     "DefaultValue": null,
                     "Required":
                     {
-                        "And":
+                        "Or":
                         [
                             {
-                                "Variable": "Key",
+                                "Variable": "CommonTextId",
                                 "Operation": "eq",
                                 "Comparand": null
                             },
                             {
-                                "Variable": "$local$::Tooltip",
+                                "Variable": "CommonTextId",
                                 "Operation": "eq",
-                                "Comparand": null
+                                "Comparand": ""
                             }
                         ],
-                        "Value": null
+                        "Value": true
                     },
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-tooltip-string",
-                    "Description": "Text displayed when hovering over the button in the context menu for action #(Self.KeyGroups[0]).",
+                    "Description": "Text displayed when hovering over the button in the context menu for this action.",
                     "Variable": "tooltip",
-                    "InclusiveWith": [ "Tooltip" ]
-                },
-                {
-                    "Key": "Source",
-                    "Type": "Id",
-                    "ElementType": "ITEM",
-                    "DefaultValue": "@SDG.Unturned.Asset, Assembly-CSharp::ID",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-source-uint16",
-                    "Description": "The ID of the item action #(Self.KeyGroups[0])'s @Blueprints are referencing.",
-                    "Variable": "blueprintOwnerRef"
+                    "ExclusiveWith": [ "CommonTextId" ],
+                    "InclusiveWith": [ "TextId" ]
                 }
             ]
         },
@@ -1637,7 +1729,6 @@
                     "Value": "NONE",
                     "Casing": "None",
                     "Description": "No useable type.",
-                    "CorrespondingType": null,
                     "RequiredBaseType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
                 },
                 {
@@ -2109,6 +2200,44 @@
                     "Casing": "Vehicle_Paint_Tool",
                     "Description": "An item that can paint vehicles a specific color.",
                     "RequiredBaseType": "SDG.Unturned.ItemVehiclePaintToolAsset, Assembly-CSharp"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EItemRarity, Assembly-CSharp",
+            "DisplayName": "Item Rarity",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eitemrarity.html",
+            "Values":
+            [
+                {
+                    "Value": "COMMON",
+                    "Casing": "Common",
+                    "Description": "Corresponds to the 'Common' (white-colored) rarity."
+                },
+                {
+                    "Value": "UNCOMMON",
+                    "Casing": "Uncommon",
+                    "Description": "Corresponds to the 'Uncommon' (green-colored) rarity."
+                },
+                {
+                    "Value": "RARE",
+                    "Casing": "Rare",
+                    "Description": "Corresponds to the 'Rare' (blue-colored) rarity."
+                },
+                {
+                    "Value": "EPIC",
+                    "Casing": "Epic",
+                    "Description": "Corresponds to the 'Epic' (purple-colored) rarity."
+                },
+                {
+                    "Value": "LEGENDARY",
+                    "Casing": "Legendary",
+                    "Description": "Corresponds to the 'Legendary' (pink-colored) rarity."
+                },
+                {
+                    "Value": "MYTHICAL",
+                    "Casing": "Mythical",
+                    "Description": "Corresponds to the 'Mythical' (red-colored) rarity."
                 }
             ]
         }

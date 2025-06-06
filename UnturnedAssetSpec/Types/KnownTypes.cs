@@ -1,4 +1,3 @@
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
@@ -14,6 +13,7 @@ public static class KnownTypes
     {
         { "Flag", () => Flag },
         { "Boolean", () => Boolean },
+        { "BooleanOrFlag", () => BooleanOrFlag },
         { "FaceIndex", () => FaceIndex },
         { "BeardIndex", () => BeardIndex },
         { "HairIndex", () => HairIndex },
@@ -45,7 +45,8 @@ public static class KnownTypes
         { "NavId", () => NavId },
         { "SpawnpointId", () => SpawnpointId },
         { "FlagId", () => FlagId },
-        { "BlueprintSupplyId", () => BlueprintSupplyId },
+        { "BlueprintId", () => BlueprintId },
+        { "BlueprintIdString", () => BlueprintIdString },
         { "NPCAchievementId", () => NPCAchievementId },
         { "DateTime", () => DateTime },
         { "DateTimeOffset", () => DateTimeOffset },
@@ -63,7 +64,9 @@ public static class KnownTypes
         { "AssetBundleVersion", () => AssetBundleVersion },
         { "MapName", () => MapName },
         { "ActionKey", () => ActionKey },
-        { "LocalizableString", () => LocalizableString }
+        { "LocalizableString", () => LocalizableString },
+        { "Skill", () => Skill() },
+        { "BlueprintSkill", () => Skill(true, true) }
     };
 
     public static ISpecPropertyType? GetType(string knownType)
@@ -85,7 +88,7 @@ public static class KnownTypes
         return null;
     }
 
-    public static ISpecPropertyType? GetType(string knownType, SpecProperty property, string? elementType, OneOrMore<string> specialTypes, bool resolvedOnly = false)
+    public static ISpecPropertyType? GetType(string knownType, string? elementType, OneOrMore<string> specialTypes, bool resolvedOnly = false)
     {
         if (string.IsNullOrEmpty(knownType))
             return null;
@@ -113,6 +116,24 @@ public static class KnownTypes
         if (knownType.Equals("AssetReference", StringComparison.Ordinal))
         {
             return AssetReference(string.IsNullOrEmpty(elementType)
+                ? new QualifiedType(TypeHierarchy.AssetBaseType)
+                : new QualifiedType(elementType!),
+                specialTypes
+            );
+        }
+
+        if (knownType.Equals("BcAssetReference", StringComparison.Ordinal))
+        {
+            return BackwardsCompatibleAssetReference(string.IsNullOrEmpty(elementType)
+                ? new QualifiedType(TypeHierarchy.AssetBaseType)
+                : new QualifiedType(elementType!),
+                specialTypes
+            );
+        }
+
+        if (knownType.Equals("BcAssetReferenceString", StringComparison.Ordinal))
+        {
+            return BackwardsCompatibleAssetReferenceString(string.IsNullOrEmpty(elementType)
                 ? new QualifiedType(TypeHierarchy.AssetBaseType)
                 : new QualifiedType(elementType!),
                 specialTypes
@@ -190,23 +211,24 @@ public static class KnownTypes
             return CommaDelimitedString(
                 string.IsNullOrEmpty(elementType)
                     ? String
-                    : GetType(elementType!, property, elementType2, specialTypes.Remove(elementType2!)) ?? new UnresolvedSpecPropertyType(elementType!));
+                    : GetType(elementType!, elementType2, specialTypes.Remove(elementType2!)) ?? new UnresolvedSpecPropertyType(elementType!));
         }
 
-        if (knownType.Equals("List", StringComparison.Ordinal))
+        bool allowSingle = knownType.Equals("ListOrSingle", StringComparison.Ordinal);
+        if (allowSingle || knownType.Equals("List", StringComparison.Ordinal))
         {
             string? elementType2 = specialTypes.FirstOrDefault();
 
             ISpecPropertyType? resolvedElementType = string.IsNullOrEmpty(elementType)
                 ? String
-                : GetType(elementType!, property, elementType2, specialTypes.Remove(elementType2!), resolvedOnly);
+                : GetType(elementType!, elementType2, specialTypes.Remove(elementType2!), resolvedOnly);
 
             if (resolvedOnly && resolvedElementType == null)
             {
                 return null;
             }
 
-            return List(resolvedElementType ?? new UnresolvedSpecPropertyType(elementType!));
+            return List(resolvedElementType ?? new UnresolvedSpecPropertyType(elementType!), allowSingle);
         }
 
         if (knownType.Equals("LegacyCompatibleList", StringComparison.Ordinal))
@@ -227,6 +249,7 @@ public static class KnownTypes
     public static ISpecPropertyType<bool> Flag => FlagSpecPropertyType.Instance;
 
     public static ISpecPropertyType<bool> Boolean => BooleanSpecPropertyType.Instance;
+    public static ISpecPropertyType<bool> BooleanOrFlag => BooleanOrFlagSpecPropertyType.Instance;
 
     public static ISpecPropertyType<byte> FaceIndex => FaceIndexSpecPropertyType.Instance;
     public static ISpecPropertyType<byte> BeardIndex => BeardIndexSpecPropertyType.Instance;
@@ -273,6 +296,10 @@ public static class KnownTypes
         => new AssetReferenceSpecPropertyType(elementType, true, specialTypes);
     public static ISpecPropertyType<Guid> AssetReferenceString(QualifiedType elementType, OneOrMore<string> specialTypes = default)
         => new AssetReferenceSpecPropertyType(elementType, false, specialTypes);
+    public static ISpecPropertyType<GuidOrId> BackwardsCompatibleAssetReference(QualifiedType elementType, OneOrMore<string> specialTypes = default)
+        => new BackwardsCompatibleAssetReferenceSpecPropertyType(elementType, true, specialTypes);
+    public static ISpecPropertyType<GuidOrId> BackwardsCompatibleAssetReferenceString(QualifiedType elementType, OneOrMore<string> specialTypes = default)
+        => new BackwardsCompatibleAssetReferenceSpecPropertyType(elementType, false, specialTypes);
     public static ISpecPropertyType<BundleReference> MasterBundleReference(QualifiedType elementType)
         => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.MasterBundleReference);
     public static ISpecPropertyType<BundleReference> MasterBundleReferenceString(QualifiedType elementType)
@@ -301,7 +328,8 @@ public static class KnownTypes
 
     public static ISpecPropertyType<ushort> FlagId => FlagIdSpecPropertyType.Instance;
 
-    public static ISpecPropertyType<ushort> BlueprintSupplyId => BlueprintSupplyIdSpecPropertyType.Instance;
+    public static ISpecPropertyType<GuidOrId> BlueprintId => BlueprintIdSpecPropertyType.Instance;
+    public static ISpecPropertyType<GuidOrId> BlueprintIdString => BlueprintIdSpecPropertyType.StringInstance;
 
     public static ISpecPropertyType<string> NPCAchievementId => NPCAchievementIdSpecPropertyType.Instance;
 
@@ -323,21 +351,21 @@ public static class KnownTypes
     public static ISpecPropertyType<string> CommaDelimitedString(ISpecPropertyType innerType)
         => new CommaDelimitedStringSpecPropertyType(innerType ?? throw new ArgumentNullException(nameof(innerType)));
 
-    public static ISpecPropertyType<EquatableArray<TValue>> List<TValue>(ISpecPropertyType<TValue> innerType) where TValue : IEquatable<TValue>
-        => new ListSpecPropertyType<TValue>(innerType ?? throw new ArgumentNullException(nameof(innerType)));
+    public static ISpecPropertyType<EquatableArray<TValue>> List<TValue>(ISpecPropertyType<TValue> innerType, bool allowSingle) where TValue : IEquatable<TValue>
+        => new ListSpecPropertyType<TValue>(innerType ?? throw new ArgumentNullException(nameof(innerType)), allowSingle);
 
-    public static ISpecPropertyType List(ISpecPropertyType innerType)
+    public static ISpecPropertyType List(ISpecPropertyType innerType, bool allowSingle)
     {
         if (innerType == null)
             throw new ArgumentNullException(nameof(innerType));
 
         if (innerType is ISecondPassSpecPropertyType secondPassType)
         {
-            return new UnresolvedListSpecPropertyType(secondPassType);
+            return new UnresolvedListSpecPropertyType(secondPassType, allowSingle);
         }
 
         Type type = typeof(ListSpecPropertyType<>).MakeGenericType(innerType.ValueType);
-        return (ISpecPropertyType)Activator.CreateInstance(type, innerType);
+        return (ISpecPropertyType)Activator.CreateInstance(type, innerType, allowSingle);
     }
 
     public static ISpecPropertyType<string> MasterBundleName => MasterBundleNameSpecPropertyType.Instance;
@@ -349,6 +377,9 @@ public static class KnownTypes
 
     public static ISpecPropertyType<byte> SkillLevel(string skillsetOrPropertyName)
         => new SkillLevelSpecPropertyType(skillsetOrPropertyName);
+
+    public static ISpecPropertyType<string> Skill(bool allowStandardSkills = true, bool allowBlueprintSkills = false)
+        => new SkillSpecPropertyType(allowStandardSkills, allowBlueprintSkills);
 
     public static ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>> LegacyCompatibleList(ISpecType type)
         => new LegacyCompatibleListSpecPropertyType(type);

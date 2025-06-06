@@ -29,6 +29,13 @@ internal static class SpecDynamicEquationTreeValueHelpers
         return KnownTypes.Float64;
     }
 
+    public static ISpecPropertyType GetValueType(ISpecDynamicValue argument, SpecDynamicEquationTreeUnaryOperation operation)
+    {
+        // may use later
+        _ = operation;
+        return argument.ValueType ?? KnownTypes.Float64;
+    }
+
     private static ISpecPropertyType GetLargestInteger(ISpecPropertyType left, ISpecPropertyType right)
     {
         Type t0 = left.ValueType;
@@ -271,14 +278,14 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
 {
     private static readonly string[] OperationFunctionNames =
     [
-        "ADD",          // Add,
-        "SUB",          // Subtract,
-        "MUL",          // Multiply,
-        "DIV",          // Divide,
-        "MOD",          // Modulo,
-        "MIN",          // Minimum,
-        "MAX",          // Maximum,
-        "AVG",          // Average
+        "ADD",          // Add
+        "SUB",          // Subtract
+        "MUL",          // Multiply
+        "DIV",          // Divide
+        "MOD",          // Modulo
+        "MIN",          // Minimum
+        "MAX",          // Maximum
+        "AVG"           // Average
     ];
 
     public ISpecDynamicValue Left { get; }
@@ -402,10 +409,10 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
 
     public override void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
     {
-        writer.WriteStringValue($"={FunctionName}({Left} {Right})");
+        writer.WriteStringValue(ToString());
     }
 
-    public override string ToString() => $"{FunctionName}({Left} {Right})";
+    public override string ToString() => $"={FunctionName}({Left} {Right})";
 }
 
 public enum SpecDynamicEquationTreeBinaryOperation
@@ -418,4 +425,325 @@ public enum SpecDynamicEquationTreeBinaryOperation
     Minimum,
     Maximum,
     Average
+}
+
+
+public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
+{
+    private static readonly string[] OperationFunctionNames =
+    [
+        "ABS",          // Absolute
+        "ROUND",        // Round
+        "FLOOR",        // Floor
+        "CEIL"          // Ceiling
+    ];
+
+    public ISpecDynamicValue Argument { get; }
+    public SpecDynamicEquationTreeUnaryOperation Operation { get; }
+    public override string FunctionName { get; }
+
+    public SpecDynamicEquationTreeUnaryValue(ISpecDynamicValue argument, SpecDynamicEquationTreeUnaryOperation operation)
+        : base(SpecDynamicEquationTreeValueHelpers.GetValueType(argument, operation))
+    {
+        Argument = argument;
+        Operation = operation;
+        FunctionName = GetOperationName(operation);
+    }
+
+    public static bool TryParseOperation(ReadOnlySpan<char> span, out SpecDynamicEquationTreeUnaryOperation operation)
+    {
+        for (int i = 0; i < OperationFunctionNames.Length; ++i)
+        {
+            if (!span.Equals(OperationFunctionNames[i].AsSpan(), StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            operation = (SpecDynamicEquationTreeUnaryOperation)i;
+            return true;
+        }
+
+        operation = (SpecDynamicEquationTreeUnaryOperation)(-1);
+        return false;
+    }
+
+    public static string GetOperationName(SpecDynamicEquationTreeUnaryOperation operation)
+    {
+        return OperationFunctionNames[(int)operation];
+    }
+
+    public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull) where TValue : default
+    {
+        if (!TryGetArgumentValue(in ctx, 0, out TValue? argValue, out bool argIsNull))
+        {
+            value = default;
+            isNull = argIsNull;
+            return false;
+        }
+
+        if (argIsNull)
+        {
+            isNull = true;
+            value = default;
+            return true;
+        }
+
+        // none of the operations have any effect on unsigned integers at this point
+        if (typeof(TValue) == typeof(uint) || typeof(TValue) == typeof(ulong) || typeof(TValue) == typeof(byte) || typeof(TValue) == typeof(ushort))
+        {
+            value = argValue;
+            isNull = argIsNull;
+            return true;
+        }
+
+        if (typeof(TValue) == typeof(sbyte) || typeof(TValue) == typeof(short) || typeof(TValue) == typeof(int))
+        {
+            int argValueAsInt32;
+            if (typeof(TValue) == typeof(byte))
+            {
+                argValueAsInt32 = Unsafe.As<TValue, byte>(ref argValue!);
+            }
+            else if (typeof(TValue) == typeof(sbyte))
+            {
+                argValueAsInt32 = Unsafe.As<TValue, sbyte>(ref argValue!);
+            }
+            else if (typeof(TValue) == typeof(ushort))
+            {
+                argValueAsInt32 = Unsafe.As<TValue, ushort>(ref argValue!);
+            }
+            else if (typeof(TValue) == typeof(short))
+            {
+                argValueAsInt32 = Unsafe.As<TValue, short>(ref argValue!);
+            }
+            else
+            {
+                argValueAsInt32 = Unsafe.As<TValue, int>(ref argValue!);
+            }
+
+            int v = Operation switch
+            {
+                SpecDynamicEquationTreeUnaryOperation.Absolute => Math.Abs(argValueAsInt32),
+                _ => argValueAsInt32,
+            };
+
+            return SpecDynamicEquationTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
+        }
+
+        if (typeof(TValue) == typeof(long))
+        {
+            long argValueAsInt64 = Unsafe.As<TValue, long>(ref argValue!);
+
+            long v = Operation switch
+            {
+                SpecDynamicEquationTreeUnaryOperation.Absolute => Math.Abs(argValueAsInt64),
+                _ => argValueAsInt64,
+            };
+
+            return SpecDynamicEquationTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
+        }
+
+        if (typeof(TValue) == typeof(float) || typeof(TValue) == typeof(double))
+        {
+            double argValueAsDouble = typeof(TValue) == typeof(float)
+                ? Unsafe.As<TValue, float>(ref argValue!)
+                : Unsafe.As<TValue, double>(ref argValue!);
+
+            double v = Operation switch
+            {
+                SpecDynamicEquationTreeUnaryOperation.Absolute => Math.Abs(argValueAsDouble),
+                SpecDynamicEquationTreeUnaryOperation.Round => Math.Round(argValueAsDouble),
+                SpecDynamicEquationTreeUnaryOperation.Floor => Math.Floor(argValueAsDouble),
+                SpecDynamicEquationTreeUnaryOperation.Ceiling => Math.Ceiling(argValueAsDouble),
+                _ => argValueAsDouble,
+            };
+
+            return SpecDynamicEquationTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
+        }
+
+        if (typeof(TValue) == typeof(decimal))
+        {
+            decimal argValueAsDecimal = Unsafe.As<TValue, decimal>(ref argValue!);
+
+            decimal v = Operation switch
+            {
+                SpecDynamicEquationTreeUnaryOperation.Absolute => argValueAsDecimal < 0 ? -argValueAsDecimal : argValueAsDecimal,
+                SpecDynamicEquationTreeUnaryOperation.Round => decimal.Round(argValueAsDecimal),
+                SpecDynamicEquationTreeUnaryOperation.Floor => decimal.Floor(argValueAsDecimal),
+                SpecDynamicEquationTreeUnaryOperation.Ceiling => decimal.Ceiling(argValueAsDecimal),
+                _ => argValueAsDecimal,
+            };
+
+            return SpecDynamicEquationTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
+        }
+
+        if (typeof(TValue) == typeof(string))
+        {
+            string? str = Unsafe.As<TValue?, string?>(ref argValue);
+            if (str == null)
+            {
+                isNull = true;
+                value = default;
+                return true;
+            }
+
+            // unsigned integers aren't affected
+            if (ulong.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out ulong argValueAsUInt64))
+            {
+                value = argValue;
+                isNull = argIsNull;
+                return true;
+            }
+
+            if (long.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out long argValueAsInt64))
+            {
+                argValueAsInt64 = Operation switch
+                {
+                    SpecDynamicEquationTreeUnaryOperation.Absolute => Math.Abs(argValueAsInt64),
+                    _ => argValueAsInt64
+                };
+                return SpecDynamicEquationTreeValueHelpers.TryConvert(argValueAsInt64, argIsNull, out value, out isNull);
+            }
+
+            if (double.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out double argValueAsDouble))
+            {
+                argValueAsDouble = Operation switch
+                {
+                    SpecDynamicEquationTreeUnaryOperation.Absolute => Math.Abs(argValueAsDouble),
+                    SpecDynamicEquationTreeUnaryOperation.Round => Math.Round(argValueAsDouble),
+                    SpecDynamicEquationTreeUnaryOperation.Floor => Math.Floor(argValueAsDouble),
+                    SpecDynamicEquationTreeUnaryOperation.Ceiling => Math.Ceiling(argValueAsDouble),
+                    _ => argValueAsDouble,
+                };
+                return SpecDynamicEquationTreeValueHelpers.TryConvert(argValueAsDouble, argIsNull, out value, out isNull);
+            }
+        }
+
+        value = argValue;
+        isNull = argIsNull;
+        return true;
+    }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        Type? type = Argument.ValueType?.ValueType;
+
+        if (type == null)
+        {
+            if (!TryEvaluateValue(in ctx, out double val, out bool isNull))
+            {
+                return Argument.TryEvaluateValue(in ctx, out value);
+            }
+
+            value = isNull ? null : val;
+            return true;
+        }
+
+        if (type == typeof(double))
+        {
+            if (!TryEvaluateValue(in ctx, out double val, out bool isNull))
+            {
+                value = null;
+                return false;
+            }
+
+            value = isNull ? null : val;
+            return true;
+        }
+        if (type == typeof(int))
+        {
+            if (!TryEvaluateValue(in ctx, out int val, out bool isNull))
+            {
+                value = null;
+                return false;
+            }
+
+            value = isNull ? null : val;
+            return true;
+        }
+        if (type == typeof(float))
+        {
+            if (!TryEvaluateValue(in ctx, out float val, out bool isNull))
+            {
+                value = null;
+                return false;
+            }
+
+            value = isNull ? null : val;
+            return true;
+        }
+
+        // unsigned ints aren't affected by these operations
+        if (type == typeof(byte) || type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong))
+        {
+            return Argument.TryEvaluateValue(in ctx, out value);
+        }
+
+        if (type == typeof(sbyte))
+        {
+            if (!TryEvaluateValue(in ctx, out sbyte val, out bool isNull))
+            {
+                value = null;
+                return false;
+            }
+
+            value = isNull ? null : val;
+            return true;
+        }
+        if (type == typeof(short))
+        {
+            if (!TryEvaluateValue(in ctx, out short val, out bool isNull))
+            {
+                value = null;
+                return false;
+            }
+
+            value = isNull ? null : val;
+            return true;
+        }
+        if (type == typeof(long))
+        {
+            if (!TryEvaluateValue(in ctx, out long val, out bool isNull))
+            {
+                value = null;
+                return false;
+            }
+
+            value = isNull ? null : val;
+            return true;
+        }
+        if (type == typeof(decimal))
+        {
+            if (!TryEvaluateValue(in ctx, out decimal val, out bool isNull))
+            {
+                value = null;
+                return false;
+            }
+
+            value = isNull ? null : val;
+            return true;
+        }
+
+        return Argument.TryEvaluateValue(in ctx, out value);
+    }
+
+    public override ISpecDynamicValue GetArgument(int index)
+    {
+        if (index != 0)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
+        return Argument;
+    }
+
+    public override void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
+    {
+        writer.WriteStringValue(ToString());
+    }
+
+    public override string ToString() => $"={FunctionName}({Argument})";
+}
+
+public enum SpecDynamicEquationTreeUnaryOperation
+{
+    Absolute,
+    Round,
+    Floor,
+    Ceiling
 }

@@ -40,7 +40,382 @@
             "Required": true,
             "Variable": "build",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "Priority": 95
+        },
+        {
+            "Key": "Health",
+            "Type": "UInt16",
+            "Description": "This barricade's maximum health.",
+            "Variable": "health",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "DefaultValue": 0,
+            "Required": true,
+            "MinimumExclusive": 0,
             "Priority": 2
+        },
+        {
+            "Key": "Range",
+            "Type": "Float32",
+            "Description": "Maximum distance away the player can place the barricade.",
+            "Variable": "range",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "DefaultValue": 0,
+            "Required": true,
+            "Minimum": 0,
+            "Priority": 2
+        },
+        {
+            "Key": "Radius",
+            "Type": "Float32",
+            "Description": "Distance around the point where the player tries to place the barricade where it can be obstructed.",
+            "Variable": "radius",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "DefaultValue": 0,
+            "Required": true,
+            "Minimum": 0,
+            "Priority": 2
+        },
+        {
+            "Key": "Offset",
+            "Type": "Float32",
+            "Description": "Distance above the ground this barricade will be placed.",
+            "Variable": "offset",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "DefaultValue": 0,
+            "Priority": 2
+        },
+        {
+            "Key": "Explosion",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "SpecialTypes": [ "SDG.Unturned.VehicleAsset, Assembly-CSharp" ],
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "Effect played when this barricade is destroyed. If @Build is 'VEHICLE', this is the vehicle that will be spawned.",
+            "Variable": "explosionGuid",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "Priority": 1
+        },
+        {
+            "Key": "Can_Be_Damaged",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "If this barricade is damagable.",
+            "Variable": "canBeDamaged",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "Priority": 1
+        },
+        {
+            "Key": "Eligible_For_Pooling",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    {
+                        "Variable": "Build",
+                        "Operation": "eq",
+                        "Comparand": "BEACON"
+                    },
+                    "Value": false
+                },
+                {
+                    "Value": true
+                }
+            ],
+            "Description": "If this barricade can be pooled (reused).",
+            "Variable": "eligibleForPooling",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Locked",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that only the barricade's owner can interact with it.",
+            "Variable": "isLocked",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Vulnerable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this barricade can be damaged by weapons that don't have the @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Invulnerable) flag.",
+            "Variable": "isVulnerable",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Bypass_Claim",
+            "Type": "BooleanOrFlag",
+            "IncludedDefaultValue": true,
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Build",
+                            "Operation": "eq",
+                            "Comparand": "CLAIM"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Indicates that this barricade can be damaged by weapons that don't have the @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Invulnerable) flag.",
+            "Variable": "bypassClaim",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Allow_Placement_On_Vehicle",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Build",
+                            "Operation": "neq",
+                            "Comparand": "BED"
+                        },
+                        {
+                            "Variable": "Build",
+                            "Operation": "neq",
+                            "Comparand": "SENTRY"
+                        },
+                        {
+                            "Variable": "Build",
+                            "Operation": "neq",
+                            "Comparand": "SENTRY_FREEFORM"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Indicates that this barricade can be placed on vehicles.",
+            "Variable": "allowPlacementOnVehicle",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Unrepairable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this barricade can not be repaired by melee items such as the Blowtorch.",
+            "Variable": "isRepairable",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Proof_Explosion",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this barricade is immune to explosion damage.",
+            "Variable": "proofExplosion",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Unpickupable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this barricade can't be salvaged.",
+            "Variable": "isUnpickupable",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Bypass_Pickup_Ownership",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Build",
+                            "Operation": "eq",
+                            "Comparand": "CHARGE"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Allows this barricade to be salvaged by players other than the owner of this barricade.",
+            "Variable": "shouldBypassPickupOwnership",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Allow_Placement_Inside_Clip_Volumes",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Build",
+                            "Operation": "eq",
+                            "Comparand": "CHARGE"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Allows this barricade to be placed inside player clip volumes.",
+            "Variable": "AllowPlacementInsideClipVolumes",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Unsalvageable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this barricade will not drop items when salvaged.",
+            "Variable": "isSalvageable",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Salvage_Duration_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1,
+            "Description": "Multiplier for the amount of time it takes to salvage this barricade.",
+            "Variable": "salvageDurationMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Unsaveable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this barricade will not be saved when the world is saved.",
+            "Variable": "isSaveable",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Allow_Collision_While_Animating",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Indicates whether or not door colliders should remain enabled when animating.",
+            "Variable": "isSaveable",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Build",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Build",
+                                "Operation": "eq",
+                                "Comparand": "DOOR"
+                            },
+                            {
+                                "Variable": "Build",
+                                "Operation": "eq",
+                                "Comparand": "GATE"
+                            },
+                            {
+                                "Variable": "Build",
+                                "Operation": "eq",
+                                "Comparand": "SHUTTER"
+                            },
+                            {
+                                "Variable": "Build",
+                                "Operation": "eq",
+                                "Comparand": "HATCH"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Use_Water_Height_Transparent_Sort",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this barricade's material will be adjusted to properly sort when placed underwater, which is useful for transparent barricades.",
+            "Variable": "useWaterHeightTransparentSort",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "CanVehicleHookWhileAttached",
+            "Type": "Boolean",
+            "Aliases": [ "CanParentVehicleBePickedUp" ],
+            "DefaultValue": false,
+            "Description": "When true, allows towing vehicles (like the Skycrane) to pick up vehicles with this barricade (assuming all other barricades also have this set to true).",
+            "Variable": "CanParentVehicleBePickedUp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "Armor_Tier",
+            "Type": "SDG.Unturned.EArmorTier, Assembly-CSharp",
+            "IncludedDefaultValue": null,
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "#This.AssetName",
+                            "Operation": "contains",
+                            "Comparand": "Metal"
+                        }
+                    ],
+                    "Value": "HIGH"
+                },
+                {
+                    "Value": "LOW"
+                }
+            ],
+            "Description": "Indicates which armor multiplier this barricade uses from the gameplay configuration file.",
+            "Variable": "armorTier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
+        },
+        {
+            "Key": "RequiresHeatSourceCraftingTagConversion",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Enables adding crafting tag support to ovens, torches, and campfires by default.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Build",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Build",
+                                "Operation": "eq",
+                                "Comparand": "OVEN"
+                            },
+                            {
+                                "Variable": "Build",
+                                "Operation": "eq",
+                                "Comparand": "TORCH"
+                            },
+                            {
+                                "Variable": "Build",
+                                "Operation": "eq",
+                                "Comparand": "CAMPFIRE"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
         }
     ],
     "Types":

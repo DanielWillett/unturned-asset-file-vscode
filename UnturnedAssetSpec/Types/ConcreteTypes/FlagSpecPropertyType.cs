@@ -70,7 +70,7 @@ public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropert
             parse.Log(diagnostic);
         }
 
-        value = true;
+        value = parse.Node != null;
         return true;
     }
 }

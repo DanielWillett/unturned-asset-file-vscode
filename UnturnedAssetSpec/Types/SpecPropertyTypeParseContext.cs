@@ -53,4 +53,21 @@ public readonly ref struct SpecPropertyTypeParseContext
     {
         Diagnostics?.Add(message);
     }
+
+    public GuidOrId GetThisId()
+    {
+        if (File == null)
+            return GuidOrId.Empty;
+
+        Guid? guid = File.GetGuid();
+        if (guid.HasValue && guid.Value != Guid.Empty)
+            return new GuidOrId(guid.Value);
+
+        ushort? id = File.GetId();
+        if (id is null or 0)
+            return GuidOrId.Empty;
+
+        EnumSpecTypeValue category = File.GetCategory(Database);
+        return new GuidOrId(id.Value, in category);
+    }
 }

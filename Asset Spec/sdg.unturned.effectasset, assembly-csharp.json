@@ -18,6 +18,7 @@
         {
             "Key": "OneShotAudio",
             "Type": "AudioReference",
+            "DefaultValue": null,
             "Description": "Specify an instance of OneShotAudioParameters for playing this effect.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
             "Variable": "gore"
@@ -25,6 +26,7 @@
         {
             "Key": "Gore",
             "Type": "Flag",
+            "DefaultValue": false,
             "Description": "Prevents players with the gore option disabled from seeing particle emissions and splatter from this effect.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
             "Variable": "gore"
@@ -32,6 +34,7 @@
         {
             "Key": "Splatter",
             "Type": "UInt8",
+            "DefaultValue": 0,
             "Description": "Number of splatter variations available.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
             "Variable": "splatters",
@@ -40,6 +43,7 @@
         {
             "Key": "Splatters",
             "Type": "UInt8",
+            "DefaultValue": 0,
             "Description": "Number of splatters to spawn. This is multiplied by 8 when the player has the 'Splatterific' skill boost applied unless @Splatter_Liquid is true.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
             "Variable": "splatter"
@@ -47,6 +51,7 @@
         {
             "Key": "Splatter_Liquid",
             "Type": "Flag",
+            "DefaultValue": false,
             "Description": "The splatter will be visible when effects are disabled by settings, and direction will be randomized.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
             "Variable": "splatterLiquid"
@@ -54,6 +59,7 @@
         {
             "Key": "Splatter_Temperature",
             "Type": "SDG.Unturned.EPlayerTemperature, Assembly-CSharp",
+            "DefaultValue": "NONE",
             "Description": "The temperature effect created by the effect when it spawns. Players walking within range will be affected. The area of effect is based on the X-scale of the overall effect.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
             "Variable": "splatterTemperature"
@@ -128,7 +134,7 @@
         {
             "Key": "Splatter_Preload",
             "Type": "UInt8",
-            "DefaultValue": "=MUL(=DIV(@Splatters @Splatter) @Preload)",
+            "DefaultValue": "=MUL(=CEIL(=DIV(@Splatters @Splatter)) @Preload)",
             "IncludedDefaultValue": 0,
             "Description": "Number of splatter effects to cache and pool on startup. Note that @Preload has to be > 0 to preload splatters.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
@@ -137,7 +143,7 @@
         {
             "Key": "Blast",
             "Type": "GuidOrId",
-            "ElementType": "EFFECT",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
             "DefaultValue": 0,
             "Description": "The blast-mark effect to spawn when the effect is spawned. This is only displayed if the player has blast-marks enabled and has the deferred render mode selected.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
@@ -190,34 +196,42 @@
         {
             "Type": "SDG.Unturned.EPlayerTemperature, Assembly-CSharp",
             "DisplayName": "Temperature",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
             "Values":
             [
                 {
                     "Value": "FREEZING",
+                    "Casing": "Freezing",
                     "Description": "Damages the player up to 8 points depending on their clothes."
                 },
                 {
                     "Value": "COLD",
+                    "Casing": "Cold",
                     "Description": "Does not damage the player."
                 },
                 {
                     "Value": "WARM",
+                    "Casing": "Warm",
                     "Description": "Does not damage the player."
                 },
                 {
                     "Value": "BURNING",
+                    "Casing": "Burning",
                     "Description": "Damages the player by 10 points."
                 },
                 {
                     "Value": "NONE",
+                    "Casing": "None",
                     "Description": "Neutral temperature."
                 },
                 {
                     "Value": "COVERED",
+                    "Casing": "Covered",
                     "Description": "Sheltered from cold or warmth."
                 },
                 {
                     "Value": "ACID",
+                    "Casing": "Acid",
                     "Description": "Damages the player by 10 points."
                 }
             ]

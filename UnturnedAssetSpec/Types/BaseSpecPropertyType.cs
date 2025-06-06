@@ -53,6 +53,24 @@ public abstract class BaseSpecPropertyType<TValue>
         return false;
     }
 
+    protected bool MissingType(in SpecPropertyTypeParseContext parse, string type, out TValue? value)
+    {
+        if (parse.HasDiagnostics)
+        {
+            DatDiagnosticMessage message = new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2005,
+                Message = string.Format(DiagnosticResources.UNT2005, parse.BaseKey, type),
+                Range = parse.Parent?.Range ?? parse.Node?.Range ?? default
+            };
+
+            parse.Log(message);
+        }
+
+        value = default;
+        return false;
+    }
+
     protected bool FailedToParse(in SpecPropertyTypeParseContext parse, out TValue? value, AssetFileNode? node = null)
     {
         node ??= parse.Node;

@@ -82,6 +82,10 @@
                     "title": "True or false value."
                 },
                 {
+                    "const": "BooleanOrFlag",
+                    "title": "A flag unless the value is 'false', which overrides the flag being included."
+                },
+                {
                     "const": "Character",
                     "title": "A single UTF-16 character."
                 },
@@ -134,8 +138,16 @@
                     "title": "A Globally Unique Identifier (also called a UUID) referencing another asset."
                 },
                 {
+                    "const": "BcAssetReference",
+                    "title": "A backwards-compatible GUID or ID referencing another asset."
+                },
+                {
                     "const": "AssetReferenceString",
                     "title": "A Globally Unique Identifier (also called a UUID) referencing another asset."
+                },
+                {
+                    "const": "BcAssetReferenceString",
+                    "title": "A backwards-compatible GUID or ID referencing another asset."
                 },
                 {
                     "const": "ContentReference",
@@ -190,8 +202,8 @@
                     "title": "A flag short ID."
                 },
                 {
-                    "const": "BlueprintSupplyId",
-                    "title": "A short item ID, or 'this' (case insensitive) to reference the current item."
+                    "const": "BlueprintId",
+                    "title": "A backwards-compatible asset reference, or 'this' (case insensitive) to reference the current item."
                 },
                 {
                     "const": "NPCAchievementId",
@@ -246,6 +258,10 @@
                     "title": "A list of values."
                 },
                 {
+                    "const": "ListOrSingle",
+                    "title": "A list of values or one value."
+                },
+                {
                     "const": "MasterBundleName",
                     "title": "The name of a .masterbundle file."
                 },
@@ -270,12 +286,24 @@
                     "title": "A string that can be in the asset or localization file."
                 },
                 {
+                    "const": "LocalizableTargetString",
+                    "title": "A string that acts as the key for a localization property."
+                },
+                {
                     "const": "SkillLevel",
                     "title": "The level of a skill, where the special type is the skill name, the property containing the skill name, or two properties separated by a colon containing the speciality and skill indices."
                 },
                 {
                     "const": "LegacyCompatibleList",
                     "title": "List of a custom type, or a legacy list (such as a condition or reward list). The custom type should be entered as the ElementType."
+                },
+                {
+                    "const": "Skill",
+                    "title": "The name of a skill."
+                },
+                {
+                    "const": "SkillLevel",
+                    "title": "The name of a skill or blueprint skill."
                 }
             ]
         },
@@ -724,8 +752,7 @@
                                         },
                                         "required":
                                         [
-                                            "Key",
-                                            "Value"
+                                            "Key"
                                         ]
                                     },
                                     "description": "List of properties and optional values that should exist if this exists."

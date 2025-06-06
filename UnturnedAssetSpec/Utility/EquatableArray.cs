@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
+[JsonConverter(typeof(EquatableArrayConverterFactory))]
 public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>> where T : IEquatable<T>
 {
     public readonly T[] Array;
@@ -68,6 +71,118 @@ public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>> where T
         }
 
         return hash;
+    }
+}
+
+public class EquatableArrayConverterFactory : JsonConverterFactory
+{
+    public override bool CanConvert(Type typeToConvert)
+    {
+        return typeToConvert is { IsGenericType: true, IsValueType: true }
+               && typeToConvert.GetGenericTypeDefinition() == typeof(EquatableArray<>);
+    }
+
+    public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+    {
+        return (JsonConverter)Activator.CreateInstance(typeof(EquatableArrayConverter<>).MakeGenericType(typeToConvert.GetGenericArguments()[0]));
+    }
+}
+
+public sealed class EquatableArrayConverter<T> : JsonConverter<EquatableArray<T>> where T : IEquatable<T>
+{
+    private static JsonConverter<T>? GetConverter(JsonSerializerOptions options)
+    {
+        return options.GetConverter(typeof(T)) as JsonConverter<T>;
+    }
+
+    public override EquatableArray<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Null)
+        {
+            return default;
+        }
+
+        if (reader.TokenType != JsonTokenType.StartArray)
+        {
+            throw new JsonException($"Unexpected token {reader.TokenType} when parsing EquatableArray<{typeof(T).FullName}>.");
+        }
+
+        List<T>? list = null;
+        if (!reader.Read() || reader.TokenType == JsonTokenType.EndArray)
+        {
+            return EquatableArray<T>.Empty;
+        }
+
+        T? oneValue = default;
+        bool hasOneValue = false;
+
+        JsonConverter<T>? converter = GetConverter(options);
+
+        do
+        {
+            T? value = converter == null
+                ? JsonSerializer.Deserialize<T>(ref reader, options)
+                : converter.Read(ref reader, typeof(T), options);
+            if (!hasOneValue)
+            {
+                oneValue = value;
+                hasOneValue = true;
+            }
+            else if (list == null)
+            {
+                list = new List<T>(16) { oneValue!, value };
+            }
+            else
+            {
+                list.Add(value);
+            }
+        } while (reader.Read() && reader.TokenType != JsonTokenType.EndArray);
+
+        if (!hasOneValue)
+        {
+            return EquatableArray<T>.Empty;
+        }
+
+        if (list == null)
+        {
+            return new EquatableArray<T>(new T[] { oneValue! });
+        }
+
+        return new EquatableArray<T>(list);
+    }
+
+    public override void Write(Utf8JsonWriter writer, EquatableArray<T> value, JsonSerializerOptions options)
+    {
+        if (value.Array == null)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+
+        if (value.Array.Length == 0)
+        {
+            writer.WriteStartArray();
+            writer.WriteEndArray();
+            return;
+        }
+
+
+        writer.WriteStartArray();
+
+        JsonConverter<T>? converter = GetConverter(options);
+
+        if (converter == null)
+        {
+            foreach (T element in value.Array)
+                JsonSerializer.Serialize(writer, element, options);
+        }
+        else
+        {
+            foreach (T element in value.Array)
+                converter.Write(writer, element, options);
+        }
+
+        writer.WriteEndArray();
     }
 }
 

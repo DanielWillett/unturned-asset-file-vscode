@@ -83,9 +83,9 @@ public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, strin
     public override bool Equals(object? obj) => obj is AssetTypeAlias;
     public override int GetHashCode() => 0;
 
-    public Task<AutoCompleteResult[]> GetAutoCompleteResults(AutoCompleteParameters parameters)
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(InClassName inClassName)
     {
-        Dictionary<string, QualifiedType> dict = parameters.Database.Information.AssetAliases;
+        Dictionary<string, QualifiedType> dict = inClassName.Parameters.Database.Information.AssetAliases;
         AutoCompleteResult[] results = new AutoCompleteResult[dict.Count];
         int index = -1;
         foreach (KeyValuePair<string, QualifiedType> kvp in dict)

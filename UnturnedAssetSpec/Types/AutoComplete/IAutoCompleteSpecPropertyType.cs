@@ -4,5 +4,5 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 
 public interface IAutoCompleteSpecPropertyType
 {
-    Task<AutoCompleteResult[]> GetAutoCompleteResults(AutoCompleteParameters parameters);
+    Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters);
 }

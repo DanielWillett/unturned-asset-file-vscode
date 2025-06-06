@@ -185,7 +185,7 @@ public class AssetFileTree : IEnumerable<AssetFileNode>
         return hasValue;
     }
 
-    public EnumSpecTypeValue GetCategory(AssetInformation assetInfo, IAssetSpecDatabase spec)
+    public EnumSpecTypeValue GetCategory(IAssetSpecDatabase spec)
     {
         if (_hasCategory)
         {
@@ -217,7 +217,7 @@ public class AssetFileTree : IEnumerable<AssetFileNode>
             return AssetCategory.None;
         }
 
-        assetInfo.AssetCategories.TryGetValue(type, out string? str);
+        spec.Information.AssetCategories.TryGetValue(type, out string? str);
         AssetCategory.TryParse(str, out category);
         _category = category;
         _hasCategory = true;

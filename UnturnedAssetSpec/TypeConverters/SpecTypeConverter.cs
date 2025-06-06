@@ -18,6 +18,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
     private static readonly JsonEncodedText ValuesProperty = JsonEncodedText.Encode("Values");
     private static readonly JsonEncodedText PropertiesProperty = JsonEncodedText.Encode("Properties");
     private static readonly JsonEncodedText LocalizationProperty = JsonEncodedText.Encode("Localization");
+    private static readonly JsonEncodedText StringParseableTypeProperty = JsonEncodedText.Encode("StringParseableType");
 
     private static readonly JsonEncodedText[] Properties =
     [
@@ -28,7 +29,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         ParentProperty,                 // 4
         ValuesProperty,                 // 5
         PropertiesProperty,             // 6
-        LocalizationProperty            // 7
+        LocalizationProperty,           // 7
+        StringParseableTypeProperty     // 8
     ];
 
     private static readonly JsonEncodedText ValueEnumProperty = JsonEncodedText.Encode("Value");
@@ -71,6 +73,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         string? type = null, displayName = null, docs = null, parent = null;
 
         bool isExpanded = false;
+        string? stringParseableType = null;
 
         List<EnumValueInfo>? values = null;
         SpecProperty[]? properties = null, localProperties = null;
@@ -181,6 +184,15 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
 
                     localProperties = ReadPropertyList(ref reader, options, type, LocalizationProperty);
                     break;
+
+                case 8: // StringParseableType
+                    if (values != null)
+                        throw new JsonException("ISpecType contains properties for both an enum and custom type.");
+                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+
+                    stringParseableType = reader.GetString();
+                    break;
             }
         }
 
@@ -248,7 +260,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
             LocalizationProperties = localProperties,
             Docs = docs,
             ExtendedData = extraData,
-            IsLegacyExpandedType = isExpanded
+            IsLegacyExpandedType = isExpanded,
+            StringParsableType = stringParseableType
         };
 
         foreach (SpecProperty prop in properties)

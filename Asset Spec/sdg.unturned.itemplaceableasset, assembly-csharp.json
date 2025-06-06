@@ -1,0 +1,33 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemPlaceableAsset, Assembly-CSharp",
+    "DisplayName": "Placeable Item",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "Properties":
+    [
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EArmorTier, Assembly-CSharp",
+            "DisplayName": "Armor Tier",
+            "Docs": "https://unturned.wiki.gg/wiki/Gameplay_config#Barricades",
+            "Values":
+            [
+                {
+                    "Value": "LOW",
+                    "Casing": "Low",
+                    "Description": "Indicates that a barricade or structure takes more damage. 100% of damage is done by default, but this can be changed in the gameplay configuration file."
+                },
+                {
+                    "Value": "HIGH",
+                    "Casing": "High",
+                    "Description": "Indicates that a barricade or structure takes less damage. 50% of damage is done by default, but this can be changed in the gameplay configuration file."
+                }
+            ]
+        }
+    ]
+}

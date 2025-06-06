@@ -171,12 +171,11 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
 
     public static bool TryParse(string? str, out EnumSpecTypeValue category)
     {
-        if (str == null)
-        {
-            category = default;
-            return false;
-        }
+        return TryParse(str.AsSpan(), out category);
+    }
 
+    public static bool TryParse(ReadOnlySpan<char> str, out EnumSpecTypeValue category)
+    {
         str = str.Trim();
 
         if (str.Length < 3)
@@ -189,12 +188,12 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
         {
             case 'N':
             case 'n':
-                if (str.Equals("NONE", StringComparison.OrdinalIgnoreCase))
+                if (str.Equals("NONE".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     category = None;
                     return true;
                 }
-                if (str.Equals("NPC", StringComparison.OrdinalIgnoreCase))
+                if (str.Equals("NPC".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     category = NPC;
                     return true;
@@ -204,7 +203,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
 
             case 'I':
             case 'i':
-                if (str.Equals("ITEM", StringComparison.OrdinalIgnoreCase))
+                if (str.Equals("ITEM".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     category = Item;
                     return true;
@@ -214,7 +213,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
 
             case 'E':
             case 'e':
-                if (str.Equals("EFFECT", StringComparison.OrdinalIgnoreCase))
+                if (str.Equals("EFFECT".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     category = Effect;
                     return true;
@@ -224,7 +223,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
 
             case 'O':
             case 'o':
-                if (str.Equals("OBJECT", StringComparison.OrdinalIgnoreCase))
+                if (str.Equals("OBJECT".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     category = Effect;
                     return true;
@@ -234,7 +233,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
 
             case 'R':
             case 'r':
-                if (str.Equals("RESOURCE", StringComparison.OrdinalIgnoreCase))
+                if (str.Equals("RESOURCE".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     category = Resource;
                     return true;
@@ -244,7 +243,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
 
             case 'V':
             case 'v':
-                if (str.Equals("VEHICLE", StringComparison.OrdinalIgnoreCase))
+                if (str.Equals("VEHICLE".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     category = Vehicle;
                     return true;
@@ -254,7 +253,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
 
             case 'M':
             case 'm':
-                if (str.Equals("MYTHIC", StringComparison.OrdinalIgnoreCase))
+                if (str.Equals("MYTHIC".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     category = Mythic;
                     return true;
@@ -264,7 +263,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
 
             case 'A':
             case 'a':
-                if (str.Equals("ANIMAL", StringComparison.OrdinalIgnoreCase))
+                if (str.Equals("ANIMAL".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     category = Animal;
                     return true;
@@ -274,12 +273,12 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
 
             case 'S':
             case 's':
-                if (str.Equals("SKIN", StringComparison.OrdinalIgnoreCase))
+                if (str.Equals("SKIN".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     category = Skin;
                     return true;
                 }
-                if (str.Equals("SPAWN", StringComparison.OrdinalIgnoreCase))
+                if (str.Equals("SPAWN".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     category = Spawn;
                     return true;

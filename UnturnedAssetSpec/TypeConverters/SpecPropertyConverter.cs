@@ -385,7 +385,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             throw new JsonException($"Missing {TypeProperty.ToString()} property while reading SpecProperty.");
         }
 
-        ISpecPropertyType? propertyType = KnownTypes.GetType(typeStr, property, elementTypeStr, specialTypes);
+        ISpecPropertyType? propertyType = KnownTypes.GetType(typeStr, elementTypeStr, specialTypes);
         propertyType ??= new UnresolvedSpecPropertyType(typeStr);
 
         property.Type = propertyType;

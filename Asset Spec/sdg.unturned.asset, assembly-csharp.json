@@ -15,7 +15,7 @@
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header",
             "CanBeInMetadata": true,
-            "Priority": 2
+            "Priority": 100
         },
         {
             "Key": "Type",
@@ -26,7 +26,7 @@
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header",
             "CanBeInMetadata": true,
-            "Priority": 2
+            "Priority": 99
         },
         {
             "Key": "ID",
@@ -35,7 +35,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#body",
             "Description": "Short ID unique to this asset's category.",
             "DefaultValue": 0,
-            "Priority": 2
+            "Priority": 98
         },
         {
             "Key": "Ignore_NPOT",

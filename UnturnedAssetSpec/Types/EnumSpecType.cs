@@ -144,6 +144,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
 
     public bool TryParse(ReadOnlySpan<char> span, out EnumSpecTypeValue v, bool ignoreCase = true)
     {
+        span = span.Trim();
         StringComparison comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         for (int i = 0; i < Values.Length; i++)
         {
@@ -160,7 +161,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
     }
 
     /// <inheritdoc />
-    public Task<AutoCompleteResult[]> GetAutoCompleteResults(AutoCompleteParameters parameters)
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(InClassName inClassName)
     {
         if (_valueResults != null)
         {

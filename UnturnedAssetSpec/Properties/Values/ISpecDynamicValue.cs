@@ -118,14 +118,8 @@ public static class SpecDynamicValue
 
     public static bool TryGetValueAsType<TValue>(in FileEvaluationContext ctx, ISpecDynamicValue val, out TValue? value, out bool isNull)
     {
-        ISpecPropertyType? type = val.ValueType;
-        if (type == null)
-        {
-            return val.TryEvaluateValue(in ctx, out value, out isNull);
-        }
-
-        Type valueType = type.ValueType;
-        if (valueType == typeof(TValue))
+        Type? valueType = val.ValueType?.ValueType;
+        if (valueType == null || valueType == typeof(TValue))
         {
             return val.TryEvaluateValue(in ctx, out value, out isNull);
         }
@@ -860,6 +854,16 @@ public static class SpecDynamicValue
         else if (propertyName.Equals("Value".AsSpan(), StringComparison.Ordinal))
         {
             reference = new ValueBangRef(target);
+        }
+        else if (propertyName.Equals("AssetName".AsSpan(), StringComparison.Ordinal))
+        {
+            if (target is not ThisBangRef)
+            {
+                reference = null!;
+                return false;
+            }
+
+            reference = new AssetNameBangRef(target);
         }
         else if (propertyName.Equals("KeyGroups".AsSpan(), StringComparison.Ordinal))
         {

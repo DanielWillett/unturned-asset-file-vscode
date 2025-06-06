@@ -14,7 +14,6 @@ public sealed class AssetReferenceSpecPropertyType :
     IEquatable<AssetReferenceSpecPropertyType?>,
     IStringParseableSpecPropertyType
 {
-    
     public OneOrMore<QualifiedType> OtherElementTypes { get; }
     public bool CanParseDictionary { get; }
     public QualifiedType ElementType { get; }
@@ -92,7 +91,7 @@ public sealed class AssetReferenceSpecPropertyType :
                 Message = string.Format(DiagnosticResources.UNT2005, $"AssetReference<{QualifiedType.ExtractTypeName(ElementType.Type.AsSpan()).ToString()}>"),
                 Range = parse.Node?.Range ?? parse.Parent?.Range ?? default
             });
-            value = default;
+            value = Guid.Empty;
             return false;
         }
 

@@ -10,5 +10,6 @@ public interface IWorkspaceEnvironment
 
 public interface IWorkspaceFile : IDisposable
 {
+    string AssetName { get; }
     AssetFileTree File { get; }
 }

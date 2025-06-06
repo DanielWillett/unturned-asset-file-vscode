@@ -296,8 +296,6 @@ public class SpecialityInfo
     public required string Speciality { get; set; }
     public required int Index { get; set; }
     public required SkillInfo[] Skills { get; set; }
-
-    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? DisplayName { get; set; }
 }
 
@@ -308,22 +306,32 @@ public class SkillInfo
     public required int Index { get; set; }
     public required uint Cost { get; set; }
     public required float Difficulty { get; set; }
-
-    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? DisplayName { get; set; }
-
-    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Description { get; set; }
-
-    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string?[]? Levels { get; set; }
-
-    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int MaximumLevel { get; set; }
-
-    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? LevelMultiplier { get; set; }
-
-    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool LevelMultiplierInverse { get; set; }
+
+    public string? GetLevelDescription(int i)
+    {
+        if (i <= 0 || i > MaximumLevel)
+            return null;
+
+        double normalizedLevel = i >= MaximumLevel ? 1f : i / (float)MaximumLevel;
+
+        if (LevelMultiplier.HasValue)
+        {
+            double value = normalizedLevel * i;
+            if (LevelMultiplierInverse)
+                value = 1 - value;
+
+            string valueStr = value.ToString(CultureInfo.InvariantCulture);
+
+            return Levels is not { Length: 1 } || Levels[0] == null ? valueStr : string.Format(Levels[0]!, valueStr);
+        }
+
+        --i;
+        return Levels != null && i < Levels.Length ? Levels[i] : null;
+    }
 }

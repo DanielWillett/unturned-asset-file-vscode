@@ -31,7 +31,7 @@
             "Type": "Float32",
             "Description": "A volume multiplier on the attached gun's fire sound.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#volume-float32-1",
-            "Variable": "isSilenced",
+            "Variable": "volume",
             "DefaultValue": 1.0,
             "Priority": 2
         },
@@ -48,7 +48,6 @@
         {
             "Key": "Gunshot_Rolloff_Distance_Multiplier",
             "Type": "Float32",
-            "Maximum": 100,
             "Description": "Multiplier to the maximum distance a gunshot can be heard as configured by the gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#gunshot-rolloff-distance-multiplier-float32",
             "Variable": "gunshotRolloffDistanceMultiplier",

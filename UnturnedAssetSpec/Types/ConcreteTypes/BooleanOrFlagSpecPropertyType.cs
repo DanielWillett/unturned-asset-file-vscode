@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecPropertyType, bool>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
+public sealed class BooleanOrFlagSpecPropertyType : BasicSpecPropertyType<BooleanOrFlagSpecPropertyType, bool>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
-    public static readonly BooleanSpecPropertyType Instance = new BooleanSpecPropertyType();
+    public static readonly BooleanOrFlagSpecPropertyType Instance = new BooleanOrFlagSpecPropertyType();
 
-    static BooleanSpecPropertyType() { }
-    private BooleanSpecPropertyType() { }
+    static BooleanOrFlagSpecPropertyType() { }
+    private BooleanOrFlagSpecPropertyType() { }
 
     /// <inheritdoc />
-    public override string Type => "Boolean";
+    public override string Type => "BooleanOrFlag";
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Boolean;
 
     /// <inheritdoc />
-    public override string DisplayName => "Boolean";
+    public override string DisplayName => "Boolean or Flag";
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
@@ -28,22 +28,21 @@ public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecP
         if (span.Equals("true".AsSpan(), StringComparison.InvariantCultureIgnoreCase))
         {
             dynamicValue = SpecDynamicValue.True;
-            return true;
         }
-        if (span.Equals("false".AsSpan(), StringComparison.InvariantCultureIgnoreCase))
+        else if (span.Equals("false".AsSpan(), StringComparison.InvariantCultureIgnoreCase))
         {
             dynamicValue = SpecDynamicValue.False;
-            return true;
         }
-
-        if (KnownTypeValueHelper.TryParseBoolean(stringValue ?? span.ToString(), out bool result))
+        else if (KnownTypeValueHelper.TryParseBoolean(stringValue ?? span.ToString(), out bool result))
         {
             dynamicValue = result ? SpecDynamicValue.True : SpecDynamicValue.False;
-            return true;
+        }
+        else
+        {
+            dynamicValue = SpecDynamicValue.Included;
         }
 
-        dynamicValue = null!;
-        return false;
+        return true;
     }
 
     /// <inheritdoc />
@@ -51,18 +50,23 @@ public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecP
     {
         if (parse.Node == null)
         {
-            return MissingNode(in parse, out value);
+            value = false;
+            return true;
         }
 
-        if (parse.Node is AssetFileStringValueNode stringValue && KnownTypeValueHelper.TryParseBoolean(stringValue.Value, out bool boolValue))
+        if (parse.Node is AssetFileStringValueNode stringValue
+            && KnownTypeValueHelper.TryParseBoolean(stringValue.Value, out bool boolValue))
         {
             value = boolValue;
-        }
-        else
-        {
-            return FailedToParse(in parse, out value, parse.Node);
+            return true;
         }
 
+        if (parse.Node != null)
+        {
+            FailedToParse(in parse, out value, parse.Node);
+        }
+
+        value = true;
         return true;
     }
 
@@ -72,7 +76,7 @@ public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecP
         new AutoCompleteResult("false")
     });
 
-    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters context)
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters)
     {
         return BooleanResults;
     }

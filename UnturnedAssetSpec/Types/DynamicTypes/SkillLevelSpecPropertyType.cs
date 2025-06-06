@@ -1,16 +1,19 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public sealed class SkillLevelSpecPropertyType :
     BasicSpecPropertyType<SkillLevelSpecPropertyType, byte>,
     IStringParseableSpecPropertyType,
-    IElementTypeSpecPropertyType
+    IElementTypeSpecPropertyType,
+    IAutoCompleteSpecPropertyType
 {
     private ISpecDynamicValue? _skillValue;
     private ISpecDynamicValue? _specialityIndexValue;
@@ -31,7 +34,7 @@ public sealed class SkillLevelSpecPropertyType :
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
 
     /// <inheritdoc cref="ISpecPropertyType" />
-    public override string DisplayName => "Skillset Level";
+    public override string DisplayName => "Skill Level";
 
     string IElementTypeSpecPropertyType.ElementType => SkillsetOrProperty;
 
@@ -149,7 +152,6 @@ public sealed class SkillLevelSpecPropertyType :
                 }
                 _cacheDb = db;
             }
-
         }
 
         if (skillValue != null)
@@ -161,7 +163,7 @@ public sealed class SkillLevelSpecPropertyType :
 
             skill = db.Information.Specialities
                 ?.SelectMany(x => x?.Skills ?? Array.Empty<SkillInfo>())
-                ?.FirstOrDefault(x => string.Equals(x.Skill, SkillsetOrProperty));
+                ?.FirstOrDefault(x => string.Equals(x.Skill, value));
             return skill != null;
         }
 
@@ -184,5 +186,32 @@ public sealed class SkillLevelSpecPropertyType :
         }
 
         return false;
+    }
+
+    private static readonly AutoCompleteResult[] Zero = [ new AutoCompleteResult("0", "No skill.") ];
+
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters)
+    {
+        FileEvaluationContext context = new FileEvaluationContext(parameters.Property, parameters.Property.Owner, parameters.File, parameters.Workspace, parameters.Environment, parameters.Database);
+
+        if (!TryGetSkill(in context, out SkillInfo? skill) || skill == null || skill.MaximumLevel == 0)
+        {
+            return Task.FromResult(Zero);
+        }
+
+        AutoCompleteResult[] results = new AutoCompleteResult[skill.MaximumLevel + 1];
+        for (int i = 0; i < results.Length; ++i)
+        {
+            ref AutoCompleteResult result = ref results[i];
+            string? description;
+            if (i == 0)
+                description = "Not required.";
+            else
+                description = skill.GetLevelDescription(i) ?? $"Level {i}";
+
+            result = new AutoCompleteResult(i.ToString(CultureInfo.InvariantCulture), description);
+        }
+
+        return Task.FromResult(results);
     }
 }

@@ -1,5 +1,6 @@
 // ReSharper disable InconsistentNaming
 
+using System.Runtime.CompilerServices;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;
@@ -95,6 +96,11 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT1016 = new DatDiagnostic("UNT1016", DatDiagnosticSeverity.Warning);
 
+    /// <summary>
+    /// Ammount supplied for an item ID.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1017 = new DatDiagnostic("UNT1017", DatDiagnosticSeverity.Warning);
+
     /* Errors */
 
     /// <summary>
@@ -126,5 +132,15 @@ public static class DatDiagnostics
     /// Displayed when an asset bundle version is invalid in a master bundle file.
     /// </summary>
     public static readonly DatDiagnostic UNT2009 = new DatDiagnostic("UNT2009", DatDiagnosticSeverity.Error);
+
+    /// <summary>
+    /// Displayed when an asset is missing a GUID.
+    /// </summary>
+    public static readonly DatDiagnostic UNT2010 = new DatDiagnostic("UNT2010", DatDiagnosticSeverity.Error);
+
+    /// <summary>
+    /// Displayed when an asset is missing a legacy ID that is required.
+    /// </summary>
+    public static readonly DatDiagnostic UNT2011 = new DatDiagnostic("UNT2011", DatDiagnosticSeverity.Error);
 
 }

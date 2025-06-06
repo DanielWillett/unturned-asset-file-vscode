@@ -195,4 +195,13 @@
   <data name="UNT1016" xml:space="preserve">
     <value>Level {0} is not a valid level for the {1} skill.</value>
   </data>
+  <data name="UNT2010" xml:space="preserve">
+    <value>A GUID is required for this asset.</value>
+  </data>
+  <data name="UNT2011" xml:space="preserve">
+    <value>A legacy ID is required for this asset.</value>
+  </data>
+  <data name="UNT1017" xml:space="preserve">
+    <value>Unexpected amount supplied for an item ID or GUID.</value>
+  </data>
 </root>

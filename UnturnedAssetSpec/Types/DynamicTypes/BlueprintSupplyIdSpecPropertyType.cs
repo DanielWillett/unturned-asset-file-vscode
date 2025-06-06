@@ -5,62 +5,80 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class BlueprintSupplyIdSpecPropertyType :
-    IdSpecPropertyType,
-    IEquatable<BlueprintSupplyIdSpecPropertyType>
+public sealed class BlueprintIdSpecPropertyType :
+    BackwardsCompatibleAssetReferenceSpecPropertyType,
+    IEquatable<BlueprintIdSpecPropertyType>
 {
-    public static readonly BlueprintSupplyIdSpecPropertyType Instance = new BlueprintSupplyIdSpecPropertyType();
-
-    static BlueprintSupplyIdSpecPropertyType() { }
+    public static readonly BlueprintIdSpecPropertyType Instance = new BlueprintIdSpecPropertyType(true);
+    public static readonly BlueprintIdSpecPropertyType StringInstance = new BlueprintIdSpecPropertyType(false);
+    static BlueprintIdSpecPropertyType() { }
 
     /// <inheritdoc cref="ISpecPropertyType" />
-    public override string Type => "BlueprintSupplyId";
+    public override string Type => "BlueprintId";
 
-    public BlueprintSupplyIdSpecPropertyType() : base(AssetCategory.Item, OneOrMore<string>.Null) { }
+    private BlueprintIdSpecPropertyType(bool canParseDictionary) : base(AssetCategory.Item.Value, canParseDictionary, OneOrMore<string>.Null) { }
 
     /// <inheritdoc />
-    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out ushort value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out GuidOrId value)
     {
         if (parse.Node == null)
         {
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode)
+        Guid? guid = parse.File?.GetGuid();
+        ushort? id = parse.File?.GetId();
+        if (parse.Node is AssetFileStringValueNode strValNode && strValNode.Value.Equals("this", StringComparison.OrdinalIgnoreCase))
         {
-            return FailedToParse(in parse, out value);
-        }
-
-        bool wasThis = false;
-        ushort id = parse.File?.GetId() ?? 0;
-        if (!KnownTypeValueHelper.TryParseUInt16(strValNode.Value, out value))
-        {
-            if (id != 0 && string.Equals(strValNode.Value, "this", StringComparison.InvariantCultureIgnoreCase))
+            if (guid.HasValue && guid.Value != Guid.Empty)
             {
-                wasThis = true;
-                value = id;
+                value = new GuidOrId(guid.Value);
+            }
+            else if (id.HasValue && id.Value != 0)
+            {
+                value = new GuidOrId(id.Value, AssetCategory.Item);
             }
             else
             {
-                return FailedToParse(in parse, out value);
+                if (parse.HasDiagnostics)
+                {
+                    parse.Log(new DatDiagnosticMessage
+                    {
+                        Range = strValNode.Range,
+                        Diagnostic = id is 0 ? DatDiagnostics.UNT2011 : DatDiagnostics.UNT2010,
+                        Message = id is 0 ? DiagnosticResources.UNT2011 : DiagnosticResources.UNT2010
+                    });
+                }
+
+                value = default;
+                return false;
+            }
+
+            return true;
+        }
+
+        if (!base.TryParseValue(in parse, out value))
+        {
+            return false;
+        }
+
+        if (parse.HasDiagnostics)
+        {
+            if (id.HasValue && id.Value != 0 && value.Equals(id.Value)
+                || guid.HasValue && guid.Value != Guid.Empty && value.Equals(guid.Value))
+            {
+                parse.Log(new DatDiagnosticMessage
+                {
+                    Range = parse.Node?.Range ?? parse.Parent?.Range ?? default,
+                    Diagnostic = DatDiagnostics.UNT101,
+                    Message = DiagnosticResources.UNT101
+                });
             }
         }
-
-        if (id != 0 && id == value && !wasThis && parse.HasDiagnostics)
-        {
-            parse.Log(new DatDiagnosticMessage
-            {
-                Range = strValNode.Range,
-                Diagnostic = DatDiagnostics.UNT101,
-                Message = DiagnosticResources.UNT101
-            });
-        }
-
-        // todo: ID resolution
 
         return true;
     }
 
     /// <inheritdoc />
-    public bool Equals(BlueprintSupplyIdSpecPropertyType other) => other != null && Category.Equals(other.Category);
+    public bool Equals(BlueprintIdSpecPropertyType other) => other != null;
 }

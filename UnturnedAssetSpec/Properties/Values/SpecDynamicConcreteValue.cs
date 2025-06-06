@@ -301,7 +301,7 @@ public sealed class SpecDynamicConcreteValue<T> :
 
     public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
     {
-        value = IsNull ? null : _value;
+        value = IsNull ? null : BoxedPrimitives.Box(ref _value);
         return true;
     }
 
@@ -401,6 +401,14 @@ public sealed class SpecDynamicConcreteValue<T> :
         {
             Guid v = Unsafe.As<T, Guid>(ref _value!);
             writer.WriteStringValue(v);
+        }
+        else if (typeof(T) == typeof(GuidOrId))
+        {
+            GuidOrId v = Unsafe.As<T, GuidOrId>(ref _value!);
+            if (v.IsId)
+                writer.WriteNumberValue(v.Id);
+            else
+                writer.WriteStringValue(v.Guid);
         }
         else if (typeof(T) == typeof(DateTime))
         {

@@ -61,6 +61,8 @@ public class OpenedFile : IWorkspaceFile
     private readonly bool _useVirtualFiles;
 #endif
 
+    public string AssetName { get; }
+
     public string GetFullText()
     {
         lock (EditLock)
@@ -118,10 +120,24 @@ public class OpenedFile : IWorkspaceFile
         _obsessivelyValidate = obsessivelyValidate;
         Uri = uri;
 
+        string path = uri.GetFileSystemPath();
+        string fileName = Path.GetFileName(path);
+        if (string.Equals(fileName, "Asset.dat", StringComparison.Ordinal))
+        {
+            string? dirName = Path.GetDirectoryName(path);
+            fileName = dirName != null ? Path.GetFileName(dirName) : "Asset";
+        }
+        else
+        {
+            fileName = Path.GetFileNameWithoutExtension(fileName);
+        }
+
+        AssetName = fileName;
+
 #if KEEP_VIRTUAL_FILE_SYSTEM
         _useVirtualFiles = useVirtualFiles;
-        _virtualFile = Path.Combine(UnturnedAssetFileLspServer.DebugPath, Path.GetFileName(uri.GetFileSystemPath()) + ".txt");
-        _editsFile = Path.Combine(UnturnedAssetFileLspServer.DebugPath, Path.GetFileName(uri.GetFileSystemPath()) + ".edits.txt");
+        _virtualFile = Path.Combine(UnturnedAssetFileLspServer.DebugPath, Path.GetFileName(path) + ".txt");
+        _editsFile = Path.Combine(UnturnedAssetFileLspServer.DebugPath, Path.GetFileName(path) + ".edits.txt");
         if (useVirtualFiles)
             System.IO.File.WriteAllText(_editsFile, ReadOnlySpan<char>.Empty);
 #endif
