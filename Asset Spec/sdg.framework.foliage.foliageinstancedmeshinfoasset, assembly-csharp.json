@@ -44,6 +44,14 @@
             "Variable": "tileDither"
         },
         {
+            "Key": "Is_Clutter",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "If true, mesh is not loaded when clutter is turned off in graphics menu.",
+            "Variable": "IsClutter",
+            "Version": "3.25.7.0"
+        },
+        {
             "Key": "Draw_Distance",
             "Type": "Int32",
             "DefaultValue": -1,

@@ -770,6 +770,35 @@
             "Description": "If this item should be destroyed when it reaches 0% quality."
         },
         {
+            "Key": "Deleted_At_Zero_Quality_Effect",
+            "Type": "AssetReference",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Variable": "_deletedAtZeroQualityEffectRef",
+            "Description": "If this item should be destroyed when it reaches 0% quality.",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Should_Delete_At_Zero_Quality",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Deleted_At_Zero_Quality_Rewards",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "DefaultValue": null,
+            "Variable": "DeletedAtZeroQualityRewards",
+            "Description": "Rewards granted when the item reaches zero quality.",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Should_Delete_At_Zero_Quality",
+                    "Value": true
+                }
+            ]
+        },
+        {
             "Key": "Destroy_Item_Colliders",
             "Type": "Boolean",
             "DefaultValue": true,

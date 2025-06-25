@@ -415,6 +415,7 @@
             "SDG.Unturned.QuestAsset, Assembly-CSharp": { },
             "SDG.Unturned.RedirectorAsset, Assembly-CSharp": { },
             "SDG.Unturned.ResourceAsset, Assembly-CSharp": { },
+            "SDG.Unturned.RoadAsset, Assembly-CSharp": { },
             "SDG.Unturned.ServerListCurationAsset, Assembly-CSharp": { },
             "SDG.Unturned.SkinAsset, Assembly-CSharp": { },
             "SDG.Unturned.SpawnAsset, Assembly-CSharp": { },
@@ -527,7 +528,8 @@
         "RewardsList": "SDG.Unturned.NPCRewardsAsset, Assembly-CSharp",
         "Redirector": "SDG.Unturned.RedirectorAsset, Assembly-CSharp",
         "ServerCuration": "SDG.Unturned.ServerListCurationAsset, Assembly-CSharp",
-        "Tag": "SDG.Unturned.TagAsset, Assembly-CSharp"
+        "Tag": "SDG.Unturned.TagAsset, Assembly-CSharp",
+        "Road": "SDG.Unturned.RoadAsset, Assembly-CSharp"
     },
     "AssetCategories":
     {
