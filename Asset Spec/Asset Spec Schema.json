@@ -306,7 +306,7 @@
                     "title": "The name of a skill or blueprint skill."
                 },
                 {
-                    "$ref": "#/$defs/switchCase"
+                    "$ref": "#/$defs/switch"
                 }
             ]
         },
