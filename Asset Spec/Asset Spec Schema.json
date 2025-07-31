@@ -304,6 +304,9 @@
                 {
                     "const": "SkillLevel",
                     "title": "The name of a skill or blueprint skill."
+                },
+                {
+                    "$ref": "#/$defs/switchCase"
                 }
             ]
         },
