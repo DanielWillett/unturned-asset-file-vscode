@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
     "Type": "SDG.Unturned.ItemAsset, Assembly-CSharp",
     "DisplayName": "Item",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -1079,7 +1079,7 @@
                 {
                     "Key": "Critical",
                     "Type": "Boolean",
-                    "DefaultValue": false,
+                    "DefaultValue": "SDG.Unturned.Blueprint, Assembly-CSharp::InputItems_Critical",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#critical-bool-false",
                     "Description": "The player has to already have this supply to see the blueprint.",
                     "Variable": "isCritical"
@@ -1603,6 +1603,14 @@
                     "Description": "If included and @RequiresNearbyCraftingTags is exlcuded, adds the heat tag to @RequiresNearbyCraftingTags.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#requiresnearbycraftingtags-list-of-asset-pointer-to-doc-assets-tag",
                     "Variable": "TargetItem"
+                },
+                {
+                    "Key": "InputItems_Critical",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html",
+                    "Description": "The default value for the @(SDG.Unturned.BlueprintSupply, Assembly-CSharp::Critical) property of all input items, allowing the use of the shorthand format for critical items.",
+                    "Version": "3.25.7.0"
                 }
             ]
         },
@@ -2523,7 +2531,29 @@
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The object used for the dropped item, as well as the held item unless @EquipablePrefab is set. This is not required for shirts or pants.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#item-prefab",
-            "Variable": "item"
+            "Variable": "item",
+            "Required":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "Shirt"
+                        },
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "Pants"
+                        }
+                    ],
+                    "Value": false
+                },
+                {
+                    "Value": true
+                }
+            ]
         },
         {
             "AssetName": "Albedo_Base",

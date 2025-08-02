@@ -499,12 +499,12 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
             ForEachPropertyWhile(info, prop =>
             {
-                if (prop.Type is not ISecondPassSpecPropertyType s)
+                if (prop.Type.Type is not ISecondPassSpecPropertyType s)
                     return true;
 
                 try
                 {
-                    prop.Type = s.Transform(prop, wrapper, info.Owner);
+                    prop.Type = new PropertyTypeOrSwitch(s.Transform(prop, wrapper, info.Owner));
                     if (s is IDisposable disp)
                         disp.Dispose();
                 }

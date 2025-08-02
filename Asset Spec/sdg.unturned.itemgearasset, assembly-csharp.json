@@ -1,0 +1,48 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemGearAsset, Assembly-CSharp",
+    "DisplayName": "Gear Item (Headgear)",
+    "Parent": "SDG.Unturned.ItemClothingAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gear-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Hair_Visible",
+            "HideInherited": true
+        },
+        {
+            "Key": "Beard_Visible",
+            "HideInherited": true
+        },
+        {
+            "Key": "Hair",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Keeps the player's hair from being hidden while this item is equipped.",
+            "Variable": "SDG.Unturned.ItemClothingAsset, Assembly-CSharp::hairVisible",
+            "Priority": 5,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gear-asset.html#hair-flag"
+        },
+        {
+            "Key": "Beard",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Keeps the player's beard from being hidden while this item is equipped.",
+            "Variable": "SDG.Unturned.ItemClothingAsset, Assembly-CSharp::beardVisible",
+            "Priority": 5,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gear-asset.html#beard-flag"
+        },
+        {
+            "Key": "Hair_Override",
+            "Type": "String",
+            "DefaultValue": null,
+            "Description": "When this property is set, the game will look for a child Mesh Renderer component in Unity that has the same name as this property's value. If a matching Mesh Renderer is found, its material will be changed to the character's hair material. This property is used by certain cosmetics that entirely cover the character's hair, so that the player's selected hair color can still be used for customization.",
+            "Variable": "hairOverride",
+            "Priority": 4,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gear-asset.html#hair-override-string"
+        }
+    ]
+}

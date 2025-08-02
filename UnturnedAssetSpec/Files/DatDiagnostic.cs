@@ -1,6 +1,6 @@
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
-public struct DatDiagnostic
+public record struct DatDiagnostic
 {
     public string ErrorId;
     public DatDiagnosticSeverity Severity;
@@ -20,7 +20,7 @@ public enum DatDiagnosticSeverity
     Hint = 4
 }
 
-public struct DatDiagnosticMessage
+public record struct DatDiagnosticMessage
 {
     public DatDiagnostic Diagnostic;
     public FileRange Range;

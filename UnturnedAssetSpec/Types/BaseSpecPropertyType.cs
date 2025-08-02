@@ -81,7 +81,7 @@ public abstract class BaseSpecPropertyType<TValue>
                 Diagnostic = DatDiagnostics.UNT2004,
                 Message = string.Format(
                     DiagnosticResources.UNT2004,
-                    parse.Node is AssetFileStringValueNode s ? s.Value : parse.Node.ToString(),
+                    parse.Node is AssetFileStringValueNode s ? s.Value : parse.Node!.ToString(),
                     DisplayName
                 ),
                 Range = parse.Node.Range

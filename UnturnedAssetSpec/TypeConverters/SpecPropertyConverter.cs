@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -98,7 +99,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 return new SpecProperty
                 {
                     Key = reader.GetString(),
-                    Type = KnownTypes.String
+                    Type = new PropertyTypeOrSwitch(KnownTypes.String)
                 };
             }
 
@@ -108,14 +109,15 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         bool isHidingInherited = false;
         string? typeStr = null, elementTypeStr = null;
         OneOrMore<string> specialTypes = OneOrMore<string>.Null;
-        SpecProperty property = new SpecProperty { Key = null!, Type = null! };
+        SpecProperty property = new SpecProperty { Key = null!, Type = default };
 
         Utf8JsonReader
             defaultValueReader = default,
             includedDefaultValueReader = defaultValueReader,
             minimumValue = defaultValueReader,
             maximumValue = defaultValueReader,
-            exceptValue = defaultValueReader;
+            exceptValue = defaultValueReader,
+            typeSwitch = defaultValueReader;
 
         bool minimumIsExclusive = false,
             maximumIsExclusive = false;
@@ -197,6 +199,13 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     break;
 
                 case 8: // Type
+                    if (reader.TokenType is JsonTokenType.StartArray or JsonTokenType.StartObject)
+                    {
+                        typeSwitch = reader;
+                        break;
+                    }
+
+                    typeSwitch = default;
                     if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
                         ThrowUnexpectedToken(reader.TokenType, propType);
 
@@ -241,6 +250,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                             }
                             break;
 
+                        case JsonTokenType.StartArray:
                         case JsonTokenType.StartObject:
                             try
                             {
@@ -374,19 +384,29 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             }
         }
 
-        if (typeStr == null)
+        if (typeStr == null && typeSwitch.TokenType == JsonTokenType.None)
         {
             if (isHidingInherited)
             {
-                property.Type = HideInheritedPropertyType.Instance;
+                property.Type = new PropertyTypeOrSwitch(HideInheritedPropertyType.Instance);
                 return property;
             }
 
             throw new JsonException($"Missing {TypeProperty.ToString()} property while reading SpecProperty.");
         }
 
-        ISpecPropertyType? propertyType = KnownTypes.GetType(typeStr, elementTypeStr, specialTypes);
-        propertyType ??= new UnresolvedSpecPropertyType(typeStr);
+        PropertyTypeOrSwitch propertyType;
+        if (typeSwitch.TokenType != JsonTokenType.None)
+        {
+            propertyType = new PropertyTypeOrSwitch(ReadTypeSwitch(ref typeSwitch, options, in TypeProperty));
+        }
+        else
+        {
+            ISpecPropertyType? pt = KnownTypes.GetType(typeStr!, elementTypeStr, specialTypes);
+            pt ??= new UnresolvedSpecPropertyType(typeStr!);
+
+            propertyType = new PropertyTypeOrSwitch(pt);
+        }
 
         property.Type = propertyType;
 
@@ -475,7 +495,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     }
 
     private static OneOrMore<ISpecDynamicValue> ReadExceptionList(
-        ISpecPropertyType propertyType,
+        PropertyTypeOrSwitch propertyType,
         ref Utf8JsonReader reader,
         JsonSerializerOptions? options)
     {
@@ -502,14 +522,30 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         return list;
     }
 
+    private static SpecDynamicSwitchValue ReadTypeSwitch(
+        ref Utf8JsonReader reader,
+        JsonSerializerOptions? options,
+        in JsonEncodedText property)
+    {
+        try
+        {
+            SpecDynamicSwitchValue? vals = SpecDynamicSwitchValueConverter.ReadSwitch(ref reader, options, new PropertyTypeOrSwitch(SpecPropertyTypeType.Instance));
+            return vals ?? throw new JsonException($"Failed to read property \"{property.ToString()}\" while reading SpecProperty, null value.");
+        }
+        catch (Exception ex)
+        {
+            throw new JsonException($"Failed to read property \"{property.ToString()}\" while reading SpecProperty.", ex);
+        }
+    }
+
     private static ISpecDynamicValue ReadValue(
-        ISpecPropertyType propertyType,
+        PropertyTypeOrSwitch propertyType,
         ref Utf8JsonReader reader,
         SpecDynamicValueContext context,
         JsonSerializerOptions? options,
         in JsonEncodedText property)
     {
-        if (propertyType is UnresolvedSpecPropertyType unresolvedSpecPropertyType)
+        if (propertyType is { IsSwitch: false, Type: UnresolvedSpecPropertyType unresolvedSpecPropertyType })
         {
             return new UnresolvedDynamicValue(
                 unresolvedSpecPropertyType,
@@ -679,30 +715,39 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
         writer.WriteString(KeyProperty, property.Key);
 
-        writer.WriteString(TypeProperty, property.Type.Type);
-        if (property.Type is IElementTypeSpecPropertyType { ElementType: { Length: > 0 } elementType })
+        ISpecPropertyType? propType = property.Type.Type;
+        if (propType != null)
         {
-            writer.WriteString(ElementTypeProperty, elementType);
-        }
-        if (property.Type is ISpecialTypesSpecPropertyType specialTypes)
-        {
-            bool hasHeader = false;
-            foreach (string? type in specialTypes.SpecialTypes)
+            writer.WriteString(TypeProperty, propType.Type);
+            if (propType is IElementTypeSpecPropertyType { ElementType: { Length: > 0 } elementType })
             {
-                if (string.IsNullOrEmpty(type))
-                    continue;
-
-                if (!hasHeader)
+                writer.WriteString(ElementTypeProperty, elementType);
+            }
+            if (propType is ISpecialTypesSpecPropertyType specialTypes)
+            {
+                bool hasHeader = false;
+                foreach (string? type in specialTypes.SpecialTypes)
                 {
-                    writer.WriteStartArray(SpecialTypesProperty);
-                    hasHeader = true;
+                    if (string.IsNullOrEmpty(type))
+                        continue;
+
+                    if (!hasHeader)
+                    {
+                        writer.WriteStartArray(SpecialTypesProperty);
+                        hasHeader = true;
+                    }
+
+                    writer.WriteStringValue(type);
                 }
 
-                writer.WriteStringValue(type);
+                if (hasHeader)
+                    writer.WriteEndArray();
             }
-
-            if (hasHeader)
-                writer.WriteEndArray();
+        }
+        else if (property.Type.TypeSwitch != null)
+        {
+            writer.WritePropertyName(TypeProperty);
+            property.Type.TypeSwitch.WriteToJsonWriter(writer, options);
         }
 
         if (property.Description != null)
@@ -854,5 +899,67 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         }
 
         writer.WriteEndObject();
+    }
+}
+
+internal sealed class SpecPropertyTypeType : ISpecPropertyType<ISpecPropertyType>, IStringParseableSpecPropertyType
+{
+    public static SpecPropertyTypeType Instance { get; } = new SpecPropertyTypeType();
+    static SpecPropertyTypeType() { }
+    private SpecPropertyTypeType() { }
+
+    /// <inheritdoc />
+    public string Type => "Type";
+
+    /// <inheritdoc />
+    public Type ValueType => typeof(ISpecPropertyType);
+
+    /// <inheritdoc />
+    public string DisplayName => "Type";
+
+    /// <inheritdoc />
+    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+
+    /// <inheritdoc />
+    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => this as ISpecPropertyType<TValue>;
+
+    /// <inheritdoc />
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        throw new NotSupportedException();
+    }
+
+    /// <inheritdoc />
+    public bool Equals(ISpecPropertyType? other) => other is SpecPropertyTypeType;
+
+    /// <inheritdoc />
+    public bool Equals(ISpecPropertyType<ISpecPropertyType>? other) => other is SpecPropertyTypeType;
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) => obj is SpecPropertyTypeType;
+
+    /// <inheritdoc />
+    public override int GetHashCode() => 0;
+
+    /// <inheritdoc />
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecPropertyType? value)
+    {
+        throw new NotSupportedException();
+    }
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        stringValue ??= span.ToString();
+
+        ISpecPropertyType? t = KnownTypes.GetType(stringValue);
+        if (t != null)
+        {
+            dynamicValue = new SpecDynamicConcreteValue<ISpecPropertyType>(t, this);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
     }
 }

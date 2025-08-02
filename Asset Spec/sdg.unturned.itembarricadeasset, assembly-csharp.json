@@ -1,11 +1,12 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
     "Type": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
     "DisplayName": "Barricade Item",
     "Parent": "SDG.Unturned.ItemPlaceableAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html",
     "Category": "ITEM",
     "VanillaIdLimit": 2000,
+    "RequireId": true,
     "Properties":
     [
         {
@@ -512,7 +513,8 @@
             "RedirectableAssetKey": "PlacementAudioClip",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when the barricade is placed.",
-            "Variable": "use"
+            "Variable": "use",
+            "Required": true
         }
     ]
 }

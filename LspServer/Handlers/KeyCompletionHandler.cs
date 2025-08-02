@@ -1,4 +1,5 @@
 using DanielWillett.UnturnedDataFileLspServer.Completions;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -24,12 +25,21 @@ internal class KeyCompletionHandler : ICompletionHandler
     private readonly OpenedFileTracker _fileTracker;
 
     private readonly IAssetSpecDatabase _specDictionary;
+    private readonly IWorkspaceEnvironment _workspace;
+    private readonly InstallationEnvironment _installationEnvironment;
 
-    public KeyCompletionHandler(ILogger<KeyCompletionHandler> logger, OpenedFileTracker fileTracker, IAssetSpecDatabase specDictionary)
+    public KeyCompletionHandler(
+        ILogger<KeyCompletionHandler> logger,
+        OpenedFileTracker fileTracker,
+        IAssetSpecDatabase specDictionary,
+        IWorkspaceEnvironment workspace,
+        InstallationEnvironment installationEnvironment)
     {
         _logger = logger;
         _fileTracker = fileTracker;
         _specDictionary = specDictionary;
+        _workspace = workspace;
+        _installationEnvironment = installationEnvironment;
         _completionRegistrationOptions = new CompletionRegistrationOptions
         {
             DocumentSelector = UnturnedAssetFileLspServer.AssetFileSelector,
@@ -69,7 +79,7 @@ internal class KeyCompletionHandler : ICompletionHandler
         }
     }
 
-    private static CompletionItem CreateCompletionItemForKey(in KeyCompletionState state)
+    private CompletionItem CreateCompletionItemForKey(in KeyCompletionState state)
     {
         TextEditOrInsertReplaceEdit? edit;
 
@@ -106,16 +116,32 @@ internal class KeyCompletionHandler : ICompletionHandler
             });
         }
 
+        FileEvaluationContext ctx = new FileEvaluationContext(
+            property,
+            property.Owner,
+            state.File.File,
+            _workspace,
+            _installationEnvironment,
+            _specDictionary,
+            state.File
+        );
+
+        ISpecPropertyType? type = property.Type.GetType(in ctx);
+
         CompletionItem item = new CompletionItem
         {
             Label = state.Alias ?? property.Key,
             SortText = property.Key,
             InsertTextMode = InsertTextMode.AsIs,
             Kind = CompletionItemKind.Property,
-            LabelDetails = new CompletionItemLabelDetails { Description = property.Description, Detail = ": " + property.Type.DisplayName },
+            LabelDetails = new CompletionItemLabelDetails
+            {
+                Description = property.Description,
+                Detail = type != null ? ": " + type.DisplayName : string.Empty
+            },
             Deprecated = property.Deprecated,
             Tags = property.Deprecated ? new Container<CompletionItemTag>(CompletionItemTag.Deprecated) : null,
-            Detail = property.Type.DisplayName,
+            Detail = type?.DisplayName,
             Documentation =
                 property.Markdown != null
                 ? new StringOrMarkupContent(new MarkupContent
@@ -168,14 +194,34 @@ internal class KeyCompletionHandler : ICompletionHandler
 
         if (key != null && _specDictionary.FindPropertyInfo(key.Value, fileType, SpecPropertyContext.Property) is { } property && position.Character >= key.Range.End.Character)
         {
-            if (property.Type is not IAutoCompleteSpecPropertyType autoComplete)
+            FileEvaluationContext ctx = new FileEvaluationContext(
+                property,
+                fileType.Information,
+                tree,
+                _workspace,
+                _installationEnvironment,
+                _specDictionary,
+                file
+            );
+
+            ISpecPropertyType? type = property.Type.GetType(in ctx);
+            if (type is not IAutoCompleteSpecPropertyType autoComplete)
                 return new CompletionList();
 
-            AutoCompleteParameters p = new AutoCompleteParameters(_specDictionary, tree, position, fileType, property);
+            AutoCompleteParameters p = new AutoCompleteParameters(
+                _specDictionary,
+                tree,
+                position,
+                fileType,
+                property,
+                _workspace,
+                _installationEnvironment,
+                file
+            );
 
-            AutoCompleteResult[] results = await autoComplete.GetAutoCompleteResults(new InClassName(p));
+            AutoCompleteResult[] results = await autoComplete.GetAutoCompleteResults(in p, in ctx);
             List<CompletionItem> completions = new List<CompletionItem>(results.Length);
-            CompletionItemKind kind = property.Type.GetCompletionItemKind();
+            CompletionItemKind kind = type.GetCompletionItemKind();
             for (int i = 0; i < results.Length; i++)
             {
                 ref AutoCompleteResult result = ref results[i];

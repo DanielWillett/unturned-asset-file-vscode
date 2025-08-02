@@ -1,0 +1,21 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemGripAsset, Assembly-CSharp",
+    "DisplayName": "Grip Attachment Item",
+    "Parent": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/grip-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties": [ ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Grip",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "The model that appears on the gun when the item is attached.",
+            "Variable": "grip",
+            "Required": true
+        }
+    ]
+}

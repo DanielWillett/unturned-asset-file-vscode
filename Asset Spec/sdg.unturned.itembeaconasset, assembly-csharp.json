@@ -1,0 +1,50 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemBeaconAsset, Assembly-CSharp",
+    "DisplayName": "Beacon Barricade Item",
+    "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/beacon-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Wave",
+            "Type": "UInt16",
+            "Description": "Number of zombies that need to be killed to complete the beacon, including the final mega zombie.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/beacon-asset.html#beacon-asset-properties",
+            "Variable": "wave",
+            "DefaultValue": 0,
+            "Priority": 3
+        },
+        {
+            "Key": "Rewards",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Variable": "rewards",
+            "Description": "Number of reward items to drop, potentially scaled by @Enable_Participant_Scaling.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/beacon-asset.html#beacon-asset-properties",
+            "Priority": 3
+        },
+        {
+            "Key": "Reward_ID",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "DefaultValue": 0,
+            "Description": "The short ID of a spawn table to use for the reward drops.",
+            "Variable": "rewardID",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/beacon-asset.html#beacon-asset-properties",
+            "Priority": 3
+        },
+        {
+            "Key": "Enable_Participant_Scaling",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Zombie health and rewards will scale based on the number of players present. See docs for more details.",
+            "Variable": "ShouldScaleWithNumberOfParticipants",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/beacon-asset.html#beacon-asset-properties",
+            "Priority": 3
+        }
+    ]
+}

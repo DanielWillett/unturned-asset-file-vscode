@@ -287,7 +287,7 @@ public readonly struct OneOrMore<T> : IEquatable<OneOrMore<T>>, IEquatable<T>, I
     }
 
     /// <summary>
-    /// Gets the last value added, or <see langword="default"/> if there are no items in this container.
+    /// Gets the first value added, or <see langword="default"/> if there are no items in this container.
     /// </summary>
     public T? FirstOrDefault()
     {
@@ -298,6 +298,100 @@ public readonly struct OneOrMore<T> : IEquatable<OneOrMore<T>>, IEquatable<T>, I
             return default;
 
         return Values[0];
+    }
+
+    /// <summary>
+    /// Gets the first value added matching <paramref name="selector"/>, or <see langword="default"/> if there are no matching items in this container.
+    /// </summary>
+    public T? FirstOrDefault(Func<T, bool> selector)
+    {
+        if (Values == null)
+        {
+            return selector(Value) ? Value : default;
+        }
+
+        if (Values.Length == 0)
+            return default;
+
+        for (int i = 0; i < Values.Length; ++i)
+        {
+            T v = Values[0];
+            if (selector(v))
+                return v;
+        }
+
+        return default;
+    }
+
+    /// <summary>
+    /// Checks if there are any values matching <paramref name="selector"/>.
+    /// </summary>
+    public bool Any(Func<T, bool> selector)
+    {
+        if (Values == null)
+        {
+            return selector(Value);
+        }
+
+        if (Values.Length == 0)
+            return false;
+
+        for (int i = 0; i < Values.Length; ++i)
+        {
+            T v = Values[0];
+            if (selector(v))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if all values match <paramref name="selector"/>.
+    /// </summary>
+    /// <remarks>Returns <see langword="true"/> if there are no elements.</remarks>
+    public bool All(Func<T, bool> selector)
+    {
+        if (Values == null)
+        {
+            return selector(Value);
+        }
+
+        if (Values.Length == 0)
+            return true;
+
+        for (int i = 0; i < Values.Length; ++i)
+        {
+            T v = Values[0];
+            if (!selector(v))
+                return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Gets the first value added matching <paramref name="selector"/>, or throws an exception if there are no matching items in this container.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">There are no matching items in this collection.</exception>
+    public T? First(Func<T, bool> selector)
+    {
+        if (Values == null)
+        {
+            return selector(Value) ? Value : throw new InvalidOperationException("No values in collection.");
+        }
+
+        if (Values.Length == 0)
+            throw new InvalidOperationException("No values in collection.");
+
+        for (int i = 0; i < Values.Length; ++i)
+        {
+            T v = Values[0];
+            if (selector(v))
+                return v;
+        }
+
+        throw new InvalidOperationException("No values in collection.");
     }
 
     /// <summary>
@@ -985,6 +1079,25 @@ public struct OneOrMoreEnumerator<T> : IEnumerator<T>
 
 public static class OneOrMoreExtensions
 {
+    /// <summary>
+    /// Adds all values from a <see cref="OneOrMore{T}"/> to <paramref name="list"/>.
+    /// </summary>
+    public static void AddToList<T>(this OneOrMore<T> oneOrMore, List<T> list)
+    {
+        int capacity = list.Count + oneOrMore.Length;
+        if (capacity < list.Capacity)
+            list.Capacity = capacity;
+
+        if (oneOrMore.Values == null)
+        {
+            list.Add(oneOrMore.Value);
+            return;
+        }
+
+        if (oneOrMore.Values.Length != 0)
+            list.AddRange(oneOrMore.Values);
+    }
+
     /// <summary>
     /// Attempts to get a value from a <see cref="OneOrMore{T}"/> acting as a dictionary.
     /// </summary>

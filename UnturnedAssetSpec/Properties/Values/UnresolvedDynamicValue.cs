@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -71,7 +71,7 @@ internal class UnresolvedDynamicValue : ISecondPassSpecDynamicValue, IDisposable
             throw new JsonException($"Failed to read a value while reading property {_context} (no data).");
         }
 
-        ISpecPropertyType? expectedType = property.Type;
+        ISpecPropertyType? expectedType = property.Type.Type;
         if (_expectedTypeGetterOverride != null)
         {
             expectedType = _expectedTypeGetterOverride(property, database, assetFile);

@@ -7,6 +7,9 @@ using System.Diagnostics;
 
 namespace UnturnedAssetSpecTests;
 
+#pragma warning disable VSTHRD103
+#pragma warning disable VSTHRD200
+
 [NonParallelizable]
 public class InstallationEnvironmentTest
 {
@@ -447,3 +450,5 @@ public class InstallationEnvironmentTest
         _runner?.Dispose();
     }
 }
+#pragma warning restore VSTHRD200
+#pragma warning restore VSTHRD103

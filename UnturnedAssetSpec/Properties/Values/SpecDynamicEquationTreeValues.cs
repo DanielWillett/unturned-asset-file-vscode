@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
@@ -181,6 +181,17 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
         ValueType = valueType;
     }
 
+    protected static string ArgToString(ISpecDynamicValue arg)
+    {
+        if (arg is SpecDynamicEquationTreeValue or BangRef or PropertyRef)
+            return arg.ToString();
+
+        string str = arg.ToString();
+        if (str.IndexOf(' ') >= 0)
+            return $"({str})";
+        return str;
+    }
+
     public abstract bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
     public abstract bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value);
 
@@ -285,7 +296,8 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
         "MOD",          // Modulo
         "MIN",          // Minimum
         "MAX",          // Maximum
-        "AVG"           // Average
+        "AVG",          // Average
+        "CAT"           // Concat
     ];
 
     public ISpecDynamicValue Left { get; }
@@ -324,15 +336,37 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull) where TValue : default
     {
-        value = default;
-        isNull = true;
+        bool leftIsNull, rightIsNull;
+        if (typeof(TValue) == typeof(string) && Operation == SpecDynamicEquationTreeBinaryOperation.Concat)
+        {
+            if (TryGetArgumentValue(in ctx, 0, out string? leftStr, out leftIsNull)
+                && TryGetArgumentValue(in ctx, 0, out string? rightStr, out rightIsNull))
+            {
+                if (leftStr == null || leftIsNull)
+                    leftStr = string.Empty;
+                if (rightStr == null || rightIsNull)
+                    rightStr = string.Empty;
 
-        if (!TryGetArgumentValue(in ctx, 0, out double leftNum, out bool leftIsNull)
-            || !TryGetArgumentValue(in ctx, 1, out double rightNum, out bool rightIsNull))
-            return false;
+                isNull = leftIsNull && rightIsNull;
+                value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<string, TValue>(leftStr + rightStr);
+                return true;
+            }
 
-        if (leftIsNull && rightIsNull)
+            value = default;
             isNull = true;
+            return false;
+        }
+
+        if (!TryGetArgumentValue(in ctx, 0, out double leftNum, out leftIsNull)
+            || !TryGetArgumentValue(in ctx, 1, out double rightNum, out rightIsNull))
+        {
+            value = default;
+            isNull = true;
+
+            return false;
+        }
+
+        isNull = leftIsNull && rightIsNull;
         
         if (leftIsNull)
             leftNum = 0;
@@ -412,7 +446,7 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
         writer.WriteStringValue(ToString());
     }
 
-    public override string ToString() => $"={FunctionName}({Left} {Right})";
+    public override string ToString() => $"={FunctionName}({ArgToString(Left)} {ArgToString(Right)})";
 }
 
 public enum SpecDynamicEquationTreeBinaryOperation
@@ -424,7 +458,8 @@ public enum SpecDynamicEquationTreeBinaryOperation
     Modulo,
     Minimum,
     Maximum,
-    Average
+    Average,
+    Concat
 }
 
 
@@ -585,7 +620,7 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
             }
 
             // unsigned integers aren't affected
-            if (ulong.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out ulong argValueAsUInt64))
+            if (ulong.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out _))
             {
                 value = argValue;
                 isNull = argIsNull;
@@ -737,7 +772,7 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
         writer.WriteStringValue(ToString());
     }
 
-    public override string ToString() => $"={FunctionName}({Argument})";
+    public override string ToString() => $"={FunctionName}({ArgToString(Argument)})";
 }
 
 public enum SpecDynamicEquationTreeUnaryOperation
@@ -746,4 +781,129 @@ public enum SpecDynamicEquationTreeUnaryOperation
     Round,
     Floor,
     Ceiling
+}
+
+public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
+{
+    private static readonly string[] OperationFunctionNames =
+    [
+        "REP"           // Replace
+    ];
+
+    public ISpecDynamicValue Arg1 { get; }
+    public ISpecDynamicValue Arg2 { get; }
+    public ISpecDynamicValue Arg3 { get; }
+    public SpecDynamicEquationTreeTertiaryOperation Operation { get; }
+    public override string FunctionName { get; }
+
+    public SpecDynamicEquationTreeTertiaryValue(
+        ISpecDynamicValue arg1,
+        ISpecDynamicValue arg2,
+        ISpecDynamicValue arg3,
+        SpecDynamicEquationTreeTertiaryOperation operation)
+        : base(KnownTypes.String)
+    {
+        Arg1 = arg1;
+        Arg2 = arg2;
+        Arg3 = arg3;
+        Operation = operation;
+        FunctionName = GetOperationName(operation);
+    }
+
+    public static bool TryParseOperation(ReadOnlySpan<char> span, out SpecDynamicEquationTreeTertiaryOperation operation)
+    {
+        for (int i = 0; i < OperationFunctionNames.Length; ++i)
+        {
+            if (!span.Equals(OperationFunctionNames[i].AsSpan(), StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            operation = (SpecDynamicEquationTreeTertiaryOperation)i;
+            return true;
+        }
+
+        operation = (SpecDynamicEquationTreeTertiaryOperation)(-1);
+        return false;
+    }
+
+    public static string GetOperationName(SpecDynamicEquationTreeTertiaryOperation operation)
+    {
+        return OperationFunctionNames[(int)operation];
+    }
+
+    public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull) where TValue : default
+    {
+        value = default;
+        isNull = true;
+
+        if (Operation != SpecDynamicEquationTreeTertiaryOperation.Replace || typeof(TValue) != typeof(string))
+            return false;
+
+        if (!TryGetArgumentValue(in ctx, 0, out string? arg1, out bool arg1Null)
+            || !TryGetArgumentValue(in ctx, 1, out string? arg2, out bool arg2Null)
+            || !TryGetArgumentValue(in ctx, 2, out string? arg3, out bool arg3Null))
+            return false;
+
+        if (arg1Null && arg2Null && arg3Null)
+            return true;
+
+        string res;
+
+        if (string.IsNullOrEmpty(arg1))
+            res = string.Empty;
+        else if (string.IsNullOrEmpty(arg2))
+            res = arg1!;
+        else
+            res = arg1!.Replace(arg2, arg3 ?? string.Empty);
+
+        value = SpecDynamicEquationTreeValueHelpers.As<string, TValue>(res);
+        isNull = false;
+        return true;
+    }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = null;
+
+        if (Operation != SpecDynamicEquationTreeTertiaryOperation.Replace)
+            return false;
+
+        if (!TryGetArgumentValue(in ctx, 0, out string? arg1, out bool arg1Null)
+            || !TryGetArgumentValue(in ctx, 1, out string? arg2, out bool arg2Null)
+            || !TryGetArgumentValue(in ctx, 1, out string? arg3, out bool arg3Null))
+            return false;
+
+        if (arg1Null && arg2Null && arg3Null)
+            return true;
+
+        if (string.IsNullOrEmpty(arg1))
+            value = string.Empty;
+        else if (string.IsNullOrEmpty(arg2))
+            value = arg1!;
+        else
+            value = arg1!.Replace(arg2, arg3 ?? string.Empty);
+        return true;
+    }
+
+    public override ISpecDynamicValue GetArgument(int index)
+    {
+        return index switch
+        {
+            0 => Arg1,
+            1 => Arg2,
+            2 => Arg3,
+            _ => throw new ArgumentOutOfRangeException(nameof(index))
+        };
+    }
+
+    public override void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
+    {
+        writer.WriteStringValue(ToString());
+    }
+
+    public override string ToString() => $"={FunctionName}({ArgToString(Arg1)} {ArgToString(Arg2)} {ArgToString(Arg3)})";
+}
+
+public enum SpecDynamicEquationTreeTertiaryOperation
+{
+    Replace
 }

@@ -161,7 +161,8 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
     }
 
     /// <inheritdoc />
-    public Task<AutoCompleteResult[]> GetAutoCompleteResults(InClassName inClassName)
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters,
+        in FileEvaluationContext context)
     {
         if (_valueResults != null)
         {

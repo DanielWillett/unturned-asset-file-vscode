@@ -41,12 +41,13 @@ public sealed class AssetBundleVersionSpecPropertyType : BasicSpecPropertyType<A
     public override string DisplayName => "Asset Bundle Version";
 
     /// <inheritdoc />
-    public Task<AutoCompleteResult[]> GetAutoCompleteResults(InClassName inClassName)
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters,
+        in FileEvaluationContext context)
     {
         if (_autoComplete != null)
             return Task.FromResult(_autoComplete);
 
-        AssetInformation.AssetBundleVersionInfo?[]? info = inClassName.Parameters.Database.Information.AssetBundleVersions;
+        AssetInformation.AssetBundleVersionInfo?[]? info = parameters.Database.Information.AssetBundleVersions;
         if (info is not { Length: > 0 })
         {
             return Task.FromResult(AutoCompleteResult.None);

@@ -1,11 +1,12 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
     "Type": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp",
     "DisplayName": "Backpack Item",
     "Parent": "SDG.Unturned.ItemBagAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/backpack-asset.html",
     "Category": "ITEM",
     "VanillaIdLimit": 2000,
+    "RequireId": true,
     "Properties": [ ],
     "BundleAssets":
     [

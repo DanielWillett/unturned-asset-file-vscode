@@ -5,6 +5,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
@@ -23,7 +24,7 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable
     /// <summary>
     /// The type of the property.
     /// </summary>
-    public required ISpecPropertyType Type { get; set; }
+    public required PropertyTypeOrSwitch Type { get; set; }
 
     /// <summary>
     /// If <see cref="KeyIsRegex"/> is <see langword="true"/>, the singular version of the key which would not be regex (ex. <c>Blade</c> for <c>Blade_#</c>).

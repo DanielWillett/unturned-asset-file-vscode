@@ -287,7 +287,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
                 break;
         }
 
-        if (char.IsDigit(str[0]) && int.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out int num) && num is >= 0 and < 11)
+        if (char.IsDigit(str[0]) && int.TryParse(str.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out int num) && num is >= 0 and < 11)
         {
             category = TypeOf.Values[num];
             return true;

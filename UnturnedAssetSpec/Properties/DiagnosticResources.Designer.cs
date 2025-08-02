@@ -250,6 +250,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; is deprecated..
+        /// </summary>
+        internal static string UNT1018 {
+            get {
+                return ResourceManager.GetString("UNT1018", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This format string should include argument {{{0}}}..
+        /// </summary>
+        internal static string UNT102 {
+            get {
+                return ResourceManager.GetString("UNT102", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected &apos;}&apos; at end of dictionary..
         /// </summary>
         internal static string UNT2001 {
@@ -318,6 +336,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string UNT2011 {
             get {
                 return ResourceManager.GetString("UNT2011", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Malformed format string. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method..
+        /// </summary>
+        internal static string UNT2012 {
+            get {
+                return ResourceManager.GetString("UNT2012", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Malformed format string: {0}. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method..
+        /// </summary>
+        internal static string UNT2012_WithMessage {
+            get {
+                return ResourceManager.GetString("UNT2012_WithMessage", resourceCulture);
             }
         }
     }

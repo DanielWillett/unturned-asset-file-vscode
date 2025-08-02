@@ -4,6 +4,8 @@ using System.Text.Json;
 
 namespace UnturnedAssetSpecTests;
 
+#pragma warning disable VSTHRD200
+
 public class StatusTests
 {
     private AssetSpecDatabase? _runner;
@@ -63,3 +65,5 @@ public class StatusTests
         _runner?.Dispose();
     }
 }
+
+#pragma warning restore VSTHRD200

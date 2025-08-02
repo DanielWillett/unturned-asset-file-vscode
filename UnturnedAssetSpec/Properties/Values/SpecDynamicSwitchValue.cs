@@ -1,10 +1,12 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
@@ -24,6 +26,419 @@ public class SpecDynamicSwitchValue :
     {
         ValueType = valueType;
         Cases = valueCase;
+    }
+
+    public bool TryEvaluateMatchingSwitchCase(
+        IReadOnlyList<SpecDynamicSwitchCaseValue>? previousCases,
+        SpecDynamicSwitchCaseValue @case,
+        [MaybeNullWhen(false)]
+        out SpecDynamicSwitchCaseValue matchingCase)
+    {
+        // all in previousCases can be assumed false
+        // all in case can be assumed true
+
+        // with that in mind, find a case from this switch that is 100% valid
+        // returns false if inconclusive
+
+        // mainly for type switching:
+
+        /*
+         * Type (this):
+         * switch ("Uniform_Scale".Included)
+         * {
+         *     case true:
+         *          Type = Float32;
+         *     case false:
+         *          Type = Vector3;
+         *     default:
+         *          Type = Vector4;
+         * }
+         *
+         * DefaultValue:
+         * switch ("Uniform_Scale".Included)
+         * {
+         *     case true or 1 or 2: // can match
+         *          DefaultValue = 0;
+         *     case false and 1: // can not match
+         *          DefaultValue = new Vector3(0, 0, 0);
+         *     default:
+         *          DefaultValue = new Vector4(0, 0, 0);
+         * }
+         */
+
+        List<SpecCondition> falseConditions = new List<SpecCondition>();
+        List<SpecCondition> trueConditions = new List<SpecCondition>();
+        List<SpecCondition[]> trueConditionGroups = new List<SpecCondition[]>();
+        List<SpecCondition[]> falseConditionGroups = new List<SpecCondition[]>();
+
+        FigureOutConditions(previousCases, @case, falseConditions, trueConditions, trueConditionGroups, falseConditionGroups);
+
+        // if no conditions have been inconclusive
+        return EvaluateConditionIntl(
+            out matchingCase,
+            falseConditions, trueConditions, falseConditionGroups, trueConditionGroups
+        );
+    }
+
+    private bool EvaluateConditionIntl(
+        [MaybeNullWhen(false)]
+        out SpecDynamicSwitchCaseValue matchingCase,
+        List<SpecCondition> falseConditions,
+        List<SpecCondition> trueConditions,
+        List<SpecCondition[]> falseConditionGroups,
+        List<SpecCondition[]> trueConditionGroups
+        )
+    {
+        bool isSure = true;
+
+        for (int i = 0; i < Cases.Length; ++i)
+        {
+            SpecDynamicSwitchCaseValue c = Cases[i];
+            if (!c.HasConditions)
+            {
+                if (isSure)
+                {
+                    matchingCase = c;
+                    return true;
+                }
+
+                break;
+            }
+
+            switch (c.Operation)
+            {
+                case SpecDynamicSwitchCaseOperation.When:
+                    // condition must be true
+                    bool? whenCheck = CheckCondition(new SpecDynamicSwitchCaseOrCondition(c.WhenCondition), trueConditions, falseConditions);
+                    if (!whenCheck.HasValue)
+                    {
+                        isSure = false;
+                    }
+                    else if (isSure && whenCheck.Value && c.Value is SpecDynamicSwitchValue sw)
+                    {
+                        sw.EvaluateConditionIntl(out matchingCase, falseConditions,
+                            trueConditions, falseConditionGroups, trueConditionGroups);
+                    }
+
+                    break;
+
+                case SpecDynamicSwitchCaseOperation.And:
+                    // must contain all cases from parent
+                    if (c.Conditions.Length > 1)
+                    {
+                        if (ContainsGroup(falseConditionGroups, c.Conditions, true))
+                            continue;
+                    }
+
+                    bool anyFalse = false;
+                    for (int j = 0; j < c.Conditions.Length; ++j)
+                    {
+                        SpecDynamicSwitchCaseOrCondition cond1 = c.Conditions[j];
+                        bool? check = CheckCondition(cond1, trueConditions, falseConditions);
+                        if (!check.HasValue)
+                        {
+                            isSure = false;
+                        }
+                        else if (!check.Value)
+                        {
+                            anyFalse = true;
+                            break;
+                        }
+                    }
+
+                    if (!anyFalse && isSure)
+                    {
+                        matchingCase = c;
+                        return true;
+                    }
+
+                    break;
+
+                case SpecDynamicSwitchCaseOperation.Or:
+                    // must contain at least one case from parent
+
+                    // check group first
+                    if (c.Conditions.Length > 1)
+                    {
+                        if (isSure && ContainsGroup(trueConditionGroups, c.Conditions, false))
+                        {
+                            matchingCase = c;
+                            return true;
+                        }
+                    }
+
+                    bool wasSure = isSure;
+                    for (int j = 0; j < c.Conditions.Length; ++j)
+                    {
+                        SpecDynamicSwitchCaseOrCondition cond1 = c.Conditions[j];
+                        bool? check = CheckCondition(cond1, trueConditions, falseConditions);
+                        if (!check.HasValue)
+                        {
+                            isSure = false;
+                        }
+                        else if (check.Value)
+                        {
+                            if (wasSure)
+                            {
+                                matchingCase = c;
+                                return true;
+                            }
+                        }
+                    }
+
+                    break;
+            }
+        }
+
+        matchingCase = null;
+        return false;
+
+        static bool ContainsGroup(List<SpecCondition[]> groups, OneOrMore<SpecDynamicSwitchCaseOrCondition> conditions, bool falseGroup)
+        {
+            bool exists = true;
+            if (falseGroup)
+            {
+                // all in conditions are in group
+                foreach (SpecCondition[] group in groups)
+                {
+                    if (!conditions.All(x => x.Case == null && Array.IndexOf(group, x.Condition) >= 0))
+                    {
+                        exists = false;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // all in group are in conditions
+                foreach (SpecCondition[] group in groups)
+                {
+                    if (!Array.TrueForAll(group, x => conditions.Contains(new SpecDynamicSwitchCaseOrCondition(x))))
+                    {
+                        exists = false;
+                        break;
+                    }
+                }
+            }
+
+            return exists;
+        }
+
+        static bool? CheckCondition(SpecDynamicSwitchCaseOrCondition cond, List<SpecCondition> trueConditions, List<SpecCondition> falseConditions)
+        {
+            if (cond.IsNull || cond.Case != null)
+                return null;
+
+            if (trueConditions.Contains(cond.Condition))
+                return true;
+
+            return falseConditions.Contains(cond.Condition) ? false : null;
+        }
+    }
+
+    private static void FigureOutConditions(
+        IReadOnlyList<SpecDynamicSwitchCaseValue>? previousCases,
+        SpecDynamicSwitchCaseValue @case,
+        List<SpecCondition> falseConditions,
+        List<SpecCondition> trueConditions,
+        List<SpecCondition[]> trueConditionGroups,
+        List<SpecCondition[]> falseConditionGroups)
+    {
+        GatherTrueConditions(@case, trueConditions, trueConditionGroups);
+
+        foreach (SpecCondition tp in trueConditions)
+        {
+            if (!tp.TryGetOpposite(out SpecCondition fp))
+                continue;
+
+            if (!falseConditions.Contains(fp))
+                falseConditions.Add(fp);
+        }
+
+        if (previousCases != null)
+        {
+            GatherFalseConditions(previousCases, falseConditions, falseConditionGroups);
+            foreach (SpecCondition fp in falseConditions)
+            {
+                if (!fp.TryGetOpposite(out SpecCondition tp))
+                    continue;
+
+                if (!trueConditions.Contains(tp))
+                    trueConditions.Add(tp);
+            }
+        }
+
+        for (int grpIndex = trueConditionGroups.Count - 1; grpIndex >= 0; grpIndex--)
+        {
+            SpecCondition[] grp = trueConditionGroups[grpIndex];
+            int trueConds = 0, falseConds = 0;
+            int lastInconclusiveIndex = -1;
+            for (int i = 0; i < grp.Length; ++i)
+            {
+                SpecCondition c = grp[i];
+                if (trueConditions.Contains(c))
+                    ++trueConds;
+                else if (falseConditions.Contains(c))
+                    ++falseConds;
+                else if (c.TryGetOpposite(out SpecCondition opp))
+                {
+                    if (trueConditions.Contains(opp))
+                        ++falseConds;
+                    else if (falseConditions.Contains(opp))
+                        ++trueConds;
+                    else
+                        lastInconclusiveIndex = i;
+                }
+                else
+                    lastInconclusiveIndex = i;
+            }
+
+            if (trueConds == grp.Length || falseConds == grp.Length)
+            {
+                trueConditionGroups.RemoveAt(grpIndex);
+            }
+            else if (lastInconclusiveIndex != -1 && trueConds == 0 && falseConds == grp.Length - 1)
+            {
+                trueConditionGroups.RemoveAt(grpIndex);
+                // all others are false, last one must be true
+                SpecCondition trueCondition = grp[lastInconclusiveIndex];
+                trueConditions.Add(trueCondition);
+                if (trueCondition.TryGetOpposite(out SpecCondition falseCondition) && !falseConditions.Contains(falseCondition))
+                    falseConditions.Add(falseCondition);
+            }
+        }
+        for (int grpIndex = falseConditionGroups.Count - 1; grpIndex >= 0; grpIndex--)
+        {
+            SpecCondition[] grp = falseConditionGroups[grpIndex];
+            int trueConds = 0, falseConds = 0;
+            int lastInconclusiveIndex = -1;
+            for (int i = 0; i < grp.Length; ++i)
+            {
+                SpecCondition c = grp[i];
+                if (trueConditions.Contains(c))
+                    ++trueConds;
+                else if (falseConditions.Contains(c))
+                    ++falseConds;
+                else if (c.TryGetOpposite(out SpecCondition opp))
+                {
+                    if (trueConditions.Contains(opp))
+                        ++falseConds;
+                    else if (falseConditions.Contains(opp))
+                        ++trueConds;
+                    else
+                        lastInconclusiveIndex = i;
+                }
+                else
+                    lastInconclusiveIndex = i;
+            }
+
+            if (trueConds == grp.Length || falseConds == grp.Length)
+            {
+                falseConditionGroups.RemoveAt(grpIndex);
+            }
+            else if (lastInconclusiveIndex != -1 && falseConds == 0 && trueConds == grp.Length - 1)
+            {
+                falseConditionGroups.RemoveAt(grpIndex);
+                // all others are true, last one must be false
+                SpecCondition falseCondition = grp[lastInconclusiveIndex];
+                falseConditions.Add(falseCondition);
+                if (falseCondition.TryGetOpposite(out SpecCondition trueCondition) && !trueConditions.Contains(trueCondition))
+                    trueConditions.Add(trueCondition);
+            }
+        }
+    }
+
+    private static void GatherFalseConditions(
+        IReadOnlyList<SpecDynamicSwitchCaseValue> previousCases,
+        List<SpecCondition> falseConditions,
+        List<SpecCondition[]> falseConditionGroups)
+    {
+        foreach (SpecDynamicSwitchCaseValue falseCase in previousCases)
+        {
+            if (falseCase.Operation == SpecDynamicSwitchCaseOperation.When)
+            {
+                falseConditions.Add(falseCase.WhenCondition);
+                continue;
+            }
+
+            // shouldn't ever really get to this
+            if (!falseCase.HasConditions)
+                continue;
+
+            if (falseCase.Operation == SpecDynamicSwitchCaseOperation.Or || falseCase.Conditions.Length == 1)
+            {
+                foreach (SpecDynamicSwitchCaseOrCondition condition in falseCase.Conditions)
+                {
+                    if (condition.Case == null)
+                    {
+                        if (!falseConditions.Contains(condition.Condition))
+                            falseConditions.Add(condition.Condition);
+                    }
+                }
+            }
+            else if (falseCase.Conditions.All(x => x.Case == null))
+            {
+                SpecCondition[] falseConditionGroup = new SpecCondition[falseCase.Conditions.Length];
+                for (int i = 0; i < falseCase.Conditions.Length; ++i)
+                    falseConditionGroup[i] = falseCase.Conditions[i].Condition;
+
+                bool exists = false;
+                foreach (SpecCondition[] arr in falseConditionGroups)
+                {
+                    if (!arr.SequenceEqual(falseConditionGroup))
+                        continue;
+
+                    exists = true;
+                    break;
+                }
+
+                if (!exists)
+                    falseConditionGroups.Add(falseConditionGroup);
+            }
+        }
+    }
+
+    private static void GatherTrueConditions(SpecDynamicSwitchCaseValue trueCase, List<SpecCondition> trueConditions, List<SpecCondition[]> trueConditionGroups)
+    {
+        if (trueCase.Operation == SpecDynamicSwitchCaseOperation.When)
+        {
+            trueConditions.Add(trueCase.WhenCondition);
+            return;
+        }
+
+        if (!trueCase.HasConditions)
+            return;
+
+        if (trueCase.Operation == SpecDynamicSwitchCaseOperation.And || trueCase.Conditions.Length == 1)
+        {
+            foreach (SpecDynamicSwitchCaseOrCondition condition in trueCase.Conditions)
+            {
+                if (condition.Case == null)
+                {
+                    if (!trueConditions.Contains(condition.Condition))
+                        trueConditions.Add(condition.Condition);
+                }
+            }
+        }
+        else if (trueCase.Conditions.All(x => x.Case == null))
+        {
+            SpecCondition[] trueConditionGroup = new SpecCondition[trueCase.Conditions.Length];
+            for (int i = 0; i < trueCase.Conditions.Length; ++i)
+                trueConditionGroup[i] = trueCase.Conditions[i].Condition;
+
+            bool exists = false;
+            foreach (SpecCondition[] arr in trueConditionGroups)
+            {
+                if (!arr.SequenceEqual(trueConditionGroup))
+                    continue;
+
+                exists = true;
+                break;
+            }
+
+            if (!exists)
+                trueConditionGroups.Add(trueConditionGroup);
+        }
     }
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)

@@ -1,0 +1,333 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemClothingAsset, Assembly-CSharp",
+    "DisplayName": "Clothing Item",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Armor",
+            "Type": "Float32",
+            "Description": "Multiplier on damage received to the covered body part(s). The affected body part(s) will differ depending on the type of clothing.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#armor-float32-1",
+            "Variable": "armor",
+            "DefaultValue": 1.0,
+            "Priority": 2,
+            "ExclusiveWith": [ "SDG.Unturned.ItemAsset, Assembly-CSharp::Pro" ]
+        },
+        {
+            "Key": "Armor_Explosion",
+            "Type": "Float32",
+            "Description": "Multiplier on the damage received from area-of-effect explosions. Defaults to @Armor.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#armor-explosion-float32",
+            "Variable": "explosionArmor",
+            "DefaultValue": "@Armor",
+            "IncludedDefaultValue": 0.0,
+            "Priority": 2,
+            "ExclusiveWith": [ "SDG.Unturned.ItemAsset, Assembly-CSharp::Pro" ]
+        },
+        {
+            "Key": "Falling_Damage_Multiplier",
+            "Type": "Float32",
+            "Description": "Multiplier on the damage received from area-of-effect explosions. Defaults to @Armor.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#falling-damage-multiplier-float32-1",
+            "Variable": "fallingDamageMultiplier",
+            "DefaultValue": 1.0,
+            "Priority": 2,
+            "ExclusiveWith": [ "SDG.Unturned.ItemAsset, Assembly-CSharp::Pro" ]
+        },
+        {
+            "Key": "Proof_Water",
+            "Type": "Flag",
+            "Description": "Applies waterproof effects to glasses and backpack. When combined, oxygen will deplete slower, and when just glasses are worn, underwater post-processing effects will be reduced.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#proof-water-flag",
+            "Variable": "proofWater",
+            "DefaultValue": false,
+            "Priority": 2,
+            "ExclusiveWith": [ "SDG.Unturned.ItemAsset, Assembly-CSharp::Pro" ]
+        },
+        {
+            "Key": "Proof_Fire",
+            "Type": "Flag",
+            "Description": "Applies fireproof effects to shirts and pants. When combined, the player will be immue to fire.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#proof-fire-flag",
+            "Variable": "proofFire",
+            "DefaultValue": false,
+            "Priority": 2,
+            "ExclusiveWith": [ "SDG.Unturned.ItemAsset, Assembly-CSharp::Pro" ]
+        },
+        {
+            "Key": "Proof_Radiation",
+            "Type": "Flag",
+            "Description": "Applies radiation-proof effects to masks, pants, and shirts. When a mask is worn, the player will not be affected by standard deadzones. When combined, the player will be immue to full-suit deadzones.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#proof-radiation-flag",
+            "Variable": "proofRadiation",
+            "DefaultValue": false,
+            "Priority": 2,
+            "ExclusiveWith": [ "SDG.Unturned.ItemAsset, Assembly-CSharp::Pro" ]
+        },
+        {
+            "Key": "Prevents_Falling_Broken_Bones",
+            "Type": "Boolean",
+            "Description": "Prevents the player from breaking their bones when falling while this item is equipped.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#prevents-falling-broken-bones-bool-false",
+            "Variable": "preventsFallingBrokenBones",
+            "DefaultValue": false,
+            "Priority": 1,
+            "ExclusiveWith": [ "SDG.Unturned.ItemAsset, Assembly-CSharp::Pro" ]
+        },
+        {
+            "Key": "Movement_Speed_Multiplier",
+            "Type": "Float32",
+            "Description": "Multiplier on the player's walk speed while this item is equipped.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#movement-speed-multiplier-float32-1",
+            "Variable": "movementSpeedMultiplier",
+            "DefaultValue": 1.0,
+            "Priority": 1,
+            "ExclusiveWith": [ "SDG.Unturned.ItemAsset, Assembly-CSharp::Pro" ]
+        },
+        {
+            "Key": "Visible_On_Ragdoll",
+            "Type": "Boolean",
+            "Description": "Whether or not this item is displayed on ragdolls.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#visible-on-ragdoll-bool-true",
+            "Variable": "visibleOnRagdoll",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                            "Operation": "eq-i",
+                            "Comparand": "Glasses"
+                        },
+                        {
+                            "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                            "Operation": "eq-i",
+                            "Comparand": "Hat"
+                        },
+                        {
+                            "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                            "Operation": "eq-i",
+                            "Comparand": "Mask"
+                        }
+                    ],
+                    "Value": "@SDG.Unturned.ItemGearAsset::Beard"
+                },
+                {
+                    "Value": true
+                }
+            ],
+            "Priority": 1
+        },
+        {
+            "Key": "Hair_Visible",
+            "Type": "Boolean",
+            "Description": "Whether or not the player's hair should be visible when this item is equipped.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#hair-visible-bool-true",
+            "Variable": "hairVisible",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                            "Operation": "eq-i",
+                            "Comparand": "Glasses"
+                        },
+                        {
+                            "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                            "Operation": "eq-i",
+                            "Comparand": "Hat"
+                        },
+                        {
+                            "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                            "Operation": "eq-i",
+                            "Comparand": "Mask"
+                        }
+                    ],
+                    "Value": "@SDG.Unturned.ItemGearAsset::Hair"
+                },
+                {
+                    "Value": true
+                }
+            ],
+            "Priority": 2
+        },
+        {
+            "Key": "Beard_Visible",
+            "Type": "Boolean",
+            "Description": "Whether or not the player's beard should be visible when this item is equipped.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#beard-visible-bool-true",
+            "Variable": "beardVisible",
+            "DefaultValue": true,
+            "Priority": 2
+        },
+        {
+            "Key": "Mirror_Left_Handed_Model",
+            "Type": "Boolean",
+            "Description": "Clothing should be mirrored when the player is using the left-handed setting. This property only affects 3D clothing items, being: vests, backpacks, masks, glasses, and hats.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#mirror-left-handed-model-bool-true",
+            "Variable": "shouldMirrorLeftHandedModel",
+            "DefaultValue": true,
+            "Priority": 1,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                                "Operation": "eq",
+                                "Comparand": "Shirt"
+                            },
+                            {
+                                "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                                "Operation": "eq",
+                                "Comparand": "Pants"
+                            }
+                        ],
+                        "Value": false
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "WearAudio",
+            "Type": "AudioReference",
+            "Description": "AudioClip or OneShotAudioDefinition to play upon equipping this clothing item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#wearaudio-master-bundle-pointer",
+            "Variable": "beardVisible",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                            "Operation": "eq",
+                            "Comparand": "Backpack"
+                        },
+                        {
+                            "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                            "Operation": "eq",
+                            "Comparand": "Vest"
+                        }
+                    ],
+                    "Value": "core.masterbundle:Sounds/Zipper.mp3"
+                },
+                {
+                    "Value": "core.masterbundle:Sounds/Sleeve.mp3"
+                }
+            ],
+            "Priority": 1
+        },
+        {
+            "Key": "Destroy_Clothing_Colliders",
+            "Type": "Boolean",
+            "Description": "Whether or not colliders are destroyed on clothing. This property only affects 3D clothing items, being: vests, backpacks, masks, glasses, and hats.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#destroy-clothing-colliders-bool-true",
+            "Variable": "shouldDestroyClothingColliders",
+            "DefaultValue": true,
+            "Priority": 1,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                                "Operation": "eq",
+                                "Comparand": "Shirt"
+                            },
+                            {
+                                "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                                "Operation": "eq",
+                                "Comparand": "Pants"
+                            }
+                        ],
+                        "Value": false
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Priority_Over_Cosmetic",
+            "Type": "Boolean",
+            "Description": "Whether or not this item should display instead of any equipped cosmetics. Defaults to true for night vision and blindfolds.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#priority-over-cosmetic-bool",
+            "Variable": "priorityOverCosmeticOverride",
+            "DefaultValue":
+            [
+                {
+                    "When":
+                    {
+                        "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
+                        "Operation": "eq",
+                        "Comparand": "Glasses"
+                    },
+                    "Cases":
+                    [
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp::Vision",
+                                    "Operation": "neq",
+                                    "Comparand": "NONE"
+                                },
+                                {
+                                    "Variable": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp::Blindfold",
+                                    "Operation": "eq",
+                                    "Comparand": true
+                                }
+                            ],
+                            "Value": true
+                        }
+                    ]
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Priority": 2
+        },
+        {
+            "Key": "Skin_Override",
+            "Type": "String",
+            "Variable": "skinOverride",
+            "Description": "Optional name of a renderer that should use the player’s skin material.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#skin-override-string",
+            "DefaultValue": null
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "CosmeticPreviewOverride",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Pro",
+                    "Value": true
+                }
+            ],
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Overrides the model used for the cosmetic preview rendered in the shop."
+        }
+    ]
+}

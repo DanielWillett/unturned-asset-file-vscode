@@ -204,4 +204,16 @@
   <data name="UNT1017" xml:space="preserve">
     <value>Unexpected amount supplied for an item ID or GUID.</value>
   </data>
+  <data name="UNT1018" xml:space="preserve">
+    <value>Property "{0}" is deprecated.</value>
+  </data>
+  <data name="UNT2012_WithMessage" xml:space="preserve">
+    <value>Malformed format string: {0}. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method.</value>
+  </data>
+  <data name="UNT2012" xml:space="preserve">
+    <value>Malformed format string. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method.</value>
+  </data>
+  <data name="UNT102" xml:space="preserve">
+    <value>This format string should include argument {{{0}}}.</value>
+  </data>
 </root>

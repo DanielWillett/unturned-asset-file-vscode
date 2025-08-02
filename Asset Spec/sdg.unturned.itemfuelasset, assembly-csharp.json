@@ -1,0 +1,51 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemFuelAsset, Assembly-CSharp",
+    "DisplayName": "Fuel Item (Canister)",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fuel-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Fuel",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Description": "Maximum units of fuel that can be stored in the fuel canister.",
+            "Variable": "fuel",
+            "Priority": 4,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fuel-asset.html#fuel-asset-properties",
+            "Required": true
+        },
+        {
+            "Key": "Delete_After_Filling_Target",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not this item should be removed from the player's inventory after adding fuel to target.",
+            "Variable": "shouldDeleteAfterFillingTarget",
+            "Priority": 3,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fuel-asset.html#fuel-asset-properties"
+        },
+        {
+            "Key": "Always_Spawn_Full",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not this item will always spawn filled to its full capacity.",
+            "Variable": "shouldAlwaysSpawnFull",
+            "Priority": 3,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fuel-asset.html#fuel-asset-properties"
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Use",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the item is used.",
+            "Variable": "use",
+            "Required": true
+        }
+    ]
+}

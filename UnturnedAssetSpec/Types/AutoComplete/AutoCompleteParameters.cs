@@ -9,13 +9,14 @@ public readonly struct AutoCompleteParameters
 {
     public IAssetSpecDatabase Database { get; }
     public AssetFileTree File { get; }
+    public IWorkspaceFile OpenedFile { get; }
     public FilePosition Position { get; }
     public AssetFileType FileType { get; }
     public SpecProperty Property { get; }
     public IWorkspaceEnvironment Workspace { get; }
     public InstallationEnvironment Environment { get; }
 
-    public AutoCompleteParameters(IAssetSpecDatabase database, AssetFileTree file, FilePosition position, AssetFileType fileType, SpecProperty property, IWorkspaceEnvironment workspace, InstallationEnvironment environment)
+    public AutoCompleteParameters(IAssetSpecDatabase database, AssetFileTree file, FilePosition position, AssetFileType fileType, SpecProperty property, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IWorkspaceFile openedFile)
     {
         Database = database;
         File = file;
@@ -24,5 +25,6 @@ public readonly struct AutoCompleteParameters
         Property = property;
         Workspace = workspace;
         Environment = environment;
+        OpenedFile = openedFile;
     }
 }

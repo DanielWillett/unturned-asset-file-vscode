@@ -1,11 +1,12 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
     "Type": "SDG.Unturned.DialogueAsset, Assembly-CSharp",
     "DisplayName": "Dialogue",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html",
     "Category": "NPC",
     "VanillaIdLimit": 2000,
+    "RequireId": false,
     "Properties":
     [
         {

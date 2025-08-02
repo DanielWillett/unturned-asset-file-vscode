@@ -24,9 +24,9 @@ public sealed class NavIdSpecPropertyType : BasicSpecPropertyType<NavIdSpecPrope
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
-        if (sbyte.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out sbyte result))
+        if (byte.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out byte result))
         {
-            dynamicValue = SpecDynamicValue.Int8(result, this);
+            dynamicValue = SpecDynamicValue.UInt8(result, this);
             return true;
         }
 

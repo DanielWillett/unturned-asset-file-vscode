@@ -1,0 +1,114 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemChargeAsset, Assembly-CSharp",
+    "DisplayName": "Charge Barricade Item",
+    "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Range2",
+            "Type": "Float32",
+            "Description": "Radius of the damaging, area-of-effect explosion. Not to be confused with @(SDG.Unturned.ItemPlaceableAsset, Assembly-CSharp::Range) which is placement range.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
+            "Variable": "range2",
+            "DefaultValue": 0,
+            "Priority": 3
+        },
+        {
+            "Key": "Player_Damage",
+            "Type": "Float32",
+            "Description": "Damage dealt to players caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
+            "Variable": "playerDamage",
+            "DefaultValue": 0,
+            "Priority": 2
+        },
+        {
+            "Key": "Zombie_Damage",
+            "Type": "Float32",
+            "Description": "Damage dealt to zombies caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
+            "Variable": "zombieDamage",
+            "DefaultValue": 0,
+            "Priority": 2
+        },
+        {
+            "Key": "Animal_Damage",
+            "Type": "Float32",
+            "Description": "Damage dealt to animals caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
+            "Variable": "animalDamage",
+            "DefaultValue": 0,
+            "Priority": 2
+        },
+        {
+            "Key": "Barricade_Damage",
+            "Type": "Float32",
+            "Description": "Damage dealt to barricades caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
+            "Variable": "barricadeDamage",
+            "DefaultValue": 0,
+            "Priority": 2
+        },
+        {
+            "Key": "Structure_Damage",
+            "Type": "Float32",
+            "Description": "Damage dealt to structures caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
+            "Variable": "structureDamage",
+            "DefaultValue": 0,
+            "Priority": 2
+        },
+        {
+            "Key": "Vehicle_Damage",
+            "Type": "Float32",
+            "Description": "Damage dealt to vehicles caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
+            "Variable": "vehicleDamage",
+            "DefaultValue": 0,
+            "Priority": 2
+        },
+        {
+            "Key": "Resource_Damage",
+            "Type": "Float32",
+            "Description": "Damage dealt to resources caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
+            "Variable": "resourceDamage",
+            "DefaultValue": 0,
+            "Priority": 2
+        },
+        {
+            "Key": "Explosion_Launch_Speed",
+            "Type": "Float32",
+            "Description": "Damage dealt to resources caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
+            "Variable": "explosionLaunchSpeed",
+            "DefaultValue": "=MUL(@Player_Damage 0.1)",
+            "Priority": 2
+        },
+        {
+            "Key": "Object_Damage",
+            "Type": "Float32",
+            "Description": "Damage dealt to objects caught within the area-of-effect explosion. Defaults to @Resource_Damage.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
+            "Variable": "objectDamage",
+            "DefaultValue": "@Resource_Damage",
+            "IncludedDefaultValue": 0,
+            "Priority": 2
+        },
+        {
+            "Key": "Explosion2",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Description": "Effect to play upon detonation.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
+            "Variable": "DetonationEffectGuid",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Priority": 3
+        }
+    ]
+}

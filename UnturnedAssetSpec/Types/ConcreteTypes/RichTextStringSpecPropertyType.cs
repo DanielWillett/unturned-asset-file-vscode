@@ -1,8 +1,10 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class RichTextStringSpecPropertyType : BasicSpecPropertyType<RichTextStringSpecPropertyType, string>
+public sealed class RichTextStringSpecPropertyType : BasicSpecPropertyType<RichTextStringSpecPropertyType, string>, IStringParseableSpecPropertyType
 {
     public static readonly RichTextStringSpecPropertyType Instance = new RichTextStringSpecPropertyType();
 
@@ -32,6 +34,14 @@ public sealed class RichTextStringSpecPropertyType : BasicSpecPropertyType<RichT
         }
 
         value = strValNode.Value;
+        return true;
+    }
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        stringValue ??= span.ToString();
+        dynamicValue = SpecDynamicValue.String(stringValue, this);
         return true;
     }
 }

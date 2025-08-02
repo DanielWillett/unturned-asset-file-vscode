@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Numerics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -66,7 +67,10 @@ public static class KnownTypes
         { "ActionKey", () => ActionKey },
         { "LocalizableString", () => LocalizableString },
         { "Skill", () => Skill() },
-        { "BlueprintSkill", () => Skill(true, true) }
+        { "BlueprintSkill", () => Skill(true, true) },
+        { "SteamItemDef", () => SteamItemDef },
+        { "CaliberId", () => CaliberId },
+        { "BladeId", () => BladeId }
     };
 
     public static ISpecPropertyType? GetType(string knownType)
@@ -243,6 +247,34 @@ public static class KnownTypes
                 : UInt8;
         }
 
+        if (knownType.Equals("FormatString", StringComparison.Ordinal))
+        {
+            int argCount = 1;
+            bool allowRichText = false;
+            if (elementType != null)
+            {
+                string num, rt;
+                int index = elementType.IndexOf('|');
+                if (index == -1)
+                {
+                    num = elementType;
+                    rt = string.Empty;
+                }
+                else
+                {
+                    num = elementType.Substring(0, index);
+                    rt = index == elementType.Length - 1 ? string.Empty : elementType.Substring(index + 1);
+                }
+
+                if (!int.TryParse(num, NumberStyles.Number, CultureInfo.InvariantCulture, out argCount))
+                    argCount = 1;
+                if (rt.StartsWith("T", StringComparison.OrdinalIgnoreCase))
+                    allowRichText = true;
+            }
+
+            return FormatString(argCount, allowRichText);
+        }
+
         return null;
     }
 
@@ -385,4 +417,17 @@ public static class KnownTypes
         => new LegacyCompatibleListSpecPropertyType(type);
     public static ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>> LegacyCompatibleList(QualifiedType type)
         => new LegacyCompatibleListSpecPropertyType(type);
+
+    public static ISpecPropertyType<int> SteamItemDef => SteamItemDefSpecPropertyType.Instance;
+    public static ISpecPropertyType<ushort> CaliberId => CaliberIdSpecPropertyType.Instance;
+    public static ISpecPropertyType<byte> BladeId => BladeIdSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> FormatString(int argCount, bool allowRichText)
+    {
+        return argCount switch
+        {
+            1 => allowRichText ? FormatStringSpecPropertyType.OneRichText : FormatStringSpecPropertyType.OneNoRichText,
+            2 => allowRichText ? FormatStringSpecPropertyType.TwoRichText : FormatStringSpecPropertyType.TwoNoRichText,
+            _ => new FormatStringSpecPropertyType(argCount, allowRichText)
+        };
+    }
 }

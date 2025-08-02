@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -21,7 +21,7 @@ public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
     public string PropertyName => _info.PropertyName;
     public QualifiedType Type => _info.Type;
 
-    public ISpecPropertyType? ValueType => _property?.Type;
+    public ISpecPropertyType? ValueType => _property?.Type.Type;
 
     public PropertyRef(PropertyRefInfo info)
     {
@@ -335,7 +335,7 @@ public readonly struct PropertyRefInfo
 
         PropertyRefInfo crossValueInfo = new PropertyRefInfo(PropertyName.AsSpan(), PropertyName);
 
-        FileEvaluationContext crossValueCtx = new FileEvaluationContext(in ctx, workspaceFile.File);
+        FileEvaluationContext crossValueCtx = new FileEvaluationContext(in ctx, workspaceFile.File, workspaceFile);
 
         crossValueInfo.ResolveProperty(in crossValueCtx, out SpecProperty? crossedProperty, out PropertyRefInfo crossCrossPropertyInfo);
         if (crossCrossPropertyInfo.PropertyName != null || crossedProperty == null)

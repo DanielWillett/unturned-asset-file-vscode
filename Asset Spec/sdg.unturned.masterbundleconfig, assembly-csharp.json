@@ -1,10 +1,11 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
     "Type": "SDG.Unturned.MasterBundleConfig, Assembly-CSharp",
     "DisplayName": "Master Bundle Definition",
     "Parent": null,
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#master-bundles",
     "Category": "NONE",
+    "RequireId": false,
     "Properties":
     [
         {

@@ -1,10 +1,11 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
     "Type": "SDG.Framework.Foliage.FoliageInfoAsset, Assembly-CSharp",
     "DisplayName": "Foliage",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
     "Category": "NONE",
+    "RequireId": false,
     "Properties":
     [
         {
@@ -112,8 +113,40 @@
         },
         {
             "Key": "Min_Scale",
-            "Type": "EulerRotation",
-            "DefaultValue": "(0, 0, 0)",
+            "Type":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Uniform_Scale",
+                            "Operation": "eq",
+                            "Comparand": true
+                        }
+                    ],
+                    "Value": "Float32"
+                },
+                {
+                    "Value": "Scale"
+                }
+            ],
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Uniform_Scale",
+                            "Operation": "eq",
+                            "Comparand": true
+                        }
+                    ],
+                    "Value": 0
+                },
+                {
+                    "Value": "(0, 0, 0)"
+                }
+            ],
             "Maximum": "@Max_Scale",
             "Description": "The minimum scale to draw the foliage at. A random scale is chosen between @Min_Scale and @Max_Scale.",
             "Variable": "minScale",
@@ -121,12 +154,52 @@
         },
         {
             "Key": "Max_Scale",
-            "Type": "EulerRotation",
-            "DefaultValue": "(0, 0, 0)",
+            "Type":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Uniform_Scale",
+                            "Operation": "eq",
+                            "Comparand": true
+                        }
+                    ],
+                    "Value": "Float32"
+                },
+                {
+                    "Value": "Scale"
+                }
+            ],
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Uniform_Scale",
+                            "Operation": "eq",
+                            "Comparand": true
+                        }
+                    ],
+                    "Value": 0
+                },
+                {
+                    "Value": "(0, 0, 0)"
+                }
+            ],
             "Minimum": "@Min_Scale",
             "Description": "The maximum scale to draw the foliage at. A random scale is chosen between @Min_Scale and @Max_Scale.",
             "Variable": "maxScale",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
+        },
+        {
+            "Key": "Uniform_Scale",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
+            "Variable": "UniformScale",
+            "Version": "3.25.8.0"
         }
     ]
 }

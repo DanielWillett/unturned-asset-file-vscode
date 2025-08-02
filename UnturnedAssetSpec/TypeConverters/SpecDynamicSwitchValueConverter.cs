@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 public class SpecDynamicSwitchValueConverter : JsonConverter<SpecDynamicSwitchValue?>
 {
-    public static SpecDynamicSwitchValue? ReadSwitch(ref Utf8JsonReader reader, JsonSerializerOptions? options, ISpecPropertyType? expectedType)
+    public static SpecDynamicSwitchValue? ReadSwitch(ref Utf8JsonReader reader, JsonSerializerOptions? options, PropertyTypeOrSwitch expectedType)
     {
         if (reader.TokenType == JsonTokenType.Null)
         {
@@ -23,16 +23,29 @@ public class SpecDynamicSwitchValueConverter : JsonConverter<SpecDynamicSwitchVa
         }
 
         List<SpecDynamicSwitchCaseValue> buffer = new List<SpecDynamicSwitchCaseValue>(8);
+        ISpecPropertyType? endType = expectedType.Type;
         while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
         {
-            SpecDynamicSwitchCaseValue? @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref reader, options, expectedType);
+            ISpecPropertyType? type = endType;
+            Utf8JsonReader r2 = reader;
+            SpecDynamicSwitchCaseValue? @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref reader, options, type);
             if (@case == null)
                 continue;
+
+            if (type == null
+                && expectedType.IsSwitch
+                && expectedType.TypeSwitch.TryEvaluateMatchingSwitchCase(buffer, @case, out SpecDynamicSwitchCaseValue? matchingCase)
+                && matchingCase.Value is SpecDynamicConcreteValue<ISpecPropertyType> { Value: { } caseType })
+            {
+                @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref r2, options, caseType);
+                if (@case == null)
+                    continue;
+            }
 
             buffer.Add(@case);
         }
 
-        return new SpecDynamicSwitchValue(expectedType, new OneOrMore<SpecDynamicSwitchCaseValue>(buffer));
+        return new SpecDynamicSwitchValue(endType, new OneOrMore<SpecDynamicSwitchCaseValue>(buffer));
     }
 
     public static void WriteSwitch(Utf8JsonWriter writer, SpecDynamicSwitchValue? value, JsonSerializerOptions? options)
@@ -56,7 +69,7 @@ public class SpecDynamicSwitchValueConverter : JsonConverter<SpecDynamicSwitchVa
     /// <inheritdoc />
     public override SpecDynamicSwitchValue? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return ReadSwitch(ref reader, options, null);
+        return ReadSwitch(ref reader, options, default);
     }
 
 

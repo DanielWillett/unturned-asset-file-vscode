@@ -323,6 +323,7 @@
                 "SDG.Unturned.ItemBoxAsset, Assembly-CSharp": { },
                 "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp":
                 {
+                    "IsAbstract": true,
                     "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp": { },
                     "SDG.Unturned.ItemGripAsset, Assembly-CSharp": { },
                     "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp": { },
@@ -331,8 +332,10 @@
                 },
                 "SDG.Unturned.ItemClothingAsset, Assembly-CSharp":
                 {
+                    "IsAbstract": true,
                     "SDG.Unturned.ItemBagAsset, Assembly-CSharp":
                     {
+                        "IsAbstract": true,
                         "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp": { },
                         "SDG.Unturned.ItemPantsAsset, Assembly-CSharp": { },
                         "SDG.Unturned.ItemShirtAsset, Assembly-CSharp": { },
@@ -340,6 +343,7 @@
                     },
                     "SDG.Unturned.ItemGearAsset, Assembly-CSharp":
                     {
+                        "IsAbstract": true,
                         "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp": { },
                         "SDG.Unturned.ItemHatAsset, Assembly-CSharp": { },
                         "SDG.Unturned.ItemMaskAsset, Assembly-CSharp": { }
@@ -356,6 +360,7 @@
                 "SDG.Unturned.ItemOpticAsset, Assembly-CSharp": { },
                 "SDG.Unturned.ItemPlaceableAsset, Assembly-CSharp":
                 {
+                    "IsAbstract": true,
                     "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp":
                     {
                         "SDG.Unturned.ItemBeaconAsset, Assembly-CSharp": { },
@@ -385,8 +390,10 @@
                 },
                 "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp":
                 {
+                    "IsAbstract": true,
                     "SDG.Unturned.ItemConsumeableAsset, Assembly-CSharp":
                     {
+                        "IsAbstract": true,
                         "SDG.Unturned.ItemFoodAsset, Assembly-CSharp": { },
                         "SDG.Unturned.ItemMedicalAsset, Assembly-CSharp": { },
                         "SDG.Unturned.ItemWaterAsset, Assembly-CSharp": { }

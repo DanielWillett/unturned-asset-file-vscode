@@ -1,0 +1,196 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp",
+    "DisplayName": "Caliber Item (Attachment)",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Calibers",
+            "Type": "UInt8",
+            "Minimum": 0,
+            "DefaultValue": 0,
+            "Description": "Number of caliber IDs set on this attachment.",
+            "Variable": "calibers",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#calibers-uint8-0",
+            "Priority": 1,
+            "CountForRegexGroup": "item-caliber-calibers"
+        },
+        {
+            "Key": "Caliber_(\\d+)",
+            "Type": "CaliberId",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "Required": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "item-caliber-calibers",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "An arbitrary ID that has to be shared between an attachment and weapon for them to be compatible.",
+            "Variable": "calibers",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#caliber-uint16-0",
+            "Priority": 1
+        },
+        {
+            "Key": "Recoil_X",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier on horizontal recoil.",
+            "Variable": "recoil_x",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#recoil-x-float32-1",
+            "Priority": 2
+        },
+        {
+            "Key": "Recoil_Y",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier on vertical recoil.",
+            "Variable": "recoil_y",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#recoil-y-float32-1",
+            "Priority": 2
+        },
+        {
+            "Key": "Aiming_Recoil_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier on recoil magnitude while aiming down sights.",
+            "Variable": "aimingRecoilMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#aiming-recoil-multiplier-float32-1",
+            "Priority": 1
+        },
+        {
+            "Key": "Aim_Duration_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier on the value of the @(SDG.Unturned.ItemGunAsset, Assembly-CSharp::Aim_In_Duration) property.",
+            "Variable": "aimDurationMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#aim-duration-multiplier-float32-1",
+            "Priority": 1
+        },
+        {
+            "Key": "Spread",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier on bullet spread.",
+            "Variable": "spread",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#spread-float32-1",
+            "Priority": 2
+        },
+        {
+            "Key": "Sway",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier on scope sway.",
+            "Variable": "sway",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#sway-float32-1",
+            "Priority": 2
+        },
+        {
+            "Key": "Shake",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier on shake.",
+            "Variable": "shake",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#shake-float32-1",
+            "Priority": 2
+        },
+        {
+            "Key": "Firerate",
+            "Type": "Int32",
+            "DefaultValue": 0,
+            "Description": "The value of the attached ranged weapon’s @(SDG.Unturned.ItemGunAsset, Assembly-CSharp::Firerate) property is reduced by the value of this property. A larger decrease will allow for the ranged weapon to fire more often.",
+            "Variable": "FirerateOffset",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#firerate-uint8-0",
+            "Priority": 2
+        },
+        {
+            "Key": "Damage",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier on damage. Use @Ballistic_Damage_Multiplier instead.",
+            "Variable": "ballisticDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#damage-float32",
+            "Deprecated": true,
+            "ExclusiveWith": [ "Ballistic_Damage_Multiplier" ]
+        },
+        {
+            "Key": "Ballistic_Damage_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": "@Damage",
+            "Description": "Multiplier on damage.",
+            "Variable": "ballisticDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#ballistic-damage-multiplier-float32",
+            "Priority": 2
+        },
+        {
+            "Key": "Ballistic_Drop",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Gravity acceleration multiplier for bullets in flight.",
+            "Variable": "BallisticGravityMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#ballistic-drop-float32-1",
+            "Priority": 2
+        },
+        {
+            "Key": "Aiming_Movement_Speed_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier on character movement speed while aiming down sights.",
+            "Variable": "aimingMovementSpeedMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#aiming-movement-speed-multiplier-float32-1",
+            "Priority": 1
+        },
+        {
+            "Key": "Paintable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "When this flag is included, the attachment should be affected by Steam Economy skins that include support for skinning attachments.",
+            "Variable": "isPaintable",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#paintable-flag",
+            "Priority": 2
+        },
+        {
+            "Key": "Bipod",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Stat-changing properties should only take effect while prone.",
+            "Variable": "ShouldOnlyAffectAimWhileProne",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/grip-asset.html#bipod-flag",
+            "Priority": 1
+        },
+        {
+            "Key": "Invulnerable",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "If true, gun can damage entities with the Invulnerable tag.",
+            "Variable": "CanDamageInvulernableEntities",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#invulnerable-bool-false",
+            "Priority": 1
+        },
+        {
+            "Key": "Destroy_Attachment_Colliders",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "When false, colliders are not destroyed when the attached ranged weapon’s colliders are destroyed.",
+            "Variable": "shouldDestroyAttachmentColliders",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#destroy-attachment-colliders-bool-true",
+            "Priority": 1
+        },
+        {
+            "Key": "Instantiated_Attachment_Name_Override",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Name to use when instantiating attachment prefab. See docs for more info.",
+            "Variable": "instantiatedAttachmentName",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#instantiated-attachment-name-override-string",
+            "Priority": 1
+        }
+    ]
+}

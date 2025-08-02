@@ -3,6 +3,8 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace UnturnedAssetSpecTests;
 
+#pragma warning disable VSTHRD200
+
 public class DownloadActionButtonsTest
 {
     private AssetSpecDatabase? _runner;
@@ -54,3 +56,5 @@ public class DownloadActionButtonsTest
         _runner?.Dispose();
     }
 }
+
+#pragma warning restore VSTHRD200

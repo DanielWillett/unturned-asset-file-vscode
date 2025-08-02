@@ -1,0 +1,23 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemCloudAsset, Assembly-CSharp",
+    "DisplayName": "Cloud Item (Parachute)",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/cloud-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Gravity",
+            "Type": "Float32",
+            "Description": "Multiplier on the influence of gravity.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/cloud-asset.html#cloud-asset-properties",
+            "Variable": "gravity",
+            "DefaultValue": 0,
+            "Priority": 2,
+            "Required": true
+        }
+    ]
+}

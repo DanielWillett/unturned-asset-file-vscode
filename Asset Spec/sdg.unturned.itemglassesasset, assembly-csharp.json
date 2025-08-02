@@ -1,0 +1,229 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp",
+    "DisplayName": "Glasses Item",
+    "Parent": "SDG.Unturned.ItemGearAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gear-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Vision",
+            "Type": "SDG.Unturned.ELightingVision, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Description": "Keeps the player's beard from being hidden while this item is equipped.",
+            "Variable": "SDG.Unturned.ItemClothingAsset, Assembly-CSharp::beardVisible",
+            "Priority": 6,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/glasses-asset.html#glasses-asset-properties"
+        },
+        {
+            "Key": "Nightvision_Color",
+            "Type": "Color32RGBLegacy",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Vision",
+                            "Operation": "eq",
+                            "Comparand": "CIVILIAN"
+                        }
+                    ],
+                    "Value": "#666666"
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Vision",
+                            "Operation": "eq",
+                            "Comparand": "MILITARY"
+                        }
+                    ],
+                    "Value": "#147850"
+                },
+                {
+                    "Value": "#000000"
+                }
+            ],
+            "Description": "Overrides the default color when using night vision. Note that when @Vision is 'Civilian' the color will be grayscaled using the red channel.",
+            "Variable": "nightvisionColor",
+            "Priority": 5,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/glasses-asset.html#glasses-asset-properties",
+            "ExclusiveWith": 
+            [
+                {
+                    "Key": "Vision",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Vision",
+                                "Operation": "neq",
+                                "Comparand": "CIVILIAN"
+                            },
+                            {
+                                "Variable": "Vision",
+                                "Operation": "neq",
+                                "Comparand": "MILITARY"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Nightvision_Fog_Intensity",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Vision",
+                            "Operation": "eq",
+                            "Comparand": "CIVILIAN"
+                        }
+                    ],
+                    "Value": 0.5
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Vision",
+                            "Operation": "eq",
+                            "Comparand": "MILITARY"
+                        }
+                    ],
+                    "Value": 0.25
+                },
+                {
+                    "Value": 0
+                }
+            ],
+            "Description": "Overrides the default fog intensity.",
+            "Variable": "nightvisionFogIntensity",
+            "Priority": 5,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/glasses-asset.html#glasses-asset-properties",
+            "ExclusiveWith": 
+            [
+                {
+                    "Key": "Vision",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Vision",
+                                "Operation": "neq",
+                                "Comparand": "CIVILIAN"
+                            },
+                            {
+                                "Variable": "Vision",
+                                "Operation": "neq",
+                                "Comparand": "MILITARY"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Nightvision_Allowed_In_ThirdPerson",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the night vision works when the player is in third person.",
+            "Variable": "isNightvisionAllowedInThirdPerson",
+            "Priority": 5,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/glasses-asset.html#glasses-asset-properties",
+            "ExclusiveWith": 
+            [
+                {
+                    "Key": "Vision",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Vision",
+                                "Operation": "neq",
+                                "Comparand": "CIVILIAN"
+                            },
+                            {
+                                "Variable": "Vision",
+                                "Operation": "neq",
+                                "Comparand": "MILITARY"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Blindfold",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Blackens the player's screen while this item is equipped.",
+            "Variable": "isBlindfold",
+            "Priority": 6,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/glasses-asset.html#glasses-asset-properties"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.ELightingVision, Assembly-CSharp",
+            "DisplayName": "Glasses Vision Behavior",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "There is no vision effect, and normal lighting is used.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
+                },
+                {
+                    "Value": "MILITARY",
+                    "Casing": "Military",
+                    "Description": "Military nightvision lighting is used. Nightvision color is #147850, and nightvision fog intensity is 0.25.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
+                },
+                {
+                    "Value": "CIVILIAN",
+                    "Casing": "Civilian",
+                    "Description": "Civilian nightvision lighting is used. Nightvision color is #666666, and nightvision fog intensity is 0.5.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
+                },
+                {
+                    "Value": "HEADLAMP",
+                    "Casing": "Headlamp",
+                    "Description": "Headlamp lighting is used. This will enable a toggleable light source and allow for using PlayerSpotLightConfig properties.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
+                }
+            ]
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Glasses",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "The model for the glasses equipped on the player model.",
+            "Variable": "glasses",
+            "Required": true
+        }
+    ]
+}

@@ -1,0 +1,128 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemBoxAsset, Assembly-CSharp",
+    "DisplayName": "Box Item",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Generate",
+            "Type": "SteamItemDef",
+            "Description": "The itemdefid granted by opening this box, which is used to display the correct UI element after an unbox.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+            "Variable": "generate",
+            "DefaultValue": 0,
+            "Required": true,
+            "Priority": 2
+        },
+        {
+            "Key": "Destroy",
+            "Type": "SteamItemDef",
+            "Description": "The itemdefid removed by opening this box, which is used to display the correct UI element after an unbox.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+            "Variable": "generate",
+            "DefaultValue": 0,
+            "Required": true,
+            "Priority": 2
+        },
+        {
+            "Key": "Drops",
+            "Type": "Int32",
+            "Minimum": 0,
+            "DefaultValue": 0,
+            "Description": "Corresponds to the total number of items in the box, so that the correct number of UI elements are displayed when showing box contents.",
+            "Variable": "drops",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+            "Priority": 2,
+            "CountForRegexGroup": "item-box-drops"
+        },
+        {
+            "Key": "Drop_(\\d+)",
+            "Type": "SteamItemDef",
+            "KeyIsRegex": true,
+            "DefaultValue": 0,
+            "Required": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "item-box-drops",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "The itemdefid of an item in the box, which is visually displayed as a UI element when showing box contents.",
+            "Variable": "drops",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+            "Priority": 2
+        },
+        {
+            "Key": "Item_Origin",
+            "Type": "SDG.Unturned.EBoxItemOrigin, Assembly-CSharp",
+            "DefaultValue": "Unbox",
+            "Description": "The localization key to use for for the unbox/unwrap menu button.",
+            "Variable": "itemOrigin",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+            "Priority": 2
+        },
+        {
+            "Key": "Probability_Model",
+            "Type": "SDG.Unturned.EBoxProbabilityModel, Assembly-CSharp",
+            "DefaultValue": "Original",
+            "Description": "UI elements regarding unbox probability chances are added depending on the specified enumerator.",
+            "Variable": "probabilityModel",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+            "Priority": 2
+        },
+        {
+            "Key": "Contains_Bonus_Items",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "When true, adds a UI element regarding bonus items.",
+            "Variable": "containsBonusItems",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+            "Priority": 2
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EBoxItemOrigin, Assembly-CSharp",
+            "DisplayName": "Box Item Origin",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+            "Values":
+            [
+                {
+                    "Value": "Unbox",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+                    "Description": "The box is 'unboxed' when it's opened."
+                },
+                {
+                    "Value": "Unwrap",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+                    "Description": "The box is 'unwrapped' when it's opened."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EBoxProbabilityModel, Assembly-CSharp",
+            "DisplayName": "Box Probability Model",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+            "Values":
+            [
+                {
+                    "Value": "Original",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+                    "Description": "Probability is based on rarity: { Rare: 75%, Epic: 20%, Legendary: 5%, Mythical: 3% }."
+                },
+                {
+                    "Value": "Equalized",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+                    "Description": "Each item has an equal chance regardless of quality."
+                }
+            ]
+        }
+    ]
+}

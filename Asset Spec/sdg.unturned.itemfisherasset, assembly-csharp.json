@@ -1,0 +1,79 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemFisherAsset, Assembly-CSharp",
+    "DisplayName": "Fisher Item (Rod)",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Reward_ID",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "DefaultValue": 0,
+            "Description": "Spawn table used to reward items when a fish is caught.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "rewardID",
+            "Priority": 3,
+            "Required": true
+        },
+        {
+            "Key": "Reward_Experience_Min",
+            "Type": "Int32",
+            "DefaultValue": 3,
+            "Maximum": "@Reward_Experience_Max",
+            "Description": "Experience to give when a fish is caught. A random value is chosen between @Reward_Experience_Min and @Reward_Experience_Max.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "rewardExperienceMin",
+            "Priority": 3
+        },
+        {
+            "Key": "Reward_Experience_Max",
+            "Type": "Int32",
+            "DefaultValue": 3,
+            "Minimum": "@Reward_Experience_Min",
+            "Description": "Experience to give when a fish is caught. A random value is chosen between @Reward_Experience_Min and @Reward_Experience_Max.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "rewardExperienceMax",
+            "Priority": 3
+        },
+        {
+            "Key": "Quest_Rewards",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Rewards applied when catching a fish.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "rewardsList",
+            "CountForRegexGroup": "fisher-rewards",
+            "Priority": 2
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Cast",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the fishing rod is casted.",
+            "Variable": "cast",
+            "Required": true
+        },
+        {
+            "AssetName": "Reel",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when reeling the fishing rod in.",
+            "Variable": "reel",
+            "Required": true
+        },
+        {
+            "AssetName": "Tug",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when tugging on the fishing rod.",
+            "Variable": "tug",
+            "Required": true
+        }
+    ]
+}

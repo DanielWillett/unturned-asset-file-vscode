@@ -1,0 +1,414 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp",
+    "DisplayName": "Weapon Item",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "BladeIDs",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Description": "Number of blade IDs set on this weapon.",
+            "Variable": "bladeIDs",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
+            "Priority": 2,
+            "CountForRegexGroup": "item-weapon-bladeid"
+        },
+        {
+            "Key": "BladeID_(\\d+)",
+            "Type": "BladeId",
+            "KeyIsRegex": true,
+            "DefaultValue": "@BladeID",
+            "Required": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "item-weapon-bladeid",
+                    "RegexGroup": 1
+                }
+            ],
+            "Description": "An arbitrary ID that has to be shared between an object or resource and a weapon.",
+            "Variable": "bladeIDs",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "BladeID",
+            "Type": "BladeId",
+            "Deprecated": true,
+            "Description": "An arbitrary ID that has to be shared between an object or resource and a weapon. Use @BladeIDs instead.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
+            "Variable": "bladeIDs"
+        },
+        {
+            "Key": "Range",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "The maximum distance in meters before damage is no longer possible.",
+            "Variable": "range",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#weapon-asset-properties",
+            "Priority": 2,
+            "Required": true
+        },
+        {
+            "Key": "Player_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Amount of damage that should be dealt to player entities, prior to modifiers such as limb multipliers.",
+            "Variable": "playerDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Player_Leg_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Multiplier on damage targeted against a player’s legs. Limb multipliers are not utilized by explosive weapons.",
+            "Variable": "playerDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Player_Arm_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Multiplier on damage targeted against a player’s arms. Limb multipliers are not utilized by explosive weapons.",
+            "Variable": "playerDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Player_Spine_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Multiplier on damage targeted against a player’s torso. Limb multipliers are not utilized by explosive weapons.",
+            "Variable": "playerDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Player_Skull_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Multiplier on damage targeted against a player’s head. Limb multipliers are not utilized by explosive weapons.",
+            "Variable": "playerDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Player_Damage_Bleeding",
+            "Type": "SDG.Unturned.DamagePlayerParameters+Bleeding, Assembly-CSharp",
+            "DefaultValue": "Default",
+            "Description": "Determines the effect the weapon has in relation to the Bleeding status effect.",
+            "Variable": "playerDamageBleeding",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Player_Damage_Bones",
+            "Type": "SDG.Unturned.DamagePlayerParameters+Bones, Assembly-CSharp",
+            "DefaultValue": "None",
+            "Description": "Determines the effect the weapon has in relation to the Broken Bones status effect.",
+            "Variable": "playerDamageBones",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Player_Damage_Food",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Amount of degradation dealt to a targeted player’s food. Positive values are beneficial (increasing food level), and negative values are detrimental (decreasing food level).",
+            "Variable": "playerDamageFood",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Player_Damage_Water",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Amount of degradation dealt to a targeted player’s water. Positive values are beneficial (increasing water level), and negative values are detrimental (decreasing water level).",
+            "Variable": "playerDamageWater",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Player_Damage_Virus",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Amount of degradation dealt to a targeted player’s immunity. Positive values are beneficial (increasing immunity level), and negative values are detrimental (decreasing immunity level).",
+            "Variable": "playerDamageVirus",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Player_Damage_Hallucination",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Length of hallucinations inflicted onto a targeted player, in seconds. Positive values are detrimental (increasing hallucination duration), and negative values are beneficial (decreasing hallucination duration).",
+            "Variable": "playerDamageHallucination",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Zombie_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Amount of damage that should be dealt to zombie entities, prior to modifiers such as limb multipliers.",
+            "Variable": "zombieDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#zombie-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Zombie_Leg_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Multiplier on damage targeted against a zombie’s legs. Limb multipliers are not utilized by explosive weapons.",
+            "Variable": "zombieDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#zombie-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Zombie_Arm_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Multiplier on damage targeted against a zombie’s arms. Limb multipliers are not utilized by explosive weapons.",
+            "Variable": "zombieDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#zombie-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Zombie_Spine_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Multiplier on damage targeted against a zombie’s torso. Limb multipliers are not utilized by explosive weapons.",
+            "Variable": "zombieDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#zombie-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Zombie_Skull_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Multiplier on damage targeted against a zombie’s head. Limb multipliers are not utilized by explosive weapons.",
+            "Variable": "zombieDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#zombie-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Animal_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Amount of damage that should be dealt to animal entities, prior to modifiers such as limb multipliers.",
+            "Variable": "animalDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#animal-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Animal_Leg_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Multiplier on damage targeted against a animal’s legs. Limb multipliers are not utilized by explosive weapons.",
+            "Variable": "animalDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#animal-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Animal_Spine_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Multiplier on damage targeted against a animal’s torso. Limb multipliers are not utilized by explosive weapons.",
+            "Variable": "animalDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#animal-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Animal_Skull_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Multiplier on damage targeted against a animal’s head. Limb multipliers are not utilized by explosive weapons.",
+            "Variable": "animalDamageMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#animal-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Barricade_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Amount of damage that should be dealt to barricades, prior to modifiers.",
+            "Variable": "barricadeDamage",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Structure_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Amount of damage that should be dealt to structures, prior to modifiers.",
+            "Variable": "structureDamage",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Vehicle_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Amount of damage that should be dealt to vehicles, prior to modifiers.",
+            "Variable": "vehicleDamage",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Resource_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Description": "Amount of damage that should be dealt to resources, prior to modifiers.",
+            "Variable": "resourceDamage",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Object_Damage",
+            "Type": "Float32",
+            "DefaultValue": "@Resource_Damage",
+            "Description": "Amount of damage that should be dealt to objects, prior to modifiers. Defaults to @Resource_Damage.",
+            "Variable": "objectDamage",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Durability",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Probability of quality loss upon the weapon being used.",
+            "Variable": "durability",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#weapon-asset-properties",
+            "Priority": 2
+        },
+        {
+            "Key": "Wear",
+            "Type": "UInt8",
+            "Minimum": 1,
+            "DefaultValue": 1,
+            "Description": "Increment to degrade quality by.",
+            "Variable": "durability",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#weapon-asset-properties",
+            "Priority": 2
+        },
+        {
+            "Key": "Invulnerable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Specified if damage should affect objects, structures, barricades, and vehicles that are considered invulnerable to low-power weaponry. Not applicable to explosive weapons, which will always ignore invulnerability.",
+            "Variable": "isInvulnerable",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
+            "Priority": 2
+        },
+        {
+            "Key": "Allow_Flesh_Fx",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "IncludedDefaultValue": false,
+            "Description": "If special effects should occur when damaging flesh. Defaults to true.",
+            "Variable": "allowFleshFx",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#weapon-asset-properties",
+            "Priority": 1
+        },
+        {
+            "Key": "Stun_Zombie_Always",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Specified if a zombie should always be stunned when targeted by the weapon.",
+            "Variable": "zombieStunOverride",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#zombie-damage",
+            "Priority": 2,
+            "ExclusiveWith": [ "Stun_Zombie_Never" ]
+        },
+        {
+            "Key": "Stun_Zombie_Never",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Specified if a zombie should never be stunned when targeted by the weapon.",
+            "Variable": "zombieStunOverride",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#zombie-damage",
+            "Priority": 2,
+            "ExclusiveWith": [ "Stun_Zombie_Always" ]
+        },
+        {
+            "Key": "Zombie_Ragdoll_Force_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Scales force applied to zombie ragdoll.",
+            "Variable": "ZombieRagdollForceMultiplier",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#zombie-damage",
+            "Priority": 1
+        },
+        {
+            "Key": "Bypass_Allowed_To_Damage_Player",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "If the weapon should bypass the requirements for being allowed to damage other players.",
+            "Variable": "bypassAllowedToDamagePlayer",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Priority": 1
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.DamagePlayerParameters+Bleeding, Assembly-CSharp",
+            "DisplayName": "Bleed Behavior",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Values":
+            [
+                {
+                    "Value": "Default",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "The Bleeding status effect will only be applied if the necessary damage threshold is met."
+                },
+                {
+                    "Value": "Always",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "The Bleeding status effect will always be applied on hit."
+                },
+                {
+                    "Value": "Never",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "The Bleeding status effect is never applied by this weapon."
+                },
+                {
+                    "Value": "Heal",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "Anyone hit by the weapon will have their Bleeding status effect removed."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.DamagePlayerParameters+Bones, Assembly-CSharp",
+            "DisplayName": "Bone Break Behavior",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+            "Values":
+            [
+                {
+                    "Value": "None",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "The Broken Bones status effect is never applied by this weapon."
+                },
+                {
+                    "Value": "Always",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "The Broken Bones status effect will always be applied on hit."
+                },
+                {
+                    "Value": "Heal",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "Anyone hit by the weapon will have their Broken Bones status effect removed."
+                }
+            ]
+        }
+    ]
+}

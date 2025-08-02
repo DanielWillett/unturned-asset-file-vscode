@@ -309,7 +309,7 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
         {
             foreach (SpecProperty? property in value.Properties)
             {
-                if (property?.Key == null || property.Type == null)
+                if (property?.Key == null)
                     continue;
 
                 SpecPropertyConverter.WriteProperty(writer, property, options);
@@ -324,7 +324,7 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
         {
             foreach (SpecProperty? localizationProperty in value.LocalizationProperties)
             {
-                if (localizationProperty?.Key == null || localizationProperty.Type == null)
+                if (localizationProperty?.Key == null)
                     continue;
 
                 SpecPropertyConverter.WriteProperty(writer, localizationProperty, options);

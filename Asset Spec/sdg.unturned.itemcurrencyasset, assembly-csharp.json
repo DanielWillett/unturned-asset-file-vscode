@@ -1,0 +1,79 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemCurrencyAsset, Assembly-CSharp",
+    "DisplayName": "Currency",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/currency-asset.html",
+    "Category": "NONE",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "ValueFormat",
+            "Type": "FormatString",
+            "ElementType": "1|F",
+            "DefaultValue": "{0}",
+            "Description": "Template string used to display prices with currency symbols, etc. For example `${0:N0} CAD` is the vanilla Canadian currency format ('N0' in this case means a number with zero decimal places). Read more about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method.",
+            "Variable": "valueFormat",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/currency-asset.html#asset-setup",
+            "Priority": 2
+        },
+        {
+            "Key": "DefaultConditionFormat",
+            "Type": "FormatString",
+            "ElementType": "2|T",
+            "DefaultValue": "=CAT(@ValueFormat =CAT(( / ) =REP(@ValueFormat {0 {1)))",
+            "Description": "Template string used to display progress for currency conditions. For example `${0:N0}/{1:N0} CAD` is the vanilla Canadian currency format ('N0' in this case means a number with zero decimal places). Read more about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method.",
+            "Variable": "defaultConditionFormat",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/currency-asset.html#asset-setup",
+            "Priority": 2
+        },
+        {
+            "Key": "Entries",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.ItemCurrencyAsset+Entry, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "A list of all items with a value for this currency.",
+            "Variable": "entries",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/currency-asset.html#asset-setup",
+            "Priority": 2
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.ItemCurrencyAsset+Entry, Assembly-CSharp",
+            "DisplayName": "Currency Item",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/currency-asset.html#asset-setup",
+            "Properties":
+            [
+                {
+                    "Key": "Item",
+                    "Type": "AssetReference",
+                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                    "Variable": "item",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "The item with a currency value.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/currency-asset.html#asset-setup"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "UInt32",
+                    "Variable": "value",
+                    "DefaultValue": 0,
+                    "Description": "The value of this item with this currency as the unit.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/currency-asset.html#asset-setup"
+                },
+                {
+                    "Key": "Is_Visible_In_Vendor_Menu",
+                    "Type": "Boolean",
+                    "Variable": "isVisibleInVendorMenu",
+                    "DefaultValue": true,
+                    "IncludedDefaultValue": false,
+                    "Description": "If this item should be visible in the vendor menu's list of currency items.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/currency-asset.html#asset-setup"
+                }
+            ]
+        }
+    ]
+}

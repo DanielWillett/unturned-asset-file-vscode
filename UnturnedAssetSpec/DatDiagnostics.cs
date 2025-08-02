@@ -1,6 +1,5 @@
 // ReSharper disable InconsistentNaming
 
-using System.Runtime.CompilerServices;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;
@@ -13,6 +12,11 @@ public static class DatDiagnostics
     /// Displayed when a blueprint ID could be replaced with 'this'.
     /// </summary>
     public static readonly DatDiagnostic UNT101 = new DatDiagnostic("UNT101", DatDiagnosticSeverity.Hint);
+
+    /// <summary>
+    /// Displayed when a format string doesn't fill all arguments.
+    /// </summary>
+    public static readonly DatDiagnostic UNT102 = new DatDiagnostic("UNT102", DatDiagnosticSeverity.Hint);
 
     /* Warnings */
 
@@ -101,6 +105,11 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT1017 = new DatDiagnostic("UNT1017", DatDiagnosticSeverity.Warning);
 
+    /// <summary>
+    /// Deprecated property or usage.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1018 = new DatDiagnostic("UNT1018", DatDiagnosticSeverity.Warning);
+
     /* Errors */
 
     /// <summary>
@@ -142,5 +151,10 @@ public static class DatDiagnostics
     /// Displayed when an asset is missing a legacy ID that is required.
     /// </summary>
     public static readonly DatDiagnostic UNT2011 = new DatDiagnostic("UNT2011", DatDiagnosticSeverity.Error);
+
+    /// <summary>
+    /// Malformed format string.
+    /// </summary>
+    public static readonly DatDiagnostic UNT2012 = new DatDiagnostic("UNT2012", DatDiagnosticSeverity.Error);
 
 }

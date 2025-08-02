@@ -498,7 +498,7 @@ public static class SpecDynamicValue
             if (value[value.Length - 1] != ')')
                 return false;
 
-            value = value.Slice(start + 1, value.Length - start - 1);
+            value = value.Slice(start + 1, value.Length - start - 2);
         }
         else if (start != 0)
         {
@@ -514,6 +514,7 @@ public static class SpecDynamicValue
         if (value.IsEmpty)
             return false;
 
+        bool wasInParenthesis = false;
         if (value[0] == '(')
         {
             int close = IndexOfClosingBracket(value, 0);
@@ -523,30 +524,31 @@ public static class SpecDynamicValue
             value = value
                 .Slice(1, value.Length - close - 1)
                 .Trim();
+            wasInParenthesis = true;
         }
 
         int funcArgStart = value.IndexOf('(');
         int spaceIndex = value.IndexOf(' ');
-        if (spaceIndex < funcArgStart)
+        if (spaceIndex >= 0 && spaceIndex < funcArgStart)
             funcArgStart = -1;
 
         ReadOnlySpan<char> funcName = value.Slice(0, funcArgStart == -1 ? value.Length : funcArgStart).TrimEnd();
         bool isConstant = funcArgStart == -1;
         if (isConstant)
         {
-            if (funcName.Equals("PI".AsSpan(), StringComparison.OrdinalIgnoreCase))
+            if (!wasInParenthesis && funcName.Equals("PI".AsSpan(), StringComparison.OrdinalIgnoreCase))
             {
                 reference = CastFromDouble(Math.PI, expectedType)!;
             }
-            else if (funcName.Equals("TAU".AsSpan(), StringComparison.OrdinalIgnoreCase))
+            else if (!wasInParenthesis && funcName.Equals("TAU".AsSpan(), StringComparison.OrdinalIgnoreCase))
             {
                 reference = CastFromDouble(2d * Math.PI, expectedType)!;
             }
-            else if (funcName.Equals("E".AsSpan(), StringComparison.OrdinalIgnoreCase))
+            else if (!wasInParenthesis && funcName.Equals("E".AsSpan(), StringComparison.OrdinalIgnoreCase))
             {
                 reference = CastFromDouble(Math.E, expectedType)!;
             }
-            else if (funcName.Equals("NULL".AsSpan(), StringComparison.OrdinalIgnoreCase))
+            else if (!wasInParenthesis && funcName.Equals("NULL".AsSpan(), StringComparison.OrdinalIgnoreCase))
             {
                 reference = Null;
             }
@@ -586,6 +588,22 @@ public static class SpecDynamicValue
         }
 
         ReadOnlySpan<char> args = value.Slice(funcArgStart + 1, argEndIndex - funcArgStart - 1).Trim();
+        if (SpecDynamicEquationTreeUnaryValue.TryParseOperation(funcName, out SpecDynamicEquationTreeUnaryOperation unary))
+        {
+            ReadOnlySpan<char> arg0 = args.Trim();
+            if (arg0.IsEmpty)
+                return false;
+
+            TryTrimParenthesis(ref arg0, 0);
+            if (!TryParse(arg0, SpecDynamicValueContext.Optional, expectedType, out ISpecDynamicValue arg))
+            {
+                return false;
+            }
+
+            reference = new SpecDynamicEquationTreeUnaryValue(arg, unary);
+            return true;
+        }
+
         if (SpecDynamicEquationTreeBinaryValue.TryParseOperation(funcName, out SpecDynamicEquationTreeBinaryOperation binary))
         {
             spaceIndex = IndexOfAtCurrentDepth(args, 0, ' ', '(');
@@ -597,6 +615,8 @@ public static class SpecDynamicValue
             if (arg0.IsEmpty || arg1.IsEmpty)
                 return false;
 
+            TryTrimParenthesis(ref arg0, 0);
+            TryTrimParenthesis(ref arg1, 0);
             if (!TryParse(arg0, SpecDynamicValueContext.Optional, expectedType, out ISpecDynamicValue left)
                 || !TryParse(arg1, SpecDynamicValueContext.Optional, expectedType, out ISpecDynamicValue right))
             {
@@ -604,6 +624,36 @@ public static class SpecDynamicValue
             }
 
             reference = new SpecDynamicEquationTreeBinaryValue(left, right, binary);
+            return true;
+        }
+
+        if (SpecDynamicEquationTreeTertiaryValue.TryParseOperation(funcName, out SpecDynamicEquationTreeTertiaryOperation tertiary))
+        {
+            spaceIndex = IndexOfAtCurrentDepth(args, 0, ' ', '(');
+            if (spaceIndex < 1 || spaceIndex >= args.Length - 1)
+                return false;
+            
+            int spaceIndex2 = IndexOfAtCurrentDepth(args, spaceIndex + 1, ' ', '(');
+            if (spaceIndex2 < 1 || spaceIndex2 >= args.Length - 1)
+                return false;
+
+            ReadOnlySpan<char> arg0 = args.Slice(0, spaceIndex).Trim();
+            ReadOnlySpan<char> arg1 = args.Slice(spaceIndex + 1, spaceIndex2 - spaceIndex - 1).Trim();
+            ReadOnlySpan<char> arg2 = args.Slice(spaceIndex2 + 1).Trim();
+            if (arg0.IsEmpty || arg1.IsEmpty || arg2.IsEmpty)
+                return false;
+
+            TryTrimParenthesis(ref arg0, 0);
+            TryTrimParenthesis(ref arg1, 0);
+            TryTrimParenthesis(ref arg2, 0);
+            if (!TryParse(arg0, SpecDynamicValueContext.Optional, expectedType, out ISpecDynamicValue arg1Val)
+                || !TryParse(arg1, SpecDynamicValueContext.Optional, expectedType, out ISpecDynamicValue arg2Val)
+                || !TryParse(arg2, SpecDynamicValueContext.Optional, expectedType, out ISpecDynamicValue arg3Val))
+            {
+                return false;
+            }
+
+            reference = new SpecDynamicEquationTreeTertiaryValue(arg1Val, arg2Val, arg3Val, tertiary);
             return true;
         }
 
@@ -724,9 +774,6 @@ public static class SpecDynamicValue
             _ => open
         };
 
-        if (value[startIndex] == open)
-            ++startIndex;
-
         if (open == close)
         {
             int index = value.Slice(startIndex + 1).IndexOf(open);
@@ -735,9 +782,20 @@ public static class SpecDynamicValue
         }
 
         int depth = 1;
+        bool isInQuotes = false;
+
         for (int i = startIndex; i < value.Length; ++i)
         {
             char c = value[i];
+
+            if (c is '\'' or '"')
+            {
+                isInQuotes = !isInQuotes;
+            }
+            
+            if (isInQuotes)
+                continue;
+
             if (c == lookFor && depth == 1)
                 return i;
 
@@ -965,6 +1023,11 @@ public static class SpecDynamicValue
 
     public static ISpecDynamicValue Read(ref Utf8JsonReader reader, JsonSerializerOptions? options, SpecDynamicValueContext context = SpecDynamicValueContext.Default, ISpecPropertyType? expectedType = null)
     {
+        return Read(ref reader, options, context, expectedType == null ? default : new PropertyTypeOrSwitch(expectedType));
+    }
+
+    public static ISpecDynamicValue Read(ref Utf8JsonReader reader, JsonSerializerOptions? options, SpecDynamicValueContext context, PropertyTypeOrSwitch expectedType)
+    {
         if (((int)context & 0b11) == 3)
         {
             throw new ArgumentOutOfRangeException(nameof(context), "More than one of [ AssumeProperty, AssumeBang ].");
@@ -977,7 +1040,7 @@ public static class SpecDynamicValue
             case JsonTokenType.String:
             case JsonTokenType.PropertyName:
                 string str = reader.GetString()!;
-                if (!TryParse(str, context, expectedType, out ISpecDynamicValue reference))
+                if (!TryParse(str, context, expectedType.Type, out ISpecDynamicValue reference))
                     throw new JsonException("Failed to parse ISpecDynamicValue from a string value.");
 
                 return reference;
@@ -986,7 +1049,7 @@ public static class SpecDynamicValue
             case JsonTokenType.True:
             case JsonTokenType.False:
             case JsonTokenType.Number:
-                return ReadValue(ref reader, expectedType, (t, type) => t != null
+                return ReadValue(ref reader, expectedType.Type, (t, type) => t != null
                     ? throw new JsonException($"Failed to parse ISpecDynamicValue from an argument, expected type \"{type.Type}\" but was given type {t}.")
                     : throw new JsonException($"Failed to parse ISpecDynamicValue from an argument, expected type \"{type.Type}\".")
                 );
@@ -1028,7 +1091,7 @@ public static class SpecDynamicValue
                     readerCopy = reader;
                     try
                     {
-                        SpecDynamicSwitchCaseValue @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref readerCopy, options, expectedType)!;
+                        SpecDynamicSwitchCaseValue @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref readerCopy, options, expectedType.Type)!;
                         reader = readerCopy;
 
                         return @case;

@@ -1,0 +1,737 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemGunAsset, Assembly-CSharp",
+    "DisplayName": "Gun Item",
+    "Parent": "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "ShootAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Variable": "shoot",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
+            "Priority": 2
+        },
+        {
+            "Key": "ReloadAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Variable": "reload",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
+            "Priority": 2
+        },
+        {
+            "Key": "HammerAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Variable": "hammer",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
+            "Priority": 2,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "RechamberAfterMagazineAttached",
+                    "Value": "Never",
+                    "Condition":
+                    {
+                        "Variable": "RechamberAfterMagazineDetached",
+                        "Operation": "eq",
+                        "Comparand": "Never"
+                    }
+                },
+                {
+                    "Key": "RechamberAfterMagazineDetached",
+                    "Value": "Never",
+                    "Condition":
+                    {
+                        "Variable": "RechamberAfterMagazineAttached",
+                        "Operation": "eq",
+                        "Comparand": "Never"
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "AimAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Variable": "aim",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
+            "Priority": 2
+        },
+        {
+            "Key": "MinigunAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Variable": "minigun",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
+            "Priority": 2,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Action",
+                    "Value": "Minigun"
+                }
+            ]
+        },
+        {
+            "Key": "ChamberJammedAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Variable": "chamberJammedSound",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
+            "Priority": 2,
+            "InclusiveWith": [ "Can_Ever_Jam" ]
+        },
+        {
+            "Key": "FireDelayAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Variable": "fireDelaySound",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
+            "Priority": 2,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Fire_Delay_Seconds",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Fire_Delay_Seconds",
+                        "Operation": "gt",
+                        "Comparand": 0
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Ammo_Min",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "Amount of ammo this item will naturally spawn with. A random value between @Ammo_Min and @Ammo_Max will be chosen.",
+            "Maximum": "@Ammo_Max",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ammo-min-uint8-0",
+            "Priority": 10,
+            "Variable": "ammoMin"
+        },
+        {
+            "Key": "Ammo_Max",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "Amount of ammo this item will naturally spawn with. A random value between @Ammo_Min and @Ammo_Max will be chosen.",
+            "Minimum": "@Ammo_Min",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ammo-max-uint8-0",
+            "Priority": 10,
+            "Variable": "ammoMax"
+        },
+        {
+            "Key": "Sight",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.ItemSightAsset, Assembly-CSharp",
+            "DefaultValue": 0,
+            "Description": "The sight attachment that naturally spawns on this gun. Usually this is the iron sights.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#sight-uint16-0",
+            "Priority": 15,
+            "Variable": "sightID"
+        },
+        {
+            "Key": "Tactical",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.ItemTacticalAsset, Assembly-CSharp",
+            "DefaultValue": 0,
+            "Description": "The tactical attachment that naturally spawns on this gun.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#tactical-uint16-0",
+            "Priority": 15,
+            "Variable": "tacticalID"
+        },
+        {
+            "Key": "Grip",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.ItemGripAsset, Assembly-CSharp",
+            "DefaultValue": 0,
+            "Description": "The grip attachment that naturally spawns on this gun.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#grip-uint16-0",
+            "Priority": 15,
+            "Variable": "gripID"
+        },
+        {
+            "Key": "Barrel",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp",
+            "DefaultValue": 0,
+            "Description": "The barrel attachment that naturally spawns on this gun.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#barrel-uint16-0",
+            "Priority": 15,
+            "Variable": "barrelID"
+        },
+        {
+            "Key": "Magazine",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "The magazine that naturally spawns on this gun.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-uint16-0",
+            "Priority": 15,
+            "Variable": "defaultMagazineGuid"
+        },
+        {
+            "Key": "Magazine_Replacements",
+            "Type": "Int32",
+            "Minimum": 0,
+            "DefaultValue": 0,
+            "Description": "List of replacements that allow guns to use different values for @Magazine for certain maps.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
+            "Priority": 3,
+            "Variable": "magazineReplacements",
+            "CountForRegexGroup": "gun-magazine-replacements"
+        },
+        {
+            "Key": "Magazine_Replacement_(\\d+)_ID",
+            "KeyIsRegex": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "gun-magazine-replacements",
+                    "RegexGroup": 1
+                }
+            ],
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Required": true,
+            "Description": "The magazine that naturally spawns on this gun for magazine replacement #(Self.KeyGroups[0])'s map.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
+            "Priority": 3,
+            "Variable": "magazineReplacements"
+        },
+        {
+            "Key": "Magazine_Replacement_(\\d+)_Map",
+            "KeyIsRegex": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "gun-magazine-replacements",
+                    "RegexGroup": 1
+                }
+            ],
+            "Type": "MapName",
+            "DefaultValue": null,
+            "Required": true,
+            "Description": "The map for which magazine replacement #(Self.KeyGroups[0]) is active on.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
+            "Priority": 3,
+            "Variable": "magazineReplacements"
+        },
+        {
+            "Key": "Unplace",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Multiplier of the reload animation length before the magazine is despawned. This does not affect the actual animation speed, but the cooldown before the player can perform other actions (such as shooting) again.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#unplace-float32-0",
+            "Priority": 8,
+            "Variable": "unplace"
+        },
+        {
+            "Key": "Replace",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier of the reload animation length before the magazine is respawned. This does not affect the actual animation speed, but the cooldown before the player can perform other actions (such as shooting) again.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#replace-float32-1",
+            "Priority": 8,
+            "Variable": "replace"
+        },
+        {
+            "Key": "RechamberAfterShotDelay",
+            "Type": "Float32",
+            "DefaultValue": 0.25,
+            "Description": "Time in seconds after firing it takes to rechamber the gun.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#rechamberaftershotdelay-float32-0-25",
+            "Priority": 8,
+            "Variable": "RechamberAfterShotDelay"
+        },
+        {
+            "Key": "EjectAfterHammerDelay",
+            "Type": "Float32",
+            "DefaultValue": 0.45,
+            "Description": "Time in seconds after hammering it takes to eject bullet casings.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ejectafterhammerdelay-float32-0-45",
+            "Priority": 8,
+            "Variable": "EjectAfterHammerDelay"
+        },
+        {
+            "Key": "EjectAfterReloadDelay",
+            "Type": "Float32",
+            "DefaultValue": 0.5,
+            "Description": "Time in seconds after reloading to eject bullet casings.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ejectafterreloaddelay-float32-0-5",
+            "Priority": 8,
+            "Variable": "EjectAfterReloadDelay"
+        },
+        {
+            "Key": "Hook_Sight",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows the player to change the sight attachment.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#hook-sight-flag",
+            "Priority": 14,
+            "Variable": "hasSight"
+        },
+        {
+            "Key": "Hook_Tactical",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows the player to change the tactical attachment.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#hook-tactical-flag",
+            "Priority": 14,
+            "Variable": "hasTactical"
+        },
+        {
+            "Key": "Hook_Grip",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows the player to change the grip attachment.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#hook-grip-flag",
+            "Priority": 14,
+            "Variable": "hasGrip"
+        },
+        {
+            "Key": "Hook_Barrel",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows the player to change the barrel attachment.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#hook-barrel-flag",
+            "Priority": 14,
+            "Variable": "hasBarrel"
+        },
+        {
+            "Key": "Magazine_Calibers",
+            "Type": "Int32",
+            "Minimum": 1,
+            "DefaultValue": 0,
+            "Description": "Arbitrary IDs that must be also be present in magazines for them to be attachable to this gun.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-calibers-int32",
+            "Priority": 7,
+            "Variable": "magazineCalibers",
+            "CountForRegexGroup": "gun-magazine-calibers"
+        },
+        {
+            "Key": "Magazine_Caliber_(\\d+)",
+            "KeyIsRegex": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "gun-magazine-calibers",
+                    "RegexGroup": 1
+                }
+            ],
+            "Type": "CaliberId",
+            "DefaultValue": 0,
+            "Required": true,
+            "Description": "An arbitrary ID that must be also be present in magazines for them to be attachable to this gun.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-caliber-uint16",
+            "Priority": 7,
+            "Variable": "magazineCalibers"
+        },
+        {
+            "Key": "Attachment_Calibers",
+            "Type": "Int32",
+            "Minimum": 1,
+            "DefaultValue": "@Magazine_Calibers",
+            "Description": "Arbitrary IDs that must be also be present in attachments for them to be attachable to this gun. Defaults to @Magazine_Calibers.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#attachment-calibers-int32",
+            "Priority": 7,
+            "Variable": "attachmentCalibers",
+            "CountForRegexGroup": "gun-attachment-calibers",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Magazine_Calibers",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Magazine_Calibers",
+                        "Operation": "gt",
+                        "Comparand": 0
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Attachment_Caliber_(\\d+)",
+            "KeyIsRegex": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "gun-attachment-calibers",
+                    "RegexGroup": 1
+                }
+            ],
+            "Type": "CaliberId",
+            "DefaultValue": "@Magazine_Calibers",
+            "Required": true,
+            "Description": "An arbitrary ID that must be also be present in attachments for them to be attachable to this gun. Magazine calibers must also be specified to use this property.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#attachment-caliber-uint16",
+            "Priority": 7,
+            "Variable": "attachmentCalibers"
+        },
+        {
+            "Key": "Caliber",
+            "Type": "CaliberId",
+            "DefaultValue": 0,
+            "Deprecated": true,
+            "Description": "The attachment and magazine caliber for this gun. Use @Magazine_Calibers and @Attachment_Calibers instead.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-caliber-uint16",
+            "Priority": 7,
+            "Variable": "magazineCalibers"
+        },
+        {
+            "Key": "Firerate",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "Number of ticks in-between each shot. There are 50 ticks in a second.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#firerate-uint8-0",
+            "Priority": 14,
+            "Variable": "firerate"
+        },
+        {
+            "Key": "Action",
+            "Type": "SDG.Unturned.EAction, Assembly-CSharp",
+            "DefaultValue": "Trigger",
+            "Required": true,
+            "Description": "Action mechanism of this gun, changing how it fires and reloads.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#action-eaction",
+            "Priority": 14,
+            "Variable": "action"
+        },
+        {
+            "Key": "Delete_Empty_Magazines",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Deprecated": true,
+            "Description": "The attached magazine attachment is deleted when fully depleted. Use @Should_Delete_Empty_Magazines instead.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#delete-empty-magazines-flag",
+            "Priority": 7,
+            "Variable": "shouldDeleteEmptyMagazines"
+        },
+        {
+            "Key": "Should_Delete_Empty_Magazines",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Pump"
+                        },
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Rail"
+                        },
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "String"
+                        },
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Rocket"
+                        },
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Break"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Whether or not the attached magazine attachment is deleted when fully depleted.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#should-delete-empty-magazines-bool",
+            "Priority": 7,
+            "Variable": "shouldDeleteEmptyMagazines"
+        },
+        {
+            "Key": "Requires_NonZero_Attachment_Caliber",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not attachments must specify at least one non-zero caliber ID to be compatible.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#requires-nonzero-attachment-caliber-bool-false",
+            "Priority": 7,
+            "Variable": "requiresNonZeroAttachmentCaliber"
+        },
+        {
+            "Key": "Bursts",
+            "Type": "Int32",
+            "DefaultValue": false,
+            "Minimum": 0,
+            "Description": "When a value greater than 0 is provided, the weapon has a burst firing mode. A number of shots equal to this value is fired when using this mode.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#bursts-int32-0",
+            "Priority": 14,
+            "Variable": "bursts"
+        },
+        {
+            "Key": "Safety",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "The weapon has a safety firing mode.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#safety-flag",
+            "Priority": 14,
+            "Variable": "hasSafety"
+        },
+        {
+            "Key": "Semi",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "The weapon has a semi-automatic firing mode.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#semi-flag",
+            "Priority": 14,
+            "Variable": "hasSemi"
+        },
+        {
+            "Key": "Auto",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "The weapon has an automatic firing mode.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#auto-flag",
+            "Priority": 14,
+            "Variable": "hasAuto"
+        },
+        {
+            "Key": "Turret",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This weapon should be treated as a vehicular turret. This flag affects the player’s first-person viewmodel while the weapon is held.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#turret-flag",
+            "Priority": 13,
+            "Variable": "isTurret"
+        },
+        {
+            "Key": "DriverTurretViewmodelMode",
+            "Type": "SDG.Unturned.EDriverTurretViewmodelMode, Assembly-CSharp",
+            "DefaultValue": "OffscreenWhileAiming",
+            "Description": "Controls how first-person arms are moved for turrets operated from the driver’s seat.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#driverturretviewmodelmode-edriverturretviewmodelmode",
+            "Priority": 3,
+            "Variable": "driverTurretViewmodelMode"
+        },
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EAction, Assembly-CSharp",
+            "DisplayName": "Action Mechanism",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#eaction-enumeration",
+            "Values":
+            [
+                {
+                    "Value": "Trigger",
+                    "Description": "Standard firearm mode for guns.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#eaction-enumeration"
+                },
+                {
+                    "Value": "Bolt",
+                    "Description": "Bolt-action rifle.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#eaction-enumeration"
+                },
+                {
+                    "Value": "Pump",
+                    "Description": "Pump-action shotgun.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#eaction-enumeration"
+                },
+                {
+                    "Value": "Rail",
+                    "Description": "Railgun.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#eaction-enumeration"
+                },
+                {
+                    "Value": "String",
+                    "Description": "Bow or crossbow.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#eaction-enumeration"
+                },
+                {
+                    "Value": "Break",
+                    "Description": "Break-action shotgun.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#eaction-enumeration"
+                },
+                {
+                    "Value": "Rocket",
+                    "Description": "Rocket launcher.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#eaction-enumeration"
+                },
+                {
+                    "Value": "Minigun",
+                    "Description": "Revvable minigun.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#eaction-enumeration"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EDriverTurretViewmodelMode, Assembly-CSharp",
+            "DisplayName": "Driver Turret Viewmodel Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#edriverturretviewmodelmode-enumeration",
+            "Values":
+            [
+                {
+                    "Value": "OffscreenWhileAiming",
+                    "Description": "Pushes first-person arms off-screen while aiming.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#edriverturretviewmodelmode-enumeration"
+                },
+                {
+                    "Value": "AlwaysOffscreen",
+                    "Description": "Push first-person arms off-screen when equipped.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#edriverturretviewmodelmode-enumeration"
+                },
+                {
+                    "Value": "AlwaysOnscreen",
+                    "Description": "First-person arms are always on-screen.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#edriverturretviewmodelmode-enumeration"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ERechamberGunAfterReloadMode, Assembly-CSharp",
+            "DisplayName": "Gun Rechamber Behavior",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#erechambergunafterreloadmode-enumeration",
+            "Values":
+            [
+                {
+                    "Value": "IfAmmoWasEmpty",
+                    "Description": "Plays \"Hammer\" animation if ammo count was zero.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#erechambergunafterreloadmode-enumeration"
+                },
+                {
+                    "Value": "Never",
+                    "Description": "Regardless of ammo, does not play \"Hammer\" animation after reloading.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#erechambergunafterreloadmode-enumeration"
+                },
+                {
+                    "Value": "Always",
+                    "Description": "Regardless of ammo, will play \"Hammer\" animation after reloading.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#erechambergunafterreloadmode-enumeration"
+                }
+            ]
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Shoot",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the gun is shot.",
+            "Variable": "shoot",
+            "RedirectableAssetKey": "ShootAudioClip"
+        },
+        {
+            "AssetName": "Reload",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the gun is reloaded.",
+            "Variable": "reload",
+            "RedirectableAssetKey": "ReloadAudioClip"
+        },
+        {
+            "AssetName": "Hammer",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the gun is hammered.",
+            "Variable": "hammer",
+            "RedirectableAssetKey": "HammerAudioClip",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "RechamberAfterMagazineAttached",
+                    "Value": "Never",
+                    "Condition":
+                    {
+                        "Variable": "RechamberAfterMagazineDetached",
+                        "Operation": "eq",
+                        "Comparand": "Never"
+                    }
+                },
+                {
+                    "Key": "RechamberAfterMagazineDetached",
+                    "Value": "Never",
+                    "Condition":
+                    {
+                        "Variable": "RechamberAfterMagazineAttached",
+                        "Operation": "eq",
+                        "Comparand": "Never"
+                    }
+                }
+            ]
+        },
+        {
+            "AssetName": "Aim",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the player aims down sights.",
+            "Variable": "aim",
+            "RedirectableAssetKey": "AimAudioClip"
+        },
+        {
+            "AssetName": "Minigun",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the player revs this minigun.",
+            "Variable": "minigun",
+            "RedirectableAssetKey": "MinigunAudioClip",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Action",
+                    "Value": "Minigun"
+                }
+            ]
+        },
+        {
+            "AssetName": "ChamberJammed",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when this gun jams.",
+            "Variable": "chamberJammedSound",
+            "RedirectableAssetKey": "ChamberJammedAudioClip",
+            "InclusiveWith": [ "Can_Ever_Jam" ]
+        },
+        {
+            "AssetName": "FireDelay",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when this the player first starts the fire delay.",
+            "Variable": "chamberJammedSound",
+            "RedirectableAssetKey": "ChamberJammedAudioClip",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Fire_Delay_Seconds",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Fire_Delay_Seconds",
+                        "Operation": "gt",
+                        "Comparand": 0
+                    }
+                }
+            ]
+        },
+        {
+            "AssetName": "Projectile",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "The projectile object spawned for physics-based guns. Whether or not this is present decides if the gun uses the ballistic or physics projectile system.",
+            "Variable": "projectile"
+        },
+    ]
+}

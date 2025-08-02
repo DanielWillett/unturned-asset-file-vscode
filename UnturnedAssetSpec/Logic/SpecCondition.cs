@@ -22,9 +22,43 @@ public readonly struct SpecCondition : IEquatable<SpecCondition>
         Comparand = comparand;
     }
 
+    public bool TryGetOpposite(out SpecCondition condition)
+    {
+        switch (Operation)
+        {
+            case ConditionOperation.Equal:
+                condition = new SpecCondition(Variable, ConditionOperation.NotEqual, Comparand);
+                return true;
+            case ConditionOperation.NotEqual:
+                condition = new SpecCondition(Variable, ConditionOperation.Equal, Comparand);
+                return true;
+            case ConditionOperation.EqualCaseInsensitive:
+                condition = new SpecCondition(Variable, ConditionOperation.NotEqualCaseInsensitive, Comparand);
+                return true;
+            case ConditionOperation.NotEqualCaseInsensitive:
+                condition = new SpecCondition(Variable, ConditionOperation.EqualCaseInsensitive, Comparand);
+                return true;
+            case ConditionOperation.GreaterThan:
+                condition = new SpecCondition(Variable, ConditionOperation.LessThanOrEqual, Comparand);
+                return true;
+            case ConditionOperation.LessThan:
+                condition = new SpecCondition(Variable, ConditionOperation.GreaterThanOrEqual, Comparand);
+                return true;
+            case ConditionOperation.GreaterThanOrEqual:
+                condition = new SpecCondition(Variable, ConditionOperation.LessThan, Comparand);
+                return true;
+            case ConditionOperation.LessThanOrEqual:
+                condition = new SpecCondition(Variable, ConditionOperation.GreaterThan, Comparand);
+                return true;
+        }
+
+        condition = default;
+        return false;
+    }
+
     public bool Equals(SpecCondition other)
     {
-        return Variable.Equals(other.Variable) && Operation == other.Operation && Equals(Comparand, other.Comparand);
+        return (Variable?.Equals(other.Variable) ?? other.Variable == null) && Operation == other.Operation && Equals(Comparand, other.Comparand);
     }
 
     public override bool Equals(object? obj) => obj is SpecCondition c && Equals(c);

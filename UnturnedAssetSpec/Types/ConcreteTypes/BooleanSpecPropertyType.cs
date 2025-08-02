@@ -72,7 +72,7 @@ public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecP
         new AutoCompleteResult("false")
     });
 
-    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters context)
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters, in FileEvaluationContext context)
     {
         return BooleanResults;
     }

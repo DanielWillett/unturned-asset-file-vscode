@@ -2,7 +2,6 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -30,7 +29,7 @@ public class InstallationEnvironment : IDisposable
         }
     }
 
-    private readonly FileEnumerable _fileSync;
+    private readonly object _fileSync;
     private readonly IAssetSpecDatabase _database;
     private readonly List<SourceDirectory> _sourceDirs;
     private readonly Action<string, string> _logAction;
@@ -42,6 +41,8 @@ public class InstallationEnvironment : IDisposable
 
     private readonly Dictionary<Guid, OneOrMore<DiscoveredDatFile>> _guidIndex;
     private readonly Dictionary<ushort, OneOrMore<DiscoveredDatFile>>[] _idIndex;
+    private readonly Dictionary<ushort, List<DiscoveredDatFile>> _caliberIndex;
+    private readonly Dictionary<byte, List<DiscoveredDatFile>> _bladeIndex;
 
     public event HandleFileUpdate? OnFileUpdated;
     public event HandleFile? OnFileRemoved;
@@ -65,7 +66,7 @@ public class InstallationEnvironment : IDisposable
 
     public InstallationEnvironment(IAssetSpecDatabase database, params string[] sourceDirectories)
     {
-        _fileSync = new FileEnumerable(this);
+        _fileSync = new object();
 
         _database = database;
         _sourceDirs = new List<SourceDirectory>();
@@ -76,11 +77,58 @@ public class InstallationEnvironment : IDisposable
 
         _guidIndex = new Dictionary<Guid, OneOrMore<DiscoveredDatFile>>(1024);
 
+        _caliberIndex = new Dictionary<ushort, List<DiscoveredDatFile>>(512);
+        _bladeIndex = new Dictionary<byte, List<DiscoveredDatFile>>(128);
+
         _logAction = Log;
 
         foreach (string dir in sourceDirectories)
         {
             AddSearchableDirectory(dir);
+        }
+    }
+
+    public void ForEachFileWithCaliber(ushort caliber, Action<DiscoveredDatFile> action)
+    {
+        lock (_fileSync)
+        {
+            if (_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile> files))
+            {
+                files.ForEach(action);
+            }
+        }
+    }
+
+    public void ForEachCaliber(Action<ushort, IReadOnlyList<DiscoveredDatFile>> action)
+    {
+        lock (_fileSync)
+        {
+            foreach (KeyValuePair<ushort, List<DiscoveredDatFile>> kvp in _caliberIndex)
+            {
+                action(kvp.Key, kvp.Value);
+            }
+        }
+    }
+
+    public void ForEachFileWithBladeId(byte bladeId, Action<DiscoveredDatFile> action)
+    {
+        lock (_fileSync)
+        {
+            if (_bladeIndex.TryGetValue(bladeId, out List<DiscoveredDatFile> files))
+            {
+                files.ForEach(action);
+            }
+        }
+    }
+
+    public void ForEachBladeId(Action<byte, IReadOnlyList<DiscoveredDatFile>> action)
+    {
+        lock (_fileSync)
+        {
+            foreach (KeyValuePair<byte, List<DiscoveredDatFile>> kvp in _bladeIndex)
+            {
+                action(kvp.Key, kvp.Value);
+            }
         }
     }
 
@@ -459,6 +507,115 @@ public class InstallationEnvironment : IDisposable
             }
         }
 
+        bool isCalEqual = file.Calibers.Equals(file.MagazineCalibers);
+        bool wasCalEqual = oldFile.Calibers.Equals(oldFile.MagazineCalibers);
+
+        foreach (ushort caliber in oldFile.Calibers)
+        {
+            if (caliber == 0)
+                continue;
+
+            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile> f))
+            {
+                continue;
+            }
+
+            if (file.Calibers.Contains(caliber)
+                || (!isCalEqual && file.MagazineCalibers.Contains(caliber)))
+            {
+                // still in new asset
+                int ind = f.IndexOf(oldFile);
+                if (ind == -1)
+                {
+                    if (!f.Contains(file))
+                        f.Add(file);
+                }
+                else
+                    f[ind] = file;
+                continue;
+            }
+
+            // removed caliber
+            f.Remove(oldFile);
+            if (f.Count == 0)
+            {
+                _caliberIndex.Remove(caliber);
+            }
+        }
+
+        foreach (ushort caliber in file.Calibers)
+        {
+            if (caliber == 0)
+                continue;
+
+            // check for new calibers
+            if (oldFile.Calibers.Contains(caliber)
+                || (!wasCalEqual && oldFile.MagazineCalibers.Contains(caliber)))
+            {
+                continue;
+            }
+
+            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile> f))
+            {
+                _caliberIndex.Add(caliber, new List<DiscoveredDatFile>(8) { file });
+                continue;
+            }
+
+            f.Add(file);
+        }
+
+        foreach (byte blade in oldFile.BladeIds)
+        {
+            if (blade == 0)
+                continue;
+
+            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile> f))
+            {
+                continue;
+            }
+
+            if (file.Calibers.Contains(blade))
+            {
+                // still in new asset
+                int ind = f.IndexOf(oldFile);
+                if (ind == -1)
+                {
+                    if (!f.Contains(file))
+                        f.Add(file);
+                }
+                else
+                    f[ind] = file;
+                continue;
+            }
+
+            // removed blade
+            f.Remove(oldFile);
+            if (f.Count == 0)
+            {
+                _bladeIndex.Remove(blade);
+            }
+        }
+
+        foreach (byte blade in file.BladeIds)
+        {
+            if (blade == 0)
+                continue;
+
+            // check for new blades
+            if (oldFile.BladeIds.Contains(blade))
+            {
+                continue;
+            }
+
+            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile> f))
+            {
+                _bladeIndex.Add(blade, new List<DiscoveredDatFile>(4) { file });
+                continue;
+            }
+
+            f.Add(file);
+        }
+
         try
         {
             OnFileUpdated?.Invoke(oldFile, file);
@@ -506,10 +663,47 @@ public class InstallationEnvironment : IDisposable
             Dictionary<ushort, OneOrMore<DiscoveredDatFile>> indexGroup = _idIndex[file.Category - 1];
             if (indexGroup.TryGetValue(file.Id, out index))
             {
+                index = index.Remove(file);
                 if (index.IsNull)
                     indexGroup.Remove(file.Id);
                 else
                     indexGroup[file.Id] = index;
+            }
+        }
+
+        foreach (ushort caliber in file.Calibers)
+        {
+            if (caliber == 0)
+                continue;
+
+            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile> f))
+            {
+                continue;
+            }
+
+            // removed caliber
+            f.Remove(file);
+            if (f.Count == 0)
+            {
+                _caliberIndex.Remove(caliber);
+            }
+        }
+
+        foreach (byte blade in file.BladeIds)
+        {
+            if (blade == 0)
+                continue;
+
+            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile> f))
+            {
+                continue;
+            }
+
+            // removed blade
+            f.Remove(file);
+            if (f.Count == 0)
+            {
+                _bladeIndex.Remove(blade);
             }
         }
 
@@ -556,6 +750,36 @@ public class InstallationEnvironment : IDisposable
             indexGroup[file.Id] = files.Add(file);
         else
             indexGroup.Add(file.Id, file);
+
+        foreach (ushort caliber in file.Calibers)
+        {
+            if (caliber == 0)
+                continue;
+
+            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile> f))
+            {
+                _caliberIndex.Add(caliber, new List<DiscoveredDatFile>(8) { file });
+                continue;
+            }
+
+            if (!f.Contains(file))
+                f.Add(file);
+        }
+
+        foreach (byte blade in file.BladeIds)
+        {
+            if (blade == 0)
+                continue;
+
+            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile> f))
+            {
+                _bladeIndex.Add(blade, new List<DiscoveredDatFile>(8) { file });
+                continue;
+            }
+
+            if (!f.Contains(file))
+                f.Add(file);
+        }
 
         try
         {
@@ -836,54 +1060,5 @@ public class InstallationEnvironment : IDisposable
     {
         Dispose(true);
         GC.SuppressFinalize(this);
-    }
-
-    private class FileEnumerable : IEnumerable<DiscoveredDatFile>
-    {
-        private readonly InstallationEnvironment _environment;
-
-        public FileEnumerable(InstallationEnvironment environment)
-        {
-            _environment = environment;
-        }
-
-        /// <inheritdoc />
-        public IEnumerator<DiscoveredDatFile> GetEnumerator() => new Enumerator(_environment);
-
-        /// <inheritdoc />
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        public class Enumerator : IEnumerator<DiscoveredDatFile>
-        {
-            private readonly InstallationEnvironment _environment;
-            private DiscoveredDatFile? _head;
-
-            /// <inheritdoc />
-            public DiscoveredDatFile Current => _head!;
-
-            /// <inheritdoc />
-            object IEnumerator.Current => Current;
-
-            public Enumerator(InstallationEnvironment env)
-            {
-                _environment = env;
-                _head = env._head;
-            }
-
-            /// <inheritdoc />
-            public bool MoveNext()
-            {
-                return (_head = _head?.Next) != null;
-            }
-
-            /// <inheritdoc />
-            public void Reset()
-            {
-                _head = _environment._head;
-            }
-
-            /// <inheritdoc />
-            public void Dispose() { }
-        }
     }
 }

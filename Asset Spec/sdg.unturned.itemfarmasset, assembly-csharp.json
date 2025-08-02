@@ -1,0 +1,137 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemFarmAsset, Assembly-CSharp",
+    "DisplayName": "Farm Item (Plant)",
+    "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Growth",
+            "Type": "UInt32",
+            "DefaultValue": 0,
+            "Required": true,
+            "Description": "How long before the crop is fully grown in seconds.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
+            "Variable": "growth",
+            "Priority": 5
+        },
+        {
+            "Key": "Grow",
+            "Type": "Id",
+            "ElementType": "ITEM",
+            "DefaultValue": 0,
+            "Description": "ID of the item to spawn when harvested.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
+            "Variable": "grow",
+            "Priority": 5,
+            "ExclusiveWith": 
+            [
+                {
+                    "Key": "Grow_SpawnTable",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Grow",
+                                "Operation": "neq",
+                                "Comparand": 0
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Grow_SpawnTable",
+            "Type": "Guid",
+            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "DefaultValue": 0,
+            "ExclusiveWith": 
+            [
+                {
+                    "Key": "Grow",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Grow",
+                                "Operation": "neq",
+                                "Comparand": 0
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ],
+            "Description": "GUID of the spawn table to spawn items from when harvested.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
+            "Variable": "growSpawnTableGuid",
+            "Priority": 5
+        },
+        {
+            "Key": "Ignore_Soil_Restrictions",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows placement anywhere instead of just on Soil Materials.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
+            "Variable": "ignoreSoilRestrictions",
+            "Priority": 4
+        },
+        {
+            "Key": "Allow_Fertilizer",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Allows the player to use fertilizer to fully grow the plant.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
+            "Variable": "canFertilize",
+            "Priority": 4
+        },
+        {
+            "Key": "Harvest_Reward_Experience",
+            "Type": "UInt32",
+            "DefaultValue": 1,
+            "Description": "The amount of experience gained upon harvesting.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
+            "Variable": "harvestRewardExperience",
+            "Priority": 5
+        },
+        {
+            "Key": "Affected_By_Agriculture_Skill",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not the amount of crops acquired when harvesting the plant is affected by the Agriculture skill.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
+            "Variable": "isAffectedByAgricultureSkill",
+            "Priority": 4
+        },
+        {
+            "Key": "Rain_Affects_Growth",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not the plant will fully finish growing after rainy weather.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
+            "Variable": "shouldRainAffectGrowth",
+            "Priority": 4
+        },
+        {
+            "Key": "Harvest_Rewards",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Rewards applied when harvesting this item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
+            "Variable": "harvestRewardsList",
+            "CountForRegexGroup": "farm-rewards",
+            "Priority": 4
+        }
+    ]
+}

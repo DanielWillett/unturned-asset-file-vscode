@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -59,7 +60,7 @@ public readonly struct FileEvaluationContext
         return TryGetValue(out value, out _, diagnostics);
     }
 
-    public bool TryGetValue(out ISpecDynamicValue value, out AssetFileKeyValuePairNode? node, ICollection<DatDiagnosticMessage>? diagnostics = null)
+    public bool TryGetValue([MaybeNullWhen(false)] out ISpecDynamicValue value, out AssetFileKeyValuePairNode? node, ICollection<DatDiagnosticMessage>? diagnostics = null)
     {
         if (diagnostics is { IsReadOnly: true })
             throw new ArgumentException("Diagnostics collection is readonly.", nameof(diagnostics));
@@ -71,7 +72,7 @@ public readonly struct FileEvaluationContext
         }
 
         SpecPropertyTypeParseContext parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(this, Self, node, node.Value, diagnostics);
-            
+
         if (Self.Type.TryParseValue(in parse, out value))
         {
             return true;

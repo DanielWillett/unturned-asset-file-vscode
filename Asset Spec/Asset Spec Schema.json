@@ -306,6 +306,14 @@
                     "title": "The name of a skill or blueprint skill."
                 },
                 {
+                    "const": "SteamItemDef",
+                    "title": "A 32 bit integer representing a SteamItemDef_t value (Steam inventory item ID)."
+                },
+                {
+                    "const": "CaliberId",
+                    "title": "An arbitrary ID that has to be shared between an attachment and weapon for them to be compatible."
+                },
+                {
                     "$ref": "#/$defs/switch"
                 }
             ]

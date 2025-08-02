@@ -1,3 +1,4 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -17,6 +18,8 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
     private readonly OpenedFileTracker _fileTracker;
     private readonly IAssetSpecDatabase _specDictionary;
     private readonly ILogger<DocumentSymbolHandler> _logger;
+    private readonly IWorkspaceEnvironment _workspace;
+    private readonly InstallationEnvironment _installationEnvironment;
 
     /// <inheritdoc />
     DocumentSymbolRegistrationOptions IRegistration<DocumentSymbolRegistrationOptions, DocumentSymbolCapability>.GetRegistrationOptions(
@@ -28,11 +31,18 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
         };
     }
 
-    public DocumentSymbolHandler(OpenedFileTracker fileTracker, IAssetSpecDatabase specDictionary, ILogger<DocumentSymbolHandler> logger)
+    public DocumentSymbolHandler(
+        OpenedFileTracker fileTracker,
+        IAssetSpecDatabase specDictionary,
+        ILogger<DocumentSymbolHandler> logger,
+        IWorkspaceEnvironment workspace,
+        InstallationEnvironment installationEnvironment)
     {
         _fileTracker = fileTracker;
         _specDictionary = specDictionary;
         _logger = logger;
+        _workspace = workspace;
+        _installationEnvironment = installationEnvironment;
     }
 
     /// <inheritdoc />
@@ -62,6 +72,20 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
                 if (property == null)
                     continue;
 
+                FileEvaluationContext ctx = new FileEvaluationContext(
+                    property,
+                    property.Owner,
+                    tree,
+                    _workspace,
+                    _installationEnvironment,
+                    _specDictionary,
+                    file
+                );
+
+                ISpecPropertyType? propType = property.Type.GetType(in ctx);
+                if (propType == null)
+                    continue;
+
                 Range range = node.Range.ToRange();
                 symbols.Add(new SymbolInformationOrDocumentSymbol(new DocumentSymbol
                 {
@@ -69,7 +93,7 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
                     Kind = SymbolKind.Property,
                     Deprecated = false,
                     SelectionRange = range,
-                    Detail = property.Type.DisplayName,
+                    Detail = propType.DisplayName,
                     Name = property.Key
                 }));
             }
@@ -78,10 +102,27 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
                 string? propertyName = (strValue.Parent as AssetFileKeyValuePairNode)?.Key?.Value;
                 SpecProperty? property = propertyName == null ? null : _specDictionary.FindPropertyInfo(propertyName, type);
                 Range range = node.Range.ToRange();
+
+                ISpecPropertyType? propType = null;
+                if (property != null)
+                {
+                    FileEvaluationContext ctx = new FileEvaluationContext(
+                        property,
+                        property.Owner,
+                        tree,
+                        _workspace,
+                        _installationEnvironment,
+                        _specDictionary,
+                        file
+                    );
+
+                    propType = property.Type.GetType(in ctx);
+                }
+
                 symbols.Add(new SymbolInformationOrDocumentSymbol(new DocumentSymbol
                 {
                     Range = range,
-                    Kind = property?.Type?.GetSymbolKind() ?? SymbolKind.String,
+                    Kind = propType?.GetSymbolKind() ?? SymbolKind.String,
                     Deprecated = false,
                     SelectionRange = range,
                     Name = strValue.Value

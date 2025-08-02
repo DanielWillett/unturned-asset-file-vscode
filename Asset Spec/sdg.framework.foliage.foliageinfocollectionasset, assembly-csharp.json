@@ -1,9 +1,10 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
     "Type": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
     "DisplayName": "Foliage Collection",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Category": "NONE",
+    "RequireId": false,
     "Properties":
     [
         {

@@ -190,10 +190,8 @@ public sealed class SkillLevelSpecPropertyType :
 
     private static readonly AutoCompleteResult[] Zero = [ new AutoCompleteResult("0", "No skill.") ];
 
-    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters)
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters, in FileEvaluationContext context)
     {
-        FileEvaluationContext context = new FileEvaluationContext(parameters.Property, parameters.Property.Owner, parameters.File, parameters.Workspace, parameters.Environment, parameters.Database);
-
         if (!TryGetSkill(in context, out SkillInfo? skill) || skill == null || skill.MaximumLevel == 0)
         {
             return Task.FromResult(Zero);

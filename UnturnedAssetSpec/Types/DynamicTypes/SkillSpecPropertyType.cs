@@ -149,10 +149,8 @@ public sealed class SkillSpecPropertyType :
         return true;
     }
 
-    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters)
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters, in FileEvaluationContext context)
     {
-        FileEvaluationContext context = new FileEvaluationContext(parameters.Property, parameters.Property.Owner, parameters.File, parameters.Workspace, parameters.Environment, parameters.Database);
-
         SpecialityInfo?[]? specialities = context.Information.Information.Specialities;
         if (specialities == null)
         {
