@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Globalization;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
@@ -10,8 +11,62 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 internal static class SpecDynamicEquationTreeValueHelpers
 {
-    public static ISpecPropertyType GetValueType(ISpecDynamicValue left, ISpecDynamicValue? right, SpecDynamicEquationTreeBinaryOperation operation)
+    public static ISpecPropertyType GetValueType(ISpecDynamicValue argument, SpecDynamicEquationTreeUnaryOperation operation, ISpecPropertyType? expectedType)
     {
+        if (operation
+            is >= SpecDynamicEquationTreeUnaryOperation.SineRad
+            and <= SpecDynamicEquationTreeUnaryOperation.SquareRoot)
+        {
+            if (expectedType != null && (expectedType.ValueType == typeof(float) || expectedType.ValueType == typeof(double) || expectedType.ValueType == typeof(decimal)))
+            {
+                return expectedType;
+            }
+
+            // trig operations, must be decimal
+            if (argument.ValueType == null)
+                return KnownTypes.Float64;
+
+            Type t = argument.ValueType.ValueType;
+            if (t == typeof(float) || t == typeof(double) || t == typeof(decimal) || t == typeof(string))
+                return argument.ValueType;
+
+            return KnownTypes.Float64;
+        }
+
+        if (expectedType != null)
+        {
+            if (expectedType.ValueType == typeof(string)
+                || IsInteger(expectedType.ValueType)
+                || expectedType.ValueType == typeof(float)
+                || expectedType.ValueType == typeof(double)
+                || expectedType.ValueType == typeof(decimal))
+            {
+                return expectedType;
+            }
+        }
+
+        return argument.ValueType ?? KnownTypes.Float64;
+    }
+
+    public static ISpecPropertyType GetValueType(ISpecDynamicValue left, ISpecDynamicValue? right, SpecDynamicEquationTreeBinaryOperation operation, ISpecPropertyType? expectedType)
+    {
+        if (operation == SpecDynamicEquationTreeBinaryOperation.Concat)
+        {
+            return expectedType != null && (expectedType is EnumSpecType || expectedType.ValueType == typeof(string)) ? expectedType : KnownTypes.String;
+        }
+
+        if (expectedType != null)
+        {
+            if (expectedType.ValueType == typeof(string)
+                || IsInteger(expectedType.ValueType)
+                || expectedType.ValueType == typeof(float)
+                || expectedType.ValueType == typeof(double)
+                || expectedType.ValueType == typeof(decimal))
+            {
+                return expectedType;
+            }
+        }
+
         if (right == null)
         {
             return left.ValueType ?? KnownTypes.Float64;
@@ -29,11 +84,24 @@ internal static class SpecDynamicEquationTreeValueHelpers
         return KnownTypes.Float64;
     }
 
-    public static ISpecPropertyType GetValueType(ISpecDynamicValue argument, SpecDynamicEquationTreeUnaryOperation operation)
+    public static ISpecPropertyType GetValueType(ISpecDynamicValue arg1, ISpecDynamicValue arg2, ISpecDynamicValue arg3, SpecDynamicEquationTreeTertiaryOperation operation, ISpecPropertyType? expectedType)
     {
-        // may use later
-        _ = operation;
-        return argument.ValueType ?? KnownTypes.Float64;
+        if (operation == SpecDynamicEquationTreeTertiaryOperation.BallisticGravityMultiplierCalculation)
+        {
+            if (expectedType != null && (expectedType.ValueType == typeof(float) || expectedType.ValueType == typeof(double) || expectedType.ValueType == typeof(decimal) || expectedType.ValueType == typeof(string)))
+            {
+                return expectedType;
+            }
+
+            return KnownTypes.Float32;
+        }
+
+        if (operation == SpecDynamicEquationTreeTertiaryOperation.Replace)
+        {
+            return expectedType != null && (expectedType is EnumSpecType || expectedType.ValueType == typeof(string)) ? expectedType : KnownTypes.String;
+        }
+
+        return expectedType ?? KnownTypes.String;
     }
 
     private static ISpecPropertyType GetLargestInteger(ISpecPropertyType left, ISpecPropertyType right)
@@ -297,7 +365,8 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
         "MIN",          // Minimum
         "MAX",          // Maximum
         "AVG",          // Average
-        "CAT"           // Concat
+        "CAT",          // Concat
+        "POW"           // Power
     ];
 
     public ISpecDynamicValue Left { get; }
@@ -305,8 +374,8 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
     public SpecDynamicEquationTreeBinaryOperation Operation { get; }
     public override string FunctionName { get; }
 
-    public SpecDynamicEquationTreeBinaryValue(ISpecDynamicValue left, ISpecDynamicValue right, SpecDynamicEquationTreeBinaryOperation operation)
-        : base(SpecDynamicEquationTreeValueHelpers.GetValueType(left, right, operation))
+    public SpecDynamicEquationTreeBinaryValue(ISpecDynamicValue left, ISpecDynamicValue right, SpecDynamicEquationTreeBinaryOperation operation, ISpecPropertyType? expectedType)
+        : base(SpecDynamicEquationTreeValueHelpers.GetValueType(left, right, operation, expectedType))
     {
         Left = left;
         Right = right;
@@ -382,6 +451,7 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
             SpecDynamicEquationTreeBinaryOperation.Minimum => Math.Min(leftNum, rightNum),
             SpecDynamicEquationTreeBinaryOperation.Maximum => Math.Max(leftNum, rightNum),
             SpecDynamicEquationTreeBinaryOperation.Average => (leftNum + rightNum) / 2d,
+            SpecDynamicEquationTreeBinaryOperation.Power => Math.Pow(leftNum, rightNum),
             _ => leftNum
         };
 
@@ -413,6 +483,7 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
             SpecDynamicEquationTreeBinaryOperation.Minimum => Math.Min(leftNum, rightNum),
             SpecDynamicEquationTreeBinaryOperation.Maximum => Math.Max(leftNum, rightNum),
             SpecDynamicEquationTreeBinaryOperation.Average => (leftNum + rightNum) / 2d,
+            SpecDynamicEquationTreeBinaryOperation.Power => Math.Pow(leftNum, rightNum),
             _ => leftNum
         };
 
@@ -459,7 +530,8 @@ public enum SpecDynamicEquationTreeBinaryOperation
     Minimum,
     Maximum,
     Average,
-    Concat
+    Concat,
+    Power
 }
 
 
@@ -470,15 +542,28 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
         "ABS",          // Absolute
         "ROUND",        // Round
         "FLOOR",        // Floor
-        "CEIL"          // Ceiling
+        "CEIL",         // Ceiling
+        "SINR",         // SineRad
+        "COSR",         // CosineRad
+        "TANR",         // TangentRad
+        "ASINR",        // ArcSineRad
+        "ACOSR",        // ArcCosineRad
+        "ATANR",        // ArcTangentRad
+        "SIND",         // SineDeg
+        "COSD",         // CosineDeg
+        "TAND",         // TangentDeg
+        "ASIND",        // ArcSineDeg
+        "ACOSD",        // ArcCosineDeg
+        "ATAND",        // ArcTangentDeg
+        "SQRT"          // SquareRoot
     ];
 
     public ISpecDynamicValue Argument { get; }
     public SpecDynamicEquationTreeUnaryOperation Operation { get; }
     public override string FunctionName { get; }
 
-    public SpecDynamicEquationTreeUnaryValue(ISpecDynamicValue argument, SpecDynamicEquationTreeUnaryOperation operation)
-        : base(SpecDynamicEquationTreeValueHelpers.GetValueType(argument, operation))
+    public SpecDynamicEquationTreeUnaryValue(ISpecDynamicValue argument, SpecDynamicEquationTreeUnaryOperation operation, ISpecPropertyType? expectedType)
+        : base(SpecDynamicEquationTreeValueHelpers.GetValueType(argument, operation, expectedType))
     {
         Argument = argument;
         Operation = operation;
@@ -507,6 +592,13 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull) where TValue : default
     {
+        if (Operation
+            is >= SpecDynamicEquationTreeUnaryOperation.SineRad
+            and <= SpecDynamicEquationTreeUnaryOperation.SquareRoot)
+        {
+            return TryEvaluateFuncValue(in ctx, out value, out isNull);
+        }
+
         if (!TryGetArgumentValue(in ctx, 0, out TValue? argValue, out bool argIsNull))
         {
             value = default;
@@ -529,6 +621,7 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
             return true;
         }
 
+        isNull = false;
         if (typeof(TValue) == typeof(sbyte) || typeof(TValue) == typeof(short) || typeof(TValue) == typeof(int))
         {
             int argValueAsInt32;
@@ -575,11 +668,26 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
             return SpecDynamicEquationTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
         }
 
-        if (typeof(TValue) == typeof(float) || typeof(TValue) == typeof(double))
+        if (typeof(TValue) == typeof(float))
         {
-            double argValueAsDouble = typeof(TValue) == typeof(float)
-                ? Unsafe.As<TValue, float>(ref argValue!)
-                : Unsafe.As<TValue, double>(ref argValue!);
+            float argValueAsFloat = Unsafe.As<TValue, float>(ref argValue!);
+
+            float v = Operation switch
+            {
+                SpecDynamicEquationTreeUnaryOperation.Absolute => MathF.Abs(argValueAsFloat),
+                SpecDynamicEquationTreeUnaryOperation.Round => MathF.Round(argValueAsFloat),
+                SpecDynamicEquationTreeUnaryOperation.Floor => MathF.Floor(argValueAsFloat),
+                SpecDynamicEquationTreeUnaryOperation.Ceiling => MathF.Ceiling(argValueAsFloat),
+                _ => argValueAsFloat,
+            };
+
+            value = Unsafe.As<float, TValue>(ref v);
+            return true;
+        }
+
+        if (typeof(TValue) == typeof(double))
+        {
+            double argValueAsDouble = Unsafe.As<TValue, double>(ref argValue!);
 
             double v = Operation switch
             {
@@ -590,7 +698,8 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
                 _ => argValueAsDouble,
             };
 
-            return SpecDynamicEquationTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
+            value = Unsafe.As<double, TValue>(ref v);
+            return true;
         }
 
         if (typeof(TValue) == typeof(decimal))
@@ -656,8 +765,130 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
         return true;
     }
 
+    private bool TryEvaluateFuncValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
+    {
+        isNull = false;
+        value = default;
+
+        if (typeof(TValue) == typeof(float) && ValueType.ValueType == typeof(float))
+        {
+            if (!TryGetArgumentValue(in ctx, 0, out float r32, out bool argIsNull))
+            {
+                isNull = argIsNull;
+                return false;
+            }
+
+            if (isNull)
+                return true;
+
+            float v = Operation switch
+            {
+                SpecDynamicEquationTreeUnaryOperation.SineRad => MathF.Sin(r32),
+                SpecDynamicEquationTreeUnaryOperation.CosineRad => MathF.Cos(r32),
+                SpecDynamicEquationTreeUnaryOperation.TangentRad => MathF.Tan(r32),
+                SpecDynamicEquationTreeUnaryOperation.ArcSineRad => MathF.Asin(r32),
+                SpecDynamicEquationTreeUnaryOperation.ArcCosineRad => MathF.Acos(r32),
+                SpecDynamicEquationTreeUnaryOperation.ArcTangentRad => MathF.Atan(r32),
+                SpecDynamicEquationTreeUnaryOperation.SineDeg => MathF.Sin(r32 * (180f / MathF.PI)),
+                SpecDynamicEquationTreeUnaryOperation.CosineDeg => MathF.Cos(r32 * (180f / MathF.PI)),
+                SpecDynamicEquationTreeUnaryOperation.TangentDeg => MathF.Tan(r32 * (180f / MathF.PI)),
+                SpecDynamicEquationTreeUnaryOperation.ArcSineDeg => MathF.Asin(r32) * (180f / MathF.PI),
+                SpecDynamicEquationTreeUnaryOperation.ArcCosineDeg => MathF.Acos(r32) * (180 / MathF.PI),
+                SpecDynamicEquationTreeUnaryOperation.ArcTangentDeg => MathF.Atan(r32) * (180 / MathF.PI),
+                SpecDynamicEquationTreeUnaryOperation.SquareRoot => MathF.Sqrt(r32),
+                _ => r32
+            };
+
+            if (typeof(TValue) == typeof(float))
+            {
+                value = Unsafe.As<float, TValue>(ref v);
+            }
+            else if (!SpecDynamicEquationTreeValueHelpers.TryConvert(v, false, out value, out isNull))
+            {
+                isNull = true;
+                return false;
+            }
+        }
+        else // double or other
+        {
+            if (!TryGetArgumentValue(in ctx, 0, out double r64, out bool argIsNull))
+            {
+                isNull = argIsNull;
+                return false;
+            }
+
+            if (isNull)
+                return true;
+
+            double v = Operation switch
+            {
+                SpecDynamicEquationTreeUnaryOperation.SineRad => Math.Sin(r64),
+                SpecDynamicEquationTreeUnaryOperation.CosineRad => Math.Cos(r64),
+                SpecDynamicEquationTreeUnaryOperation.TangentRad => Math.Tan(r64),
+                SpecDynamicEquationTreeUnaryOperation.ArcSineRad => Math.Asin(r64),
+                SpecDynamicEquationTreeUnaryOperation.ArcCosineRad => Math.Acos(r64),
+                SpecDynamicEquationTreeUnaryOperation.ArcTangentRad => Math.Atan(r64),
+                SpecDynamicEquationTreeUnaryOperation.SineDeg => Math.Sin(r64 * (180 / Math.PI)),
+                SpecDynamicEquationTreeUnaryOperation.CosineDeg => Math.Cos(r64 * (180 / Math.PI)),
+                SpecDynamicEquationTreeUnaryOperation.TangentDeg => Math.Tan(r64 * (180 / Math.PI)),
+                SpecDynamicEquationTreeUnaryOperation.ArcSineDeg => Math.Asin(r64) * (180 / Math.PI),
+                SpecDynamicEquationTreeUnaryOperation.ArcCosineDeg => Math.Acos(r64) * (180 / Math.PI),
+                SpecDynamicEquationTreeUnaryOperation.ArcTangentDeg => Math.Atan(r64) * (180 / Math.PI),
+                SpecDynamicEquationTreeUnaryOperation.SquareRoot => Math.Sqrt(r64),
+                _ => r64
+            };
+
+            if (typeof(TValue) == typeof(double))
+            {
+                value = Unsafe.As<double, TValue>(ref v);
+            }
+            else if (!SpecDynamicEquationTreeValueHelpers.TryConvert(v, false, out value, out isNull))
+            {
+                isNull = true;
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
     {
+        if (Operation
+            is >= SpecDynamicEquationTreeUnaryOperation.SineRad
+            and <= SpecDynamicEquationTreeUnaryOperation.SquareRoot)
+        {
+            if (!TryEvaluateFuncValue(in ctx, out double vDb, out bool isNull))
+            {
+                value = null;
+                return false;
+            }
+
+            if (isNull)
+            {
+                value = null;
+                return true;
+            }
+
+            if (ValueType.ValueType == typeof(double))
+            {
+                value = vDb;
+                return true;
+            }
+
+
+            try
+            {
+                value = Convert.ChangeType(vDb, ValueType.ValueType, CultureInfo.InvariantCulture);
+                return true;
+            }
+            catch (InvalidCastException)
+            {
+                value = null;
+                return false;
+            }
+        }
+
         Type? type = Argument.ValueType?.ValueType;
 
         if (type == null)
@@ -780,14 +1011,28 @@ public enum SpecDynamicEquationTreeUnaryOperation
     Absolute,
     Round,
     Floor,
-    Ceiling
+    Ceiling,
+    SineRad,
+    CosineRad,
+    TangentRad,
+    ArcSineRad,
+    ArcCosineRad,
+    ArcTangentRad,
+    SineDeg,
+    CosineDeg,
+    TangentDeg,
+    ArcSineDeg,
+    ArcCosineDeg,
+    ArcTangentDeg,
+    SquareRoot
 }
 
 public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
 {
     private static readonly string[] OperationFunctionNames =
     [
-        "REP"           // Replace
+        "REP",                    // Replace
+        "CUSTOM_BALLISTIC_GRAV"   // BallisticGravityMultiplierCalculation
     ];
 
     public ISpecDynamicValue Arg1 { get; }
@@ -800,8 +1045,9 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
         ISpecDynamicValue arg1,
         ISpecDynamicValue arg2,
         ISpecDynamicValue arg3,
-        SpecDynamicEquationTreeTertiaryOperation operation)
-        : base(KnownTypes.String)
+        SpecDynamicEquationTreeTertiaryOperation operation,
+        ISpecPropertyType? expectedType)
+        : base(SpecDynamicEquationTreeValueHelpers.GetValueType(arg1, arg2, arg3, operation, expectedType))
     {
         Arg1 = arg1;
         Arg2 = arg2;
@@ -832,6 +1078,11 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull) where TValue : default
     {
+        if (Operation == SpecDynamicEquationTreeTertiaryOperation.BallisticGravityMultiplierCalculation)
+        {
+            return TryEvaluateBallisticGravityMultiplier(in ctx, out value, out isNull);
+        }
+
         value = default;
         isNull = true;
 
@@ -862,6 +1113,18 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
 
     public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
     {
+        if (Operation == SpecDynamicEquationTreeTertiaryOperation.BallisticGravityMultiplierCalculation)
+        {
+            if (!TryEvaluateBallisticGravityMultiplier(in ctx, out float multiplier, out bool isNull))
+            {
+                value = null;
+                return false;
+            }
+
+            value = isNull ? null : multiplier;
+            return true;
+        }
+
         value = null;
 
         if (Operation != SpecDynamicEquationTreeTertiaryOperation.Replace)
@@ -882,6 +1145,48 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
         else
             value = arg1!.Replace(arg2, arg3 ?? string.Empty);
         return true;
+    }
+
+    private bool TryEvaluateBallisticGravityMultiplier<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
+    {
+        if (!TryGetArgumentValue(in ctx, 0, out float ballisticTravel, out bool btIsNull)
+            || !TryGetArgumentValue(in ctx, 1, out byte ballisticSteps, out bool bsIsNull)
+            || !TryGetArgumentValue(in ctx, 1, out float ballisticDrop, out bool bdIsNull))
+        {
+            isNull = true;
+            value = default;
+            return false;
+        }
+
+        if (btIsNull || bsIsNull || bdIsNull)
+        {
+            isNull = true;
+            value = default;
+            return true;
+        }
+
+        isNull = false;
+
+        // copied from ItemGunAsset.PopulateAsset
+        float totalBallisticRise = 0.0f;
+        Vector2 right = new Vector2(1f, 0f);
+        for (int index = 0; index < ballisticSteps; ++index)
+        {
+            totalBallisticRise += right.Y * ballisticTravel;
+            right.Y -= ballisticDrop;
+            right = Vector2.Normalize(right);
+        }
+
+        float totalTimeSec = ballisticSteps * 0.02f;
+        float bulletGravityMultiplier = 2f * totalBallisticRise / (totalTimeSec * totalTimeSec) / -9.81f;
+
+        if (typeof(TValue) == typeof(float))
+        {
+            value = Unsafe.As<float, TValue>(ref bulletGravityMultiplier);
+            return true;
+        }
+
+        return SpecDynamicEquationTreeValueHelpers.TryConvert(bulletGravityMultiplier, false, out value, out isNull);
     }
 
     public override ISpecDynamicValue GetArgument(int index)
@@ -905,5 +1210,6 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
 
 public enum SpecDynamicEquationTreeTertiaryOperation
 {
-    Replace
+    Replace,
+    BallisticGravityMultiplierCalculation
 }

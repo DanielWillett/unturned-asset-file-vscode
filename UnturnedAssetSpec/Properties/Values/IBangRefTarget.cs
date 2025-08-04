@@ -5,7 +5,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 public interface IBangRefTarget : IEquatable<IBangRefTarget>, ISpecDynamicValue
 {
-    bool EvaluateIsIncluded(in FileEvaluationContext ctx);
+    bool EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext ctx);
     string? EvaluateKey(in FileEvaluationContext ctx);
     ISpecDynamicValue? EvaluateValue(in FileEvaluationContext ctx);
     int EvaluateKeyGroup(in FileEvaluationContext ctx, int index);

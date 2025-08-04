@@ -124,7 +124,8 @@
             "Maximum": "@Ammo_Max",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ammo-min-uint8-0",
             "Priority": 10,
-            "Variable": "ammoMin"
+            "Variable": "ammoMin",
+            "InclusiveWith": [ "Ammo_Max" ]
         },
         {
             "Key": "Ammo_Max",
@@ -534,6 +535,374 @@
             "Priority": 3,
             "Variable": "driverTurretViewmodelMode"
         },
+        {
+            "Key": "Spread_Aim",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Multiplier on the bullet spread while aiming down sights. This is multiplied by value of @Spread_Angle_Degrees.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-aim-float32-0",
+            "Priority": 12,
+            "Variable": "spreadAim"
+        },
+        {
+            "Key": "Spread_Angle_Degrees",
+            "Type": "Float32",
+            "DefaultValue": "=ATAND(@Spread_Hip)",
+            "IncludedDefaultValue": 0.0,
+            "Minimum": 0,
+            "Maximum": 180,
+            "Description": "Bullet angle of deviation away from the aiming direction in degrees.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-angle-degrees-float32-0",
+            "Priority": 12,
+            "Variable": "baseSpreadAngleRadians",
+            "Version": "3.22.20.0",
+            "ExclusiveWith": [ "Spread_Hip" ]
+        },
+        {
+            "Key": "Spread_Hip",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Deprecated": true,
+            "Minimum": 0,
+            "Description": "Bullet spread from the crosshair. Use @Spread_Angle_Degrees instead.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-hip-float32",
+            "Priority": 12,
+            "Variable": "spreadHip",
+            "ExclusiveWith": [ "Spread_Angle_Degrees" ]
+        },
+        {
+            "Key": "Spread_Sprint",
+            "Type": "Float32",
+            "DefaultValue": 1.25,
+            "Minimum": 0,
+            "Description": "Multiplier on the bullet spread while sprinting.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-sprint-float32-1-25",
+            "Priority": 12,
+            "Variable": "spreadSprint"
+        },
+        {
+            "Key": "Spread_Crouch",
+            "Type": "Float32",
+            "DefaultValue": 0.85,
+            "Minimum": 0,
+            "Description": "Multiplier on the bullet spread while crouched.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-crouch-float32-0-85",
+            "Priority": 12,
+            "Variable": "spreadCrouch"
+        },
+        {
+            "Key": "Spread_Prone",
+            "Type": "Float32",
+            "DefaultValue": 0.7,
+            "Minimum": 0,
+            "Description": "Multiplier on the bullet spread while prone.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-prone-float32-0-7",
+            "Priority": 12,
+            "Variable": "spreadProne"
+        },
+        {
+            "Key": "Spread_Swimming",
+            "Type": "Float32",
+            "DefaultValue": 1.1,
+            "Minimum": 0,
+            "Description": "Multiplier on the bullet spread while swimming.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-swimming-float32-1-1",
+            "Priority": 12,
+            "Variable": "spreadSwimming"
+        },
+        {
+            "Key": "Spread_Midair",
+            "Type": "Float32",
+            "DefaultValue": 1.5,
+            "Minimum": 0,
+            "Description": "Multiplier on the bullet spread while jumping and/or falling.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-midair-float32-1-5",
+            "Priority": 12,
+            "Variable": "spreadMidair"
+        },
+        {
+            "Key": "Recoil_Min_X",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Maximum": "@Recoil_Max_X",
+            "Description": "Minimum horizontal camera recoil in degrees.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-min-x-float32-0",
+            "Priority": 12,
+            "Variable": "recoilMin_x",
+            "InclusiveWith": [ "Recoil_Max_X" ]
+        },
+        {
+            "Key": "Recoil_Min_Y",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Maximum": "@Recoil_Max_Y",
+            "Description": "Minimum vertical camera recoil in degrees.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-min-y-float32-0",
+            "Priority": 12,
+            "Variable": "recoilMin_y",
+            "InclusiveWith": [ "Recoil_Max_Y" ]
+        },
+        {
+            "Key": "Recoil_Max_X",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Minimum": "@Recoil_Min_X",
+            "Description": "Maximum horizontal camera recoil in degrees.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-max-x-float32-0",
+            "Priority": 12,
+            "Variable": "recoilMax_x"
+        },
+        {
+            "Key": "Recoil_Max_Y",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Minimum": "@Recoil_Min_Y",
+            "Description": "Maximum vertical camera recoil in degrees.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-max-y-float32-0",
+            "Priority": 12,
+            "Variable": "recoilMax_y"
+        },
+        {
+            "Key": "Aiming_Recoil_Multiplier",
+            "Type": "Float32",
+            "Minimum": 0,
+            "DefaultValue": 1,
+            "Description": "Multiplier on recoil magnitude while aiming down sights.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#aiming-recoil-multiplier-float32-1",
+            "Priority": 12,
+            "Variable": "aimingRecoilMultiplier"
+        },
+        {
+            "Key": "Recover_X",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Minimum": 0,
+            "Description": "Multiplier on camera degrees to be counter-animated horizontally over the next 250 milliseconds.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recover-x-float32-0",
+            "Priority": 12,
+            "Variable": "recover_x"
+        },
+        {
+            "Key": "Recover_Y",
+            "Type": "Float32",
+            "DefaultValue": 0,
+            "Minimum": 0,
+            "Description": "Multiplier on camera degrees to be counter-animated vertically over the next 250 milliseconds.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recover-y-float32-0",
+            "Priority": 12,
+            "Variable": "recover_y"
+        },
+        {
+            "Key": "Recoil_Sprint",
+            "Type": "Float32",
+            "DefaultValue": 1.25,
+            "Minimum": 0,
+            "Description": "Multiplier on camera recoil while sprinting.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-sprint-float32-1-25",
+            "Priority": 12,
+            "Variable": "recoilSprint",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Can_Aim_During_Sprint",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Recoil_Crouch",
+            "Type": "Float32",
+            "DefaultValue": 0.85,
+            "Minimum": 0,
+            "Description": "Multiplier on camera recoil while crouched.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-crouch-float32-0-85",
+            "Priority": 12,
+            "Variable": "recoilCrouch"
+        },
+        {
+            "Key": "Recoil_Prone",
+            "Type": "Float32",
+            "DefaultValue": 0.7,
+            "Minimum": 0,
+            "Description": "Multiplier on camera recoil while prone.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-prone-float32-0-7",
+            "Priority": 12,
+            "Variable": "recoilProne"
+        },
+        {
+            "Key": "Recoil_Swimming",
+            "Type": "Float32",
+            "DefaultValue": 1.1,
+            "Minimum": 0,
+            "Description": "Multiplier on camera recoil while swimming.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-swimming-float32-1-1",
+            "Priority": 12,
+            "Variable": "recoilSwimming"
+        },
+        {
+            "Key": "Recoil_Midair",
+            "Type": "Float32",
+            "DefaultValue": 1.1,
+            "Minimum": 0,
+            "Description": "Multiplier on camera recoil while jumping and/or falling.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-midair-float32-1-0",
+            "Priority": 12,
+            "Variable": "recoilSwimming"
+        },
+        {
+            "Key": "Shake_Min_X",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Maximum": "@Shake_Max_X",
+            "Description": "Minimum X-axis model shake caused from firing the weapon.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-min-x-float32-0",
+            "Priority": 12,
+            "Variable": "shakeMin_x"
+        },
+        {
+            "Key": "Shake_Min_Y",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Maximum": "@Shake_Max_Y",
+            "Description": "Minimum Y-axis model shake caused from firing the weapon.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-min-y-float32-0",
+            "Priority": 12,
+            "Variable": "shakeMin_y"
+        },
+        {
+            "Key": "Shake_Min_Z",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Maximum": "@Shake_Max_Z",
+            "Description": "Minimum Z-axis model shake caused from firing the weapon.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-min-z-float32-0",
+            "Priority": 12,
+            "Variable": "shakeMin_z"
+        },
+        {
+            "Key": "Shake_Max_X",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": "@Shake_Min_X",
+            "Description": "Maximum X-axis model shake caused from firing the weapon.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-max-x-float32-0",
+            "Priority": 12,
+            "Variable": "shakeMax_x"
+        },
+        {
+            "Key": "Shake_Max_Y",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": "@Shake_Min_Y",
+            "Description": "Maximum Y-axis model shake caused from firing the weapon.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-max-y-float32-0",
+            "Priority": 12,
+            "Variable": "shakeMax_y"
+        },
+        {
+            "Key": "Shake_Max_Z",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": "@Shake_Min_Z",
+            "Description": "Maximum Z-axis model shake caused from firing the weapon.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-max-z-float32-0",
+            "Priority": 12,
+            "Variable": "shakeMax_z"
+        },
+        {
+            "Key": "Ballistic_Steps",
+            "Type": "UInt8",
+            "Maximum": 254,
+            "DefaultValue": "=CEIL(=DIV(@(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) @Ballistic_Travel))",
+            "Description": "Lifespan of ballistic projectiles in ticks. The higher this number is, the smoother the arc taken by the bullet will be, but the longer it will take to land. Only one of @Ballistic_Steps and @Ballistic_Travel should be specified.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ballistic-steps-uint8",
+            "Priority": 10,
+            "Variable": "ballisticSteps",
+            "ExclusiveWith": [ "Ballistic_Travel", "$bndl$::Projectile" ]
+        },
+        {
+            "Key": "Ballistic_Travel",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Ballistic_Steps",
+                            "Operation": "value-included",
+                            "Comparand": null
+                        },
+                        {
+                            "Variable": "Ballistic_Steps",
+                            "Operation": "gt",
+                            "Comparand": 0
+                        }
+                    ],
+                    "Value": "=DIV(@(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) @Ballistic_Steps)"
+                },
+                {
+                    "Value": 10
+                }
+            ],
+            "MinimumExclusive": "=MAX(0.1 =DIV(@RANGE 253))",
+            "Description": "Travel speed of ballistic projectiles in meters per ballistic step. Only one of @Ballistic_Steps and @Ballistic_Travel should be specified.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ballistic-travel-float32",
+            "Priority": 10,
+            "Variable": "ballisticTravel",
+            "ExclusiveWith": [ "Ballistic_Steps", "$bndl$::Projectile" ]
+        },
+        {
+            "Key": "Bullet_Gravity_Multiplier",
+            "Type": "Float32",
+            "IncludedDefaultValue": 4.0,
+            "DefaultValue":
+            [
+                {
+                    "When":
+                    {
+                        "Variable": "Ballistic_Drop",
+                        "Operation": "value-included",
+                        "Comparand": null
+                    },
+                    "Cases":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Ballistic_Drop",
+                                    "Operation": "lt",
+                                    "Comparand": 0.00001
+                                }
+                            ],
+                            "Value": 0.0
+                        },
+                        {
+                            "Value": "=CUSTOM_BALLISTIC_GRAV(@Ballistic_Travel @Ballistic_Steps @Ballistic_Drop)"
+                        }
+                    ]
+                },
+                {
+                    "Value": 4.0
+                }
+            ],
+            "Description": "Multiplier for gravity’s acceleration.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#bullet-gravity-multiplier-float32-4",
+            "Priority": 10,
+            "Variable": "ballisticTravel",
+            "ExclusiveWith": [ "Ballistic_Drop", "$bndl$::Projectile" ]
+        },
+        {
+            "Key": "Ballistic_Drop",
+            "Type": "Float32",
+            "DefaultValue": 4.0,
+            "Description": "Multiplier for gravity’s acceleration.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#bullet-gravity-multiplier-float32-4",
+            "Priority": 10,
+            "Variable": "ballisticTravel",
+            "ExclusiveWith": [ "Ballistic_Steps", "$bndl$::Projectile" ]
+        },
     ],
     "Types":
     [
@@ -732,6 +1101,6 @@
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The projectile object spawned for physics-based guns. Whether or not this is present decides if the gun uses the ballistic or physics projectile system.",
             "Variable": "projectile"
-        },
+        }
     ]
 }

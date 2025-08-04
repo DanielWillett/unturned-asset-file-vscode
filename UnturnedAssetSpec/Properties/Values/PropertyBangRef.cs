@@ -8,7 +8,7 @@ using System.Text.Json;
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 /// <summary>
-/// #Property, defaulting to <see cref="Namespace"/>.
+/// #Property, defaulting to <see cref="Property"/>.
 /// </summary>
 public sealed class PropertyBangRef : IEquatable<ISpecDynamicValue>, IEquatable<PropertyBangRef>, IBangRefTarget
 {
@@ -50,10 +50,9 @@ public sealed class PropertyBangRef : IEquatable<ISpecDynamicValue>, IEquatable<
         return Property.ToString();
     }
 
-    public bool EvaluateIsIncluded(in FileEvaluationContext context)
+    public bool EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext context)
     {
-        SpecProperty? property = Property.ResolveProperty(in context);
-        return property != null && context.File.TryGetProperty(property, out _);
+        return Property.GetIsIncluded(valueIncluded, in context);
     }
 
     public string? EvaluateKey(in FileEvaluationContext context)

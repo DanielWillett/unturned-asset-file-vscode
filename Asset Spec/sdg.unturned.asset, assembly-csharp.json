@@ -824,7 +824,7 @@
                     "Type": "CommaDelimitedString",
                     "ElementType": "Int32",
                     "Description": "Comma-separated indexes of other conditions that must be met first before this condition will be visible in-game.",
-                    "ValueRegexGroupReference": "#This.KeyGroups[-1]{PreventSelfReference=true}",
+                    "ValueRegexGroupReference": "#This.KeyGroups[0]{PreventSelfReference=true}",
                     "DefaultValue": null,
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "uiRequirementIndices"
@@ -2307,7 +2307,7 @@
                     "Description": "The sight to use if the item is a gun, or -1 to use the default sight.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
                     "Variable": "sight",
-                    "ExclusiveWith":
+                    "InclusiveWith":
                     [
                         {
                             "Key": "ID",
@@ -2328,7 +2328,7 @@
                     "Description": "The tactical to use if the item is a gun, or -1 to use the default tactical.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
                     "Variable": "tactical",
-                    "ExclusiveWith":
+                    "InclusiveWith":
                     [
                         {
                             "Key": "ID",
@@ -2349,7 +2349,7 @@
                     "Description": "The grip to use if the item is a gun, or -1 to use the default grip.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
                     "Variable": "grip",
-                    "ExclusiveWith":
+                    "InclusiveWith":
                     [
                         {
                             "Key": "ID",
@@ -2370,7 +2370,7 @@
                     "Description": "The barrel to use if the item is a gun, or -1 to use the default barrel.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
                     "Variable": "barrel",
-                    "ExclusiveWith":
+                    "InclusiveWith":
                     [
                         {
                             "Key": "ID",
@@ -2391,7 +2391,7 @@
                     "Description": "The magazine to use if the item is a gun, or -1 to use the default magazine.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
                     "Variable": "magazine",
-                    "ExclusiveWith":
+                    "InclusiveWith":
                     [
                         {
                             "Key": "ID",
@@ -2414,7 +2414,7 @@
                     "Description": "The ammo count if the item is a gun, or -1 to use the default value.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
                     "Variable": "magazine",
-                    "ExclusiveWith":
+                    "InclusiveWith":
                     [
                         {
                             "Key": "ID",

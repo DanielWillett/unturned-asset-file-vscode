@@ -600,7 +600,7 @@ public static class SpecDynamicValue
                 return false;
             }
 
-            reference = new SpecDynamicEquationTreeUnaryValue(arg, unary);
+            reference = new SpecDynamicEquationTreeUnaryValue(arg, unary, expectedType);
             return true;
         }
 
@@ -623,7 +623,7 @@ public static class SpecDynamicValue
                 return false;
             }
 
-            reference = new SpecDynamicEquationTreeBinaryValue(left, right, binary);
+            reference = new SpecDynamicEquationTreeBinaryValue(left, right, binary, expectedType);
             return true;
         }
 
@@ -653,7 +653,7 @@ public static class SpecDynamicValue
                 return false;
             }
 
-            reference = new SpecDynamicEquationTreeTertiaryValue(arg1Val, arg2Val, arg3Val, tertiary);
+            reference = new SpecDynamicEquationTreeTertiaryValue(arg1Val, arg2Val, arg3Val, tertiary, expectedType);
             return true;
         }
 
@@ -822,7 +822,7 @@ public static class SpecDynamicValue
 
     private static bool TryParseBangRef(ReadOnlySpan<char> value, string? optionalString, out ISpecDynamicValue reference)
     {
-        int dot = value.IndexOf('.');
+        int dot = IndexOfAtCurrentDepth(value, 0, '.', '(');
         if (dot < 0)
             dot = value.Length;
 

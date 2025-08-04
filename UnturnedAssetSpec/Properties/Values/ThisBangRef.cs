@@ -54,9 +54,9 @@ public sealed class ThisBangRef : IEquatable<ISpecDynamicValue>, IEquatable<This
         return false;
     }
 
-    public bool EvaluateIsIncluded(in FileEvaluationContext ctx)
+    public bool EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext ctx)
     {
-        return ctx.File.TryGetProperty(ctx.Self, out _);
+        return PropertyRefInfo.EvaluateIsIncluded(ctx.Self, valueIncluded, in ctx);
     }
 
     public string EvaluateKey(in FileEvaluationContext ctx)

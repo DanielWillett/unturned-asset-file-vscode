@@ -55,7 +55,7 @@ public abstract class BangRef : IBangRefTarget, IEquatable<BangRef>, IEquatable<
     public abstract bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
     public abstract bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value);
 
-    bool IBangRefTarget.EvaluateIsIncluded(in FileEvaluationContext ctx) => Target.EvaluateIsIncluded(in ctx);
+    bool IBangRefTarget.EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext ctx) => Target.EvaluateIsIncluded(valueIncluded, in ctx);
     string? IBangRefTarget.EvaluateKey(in FileEvaluationContext ctx) => Target.EvaluateKey(in ctx);
     ISpecDynamicValue? IBangRefTarget.EvaluateValue(in FileEvaluationContext ctx) => Target.EvaluateValue(in ctx);
     int IBangRefTarget.EvaluateKeyGroup(in FileEvaluationContext ctx, int index) => Target.EvaluateKeyGroup(in ctx, index);
@@ -140,7 +140,11 @@ public sealed class IncludedBangRef : BangRef, IEquatable<IncludedBangRef>
             return condition.Operation.EvaluateNulls(false, true);
         }
 
-        return condition.Operation.Evaluate(Target.EvaluateIsIncluded(in ctx), v, ctx.Information.Information);
+        return condition.Operation.Evaluate(
+            Target.EvaluateIsIncluded(false, in ctx),
+            v,
+            ctx.Information.Information
+        );
     }
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
@@ -151,7 +155,7 @@ public sealed class IncludedBangRef : BangRef, IEquatable<IncludedBangRef>
         {
             if (typeof(TValue) == typeof(string))
             {
-                string vStr = Target.EvaluateIsIncluded(in ctx).ToString();
+                string vStr = Target.EvaluateIsIncluded(false, in ctx).ToString();
                 value = Unsafe.As<string, TValue>(ref vStr);
                 return true;
             }
@@ -160,14 +164,14 @@ public sealed class IncludedBangRef : BangRef, IEquatable<IncludedBangRef>
             return false;
         }
 
-        bool v = Target.EvaluateIsIncluded(in ctx);
+        bool v = Target.EvaluateIsIncluded(false, in ctx);
         value = Unsafe.As<bool, TValue>(ref v);
         return true;
     }
 
     public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
     {
-        value = Target.EvaluateIsIncluded(in ctx);
+        value = Target.EvaluateIsIncluded(false, in ctx);
         return true;
     }
 }
@@ -189,7 +193,7 @@ public sealed class ExcludedBangRef : BangRef, IEquatable<ExcludedBangRef>
             return condition.Operation.EvaluateNulls(false, true);
         }
 
-        return condition.Operation.Evaluate(!Target.EvaluateIsIncluded(in ctx), v, ctx.Information.Information);
+        return condition.Operation.Evaluate(!Target.EvaluateIsIncluded(false, in ctx), v, ctx.Information.Information);
     }
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
@@ -200,7 +204,7 @@ public sealed class ExcludedBangRef : BangRef, IEquatable<ExcludedBangRef>
         {
             if (typeof(TValue) == typeof(string))
             {
-                string vStr = (!Target.EvaluateIsIncluded(in ctx)).ToString();
+                string vStr = (!Target.EvaluateIsIncluded(false, in ctx)).ToString();
                 value = Unsafe.As<string, TValue>(ref vStr);
                 return true;
             }
@@ -209,14 +213,14 @@ public sealed class ExcludedBangRef : BangRef, IEquatable<ExcludedBangRef>
             return false;
         }
 
-        bool v = !Target.EvaluateIsIncluded(in ctx);
+        bool v = !Target.EvaluateIsIncluded(false, in ctx);
         value = Unsafe.As<bool, TValue>(ref v);
         return true;
     }
 
     public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
     {
-        value = !Target.EvaluateIsIncluded(in ctx);
+        value = !Target.EvaluateIsIncluded(false, in ctx);
         return true;
     }
 }

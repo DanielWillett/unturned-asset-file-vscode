@@ -30,7 +30,9 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
         JsonEncodedText.Encode("assignable-to"),    // AssignableTo
         JsonEncodedText.Encode("assignable-from"),  // AssignableFrom
         JsonEncodedText.Encode("included"),         // Included
-        JsonEncodedText.Encode("is-type")           // ReferenceIsOfType
+        JsonEncodedText.Encode("is-type"),          // ReferenceIsOfType
+        JsonEncodedText.Encode("value-included"),   // ValueIncluded
+        JsonEncodedText.Encode("excluded")          // Excluded
     ];
 
     private static readonly JsonEncodedText VariableProperty = JsonEncodedText.Encode("Variable");

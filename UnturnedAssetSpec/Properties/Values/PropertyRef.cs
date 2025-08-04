@@ -52,6 +52,14 @@ public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
             : _info.GetValue(in ctx, prop, default, null);
     }
 
+    public bool GetIsIncluded(bool valueIncluded, in FileEvaluationContext ctx)
+    {
+        SpecProperty? prop = ResolveProperty(in ctx);
+        return _crossReferenceProperty != null
+            ? _info.GetIsIncluded(valueIncluded, in ctx, prop, _crossReferenceProperty._info, _crossReferenceProperty.ResolveProperty(in ctx))
+            : _info.GetIsIncluded(valueIncluded, in ctx, prop, default, null);
+    }
+
     public SpecProperty? ResolveProperty(in FileEvaluationContext ctx)
     {
         if (_hasCache)
@@ -71,6 +79,16 @@ public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
+        if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
+        {
+            return GetIsIncluded(condition.Operation == ConditionOperation.Included, in ctx);
+        }
+
+        if (condition.Operation == ConditionOperation.Excluded)
+        {
+            return !GetIsIncluded(false, in ctx);
+        }
+
         ISpecDynamicValue? val = GetValue(in ctx);
         return val?.EvaluateCondition(in ctx, in condition) ?? condition.Operation.EvaluateNulls(true, condition.Comparand == null);
     }
@@ -101,7 +119,7 @@ public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
 
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
     {
-        string str = ToString();
+        string str = _info.ToString();
         if (StringHelper.ContainsWhitespace(str))
         {
             str = "@(" + str + ")";
@@ -134,13 +152,14 @@ public readonly struct PropertyRefInfo
     {
         return Context switch
         {
-            SpecPropertyContext.Property => "$prop$::" + PropertyName,
-            SpecPropertyContext.Localization => "local::" + PropertyName,
-            SpecPropertyContext.CrossReferenceLocalization => "$cr.local$::" + PropertyName,
-            SpecPropertyContext.CrossReferenceProperty => "$cr.prop$::" + PropertyName,
-            SpecPropertyContext.CrossReferenceUnspecified => "$cr$::" + PropertyName,
-            _ => PropertyName
-        };
+            SpecPropertyContext.Property => "$prop$::",
+            SpecPropertyContext.Localization => "$local$::",
+            SpecPropertyContext.CrossReferenceLocalization => "$cr.local$::",
+            SpecPropertyContext.CrossReferenceProperty => "$cr.prop$::",
+            SpecPropertyContext.CrossReferenceUnspecified => "$cr$::",
+            SpecPropertyContext.BundleAsset => "$bndl$::",
+            _ => string.Empty
+        } + PropertyName;
     }
 
     public PropertyRefInfo(ReadOnlySpan<char> propertyName, string? originalString)
@@ -173,6 +192,11 @@ public readonly struct PropertyRefInfo
             Context = SpecPropertyContext.CrossReferenceUnspecified;
             propertyName = propertyName.Slice(6);
         }
+        else if (propertyName.StartsWith("$bndl$::".AsSpan(), StringComparison.Ordinal) && propertyName.Length > 6)
+        {
+            Context = SpecPropertyContext.BundleAsset;
+            propertyName = propertyName.Slice(8);
+        }
         else
         {
             Context = SpecPropertyContext.Unspecified;
@@ -190,7 +214,6 @@ public readonly struct PropertyRefInfo
 
         PropertyName = originalString != null && propertyName.Length == originalString.Length ? originalString : propertyName.ToString();
     }
-
 
     public void ResolveProperty(in FileEvaluationContext ctx, out SpecProperty? property, out PropertyRefInfo crossRefProperty)
     {
@@ -238,6 +261,43 @@ public readonly struct PropertyRefInfo
         }
 
         crossRefProperty = new PropertyRefInfo(ctx.Self.FileCrossRef.AsSpan(), ctx.Self.FileCrossRef);
+    }
+
+    internal static bool EvaluateIsIncluded(SpecProperty? property, bool valueIncluded, in FileEvaluationContext context)
+    {
+        if (property != null && context.File.TryGetProperty(property, out AssetFileKeyValuePairNode prop2))
+        {
+            if (!valueIncluded)
+                return true;
+
+            if (prop2.Value == null)
+                return false;
+
+            if (prop2.Value is AssetFileStringValueNode strValNode)
+            {
+                if (string.IsNullOrWhiteSpace(strValNode.Value) && !strValNode.IsQuoted)
+                    return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool GetIsIncluded(bool valueIncluded, in FileEvaluationContext ctx, SpecProperty? prop, PropertyRefInfo crossReferencePropertyInfo, SpecProperty? crossReferenceProperty)
+    {
+        if (prop == null)
+        {
+            return false;
+        }
+
+        if (crossReferencePropertyInfo.PropertyName != null)
+        {
+            return CrossReferenceIsIncluded(valueIncluded, in ctx, crossReferencePropertyInfo, crossReferenceProperty);
+        }
+
+        return EvaluateIsIncluded(prop, valueIncluded, in ctx);
     }
 
     public ISpecDynamicValue? GetValue(in FileEvaluationContext ctx, SpecProperty? prop, PropertyRefInfo crossReferencePropertyInfo, SpecProperty? crossReferenceProperty)
@@ -338,6 +398,8 @@ public readonly struct PropertyRefInfo
         FileEvaluationContext crossValueCtx = new FileEvaluationContext(in ctx, workspaceFile.File, workspaceFile);
 
         crossValueInfo.ResolveProperty(in crossValueCtx, out SpecProperty? crossedProperty, out PropertyRefInfo crossCrossPropertyInfo);
+
+        // can't nest cross references
         if (crossCrossPropertyInfo.PropertyName != null || crossedProperty == null)
         {
             return null;
@@ -346,5 +408,88 @@ public readonly struct PropertyRefInfo
         crossValueCtx = new FileEvaluationContext(in crossValueCtx, crossedProperty);
 
         return crossValueInfo.GetValue(in crossValueCtx, crossedProperty, default, null);
+    }
+
+    private bool CrossReferenceIsIncluded(bool valueIncluded, in FileEvaluationContext ctx, PropertyRefInfo crossReferencePropertyInfo, SpecProperty? crossReferenceProperty)
+    {
+        if (crossReferenceProperty == null)
+        {
+            crossReferencePropertyInfo.ResolveProperty(in ctx, out crossReferenceProperty, out _);
+        }
+
+        if (crossReferenceProperty == null)
+        {
+            return false;
+        }
+
+        FileEvaluationContext crossRefCtx = new FileEvaluationContext(in ctx, crossReferenceProperty);
+
+        ISpecDynamicValue? crossRef = crossReferencePropertyInfo.GetValue(in crossRefCtx, crossReferenceProperty, default, null);
+        if (crossRef == null)
+        {
+            return false;
+        }
+
+        OneOrMore<DiscoveredDatFile> referenceFile;
+        if (crossRef.TryEvaluateValue(in ctx, out Guid guid, out bool isNull) && !isNull && guid != Guid.Empty)
+        {
+            referenceFile = ctx.Environment.FindFile(guid);
+        }
+        else if (crossRef.TryEvaluateValue(in ctx, out ushort id, out isNull) && !isNull && id != 0
+                 && crossRef is IElementTypeSpecPropertyType elementType
+                 && AssetCategory.TryParse(elementType.ElementType, out EnumSpecTypeValue assetCategory))
+        {
+            referenceFile = ctx.Environment.FindFile(id, assetCategory);
+        }
+        else if (crossRef.ValueType is GuidOrIdSpecPropertyType &&
+                 crossRef.TryEvaluateValue(in ctx, out GuidOrId guidOrId, out isNull) && !isNull &&
+                 !guidOrId.IsNull)
+        {
+            if (guidOrId.Guid != Guid.Empty)
+            {
+                referenceFile = ctx.Environment.FindFile(guidOrId.Guid);
+            }
+            else if (crossRef is IElementTypeSpecPropertyType elementType2
+                     && AssetCategory.TryParse(elementType2.ElementType, out assetCategory))
+            {
+                referenceFile = ctx.Environment.FindFile(guidOrId.Id, assetCategory);
+            }
+            else
+            {
+                referenceFile = default;
+            }
+        }
+        else
+        {
+            referenceFile = default;
+        }
+
+        DiscoveredDatFile? file = referenceFile.FirstOrDefault();
+        if (file == null)
+        {
+            return false;
+        }
+
+        using IWorkspaceFile? workspaceFile = ctx.Workspace.TemporarilyGetOrLoadFile(file);
+        if (workspaceFile == null)
+        {
+            return false;
+        }
+
+        PropertyRefInfo crossValueInfo = new PropertyRefInfo(PropertyName.AsSpan(), PropertyName);
+
+        FileEvaluationContext crossValueCtx = new FileEvaluationContext(in ctx, workspaceFile.File, workspaceFile);
+
+        crossValueInfo.ResolveProperty(in crossValueCtx, out SpecProperty? crossedProperty, out PropertyRefInfo crossCrossPropertyInfo);
+
+        // can't nest cross references
+        if (crossCrossPropertyInfo.PropertyName != null || crossedProperty == null)
+        {
+            return false;
+        }
+
+        crossValueCtx = new FileEvaluationContext(in crossValueCtx, crossedProperty);
+
+        return crossValueInfo.GetIsIncluded(valueIncluded, in crossValueCtx, crossedProperty, default, null);
     }
 }

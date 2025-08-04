@@ -166,7 +166,8 @@
             "Maximum": "@Count_Max",
             "Description": "Minimum number of items to spawn in a stackable item (like a magazine or ammo crate) when spawning naturally.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#count-min-uint8-1",
-            "Variable": "countMin"
+            "Variable": "countMin",
+            "InclusiveWith": [ "Count_Max" ]
         },
         {
             "Key": "Count_Max",
@@ -185,7 +186,8 @@
             "Maximum": "@Quality_Max",
             "Description": "Minimum quality/durability level to naturally spawn the item at.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#quality-min-uint8-10",
-            "Variable": "qualityMin"
+            "Variable": "qualityMin",
+            "InclusiveWith": [ "Quality_Max" ]
         },
         {
             "Key": "Quality_Max",
@@ -1306,7 +1308,7 @@
                 {
                     "Key": "Skill",
                     "Type": "BlueprintSkill",
-                    "DefaultValue": "NONE",
+                    "DefaultValue": "BP:0",
                     "Required":
                     {
                         "Variable": "Skill_Level",

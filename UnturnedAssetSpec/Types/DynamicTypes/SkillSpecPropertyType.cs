@@ -59,13 +59,14 @@ public sealed class SkillSpecPropertyType :
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
-        if (byte.TryParse(stringValue ?? span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out byte result))
+        if (span.IsEmpty)
         {
-            dynamicValue = SpecDynamicValue.UInt8(result, this);
-            return true;
+            dynamicValue = null!;
+            return false;
         }
 
-        dynamicValue = null!;
+        stringValue ??= span.ToString();
+        dynamicValue = SpecDynamicValue.String(stringValue, this);
         return false;
     }
 

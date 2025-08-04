@@ -1319,7 +1319,7 @@ public static class AssetSpecDatabaseExtensions
 
     public static SpecProperty? FindPropertyInfo(this IAssetSpecDatabase db, string property, AssetFileType fileType, SpecPropertyContext context = SpecPropertyContext.Property)
     {
-        if (context is not SpecPropertyContext.Localization and not SpecPropertyContext.Property)
+        if (context is not SpecPropertyContext.Localization and not SpecPropertyContext.Property and not SpecPropertyContext.BundleAsset)
             throw new ArgumentOutOfRangeException(nameof(context));
 
         if (!fileType.IsValid)
@@ -1328,7 +1328,7 @@ public static class AssetSpecDatabaseExtensions
         }
 
         string? assetType = null;
-        bool isLocal = false, isProp = false;
+        bool isLocal = false, isProp = false, isBundleAsset = false;
         while (true)
         {
             int divIndex = property.IndexOf("::", 0, StringComparison.Ordinal);
@@ -1343,12 +1343,21 @@ public static class AssetSpecDatabaseExtensions
                     assetType = null;
                     isLocal = true;
                     isProp = false;
+                    isBundleAsset = false;
                 }
                 else if (assetType.Equals("$prop$", StringComparison.OrdinalIgnoreCase))
                 {
                     assetType = null;
                     isProp = true;
                     isLocal = false;
+                    isBundleAsset = false;
+                }
+                else if (assetType.Equals("$bndl$", StringComparison.OrdinalIgnoreCase))
+                {
+                    assetType = null;
+                    isProp = false;
+                    isLocal = false;
+                    isBundleAsset = true;
                 }
             }
             property = property.Substring(divIndex + 2);
@@ -1363,6 +1372,15 @@ public static class AssetSpecDatabaseExtensions
             if (!db.Types.TryGetValue(type, out AssetSpecType info))
             {
                 continue;
+            }
+
+            if (isBundleAsset || context == SpecPropertyContext.BundleAsset)
+            {
+                SpecBundleAsset? bundleAsset = Array.Find(info.BundleAssets, p => p.Key.Equals(property, StringComparison.OrdinalIgnoreCase));
+                if (bundleAsset != null)
+                {
+                    return bundleAsset;
+                }
             }
 
             SpecProperty[] props = isLocal || context == SpecPropertyContext.Localization && !isProp ? info.LocalizationProperties : info.Properties;
@@ -1383,6 +1401,11 @@ public static class AssetSpecDatabaseExtensions
         if (!isProp && context == SpecPropertyContext.Localization)
         {
             return db.FindPropertyInfo("$local$::" + property, fileType, SpecPropertyContext.Property);
+        }
+
+        if (!isBundleAsset && context == SpecPropertyContext.BundleAsset)
+        {
+            return db.FindPropertyInfo("$bndl$::" + property, fileType, SpecPropertyContext.Property);
         }
 
         return null;

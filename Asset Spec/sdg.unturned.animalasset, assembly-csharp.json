@@ -106,7 +106,8 @@
             "Maximum": "@Reward_Max",
             "Description": "The minimum number of items to drop from the provided spawn table if @Reward_ID is set.",
             "Variable": "rewardMin",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops",
+            "InclusiveWith": [ "Reward_Max" ]
         },
         {
             "Key": "Reward_Max",

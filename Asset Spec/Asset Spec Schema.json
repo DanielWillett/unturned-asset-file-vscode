@@ -851,7 +851,9 @@
                         "assignable-to",
                         "assignable-from",
                         "included",
-                        "is-type"
+                        "is-type",
+                        "value-included",
+                        "excluded"
                     ]
                 },
                 "Comparand":

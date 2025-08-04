@@ -293,6 +293,8 @@ public class CustomSpecTypeInstance : IEquatable<CustomSpecTypeInstance>, ISpecD
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
+        if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
+            return true;
         if (condition.Comparand is not CustomSpecTypeInstance customInstance || !customInstance.Type.Equals(Type))
         {
             return condition.Operation.EvaluateNulls(false, true);

@@ -58,7 +58,30 @@
                     "Description": "The item the blueprint is declared in.",
                     "Variable": "assetRef",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
-                    "Required": true
+                    "Required": true,
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Blueprint",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "BlueprintName",
+                                "Operation": "excluded",
+                                "Comparand": null
+                            }
+                        },
+                        {
+                            "Key": "BlueprintName",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Blueprint",
+                                "Operation": "excluded",
+                                "Comparand": null
+                            }
+                        }
+                    ]
                 },
                 {
                     "Key": "Blueprint",
@@ -68,8 +91,8 @@
                     "Description": "The index of the blueprint to blacklist, starting at 0.",
                     "Variable": "index",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
-                    "Required": true,
-                    "ValueRegexGroupReference": "@(Item[#item-blueprints])",
+                    "FileCrossRef": "Item",
+                    "ValueRegexGroupReference": "#($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).KeyGroups[0]",
                     "ExclusiveWith": [ "BlueprintName" ]
                 },
                 {

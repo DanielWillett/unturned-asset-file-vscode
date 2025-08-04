@@ -26,6 +26,9 @@ public readonly struct SpecCondition : IEquatable<SpecCondition>
     {
         switch (Operation)
         {
+            case ConditionOperation.Included:
+                condition = new SpecCondition(Variable, ConditionOperation.Excluded, Comparand);
+                return true;
             case ConditionOperation.Equal:
                 condition = new SpecCondition(Variable, ConditionOperation.NotEqual, Comparand);
                 return true;
@@ -109,7 +112,9 @@ public static class ConditionOperationExtensions
         false,         // AssignableTo,
         false,         // AssignableFrom,
         false,         // Included,
-        false          // ReferenceIsOfType
+        false,         // ReferenceIsOfType
+        false,         // ValueIncluded
+        false          // Excluded
     ];
 
     /// <summary>
@@ -135,7 +140,9 @@ public static class ConditionOperationExtensions
         true,          // AssignableTo,
         true,          // AssignableFrom,
         false,         // Included,
-        false          // ReferenceIsOfType
+        false,         // ReferenceIsOfType
+        false,         // ValueIncluded
+        false          // Excluded
     ];
 
     /// <summary>
@@ -161,7 +168,9 @@ public static class ConditionOperationExtensions
         true,          // AssignableTo,
         true,          // AssignableFrom,
         false,         // Included,
-        true           // ReferenceIsOfType
+        true,          // ReferenceIsOfType
+        false,         // ValueIncluded
+        false          // Excluded
     ];
 
     public static bool IsCaseInsensitive(this ConditionOperation op)
@@ -197,6 +206,12 @@ public static class ConditionOperationExtensions
 
         if (op == ConditionOperation.Included)
             return true;
+
+        if (op == ConditionOperation.Excluded)
+            return false;
+
+        if (op == ConditionOperation.ValueIncluded)
+            return !valueIsNull;
 
         if (valueIsNull)
         {
@@ -327,7 +342,11 @@ public static class ConditionOperationExtensions
             }
 
             case ConditionOperation.Included:
+            case ConditionOperation.ValueIncluded:
                 return true;
+
+            case ConditionOperation.Excluded:
+                return false;
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(op), op, null);
@@ -337,6 +356,12 @@ public static class ConditionOperationExtensions
 
 public enum ConditionOperation
 {
+    // when adding:
+    // * update SpecConditionConverter.Operations
+    // * udpate 3 arrays in ConditionOperationExtensions
+    // * update conditions.md in docs
+    // * update JSON spec
+    // * add needed checks and switch cases
     LessThan,
     GreaterThan,
     LessThanOrEqual,
@@ -355,5 +380,7 @@ public enum ConditionOperation
     AssignableTo,
     AssignableFrom,
     Included,
-    ReferenceIsOfType
+    ReferenceIsOfType,
+    ValueIncluded,
+    Excluded
 }

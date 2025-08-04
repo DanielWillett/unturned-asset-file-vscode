@@ -38,6 +38,11 @@ public sealed class SpecDynamicConcreteNullValue :
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
+        if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
+            return true;
+        if (condition.Operation == ConditionOperation.Excluded)
+            return false;
+
         return condition.Operation.EvaluateNulls(true, condition.Comparand == null);
     }
 
@@ -121,8 +126,11 @@ public sealed class SpecDynamicConcreteEnumValue :
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
-        if (condition.Operation == ConditionOperation.Included)
+        if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
             return true;
+
+        if (condition.Operation == ConditionOperation.Excluded)
+            return false;
 
         if (condition.Comparand is not string str
             || !Type.TryParse(str.AsSpan(), out EnumSpecTypeValue v, ignoreCase: condition.Operation.IsCaseInsensitive()))
@@ -259,8 +267,10 @@ public sealed class SpecDynamicConcreteValue<T> :
     /// <inheritdoc />
     public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
-        if (condition.Operation == ConditionOperation.Included)
+        if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
             return true;
+        if (condition.Operation == ConditionOperation.Excluded)
+            return false;
 
         if (condition.Comparand is not T comparand)
         {

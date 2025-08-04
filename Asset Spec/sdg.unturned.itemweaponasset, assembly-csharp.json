@@ -52,7 +52,7 @@
             "Description": "The maximum distance in meters before damage is no longer possible.",
             "Variable": "range",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#weapon-asset-properties",
-            "Priority": 2,
+            "Priority": 10,
             "Required": true
         },
         {

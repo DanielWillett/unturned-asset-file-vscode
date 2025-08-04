@@ -118,6 +118,8 @@ public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatabl
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
+        if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
+            return true;
         if (condition.Operation is ConditionOperation.AssignableTo or ConditionOperation.AssignableFrom)
         {
             QualifiedType correspondingType = GetCorrespondingType(ctx.Information);

@@ -20,6 +20,7 @@
         {
             "Key": "Min_Normal_Position_Offset",
             "Type": "Float32",
+            "Maximum": "@Max_Normal_Position_Offset",
             "DefaultValue": 0.0,
             "Description": "Minimum change in the relative Y-position from the terrain's height (how far it is off the ground). A random value is chosen between @Min_Normal_Position_Offset and @Max_Normal_Position_Offset per foliage instance.",
             "Variable": "minNormalPositionOffset",
@@ -29,6 +30,7 @@
             "Key": "Max_Normal_Position_Offset",
             "Type": "Float32",
             "DefaultValue": 0.0,
+            "Minimum": "@Min_Normal_Position_Offset",
             "Description": "Maximum change in the relative Y-position from the terrain's height (how far it is off the ground). A random value is chosen between @Min_Normal_Position_Offset and @Max_Normal_Position_Offset per foliage instance.",
             "Variable": "maxNormalPositionOffset",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
@@ -60,7 +62,8 @@
             "Maximum": "@Max_Weight",
             "Description": "The minimum weight of a terrain material to allow placement of foliage. The weight is a value from 0 to 1 which is multiplied by the density to determine how many foliage instances are placed.",
             "Variable": "minSurfaceWeight",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference",
+            "InclusiveWith": [ "Max_Weight" ]
         },
         {
             "Key": "Max_Weight",
@@ -80,7 +83,8 @@
             "Maximum": "@Max_Angle",
             "Description": "The minimum terrain surface angle to allow placement of the foliage. This is the angle in degrees between the Y-axis and the angle of the terrain (where an angle of 0 would be flat ground).",
             "Variable": "minSurfaceAngle",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference",
+            "InclusiveWith": [ "Max_Angle" ]
         },
         {
             "Key": "Max_Angle",
@@ -100,7 +104,8 @@
             "Maximum": "@Max_Rotation",
             "Description": "The minimum rotation offset from the terrain's rotaiton. A random rotation is chosen between @Min_Rotation and @Max_Rotation.",
             "Variable": "minRotation",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
+            "InclusiveWith": [ "Max_Rotation" ]
         },
         {
             "Key": "Max_Rotation",
@@ -150,7 +155,8 @@
             "Maximum": "@Max_Scale",
             "Description": "The minimum scale to draw the foliage at. A random scale is chosen between @Min_Scale and @Max_Scale.",
             "Variable": "minScale",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
+            "InclusiveWith": [ "Max_Scale" ]
         },
         {
             "Key": "Max_Scale",

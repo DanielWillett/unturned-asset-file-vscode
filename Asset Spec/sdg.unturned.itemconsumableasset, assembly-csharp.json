@@ -242,7 +242,8 @@
             "Description": "Minimum number of items from @Item_Reward_Spawn_ID to award when consuming this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
             "Variable": "itemRewards",
-            "Priority": 3
+            "Priority": 3,
+            "InclusiveWith": [ "Max_Item_Rewards" ]
         },
         {
             "Key": "Max_Item_Rewards",

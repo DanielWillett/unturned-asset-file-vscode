@@ -97,6 +97,12 @@ internal static class JsonHelper
         return new Utf8JsonReader(mem.Span, options);
     }
 
+    private static readonly object TrueBox = true;
+    private static readonly object FalseBox = false;
+    private static readonly object ZeroBox = 0;
+    private static readonly object OneBox = 1;
+    private static readonly object NegativeOneBox = -1;
+
     public static bool TryReadGenericValue(ref Utf8JsonReader reader, out object? obj)
     {
         obj = null;
@@ -107,12 +113,18 @@ internal static class JsonHelper
 
             case JsonTokenType.True:
             case JsonTokenType.False:
-                obj = reader.GetBoolean();
+                obj = reader.GetBoolean() ? TrueBox : FalseBox;
                 return true;
 
             case JsonTokenType.Number:
                 if (reader.TryGetInt32(out int int32))
-                    obj = int32;
+                    obj = int32 switch
+                    {
+                        -1 => NegativeOneBox,
+                        0 => ZeroBox,
+                        1 => OneBox,
+                        _ => int32
+                    };
                 else if (reader.TryGetUInt32(out uint uint32))
                     obj = uint32;
                 else if (reader.TryGetInt64(out long int64))
@@ -183,6 +195,15 @@ internal static class JsonHelper
         if (value == null)
         {
             writer.WriteNullValue();
+        }
+        else if (value is Array array)
+        {
+            writer.WriteStartArray();
+            for (int i = 0; i < array.Length; ++i)
+            {
+                WriteGenericValue(writer, array.GetValue(i));
+            }
+            writer.WriteEndArray();
         }
         else if (value is IConvertible c)
         {

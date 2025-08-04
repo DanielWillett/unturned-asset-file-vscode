@@ -45,6 +45,19 @@ public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropert
     }
 
     /// <inheritdoc />
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (!TryParseValue(in parse, out bool val))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = val ? SpecDynamicValue.Included : SpecDynamicValue.Excluded;
+        return true;
+    }
+
+    /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out bool value)
     {
         if (parse.Node != null && parse.HasDiagnostics)

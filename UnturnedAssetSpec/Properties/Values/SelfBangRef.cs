@@ -40,6 +40,16 @@ public sealed class SelfBangRef : IEquatable<ISpecDynamicValue>, IEquatable<Self
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
         PropertyRefInfo info = new PropertyRefInfo(ctx.Self);
+        if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
+        {
+            return info.GetIsIncluded(condition.Operation == ConditionOperation.Included, in ctx, ctx.Self, default, null);
+        }
+
+        if (condition.Operation == ConditionOperation.Excluded)
+        {
+            return !info.GetIsIncluded(false, in ctx, ctx.Self, default, null);
+        }
+
         ISpecDynamicValue? val = info.GetValue(in ctx, ctx.Self, default, null);
         return val?.EvaluateCondition(in ctx, in condition) ?? condition.Operation.EvaluateNulls(true, condition.Comparand == null);
     }
@@ -71,9 +81,9 @@ public sealed class SelfBangRef : IEquatable<ISpecDynamicValue>, IEquatable<Self
         return false;
     }
 
-    public bool EvaluateIsIncluded(in FileEvaluationContext ctx)
+    public bool EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext ctx)
     {
-        return ctx.File.TryGetProperty(ctx.Self, out _);
+        return PropertyRefInfo.EvaluateIsIncluded(ctx.Self, valueIncluded, in ctx);
     }
 
     public string? EvaluateKey(in FileEvaluationContext ctx)
