@@ -40,13 +40,12 @@ internal sealed class UnresolvedSpecPropertyType :
     /// <inheritdoc />
     public SpecPropertyTypeKind Kind => throw new NotSupportedException();
 
-    /// <inheritdoc />
-    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => null;
-
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
         throw new NotSupportedException();
     }
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) { }
 
     public ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile)
     {

@@ -122,6 +122,8 @@ public sealed class ListSpecPropertyType<TElementType> :
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<EquatableArray<TElementType>>? other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
 }
 
 internal sealed class UnresolvedListSpecPropertyType :
@@ -154,8 +156,6 @@ internal sealed class UnresolvedListSpecPropertyType :
             d.Dispose();
     }
 
-    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => null;
-
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
         value = null!;
@@ -166,4 +166,6 @@ internal sealed class UnresolvedListSpecPropertyType :
     {
         return KnownTypes.List(InnerType.Transform(property, database, assetFile), AllowSingle);
     }
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) { }
 }

@@ -260,4 +260,6 @@ public sealed class LegacyCompatibleListSpecPropertyType :
         instance = type!;
         return instance != null;
     }
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
 }

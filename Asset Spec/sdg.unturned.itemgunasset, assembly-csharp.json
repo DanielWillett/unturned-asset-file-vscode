@@ -13,6 +13,7 @@
             "Key": "ShootAudioClip",
             "Type": "MasterBundleReferenceString",
             "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when this gun is shot.",
             "DefaultValue": null,
             "Variable": "shoot",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
@@ -22,6 +23,7 @@
             "Key": "ReloadAudioClip",
             "Type": "MasterBundleReferenceString",
             "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when this gun is reloaded.",
             "DefaultValue": null,
             "Variable": "reload",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
@@ -31,6 +33,7 @@
             "Key": "HammerAudioClip",
             "Type": "MasterBundleReferenceString",
             "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when this gun is hammered.",
             "DefaultValue": null,
             "Variable": "hammer",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
@@ -63,6 +66,7 @@
             "Key": "AimAudioClip",
             "Type": "MasterBundleReferenceString",
             "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the player aims down sights.",
             "DefaultValue": null,
             "Variable": "aim",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
@@ -98,6 +102,7 @@
             "Key": "FireDelayAudioClip",
             "Type": "MasterBundleReferenceString",
             "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the player revs this minigun.",
             "DefaultValue": null,
             "Variable": "fireDelaySound",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
@@ -521,16 +526,16 @@
             "Key": "Turret",
             "Type": "Flag",
             "DefaultValue": false,
-            "Description": "This weapon should be treated as a vehicular turret. This flag affects the player’s first-person viewmodel while the weapon is held.",
+            "Description": "This weapon should be treated as a vehicular turret. This flag affects the player's first-person viewmodel while the weapon is held.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#turret-flag",
-            "Priority": 13,
+            "Priority": 14,
             "Variable": "isTurret"
         },
         {
             "Key": "DriverTurretViewmodelMode",
             "Type": "SDG.Unturned.EDriverTurretViewmodelMode, Assembly-CSharp",
             "DefaultValue": "OffscreenWhileAiming",
-            "Description": "Controls how first-person arms are moved for turrets operated from the driver’s seat.",
+            "Description": "Controls how first-person arms are moved for turrets operated from the driver's seat.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#driverturretviewmodelmode-edriverturretviewmodelmode",
             "Priority": 3,
             "Variable": "driverTurretViewmodelMode"
@@ -845,7 +850,7 @@
                     "Value": 10
                 }
             ],
-            "MinimumExclusive": "=MAX(0.1 =DIV(@RANGE 253))",
+            "MinimumExclusive": "=MAX(0.1 =DIV(@(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) 253))",
             "Description": "Travel speed of ballistic projectiles in meters per ballistic step. Only one of @Ballistic_Steps and @Ballistic_Travel should be specified.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ballistic-travel-float32",
             "Priority": 10,
@@ -887,22 +892,555 @@
                     "Value": 4.0
                 }
             ],
-            "Description": "Multiplier for gravity’s acceleration.",
+            "Description": "Multiplier for gravity's acceleration.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#bullet-gravity-multiplier-float32-4",
             "Priority": 10,
-            "Variable": "ballisticTravel",
-            "ExclusiveWith": [ "Ballistic_Drop", "$bndl$::Projectile" ]
+            "Variable": "bulletGravityMultiplier",
+            "ExclusiveWith": [ "Ballistic_Drop", "$bndl$::Projectile" ],
+            "Version": "3.23.7.0"
         },
         {
             "Key": "Ballistic_Drop",
             "Type": "Float32",
-            "DefaultValue": 4.0,
-            "Description": "Multiplier for gravity’s acceleration.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#bullet-gravity-multiplier-float32-4",
+            "Description": "Use @Bullet_Gravity_Multiplier instead.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ballistic-drop-float32",
             "Priority": 10,
-            "Variable": "ballisticTravel",
-            "ExclusiveWith": [ "Ballistic_Steps", "$bndl$::Projectile" ]
+            "Variable": "bulletGravityMultiplier",
+            "Deprecated": true,
+            "ExclusiveWith": [ "Bullet_Gravity_Multiplier", "$bndl$::Projectile" ]
         },
+        {
+            "Key": "Ballistic_Force",
+            "Type": "Float32",
+            "Description": "The amount of force that should be applied to the physics projectile, measured in Newtons.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ballistic-force-float32-0-002",
+            "Priority": 10,
+            "DefaultValue": 0.002,
+            "IncludedDefaultValue": 0,
+            "Variable": "ballisticForce",
+            "InclusiveWith": [ "$bndl$::Projectile" ]
+        },
+        {
+            "Key": "Damage_Falloff_Range",
+            "Type": "Float32",
+            "Minimum": 0,
+            "Maximum": "@Damage_Falloff_Max_Range",
+            "Description": "Percentage (0-1) of @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) where damage begins decreasing towards @Damage_Falloff_Multiplier.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#damage-falloff-range-float32-1",
+            "Priority": 9,
+            "DefaultValue": 1.0,
+            "Variable": "damageFalloffRange",
+            "InclusiveWith": [ "Damage_Falloff_Multiplier" ],
+            "ExclusiveWith": [ "$bndl$::Projectile" ]
+        },
+        {
+            "Key": "Damage_Falloff_Max_Range",
+            "Type": "Float32",
+            "Minimum": "@Damage_Falloff_Range",
+            "Maximum": 1,
+            "Description": "Percentage (0-1) of @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) where damage stops decreasing towards @Damage_Falloff_Multiplier.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#damage-falloff-max-range-float32-1",
+            "Priority": 9,
+            "DefaultValue": 1.0,
+            "Variable": "damageFalloffMaxRange",
+            "InclusiveWith": [ "Damage_Falloff_Range", "Damage_Falloff_Multiplier" ],
+            "ExclusiveWith": [ "$bndl$::Projectile" ]
+        },
+        {
+            "Key": "Damage_Falloff_Multiplier",
+            "Type": "Float32",
+            "Minimum": 0,
+            "Maximum": 1,
+            "Description": "Percentage (0-1) of damage to apply at maximum range (past @Damage_Falloff_Max_Range).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#damage-falloff-multiplier-float32-1",
+            "Priority": 9,
+            "DefaultValue": 1.0,
+            "Variable": "damageFalloffMultiplier",
+            "InclusiveWith": [ "Damage_Falloff_Range" ],
+            "ExclusiveWith": [ "$bndl$::Projectile" ]
+        },
+        {
+            "Key": "Projectile_Lifespan",
+            "Type": "Float32",
+            "MinimumExclusive": 0.0,
+            "Description": "Lifespan of physics projectiles in seconds, after which the projectile despawns.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#projectile-lifespan-float32-30",
+            "Priority": 10,
+            "DefaultValue": 30.0,
+            "Variable": "projectileLifespan",
+            "InclusiveWith": [ "$bndl$::Projectile" ]
+        },
+        {
+            "Key": "Projectile_Penetrate_Buildables",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Explosions from projectiles penetrate through buildables when this flag is set.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#projectile-penetrate-buildables-flag",
+            "Priority": 10,
+            "Variable": "projectilePenetrateBuildables",
+            "InclusiveWith": [ "$bndl$::Projectile" ]
+        },
+        {
+            "Key": "Projectile_Explosion_Launch_Speed",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Player_Damage) 0.1)",
+            "Description": "Players caught within the projectile explosion are launched at this speed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#projectile-explosion-launch-speed-float32",
+            "Priority": 10,
+            "Variable": "projectileExplosionLaunchSpeed",
+            "InclusiveWith": [ "$bndl$::Projectile" ]
+        },
+        {
+            "Key": "Reload_Time",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 1,
+            "Description": "Multiplier on time it takes to finish reloading this weapon (based on the animation length).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#reload-time-float32-1",
+            "Priority": 8,
+            "Variable": "reloadTime"
+        },
+        {
+            "Key": "Hammer_Time",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 1,
+            "Description": "Multiplier on the time it takes to pull back the hammer on this weapon (based on the animation length).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#hammer-time-float32-1",
+            "Priority": 8,
+            "Variable": "hammerTime"
+        },
+        {
+            "Key": "Muzzle",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "The GUID or ID of the effect to play after shooting. This is emitted from this weapon's \"Barrel\" hook.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#muzzle-doc-data-guid-or-uint16",
+            "Priority": 13,
+            "Variable": "muzzleGuid"
+        },
+        {
+            "Key": "Explosion",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "The GUID or ID of the effect that should be used for explosions caused by projectiles.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#explosion-doc-data-guid-or-uint16",
+            "Priority": 13,
+            "Variable": "projectileExplosionEffectGuid",
+            "InclusiveWith": [ "$bndl$::Projectile" ]
+        },
+        {
+            "Key": "Shell",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "IncludedDefaultValue": "00000000000000000000000000000000",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Pump"
+                        },
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Break"
+                        }
+                    ],
+                    "Value": "0dc9bf936ce0409585fe9525287c7a7d"
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Action",
+                            "Operation": "neq",
+                            "Comparand": "Rail"
+                        }
+                    ],
+                    "Value": "f380a6a6f41f422c9f5b9ac13e3b13e8"
+                },
+                {
+                    "Value": "00000000000000000000000000000000"
+                }
+            ],
+            "Description": "The GUID or ID of the effect to play after shooting, emitted from the this weapon's \"Eject\" hook.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shell-doc-data-guid-or-uint16",
+            "Priority": 13,
+            "Variable": "shellGuid",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "$bndl$::Projectile",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "CasingEjectCountAfterRechamberingAfterShooting",
+                                "Operation": "lte",
+                                "Comparand": 0
+                            },
+                            {
+                                "Variable": "RechamberAfterShotCount",
+                                "Operation": "lte",
+                                "Comparand": 0
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Alert_Radius",
+            "Type": "Float32",
+            "Minimum": 0,
+            "DefaultValue": 48.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "The radius (in meters) of the alert generated by this weapon when fired. Zombies and Animals caught within this radius are alerted.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#alert-radius-float32-48",
+            "Priority": 11,
+            "Variable": "alertRadius"
+        },
+        {
+            "Key": "Range_Rangefinder",
+            "Type": "Float32",
+            "Minimum": 0,
+            "DefaultValue": "@Range",
+            "IncludedDefaultValue": 0.0,
+            "Description": "The maximum distance displayed when using a \"Rangefinder\" tactical attachment on this weapon.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#range-rangefinder-float32",
+            "Priority": 10,
+            "Variable": "rangeRangefinder"
+        },
+        {
+            "Key": "Infinite_Ammo",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not ammunition is not depleted from the magazine attachment.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#infinite-ammo-bool-false",
+            "Priority": 6,
+            "Variable": "infiniteAmmo"
+        },
+        {
+            "Key": "Ammo_Per_Shot",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Description": "Number of ammunition consumed per shot.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ammo-per-shot-uint8-1",
+            "Priority": 6,
+            "Variable": "ammoPerShot"
+        },
+        {
+            "Key": "Fire_Delay_Seconds",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": 0.0,
+            "Description": "Number of seconds before the weapon is actually fired after the player shoots.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#fire-delay-seconds-int32-0",
+            "Priority": 8,
+            "Variable": "fireDelay"
+        },
+        {
+            "Key": "Allow_Magazine_Change",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not the magazine can be removed, replaced, or reloaded.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#allow-magazine-change-bool-true",
+            "Priority": 14,
+            "Variable": "allowMagazineChange"
+        },
+        {
+            "Key": "Can_Aim_During_Sprint",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the player can aim down sights while sprinting.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#can-aim-during-sprint-bool-false",
+            "Priority": 12,
+            "Variable": "canAimDuringSprint"
+        },
+        {
+            "Key": "Aiming_Movement_Speed_Multiplier",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Can_Aim_During_Sprint",
+                            "Operation": "eq",
+                            "Comparand": true
+                        }
+                    ],
+                    "Value": 1.0
+                },
+                {
+                    "Value": 0.75
+                }
+            ],
+            "Description": "Multiplier on the player's movement speed while aiming down sights.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#aiming-movement-speed-multiplier-float32",
+            "Priority": 12,
+            "Variable": "aimingMovementSpeedMultiplier"
+        },
+        {
+            "Key": "Must_Aim_To_Shoot",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Minigun"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Whether or not the gun is unable to shoot unless the player is aiming.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#must-aim-to-shoot-bool",
+            "Priority": 12,
+            "Variable": "MustAimToShoot",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Action",
+                    "Value": "String"
+                }
+            ]
+        },
+        {
+            "Key": "Stop_Aiming_After_Shooting",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the gun should stop aiming after the player shoots once.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#stop-aiming-after-shooting-bool-false",
+            "Priority": 12,
+            "Variable": "ShouldForceStopAimingAfterShooting"
+        },
+        {
+            "Key": "Can_Ever_Jam",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This gun can jam occasionally once it's quality drops below =MUL(@Jam_Quality_Threshold 100)%.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#can-ever-jam-flag",
+            "Priority": 5,
+            "Variable": "canEverJam"
+        },
+        {
+            "Key": "Jam_Quality_Threshold",
+            "Type": "Float32",
+            "MinimumExclusive": 0.0,
+            "Maximum": 1.0,
+            "DefaultValue": 0.4,
+            "Description": "The quality level (0-1) at which this weapon begin to jam. As the quality goes below this value, the chance of a jam occuring will go up.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#jam-quality-threshold-float32-0-4",
+            "Priority": 5,
+            "Variable": "jamQualityThreshold",
+            "InclusiveWith": [ "Can_Ever_Jam" ]
+        },
+        {
+            "Key": "Jam_Max_Chance",
+            "Type": "Float32",
+            "MinimumExclusive": 0.0,
+            "Maximum": 1.0,
+            "DefaultValue": 0.1,
+            "Description": "The chance (0-1) of this weapon jamming at 0% quality. The chance of jamming starts at 0% when quality is greater than @Jam_Quality_Threshold and linearly interpolates towards this value as quality approaches 0%.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#jam-max-chance-float32-0-1",
+            "Priority": 5,
+            "Variable": "jamMaxChance",
+            "InclusiveWith": [ "Can_Ever_Jam" ]
+        },
+        {
+            "Key": "Unjam_Chamber_Anim",
+            "Type": "String",
+            "DefaultValue": "UnjamChamber",
+            "Description": "Name of an animation clip to play when unjamming the weapon.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#unjam-chamber-anim-string-unjamchamber",
+            "Priority": 5,
+            "Variable": "unjamChamberAnimName",
+            "InclusiveWith": [ "Can_Ever_Jam" ]
+        },
+        {
+            "Key": "Gunshot_Rolloff_Distance",
+            "Type": "Float32",
+            "Minimum": 0,
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Rocket"
+                        }
+                    ],
+                    "Value": 64
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "String"
+                        }
+                    ],
+                    "Value": 16
+                },
+                {
+                    "Value": 512
+                }
+            ],
+            "Description": "Maximum distance the gunshot is audible from, including the rolloff distance. Roll-off uses a custom curve.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#gunshot-rolloff-distance-float32",
+            "Priority": 10,
+            "Variable": "gunshotRolloffDistance"
+        },
+        {
+            "Key": "Shoot_Quest_Rewards",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Rewards applied when the player fires a shot.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#npc-rewards",
+            "Variable": "shootQuestRewards",
+            "CountForRegexGroup": "gun-shoot-rewards",
+            "Priority": 4
+        },
+        {
+            "Key": "Aim_In_Duration",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": 0.2,
+            "Description": "Number of seconds it takes to fully aim down sights.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#aim-in-duration-float32-0-2",
+            "Priority": 8,
+            "Variable": "aimInDuration"
+        },
+        {
+            "Key": "Scale_Aim_Animation_Speed",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "When true, the length of the \"Aim_Start\" and \"Aim_Stop\" animations are scaled to match @Aim_In_Duration (with modifiers).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#scale-aim-animation-speed-bool-true",
+            "Priority": 8,
+            "Variable": "shouldScaleAimAnimations"
+        },
+        {
+            "Key": "RechamberAfterShotCount",
+            "Type": "Int32",
+            "Minimum": 0,
+            "Maximum": 255,
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Bolt"
+                        },
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Pump"
+                        }
+                    ],
+                    "Value": 1
+                },
+                {
+                    "Value": 0
+                }
+            ],
+            "Description": "Number of shots that have to be shot before hammering this gun is required. The count will reset to 0 each time.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#rechamberaftershotcount-int32",
+            "Priority": 14,
+            "Variable": "RechamberAfterShotCount"
+        },
+        {
+            "Key": "CasingEjectCountAfterRechamberingAfterShooting",
+            "Type": "Int32",
+            "Minimum": 0,
+            "DefaultValue": 1,
+            "Description": "Number of bullet casings to emit after this gun is hammered. This property applies to rechambering due to reaching @RechamberAfterShotCount shots.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#casingejectcountafterrechamberingaftershooting-int32-1",
+            "Priority": 14,
+            "Variable": "CasingEjectCountAfterRechamberingAfterShooting",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "RechamberAfterShotCount",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "RechamberAfterShotCount",
+                        "Operation": "gt",
+                        "Comparand": 0
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "CasingEjectCountAfterReload",
+            "Type": "Int32",
+            "Minimum": 0,
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Break"
+                        }
+                    ],
+                    "Value": "@Ammo_Max"
+                },
+                {
+                    "Value": 0
+                }
+            ],
+            "Description": "Number of bullet casings to emit after this gun is hammered. This property applies to rechambering due to reloading.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#casingejectcountafterreload-int32",
+            "Priority": 14,
+            "Variable": "CasingEjectCountAfterReload"
+        },
+        {
+            "Key": "RechamberAfterMagazineAttached",
+            "Type": "SDG.Unturned.ERechamberGunAfterReloadMode, Assembly-CSharp",
+            "DefaultValue": "IfAmmoWasEmpty",
+            "Description": "Determines whether or not this gun will be hammered when attaching or replacing a magazine.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#rechamberaftermagazineattached-erechambergunafterreloadmode-ifammowasempty",
+            "Priority": 14,
+            "Variable": "RechamberAfterMagazineAttached"
+        },
+        {
+            "Key": "RechamberAfterMagazineDetached",
+            "Type": "SDG.Unturned.ERechamberGunAfterReloadMode, Assembly-CSharp",
+            "DefaultValue": "Always",
+            "Description": "Determines whether or not this gun will be hammered when removing a magazine (without replacing it).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#rechamberaftermagazinedetached-erechambergunafterreloadmode-always",
+            "Priority": 14,
+            "Variable": "RechamberAfterMagazineDetached"
+        }
     ],
     "Types":
     [
@@ -1006,21 +1544,21 @@
         {
             "AssetName": "Shoot",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
-            "Description": "The sound played when the gun is shot.",
+            "Description": "The sound played when this gun is shot.",
             "Variable": "shoot",
             "RedirectableAssetKey": "ShootAudioClip"
         },
         {
             "AssetName": "Reload",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
-            "Description": "The sound played when the gun is reloaded.",
+            "Description": "The sound played when this gun is reloaded.",
             "Variable": "reload",
             "RedirectableAssetKey": "ReloadAudioClip"
         },
         {
             "AssetName": "Hammer",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
-            "Description": "The sound played when the gun is hammered.",
+            "Description": "The sound played when this gun is hammered.",
             "Variable": "hammer",
             "RedirectableAssetKey": "HammerAudioClip",
             "ExclusiveWith":

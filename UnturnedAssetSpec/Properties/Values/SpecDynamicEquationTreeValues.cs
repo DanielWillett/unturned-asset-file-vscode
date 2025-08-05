@@ -17,7 +17,7 @@ internal static class SpecDynamicEquationTreeValueHelpers
             is >= SpecDynamicEquationTreeUnaryOperation.SineRad
             and <= SpecDynamicEquationTreeUnaryOperation.SquareRoot)
         {
-            if (expectedType != null && (expectedType.ValueType == typeof(float) || expectedType.ValueType == typeof(double) || expectedType.ValueType == typeof(decimal)))
+            if (expectedType != null && (expectedType is IVectorSpecPropertyType || expectedType.ValueType == typeof(float) || expectedType.ValueType == typeof(double) || expectedType.ValueType == typeof(decimal)))
             {
                 return expectedType;
             }
@@ -35,7 +35,8 @@ internal static class SpecDynamicEquationTreeValueHelpers
 
         if (expectedType != null)
         {
-            if (expectedType.ValueType == typeof(string)
+            if (expectedType is IVectorSpecPropertyType
+                || expectedType.ValueType == typeof(string)
                 || IsInteger(expectedType.ValueType)
                 || expectedType.ValueType == typeof(float)
                 || expectedType.ValueType == typeof(double)
@@ -57,7 +58,8 @@ internal static class SpecDynamicEquationTreeValueHelpers
 
         if (expectedType != null)
         {
-            if (expectedType.ValueType == typeof(string)
+            if (expectedType is IVectorSpecPropertyType
+                || expectedType.ValueType == typeof(string)
                 || IsInteger(expectedType.ValueType)
                 || expectedType.ValueType == typeof(float)
                 || expectedType.ValueType == typeof(double)
@@ -164,6 +166,90 @@ internal static class SpecDynamicEquationTreeValueHelpers
         return Unsafe.As<TFrom, TTo>(ref value);
     }
 
+    public static bool TryConvertVector<TIn, TOut>(TIn? rawValue, bool rawIsNull, out TOut? value, out bool isNull)
+    {
+        if (rawIsNull || rawValue == null)
+        {
+            isNull = true;
+            value = default;
+            return true;
+        }
+
+        isNull = rawIsNull;
+
+        if (typeof(TIn) == typeof(TOut))
+        {
+            value = As<TIn, TOut>(rawValue);
+            return true;
+        }
+
+        if (typeof(TIn) == typeof(Color))
+        {
+            if (typeof(TOut) == typeof(Color32))
+            {
+                value = As<Color32, TOut>(As<TIn, Color>(rawValue));
+                return true;
+            }
+        }
+        else if (typeof(TIn) == typeof(Color32))
+        {
+            if (typeof(TOut) == typeof(Color))
+            {
+                value = As<Color, TOut>(As<TIn, Color32>(rawValue));
+                return true;
+            }
+        }
+        else if (typeof(TIn) == typeof(Vector2))
+        {
+            if (typeof(TOut) == typeof(Vector3))
+            {
+                Vector2 v2 = As<TIn, Vector2>(rawValue);
+                value = As<Vector3, TOut>(new Vector3(v2.X, v2.Y, 0f));
+                return true;
+            }
+            if (typeof(TOut) == typeof(Vector4))
+            {
+                Vector2 v2 = As<TIn, Vector2>(rawValue);
+                value = As<Vector4, TOut>(new Vector4(v2.X, v2.Y, 0f, 0f));
+                return true;
+            }
+        }
+        else if (typeof(TIn) == typeof(Vector3))
+        {
+            if (typeof(TOut) == typeof(Vector2))
+            {
+                Vector3 v3 = As<TIn, Vector3>(rawValue);
+                value = As<Vector2, TOut>(new Vector2(v3.X, v3.Y));
+                return true;
+            }
+            if (typeof(TOut) == typeof(Vector4))
+            {
+                Vector3 v3 = As<TIn, Vector3>(rawValue);
+                value = As<Vector4, TOut>(new Vector4(v3.X, v3.Y, v3.Z, 0f));
+                return true;
+            }
+        }
+        else if (typeof(TIn) == typeof(Vector4))
+        {
+            if (typeof(TOut) == typeof(Vector2))
+            {
+                Vector4 v4 = As<TIn, Vector4>(rawValue);
+                value = As<Vector2, TOut>(new Vector2(v4.X, v4.Y));
+                return true;
+            }
+            if (typeof(TOut) == typeof(Vector3))
+            {
+                Vector4 v4 = As<TIn, Vector4>(rawValue);
+                value = As<Vector3, TOut>(new Vector3(v4.X, v4.Y, v4.Z));
+                return true;
+            }
+        }
+
+        isNull = true;
+        value = default;
+        return false;
+    }
+
     public static bool TryConvert<TIn, TOut>(TIn? rawValue, bool rawIsNull, out TOut? value, out bool isNull) where TIn : IConvertible
     {
         if (rawIsNull || rawValue == null)
@@ -171,6 +257,50 @@ internal static class SpecDynamicEquationTreeValueHelpers
             isNull = true;
             value = default;
             return true;
+        }
+
+        if (typeof(TIn) == typeof(TOut))
+        {
+            value = As<TIn, TOut>(rawValue);
+            isNull = rawIsNull;
+            return true;
+        }
+
+        if (typeof(TOut) == typeof(Vector2))
+        {
+            if (TryConvert(rawValue, rawIsNull, out float comp, out isNull))
+            {
+                value = As<Vector2, TOut>(new Vector2(comp, comp));
+                return true;
+            }
+
+            value = default;
+            isNull = true;
+            return false;
+        }
+        if (typeof(TOut) == typeof(Vector3))
+        {
+            if (TryConvert(rawValue, rawIsNull, out float comp, out isNull))
+            {
+                value = As<Vector3, TOut>(new Vector3(comp, comp, comp));
+                return true;
+            }
+
+            value = default;
+            isNull = true;
+            return false;
+        }
+        if (typeof(TOut) == typeof(Vector4))
+        {
+            if (TryConvert(rawValue, rawIsNull, out float comp, out isNull))
+            {
+                value = As<Vector4, TOut>(new Vector4(comp, comp, comp, comp));
+                return true;
+            }
+
+            value = default;
+            isNull = true;
+            return false;
         }
 
         isNull = false;
@@ -261,9 +391,42 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
     }
 
     public abstract bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
-    public abstract bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value);
 
-    private bool EvaluateCondition<T>(in FileEvaluationContext ctx, in SpecCondition condition, T value) where T : IConvertible
+    public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = null;
+
+        TryEvaluateBoxedValueVisitor visitor = new TryEvaluateBoxedValueVisitor
+        {
+            Context = ctx,
+            Tree = this
+        };
+
+        ValueType.Visit(visitor);
+
+        value = visitor.Value;
+        return visitor.HasValue;
+    }
+
+    private struct TryEvaluateBoxedValueVisitor : ISpecPropertyTypeVisitor
+    {
+        public FileEvaluationContext Context;
+        public SpecDynamicEquationTreeValue Tree;
+        public bool HasValue;
+        public object? Value;
+
+        public void Visit<T>(ISpecPropertyType<T> type) where T : IEquatable<T>
+        {
+            if (HasValue)
+                return;
+            HasValue = Tree.TryEvaluateValue(in Context, out T? value, out bool isNull);
+
+            if (HasValue)
+                Value = isNull ? null : value;
+        }
+    }
+
+    private bool EvaluateCondition<T>(in FileEvaluationContext ctx, in SpecCondition condition, T value)
     {
         if (!TryEvaluateValue(in ctx, out T? val, out bool isNull))
         {
@@ -275,60 +438,121 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
-        if (condition.Comparand is IConvertible conv)
+        switch (condition.Comparand)
         {
-            TypeCode tc = conv.GetTypeCode();
-            switch (tc)
-            {
-                case TypeCode.Boolean:
-                    return EvaluateCondition(in ctx, in condition, (bool)condition.Comparand);
+            case IConvertible conv:
+                TypeCode tc = conv.GetTypeCode();
+                switch (tc)
+                {
+                    case TypeCode.Boolean:
+                        return EvaluateCondition(in ctx, in condition, (bool)condition.Comparand);
 
-                case TypeCode.Byte:
-                    return EvaluateCondition(in ctx, in condition, (byte)condition.Comparand);
+                    case TypeCode.Byte:
+                        return EvaluateCondition(in ctx, in condition, (byte)condition.Comparand);
 
-                case TypeCode.Char:
-                    return EvaluateCondition(in ctx, in condition, (char)condition.Comparand);
+                    case TypeCode.Char:
+                        return EvaluateCondition(in ctx, in condition, (char)condition.Comparand);
 
-                case TypeCode.DateTime:
-                    return EvaluateCondition(in ctx, in condition, (DateTime)condition.Comparand);
+                    case TypeCode.DateTime:
+                        return EvaluateCondition(in ctx, in condition, (DateTime)condition.Comparand);
 
-                case TypeCode.Decimal:
-                    return EvaluateCondition(in ctx, in condition, (decimal)condition.Comparand);
+                    case TypeCode.Decimal:
+                        return EvaluateCondition(in ctx, in condition, (decimal)condition.Comparand);
 
-                case TypeCode.Double:
-                    return EvaluateCondition(in ctx, in condition, (double)condition.Comparand);
+                    case TypeCode.Double:
+                        return EvaluateCondition(in ctx, in condition, (double)condition.Comparand);
 
-                case TypeCode.Int16:
-                    return EvaluateCondition(in ctx, in condition, (short)condition.Comparand);
+                    case TypeCode.Int16:
+                        return EvaluateCondition(in ctx, in condition, (short)condition.Comparand);
 
-                case TypeCode.Int32:
-                    return EvaluateCondition(in ctx, in condition, (int)condition.Comparand);
+                    case TypeCode.Int32:
+                        return EvaluateCondition(in ctx, in condition, (int)condition.Comparand);
 
-                case TypeCode.Int64:
-                    return EvaluateCondition(in ctx, in condition, (long)condition.Comparand);
+                    case TypeCode.Int64:
+                        return EvaluateCondition(in ctx, in condition, (long)condition.Comparand);
 
-                case TypeCode.SByte:
-                    return EvaluateCondition(in ctx, in condition, (sbyte)condition.Comparand);
+                    case TypeCode.SByte:
+                        return EvaluateCondition(in ctx, in condition, (sbyte)condition.Comparand);
 
-                case TypeCode.Single:
-                    return EvaluateCondition(in ctx, in condition, (float)condition.Comparand);
+                    case TypeCode.Single:
+                        return EvaluateCondition(in ctx, in condition, (float)condition.Comparand);
 
-                case TypeCode.String:
-                    return EvaluateCondition(in ctx, in condition, (string)condition.Comparand);
+                    case TypeCode.String:
+                        string str = (string)condition.Comparand;
+                        if (ValueType.ValueType == typeof(Vector2))
+                        {
+                            if (KnownTypeValueHelper.TryParseVector2Components(str.AsSpan(), out Vector2 v2))
+                            {
+                                return EvaluateCondition(in ctx, in condition, v2);
+                            }
+                        }
+                        else if (ValueType.ValueType == typeof(Vector3))
+                        {
+                            if (KnownTypeValueHelper.TryParseVector3Components(str.AsSpan(), out Vector3 v3))
+                            {
+                                return EvaluateCondition(in ctx, in condition, v3);
+                            }
+                        }
+                        else if (ValueType.ValueType == typeof(Vector4))
+                        {
+                            if (KnownTypeValueHelper.TryParseVector4Components(str.AsSpan(), out Vector4 v4))
+                            {
+                                return EvaluateCondition(in ctx, in condition, v4);
+                            }
+                        }
+                        else if (ValueType.ValueType == typeof(Color32))
+                        {
+                            if (KnownTypeValueHelper.TryParseColorHex(str.AsSpan(), out Color32 clr, allowAlpha: true))
+                            {
+                                return EvaluateCondition(in ctx, in condition, clr);
+                            }
+                        }
+                        else if (ValueType.ValueType == typeof(Color))
+                        {
+                            if (KnownTypeValueHelper.TryParseColorHex(str.AsSpan(), out Color32 clr, allowAlpha: true))
+                            {
+                                return EvaluateCondition(in ctx, in condition, (Color)clr);
+                            }
+                        }
+                        else if (ValueType.ValueType == typeof(Guid))
+                        {
+                            if (KnownTypeValueHelper.TryParseGuid(str, out Guid guid))
+                            {
+                                return EvaluateCondition(in ctx, in condition, guid);
+                            }
+                        }
 
-                case TypeCode.UInt16:
-                    return EvaluateCondition(in ctx, in condition, (ushort)condition.Comparand);
+                        return EvaluateCondition(in ctx, in condition, str);
 
-                case TypeCode.UInt32:
-                    return EvaluateCondition(in ctx, in condition, (uint)condition.Comparand);
+                    case TypeCode.UInt16:
+                        return EvaluateCondition(in ctx, in condition, (ushort)condition.Comparand);
 
-                case TypeCode.UInt64:
-                    return EvaluateCondition(in ctx, in condition, (ulong)condition.Comparand);
-            }
-        }
-        else if (condition.Comparand is GuidOrId { IsId: true } guidOrId)
-        {
-            return EvaluateCondition(in ctx, in condition, guidOrId.Id);
+                    case TypeCode.UInt32:
+                        return EvaluateCondition(in ctx, in condition, (uint)condition.Comparand);
+
+                    case TypeCode.UInt64:
+                        return EvaluateCondition(in ctx, in condition, (ulong)condition.Comparand);
+                }
+
+                break;
+
+            case GuidOrId { IsId: true } guidOrId:
+                return EvaluateCondition(in ctx, in condition, guidOrId.Id);
+
+            case Vector2 v2:
+                return EvaluateCondition(in ctx, in condition, v2);
+
+            case Vector3 v3:
+                return EvaluateCondition(in ctx, in condition, v3);
+
+            case Vector4 v4:
+                return EvaluateCondition(in ctx, in condition, v4);
+
+            case Color clr:
+                return EvaluateCondition(in ctx, in condition, clr);
+
+            case Color32 clr32:
+                return EvaluateCondition(in ctx, in condition, clr32);
         }
 
         return condition.Operation.EvaluateNulls(true, true);
@@ -338,7 +562,11 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
 
     public bool TryGetArgumentValue<TValue>(in FileEvaluationContext ctx, int index, out TValue? value, out bool isNull)
     {
-        ISpecDynamicValue arg = GetArgument(index);
+        return TryGetArgumentValue(in ctx, GetArgument(index), out value, out isNull);
+    }
+
+    public bool TryGetArgumentValue<TValue>(in FileEvaluationContext ctx, ISpecDynamicValue arg, out TValue? value, out bool isNull)
+    {
         ISpecPropertyType? type = arg.ValueType;
 
         if (type == null || type.ValueType == typeof(TValue))
@@ -426,81 +654,130 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
             return false;
         }
 
-        if (!TryGetArgumentValue(in ctx, 0, out double leftNum, out leftIsNull)
-            || !TryGetArgumentValue(in ctx, 1, out double rightNum, out rightIsNull))
+        if (ValueType is IVectorSpecPropertyType<TValue> vectorType)
         {
             value = default;
             isNull = true;
 
-            return false;
+            ISpecDynamicValue leftArg = GetArgument(0);
+            ISpecDynamicValue rightArg = GetArgument(1);
+            bool leftIsVector = leftArg.ValueType is IVectorSpecPropertyType<TValue>;
+            bool rightIsVector = leftArg.ValueType is IVectorSpecPropertyType<TValue>;
+            TValue? leftVector = default, rightVector = default;
+            double leftNum = 0, rightNum = 0;
+            if (leftIsVector)
+            {
+                if (!TryGetArgumentValue(in ctx, leftArg, out leftVector, out leftIsNull))
+                    return false;
+            }
+            else if (!TryGetArgumentValue(in ctx, leftArg, out leftNum, out leftIsNull))
+                return false;
+            if (rightIsVector)
+            {
+                if (!TryGetArgumentValue(in ctx, rightArg, out rightVector, out rightIsNull))
+                    return false;
+            }
+            else if (!TryGetArgumentValue(in ctx, rightArg, out rightNum, out rightIsNull))
+                return false;
+
+            isNull = leftIsNull && rightIsNull;
+
+            if (leftIsNull)
+            {
+                if (leftIsVector)
+                    leftVector = default;
+                else
+                    leftNum = 0;
+            }
+            if (rightIsNull)
+            {
+                if (rightIsVector)
+                    rightVector = default;
+                else
+                    rightNum = 0;
+            }
+
+            TValue? v;
+            if (leftIsVector ^ rightIsVector)
+            {
+                TValue vector = vectorType.Construct(leftIsVector ? rightNum : leftNum);
+                v = Operation switch
+                {
+                    SpecDynamicEquationTreeBinaryOperation.Add
+                        => leftIsVector ? vectorType.Add(leftVector, vector) : vectorType.Add(vector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Subtract
+                        => leftIsVector ? vectorType.Subtract(leftVector, vector) : vectorType.Subtract(vector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Multiply
+                        => leftIsVector ? vectorType.Multiply(leftVector, vector) : vectorType.Multiply(vector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Divide
+                        => leftIsVector ? vectorType.Divide(leftVector, vector) : vectorType.Divide(vector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Minimum
+                        => leftIsVector ? vectorType.Min(leftVector, vector) : vectorType.Min(vector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Maximum
+                        => leftIsVector ? vectorType.Max(leftVector, vector) : vectorType.Max(vector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Average
+                        => leftIsVector ? vectorType.Avg(leftVector, vector) : vectorType.Avg(vector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Power
+                        => leftIsVector ? vectorType.Power(leftVector, vector) : vectorType.Power(vector, rightVector),
+                    _ => leftIsVector ? leftVector : vector
+                };
+            }
+            else
+            {
+                if (!leftIsVector /* && !rightIsVector */) // implied
+                {
+                    leftVector = vectorType.Construct(leftNum);
+                    rightVector = vectorType.Construct(rightNum);
+                }
+
+                v = Operation switch
+                {
+                    SpecDynamicEquationTreeBinaryOperation.Add => vectorType.Add(leftVector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Subtract => vectorType.Subtract(leftVector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Multiply => vectorType.Multiply(leftVector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Divide => vectorType.Divide(leftVector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Minimum => vectorType.Min(leftVector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Maximum => vectorType.Max(leftVector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Average => vectorType.Avg(leftVector, rightVector),
+                    SpecDynamicEquationTreeBinaryOperation.Power => vectorType.Power(leftVector, rightVector),
+                    _ => leftVector
+                };
+            }
+
+            return SpecDynamicEquationTreeValueHelpers.TryConvertVector(v, isNull, out value, out isNull);
         }
-
-        isNull = leftIsNull && rightIsNull;
-        
-        if (leftIsNull)
-            leftNum = 0;
-        if (rightIsNull)
-            rightNum = 0;
-
-        double v = Operation switch
+        else
         {
-            SpecDynamicEquationTreeBinaryOperation.Add => leftNum + rightNum,
-            SpecDynamicEquationTreeBinaryOperation.Subtract => leftNum - rightNum,
-            SpecDynamicEquationTreeBinaryOperation.Multiply => leftNum * rightNum,
-            SpecDynamicEquationTreeBinaryOperation.Divide => leftNum / rightNum,
-            SpecDynamicEquationTreeBinaryOperation.Minimum => Math.Min(leftNum, rightNum),
-            SpecDynamicEquationTreeBinaryOperation.Maximum => Math.Max(leftNum, rightNum),
-            SpecDynamicEquationTreeBinaryOperation.Average => (leftNum + rightNum) / 2d,
-            SpecDynamicEquationTreeBinaryOperation.Power => Math.Pow(leftNum, rightNum),
-            _ => leftNum
-        };
+            if (!TryGetArgumentValue(in ctx, 0, out double leftNum, out leftIsNull)
+                || !TryGetArgumentValue(in ctx, 1, out double rightNum, out rightIsNull))
+            {
+                value = default;
+                isNull = true;
 
-        return SpecDynamicEquationTreeValueHelpers.TryConvert(v, isNull, out value, out isNull);
-    }
+                return false;
+            }
 
-    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
-    {
-        value = null;
+            isNull = leftIsNull && rightIsNull;
 
-        if (!TryGetArgumentValue(in ctx, 0, out double leftNum, out bool leftIsNull)
-            || !TryGetArgumentValue(in ctx, 1, out double rightNum, out bool rightIsNull))
-            return false;
+            if (leftIsNull)
+                leftNum = 0;
+            if (rightIsNull)
+                rightNum = 0;
 
-        if (leftIsNull && rightIsNull)
-            return true;
-        
-        if (leftIsNull)
-            leftNum = 0;
-        if (rightIsNull)
-            rightNum = 0;
+            double v = Operation switch
+            {
+                SpecDynamicEquationTreeBinaryOperation.Add => leftNum + rightNum,
+                SpecDynamicEquationTreeBinaryOperation.Subtract => leftNum - rightNum,
+                SpecDynamicEquationTreeBinaryOperation.Multiply => leftNum * rightNum,
+                SpecDynamicEquationTreeBinaryOperation.Divide => leftNum / rightNum,
+                SpecDynamicEquationTreeBinaryOperation.Minimum => Math.Min(leftNum, rightNum),
+                SpecDynamicEquationTreeBinaryOperation.Maximum => Math.Max(leftNum, rightNum),
+                SpecDynamicEquationTreeBinaryOperation.Average => (leftNum + rightNum) / 2d,
+                SpecDynamicEquationTreeBinaryOperation.Power => Math.Pow(leftNum, rightNum),
+                _ => leftNum
+            };
 
-        double v = Operation switch
-        {
-            SpecDynamicEquationTreeBinaryOperation.Add => leftNum + rightNum,
-            SpecDynamicEquationTreeBinaryOperation.Subtract => leftNum - rightNum,
-            SpecDynamicEquationTreeBinaryOperation.Multiply => leftNum * rightNum,
-            SpecDynamicEquationTreeBinaryOperation.Divide => leftNum / rightNum,
-            SpecDynamicEquationTreeBinaryOperation.Minimum => Math.Min(leftNum, rightNum),
-            SpecDynamicEquationTreeBinaryOperation.Maximum => Math.Max(leftNum, rightNum),
-            SpecDynamicEquationTreeBinaryOperation.Average => (leftNum + rightNum) / 2d,
-            SpecDynamicEquationTreeBinaryOperation.Power => Math.Pow(leftNum, rightNum),
-            _ => leftNum
-        };
-
-        if (ValueType.ValueType == typeof(double))
-        {
-            value = v;
-            return true;
-        }
-
-        try
-        {
-            value = Convert.ChangeType(v, ValueType.ValueType, CultureInfo.InvariantCulture);
-            return true;
-        }
-        catch (InvalidCastException)
-        {
-            return false;
+            return SpecDynamicEquationTreeValueHelpers.TryConvert(v, isNull, out value, out isNull);
         }
     }
 
@@ -611,6 +888,20 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
             isNull = true;
             value = default;
             return true;
+        }
+
+        if (ValueType is IVectorSpecPropertyType<TValue> vectorType)
+        {
+            TValue? v = Operation switch
+            {
+                SpecDynamicEquationTreeUnaryOperation.Absolute => vectorType.Absolute(argValue),
+                SpecDynamicEquationTreeUnaryOperation.Round => vectorType.Round(argValue),
+                SpecDynamicEquationTreeUnaryOperation.Floor => vectorType.Floor(argValue),
+                SpecDynamicEquationTreeUnaryOperation.Ceiling => vectorType.Ceiling(argValue),
+                _ => argValue
+            };
+
+            return SpecDynamicEquationTreeValueHelpers.TryConvertVector(v, argIsNull, out value, out isNull);
         }
 
         // none of the operations have any effect on unsigned integers at this point
@@ -767,6 +1058,61 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
 
     private bool TryEvaluateFuncValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
     {
+        if (ValueType is IVectorSpecPropertyType<TValue> vectorType)
+        {
+            ISpecDynamicValue arg = GetArgument(0);
+            TValue? vector;
+            bool vectorIsNull;
+            if (arg.ValueType is IVectorSpecPropertyType<TValue>)
+            {
+                if (!TryGetArgumentValue(in ctx, arg, out vector, out vectorIsNull))
+                {
+                    value = vector;
+                    isNull = true;
+                    return false;
+                }
+            }
+            else
+            {
+                if (!TryGetArgumentValue(in ctx, arg, out double val, out vectorIsNull))
+                {
+                    value = default;
+                    isNull = true;
+                    return false;
+                }
+
+                vector = vectorIsNull ? default : vectorType.Construct(val);
+            }
+
+            if (vectorIsNull)
+            {
+                isNull = true;
+                value = vector;
+                return true;
+            }
+
+            TValue? v;
+            if (Operation < SpecDynamicEquationTreeUnaryOperation.SquareRoot)
+            {
+                bool deg = Operation >= SpecDynamicEquationTreeUnaryOperation.SineDeg;
+                int op = deg
+                    ? (Operation - SpecDynamicEquationTreeUnaryOperation.SineDeg)
+                    : (Operation - SpecDynamicEquationTreeUnaryOperation.SineRad);
+
+                v = vectorType.TrigOperation(vector, op, deg);
+            }
+            else
+            {
+                v = Operation switch
+                {
+                    SpecDynamicEquationTreeUnaryOperation.SquareRoot => vectorType.Sqrt(vector),
+                    _ => vector
+                };
+            }
+            
+            return SpecDynamicEquationTreeValueHelpers.TryConvertVector(v, vectorIsNull, out value, out isNull);
+        }
+
         isNull = false;
         value = default;
 
@@ -789,9 +1135,9 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
                 SpecDynamicEquationTreeUnaryOperation.ArcSineRad => MathF.Asin(r32),
                 SpecDynamicEquationTreeUnaryOperation.ArcCosineRad => MathF.Acos(r32),
                 SpecDynamicEquationTreeUnaryOperation.ArcTangentRad => MathF.Atan(r32),
-                SpecDynamicEquationTreeUnaryOperation.SineDeg => MathF.Sin(r32 * (180f / MathF.PI)),
-                SpecDynamicEquationTreeUnaryOperation.CosineDeg => MathF.Cos(r32 * (180f / MathF.PI)),
-                SpecDynamicEquationTreeUnaryOperation.TangentDeg => MathF.Tan(r32 * (180f / MathF.PI)),
+                SpecDynamicEquationTreeUnaryOperation.SineDeg => MathF.Sin(r32 * (MathF.PI / 180f)),
+                SpecDynamicEquationTreeUnaryOperation.CosineDeg => MathF.Cos(r32 * (MathF.PI / 180f)),
+                SpecDynamicEquationTreeUnaryOperation.TangentDeg => MathF.Tan(r32 * (MathF.PI / 180f)),
                 SpecDynamicEquationTreeUnaryOperation.ArcSineDeg => MathF.Asin(r32) * (180f / MathF.PI),
                 SpecDynamicEquationTreeUnaryOperation.ArcCosineDeg => MathF.Acos(r32) * (180 / MathF.PI),
                 SpecDynamicEquationTreeUnaryOperation.ArcTangentDeg => MathF.Atan(r32) * (180 / MathF.PI),
@@ -828,9 +1174,9 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
                 SpecDynamicEquationTreeUnaryOperation.ArcSineRad => Math.Asin(r64),
                 SpecDynamicEquationTreeUnaryOperation.ArcCosineRad => Math.Acos(r64),
                 SpecDynamicEquationTreeUnaryOperation.ArcTangentRad => Math.Atan(r64),
-                SpecDynamicEquationTreeUnaryOperation.SineDeg => Math.Sin(r64 * (180 / Math.PI)),
-                SpecDynamicEquationTreeUnaryOperation.CosineDeg => Math.Cos(r64 * (180 / Math.PI)),
-                SpecDynamicEquationTreeUnaryOperation.TangentDeg => Math.Tan(r64 * (180 / Math.PI)),
+                SpecDynamicEquationTreeUnaryOperation.SineDeg => Math.Sin(r64 * (Math.PI / 180)),
+                SpecDynamicEquationTreeUnaryOperation.CosineDeg => Math.Cos(r64 * (Math.PI / 180)),
+                SpecDynamicEquationTreeUnaryOperation.TangentDeg => Math.Tan(r64 * (Math.PI / 180)),
                 SpecDynamicEquationTreeUnaryOperation.ArcSineDeg => Math.Asin(r64) * (180 / Math.PI),
                 SpecDynamicEquationTreeUnaryOperation.ArcCosineDeg => Math.Acos(r64) * (180 / Math.PI),
                 SpecDynamicEquationTreeUnaryOperation.ArcTangentDeg => Math.Atan(r64) * (180 / Math.PI),
@@ -850,144 +1196,6 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
         }
 
         return true;
-    }
-
-    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
-    {
-        if (Operation
-            is >= SpecDynamicEquationTreeUnaryOperation.SineRad
-            and <= SpecDynamicEquationTreeUnaryOperation.SquareRoot)
-        {
-            if (!TryEvaluateFuncValue(in ctx, out double vDb, out bool isNull))
-            {
-                value = null;
-                return false;
-            }
-
-            if (isNull)
-            {
-                value = null;
-                return true;
-            }
-
-            if (ValueType.ValueType == typeof(double))
-            {
-                value = vDb;
-                return true;
-            }
-
-
-            try
-            {
-                value = Convert.ChangeType(vDb, ValueType.ValueType, CultureInfo.InvariantCulture);
-                return true;
-            }
-            catch (InvalidCastException)
-            {
-                value = null;
-                return false;
-            }
-        }
-
-        Type? type = Argument.ValueType?.ValueType;
-
-        if (type == null)
-        {
-            if (!TryEvaluateValue(in ctx, out double val, out bool isNull))
-            {
-                return Argument.TryEvaluateValue(in ctx, out value);
-            }
-
-            value = isNull ? null : val;
-            return true;
-        }
-
-        if (type == typeof(double))
-        {
-            if (!TryEvaluateValue(in ctx, out double val, out bool isNull))
-            {
-                value = null;
-                return false;
-            }
-
-            value = isNull ? null : val;
-            return true;
-        }
-        if (type == typeof(int))
-        {
-            if (!TryEvaluateValue(in ctx, out int val, out bool isNull))
-            {
-                value = null;
-                return false;
-            }
-
-            value = isNull ? null : val;
-            return true;
-        }
-        if (type == typeof(float))
-        {
-            if (!TryEvaluateValue(in ctx, out float val, out bool isNull))
-            {
-                value = null;
-                return false;
-            }
-
-            value = isNull ? null : val;
-            return true;
-        }
-
-        // unsigned ints aren't affected by these operations
-        if (type == typeof(byte) || type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong))
-        {
-            return Argument.TryEvaluateValue(in ctx, out value);
-        }
-
-        if (type == typeof(sbyte))
-        {
-            if (!TryEvaluateValue(in ctx, out sbyte val, out bool isNull))
-            {
-                value = null;
-                return false;
-            }
-
-            value = isNull ? null : val;
-            return true;
-        }
-        if (type == typeof(short))
-        {
-            if (!TryEvaluateValue(in ctx, out short val, out bool isNull))
-            {
-                value = null;
-                return false;
-            }
-
-            value = isNull ? null : val;
-            return true;
-        }
-        if (type == typeof(long))
-        {
-            if (!TryEvaluateValue(in ctx, out long val, out bool isNull))
-            {
-                value = null;
-                return false;
-            }
-
-            value = isNull ? null : val;
-            return true;
-        }
-        if (type == typeof(decimal))
-        {
-            if (!TryEvaluateValue(in ctx, out decimal val, out bool isNull))
-            {
-                value = null;
-                return false;
-            }
-
-            value = isNull ? null : val;
-            return true;
-        }
-
-        return Argument.TryEvaluateValue(in ctx, out value);
     }
 
     public override ISpecDynamicValue GetArgument(int index)
@@ -1108,42 +1316,6 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
 
         value = SpecDynamicEquationTreeValueHelpers.As<string, TValue>(res);
         isNull = false;
-        return true;
-    }
-
-    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
-    {
-        if (Operation == SpecDynamicEquationTreeTertiaryOperation.BallisticGravityMultiplierCalculation)
-        {
-            if (!TryEvaluateBallisticGravityMultiplier(in ctx, out float multiplier, out bool isNull))
-            {
-                value = null;
-                return false;
-            }
-
-            value = isNull ? null : multiplier;
-            return true;
-        }
-
-        value = null;
-
-        if (Operation != SpecDynamicEquationTreeTertiaryOperation.Replace)
-            return false;
-
-        if (!TryGetArgumentValue(in ctx, 0, out string? arg1, out bool arg1Null)
-            || !TryGetArgumentValue(in ctx, 1, out string? arg2, out bool arg2Null)
-            || !TryGetArgumentValue(in ctx, 1, out string? arg3, out bool arg3Null))
-            return false;
-
-        if (arg1Null && arg2Null && arg3Null)
-            return true;
-
-        if (string.IsNullOrEmpty(arg1))
-            value = string.Empty;
-        else if (string.IsNullOrEmpty(arg2))
-            value = arg1!;
-        else
-            value = arg1!.Replace(arg2, arg3 ?? string.Empty);
         return true;
     }
 

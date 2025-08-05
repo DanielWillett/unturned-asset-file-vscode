@@ -179,4 +179,6 @@ public sealed class CommaDelimitedStringSpecPropertyType :
         if (InnerType is ISecondPassSpecPropertyType and IDisposable disp)
             disp.Dispose();
     }
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
 }

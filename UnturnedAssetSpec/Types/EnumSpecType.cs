@@ -182,7 +182,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
 
     SpecProperty? ISpecType.FindProperty(string propertyName, SpecPropertyContext context) => null;
 
-    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => this as ISpecPropertyType<TValue>;
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
 }
 
 [DebuggerDisplay("{Value,nq}")]

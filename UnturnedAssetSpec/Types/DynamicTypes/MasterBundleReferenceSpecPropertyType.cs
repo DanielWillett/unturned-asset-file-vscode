@@ -145,6 +145,8 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<BundleReference>? other) => other is MasterBundleReferenceSpecPropertyType t && Equals(t);
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
 }
 
 public enum MasterBundleReferenceType

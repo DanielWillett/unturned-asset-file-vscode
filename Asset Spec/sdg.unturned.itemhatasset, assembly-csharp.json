@@ -1,0 +1,20 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemHatAsset, Assembly-CSharp",
+    "DisplayName": "Hat Item",
+    "Parent": "SDG.Unturned.ItemGearAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/hat-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties": [ ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Hat",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "The model that appears on the player's third-person model.",
+            "Required": true
+        }
+    ]
+}

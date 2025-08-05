@@ -46,8 +46,6 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
     public AssetSpecType Owner { get; set; }
 #nullable restore
 
-    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => null;
-
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
         value = null!;
@@ -240,6 +238,8 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
 
         return null;
     }
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
 }
 
 public enum CustomSpecTypeParseOptions

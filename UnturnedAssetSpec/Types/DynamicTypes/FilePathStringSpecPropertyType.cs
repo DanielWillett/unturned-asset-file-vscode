@@ -206,4 +206,6 @@ public sealed class FilePathStringSpecPropertyType :
 
         return slashIndex != -1 ? fullName.Substring(slashIndex + 1) : fullName;
     }
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
 }

@@ -1,0 +1,42 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp",
+    "DisplayName": "Mask Item",
+    "Parent": "SDG.Unturned.ItemGearAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/mask-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "FilterDegradationRateMultiplier",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": 1.0,
+            "Description": "Multiplier for how quickly deadzones deplete a gasmask’s filter quality. Higher is faster.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/mask-asset.html#mask-asset-properties",
+            "Variable": "FilterDegradationRateMultiplier",
+            "Priority": 3
+        },
+        {
+            "Key": "Earpiece",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This mask allows communication over the walkie-talkie system.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/mask-asset.html#mask-asset-properties",
+            "Variable": "isEarpiece",
+            "Priority": 3,
+            "ExclusiveWith": [ "SDG.Unturned.ItemAsset, Assembly-CSharp::Pro" ]
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Mask",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "The model that appears on the player's third-person model.",
+            "Required": true
+        }
+    ]
+}

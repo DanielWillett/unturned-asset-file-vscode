@@ -1,0 +1,199 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemMeleeAsset, Assembly-CSharp",
+    "DisplayName": "Melee Item",
+    "Parent": "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "AttackAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when this melee weapon is used.",
+            "DefaultValue": null,
+            "Variable": "use",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#melee-asset-properties",
+            "Priority": 4
+        },
+        {
+            "Key": "Strength",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Multiplier on the damage dealt by strong attacks.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#melee-asset-properties",
+            "Priority": 10,
+            "Variable": "strength",
+            "ExclusiveWith": [ "Repeated" ]
+        },
+        {
+            "Key": "Weak",
+            "Type": "Float32",
+            "DefaultValue": 0.5,
+            "Minimum": 0,
+            "Maximum": 1,
+            "Description": "Percentage (0-1) of the way through the \"Weak\" animation to apply damage.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#melee-asset-properties",
+            "Priority": 10,
+            "Variable": "weak"
+        },
+        {
+            "Key": "Strong",
+            "Type": "Float32",
+            "DefaultValue": 0.33,
+            "Minimum": 0,
+            "Maximum": 1,
+            "Description": "Percentage (0-1) of the way through the \"Strong\" animation to apply damage.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#melee-asset-properties",
+            "Priority": 10,
+            "Variable": "strong",
+            "ExclusiveWith": [ "Repeated" ]
+        },
+        {
+            "Key": "Stamina",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Minimum": 0,
+            "Maximum": 100,
+            "Description": "Amount of stamina depleted with each attack.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#melee-asset-properties",
+            "Priority": 9,
+            "Variable": "stamina"
+        },
+        {
+            "Key": "Repair",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This melee item repairs barricades, structures, and vehicles.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#melee-asset-properties",
+            "Priority": 8,
+            "Variable": "isRepair"
+        },
+        {
+            "Key": "Repeated",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This melee item's weak attack repeates while the player continues holding down their primary key. Strong attacks are disabled.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#melee-asset-properties",
+            "Priority": 8,
+            "Variable": "isRepeated"
+        },
+        {
+            "Key": "Light",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This melee item has a light that can be toggled using the player's tactical key.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#melee-asset-properties",
+            "Priority": 7,
+            "Variable": "isLight"
+        },
+        {
+            "Key": "SpotLight_Enabled",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not this flashlight emits light when enabled.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-enabled-bool-true",
+            "Priority": 6,
+            "Variable": "lightConfig",
+            "InclusiveWith": [ "Light" ]
+        },
+        {
+            "Key": "SpotLight_Range",
+            "Type": "Float32",
+            "DefaultValue": 64.0,
+            "Description": "Range of the flashlight's beam, measured in meters.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-range-float32-64",
+            "Priority": 6,
+            "Variable": "lightConfig",
+            "InclusiveWith": [ "Light" ]
+        },
+        {
+            "Key": "SpotLight_Angle",
+            "Type": "Float32",
+            "DefaultValue": 90.0,
+            "Minimum": 0.0,
+            "Maximum": 360.0,
+            "Description": "Angle of the flashlight's beam, measured in degrees.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-angle-float32-90",
+            "Priority": 6,
+            "Variable": "lightConfig",
+            "InclusiveWith": [ "Light" ]
+        },
+        {
+            "Key": "SpotLight_Intensity",
+            "Type": "Float32",
+            "DefaultValue": 1.3,
+            "MinimumExclusive": 0.0,
+            "Description": "Intensity of the flashlight's beam.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-intensity-float32-1-3",
+            "Priority": 6,
+            "Variable": "lightConfig",
+            "InclusiveWith": [ "Light" ]
+        },
+        {
+            "Key": "SpotLight_Color",
+            "Type": "Color",
+            "DefaultValue": "#f5df93",
+            "Description": "Color of the flashlight's beam.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-color-color-f5df93",
+            "Priority": 6,
+            "Variable": "lightConfig",
+            "InclusiveWith": [ "Light" ]
+        },
+        {
+            "Key": "Alert_Radius",
+            "Type": "Float32",
+            "Minimum": 0,
+            "DefaultValue": 8,
+            "IncludedDefaultValue": 0,
+            "Description": "The radius where zombies and animals should be alerted when attacking, measured in meters.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#melee-asset-properties",
+            "Priority": 5,
+            "Variable": "alertRadius"
+        },
+        {
+            "Key": "ImpactAudioDef",
+            "Type": "AudioReference",
+            "DefaultValue": null,
+            "Description": "Audio to play upon impact.",
+            "Variable": "impactAudio",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#melee-asset-properties",
+            "Priority": 4
+        },
+        {
+            "Key": "Weak_Attack_Quest_Rewards",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Rewards applied when the player performs a weak attack.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#npc-rewards",
+            "Variable": "weakAttackQuestRewards",
+            "CountForRegexGroup": "melee-weak-rewards",
+            "Priority": 3
+        },
+        {
+            "Key": "Strong_Attack_Quest_Rewards",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Rewards applied when the player performs a strong attack.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#npc-rewards",
+            "Variable": "strongAttackQuestRewards",
+            "CountForRegexGroup": "melee-strong-rewards",
+            "Priority": 3
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Use",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when this melee weapon is used.",
+            "Variable": "use",
+            "RedirectableAssetKey": "AttackAudioClip"
+        }
+    ]
+}

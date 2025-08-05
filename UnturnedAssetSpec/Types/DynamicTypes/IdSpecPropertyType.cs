@@ -122,4 +122,6 @@ public class IdSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<ushort>? other) => other is IdSpecPropertyType t && Equals(t);
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
 }

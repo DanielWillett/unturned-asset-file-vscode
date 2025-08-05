@@ -11,10 +11,6 @@ public abstract class BaseSpecPropertyType<TValue>
     public abstract string Type { get; }
     public abstract string DisplayName { get; }
     
-#pragma warning disable CS0693
-    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => this as ISpecPropertyType<TValue>;
-#pragma warning restore CS0693
-
     public override string ToString() => Type;
 
     protected bool MissingNode(in SpecPropertyTypeParseContext parse, out TValue? value)

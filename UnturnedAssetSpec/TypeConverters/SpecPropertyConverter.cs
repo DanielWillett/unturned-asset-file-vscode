@@ -921,9 +921,6 @@ internal sealed class SpecPropertyTypeType : ISpecPropertyType<ISpecPropertyType
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     /// <inheritdoc />
-    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => this as ISpecPropertyType<TValue>;
-
-    /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
         throw new NotSupportedException();
@@ -962,4 +959,6 @@ internal sealed class SpecPropertyTypeType : ISpecPropertyType<ISpecPropertyType
         dynamicValue = null!;
         return false;
     }
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
 }

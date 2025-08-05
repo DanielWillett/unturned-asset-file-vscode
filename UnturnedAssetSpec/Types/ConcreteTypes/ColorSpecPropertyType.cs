@@ -80,7 +80,9 @@ public sealed class ColorRGBALegacySpecPropertyType : ColorSpecPropertyType
     private protected override bool HasAlpha => true;
 }
 
-public abstract class ColorSpecPropertyType : BasicSpecPropertyType<ColorSpecPropertyType, Color>, IStringParseableSpecPropertyType
+public abstract class ColorSpecPropertyType :
+    BaseColorSpecPropertyType<ColorSpecPropertyType, Color>,
+    IStringParseableSpecPropertyType
 {
     private protected abstract VectorTypeParseOptions Options { get; }
     private protected abstract bool HasAlpha { get; }
@@ -378,5 +380,229 @@ public abstract class ColorSpecPropertyType : BasicSpecPropertyType<ColorSpecPro
 
         value = new Color(a, r, g, b);
         return true;
+    }
+}
+
+public abstract class BaseColorSpecPropertyType<TSelf, T>
+    : BasicSpecPropertyType<TSelf, T>,
+        IVectorSpecPropertyType<Color>,
+        IVectorSpecPropertyType<Color32>
+    where T : unmanaged, IEquatable<T> where TSelf : BaseColorSpecPropertyType<TSelf, T>
+{
+    void IVectorSpecPropertyType.Visit<TVisitor>(TVisitor visitor)
+    {
+        visitor.Visit<Color>(this);
+        visitor.Visit<Color32>(this);
+    }
+
+    public Color Multiply(Color val1, Color val2)
+    {
+        return new Color(val1.A * val2.A, val1.R * val2.R, val1.G * val2.G, val1.B * val2.B);
+    }
+
+    public Color Divide(Color val1, Color val2)
+    {
+        return new Color(val1.A / val2.A, val1.R / val2.R, val1.G / val2.G, val1.B / val2.B);
+    }
+
+    public Color Add(Color val1, Color val2)
+    {
+        return new Color(val1.A + val2.A, val1.R + val2.R, val1.G + val2.G, val1.B + val2.B);
+    }
+
+    public Color Subtract(Color val1, Color val2)
+    {
+        return new Color(val1.A - val2.A, val1.R - val2.R, val1.G - val2.G, val1.B - val2.B);
+    }
+
+    public Color Modulo(Color val1, Color val2)
+    {
+        return new Color(val1.A % val2.A, val1.R % val2.R, val1.G % val2.G, val1.B % val2.B);
+    }
+
+    public Color Power(Color val1, Color val2)
+    {
+        return new Color(MathF.Pow(val1.A, val2.A), MathF.Pow(val1.R, val2.R), MathF.Pow(val1.G, val2.G), MathF.Pow(val1.B, val2.B));
+    }
+
+    public Color Min(Color val1, Color val2)
+    {
+        return new Color(Math.Min(val1.A, val2.A), Math.Min(val1.R, val2.R), Math.Min(val1.G, val2.G), Math.Min(val1.B, val2.B));
+    }
+
+    public Color Max(Color val1, Color val2)
+    {
+        return new Color(Math.Max(val1.A, val2.A), Math.Max(val1.R, val2.R), Math.Max(val1.G, val2.G), Math.Max(val1.B, val2.B));
+    }
+
+    public Color Avg(Color val1, Color val2)
+    {
+        return new Color((val1.A + val2.A) / 2f, (val1.R + val2.R) / 2f, (val1.G + val2.G) / 2f, (val1.B + val2.B) / 2f);
+    }
+
+    public Color Absolute(Color val)
+    {
+        return new Color(Math.Abs(val.A), Math.Abs(val.R), Math.Abs(val.G), Math.Abs(val.B));
+    }
+
+    public Color Round(Color val)
+    {
+        return new Color(MathF.Round(val.A), MathF.Round(val.R), MathF.Round(val.G), MathF.Round(val.B));
+    }
+
+    public Color Ceiling(Color val)
+    {
+        return new Color(MathF.Ceiling(val.A), MathF.Ceiling(val.R), MathF.Ceiling(val.G), MathF.Ceiling(val.B));
+    }
+
+    public Color Floor(Color val)
+    {
+        return new Color(MathF.Floor(val.A), MathF.Floor(val.R), MathF.Floor(val.G), MathF.Floor(val.B));
+    }
+
+    public Color TrigOperation(Color val, int op, bool deg)
+    {
+        return deg
+            ? op switch
+            {
+                0 => new Color(MathF.Sin(val.A * (MathF.PI / 180f)), MathF.Sin(val.R * (MathF.PI / 180f)), MathF.Sin(val.G * (MathF.PI / 180f)), MathF.Sin(val.B * (MathF.PI / 180f))),
+                1 => new Color(MathF.Cos(val.A * (MathF.PI / 180f)), MathF.Cos(val.R * (MathF.PI / 180f)), MathF.Cos(val.G * (MathF.PI / 180f)), MathF.Cos(val.B * (MathF.PI / 180f))),
+                2 => new Color(MathF.Tan(val.A * (MathF.PI / 180f)), MathF.Tan(val.R * (MathF.PI / 180f)), MathF.Tan(val.G * (MathF.PI / 180f)), MathF.Tan(val.B * (MathF.PI / 180f))),
+                3 => new Color(MathF.Asin(val.A) * (180f / MathF.PI), MathF.Asin(val.R) * (180f / MathF.PI), MathF.Asin(val.G) * (180f / MathF.PI), MathF.Asin(val.B) * (180f / MathF.PI)),
+                4 => new Color(MathF.Acos(val.A) * (180f / MathF.PI), MathF.Acos(val.R) * (180f / MathF.PI), MathF.Acos(val.G) * (180f / MathF.PI), MathF.Acos(val.B) * (180f / MathF.PI)),
+                5 => new Color(MathF.Atan(val.A) * (180f / MathF.PI), MathF.Atan(val.R) * (180f / MathF.PI), MathF.Atan(val.G) * (180f / MathF.PI), MathF.Atan(val.B) * (180f / MathF.PI)),
+                _ => throw new ArgumentOutOfRangeException(nameof(op))
+            }
+            : op switch
+            {
+                0 => new Color(MathF.Sin(val.A), MathF.Sin(val.R), MathF.Sin(val.G), MathF.Sin(val.B)),
+                1 => new Color(MathF.Cos(val.A), MathF.Cos(val.R), MathF.Cos(val.G), MathF.Cos(val.B)),
+                2 => new Color(MathF.Tan(val.A), MathF.Tan(val.R), MathF.Tan(val.G), MathF.Tan(val.B)),
+                3 => new Color(MathF.Asin(val.A), MathF.Asin(val.R), MathF.Asin(val.G), MathF.Asin(val.B)),
+                4 => new Color(MathF.Acos(val.A), MathF.Acos(val.R), MathF.Acos(val.G), MathF.Acos(val.B)),
+                5 => new Color(MathF.Atan(val.A), MathF.Atan(val.R), MathF.Atan(val.G), MathF.Atan(val.B)),
+                _ => throw new ArgumentOutOfRangeException(nameof(op))
+            };
+    }
+
+    public Color Sqrt(Color val)
+    {
+        return new Color(MathF.Sqrt(val.A), MathF.Sqrt(val.R), MathF.Sqrt(val.G), MathF.Sqrt(val.B));
+    }
+
+    Color IVectorSpecPropertyType<Color>.Construct(double scalar) => new Color((float)scalar, (float)scalar, (float)scalar, (float)scalar);
+
+    private static byte Clamp(double db)
+    {
+        return db < 0 ? (byte)0 : db > 255 ? (byte)255 : (byte)Math.Round(db);
+    }
+    private static byte Clamp(float fl)
+    {
+        return fl < 0 ? (byte)0 : fl > 255 ? (byte)255 : (byte)Math.Round(fl);
+    }
+    private static byte Clamp(int integer)
+    {
+        return integer < 0 ? (byte)0 : integer > 255 ? (byte)255 : (byte)integer;
+    }
+
+    public Color32 Multiply(Color32 val1, Color32 val2)
+    {
+        return new Color32(Clamp(val1.A * val2.A), Clamp(val1.R * val2.R), Clamp(val1.G * val2.G), Clamp(val1.B * val2.B));
+    }
+
+    public Color32 Divide(Color32 val1, Color32 val2)
+    {
+        return new Color32(Clamp(val1.A / val2.A), Clamp(val1.R / val2.R), Clamp(val1.G / val2.G), Clamp(val1.B / val2.B));
+    }
+
+    public Color32 Add(Color32 val1, Color32 val2)
+    {
+        return new Color32(Clamp(val1.A + val2.A), Clamp(val1.R + val2.R), Clamp(val1.G + val2.G), Clamp(val1.B + val2.B));
+    }
+
+    public Color32 Subtract(Color32 val1, Color32 val2)
+    {
+        return new Color32(Clamp(val1.A - val2.A), Clamp(val1.R - val2.R), Clamp(val1.G - val2.G), Clamp(val1.B - val2.B));
+    }
+
+    public Color32 Modulo(Color32 val1, Color32 val2)
+    {
+        return new Color32(Clamp(val1.A % val2.A), Clamp(val1.R % val2.R), Clamp(val1.G % val2.G), Clamp(val1.B % val2.B));
+    }
+
+    public Color32 Power(Color32 val1, Color32 val2)
+    {
+        return new Color32(Clamp(Math.Pow(val1.A, val2.A)), Clamp(Math.Pow(val1.R, val2.R)), Clamp(Math.Pow(val1.G, val2.G)), Clamp(Math.Pow(val1.B, val2.B)));
+    }
+
+    public Color32 Min(Color32 val1, Color32 val2)
+    {
+        return new Color32(Math.Min(val1.A, val2.A), Math.Min(val1.R, val2.R), Math.Min(val1.G, val2.G), Math.Min(val1.B, val2.B));
+    }
+
+    public Color32 Max(Color32 val1, Color32 val2)
+    {
+        return new Color32(Math.Max(val1.A, val2.A), Math.Max(val1.R, val2.R), Math.Max(val1.G, val2.G), Math.Max(val1.B, val2.B));
+    }
+
+    public Color32 Avg(Color32 val1, Color32 val2)
+    {
+        return new Color32((byte)Math.Round((val1.A + val2.A) / 2f), (byte)Math.Round((val1.R + val2.R) / 2f), (byte)Math.Round((val1.G + val2.G) / 2f), (byte)Math.Round((val1.B + val2.B) / 2f));
+    }
+
+    public Color32 Absolute(Color32 val)
+    {
+        return val;
+    }
+
+    public Color32 Round(Color32 val)
+    {
+        return val;
+    }
+
+    public Color32 Ceiling(Color32 val)
+    {
+        return val;
+    }
+
+    public Color32 Floor(Color32 val)
+    {
+        return val;
+    }
+
+    public Color32 TrigOperation(Color32 val, int op, bool deg)
+    {
+        return deg
+            ? op switch
+            {
+                0 => new Color32(Clamp(MathF.Sin(val.A * (MathF.PI / 180f))), Clamp(MathF.Sin(val.R * (MathF.PI / 180f))), Clamp(MathF.Sin(val.G * (MathF.PI / 180f))), Clamp(MathF.Sin(val.B * (MathF.PI / 180f)))),
+                1 => new Color32(Clamp(MathF.Cos(val.A * (MathF.PI / 180f))), Clamp(MathF.Cos(val.R * (MathF.PI / 180f))), Clamp(MathF.Cos(val.G * (MathF.PI / 180f))), Clamp(MathF.Cos(val.B * (MathF.PI / 180f)))),
+                2 => new Color32(Clamp(MathF.Tan(val.A * (MathF.PI / 180f))), Clamp(MathF.Tan(val.R * (MathF.PI / 180f))), Clamp(MathF.Tan(val.G * (MathF.PI / 180f))), Clamp(MathF.Tan(val.B * (MathF.PI / 180f)))),
+                3 => new Color32(Clamp(MathF.Asin(val.A) * (180f / MathF.PI)), Clamp(MathF.Asin(val.R) * (180f / MathF.PI)), Clamp(MathF.Asin(val.G) * (180f / MathF.PI)), Clamp(MathF.Asin(val.B) * (180f / MathF.PI))),
+                4 => new Color32(Clamp(MathF.Acos(val.A) * (180f / MathF.PI)), Clamp(MathF.Acos(val.R) * (180f / MathF.PI)), Clamp(MathF.Acos(val.G) * (180f / MathF.PI)), Clamp(MathF.Acos(val.B) * (180f / MathF.PI))),
+                5 => new Color32(Clamp(MathF.Atan(val.A) * (180f / MathF.PI)), Clamp(MathF.Atan(val.R) * (180f / MathF.PI)), Clamp(MathF.Atan(val.G) * (180f / MathF.PI)), Clamp(MathF.Atan(val.B) * (180f / MathF.PI))),
+                _ => throw new ArgumentOutOfRangeException(nameof(op))
+            }
+            : op switch
+            {
+                0 => new Color32(Clamp(MathF.Sin(val.A)), Clamp(MathF.Sin(val.R)), Clamp(MathF.Sin(val.G)), Clamp(MathF.Sin(val.B))),
+                1 => new Color32(Clamp(MathF.Cos(val.A)), Clamp(MathF.Cos(val.R)), Clamp(MathF.Cos(val.G)), Clamp(MathF.Cos(val.B))),
+                2 => new Color32(Clamp(MathF.Tan(val.A)), Clamp(MathF.Tan(val.R)), Clamp(MathF.Tan(val.G)), Clamp(MathF.Tan(val.B))),
+                3 => new Color32(Clamp(MathF.Asin(val.A)), Clamp(MathF.Asin(val.R)), Clamp(MathF.Asin(val.G)), Clamp(MathF.Asin(val.B))),
+                4 => new Color32(Clamp(MathF.Acos(val.A)), Clamp(MathF.Acos(val.R)), Clamp(MathF.Acos(val.G)), Clamp(MathF.Acos(val.B))),
+                5 => new Color32(Clamp(MathF.Atan(val.A)), Clamp(MathF.Atan(val.R)), Clamp(MathF.Atan(val.G)), Clamp(MathF.Atan(val.B))),
+                _ => throw new ArgumentOutOfRangeException(nameof(op))
+            };
+    }
+
+    public Color32 Sqrt(Color32 val)
+    {
+        return new Color32(Clamp(MathF.Sqrt(val.A)), Clamp(MathF.Sqrt(val.R)), Clamp(MathF.Sqrt(val.G)), Clamp(MathF.Sqrt(val.B)));
+    }
+
+    Color32 IVectorSpecPropertyType<Color32>.Construct(double scalar)
+    {
+        byte v = Clamp(scalar);
+        return new Color32(v, v, v, v);
     }
 }

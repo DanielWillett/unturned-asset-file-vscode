@@ -421,6 +421,23 @@ public static class SpecDynamicValue
             }
         }
 
+        if (typeof(TValue) == typeof(Color32) && valueType == typeof(Color))
+        {
+            if (val.TryEvaluateValue(in ctx, out Color clr, out isNull))
+            {
+                value = SpecDynamicEquationTreeValueHelpers.As<Color32, TValue>(clr);
+                return true;
+            }
+        }
+        if (typeof(TValue) == typeof(Color) && valueType == typeof(Color32))
+        {
+            if (val.TryEvaluateValue(in ctx, out Color32 clr, out isNull))
+            {
+                value = SpecDynamicEquationTreeValueHelpers.As<Color, TValue>(clr);
+                return true;
+            }
+        }
+
         isNull = true;
         return false;
     }
@@ -695,7 +712,7 @@ public static class SpecDynamicValue
                 return UInt16(checked ( (ushort)d ), expectedType);
             
             if (vt == typeof(GuidOrId))
-                return new SpecDynamicConcreteValue<GuidOrId>(new GuidOrId(checked ( (ushort)d )), expectedType.As<GuidOrId>());
+                return new SpecDynamicConcreteValue<GuidOrId>(new GuidOrId(checked ( (ushort)d )), expectedType as ISpecPropertyType<GuidOrId>);
             
             if (vt == typeof(short))
                 return Int16(checked ( (short)d ), expectedType);
@@ -1119,10 +1136,10 @@ public static class SpecDynamicValue
         switch (reader.TokenType)
         {
             case JsonTokenType.False:
-                return expectedType == null || expectedType.As<bool>() != null ? False : invalidTypeThrowHandler(typeof(bool), expectedType);
+                return expectedType == null || expectedType is ISpecPropertyType<bool> ? False : invalidTypeThrowHandler(typeof(bool), expectedType);
 
             case JsonTokenType.True:
-                return expectedType == null || expectedType.As<bool>() != null ? True : invalidTypeThrowHandler(typeof(bool), expectedType);
+                return expectedType == null || expectedType is ISpecPropertyType<bool> ? True : invalidTypeThrowHandler(typeof(bool), expectedType);
 
             case JsonTokenType.Null:
                 return Null;
@@ -1215,24 +1232,24 @@ public static class SpecDynamicValue
                 if (valueType == typeof(GuidOrId))
                 {
                     return reader.TryGetUInt16(out ushort id)
-                        ? new SpecDynamicConcreteValue<GuidOrId>(new GuidOrId(id), expectedType.As<GuidOrId>() ?? KnownTypes.GuidOrId(default))
+                        ? new SpecDynamicConcreteValue<GuidOrId>(new GuidOrId(id), expectedType as ISpecPropertyType<GuidOrId> ?? KnownTypes.GuidOrId(default))
                         : invalidTypeThrowHandler(typeof(double), expectedType);
                 }
                 if (valueType == typeof(DateTime))
                 {
                     return reader.TryGetInt32(out int i4) && i4 == 0
-                        ? new SpecDynamicConcreteValue<DateTime>(DateTime.MinValue, expectedType.As<DateTime>() ?? KnownTypes.DateTime)
+                        ? new SpecDynamicConcreteValue<DateTime>(DateTime.MinValue, expectedType as ISpecPropertyType<DateTime> ?? KnownTypes.DateTime)
                         : invalidTypeThrowHandler(typeof(double), expectedType);
                 }
                 if (valueType == typeof(DateTimeOffset))
                 {
                     return reader.TryGetInt32(out int i4) && i4 == 0
-                        ? new SpecDynamicConcreteValue<DateTimeOffset>(DateTimeOffset.MinValue, expectedType.As<DateTimeOffset>() ?? KnownTypes.DateTimeOffset)
+                        ? new SpecDynamicConcreteValue<DateTimeOffset>(DateTimeOffset.MinValue, expectedType as ISpecPropertyType<DateTimeOffset> ?? KnownTypes.DateTimeOffset)
                         : invalidTypeThrowHandler(typeof(double), expectedType);
                 }
                 if (valueType == typeof(char))
                 {
-                    return reader.TryGetUInt16(out ushort u2) ? new SpecDynamicConcreteValue<char>((char)u2, expectedType.As<char>() ?? KnownTypes.Character) : invalidTypeThrowHandler(typeof(double), expectedType);
+                    return reader.TryGetUInt16(out ushort u2) ? new SpecDynamicConcreteValue<char>((char)u2, expectedType as ISpecPropertyType<char> ?? KnownTypes.Character) : invalidTypeThrowHandler(typeof(double), expectedType);
                 }
 
                 break;
@@ -1254,25 +1271,25 @@ public static class SpecDynamicValue
                         return new SpecDynamicConcreteValue<DateTimeOffset>(dtOffset, KnownTypes.DateTimeOffset);
                     }
 
-                    return String(reader.GetString(), expectedType?.As<string>() ?? KnownTypes.String);
+                    return String(reader.GetString(), expectedType as ISpecPropertyType<string> ?? KnownTypes.String);
                 }
 
                 valueType = expectedType.ValueType;
                 if (valueType == typeof(string))
                 {
-                    return String(reader.GetString(), expectedType.As<string>() ?? KnownTypes.String);
+                    return String(reader.GetString(), expectedType as ISpecPropertyType<string> ?? KnownTypes.String);
                 }
                 if (valueType == typeof(Guid))
                 {
-                    return reader.TryGetGuid(out Guid guid) ? Guid(guid, expectedType.As<Guid>() ?? KnownTypes.Guid) : invalidTypeThrowHandler(typeof(string), expectedType);
+                    return reader.TryGetGuid(out Guid guid) ? Guid(guid, expectedType as ISpecPropertyType<Guid> ?? KnownTypes.Guid) : invalidTypeThrowHandler(typeof(string), expectedType);
                 }
                 if (valueType == typeof(DateTime))
                 {
-                    return reader.TryGetDateTime(out DateTime dt) ? new SpecDynamicConcreteValue<DateTime>(dt, expectedType.As<DateTime>() ?? KnownTypes.DateTime) : invalidTypeThrowHandler(typeof(string), expectedType);
+                    return reader.TryGetDateTime(out DateTime dt) ? new SpecDynamicConcreteValue<DateTime>(dt, expectedType as ISpecPropertyType<DateTime> ?? KnownTypes.DateTime) : invalidTypeThrowHandler(typeof(string), expectedType);
                 }
                 if (valueType == typeof(DateTimeOffset))
                 {
-                    return reader.TryGetDateTimeOffset(out DateTimeOffset dt) ? new SpecDynamicConcreteValue<DateTimeOffset>(dt, expectedType.As<DateTimeOffset>() ?? KnownTypes.DateTimeOffset) : invalidTypeThrowHandler(typeof(string), expectedType);
+                    return reader.TryGetDateTimeOffset(out DateTimeOffset dt) ? new SpecDynamicConcreteValue<DateTimeOffset>(dt, expectedType as ISpecPropertyType<DateTimeOffset> ?? KnownTypes.DateTimeOffset) : invalidTypeThrowHandler(typeof(string), expectedType);
                 }
                 if (valueType == typeof(char))
                 {
@@ -1280,7 +1297,7 @@ public static class SpecDynamicValue
                     if (str.Length != 1)
                         invalidTypeThrowHandler(typeof(string), expectedType);
 
-                    return new SpecDynamicConcreteValue<char>(str[0], expectedType.As<char>() ?? KnownTypes.Character);
+                    return new SpecDynamicConcreteValue<char>(str[0], expectedType as ISpecPropertyType<char> ?? KnownTypes.Character);
                 }
                 if (expectedType is IStringParseableSpecPropertyType stringParseable)
                 {

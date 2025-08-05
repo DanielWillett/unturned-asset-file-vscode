@@ -75,4 +75,6 @@ public sealed class FlagIdSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<ushort>? other) => other is FlagIdSpecPropertyType t && Equals(t);
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
 }

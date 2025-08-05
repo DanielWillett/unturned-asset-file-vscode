@@ -21,11 +21,11 @@ internal sealed class HideInheritedPropertyType : ISpecPropertyType, IEquatable<
 
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Other;
 
-    public ISpecPropertyType<TValue>? As<TValue>() where TValue : IEquatable<TValue> => null;
-
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
         value = null!;
         return false;
     }
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) { }
 }

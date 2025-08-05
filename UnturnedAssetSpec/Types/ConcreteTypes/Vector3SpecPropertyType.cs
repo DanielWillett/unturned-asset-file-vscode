@@ -5,7 +5,9 @@ using System.Numerics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3SpecPropertyType, Vector3>, IStringParseableSpecPropertyType
+public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3SpecPropertyType, Vector3>,
+    IStringParseableSpecPropertyType,
+    IVectorSpecPropertyType<Vector3>
 {
     private protected abstract VectorTypeParseOptions Options { get; }
 
@@ -159,5 +161,111 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
 
         value = new Vector3(x, y, z);
         return true;
+    }
+
+    void IVectorSpecPropertyType.Visit<TVisitor>(TVisitor visitor)
+    {
+        visitor.Visit(this);
+    }
+
+    public Vector3 Multiply(Vector3 val1, Vector3 val2)
+    {
+        return new Vector3(val1.X * val2.X, val1.Y * val2.Y, val1.Z * val2.Z);
+    }
+
+    public Vector3 Divide(Vector3 val1, Vector3 val2)
+    {
+        return new Vector3(val1.X / val2.X, val1.Y / val2.Y, val1.Z / val2.Z);
+    }
+
+    public Vector3 Add(Vector3 val1, Vector3 val2)
+    {
+        return new Vector3(val1.X + val2.X, val1.Y + val2.Y, val1.Z + val2.Z);
+    }
+
+    public Vector3 Subtract(Vector3 val1, Vector3 val2)
+    {
+        return new Vector3(val1.X - val2.X, val1.Y - val2.Y, val1.Z - val2.Z);
+    }
+
+    public Vector3 Modulo(Vector3 val1, Vector3 val2)
+    {
+        return new Vector3(val1.X % val2.X, val1.Y % val2.Y, val1.Z % val2.Z);
+    }
+
+    public Vector3 Power(Vector3 val1, Vector3 val2)
+    {
+        return new Vector3((float)Math.Pow(val1.X, val2.X), (float)Math.Pow(val1.Y, val2.Y), (float)Math.Pow(val1.Z, val2.Z));
+    }
+
+    public Vector3 Min(Vector3 val1, Vector3 val2)
+    {
+        return new Vector3(Math.Min(val1.X, val2.X), Math.Min(val1.Y, val2.Y), Math.Min(val1.Z, val2.Z));
+    }
+
+    public Vector3 Max(Vector3 val1, Vector3 val2)
+    {
+        return new Vector3(Math.Max(val1.X, val2.X), Math.Max(val1.Y, val2.Y), Math.Max(val1.Z, val2.Z));
+    }
+
+    public Vector3 Avg(Vector3 val1, Vector3 val2)
+    {
+        return new Vector3((val1.X + val2.X) / 2f, (val1.Y + val2.Y) / 2f, (val1.Z + val2.Z) / 2f);
+    }
+
+    public Vector3 Absolute(Vector3 val)
+    {
+        return new Vector3(Math.Abs(val.X), Math.Abs(val.Y), Math.Abs(val.Z));
+    }
+
+    public Vector3 Round(Vector3 val)
+    {
+        return new Vector3(MathF.Round(val.X), MathF.Round(val.Y), MathF.Round(val.Z));
+    }
+
+    public Vector3 Ceiling(Vector3 val)
+    {
+        return new Vector3(MathF.Ceiling(val.X), MathF.Ceiling(val.Y), MathF.Ceiling(val.Z));
+    }
+
+    public Vector3 Floor(Vector3 val)
+    {
+        return new Vector3(MathF.Floor(val.X), MathF.Floor(val.Y), MathF.Floor(val.Z));
+    }
+
+    public Vector3 TrigOperation(Vector3 val, int op, bool deg)
+    {
+        return deg
+            ? op switch
+            {
+                0 => new Vector3(MathF.Sin(val.X * (MathF.PI / 180f)), MathF.Sin(val.Y * (MathF.PI / 180f)), MathF.Sin(val.Z * (MathF.PI / 180f))),
+                1 => new Vector3(MathF.Cos(val.X * (MathF.PI / 180f)), MathF.Cos(val.Y * (MathF.PI / 180f)), MathF.Cos(val.Z * (MathF.PI / 180f))),
+                2 => new Vector3(MathF.Tan(val.X * (MathF.PI / 180f)), MathF.Tan(val.Y * (MathF.PI / 180f)), MathF.Tan(val.Z * (MathF.PI / 180f))),
+                3 => new Vector3(MathF.Asin(val.X) * (180f / MathF.PI), MathF.Asin(val.Y) * (180f / MathF.PI), MathF.Asin(val.Z) * (180f / MathF.PI)),
+                4 => new Vector3(MathF.Acos(val.X) * (180f / MathF.PI), MathF.Acos(val.Y) * (180f / MathF.PI), MathF.Acos(val.Z) * (180f / MathF.PI)),
+                5 => new Vector3(MathF.Atan(val.X) * (180f / MathF.PI), MathF.Atan(val.Y) * (180f / MathF.PI), MathF.Atan(val.Z) * (180f / MathF.PI)),
+                _ => throw new ArgumentOutOfRangeException(nameof(op))
+            }
+            : op switch
+            {
+                0 => new Vector3(MathF.Sin(val.X), MathF.Sin(val.Y), MathF.Sin(val.Z)),
+                1 => new Vector3(MathF.Cos(val.X), MathF.Cos(val.Y), MathF.Cos(val.Z)),
+                2 => new Vector3(MathF.Tan(val.X), MathF.Tan(val.Y), MathF.Tan(val.Z)),
+                3 => new Vector3(MathF.Asin(val.X), MathF.Asin(val.Y), MathF.Asin(val.Z)),
+                4 => new Vector3(MathF.Acos(val.X), MathF.Acos(val.Y), MathF.Acos(val.Z)),
+                5 => new Vector3(MathF.Atan(val.X), MathF.Atan(val.Y), MathF.Atan(val.Z)),
+                _ => throw new ArgumentOutOfRangeException(nameof(op))
+            };
+    }
+
+    public Vector3 Sqrt(Vector3 val)
+    {
+        return new Vector3(MathF.Sqrt(val.X), MathF.Sqrt(val.Y), MathF.Sqrt(val.Z));
+    }
+
+    public Vector3 Construct(double scalar)
+    {
+        float fl = (float)scalar;
+        return new Vector3(fl, fl, fl);
     }
 }

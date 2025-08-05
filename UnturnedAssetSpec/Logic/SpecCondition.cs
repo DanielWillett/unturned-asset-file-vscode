@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -239,6 +240,87 @@ public static class ConditionOperationExtensions
             and not ConditionOperation.AssignableTo;
     }
 
+    private static readonly IComparer<Vector2> Vector2Comparer = Comparer<Vector2>.Create((a, b) =>
+    {
+        const float tolerance = 0.0001f;
+
+        float sub = a.X - b.X;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = a.Y - b.Y;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+
+        return 0;
+    });
+
+    private static readonly IComparer<Vector3> Vector3Comparer = Comparer<Vector3>.Create((a, b) =>
+    {
+        const float tolerance = 0.0001f;
+
+        float sub = a.X - b.X;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = a.Y - b.Y;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = a.Z - b.Z;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+
+        return 0;
+    });
+
+    private static readonly IComparer<Vector4> Vector4Comparer = Comparer<Vector4>.Create((a, b) =>
+    {
+        const float tolerance = 0.0001f;
+
+        float sub = a.X - b.X;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = a.Y - b.Y;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = a.Z - b.Z;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = a.W - b.W;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+
+        return 0;
+    });
+
+    private static IComparer<T> GetComparer<T>()
+    {
+        if (typeof(T) == typeof(Vector2))
+            return (IComparer<T>)Vector2Comparer;
+        if (typeof(T) == typeof(Vector3))
+            return (IComparer<T>)Vector3Comparer;
+        if (typeof(T) == typeof(Vector4))
+            return (IComparer<T>)Vector4Comparer;
+
+        return Comparer<T>.Default;
+    }
+
     public static bool Evaluate<T>(this ConditionOperation op, T value, T comparand, AssetInformation? information)
     {
         if (value == null)
@@ -253,30 +335,30 @@ public static class ConditionOperationExtensions
         switch (op)
         {
             case ConditionOperation.LessThan:
-                return Comparer<T>.Default.Compare(value, comparand) < 0;
+                return GetComparer<T>().Compare(value, comparand) < 0;
 
             case ConditionOperation.GreaterThan:
-                return Comparer<T>.Default.Compare(value, comparand) > 0;
+                return GetComparer<T>().Compare(value, comparand) > 0;
 
             case ConditionOperation.LessThanOrEqual:
-                return Comparer<T>.Default.Compare(value, comparand) <= 0;
+                return GetComparer<T>().Compare(value, comparand) <= 0;
 
             case ConditionOperation.GreaterThanOrEqual:
-                return Comparer<T>.Default.Compare(value, comparand) >= 0;
+                return GetComparer<T>().Compare(value, comparand) >= 0;
 
             case ConditionOperation.Equal:
             {
-                return value is string str ? string.Equals(str, (string)(object)comparand, StringComparison.Ordinal) : Comparer<T>.Default.Compare(value, comparand) == 0;
+                return value is string str ? string.Equals(str, (string)(object)comparand, StringComparison.Ordinal) : GetComparer<T>().Compare(value, comparand) == 0;
             }
 
             case ConditionOperation.NotEqual:
             {
-                return value is string str ? !string.Equals(str, (string)(object)comparand, StringComparison.Ordinal) : Comparer<T>.Default.Compare(value, comparand) != 0;
+                return value is string str ? !string.Equals(str, (string)(object)comparand, StringComparison.Ordinal) : GetComparer<T>().Compare(value, comparand) != 0;
             }
 
             case ConditionOperation.NotEqualCaseInsensitive:
             {
-                return value is string str ? !string.Equals(str, (string)(object)comparand, StringComparison.OrdinalIgnoreCase) : (Comparer<T>.Default.Compare(value, comparand) != 0);
+                return value is string str ? !string.Equals(str, (string)(object)comparand, StringComparison.OrdinalIgnoreCase) : (GetComparer<T>().Compare(value, comparand) != 0);
             }
 
             case ConditionOperation.Containing:

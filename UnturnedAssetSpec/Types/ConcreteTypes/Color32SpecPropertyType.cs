@@ -80,7 +80,7 @@ public sealed class Color32RGBALegacySpecPropertyType : Color32SpecPropertyType
     private protected override bool HasAlpha => true;
 }
 
-public abstract class Color32SpecPropertyType : BasicSpecPropertyType<Color32SpecPropertyType, Color32>, IStringParseableSpecPropertyType
+public abstract class Color32SpecPropertyType : BaseColorSpecPropertyType<Color32SpecPropertyType, Color32>, IStringParseableSpecPropertyType
 {
     private protected abstract VectorTypeParseOptions Options { get; }
     private protected abstract bool HasAlpha { get; }

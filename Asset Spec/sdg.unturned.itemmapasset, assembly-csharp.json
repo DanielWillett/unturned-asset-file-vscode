@@ -1,0 +1,40 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemMapAsset, Assembly-CSharp",
+    "DisplayName": "Map Item",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/map-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Enables_Compass",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "The compass HUD will be visible while this item is in the player's inventory.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/map-asset.html#map-asset-properties",
+            "Variable": "enablesCompass",
+            "Priority": 3
+        },
+        {
+            "Key": "Enables_Chart",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "The chart map will be available while this item is in the player's inventory.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/map-asset.html#map-asset-properties",
+            "Variable": "enablesChart",
+            "Priority": 3
+        },
+        {
+            "Key": "Enables_Map",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "The satellite map will be available while this item is in the player's inventory.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/map-asset.html#map-asset-properties",
+            "Variable": "enablesMap",
+            "Priority": 3
+        }
+    ]
+}

@@ -126,4 +126,6 @@ public class DefaultableIdSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<int>? other) => other is DefaultableIdSpecPropertyType t && Equals(t);
+
+    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
 }

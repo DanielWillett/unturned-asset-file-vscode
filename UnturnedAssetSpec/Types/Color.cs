@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 [StructLayout(LayoutKind.Explicit, Size = 16)]
-public readonly struct Color : IEquatable<Color>
+public readonly struct Color : IEquatable<Color>, IComparable<Color>
 {
     [FieldOffset(0)]
     public readonly float A;
@@ -40,6 +40,38 @@ public readonly struct Color : IEquatable<Color>
     public bool AlmostEquals(Color other, float tolerance = 0.00390625f)
     {
         return Math.Abs(A - other.A) < tolerance && Math.Abs(R - other.R) < tolerance && Math.Abs(G - other.G) < tolerance && Math.Abs(B - other.B) < tolerance;
+    }
+
+    /// <summary>
+    /// Compares colors in order of A, R, G, B.
+    /// </summary>
+    /// <returns>1 if this is greater than <paramref name="other"/>, -1 if this is less than <paramref name="other"/>, 0 if they're nearly equal.</returns>
+    public int CompareTo(Color other)
+    {
+        const float tolerance = 0.00390625f;
+
+        float sub = A - other.A;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = R - other.R;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = G - other.G;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = B - other.B;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+
+        return 0;
     }
 
     /// <inheritdoc />

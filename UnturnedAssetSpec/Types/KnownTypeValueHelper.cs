@@ -295,6 +295,106 @@ public static class KnownTypeValueHelper
         return true;
     }
 
+    public static bool TryParseVector4Components(ReadOnlySpan<char> str, out Vector4 value)
+    {
+        if (str.IsEmpty)
+        {
+            value = default;
+            return false;
+        }
+
+        int paren1 = str.IndexOf('(');
+        int startIndex;
+        int endIndex;
+        if (paren1 >= 0)
+        {
+            int paren2 = str.Slice(paren1 + 2).IndexOf(')');
+            if (paren2 < 0)
+            {
+                value = default;
+                return false;
+            }
+
+            paren2 += paren1 + 2;
+            startIndex = paren1 + 1;
+            endIndex = paren2 - 1;
+        }
+        else
+        {
+            startIndex = 0;
+            endIndex = str.Length - 1;
+        }
+
+        int comma1 = str.Slice(startIndex).IndexOf(',');
+        if (comma1 < 0)
+        {
+            value = default;
+            return false;
+        }
+
+        comma1 += startIndex;
+        if (comma1 + 2 > endIndex)
+        {
+            value = default;
+            return false;
+        }
+
+        int comma2 = str.Slice(comma1 + 2).IndexOf(',');
+        if (comma2 < 0)
+        {
+            value = default;
+            return false;
+        }
+
+        comma2 += comma1 + 2;
+        if (comma2 + 1 > endIndex)
+        {
+            value = default;
+            return false;
+        }
+
+        int comma3 = str.Slice(comma2 + 2).IndexOf(',');
+        if (comma3 < 0)
+        {
+            value = default;
+            return false;
+        }
+
+        comma3 += comma2 + 2;
+        if (comma3 + 1 > endIndex)
+        {
+            value = default;
+            return false;
+        }
+
+        if (!float.TryParse(str.Slice(startIndex, comma1 - startIndex).ToString(), out float x))
+        {
+            value = default;
+            return false;
+        }
+
+        if (!float.TryParse(str.Slice(comma1 + 1, comma2 - comma1 - 1).ToString(), out float y))
+        {
+            value = default;
+            return false;
+        }
+
+        if (!float.TryParse(str.Slice(comma2 + 1, comma3 - comma2 - 1).ToString(), out float z))
+        {
+            value = default;
+            return false;
+        }
+
+        if (!float.TryParse(str.Slice(comma3 + 1, endIndex - comma3).ToString(), out float w))
+        {
+            value = default;
+            return false;
+        }
+
+        value = new Vector4(x, y, z, w);
+        return true;
+    }
+
     public static bool TryParseVector2Components(ReadOnlySpan<char> str, out Vector2 value)
     {
         // stolen from nelson

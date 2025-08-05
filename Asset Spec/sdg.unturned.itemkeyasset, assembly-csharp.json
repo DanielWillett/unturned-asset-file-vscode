@@ -1,0 +1,22 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemKeyAsset, Assembly-CSharp",
+    "DisplayName": "Key Item",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/key-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Exchange_With_Target_Item",
+            "Type": "Flag",
+            "Description": "Adds UI elements for using this Steam Economy item on another Steam Economy item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/key-asset.html#key-asset-properties",
+            "Variable": "exchangeWithTargetItem",
+            "DefaultValue": false,
+            "Priority": 3
+        }
+    ]
+}
