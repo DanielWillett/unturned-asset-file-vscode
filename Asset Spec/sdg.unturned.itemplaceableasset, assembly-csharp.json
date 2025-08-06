@@ -9,7 +9,109 @@
     "RequireId": true,
     "Properties":
     [
-        
+        {
+            "Key": "Can_Zombies_Target",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not this item is eligible for zombies to detect and attack when stuck.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "CanZombiesTarget"
+        },
+        {
+            "Key": "Items_Recovered_On_Salvage",
+            "Type": "Int32",
+            "DefaultValue": 1,
+            "Minimum": 0,
+            "Maximum": 100,
+            "Description": "Number of items from @SalvageItem to recover when this item is salvaged at less than full health.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "MinItemsRecoveredOnSalvage",
+            "ExclusiveWith": [ "Min_Items_Recovered_On_Salvage", "Max_Items_Recovered_On_Salvage" ]
+        },
+        {
+            "Key": "Min_Items_Recovered_On_Salvage",
+            "Type": "Int32",
+            "Minimum": 0,
+            "Maximum": "@Max_Items_Recovered_On_Salvage",
+            "DefaultValue": "@Items_Recovered_On_Salvage",
+            "Description": "Minimum number of items from @SalvageItem to recover when this item is salvaged at less than full health. A random value will be chosen between this and @Max_Items_Recovered_On_Salvage.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "MinItemsRecoveredOnSalvage"
+        },
+        {
+            "Key": "Max_Items_Recovered_On_Salvage",
+            "Type": "Int32",
+            "Minimum": "@Min_Items_Recovered_On_Salvage",
+            "Maximum": 100,
+            "DefaultValue": "@Items_Recovered_On_Salvage",
+            "Description": "Maximum number of items from @SalvageItem to recover when this item is salvaged at less than full health. A random value will be chosen between @Min_Items_Recovered_On_Salvage and this.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "MaxItemsRecoveredOnSalvage"
+        },
+        {
+            "Key": "SalvageItem",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "SpecialTypes": [ "SDG.Unturned.SpawnAsset, Assembly-CSharp", "this" ],
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "The item or spawn to give when salvaging this item at less than full health. Defaults to a random supply from the first blueprint on this asset that outputs only this item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "SalvageItemRef"
+        },
+        {
+            "Key": "Items_Dropped_On_Destroy",
+            "Type": "Int32",
+            "DefaultValue": 0,
+            "Minimum": 0,
+            "Maximum": 100,
+            "Description": "Number of items from @Item_Dropped_On_Destroy to drop when this item is destroyed (not counting salvaging).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "minItemsDroppedOnDestroy",
+            "ExclusiveWith": [ "Min_Items_Dropped_On_Destroy", "Max_Items_Dropped_On_Destroy" ],
+            "InclusiveWith": [ "Item_Dropped_On_Destroy" ]
+        },
+        {
+            "Key": "Min_Items_Dropped_On_Destroy",
+            "Type": "Int32",
+            "Minimum": 0,
+            "Maximum": "@Max_Items_Dropped_On_Destroy",
+            "DefaultValue": "@Items_Dropped_On_Destroy",
+            "Description": "Minimum number of items from @Item_Dropped_On_Destroy to drop when this item is destroyed (not counting salvaging). A random value will be chosen between this and @Max_Items_Dropped_On_Destroy.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "minItemsDroppedOnDestroy",
+            "InclusiveWith": [ "Max_Items_Dropped_On_Destroy", "Item_Dropped_On_Destroy" ]
+        },
+        {
+            "Key": "Max_Items_Dropped_On_Destroy",
+            "Type": "Int32",
+            "Minimum": "@Min_Items_Dropped_On_Destroy",
+            "Maximum": 100,
+            "DefaultValue": "@Items_Dropped_On_Destroy",
+            "Description": "Maximum number of items from @Item_Dropped_On_Destroy to drop when this item is destroyed (not counting salvaging). A random value will be chosen between @Min_Items_Dropped_On_Destroy and this.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "maxItemsDroppedOnDestroy",
+            "InclusiveWith": [ "Item_Dropped_On_Destroy" ]
+        },
+        {
+            "Key": "Item_Dropped_On_Destroy",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "SpecialTypes": [ "SDG.Unturned.SpawnAsset, Assembly-CSharp", "this" ],
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "The item or spawn to drop when this item is destroyed (not counting salvaging).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "ItemDroppedOnDestroyRef"
+        },
+        {
+            "Key": "PlaceableProvidesCraftingTags",
+            "Type": "List",
+            "ElementType": "AssetReference",
+            "SpecialTypes": [ "SDG.Unturned.TagAsset, Assembly-CSharp" ],
+            "DefaultValue": null,
+            "Description": "List of crafting tags to provide to nearby players when this item is placed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "PlaceableProvidedCraftingTags"
+        }
     ],
     "Types":
     [

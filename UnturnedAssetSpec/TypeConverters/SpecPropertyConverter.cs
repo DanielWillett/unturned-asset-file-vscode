@@ -339,11 +339,11 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     break;
 
                 case 25: // ExclusiveWith
-                    property.ExclusiveProperties = InclusionConditionConverter.ReadCondition(ref reader, options);
+                    property.ExclusiveProperties = InclusionConditionConverter.ReadCondition(ref reader, options, false);
                     break;
 
                 case 26: // InclusiveWith
-                    property.InclusiveProperties = InclusionConditionConverter.ReadCondition(ref reader, options);
+                    property.InclusiveProperties = InclusionConditionConverter.ReadCondition(ref reader, options, true);
                     break;
 
                 case 27: // Deprecated

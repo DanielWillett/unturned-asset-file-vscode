@@ -1,0 +1,23 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemOpticAsset, Assembly-CSharp",
+    "DisplayName": "Optic Item",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/optic-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Zoom",
+            "Type": "Float32",
+            "Description": "Multiplicative amount of zoom.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/optic-asset.html#sight-asset-properties",
+            "Variable": "zoom",
+            "Minimum": 1.0,
+            "DefaultValue": 1.0,
+            "Priority": 3
+        }
+    ]
+}

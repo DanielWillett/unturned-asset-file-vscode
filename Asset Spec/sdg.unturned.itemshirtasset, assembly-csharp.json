@@ -1,0 +1,106 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp",
+    "DisplayName": "Shirt Item",
+    "Parent": "SDG.Unturned.ItemBagAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/shirt-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Has_1P_Character_Mesh_Override",
+            "Type": "Boolean",
+            "Description": "Whether or not to load a first-person character mesh replacement.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html",
+            "Variable": "characterMeshOverride1pLODs",
+            "DefaultValue": false,
+            "Priority": 3
+        },
+        {
+            "Key": "Character_Mesh_3P_Override_LODs",
+            "Type": "UInt16",
+            "Description": "Number of LODs to load for a third-person character mesh replacement. If zero no replacement will be loaded.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html",
+            "Variable": "characterMeshOverride3pLODs",
+            "DefaultValue": 0,
+            "Priority": 3,
+            "CountForRegexGroup": "shirt-3p-character-mesh-overrides"
+        },
+        {
+            "Key": "Has_Character_Material_Override",
+            "Type": "Boolean",
+            "Description": "Whether or not to load a replacement material for the first-person and third-person character mesh.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html",
+            "Variable": "characterMaterialOverride",
+            "DefaultValue": false,
+            "Priority": 3
+        },
+        {
+            "Key": "Ignore_Hand",
+            "Type": "Flag",
+            "Description": "This shirt should ignore the player's left-handed setting.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/shirt-asset.html#shirt-asset-properties",
+            "Variable": "ignoreHand",
+            "DefaultValue": false,
+            "Priority": 4
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Shirt",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Variable": "shirt",
+            "Description": "Albedo texture for the shirt displayed on the player model.",
+            "Required": true
+        },
+        {
+            "AssetName": "Emission",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Variable": "emission",
+            "Description": "Emission texture for the shirt displayed on the player model."
+        },
+        {
+            "AssetName": "Metallic",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Variable": "metallic",
+            "Description": "Metallic texture for the shirt displayed on the player model."
+        },
+        {
+            "AssetName": "Character_Mesh_1P_Override_0",
+            "Aliases": [ "Character_Mesh_Override_0" ],
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "characterMeshOverride1pLODs",
+            "Description": "First-person character mesh replacement.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html",
+            "Required": "@Has_1P_Character_Mesh_Override"
+        },
+        {
+            "AssetName": "Character_Mesh_3P_Override_(\\d+)",
+            "Aliases": [ "Character_Mesh_Override_(\\d+)" ],
+            "AssetNameIsRegex": true,
+            "AssetNameGroups":
+            [
+                {
+                    "Name": "shirt-3p-character-mesh-overrides",
+                    "RegexGroup": 1
+                }
+            ],
+            "Required": true,
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "characterMeshOverride3pLODs",
+            "Description": "First-person character mesh replacement.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html"
+        },
+        {
+            "AssetName": "Character_Material_Override",
+            "Type": "UnityEngine.Material, UnityEngine.CoreModule",
+            "Variable": "characterMaterialOverride",
+            "Description": "First-person character mesh replacement.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html",
+            "Required": "@Has_Character_Material_Override"
+        }
+    ]
+}

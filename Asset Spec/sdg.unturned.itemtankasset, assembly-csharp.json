@@ -1,0 +1,60 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemTankAsset, Assembly-CSharp",
+    "DisplayName": "Tank Barricade Item",
+    "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tank-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Resource",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Required": true,
+            "Description": "Maximum units of liquid that can be stored in the tank. One unit of water is the equivalent of one usage of a water canister.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tank-asset.html#tank-asset-properties",
+            "Variable": "resource",
+            "Priority": 5
+        },
+        {
+            "Key": "Source",
+            "Type": "SDG.Unturned.ETankSource, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Required": true,
+            "Description": "The type of liquid stored in this tank.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tank-asset.html#tank-asset-properties",
+            "Variable": "source",
+            "Priority": 6
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.ETankSource, Assembly-CSharp",
+            "DisplayName": "Tank Source",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tank-asset.html#tank-asset-properties",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "This tank can't store any liquid. This shouldn't be used.",
+                    "Deprecated": true
+                },
+                {
+                    "Value": "WATER",
+                    "Casing": "Water",
+                    "Description": "This tank stores water."
+                },
+                {
+                    "Value": "FUEL",
+                    "Casing": "Fuel",
+                    "Description": "This tank stores fuel."
+                }
+            ]
+        }
+    ]
+}

@@ -851,6 +851,8 @@ public class InstallationEnvironment : IDisposable
                 _guidIndex.Clear();
                 for (int i = 0; i < _idIndex.Length; ++i)
                     _idIndex[i].Clear();
+                _bladeIndex.Clear();
+                _caliberIndex.Clear();
 
                 _head = null;
                 _tail = null;

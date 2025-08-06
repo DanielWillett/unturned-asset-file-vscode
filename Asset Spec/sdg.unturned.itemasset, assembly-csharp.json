@@ -2279,6 +2279,108 @@
                     "Description": "Corresponds to the 'Mythical' (red-colored) rarity."
                 }
             ]
+        },
+        {
+            "Type": "SDG.Unturned.ELightingVision, Assembly-CSharp",
+            "DisplayName": "Lighting Vision Effect",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "There is no vision effect, and normal lighting is used.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
+                },
+                {
+                    "Value": "MILITARY",
+                    "Casing": "Military",
+                    "Description": "Military nightvision lighting is used. Nightvision color is #147850, and nightvision fog intensity is 0.25.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
+                },
+                {
+                    "Value": "CIVILIAN",
+                    "Casing": "Civilian",
+                    "Description": "Civilian nightvision lighting is used. Nightvision color is #666666, and nightvision fog intensity is 0.5.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
+                },
+                {
+                    "Value": "HEADLAMP",
+                    "Casing": "Headlamp",
+                    "Description": "Headlamp lighting is used. This will enable a toggleable light source and allow for using PlayerSpotLightConfig properties.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EZombieStunOverride, Assembly-CSharp",
+            "DisplayName": "Zombie Stun Override",
+            "Values":
+            [
+                {
+                    "Value": "None",
+                    "Description": "Stun behaviour is determined by damage dealt (greater than 20 damage for normal zombies will stun them)."
+                },
+                {
+                    "Value": "Never",
+                    "Description": "Zombies will never get stunned by this weapon."
+                },
+                {
+                    "Value": "Always",
+                    "Description": "Zombies will always get stunned by this weapon."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.DamagePlayerParameters+Bleeding, Assembly-CSharp",
+            "DisplayName": "Bleed Behavior",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+            "Values":
+            [
+                {
+                    "Value": "Default",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "The Bleeding status effect will only be applied if the necessary damage threshold is met."
+                },
+                {
+                    "Value": "Always",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "The Bleeding status effect will always be applied on hit."
+                },
+                {
+                    "Value": "Never",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "The Bleeding status effect is never applied by this weapon."
+                },
+                {
+                    "Value": "Heal",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "Anyone hit by the weapon will have their Bleeding status effect removed."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.DamagePlayerParameters+Bones, Assembly-CSharp",
+            "DisplayName": "Bone Break Behavior",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
+            "Values":
+            [
+                {
+                    "Value": "None",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "The Broken Bones status effect is never applied by this weapon."
+                },
+                {
+                    "Value": "Always",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "The Broken Bones status effect will always be applied on hit."
+                },
+                {
+                    "Value": "Heal",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
+                    "Description": "Anyone hit by the weapon will have their Broken Bones status effect removed."
+                }
+            ]
         }
     ],
     "BundleAssets":

@@ -34,12 +34,37 @@ public sealed class InclusionCondition : IEquatable<InclusionCondition?>
 
 public sealed class InclusionConditionProperty : IEquatable<InclusionConditionProperty?>
 {
+    // ReSharper disable once ReplaceWithFieldKeyword
+    private readonly bool _isInclusive;
+    private Func<SpecDynamicSwitchCaseOrCondition, bool>? _isConditionRequirementSelector;
+
     public PropertyRef PropertyName { get; }
     public object? Value { get; }
     public SpecDynamicSwitchCaseOrCondition Condition { get; }
 
-    public InclusionConditionProperty(PropertyRef propertyName, object? value, SpecDynamicSwitchCaseOrCondition condition = default)
+    /// <summary>
+    /// If this is inclusive and condition refers to the same variabel as <see cref="PropertyName"/>, this condition is a requirement of <see cref="PropertyName"/> instead of a condition of inclusion.
+    /// </summary>
+    public bool IsConditionRequirement
     {
+        get
+        {
+            if (!_isInclusive)
+                return false;
+
+            if (Condition.Case == null)
+            {
+                return PropertyName.Equals(Condition.Condition.Variable);
+            }
+
+            _isConditionRequirementSelector ??= x => PropertyName.Equals(x.Condition.Variable);
+            return Condition.Case.HasConditions && Condition.Case.Conditions.Any(_isConditionRequirementSelector);
+        }
+    }
+
+    public InclusionConditionProperty(bool isInclusive, PropertyRef propertyName, object? value, SpecDynamicSwitchCaseOrCondition condition = default)
+    {
+        _isInclusive = isInclusive;
         PropertyName = propertyName;
         Value = value;
         Condition = condition;

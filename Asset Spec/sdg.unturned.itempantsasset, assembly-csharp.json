@@ -1,0 +1,45 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp",
+    "DisplayName": "Pants Item",
+    "Parent": "SDG.Unturned.ItemBagAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/pants-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Zoom",
+            "Type": "Float32",
+            "Description": "Multiplicative amount of zoom.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/pants-asset.html#pants-asset-properties",
+            "Variable": "zoom",
+            "Minimum": 1.0,
+            "DefaultValue": 1.0,
+            "Priority": 3
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Pants",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Variable": "pants",
+            "Description": "Albedo texture for the pants displayed on the player model.",
+            "Required": true
+        },
+        {
+            "AssetName": "Emission",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Variable": "emission",
+            "Description": "Emission texture for the pants displayed on the player model."
+        },
+        {
+            "AssetName": "Metallic",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Variable": "metallic",
+            "Description": "Metallic texture for the pants displayed on the player model."
+        }
+    ]
+}

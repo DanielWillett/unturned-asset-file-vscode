@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Text;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -16,10 +17,11 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
 {
     public OneOrMore<QualifiedType> OtherElementTypes { get; }
     public bool CanParseDictionary { get; }
+    public bool SupportsThis { get; }
     public QualifiedType ElementType { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
-    public override string DisplayName { get; }
+    public sealed override string DisplayName { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string Type => "BcAssetReference";
@@ -36,25 +38,64 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
     public BackwardsCompatibleAssetReferenceSpecPropertyType(QualifiedType elementType, bool canParseDictionary, OneOrMore<string> specialTypes)
     {
         CanParseDictionary = canParseDictionary;
-        if (elementType.Type == null || elementType.Equals(QualifiedType.AssetBaseType))
+
+        SupportsThis = AssetReferenceSpecPropertyType.ExtractThisElementType(ref elementType, ref specialTypes);
+
+        if (specialTypes.Contains(QualifiedType.AssetBaseType.Type) || elementType == QualifiedType.AssetBaseType)
+        {
+            specialTypes = OneOrMore<string>.Null;
+            elementType = QualifiedType.AssetBaseType;
+        }
+
+        if (elementType.Type == null || elementType == QualifiedType.AssetBaseType)
         {
             ElementType = QualifiedType.AssetBaseType;
-            DisplayName = "Asset Reference (Backwards-Compatible)";
         }
         else if (AssetCategory.TryParse(elementType.Type, out EnumSpecTypeValue category))
         {
-            ElementType = elementType;
+            ElementType = new QualifiedType(category.Value);
             DisplayName = $"{category.Casing} Asset Reference (Backwards-Compatible)";
         }
         else
         {
-            ElementType = elementType;
-            DisplayName = $"Asset Reference to {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()} (Backwards-Compatible)";
+            specialTypes = specialTypes.Add(elementType);
+            ElementType = QualifiedType.AssetBaseType;
         }
 
         OtherElementTypes = specialTypes
             .Where(x => !string.IsNullOrEmpty(x))
             .Select(x => new QualifiedType(x));
+
+        if (DisplayName != null)
+            return;
+
+        switch (OtherElementTypes.Length)
+        {
+            case 0:
+                DisplayName = "Asset Reference (Backwards-Compatible)";
+                break;
+
+            case 1:
+                DisplayName = $"Asset Reference to {OtherElementTypes[0].GetTypeName()} (Backwards-Compatible)";
+                break;
+
+            default:
+                StringBuilder sb = new StringBuilder("Asset Reference to ");
+                for (int i = 0; i < OtherElementTypes.Length; i++)
+                {
+                    QualifiedType t = OtherElementTypes[i];
+                    if (i == OtherElementTypes.Length - 1)
+                        sb.Append(i == 1 ? " or " : ", or ");
+                    else if (i != 0)
+                        sb.Append(", ");
+
+                    sb.Append(t.GetTypeName());
+                }
+
+                sb.Append(" (Backwards-Compatible)");
+                DisplayName = sb.ToString();
+                break;
+        }
     }
 
     /// <inheritdoc />
@@ -97,7 +138,7 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
             parse.Log(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2005,
-                Message = string.Format(DiagnosticResources.UNT2005, $"CachedBcAssetRef<{QualifiedType.ExtractTypeName(ElementType.Type.AsSpan()).ToString()}>"),
+                Message = string.Format(DiagnosticResources.UNT2005, ElementType == QualifiedType.AssetBaseType ? "CachedBcAssetRef" : $"CachedBcAssetRef<{ElementType.Type}>"),
                 Range = parse.Node?.Range ?? parse.Parent?.Range ?? default
             });
             value = default;
@@ -111,22 +152,39 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
 
         if (parse.Node is AssetFileStringValueNode stringValue)
         {
-            if (parse.HasDiagnostics)
+            if (SupportsThis && string.Equals(stringValue.Value, "this", StringComparison.InvariantCultureIgnoreCase))
             {
-                int indexOfX = stringValue.Value.IndexOf('x');
-                if (indexOfX != -1)
+                if (parse.File != null)
+                {
+                    if (parse.File.GetGuid() is { } guid2 && guid2 != Guid.Empty)
+                    {
+                        value = new GuidOrId(guid2);
+                        return true;
+                    }
+
+                    EnumSpecTypeValue category;
+                    if (parse.File.GetId() is { } id2 && id2 != 0 && (category = parse.File.GetCategory(parse.Database)) != AssetCategory.None)
+                    {
+                        value = new GuidOrId(id2, in category);
+                        return true;
+                    }
+                }
+
+                if (parse.HasDiagnostics)
                 {
                     parse.Log(new DatDiagnosticMessage
                     {
-                        Diagnostic = DatDiagnostics.UNT1017,
-                        Message = DiagnosticResources.UNT1017,
-                        Range = stringValue.Range with
-                        {
-                            Start = new FilePosition(stringValue.Range.Start.Line, stringValue.Range.Start.Character + indexOfX)
-                        }
+                        Diagnostic = DatDiagnostics.UNT2010,
+                        Message = DiagnosticResources.UNT2010,
+                        Range = stringValue.Range
                     });
                 }
+
+                value = GuidOrId.Empty;
+                return false;
             }
+
+            AssetReferenceSpecPropertyType.CheckInappropriateAmount(in parse, stringValue);
 
             return TryParse(stringValue.Value.AsSpan(), stringValue.Value, out value) || FailedToParse(in parse, out value);
         }

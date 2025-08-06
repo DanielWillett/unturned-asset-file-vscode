@@ -1,0 +1,180 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemSentryAsset, Assembly-CSharp",
+    "DisplayName": "Sentry Barricade Item",
+    "Parent": "SDG.Unturned.ItemStorageAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Mode",
+            "Type": "SDG.Unturned.ESentryMode, Assembly-CSharp",
+            "DefaultValue": "NEUTRAL",
+            "Description": "The sentry's targeting aggression.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "sentryMode",
+            "Priority": 16
+        },
+        {
+            "Key": "Requires_Power",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not the sentry requires power from a generator.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "requiresPower",
+            "Priority": 13
+        },
+        {
+            "Key": "Infinite_Ammo",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the magazine attachments in the stored gun should be depleted during use.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "infiniteAmmo",
+            "Priority": 12
+        },
+        {
+            "Key": "Infinite_Quality",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the stored gun should degrade during use.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "infiniteQuality",
+            "Priority": 12
+        },
+        {
+            "Key": "AmmoConsumptionProbability",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 0.0,
+            "Maximum": 1.0,
+            "Description": "Percentage (0-1) chance that ammo will be consumed after shooting.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "AmmoConsumptionProbability",
+            "Priority": 11
+        },
+        {
+            "Key": "QualityConsumptionProbability",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 0.0,
+            "Maximum": 1.0,
+            "Description": "Percentage (0-1) chance that the gun's quality will degrade after shooting.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "QualityConsumptionProbability",
+            "Priority": 11
+        },
+        {
+            "Key": "Detection_Radius",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": 48.0,
+            "Description": "Radius (in meters) in which targets can be initially detected.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "detectionRadius",
+            "Priority": 15
+        },
+        {
+            "Key": "Target_Loss_Radius",
+            "Type": "Float32",
+            "Minimum": "@Detection_Radius",
+            "DefaultValue": "=MUL(@Detection_Radius 1.2)",
+            "Description": "Radius (in meters) for continuing to track targets after they have left the initial detection radius.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "targetLossRadius",
+            "Priority": 15
+        },
+        {
+            "Key": "Target_Players",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not to target players.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "CanTargetPlayers",
+            "Priority": 14
+        },
+        {
+            "Key": "Target_Zombies",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not to target zombies.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "CanTargetZombies",
+            "Priority": 14
+        },
+        {
+            "Key": "Target_Animals",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not to target animals.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "CanTargetAnimals",
+            "Priority": 14
+        },
+        {
+            "Key": "Target_Vehicles",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not to target vehicles.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "CanTargetVehicles",
+            "Priority": 14,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Mode",
+                    "Value": "HOSTILE"
+                }
+            ]
+        },
+        {
+            "Key": "Target_Acquired_Effect",
+            "Type": "AssetReferenceString",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "ab5f0056b54545c8a051159659da8bea",
+            "Description": "The audio effect played when a target is detected.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "targetAcquiredEffect",
+            "Priority": 10
+        },
+        {
+            "Key": "Target_Lost_Effect",
+            "Type": "AssetReferenceString",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "288b98b718084699ba3653c592e57803",
+            "Description": "The audio effect played when a target is no longer detected.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "targetLostEffect",
+            "Priority": 10
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.ESentryMode, Assembly-CSharp",
+            "DisplayName": "Sentry Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Values":
+            [
+                {
+                    "Value": "NEUTRAL",
+                    "Casing": "Neutral",
+                    "Description": "Shoots at unfriendly players who aren't surrendered, zombies, and hunting animals."
+                },
+                {
+                    "Value": "FRIENDLY",
+                    "Casing": "Friendly",
+                    "Description": "Shoots at unfriendly players who have recently punched or are holding a weapon, zombies, and hunting animals."
+                },
+                {
+                    "Value": "HOSTILE",
+                    "Casing": "Hostile",    
+                    "Description": "Shoots at all unfriendly players, zombies, unfriendly vehicles, and animals."
+                }
+            ]
+        }
+    ]
+}

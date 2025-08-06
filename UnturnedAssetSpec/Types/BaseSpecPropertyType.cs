@@ -1,6 +1,5 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using System;
 using System.ComponentModel;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;

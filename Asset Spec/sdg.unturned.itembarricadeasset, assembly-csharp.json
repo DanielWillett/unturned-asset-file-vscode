@@ -21,6 +21,7 @@
             "Key": "PlacementPreviewPrefab",
             "Type": "MasterBundleReferenceString",
             "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Overrides the placement preview model spawned when this item is held.",
             "DefaultValue": null,
             "Variable": "placementPreviewRef",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
@@ -30,6 +31,7 @@
             "Key": "PlacementAudioClip",
             "Type": "MasterBundleReferenceString",
             "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when this barricade is placed.",
             "DefaultValue": null,
             "Variable": "use",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
@@ -38,10 +40,24 @@
         {
             "Key": "Build",
             "Type": "SDG.Unturned.EBuild, Assembly-CSharp",
+            "Description": "The type of barricade to build.",
             "Required": true,
             "Variable": "build",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Priority": 95
+            "Priority": 95,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Explosion",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Build",
+                        "Operation": "eq",
+                        "Comparand": "VEHICLE"
+                    }
+                }
+            ]
         },
         {
             "Key": "Health",
@@ -91,10 +107,55 @@
             "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
             "SpecialTypes": [ "SDG.Unturned.VehicleAsset, Assembly-CSharp" ],
             "DefaultValue": "00000000000000000000000000000000",
-            "Description": "Effect played when this barricade is destroyed. If @Build is 'VEHICLE', this is the vehicle that will be spawned.",
+            "Description": "Effect played when this barricade is destroyed. If @Build is 'Vehicle', this is the vehicle that will be spawned.",
             "Variable": "explosionGuid",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Priority": 1
+            "Priority": 1,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Build",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Build",
+                                "Operation": "eq",
+                                "Comparand": "VEHICLE"
+                            },
+                            {
+                                "Variable": "Explosion",
+                                "Operation": "is-type",
+                                "Comparand": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+                            }
+                        ],
+                        "Value": true
+                    }
+                },
+                {
+                    "Key": "Build",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Build",
+                                "Operation": "neq",
+                                "Comparand": "VEHICLE"
+                            },
+                            {
+                                "Variable": "Explosion",
+                                "Operation": "is-type",
+                                "Comparand": "SDG.Unturned.VehicleAsset, Assembly-CSharp"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
         },
         {
             "Key": "Can_Be_Damaged",
@@ -483,6 +544,7 @@
                     "RequiredBaseType": "SDG.Unturned.ItemFarmAsset, Assembly-CSharp",
                     "InteractableType": "SDG.Unturned.InteractableFire, Assembly-CSharp"
                 }
+                // todo
             ]
         }
     ],
@@ -512,7 +574,7 @@
             "AssetName": "Use",
             "RedirectableAssetKey": "PlacementAudioClip",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
-            "Description": "The sound played when the barricade is placed.",
+            "Description": "The sound played when this barricade is placed.",
             "Variable": "use",
             "Required": true
         }

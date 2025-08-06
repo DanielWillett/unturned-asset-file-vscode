@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Text;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -16,6 +17,7 @@ public sealed class AssetReferenceSpecPropertyType :
 {
     public OneOrMore<QualifiedType> OtherElementTypes { get; }
     public bool CanParseDictionary { get; }
+    public bool SupportsThis { get; }
     public QualifiedType ElementType { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -49,21 +51,109 @@ public sealed class AssetReferenceSpecPropertyType :
     public AssetReferenceSpecPropertyType(QualifiedType elementType, bool canParseDictionary, OneOrMore<string> specialTypes)
     {
         CanParseDictionary = canParseDictionary;
+
+        SupportsThis = ExtractThisElementType(ref elementType, ref specialTypes);
+
+        if (specialTypes.Contains(QualifiedType.AssetBaseType.Type) || elementType == QualifiedType.AssetBaseType)
+        {
+            specialTypes = OneOrMore<string>.Null;
+            elementType = QualifiedType.AssetBaseType;
+        }
+
         if (elementType.Type == null || elementType.Equals(QualifiedType.AssetBaseType))
         {
             ElementType = QualifiedType.AssetBaseType;
-            DisplayName = "Asset Reference";
-            OtherElementTypes = OneOrMore<QualifiedType>.Null;
         }
         else
         {
             ElementType = elementType;
-            DisplayName = $"Asset Reference to {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
-
-            OtherElementTypes = specialTypes
-                .Where(x => !string.IsNullOrEmpty(x))
-                .Select(x => new QualifiedType(x));
         }
+
+        OtherElementTypes = specialTypes
+            .Where(x => !string.IsNullOrEmpty(x))
+            .Select(x => new QualifiedType(x));
+
+        if (DisplayName != null)
+            return;
+
+        switch (OtherElementTypes.Length)
+        {
+            case 0:
+                if (ElementType == QualifiedType.AssetBaseType)
+                {
+                    DisplayName = "Asset Reference";
+                }
+                else
+                {
+                    DisplayName = $"Asset Reference to {ElementType.GetTypeName()}";
+                }
+                break;
+
+            case 1:
+                if (ElementType == QualifiedType.AssetBaseType)
+                {
+                    DisplayName = $"Asset Reference to {OtherElementTypes[0].GetTypeName()}";
+                }
+                else
+                {
+                    DisplayName = $"Asset Reference to {ElementType.GetTypeName()} or {OtherElementTypes[0].GetTypeName()}";
+                }
+                break;
+
+            default:
+                StringBuilder sb = new StringBuilder("Asset Reference to ");
+
+                int ct;
+                if (ElementType != QualifiedType.AssetBaseType)
+                {
+                    sb.Append(ElementType.GetTypeName());
+                    ct = 1;
+                }
+                else ct = 0;
+                for (int i = 0; i < OtherElementTypes.Length; i++)
+                {
+                    QualifiedType t = OtherElementTypes[i];
+                    if (ct == OtherElementTypes.Length - 1)
+                        sb.Append(ct == 1 ? " or " : ", or ");
+                    else if (ct != 0)
+                        sb.Append(", ");
+
+                    sb.Append(t.GetTypeName());
+                    ++ct;
+                }
+
+                DisplayName = sb.ToString();
+                break;
+        }
+    }
+
+    internal static bool ExtractThisElementType(ref QualifiedType elementType, ref OneOrMore<string> specialTypes)
+    {
+        if (!string.Equals(elementType.Type, "this", StringComparison.OrdinalIgnoreCase))
+        {
+            int l1 = specialTypes.Length;
+            specialTypes = specialTypes.Remove("this", StringComparison.OrdinalIgnoreCase);
+            return l1 > specialTypes.Length;
+        }
+
+        switch (specialTypes.Length)
+        {
+            case 0:
+                elementType = QualifiedType.None;
+                break;
+
+            case 1:
+                elementType = new QualifiedType(specialTypes[0]);
+                specialTypes = OneOrMore<string>.Null;
+                break;
+
+            default:
+                elementType = new QualifiedType(specialTypes[0]);
+                specialTypes = specialTypes.Remove(elementType.Type);
+                break;
+        }
+
+        return true;
     }
 
     /// <inheritdoc />
@@ -77,6 +167,26 @@ public sealed class AssetReferenceSpecPropertyType :
 
         value = new SpecDynamicConcreteValue<Guid>(val, this);
         return true;
+    }
+
+    internal static void CheckInappropriateAmount(in SpecPropertyTypeParseContext parse, AssetFileStringValueNode stringValue)
+    {
+        if (!parse.HasDiagnostics)
+            return;
+
+        int indexOfX = stringValue.Value.IndexOf('x');
+        if (indexOfX != -1)
+        {
+            parse.Log(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1017,
+                Message = DiagnosticResources.UNT1017,
+                Range = stringValue.Range with
+                {
+                    Start = new FilePosition(stringValue.Range.Start.Line, stringValue.Range.Start.Character + indexOfX)
+                }
+            });
+        }
     }
 
     /// <inheritdoc />
@@ -102,6 +212,30 @@ public sealed class AssetReferenceSpecPropertyType :
 
         if (parse.Node is AssetFileStringValueNode stringValue)
         {
+            if (SupportsThis && string.Equals(stringValue.Value, "this", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (parse.File != null && parse.File.GetGuid() is { } guid && guid != Guid.Empty)
+                {
+                    value = guid;
+                    return true;
+                }
+
+                if (parse.HasDiagnostics)
+                {
+                    parse.Log(new DatDiagnosticMessage
+                    {
+                        Diagnostic = DatDiagnostics.UNT2010,
+                        Message = DiagnosticResources.UNT2010,
+                        Range = stringValue.Range
+                    });
+                }
+
+                value = Guid.Empty;
+                return false;
+            }
+
+            CheckInappropriateAmount(in parse, stringValue);
+
             return KnownTypeValueHelper.TryParseGuid(stringValue.Value, out value) || FailedToParse(in parse, out value);
         }
 

@@ -1,0 +1,347 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemSightAsset, Assembly-CSharp",
+    "DisplayName": "Sight Attachment Item",
+    "Parent": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Vision",
+            "Type": "SDG.Unturned.ELightingVision, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Except": [ "HEADLAMP" ],
+            "Description": "Set a unique lighting vision effect to use.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#vision-elightingvision-none",
+            "Variable": "vision",
+            "Priority": 7
+        },
+        {
+            "Key": "Nightvision_Color",
+            "Type": "Color32RGBLegacy",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Vision",
+                            "Operation": "eq",
+                            "Comparand": "CIVILIAN"
+                        }
+                    ],
+                    "Value": "#666666"
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Vision",
+                            "Operation": "eq",
+                            "Comparand": "MILITARY"
+                        }
+                    ],
+                    "Value": "#147850"
+                },
+                {
+                    "Value": "#000000"
+                }
+            ],
+            "Description": "Overrides the default color when using night vision.",
+            "Variable": "nightvisionColor",
+            "Priority": 6,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#nightvision-color-color",
+            "ExclusiveWith": 
+            [
+                {
+                    "Key": "Vision",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Vision",
+                                "Operation": "neq",
+                                "Comparand": "CIVILIAN"
+                            },
+                            {
+                                "Variable": "Vision",
+                                "Operation": "neq",
+                                "Comparand": "MILITARY"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Nightvision_Fog_Intensity",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Vision",
+                            "Operation": "eq",
+                            "Comparand": "CIVILIAN"
+                        }
+                    ],
+                    "Value": 0.5
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Vision",
+                            "Operation": "eq",
+                            "Comparand": "MILITARY"
+                        }
+                    ],
+                    "Value": 0.25
+                },
+                {
+                    "Value": 0
+                }
+            ],
+            "Description": "Overrides the default fog intensity.",
+            "Variable": "nightvisionFogIntensity",
+            "Priority": 6,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#nightvision-fog-intensity-float32",
+            "ExclusiveWith": 
+            [
+                {
+                    "Key": "Vision",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Vision",
+                                "Operation": "neq",
+                                "Comparand": "CIVILIAN"
+                            },
+                            {
+                                "Variable": "Vision",
+                                "Operation": "neq",
+                                "Comparand": "MILITARY"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Zoom",
+            "Type": "Float32",
+            "Minimum": 1.0,
+            "DefaultValue": 1.0,
+            "Description": "Multiplicative amount of zoom.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#zoom-float32-1",
+            "Variable": "zoom",
+            "Priority": 10
+        },
+        {
+            "Key": "ThirdPerson_Zoom",
+            "Type": "Float32",
+            "Minimum": 1.0,
+            "DefaultValue": 1.25,
+            "Description": "Zoom factor while in the third-person perspective.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#thirdperson-zoom-float32-1-25",
+            "Variable": "thirdPersonZoomFactor",
+            "Priority": 10
+        },
+        {
+            "Key": "Zoom_Using_Eyes",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether the main camera field of view should zoom without a scope overlay.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#zoom-using-eyes-bool-false",
+            "Variable": "shouldZoomUsingEyes",
+            "Priority": 10
+        },
+        {
+            "Key": "Offset_Scope_Overlay_By_One_Texel",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not to scale the scope texture up slightly to center the pixel that is usually offset to the left.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#offset-scope-overlay-by-one-texel-bool-false",
+            "Variable": "shouldOffsetScopeOverlayByOneTexel",
+            "Priority": 9
+        },
+        {
+            "Key": "AimAlignment_Owner",
+            "Type": "SDG.Unturned.EAimAlignmentTransformOwner, Assembly-CSharp",
+            "DefaultValue": "Sight",
+            "Description": "Controls where to find @AimAlignment_Path.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#aimalignment-owner-eaimalignmenttransformowner-sight",
+            "Variable": "AimAlignmentTransformOwner",
+            "Priority": 5,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "AimAlignment_Path",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "AimAlignment_Owner",
+                        "Operation": "eq",
+                        "Comparand": "Gun"
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "AimAlignment_Path",
+            "Type": "String",
+            "DefaultValue": "Model_0/Aim",
+            "Description": "While aiming down sights, the camera’s position is aligned with this transform. Relative to @AimAlignment_Owner.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#aimalignment-owner-eaimalignmenttransformowner-sight",
+            "Variable": "AimAlignmentTransformOwner",
+            "Priority": 5
+        },
+        {
+            "Key": "AimAlignment_LocalOffset",
+            "Type": "Position",
+            "DefaultValue": "(0, 0, 0)",
+            "Description": "Position offset relative to the 'Aim' transform or the transform specified by @AimAlignment_Path.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#aimalignment-localoffset-vector3-0-0-0",
+            "Variable": "AimAlignmentLocalOffset",
+            "Priority": 5
+        },
+        {
+            "Key": "Holographic",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This sight follows the true aiming direction regardless of viewmodel animation.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#holographic-flag",
+            "Variable": "isHolographic",
+            "Priority": 11
+        },
+        {
+            "Key": "DistanceMarkers",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.ItemSightAsset+DistanceMarker, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "List of accurate distance markers on the sight that account for the gun's bullet drop.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#distancemarkers-list-of-distancemarker",
+            "Variable": "distanceMarkers",
+            "Priority": 4
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EAimAlignmentTransformOwner, Assembly-CSharp",
+            "DisplayName": "Aim Alignment Transform Owner",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#eaimalignmenttransformowner-enumeration",
+            "Values":
+            [
+                {
+                    "Value": "Sight",
+                    "Description": "Look for aim alignment transform relative to sight model, defaulting to 'Model_0/Aim'."
+                },
+                {
+                    "Value": "Gun",
+                    "Description": "Look for aim alignment transform relative to equipable prefab. Requires setting @AimAlignment_Path."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ItemSightAsset+DistanceMarker+ESide, Assembly-CSharp",
+            "DisplayName": "Distance Marker Side",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#doc-item-asset-sight-eside-enumeration",
+            "Values":
+            [
+                {
+                    "Value": "Left",
+                    "Description": "The distance text is on the left side of the horizontal line."
+                },
+                {
+                    "Value": "Right",
+                    "Description": "The distance text is on the right side of the horizontal line."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ItemSightAsset+DistanceMarker, Assembly-CSharp",
+            "DisplayName": "Distance Marker",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#distancemarker-dictionary",
+            "Properties":
+            [
+                {
+                    "Key": "Distance",
+                    "Type": "Float32",
+                    "Required": true,
+                    "DefaultValue": 0.0,
+                    "Minimum": 0.0,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#distance-float32-0",
+                    "Description": "Meters between the player and a hypothethical target.",
+                    "Variable": "distance"
+                },
+                {
+                    "Key": "LineOffset",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Minimum": -1.0,
+                    "Maximum": 1.0,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#lineoffset-float32-0",
+                    "Description": "Percentage (0-1) of the way between the middle of the screen and the side of the horizontal line marker opposite to the text (opposite of @Side). Negative values make the line start on the opposite side of the middle of the screen as the text. A value of 0.0 starts the line on the middle of the screen.",
+                    "Variable": "lineOffset"
+                },
+                {
+                    "Key": "LineWidth",
+                    "Type": "Float32",
+                    "DefaultValue": 0.05,
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#linewidth-float32-0-05",
+                    "Description": "Width of the horizontal line, as a percentage (0-1) of the screen.",
+                    "Variable": "lineWidth"
+                },
+                {
+                    "Key": "Side",
+                    "Type": "SDG.Unturned.ItemSightAsset+DistanceMarker+ESide, Assembly-CSharp",
+                    "DefaultValue": "Right",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#side-eside-right",
+                    "Description": "Which side of the horizontal line the text will render on. The line will 'start' on the opposite side.",
+                    "Variable": "side"
+                },
+                {
+                    "Key": "HasLabel",
+                    "Type": "Boolean",
+                    "DefaultValue": true,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#haslabel-bool-true",
+                    "Description": "Whether or not to draw a distance label next to the line.",
+                    "Variable": "hasLabel"
+                },
+                {
+                    "Key": "Color",
+                    "Type": "Color32RGB",
+                    "DefaultValue": "#000000",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#color-color-black",
+                    "Description": "The color of the horizontal line and text.",
+                    "Variable": "color"
+                }
+            ]
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Sight",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "The model that appears on the gun when the item is attached.",
+            "Variable": "sight",
+            "Required": true
+        }
+    ]
+}

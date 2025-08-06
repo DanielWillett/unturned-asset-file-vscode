@@ -1,7 +1,7 @@
 {
     "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
     "Type": "SDG.Unturned.ItemFarmAsset, Assembly-CSharp",
-    "DisplayName": "Farm Item (Plant)",
+    "DisplayName": "Farm Barricade Item (Plant)",
     "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html",
     "Category": "ITEM",

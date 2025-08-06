@@ -1,0 +1,51 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemStorageAsset, Assembly-CSharp",
+    "DisplayName": "Storage Barricade Item",
+    "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Storage_X",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Minimum": 1,
+            "Description": "Number of columns (horizontal storage space).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
+            "Variable": "storage_x",
+            "Priority": 5
+        },
+        {
+            "Key": "Storage_Y",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Minimum": 1,
+            "Description": "Number of rows (vertical storage space).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
+            "Variable": "storage_y",
+            "Priority": 5
+        },
+        {
+            "Key": "Display",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "The first item in this storage will be visibly displayed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
+            "Variable": "isDisplay",
+            "Priority": 4
+        },
+        {
+            "Key": "Should_Close_When_Outside_Range",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the storage should automatically close when the player is outside of the interaction range.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
+            "Variable": "shouldCloseWhenOutsideRange",
+            "Priority": 3
+        }
+    ]
+}

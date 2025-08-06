@@ -181,41 +181,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/glasses-asset.html#glasses-asset-properties"
         }
     ],
-    "Types":
-    [
-        {
-            "Type": "SDG.Unturned.ELightingVision, Assembly-CSharp",
-            "DisplayName": "Glasses Vision Behavior",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html",
-            "Values":
-            [
-                {
-                    "Value": "NONE",
-                    "Casing": "None",
-                    "Description": "There is no vision effect, and normal lighting is used.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
-                },
-                {
-                    "Value": "MILITARY",
-                    "Casing": "Military",
-                    "Description": "Military nightvision lighting is used. Nightvision color is #147850, and nightvision fog intensity is 0.25.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
-                },
-                {
-                    "Value": "CIVILIAN",
-                    "Casing": "Civilian",
-                    "Description": "Civilian nightvision lighting is used. Nightvision color is #666666, and nightvision fog intensity is 0.5.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
-                },
-                {
-                    "Value": "HEADLAMP",
-                    "Casing": "Headlamp",
-                    "Description": "Headlamp lighting is used. This will enable a toggleable light source and allow for using PlayerSpotLightConfig properties.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html#enumerators"
-                }
-            ]
-        }
-    ],
     "BundleAssets":
     [
         {

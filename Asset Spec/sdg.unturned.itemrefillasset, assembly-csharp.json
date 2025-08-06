@@ -1,0 +1,243 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemRefillAsset, Assembly-CSharp",
+    "DisplayName": "Refill Item (Water Canister)",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "ConsumeAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when this item is drank from.",
+            "DefaultValue": null,
+            "Variable": "use",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Priority": 2
+        },
+        {
+            "Key": "Water",
+            "Type": "Float32",
+            "Deprecated": true,
+            "DefaultValue": 0.0,
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of water restored when drinking clean water. Use @Clean_Water instead.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "cleanWater",
+            "Priority": 10
+        },
+        {
+            "Key": "Clean_Health",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of health restored when drinking clean water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "cleanHealth",
+            "Priority": 8
+        },
+        {
+            "Key": "Salty_Health",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Health 0.25)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of health restored when drinking salty water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "saltyHealth",
+            "Priority": 8
+        },
+        {
+            "Key": "Dirty_Health",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Health 0.6)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of health restored when drinking dirty water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "dirtyHealth",
+            "Priority": 8
+        },
+        {
+            "Key": "Clean_Food",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of food restored when drinking clean water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "cleanFood",
+            "Priority": 7
+        },
+        {
+            "Key": "Salty_Food",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Food 0.25)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of food restored when drinking salty water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "saltyFood",
+            "Priority": 7
+        },
+        {
+            "Key": "Dirty_Food",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Food 0.6)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of food restored when drinking dirty water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "dirtyFood",
+            "Priority": 7
+        },
+        {
+            "Key": "Clean_Water",
+            "Type": "Float32",
+            "DefaultValue": "@Water",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of water restored when drinking clean water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "cleanWater",
+            "Priority": 10
+        },
+        {
+            "Key": "Salty_Water",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Water 0.25)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of water restored when drinking salty water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "saltyWater",
+            "Priority": 10
+        },
+        {
+            "Key": "Dirty_Water",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Water 0.6)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of water restored when drinking dirty water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "dirtyWater",
+            "Priority": 10
+        },
+        {
+            "Key": "Clean_Virus",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of virus restored when drinking clean water. Negative values infect.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "cleanVirus",
+            "Priority": 9
+        },
+        {
+            "Key": "Salty_Virus",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Water -0.75)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of virus restored when drinking salty water. Negative values infect.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "saltyVirus",
+            "Priority": 9
+        },
+        {
+            "Key": "Dirty_Virus",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Water -0.4)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of virus restored when drinking dirty water. Negative values infect.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "dirtyVirus",
+            "Priority": 9
+        },
+        {
+            "Key": "Clean_Stamina",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of stamina restored when drinking clean water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "cleanStamina",
+            "Priority": 6
+        },
+        {
+            "Key": "Salty_Stamina",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Stamina 0.25)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of stamina restored when drinking salty water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "saltyStamina",
+            "Priority": 6
+        },
+        {
+            "Key": "Dirty_Stamina",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Stamina 0.6)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of stamina restored when drinking dirty water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "dirtyStamina",
+            "Priority": 6
+        },
+        {
+            "Key": "Clean_Oxygen",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of oxygen restored when drinking clean water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "cleanOxygen",
+            "Priority": 5
+        },
+        {
+            "Key": "Salty_Oxygen",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Oxygen 0.25)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of oxygen restored when drinking salty water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "saltyOxygen",
+            "Priority": 5
+        },
+        {
+            "Key": "Dirty_Oxygen",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Clean_Oxygen 0.6)",
+            "Minimum": -100.0,
+            "Maximum": 100.0,
+            "Description": "The amount of oxygen restored when drinking dirty water.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
+            "Variable": "dirtyOxygen",
+            "Priority": 5
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Use",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when this item is drank from.",
+            "Variable": "use",
+            "RedirectableAssetKey": "ConsumeAudioClip"
+        }
+    ]
+}

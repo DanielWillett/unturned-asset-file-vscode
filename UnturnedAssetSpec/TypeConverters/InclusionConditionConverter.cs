@@ -17,9 +17,10 @@ public class InclusionConditionConverter : JsonConverter<InclusionCondition?>
     /// <inheritdoc />
     public override InclusionCondition? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return ReadCondition(ref reader, options);
+        return ReadCondition(ref reader, options, false);
     }
-    public static InclusionCondition? ReadCondition(ref Utf8JsonReader reader, JsonSerializerOptions? options)
+
+    public static InclusionCondition? ReadCondition(ref Utf8JsonReader reader, JsonSerializerOptions? options, bool isInclusive)
     {
         if (reader.TokenType == JsonTokenType.Null)
         {
@@ -163,7 +164,7 @@ public class InclusionConditionConverter : JsonConverter<InclusionCondition?>
                 }
             }
 
-            InclusionConditionProperty prop = new InclusionConditionProperty(new PropertyRef(key.AsSpan(), key), value, cond);
+            InclusionConditionProperty prop = new InclusionConditionProperty(isInclusive, new PropertyRef(key.AsSpan(), key), value, cond);
             conditions = conditions.Add(prop);
         }
 
