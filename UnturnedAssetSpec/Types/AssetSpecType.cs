@@ -26,7 +26,7 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
 
     public string DisplayName { get; set; } = string.Empty;
 
-    public OneOrMore<KeyValuePair<string, object?>> ExtendedData { get; set; } = OneOrMore<KeyValuePair<string, object?>>.Null;
+    public OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; set; } = OneOrMore<KeyValuePair<string, object?>>.Null;
 
 #nullable disable
     public SpecProperty[] Properties { get; set; }

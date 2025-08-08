@@ -1,0 +1,173 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemThrowableAsset, Assembly-CSharp",
+    "DisplayName": "Throwable Weapon Item",
+    "Parent": "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Explosion",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "Explosion effect to play upon detonation.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html#throwable-asset-properties",
+            "Variable": "explosionEffectGuid",
+            "Priority": 5,
+            "InclusiveWith": [ "Explosive" ]
+        },
+        {
+            "Key": "Explosive",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Specified if the throwable should have an area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html#throwable-asset-properties",
+            "Variable": "isExplosive",
+            "Priority": 8
+        },
+        {
+            "Key": "Flash",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Specified if the throwable should cause a flashbang effect for players caught within the area-of-effect.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html#throwable-asset-properties",
+            "Variable": "isFlash",
+            "Priority": 8
+        },
+        {
+            "Key": "Sticky",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Specified if the throwable should stick to the environment, barricades, and structures.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html#throwable-asset-properties",
+            "Variable": "isSticky",
+            "Priority": 8
+        },
+        {
+            "Key": "Explode_On_Impact",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Specified if the throwable should immediately detonate upon impact.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html#throwable-asset-properties",
+            "Variable": "explodeOnImpact",
+            "Priority": 8,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Explode_On_Impact",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Explosive",
+                                "Operation": "eq",
+                                "Comparand": false
+                            },
+                            {
+                                "Variable": "Flash",
+                                "Operation": "eq",
+                                "Comparand": false
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Fuse_Length",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Explosive",
+                            "Operation": "eq",
+                            "Comparand": true
+                        },
+                        {
+                            "Variable": "Flash",
+                            "Operation": "eq",
+                            "Comparand": true
+                        }
+                    ],
+                    "Value": 2.5
+                },
+                {
+                    "Value": 180
+                }
+            ],
+            "Description": "A timer, in seconds, for the fuse length (how long the throwable lasts).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html#throwable-asset-properties",
+            "Variable": "fuseLength",
+            "Priority": 6
+        },
+        {
+            "Key": "Explosion_Launch_Speed",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": "=MUL(@(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Player_Damage) 0.1)",
+            "Description": "Velocity at which players are launched by area-of-effect explosions.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html#throwable-asset-properties",
+            "Variable": "explosionLaunchSpeed",
+            "Priority": 6,
+            "InclusiveWith": [ "Explosive" ]
+        },
+        {
+            "Key": "Strong_Throw_Force",
+            "Type": "Float32",
+            "DefaultValue": 1100.0,
+            "Minimum": 0.0,
+            "Description": "The amount of force throwables are thrown with when performing a strong throw, measured in Newtons.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html#throwable-asset-properties",
+            "Variable": "strongThrowForce",
+            "Priority": 7
+        },
+        {
+            "Key": "Weak_Throw_Force",
+            "Type": "Float32",
+            "DefaultValue": 600.0,
+            "Minimum": 0.0,
+            "Description": "The amount of force throwables are thrown with when performing a weak throw, measured in Newtons.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html#throwable-asset-properties",
+            "Variable": "weakThrowForce",
+            "Priority": 7
+        },
+        {
+            "Key": "Boost_Throw_Force_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.4,
+            "Minimum": 0.0,
+            "Description": "A multiplier on the amount of throwing force when the player has the \"Olympic\" random boost.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html#throwable-asset-properties",
+            "Variable": "boostForceMultiplier",
+            "Priority": 7
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Use",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the item is thrown.",
+            "Variable": "use",
+            "Required": true
+        },
+        {
+            "AssetName": "Throwable",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "The sound played when the item is thrown.",
+            "Variable": "throwable",
+            "Required": true
+        }
+    ]
+}

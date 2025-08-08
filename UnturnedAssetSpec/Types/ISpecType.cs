@@ -14,7 +14,7 @@ public interface ISpecType : IEquatable<ISpecType?>
 
     AssetSpecType Owner { get; set; }
 
-    OneOrMore<KeyValuePair<string, object?>> ExtendedData { get; }
+    OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; }
     SpecProperty? FindProperty(string propertyName, SpecPropertyContext context);
 }
 

@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 [DebuggerDisplay("Type: {Type.GetTypeName()}")]
-public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<CustomSpecTypeInstance>, IEquatable<CustomSpecType>
+public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<CustomSpecTypeInstance>, IEquatable<CustomSpecType>, IAdditionalPropertyProvider
 {
     // example value could be Condition for Conditions
     public const string PluralBaseKeyProperty = "PluralBaseKey";
@@ -27,7 +27,7 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
     /// A type used to parse this object as a string value.
     /// </summary>
     public string? StringParsableType { get; init; }
-    public required OneOrMore<KeyValuePair<string, object?>> ExtendedData { get; init; }
+    public required OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; init; }
 
     public Type ValueType => typeof(CustomSpecTypeInstance);
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;

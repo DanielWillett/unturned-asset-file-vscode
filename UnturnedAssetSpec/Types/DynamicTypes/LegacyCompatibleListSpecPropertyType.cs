@@ -179,7 +179,7 @@ public sealed class LegacyCompatibleListSpecPropertyType :
         // ..._Conditions -> ..._Condition_n
 
         string baseKey;
-        if (customType.ExtendedData.TryGetValue(CustomSpecType.PluralBaseKeyProperty, out object? value))
+        if (customType.AdditionalProperties.TryGetValue(CustomSpecType.PluralBaseKeyProperty, out object? value))
         {
             baseKey = value?.ToString() ?? string.Empty;
         }

@@ -496,7 +496,7 @@
                 {
                     "Value": "BARRICADE",
                     "Casing": "Barricade",
-                    "Description": "A standard barricade with no special behavior.",
+                    "Description": "A standard barricade with no special behavior that can be placed on the ground.",
                     "InteractableType": null
                 },
                 {
@@ -541,10 +541,211 @@
                     "Value": "TORCH",
                     "Casing": "Torch",
                     "Description": "A fire barricade which is placed on the wall.",
-                    "RequiredBaseType": "SDG.Unturned.ItemFarmAsset, Assembly-CSharp",
                     "InteractableType": "SDG.Unturned.InteractableFire, Assembly-CSharp"
+                },
+                {
+                    "Value": "CAMPFIRE",
+                    "Casing": "Campfire",
+                    "Description": "A fire barricade which is placed on the ground.",
+                    "InteractableType": "SDG.Unturned.InteractableFire, Assembly-CSharp"
+                },
+                {
+                    "Value": "SPIKE",
+                    "Casing": "Spike",
+                    "Description": "A trap barricade that can be placed on the ground.",
+                    "RequiredBaseType": "SDG.Unturned.ItemTrapAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableTrap, Assembly-CSharp"
+                },
+                {
+                    "Value": "WIRE",
+                    "Casing": "Wire",
+                    "Description": "A trap barricade that can be placed anywhere.",
+                    "RequiredBaseType": "SDG.Unturned.ItemTrapAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableTrap, Assembly-CSharp"
+                },
+                {
+                    "Value": "GENERATOR",
+                    "Casing": "Generator",
+                    "Description": "A generator that emits an electrical source when filled with fuel.",
+                    "RequiredBaseType": "SDG.Unturned.ItemGeneratorAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableGenerator, Assembly-CSharp"
+                },
+                {
+                    "Value": "SPOT",
+                    "Casing": "Spot",
+                    "Description": "A powered light that can be placed on the ground.",
+                    "InteractableType": "SDG.Unturned.InteractableSpot, Assembly-CSharp"
+                },
+                {
+                    "Value": "SAFEZONE",
+                    "Casing": "Safezone",
+                    "Description": "A safezone bubble emitter that can be placed on the ground.",
+                    "InteractableType": "SDG.Unturned.InteractableSafezone, Assembly-CSharp"
+                },
+                {
+                    "Value": "FREEFORM",
+                    "Casing": "Freeform",
+                    "Description": "A barricade that can be rotated on all axis.",
+                    "InteractableType": null
+                },
+                {
+                    "Value": "SIGN",
+                    "Casing": "Sign",
+                    "Description": "An editable sign that can be placed on the ground.",
+                    "InteractableType": "SDG.Unturned.InteractableSign, Assembly-CSharp"
+                },
+                {
+                    "Value": "VEHICLE",
+                    "Casing": "Vehicle",
+                    "Description": "An barricade that spawns a vehicle when placed.",
+                    "InteractableType": null
+                },
+                {
+                    "Value": "CLAIM",
+                    "Casing": "Claim",
+                    "Description": "A claim bubble emitter that can be placed on the ground.",
+                    "InteractableType": "SDG.Unturned.InteractableClaim, Assembly-CSharp"
+                },
+                {
+                    "Value": "BEACON",
+                    "Casing": "Beacon",
+                    "Description": "A horde beacon that can be placed on the ground.",
+                    "InteractableType": "SDG.Unturned.InteractableBeacon, Assembly-CSharp"
+                },
+                {
+                    "Value": "STORAGE_WALL",
+                    "Casing": "Storage_Wall",
+                    "Description": "An item storage unit that can be placed on the wall.",
+                    "RequiredBaseType": "SDG.Unturned.ItemStorageAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableStorage, Assembly-CSharp"
+                },
+                {
+                    "Value": "BARREL_RAIN",
+                    "Casing": "Barrel_Rain",
+                    "Description": "A water storage tank that fills up when it rains.",
+                    "InteractableType": "SDG.Unturned.InteractableRainBarrel, Assembly-CSharp"
+                },
+                {
+                    "Value": "OIL",
+                    "Casing": "Oil",
+                    "Description": "A powered oil drill.",
+                    "RequiredBaseType": "SDG.Unturned.ItemOilPumpAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableOil, Assembly-CSharp"
+                },
+                {
+                    "Value": "CAGE",
+                    "Casing": "Cage",
+                    "Description": "A powered light that can be placed on the wall.",
+                    "InteractableType": "SDG.Unturned.InteractableSpot, Assembly-CSharp"
+                },
+                {
+                    "Value": "SHUTTER",
+                    "Casing": "Shutter",
+                    "Description": "An openable shutter door that can be placed in windows.",
+                    "InteractableType": "SDG.Unturned.InteractableDoor, Assembly-CSharp"
+                },
+                {
+                    "Value": "TANK",
+                    "Casing": "Tank",
+                    "Description": "A fuel or water storage tank.",
+                    "RequiredBaseType": "SDG.Unturned.ItemTankAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableTank, Assembly-CSharp"
+                },
+                {
+                    "Value": "CHARGE",
+                    "Casing": "Charge",
+                    "Description": "An explosive charge.",
+                    "RequiredBaseType": "SDG.Unturned.ItemChargeAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableCharge, Assembly-CSharp"
+                },
+                {
+                    "Value": "SENTRY",
+                    "Casing": "Sentry",
+                    "Description": "An item storage barricade which can store and use a ranged weapon.",
+                    "RequiredBaseType": "SDG.Unturned.ItemSentryAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableSentry, Assembly-CSharp"
+                },
+                {
+                    "Value": "SENTRY",
+                    "Casing": "Sentry",
+                    "Description": "An item storage barricade which can store and use a ranged weapon, placed on the ground.",
+                    "RequiredBaseType": "SDG.Unturned.ItemSentryAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableSentry, Assembly-CSharp"
+                },
+                {
+                    "Value": "SENTRY_FREEFORM",
+                    "Casing": "Sentry_Freeform",
+                    "Description": "An item storage barricade which can store and use a ranged weapon, placed anywhere and can rotate on all axis.",
+                    "RequiredBaseType": "SDG.Unturned.ItemSentryAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableSentry, Assembly-CSharp"
+                },
+                {
+                    "Value": "OVEN",
+                    "Casing": "Oven",
+                    "Description": "A powered fire barricade which is placed on the wall.",
+                    "InteractableType": "SDG.Unturned.InteractableOven, Assembly-CSharp"
+                },
+                {
+                    "Value": "LIBRARY",
+                    "Casing": "Library",
+                    "Description": "An XP storage barricade that can be placed on the ground.",
+                    "RequiredBaseType": "SDG.Unturned.ItemLibraryAsset, Assembly-CSharp",
+                    "InteractableType": "SDG.Unturned.InteractableLibrary, Assembly-CSharp"
+                },
+                {
+                    "Value": "OXYGENATOR",
+                    "Casing": "Oxygenator",
+                    "Description": "An oxygen bubble emitter that can be placed on the ground.",
+                    "InteractableType": "SDG.Unturned.InteractableOxygenator, Assembly-CSharp"
+                },
+                {
+                    "Value": "GLASS",
+                    "Casing": "Glass",
+                    "Description": "An optionally transparnet panel that can be placed in windows.",
+                    "InteractableType": null
+                },
+                {
+                    "Value": "NOTE",
+                    "Casing": "Note",
+                    "Description": "A barricade used to store text.",
+                    "InteractableType": "SDG.Unturned.InteractableSign, Assembly-CSharp"
+                },
+                {
+                    "Value": "HATCH",
+                    "Casing": "Hatch",
+                    "Description": "An openable hatch door that can be placed in ceiling holes.",
+                    "InteractableType": "SDG.Unturned.InteractableDoor, Assembly-CSharp"
+                },
+                {
+                    "Value": "MANNEQUIN",
+                    "Casing": "Mannequin",
+                    "Description": "An XP storage barricade that can be placed on the ground.",
+                    "InteractableType": "SDG.Unturned.InteractableMannequin, Assembly-CSharp"
+                },
+                {
+                    "Value": "STEREO",
+                    "Casing": "Stereo",
+                    "Description": "A stereo/radio that can play audio clips that can be placed on the ground.",
+                    "InteractableType": "SDG.Unturned.InteractableStereo, Assembly-CSharp"
+                },
+                {
+                    "Value": "SIGN_WALL",
+                    "Casing": "Sign_Wall",
+                    "Description": "An editable sign that can be placed on the wall.",
+                    "InteractableType": "SDG.Unturned.InteractableSign, Assembly-CSharp"
+                },
+                {
+                    "Value": "CLOCK",
+                    "Casing": "Clock",
+                    "Description": "An analog clock.",
+                    "InteractableType": "SDG.Unturned.InteractableClock, Assembly-CSharp"
+                },
+                {
+                    "Value": "BARRICADE_WALL",
+                    "Casing": "Barricade_Wall",
+                    "Description": "A standard barricade with no special behavior that can be placed on the wall.",
+                    "InteractableType": null
                 }
-                // todo
             ]
         }
     ],

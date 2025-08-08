@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -122,6 +123,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         bool minimumIsExclusive = false,
             maximumIsExclusive = false;
 
+        OneOrMore<KeyValuePair<string, object?>> extraData = OneOrMore<KeyValuePair<string, object?>>.Null;
+
         while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
             if (reader.TokenType != JsonTokenType.PropertyName)
@@ -143,6 +146,12 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 break;
             }
 
+            string? key = null;
+            if (propType == -1)
+            {
+                key = reader.GetString();
+            }
+
             if (!reader.Read() || reader.TokenType is JsonTokenType.EndObject or JsonTokenType.EndArray or JsonTokenType.PropertyName or JsonTokenType.Comment)
             {
                 if (propType != -1)
@@ -154,6 +163,14 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             
             switch (propType)
             {
+                case -1:
+                    // extra properties
+                    if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
+                    {
+                        extraData = extraData.Add(new KeyValuePair<string, object?>(key!, extraValue));
+                    }
+                    break;
+
                 case 0: // Key
                     if (reader.TokenType is not JsonTokenType.String)
                         ThrowUnexpectedToken(reader.TokenType, propType);
@@ -376,11 +393,6 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                         ThrowUnexpectedToken(reader.TokenType, propType);
                     property.SimilarGrouping = reader.GetString();
                     break;
-
-                default:
-                    reader.Skip();
-                    break;
-
             }
         }
 
@@ -490,6 +502,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         {
             property.Exceptions = OneOrMore<ISpecDynamicValue>.Null;
         }
+
+        property.AdditionalProperties = extraData;
 
         return property;
     }

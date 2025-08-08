@@ -1,0 +1,33 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemToolAsset, Assembly-CSharp",
+    "DisplayName": "Tool Item",
+    "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tool-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "UseAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the item is used.",
+            "DefaultValue": null,
+            "Variable": "use",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tool-asset.html#tool-asset-properties",
+            "Priority": 2
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Use",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "The sound played when the item is used.",
+            "Variable": "use",
+            "Required": true
+        }
+    ]
+}

@@ -1,0 +1,55 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
+    "DisplayName": "Landscape Material",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Category": "NONE",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Texture",
+            "Type": "ContentReference",
+            "ElementType": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "DefaultValue": null,
+            "Description": "The albedo texture of the terrain.",
+            "Variable": "texture",
+            "Docs": "https://docs.unity3d.com/2021.3/Documentation/ScriptReference/TerrainLayer.html"
+        },
+        {
+            "Key": "Mask",
+            "Type": "ContentReference",
+            "ElementType": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "DefaultValue": null,
+            "Description": "The normal map texture of the terrain.",
+            "Variable": "mask",
+            "Docs": "https://docs.unity3d.com/2021.3/Documentation/ScriptReference/TerrainLayer.html"
+        },
+        {
+            "Key": "Physics_Material",
+            "Type": "PhysicsMaterialLegacy",
+            "ElementType": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "DefaultValue": null,
+            "Description": "The physics material used by this material.",
+            "Variable": "physicsMaterialName",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html"
+        },
+        {
+            "Key": "Foliage",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "The default foliage to spawn on this material when baking it.",
+            "Variable": "foliage"
+        },
+        {
+            "Key": "Christmas_Redirect",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
+            "PreventSelfReference": true,
+            "DefaultValue": null,
+            "Description": "The default foliage to spawn on this material when baking it.",
+            "Variable": "foliage"
+        },
+    ]
+}

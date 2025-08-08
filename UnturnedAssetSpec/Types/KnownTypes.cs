@@ -70,7 +70,8 @@ public static class KnownTypes
         { "BlueprintSkill", () => Skill(true, true) },
         { "SteamItemDef", () => SteamItemDef },
         { "CaliberId", () => CaliberId },
-        { "BladeId", () => BladeId }
+        { "BladeId", () => BladeId },
+        { "PhysicsMaterial", () => String } // todo
     };
 
     public static ISpecPropertyType? GetType(string knownType)

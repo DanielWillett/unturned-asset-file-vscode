@@ -216,4 +216,7 @@
   <data name="UNT102" xml:space="preserve">
     <value>This format string should include argument {{{0}}}.</value>
   </data>
+  <data name="UNT1019" xml:space="preserve">
+    <value>This property shouldn't reference the asset it's defined in.</value>
+  </data>
 </root>

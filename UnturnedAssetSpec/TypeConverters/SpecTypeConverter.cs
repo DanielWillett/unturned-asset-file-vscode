@@ -224,7 +224,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                 DisplayName = displayName!,
                 Docs = docs,
                 Type = qt,
-                ExtendedData = extraData
+                AdditionalProperties = extraData
             };
 
             for (int i = 0; i < createdValues.Length; ++i)
@@ -259,7 +259,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
             Properties = properties,
             LocalizationProperties = localProperties,
             Docs = docs,
-            ExtendedData = extraData,
+            AdditionalProperties = extraData,
             IsLegacyExpandedType = isExpanded,
             StringParsableType = stringParseableType
         };

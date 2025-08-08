@@ -1,0 +1,178 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemTrapAsset, Assembly-CSharp",
+    "DisplayName": "Trap Barricade Item",
+    "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Range2",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The radius (in meters) of the damaging, area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "range2",
+            "Priority": 8,
+            "Required": "@Explosive",
+            "InclusiveWith": [ "Explosive" ]
+        },
+        {
+            "Key": "Player_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Damage dealt to players caught within the area-of-effect explosion or who collide with the trap.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "playerDamage",
+            "Priority": 6
+        },
+        {
+            "Key": "Zombie_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Damage dealt to zombies caught within the area-of-effect explosion or who collide with the trap.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "zombieDamage",
+            "Priority": 6
+        },
+        {
+            "Key": "Animal_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Damage dealt to animals caught within the area-of-effect explosion or who collide with the trap.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "animalDamage",
+            "Priority": 6
+        },
+        {
+            "Key": "Barricade_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Damage dealt to barricades caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "barricadeDamage",
+            "Priority": 6,
+            "InclusiveWith": [ "Explosive" ]
+        },
+        {
+            "Key": "Structure_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Damage dealt to structures caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "structureDamage",
+            "Priority": 6,
+            "InclusiveWith": [ "Explosive" ]
+        },
+        {
+            "Key": "Vehicle_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Damage dealt to vehicles caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "vehicleDamage",
+            "Priority": 6,
+            "InclusiveWith": [ "Explosive" ]
+        },
+        {
+            "Key": "Resource_Damage",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Damage dealt to resources caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "resourceDamage",
+            "Priority": 6,
+            "InclusiveWith": [ "Explosive" ]
+        },
+        {
+            "Key": "Object_Damage",
+            "Type": "Float32",
+            "DefaultValue": "@Resource_Damage",
+            "IncludedDefaultValue": 0.0,
+            "Description": "Damage dealt to objects caught within the area-of-effect explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "objectDamage",
+            "Priority": 6,
+            "InclusiveWith": [ "Explosive" ]
+        },
+        {
+            "Key": "Trap_Setup_Delay",
+            "Type": "Float32",
+            "DefaultValue": 0.25,
+            "Description": "Number of seconds before a trap becomes active after being placed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "trapSetupDelay",
+            "Priority": 7
+        },
+        {
+            "Key": "Trap_Cooldown",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Number of seconds after the trap is triggered before the trap is active again.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "trapCooldown",
+            "Priority": 7
+        },
+        {
+            "Key": "Explosion2",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "Effect spawned when the trap explodes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "trapDetonationEffectGuid",
+            "Priority": 5,
+            "InclusiveWith": [ "Explosive" ]
+        },
+        {
+            "Key": "Explosion_Launch_Speed",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Player_Damage 0.1)",
+            "Description": "Launch speed of players caught within the area-of-effect explosion, in meters per second.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "explosionLaunchSpeed",
+            "Priority": 5,
+            "InclusiveWith": [ "Explosive" ]
+        },
+        {
+            "Key": "Broken",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Players who trigger this trap will be inflicted with the Broken Bones status effect.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "isBroken",
+            "Priority": 8,
+            "ExclusiveWith": [ "Explosive" ]
+        },
+        {
+            "Key": "Explosive",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This trap should have an area-of-effect explosion when triggered.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "isExplosive",
+            "Priority": 8
+        },
+        {
+            "Key": "Damage_Tires",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This trap can pop the tires of vehicles that drive over it.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "damageTires",
+            "Priority": 8
+        },
+        {
+            "Key": "Requires_Power",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the trap requires power from a generator.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
+            "Variable": "requiresPower",
+            "Priority": 7
+        }
+    ]
+}

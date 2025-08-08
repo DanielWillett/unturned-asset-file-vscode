@@ -5,14 +5,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 [JsonConverter(typeof(SpecPropertyConverter))]
 [DebuggerDisplay("{Key}")]
-public class SpecProperty : IEquatable<SpecProperty?>, ICloneable
+public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPropertyProvider
 {
     /// <summary>
     /// The key of the flag or property.
@@ -179,6 +178,11 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable
     /// The property overridden by this one.
     /// </summary>
     public SpecProperty? Parent { get; internal set; }
+
+    /// <summary>
+    /// Additional properties present on the property's definition.
+    /// </summary>
+    public OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; set; } = OneOrMore<KeyValuePair<string, object?>>.Null;
 
     internal void ProcessValues(Func<ISpecDynamicValue, ISpecDynamicValue?> process)
     {

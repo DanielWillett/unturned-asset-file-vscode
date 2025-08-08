@@ -22,7 +22,7 @@ public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, strin
 
     public AssetSpecType Owner { get => throw new NotSupportedException(); set { } }
 
-    public OneOrMore<KeyValuePair<string, object?>> ExtendedData => OneOrMore<KeyValuePair<string, object?>>.Null;
+    public OneOrMore<KeyValuePair<string, object?>> AdditionalProperties => OneOrMore<KeyValuePair<string, object?>>.Null;
 
     public SpecProperty? FindProperty(string propertyName, SpecPropertyContext context) => null;
 

@@ -83,6 +83,7 @@ public sealed class GuidOrIdSpecPropertyType :
         // todo: remember that [vehicle ]redirect assets need to work properly
         ISpecType? specType = null;
 
+        // todo wtf is this for
         if (_cachedSpecDb == parse.Database)
         {
             lock (this)
@@ -157,7 +158,32 @@ public sealed class GuidOrIdSpecPropertyType :
             }
         }
 
-        return GuidOrId.TryParse(val, out value) || FailedToParse(in parse, out value);
+        if (!GuidOrId.TryParse(val, out value))
+        {
+            return FailedToParse(in parse, out value);
+        }
+
+        if (!AssetReferenceSpecPropertyType.GetPreventSelfRef(in parse))
+            return true;
+
+        if (!value.IsId)
+        {
+            AssetReferenceSpecPropertyType.CheckSelfRef(in parse, value.Guid, stringNode, true);
+        }
+        else
+        {
+            int category = value.Category;
+            if (category == 0)
+            {
+                category = parse.Database.Information.GetAssetCategory(ElementType, OtherElementTypes);
+            }
+            if (category > 0)
+            {
+                AssetReferenceSpecPropertyType.CheckSelfRef(in parse, value.Id, category, stringNode, true);
+            }
+        }
+
+        return true;
     }
 
     /// <inheritdoc />

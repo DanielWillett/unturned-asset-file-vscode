@@ -314,6 +314,14 @@
                     "title": "An arbitrary ID that has to be shared between an attachment and weapon for them to be compatible."
                 },
                 {
+                    "const": "PhysicsMaterial",
+                    "title": "An physics material name."
+                },
+                {
+                    "const": "PhysicsMaterialLegacy",
+                    "title": "An physics material name or legacy SDG.Unturned.EPhysicsMaterial."
+                },
+                {
                     "$ref": "#/$defs/switch"
                 }
             ]

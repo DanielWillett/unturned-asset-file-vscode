@@ -1,0 +1,44 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemTireAsset, Assembly-CSharp",
+    "DisplayName": "Tire Item",
+    "Parent": "SDG.Unturned.ItemVehicleRepairToolAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tire-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Mode",
+            "Type": "SDG.Unturned.EUseableTireMode, Assembly-CSharp",
+            "DefaultValue": "ADD",
+            "Description": "Whether to add tires to the vehicle or remove them from the vehicle.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tire-asset.html#tire-asset-properties",
+            "Variable": "mode",
+            "Priority": 8,
+            "Required": true
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EUseableTireMode, Assembly-CSharp",
+            "DisplayName": "Tire Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tire-asset.html#tire-asset-properties",
+            "Values":
+            [
+                {
+                    "Value": "ADD",
+                    "Casing": "Add",
+                    "Description": "Installs tires on vehicles."
+                },
+                {
+                    "Value": "REMOVE",
+                    "Casing": "Remove",
+                    "Description": "Removes tires from vehicles."
+                }
+            ]
+        }
+    ]
+}

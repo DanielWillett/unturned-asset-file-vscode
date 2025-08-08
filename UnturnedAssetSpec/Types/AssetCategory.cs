@@ -17,7 +17,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
         Type = "SDG.Unturned.EAssetType, Assembly-CSharp",
         Docs = "https://docs.smartlydressedgames.com/en/stable/data/enum/eassettype.html",
         Values = new EnumSpecTypeValue[11],
-        ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+        AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
     };
 
     public static readonly EnumSpecTypeValue None;
@@ -147,17 +147,26 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
     /// <returns>The index of the type, or -1 if this type is a redirector asset.</returns>
     public static int GetCategoryFromType(QualifiedType type, IAssetSpecDatabase database)
     {
+        return GetCategoryFromType(type, database.Information);
+    }
+
+    /// <summary>
+    /// Gets the asset category from the given type, with special handling for redirector assets.
+    /// </summary>
+    /// <returns>The index of the type, or -1 if this type is a redirector asset.</returns>
+    public static int GetCategoryFromType(QualifiedType type, AssetInformation info)
+    {
         if (type.Equals("SDG.Unturned.RedirectorAsset, Assembly-CSharp"))
         {
             return -1;
         }
 
-        InverseTypeHierarchy typeHierarchy = database.Information.GetParentTypes(type);
+        InverseTypeHierarchy typeHierarchy = info.GetParentTypes(type);
 
         QualifiedType[] types = typeHierarchy.ParentTypes;
         for (int i = types.Length - 1; i >= 0; --i)
         {
-            if (!database.Information.AssetCategories.TryGetValue(typeHierarchy.ParentTypes[i], out string category))
+            if (!info.AssetCategories.TryGetValue(typeHierarchy.ParentTypes[i], out string category))
                 continue;
 
             if (TryParse(category, out EnumSpecTypeValue categoryType))

@@ -259,6 +259,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This property shouldn&apos;t reference the asset it&apos;s defined in..
+        /// </summary>
+        internal static string UNT1019 {
+            get {
+                return ResourceManager.GetString("UNT1019", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This format string should include argument {{{0}}}..
         /// </summary>
         internal static string UNT102 {

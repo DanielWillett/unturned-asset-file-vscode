@@ -1,0 +1,22 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemVehiclePaintToolAsset, Assembly-CSharp",
+    "DisplayName": "Vehicle Paint Tool Item",
+    "Parent": "SDG.Unturned.ItemToolAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vehicle-paint-tool-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "PaintColor",
+            "Type": "Color32RGB",
+            "Description": "Vehicle’s color will be replaced with this when used.",
+            "DefaultValue": null,
+            "Variable": "PaintColor",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vehicle-paint-tool-asset.html#vehicle-paint-tool-asset-properties",
+            "Priority": 2
+        }
+    ]
+}

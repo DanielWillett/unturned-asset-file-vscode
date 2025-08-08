@@ -88,7 +88,7 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
                     // extra properties
                     if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
                     {
-                        type.ExtendedData = type.ExtendedData.Add(new KeyValuePair<string, object?>(key!, extraValue));
+                        type.AdditionalProperties = type.AdditionalProperties.Add(new KeyValuePair<string, object?>(key!, extraValue));
                     }
                     break;
 

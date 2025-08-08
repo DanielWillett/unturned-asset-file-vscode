@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json.Serialization;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -225,6 +227,63 @@ public class AssetInformation
     {
         public required UnityEngineVersion EndVersion { get; set; }
         public required string DisplayName { get; set; }
+    }
+
+    /// <summary>
+    /// Gets the index of the first asset category in the list.
+    /// </summary>
+    /// <returns>
+    /// -1 if more than one asset category could be searched, 0 if no asset categories could be searched,
+    /// otherwise the index of the category in <see cref="AssetCategory.TypeOf"/>'s values.
+    /// </returns>
+    public int GetAssetCategory(OneOrMore<QualifiedType> elementTypes)
+    {
+        return GetAssetCategory(QualifiedType.None, elementTypes);
+    }
+
+    /// <summary>
+    /// Gets the index of the first asset category in the list.
+    /// </summary>
+    /// <returns>
+    /// -1 if more than one asset category could be searched, 0 if no asset categories could be searched,
+    /// otherwise the index of the category in <see cref="AssetCategory.TypeOf"/>'s values.
+    /// </returns>
+    public int GetAssetCategory(QualifiedType elementType, OneOrMore<QualifiedType> otherElementTypes)
+    {
+        int category;
+        if (elementType.Type != null)
+        {
+            int c = AssetCategory.GetCategoryFromType(elementType, this);
+            if (c == -1)
+                return -1;
+
+            category = c;
+        }
+        else
+        {
+            category = 0;
+        }
+
+        foreach (QualifiedType qt in otherElementTypes)
+        {
+            int c = AssetCategory.GetCategoryFromType(qt, this);
+            switch (c)
+            {
+                case -1: return -1;
+                case 0: continue;
+            }
+
+            if (category == 0)
+            {
+                category = c;
+            }
+            else if (category != c)
+            {
+                return -1;
+            }
+        }
+
+        return 0;
     }
 }
 

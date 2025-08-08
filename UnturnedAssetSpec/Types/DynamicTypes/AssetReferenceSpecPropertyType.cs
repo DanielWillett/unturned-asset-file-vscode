@@ -217,6 +217,9 @@ public sealed class AssetReferenceSpecPropertyType :
                 if (parse.File != null && parse.File.GetGuid() is { } guid && guid != Guid.Empty)
                 {
                     value = guid;
+
+                    CheckSelfRef(in parse, guid, stringValue);
+
                     return true;
                 }
 
@@ -236,7 +239,14 @@ public sealed class AssetReferenceSpecPropertyType :
 
             CheckInappropriateAmount(in parse, stringValue);
 
-            return KnownTypeValueHelper.TryParseGuid(stringValue.Value, out value) || FailedToParse(in parse, out value);
+            if (!KnownTypeValueHelper.TryParseGuid(stringValue.Value, out value))
+            {
+                return FailedToParse(in parse, out value);
+            }
+
+            CheckSelfRef(in parse, value, stringValue);
+
+            return true;
         }
 
         if (!CanParseDictionary || parse.Node is not AssetFileDictionaryValueNode dictionary)
@@ -254,7 +264,55 @@ public sealed class AssetReferenceSpecPropertyType :
             return FailedToParse(in parse, out value);
         }
 
+        CheckSelfRef(in parse, value, stringValue2);
+
         return true;
+    }
+
+    internal static bool GetPreventSelfRef(in SpecPropertyTypeParseContext parse)
+    {
+        return parse.HasDiagnostics && parse.EvaluationContext.Self.TryGetAdditionalProperty("PreventSelfReference", out bool s) && s;
+    }
+
+    internal static void CheckSelfRef(in SpecPropertyTypeParseContext parse, Guid value, AssetFileNode node, bool? preventSelfRef = null)
+    {
+        bool setting = preventSelfRef ?? GetPreventSelfRef(in parse);
+        if (!setting)
+            return;
+
+        if (parse.File != null && parse.File.GetGuid() is { } thisGuid && thisGuid != Guid.Empty && thisGuid == value)
+        {
+            parse.Log(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1019,
+                Message = DiagnosticResources.UNT1019,
+                Range = node.Range
+            });
+        }
+    }
+
+    internal static void CheckSelfRef(in SpecPropertyTypeParseContext parse, ushort id, int assetCategory, AssetFileNode node, bool? preventSelfRef = null)
+    {
+        if (assetCategory == 0)
+            return;
+
+        bool setting = preventSelfRef ?? GetPreventSelfRef(in parse);
+        if (!setting)
+            return;
+
+        if (parse.File?.GetId() is not { } thisId || thisId == 0 || thisId != id)
+            return;
+
+        EnumSpecTypeValue cat = parse.File.GetCategory(parse.Database);
+        if (cat.Index == 0 || cat.Index != assetCategory)
+            return;
+
+        parse.Log(new DatDiagnosticMessage
+        {
+            Diagnostic = DatDiagnostics.UNT1019,
+            Message = DiagnosticResources.UNT1019,
+            Range = node.Range
+        });
     }
 
     /// <inheritdoc />

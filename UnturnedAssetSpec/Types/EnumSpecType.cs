@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 [DebuggerDisplay("Enum: {Type.GetTypeName()}")]
-public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<EnumSpecType>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
+public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<EnumSpecType>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType, IAdditionalPropertyProvider
 {
     private AutoCompleteResult[]? _valueResults;
 
@@ -18,7 +18,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
     public required string DisplayName { get; init; }
     public required string? Docs { get; init; }
     public required EnumSpecTypeValue[] Values { get; init; }
-    public required OneOrMore<KeyValuePair<string, object?>> ExtendedData { get; init; }
+    public required OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; init; }
 
 #nullable disable
     public AssetSpecType Owner { get; set; }

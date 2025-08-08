@@ -1117,6 +1117,24 @@ public static class OneOrMoreExtensions
     }
 
     /// <summary>
+    /// Attempts to get a value from a <see cref="OneOrMore{T}"/> acting as a dictionary based on a string comparison type.
+    /// </summary>
+    public static bool TryGetValue<TValue>(this OneOrMore<KeyValuePair<string, TValue>> dictionary, string key, out TValue value, StringComparison stringComparison)
+    {
+        foreach (KeyValuePair<string, TValue> pair in dictionary)
+        {
+            if (!string.Equals(pair.Key, key, stringComparison))
+                continue;
+            
+            value = pair.Value;
+            return true;
+        }
+
+        value = default!;
+        return false;
+    }
+
+    /// <summary>
     /// Check if a string is contained in this container based on a string comparison type.
     /// </summary>
     [Pure]

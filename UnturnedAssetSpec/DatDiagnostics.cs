@@ -110,6 +110,11 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT1018 = new DatDiagnostic("UNT1018", DatDiagnosticSeverity.Warning);
 
+    /// <summary>
+    /// Self reference when it shouldn't happen.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1019 = new DatDiagnostic("UNT1019", DatDiagnosticSeverity.Warning);
+
     /* Errors */
 
     /// <summary>
