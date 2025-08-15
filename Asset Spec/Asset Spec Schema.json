@@ -322,6 +322,10 @@
                     "title": "An physics material name or legacy SDG.Unturned.EPhysicsMaterial."
                 },
                 {
+                    "const": "TypeReference",
+                    "title": "A TypeReference<> taking an assembly-qualified type name."
+                },
+                {
                     "$ref": "#/$defs/switch"
                 }
             ]
@@ -513,58 +517,127 @@
                         "Description":
                         {
                             "description": "Short description of the property.",
-                            "type": "string"
+                            "oneOf":
+                            [
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
+                            ]
                         },
                         "Variable":
                         {
                             "description": "Name of the variable in the C# class.",
-                            "type": "string"
+                            "oneOf":
+                            [
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
+                            ]
                         },
                         "Version":
                         {
                             "description": "Unturned version when this option was added.",
-                            "type":
+                            "oneOf":
                             [
-                                "string",
-                                "null"
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "format": "uri"
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
                             ]
                         },
                         "Docs":
                         {
                             "description": "Link to the Unturned modding docs when a page is available.",
-                            "type":
+                            "oneOf":
                             [
-                                "string",
-                                "null"
-                            ],
-                            "format": "uri"
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "format": "uri"
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
+                            ]
                         },
                         "Markdown":
                         {
                             "description": "Longer markdown description of the property.",
-                            "type":
+                            "oneOf":
                             [
-                                "string",
-                                "null"
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
                             ]
                         },
                         "Minimum":
                         {
-                            "type":
+                            "oneOf":
                             [
-                                "number",
-                                "string",
-                                "null"
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "number",
+                                        "integer",
+                                        "boolean",
+                                        "null"
+                                    ]
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
                             ],
                             "description": "Inclusive minimum value of the property. Can also be another property."
                         },
                         "Maximum":
                         {
-                            "type":
+                            "oneOf":
                             [
-                                "number",
-                                "string",
-                                "null"
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "number",
+                                        "integer",
+                                        "boolean",
+                                        "null"
+                                    ]
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
                             ],
                             "description": "Inclusive maximum value of the property. Can also be another property."
                         },
@@ -780,17 +853,16 @@
                         },
                         "Deprecated":
                         {
-                            "type": "boolean",
-                            "description": "If this property shouldn't be used anymore or was left in for legacy features."
-                        },
-                        "SimilarGrouping":
-                        {
-                            "type":
+                            "description": "If this property shouldn't be used anymore or was left in for legacy features.",
+                            "oneOf":
                             [
-                                "string",
-                                "null"
-                            ],
-                            "description": "Unique ID linking multiple properties that are usually kept together (no whitespace)."
+                                {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
+                                }
+                            ]
                         }
                     },
                     "required":
@@ -1231,8 +1303,16 @@
                     },
                     "Deprecated":
                     {
-                        "type": "boolean",
-                        "description": "If the prefab is no longer used or has been swapped for newer prefab features."
+                        "description": "If this property shouldn't be used anymore or was left in for legacy features.",
+                        "oneOf":
+                        [
+                            {
+                                "$ref": "#/$defs/condition"
+                            },
+                            {
+                                "$ref": "#/$defs/switchCase"
+                            }
+                        ]
                     },
                     "Required":
                     {

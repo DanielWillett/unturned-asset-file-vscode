@@ -239,7 +239,7 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
         return null;
     }
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }
 
 public enum CustomSpecTypeParseOptions

@@ -1,0 +1,30 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.NPCRewardsAsset, Assembly-CSharp",
+    "DisplayName": "NPC Reward List",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Category": "NONE",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards-list-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Conditions",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Description": "Conditions that must be met to grant the rewards.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards-list-asset.html#rewards-list-assets",
+            "Variable": "conditionsList",
+            "CountForRegexGroup": "npc-rewardlist-conditions"
+        },
+        {
+            "Key": "Rewards",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Description": "Rewards to grant upon activation.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards-list-asset.html#rewards-list-assets",
+            "Variable": "rewardsList",
+            "CountForRegexGroup": "npc-rewardlist-rewards"
+        }
+    ]
+}

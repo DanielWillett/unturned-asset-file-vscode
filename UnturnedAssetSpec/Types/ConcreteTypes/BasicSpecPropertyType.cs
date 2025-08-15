@@ -44,5 +44,5 @@ public abstract class BasicSpecPropertyType<TSpecPropertyType, TValue> :
     public override int GetHashCode() => 0;
     public override string ToString() => Type;
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

@@ -1,0 +1,374 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.LevelAsset, Assembly-CSharp",
+    "DisplayName": "Level",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Category": "NONE",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Default_Game_Mode",
+            "Type": "TypeReference",
+            "ElementType": "SDG.Unturned.GameMode, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "The default gamemode to use when loading this map.",
+            "Variable": "defaultGameMode"
+        },
+        {
+            "Key": "Supported_Game_Modes",
+            "Type": "List",
+            "ElementType": "TypeReference",
+            "SpecialTypes": [ "SDG.Unturned.GameMode, Assembly-CSharp" ],
+            "DefaultValue": null,
+            "Description": "List of gamemodes supported by this map. Doesn't appear to be used by the game.",
+            "Deprecated": true,
+            "Variable": "supportedGameModes"
+        },
+        {
+            "Key": "Dropship",
+            "Type": "MasterBundleReference",
+            "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "DefaultValue": "core.masterbundle:Level/Dropship.prefab",
+            "Description": "The object to use for the airdrop plane.",
+            "Variable": "dropshipPrefab",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "Airdrop",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.AirdropAsset, Assembly-CSharp",
+            "DefaultValue": "229440c249dc490ba26ce71e8a59d5c6",
+            "Description": "The default airdrop to use for the carepackage.",
+            "Variable": "airdropRef",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "Crafting_Blacklists",
+            "Type": "List",
+            "ElementType": "AssetReference",
+            "SpecialTypes": [ "SDG.Unturned.CraftingBlacklistAsset, Assembly-CSharp" ],
+            "DefaultValue": null,
+            "Description": "List of crafting blacklists applied to this level by default.",
+            "Variable": "craftingBlacklists",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "Weather_Types",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.LevelAsset+SchedulableWeather, Assembly-CSharp",
+            "Description": "List making up this level's weather schedule. Ignored if @Perpetual_Weather_Asset is set.",
+            "DefaultValue": null,
+            "Variable": "schedulableWeathers",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
+            "ExclusiveWith": [ "Perpetual_Weather_Asset" ]
+        },
+        {
+            "Key": "Perpetual_Weather_Asset",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp",
+            "Description": "This weather will always be active on this level. Weather scheduling is ignored.",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Variable": "perpetualWeatherRef",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
+            "ExclusiveWith": [ "Weather_Types" ]
+        },
+        {
+            "Key": "Loading_Screen_Music",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.LevelAsset+LoadingScreenMusic, Assembly-CSharp",
+            "Description": "List of loading screen music options. A random clip will be chosen from the list.",
+            "DefaultValue": null,
+            "Variable": "loadingScreenMusic",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "Death_Music",
+            "Type": "MasterBundleReference",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Description": "Audio clip played after death.",
+            "DefaultValue": "core.masterbundle:Music/Death.mp3",
+            "Variable": "DeathMusicRef",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "Should_Animate_Background_Image",
+            "Type": "Boolean",
+            "Description": "Whether or not the background image moves left/right with loading progress.",
+            "DefaultValue": false,
+            "Variable": "shouldAnimateBackgroundImage",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "Global_Weather_Mask",
+            "Type": "UInt32",
+            "Description": "Default volume mask when players aren't in another ambiance volume. A player's current volume mask has to share bits with the @(SDG.Unturned.WeatherAssetBase, Assembly-CSharp::Volume_Mask) from a weather asset for it to be visible.",
+            "DefaultValue": 4294967295,
+            "IncludedDefaultValue": 0,
+            "Variable": "globalWeatherMask",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "Skills",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.LevelAsset+SkillRule, Assembly-CSharp",
+            "Description": "List of skill rules that take effect on this level.",
+            "DefaultValue": null,
+            "Variable": "skillRules",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "Min_Stealth_Radius",
+            "Type": "Float32",
+            "Description": "Player stealth skill level cannot reduce minimum detection distance below this value.",
+            "DefaultValue": 0.0,
+            "Minimum": 0.0,
+            "Variable": "minStealthRadius",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "Fall_Damage_Speed_Threshold",
+            "Type": "Float32",
+            "Description": "Lowest vertical speed (m/s) at which, when landing, fall damage will be dealt.",
+            "DefaultValue": 22.0,
+            "Minimum": 0.01,
+            "Variable": "fallDamageSpeedThreshold",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "Enable_Admin_Faster_Salvage_Duration",
+            "Type": "Boolean",
+            "Description": "Whether or not admins should have 8x faster salvaging.",
+            "DefaultValue": true,
+            "IncludedDefaultValue": false,
+            "Variable": "enableAdminFasterSalvageDuration",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "Has_Clouds",
+            "Type": "Boolean",
+            "Description": "Whether or not clouds are enabled in the skybox.",
+            "DefaultValue": true,
+            "IncludedDefaultValue": false,
+            "Variable": "hasClouds",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "TerrainColors",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.LevelAsset+TerrainColorRule, Assembly-CSharp",
+            "Description": "Specifies which colors are too similar to terrain colors.",
+            "DefaultValue": null,
+            "Variable": "terrainColorRules",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.LevelAsset+SchedulableWeather, Assembly-CSharp",
+            "DisplayName": "Weather Schedule Entry",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#schedulable-weather-properties",
+            "Properties":
+            [
+                {
+                    "Key": "Asset",
+                    "Type": "AssetReference",
+                    "ElementType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp",
+                    "Required": true,
+                    "DefaultValue": null,
+                    "Description": "The weather this entry is scheduling.",
+                    "Variable": "assetRef",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#schedulable-weather-properties"
+                },
+                {
+                    "Key": "Min_Frequency",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": "@Max_Frequency",
+                    "Required": true,
+                    "DefaultValue": 0.0,
+                    "Description": "Number of in-game days until the weather starts after the last scheduled weather ends. A random value between @Min_Frequency and @Max_Frequency will be chosen.",
+                    "Variable": "minFrequency",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#schedulable-weather-properties"
+                },
+                {
+                    "Key": "Max_Frequency",
+                    "Type": "Float32",
+                    "Minimum": "@Min_Frequency",
+                    "Required": true,
+                    "DefaultValue": 0.0,
+                    "Description": "Number of in-game days until the weather starts after the last scheduled weather ends. A random value between @Min_Frequency and @Max_Frequency will be chosen.",
+                    "Variable": "minFrequency",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#schedulable-weather-properties"
+                },
+                {
+                    "Key": "Min_Duration",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": "@Max_Duration",
+                    "Required": true,
+                    "DefaultValue": 0.0,
+                    "Description": "Number of in-game days until the weather ends after it starts. A random value between @Min_Duration and @Max_Duration will be chosen.",
+                    "Variable": "minDuration",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#schedulable-weather-properties"
+                },
+                {
+                    "Key": "Max_Duration",
+                    "Type": "Float32",
+                    "Minimum": "=MAX(@Min_Duration 0.001001)",
+                    "Required": true,
+                    "DefaultValue": 0.0,
+                    "Description": "Number of in-game days until the weather ends after it starts. A random value between @Min_Duration and @Max_Duration will be chosen.",
+                    "Variable": "maxDuration",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#schedulable-weather-properties"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.LevelAsset+LoadingScreenMusic, Assembly-CSharp",
+            "DisplayName": "Loading Screen Music",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#music-properties",
+            "Properties":
+            [
+                {
+                    "Key": "Loop",
+                    "Type": "MasterBundleReference",
+                    "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+                    "DefaultValue": null,
+                    "Description": "Looping audio clip played until loading finishes.",
+                    "Variable": "loopRef",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#music-properties",
+                    "Priority": 1
+                },
+                {
+                    "Key": "Outro",
+                    "Type": "MasterBundleReference",
+                    "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+                    "DefaultValue": null,
+                    "Description": "Audio clip played once loading finishes.",
+                    "Variable": "outroRef",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#music-properties",
+                    "Priority": 1
+                },
+                {
+                    "Key": "Loop_Volume",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "DefaultValue": 1.0,
+                    "IncludedDefaultValue": 0.0,
+                    "Description": "Volume multiplier for @Loop.",
+                    "Variable": "loopVolume",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#music-properties"
+                },
+                {
+                    "Key": "Outro_Volume",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "DefaultValue": 1.0,
+                    "IncludedDefaultValue": 0.0,
+                    "Description": "Volume multiplier for @Outro.",
+                    "Variable": "outroVolume",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#music-properties"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.LevelAsset+SkillRule, Assembly-CSharp",
+            "DisplayName": "Level Skill Rule",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
+            "Properties":
+            [
+                {
+                    "Key": "Id",
+                    "Type": "Skill",
+                    "DefaultValue": null,
+                    "Required": true,
+                    "Description": "Name of the skill.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
+                    "Priority": 4
+                },
+                {
+                    "Key": "Default_Level",
+                    "Type": "SkillLevel",
+                    "DefaultValue": 0,
+                    "Description": "The default skill level for new players.",
+                    "Variable": "defaultLevel",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
+                    "Priority": 3
+                },
+                {
+                    "Key": "Max_Unlockable_Level",
+                    "Type": "SkillLevel",
+                    "DefaultValue": 255,
+                    "IncludedDefaultValue": 0,
+                    "Description": "Maximum skill level attainable through gameplay. Levels exceeding the usual maximum level do not have any effect.",
+                    "Variable": "maxUnlockableLevel",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
+                    "Priority": 2
+                },
+                {
+                    "Key": "Cost_Multiplier",
+                    "Type": "SkillLevel",
+                    "DefaultValue": 1.0,
+                    "IncludedDefaultValue": 0.0,
+                    "Description": "Multiplier for XP upgrade cost.",
+                    "Variable": "costMultiplier",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
+                    "Priority": 1
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.LevelAsset+TerrainColorRule, Assembly-CSharp",
+            "DisplayName": "Terrain HSV Skin Color Rule",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#terrain-color-properties",
+            "Properties":
+            [
+                {
+                    "Key": "Color",
+                    "Type": "Color32RGB",
+                    "DefaultValue": "#000000",
+                    "Required": true,
+                    "Description": "Actual base color/albedo of terrain material. Players will be kicked from multiplayer servers if their customized skin color is too similar to the value of this property.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#terrain-color-properties",
+                    "Priority": 1
+                },
+                {
+                    "Key": "HueThreshold",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Required": true,
+                    "Description": "If the difference between hues is greater than this threshold, the colors are not too similar.",
+                    "Variable": "hueThreshold",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#terrain-color-properties"
+                },
+                {
+                    "Key": "SaturationThreshold",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Required": true,
+                    "Description": "If the difference between saturations is greater than this threshold, the colors are not too similar.",
+                    "Variable": "saturationThreshold",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#terrain-color-properties"
+                },
+                {
+                    "Key": "ValueThreshold",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Required": true,
+                    "Description": "If the difference between values is greater than this threshold, the colors are not too similar.",
+                    "Variable": "valueThreshold",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#terrain-color-properties"
+                }
+            ]
+        }
+    ]
+}

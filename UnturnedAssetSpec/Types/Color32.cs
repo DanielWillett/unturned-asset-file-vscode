@@ -1,9 +1,13 @@
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
+using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 [StructLayout(LayoutKind.Explicit, Size = 4)]
+[JsonConverter(typeof(Color32Converter))]
 public readonly struct Color32 : IEquatable<Color32>, IComparable<Color32>
 {
     [FieldOffset(0)]
@@ -56,4 +60,14 @@ public readonly struct Color32 : IEquatable<Color32>, IComparable<Color32>
 
     public static bool operator ==(Color32 left, Color32 right) => left.Equals(right);
     public static bool operator !=(Color32 left, Color32 right) => !left.Equals(right);
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        string str = "#" + R.ToString("x2", CultureInfo.InvariantCulture) + G.ToString("x2", CultureInfo.InvariantCulture) + B.ToString("x2", CultureInfo.InvariantCulture);
+        if (A != byte.MaxValue)
+            str += A.ToString("x2", CultureInfo.InvariantCulture);
+
+        return str;
+    }
 }

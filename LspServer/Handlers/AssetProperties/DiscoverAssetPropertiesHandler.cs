@@ -43,7 +43,7 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
         FileEvaluationContext context = new FileEvaluationContext(null!, fileType.Information, file.File, _environment, _installEnvironment, _spec, file);
 
         List<SpecProperty> properties = fileType.Information.Properties
-            .Where(x => !x.Deprecated)
+            .Where(x => ReferenceEquals(x.Deprecated, SpecDynamicValue.False))
             .OrderByDescending(x => x.Priority)
             .ThenBy(x => x.Key)
             .ToList();
@@ -55,16 +55,21 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
             SpecProperty property = properties[i];
             FileEvaluationContext propContext = new FileEvaluationContext(in context, property);
 
+            string? desc = null, markdown = null;
+
+            property.Description?.TryEvaluateValue(in propContext, out desc, out _);
+            property.Markdown?.TryEvaluateValue(in propContext, out markdown, out _);
+
             AssetProperty prop = new AssetProperty
             {
                 Key = property.Key,
-                Description = property.Description,
-                Markdown = property.Markdown
+                Description = desc,
+                Markdown = markdown
             };
 
             outputProperties[i] = prop;
 
-            if (!propContext.TryGetValue(out ISpecDynamicValue val, out AssetFileKeyValuePairNode? lineNode))
+            if (!propContext.TryGetValue(out ISpecDynamicValue? val, out AssetFileKeyValuePairNode? lineNode))
                 continue;
 
             if (val != null && val.TryEvaluateValue(in propContext, out object? value))

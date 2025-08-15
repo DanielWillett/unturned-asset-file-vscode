@@ -402,7 +402,7 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
             Tree = this
         };
 
-        ValueType.Visit(visitor);
+        ValueType.Visit(ref visitor);
 
         value = visitor.Value;
         return visitor.HasValue;

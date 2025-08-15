@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -146,7 +147,13 @@ internal static class JsonHelper
                 else if (reader.TryGetDateTime(out DateTime dt))
                     obj = dt;
                 else
-                    obj = reader.GetString();
+                {
+                    string str = reader.GetString();
+                    if (Guid.TryParse(str, out guid))
+                        obj = guid;
+                    else
+                        obj = str;
+                }
                 return true;
 
             case JsonTokenType.StartArray:
@@ -281,5 +288,39 @@ internal static class JsonHelper
                     break;
             }
         }
+    }
+
+    public static object? Deserialize(ref Utf8JsonReader reader, Type type, JsonSerializerOptions? options)
+    {
+        if (reader.TokenType == JsonTokenType.Null)
+        {
+            return null;
+        }
+
+        if (type != typeof(Guid))
+        {
+            return JsonSerializer.Deserialize(ref reader, type, options);
+        }
+
+        if (TryGetGuid(ref reader, out Guid guid))
+        {
+            return guid;
+        }
+
+        // will error
+        return reader.GetGuid();
+    }
+
+    public static bool TryGetGuid(ref Utf8JsonReader reader, out Guid guid)
+    {
+        // doesn't support non-dashed GUID format
+        if (reader.TryGetGuid(out guid))
+            return true;
+
+        if (reader.TokenType != JsonTokenType.String)
+            return false;
+        
+        string str = reader.GetString()!;
+        return Guid.TryParse(str, out guid);
     }
 }

@@ -1,6 +1,4 @@
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using OmniSharp.Extensions.LanguageServer.Protocol;
@@ -13,8 +11,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 
 internal class HoverHandler : IHoverHandler
 {
-    private readonly OpenedFileTracker _fileTracker;
-    private readonly IAssetSpecDatabase _specDictionary;
+    private readonly FileEvaluationContextFactory _evalFactory;
 
     /// <inheritdoc />
     HoverRegistrationOptions IRegistration<HoverRegistrationOptions, HoverCapability>.GetRegistrationOptions(
@@ -26,32 +23,35 @@ internal class HoverHandler : IHoverHandler
         };
     }
 
-    public HoverHandler(OpenedFileTracker fileTracker, IAssetSpecDatabase specDictionary)
+    public HoverHandler(FileEvaluationContextFactory evalFactory)
     {
-        _fileTracker = fileTracker;
-        _specDictionary = specDictionary;
+        _evalFactory = evalFactory;
     }
 
     /// <inheritdoc />
     public Task<Hover?> Handle(HoverParams request, CancellationToken cancellationToken)
     {
-        if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))
+        if (!_evalFactory.TryCreate(request.Position, request.TextDocument.Uri, out SpecPropertyTypeParseContext ctx) && ctx.Node == null)
         {
             return Task.FromResult<Hover?>(null);
         }
 
-        AssetFileTree tree = file.File;
+        Range range = ctx.Node!.Range.ToRange();
 
-        AssetFileType fileType = AssetFileType.FromFile(file.File, _specDictionary);
-
-        AssetFileNode? node = tree.GetNode(request.Position.ToFilePosition());
-
-        if (node is not AssetFileKeyNode keyNode)
-            return Task.FromResult<Hover?>(null);
-
-        Range range = node.Range.ToRange();
-
-        SpecProperty? property = _specDictionary.FindPropertyInfo(keyNode.Value, fileType, SpecPropertyContext.Property);
+        string? desc;
+        SpecProperty? prop = ctx.EvaluationContext.Self;
+        if (prop == null)
+        {
+            desc = "Unknown property";
+        }
+        else if (prop.Description == null
+                 || !prop.Description.TryEvaluateValue(in ctx.EvaluationContext, out desc, out bool isNull)
+                 || isNull
+                 || string.IsNullOrEmpty(desc)
+                )
+        {
+            desc = prop.Key;
+        }
 
         return Task.FromResult<Hover?>(new Hover
         {
@@ -59,7 +59,7 @@ internal class HoverHandler : IHoverHandler
             Contents = new MarkedStringsOrMarkupContent(new MarkupContent
             {
                 Kind = MarkupKind.PlainText,
-                Value = property != null ? property.Description ?? property.Key : "Unknown property"
+                Value = desc
             })
         });
     }

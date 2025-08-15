@@ -180,5 +180,5 @@ public sealed class CommaDelimitedStringSpecPropertyType :
             disp.Dispose();
     }
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

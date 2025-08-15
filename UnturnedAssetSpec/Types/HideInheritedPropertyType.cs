@@ -27,5 +27,5 @@ internal sealed class HideInheritedPropertyType : ISpecPropertyType, IEquatable<
         return false;
     }
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) { }
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) { }
 }

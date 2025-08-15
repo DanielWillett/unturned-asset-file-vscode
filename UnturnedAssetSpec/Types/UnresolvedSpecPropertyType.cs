@@ -45,7 +45,7 @@ internal sealed class UnresolvedSpecPropertyType :
         throw new NotSupportedException();
     }
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) { }
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) { }
 
     public ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile)
     {

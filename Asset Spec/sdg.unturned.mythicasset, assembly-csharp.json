@@ -1,0 +1,63 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.MythicAsset, Assembly-CSharp",
+    "DisplayName": "Mythic",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Category": "MYTHIC",
+    "VanillaIdLimit": 500,
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html",
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Bypass_ID_Limit",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows IDs to be less than 500 if this isn't the vanilla bundle.",
+            "Priority": -1
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "System_Area",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "systemArea",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html#unity-prefabs",
+            "Description": "Instantiated multiple times to cover a larger area. Mythical shirts and pants attach them to character bones, and mythical vehicle skins attach them to several points on the surface. As such, this shouldn’t rely on any specific orientation. Layer should be set to Enemy."
+        },
+        {
+            "AssetName": "System_Hook",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "systemHook",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html#unity-prefabs",
+            "Description": "Attached to a cosmetic item’s \"Effect\" prefab. Layer should be set to Enemy."
+        },
+        {
+            "AssetName": "System_First",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "systemFirst",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html#unity-prefabs",
+            "Description": "Attached to first-person weapon skin. Particles should be smaller than usual, and try to avoid the up direction to reduce blocking the player’s aim. First-person particles are typically half the size, but use the same emission shape size as third-person. Layer should be set to Viewmodel."
+        },
+        {
+            "AssetName": "System_Third",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "systemThird",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html#unity-prefabs",
+            "Description": "Attached to third-person weapon skin. Unlike for cosmetics, +Z is forward and +Y is up. It may be helpful to increase particle size to make them more visible over the shoulder. Emission typically uses a box of size 25x25x50 cm. Layer should be set to Item."
+        }
+    ],
+    "Localization":
+    [
+        {
+            "Key": "Particle_Tag_Name",
+            "Type": "String",
+            "Description": "When a mythical item is crafted with this effect, this is the display name shown in the inventory.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html#localization",
+            "Variable": "particleTagName",
+            "DefaultValue": "#This.AssetName",
+            "Required": true
+        }
+    ]
+}

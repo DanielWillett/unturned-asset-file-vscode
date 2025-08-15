@@ -123,7 +123,7 @@ public sealed class ListSpecPropertyType<TElementType> :
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<EquatableArray<TElementType>>? other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }
 
 internal sealed class UnresolvedListSpecPropertyType :
@@ -167,5 +167,5 @@ internal sealed class UnresolvedListSpecPropertyType :
         return KnownTypes.List(InnerType.Transform(property, database, assetFile), AllowSingle);
     }
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) { }
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) { }
 }

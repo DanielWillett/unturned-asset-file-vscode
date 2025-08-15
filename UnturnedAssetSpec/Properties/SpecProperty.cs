@@ -33,22 +33,22 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     /// <summary>
     /// Short description of the property.
     /// </summary>
-    public string? Description { get; set; }
+    public ISpecDynamicValue? Description { get; set; }
 
     /// <summary>
     /// Name of the C# variable storing the value of this property.
     /// </summary>
-    public string? Variable { get; set; }
+    public ISpecDynamicValue? Variable { get; set; }
 
     /// <summary>
     /// Link to the SDG modding docs relating to this property.
     /// </summary>
-    public string? Docs { get; set; }
+    public ISpecDynamicValue? Docs { get; set; }
 
     /// <summary>
     /// Longer markdown description of the property.
     /// </summary>
-    public string? Markdown { get; set; }
+    public ISpecDynamicValue? Markdown { get; set; }
 
     /// <summary>
     /// Designates a property that selects the cross-ref file for any properties starting with $cr$::
@@ -88,7 +88,7 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     /// <summary>
     /// If this property shouldn't be used anymore or was left in for legacy features.
     /// </summary>
-    public bool Deprecated { get; set; }
+    public ISpecDynamicValue Deprecated { get; set; } = SpecDynamicValue.False;
 
     /// <summary>
     /// Sort priority (descending).
@@ -96,14 +96,9 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     public int Priority { get; set; }
 
     /// <summary>
-    /// Unique ID linking multiple properties that are usually kept together (no whitespace).
-    /// </summary>
-    public string? SimilarGrouping { get; set; }
-
-    /// <summary>
     /// Unturned version when this option was added.
     /// </summary>
-    public Version? Version { get; set; }
+    public ISpecDynamicValue? Version { get; set; }
 
     /// <summary>
     /// If this property is required.
@@ -223,8 +218,8 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
               || IsHidden != other.IsHidden
               || !Type.Equals(other.Type)
               || !string.Equals(SingleKeyOverride, other.SingleKeyOverride, StringComparison.Ordinal)
-              || !string.Equals(Description, other.Description, StringComparison.Ordinal)
-              || !string.Equals(Markdown, other.Markdown, StringComparison.Ordinal)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Description, other.Description)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Markdown, other.Markdown)
               || !string.Equals(FileCrossRef, other.FileCrossRef, StringComparison.Ordinal)
               || !string.Equals(CountForRegexGroup, other.CountForRegexGroup, StringComparison.Ordinal)
               || !string.Equals(ValueRegexGroupReference, other.ValueRegexGroupReference, StringComparison.Ordinal)
@@ -232,15 +227,15 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
               || !Aliases.Equals(other.Aliases, StringComparison.Ordinal)
               || CanBeInMetadata != other.CanBeInMetadata
               || KeyIsRegex != other.KeyIsRegex
-              || Deprecated != other.Deprecated
-              || !EqualityComparer<Version?>.Default.Equals(Version, other.Version)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Deprecated, other.Deprecated)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Version, other.Version)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(RequiredCondition, other.RequiredCondition)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(DefaultValue, other.DefaultValue)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(IncludedDefaultValue, other.IncludedDefaultValue)
               || !KeyGroups.Equals(other.KeyGroups)
               || !EqualityComparer<ISpecType?>.Default.Equals(Owner, other.Owner)
               || Priority != other.Priority
-              || !string.Equals(Docs, other.Docs, StringComparison.Ordinal)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Docs, other.Docs)
               || !Exceptions.Equals(other.Exceptions)
               || ExceptionsAreWhitelist != other.ExceptionsAreWhitelist
               || !EqualityComparer<InclusionCondition?>.Default.Equals(ExclusiveProperties, other.ExclusiveProperties)
@@ -250,8 +245,7 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(MaximumValue, other.MaximumValue)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(MinimumValue, other.MinimumValue)
               || !EqualityComparer<SpecProperty?>.Default.Equals(Parent, other.Parent)
-              || !string.Equals(Variable, other.Variable, StringComparison.Ordinal)
-              || !string.Equals(SimilarGrouping, other.SimilarGrouping, StringComparison.Ordinal)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Variable, other.Variable)
               )
         {
             return false;
@@ -309,7 +303,6 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
         MaximumValue = MaximumValue,
         MinimumValue = MinimumValue,
         Parent = Parent,
-        Variable = Variable,
-        SimilarGrouping = SimilarGrouping
+        Variable = Variable
     };
 }

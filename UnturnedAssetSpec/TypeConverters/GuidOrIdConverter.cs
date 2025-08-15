@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
@@ -31,7 +32,7 @@ public sealed class GuidOrIdConverter : JsonConverter<GuidOrId>
                 if (reader.ValueTextEquals(EmptyGuid.EncodedUtf8Bytes))
                     return GuidOrId.Empty;
 
-                if (reader.TryGetGuid(out Guid guid))
+                if (JsonHelper.TryGetGuid(ref reader, out Guid guid))
                     return new GuidOrId(guid);
 
                 if (ushort.TryParse(reader.GetString(), NumberStyles.Number, CultureInfo.InvariantCulture, out id))

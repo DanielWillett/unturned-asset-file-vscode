@@ -1,0 +1,21 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.MaterialPaletteAsset, Assembly-CSharp",
+    "DisplayName": "Material Palette",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Category": "NONE",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/material-palette-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Materials",
+            "Type": "List",
+            "ElementType": "ContentReference",
+            "SpecialTypes": [ "UnityEngine.Material, UnityEngine.CoreModule" ],
+            "DefaultValue": null,
+            "Description": "List of available materials.",
+            "Variable": "materials"
+        }
+    ]
+}

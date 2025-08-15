@@ -84,7 +84,16 @@ public static class KnownTypes
             return func();
         }
 
-        Type? type = System.Type.GetType(knownType, false, false);
+        Type? type;
+        try
+        {
+            type = System.Type.GetType(knownType, false, false);
+        }
+        catch
+        {
+            type = null;
+        }
+
         if (type != null && typeof(ISpecPropertyType).IsAssignableFrom(type) && !typeof(ISecondPassSpecPropertyType).IsAssignableFrom(type))
         {
             return (ISpecPropertyType)Activator.CreateInstance(type);
@@ -217,6 +226,14 @@ public static class KnownTypes
                 string.IsNullOrEmpty(elementType)
                     ? String
                     : GetType(elementType!, elementType2, specialTypes.Remove(elementType2!)) ?? new UnresolvedSpecPropertyType(elementType!));
+        }
+
+        if (knownType.Equals("TypeReference", StringComparison.Ordinal))
+        {
+            return TypeReference(string.IsNullOrEmpty(elementType)
+                ? QualifiedType.None
+                : new QualifiedType(elementType!, false)
+            );
         }
 
         bool allowSingle = knownType.Equals("ListOrSingle", StringComparison.Ordinal);
@@ -431,4 +448,6 @@ public static class KnownTypes
             _ => new FormatStringSpecPropertyType(argCount, allowRichText)
         };
     }
+    public static ISpecPropertyType<QualifiedType> TypeReference(QualifiedType elementType)
+        => new TypeReferenceSpecPropertyType(elementType);
 }

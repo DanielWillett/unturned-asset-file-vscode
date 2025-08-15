@@ -162,6 +162,8 @@
                     "Type": "RichTextString",
                     "KeyIsRegex": true,
                     "Required": true,
+                    "SupportsNewLines": true,
+                    "ExtraTags": [ "<name_npc>", "<name_char>", "<pause>" ],
                     "KeyGroups":
                     [
                         {
@@ -268,6 +270,8 @@
                     "Key": "#This.Key",
                     "Type": "RichTextString",
                     "Required": true,
+                    "SupportsNewLines": true,
+                    "ExtraTags": [ "<name_npc>", "<name_char>" ],
                     "Description": "The text shown for response #(Self.KeyGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#localization",
                     "Variable": "text"

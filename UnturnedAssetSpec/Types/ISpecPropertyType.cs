@@ -24,7 +24,7 @@ public interface ISpecPropertyType : IEquatable<ISpecPropertyType?>
     /// If this type is not strongly typed (such as <see cref="UnresolvedSpecPropertyType"/>), the visitor will not be invoked.
     /// </para>
     /// </summary>
-    void Visit<TVisitor>(TVisitor visitor) where TVisitor : ISpecPropertyTypeVisitor;
+    void Visit<TVisitor>(ref TVisitor visitor) where TVisitor : ISpecPropertyTypeVisitor;
 }
 
 public interface ISpecPropertyType<TValue> : ISpecPropertyType, IEquatable<ISpecPropertyType<TValue>?>

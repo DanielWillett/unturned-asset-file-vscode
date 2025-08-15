@@ -2657,6 +2657,7 @@
                     "Type": "RichTextString",
                     "DefaultValue": "@$local$::Text",
                     "IncludedDefaultValue": null,
+                    "SupportsNewLines": true,
                     "Description": "Message to display on the hint popup. Better to store this value in localization instead.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#hint",
                     "Variable": "text"

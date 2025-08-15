@@ -128,6 +128,12 @@ internal class KeyCompletionHandler : ICompletionHandler
 
         ISpecPropertyType? type = property.Type.GetType(in ctx);
 
+        string? description = null, markdown = null;
+        property.Description?.TryEvaluateValue(in ctx, out description, out _);
+        property.Markdown?.TryEvaluateValue(in ctx, out markdown, out _);
+
+        property.Deprecated.TryEvaluateValue(in ctx, out bool deprecated, out _);
+
         CompletionItem item = new CompletionItem
         {
             Label = state.Alias ?? property.Key,
@@ -136,20 +142,20 @@ internal class KeyCompletionHandler : ICompletionHandler
             Kind = CompletionItemKind.Property,
             LabelDetails = new CompletionItemLabelDetails
             {
-                Description = property.Description,
+                Description = description,
                 Detail = type != null ? ": " + type.DisplayName : string.Empty
             },
-            Deprecated = property.Deprecated,
-            Tags = property.Deprecated ? new Container<CompletionItemTag>(CompletionItemTag.Deprecated) : null,
+            Deprecated = deprecated,
+            Tags = deprecated ? new Container<CompletionItemTag>(CompletionItemTag.Deprecated) : null,
             Detail = type?.DisplayName,
             Documentation =
-                property.Markdown != null
+                !string.IsNullOrEmpty(markdown)
                 ? new StringOrMarkupContent(new MarkupContent
                 {
                     Kind = MarkupKind.Markdown,
-                    Value = property.Markdown
+                    Value = markdown
                 })
-                : property.Description != null ? new StringOrMarkupContent(property.Description) : null,
+                : !string.IsNullOrEmpty(description) ? new StringOrMarkupContent(description) : null,
             InsertTextFormat = InsertTextFormat.PlainText,
             CommitCharacters = property.Type.Equals(KnownTypes.Flag) ? FlagCommitKeys : CommitKeys,
             TextEdit = edit

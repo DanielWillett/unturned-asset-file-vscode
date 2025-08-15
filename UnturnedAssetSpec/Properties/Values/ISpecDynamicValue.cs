@@ -4,9 +4,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -1043,6 +1047,7 @@ public static class SpecDynamicValue
         return Read(ref reader, options, context, expectedType == null ? default : new PropertyTypeOrSwitch(expectedType));
     }
 
+    [SkipLocalsInit]
     public static ISpecDynamicValue Read(ref Utf8JsonReader reader, JsonSerializerOptions? options, SpecDynamicValueContext context, PropertyTypeOrSwitch expectedType)
     {
         if (((int)context & 0b11) == 3)
@@ -1051,6 +1056,12 @@ public static class SpecDynamicValue
         }
 
         while (reader.TokenType == JsonTokenType.Comment && reader.Read()) ;
+
+        if (reader.TokenType is JsonTokenType.None or JsonTokenType.PropertyName)
+        {
+            if (!reader.Read())
+                throw new JsonException("Failed to parse ISpecDynamicValue, no JSON data.");
+        }
 
         switch (reader.TokenType)
         {
@@ -1072,6 +1083,54 @@ public static class SpecDynamicValue
                 );
 
             case JsonTokenType.StartArray:
+                if (expectedType.Type != null
+                    && expectedType.Type.ValueType.IsConstructedGenericType
+                    && expectedType.Type.ValueType.GetGenericTypeDefinition() == typeof(EquatableArray<>))
+                {
+                    Utf8JsonReader readerCopy2 = reader;
+
+                    if (!reader.Read())
+                        break;
+
+                    if (reader.TokenType != JsonTokenType.StartObject)
+                    {
+                        Type t = expectedType.Type.ValueType.GetGenericArguments()[0];
+                        if (reader.TokenType == JsonTokenType.EndArray)
+                        {
+                            return Null;
+                        }
+
+                        Utf8JsonReader readerCopy3 = reader;
+                        int count = 1;
+                        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                            ++count;
+                        reader = readerCopy3;
+
+                        Array array = Array.CreateInstance(t, count);
+                        int i = 0;
+                        try
+                        {
+                            for (; i < count; ++i)
+                            {
+                                object? value = JsonHelper.Deserialize(ref reader, t, options);
+                                reader.Read();
+
+                                array.SetValue(value, i);
+                            }
+                        }
+                        catch (JsonException ex)
+                        {
+                            throw new JsonException($"Failed to read array value {i} for list value.", ex);
+                        }
+
+                        ReadEquatableArrayVisitor v = new ReadEquatableArrayVisitor(array);
+                        expectedType.Type.Visit(ref v);
+                        return v.Result;
+                    }
+
+                    reader = readerCopy2;
+                }
+
                 if ((context & SpecDynamicValueContext.AllowSwitch) == 0)
                     break;
 
@@ -1090,6 +1149,9 @@ public static class SpecDynamicValue
             case JsonTokenType.StartObject:
                 if ((context & SpecDynamicValueContext.AllowCondition) != 0)
                 {
+                    if (expectedType.IsSwitch || expectedType.Type != null && expectedType.Type.ValueType != typeof(bool))
+                        throw new JsonException("Expected boolean type when reading condition when parsing ISpecDynamicValue from an object value.");
+
                     readerCopy = reader;
                     try
                     {
@@ -1105,6 +1167,9 @@ public static class SpecDynamicValue
                 }
                 if ((context & SpecDynamicValueContext.AllowSwitchCase) != 0)
                 {
+                    if (expectedType.IsSwitch)
+                        throw new JsonException("Unable to read switch case for switchable type when parsing ISpecDynamicValue from an object value.");
+
                     readerCopy = reader;
                     try
                     {
@@ -1129,6 +1194,16 @@ public static class SpecDynamicValue
         }
 
         throw new JsonException($"Unexpected token type {reader.TokenType} when parsing ISpecDynamicValue.");
+    }
+
+    private struct ReadEquatableArrayVisitor(Array array) : ISpecPropertyTypeVisitor
+    {
+        public ISpecDynamicValue Result;
+        
+        public void Visit<T>(ISpecPropertyType<T> type) where T : IEquatable<T>
+        {
+            Result = new SpecDynamicConcreteValue<T>((T)Activator.CreateInstance(typeof(T), array), type);
+        }
     }
 
     public static ISpecDynamicValue ReadValue(ref Utf8JsonReader reader, ISpecPropertyType? expectedType, Func<Type?, ISpecPropertyType, ISpecDynamicValue> invalidTypeThrowHandler)
@@ -1262,7 +1337,7 @@ public static class SpecDynamicValue
                     {
                         return new SpecDynamicConcreteValue<DateTime>(dt, KnownTypes.DateTime);
                     }
-                    if (reader.TryGetGuid(out Guid guid))
+                    if (JsonHelper.TryGetGuid(ref reader, out Guid guid))
                     {
                         return Guid(guid);
                     }
@@ -1281,7 +1356,7 @@ public static class SpecDynamicValue
                 }
                 if (valueType == typeof(Guid))
                 {
-                    return reader.TryGetGuid(out Guid guid) ? Guid(guid, expectedType as ISpecPropertyType<Guid> ?? KnownTypes.Guid) : invalidTypeThrowHandler(typeof(string), expectedType);
+                    return JsonHelper.TryGetGuid(ref reader, out Guid guid) ? Guid(guid, expectedType as ISpecPropertyType<Guid> ?? KnownTypes.Guid) : invalidTypeThrowHandler(typeof(string), expectedType);
                 }
                 if (valueType == typeof(DateTime))
                 {

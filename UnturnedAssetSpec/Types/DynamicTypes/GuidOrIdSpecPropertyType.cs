@@ -195,5 +195,5 @@ public sealed class GuidOrIdSpecPropertyType :
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<GuidOrId>? other) => other is GuidOrIdSpecPropertyType t && Equals(t);
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

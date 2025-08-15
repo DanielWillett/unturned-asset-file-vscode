@@ -1,0 +1,939 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
+    "DisplayName": "Level Object",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Category": "OBJECT",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Type",
+            "Type": "SDG.Unturned.EObjectType, Assembly-CSharp",
+            "Required": true,
+            "Description": "The type of object to create.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-assets",
+            "Variable": "type",
+            "Priority": 99
+        },
+        {
+            "Key": "Decal_X",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Override the scale of the decal, on the X-axis.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#decals",
+            "Priority": 8,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                }
+            ]
+        },
+        {
+            "Key": "Decal_Y",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Override the scale of the decal, on the Y-axis.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#decals",
+            "Priority": 8,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                }
+            ]
+        },
+        {
+            "Key": "Decal_LOD_Bias",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "Multiplier for the LOD's switching distance.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#decals",
+            "Priority": 7,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                }
+            ]
+        },
+        {
+            "Key": "Decal_Alpha",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This flag should be set if the decal has a transparent texture. A different prefab is loaded for transparent decals.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#decals",
+            "Priority": 7,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability",
+            "Type": "SDG.Unturned.EObjectInteractability, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Except": [ "NONE" ],
+            "Description": "How this object can be interacted with.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 12,
+            "Variable": "interactability",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "LARGE"
+                            },
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "MEDIUM"
+                            },
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "SMALL"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Remote",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Disables the ability for players to interact with this via a button prompt.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityRemote",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Interactability",
+                        "Operation": "neq",
+                        "Comparand": "NONE"
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Delay",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The cooldown (in seconds) before the object can be interacted with again.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityDelay",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "BINARY_STATE"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "DROPPER"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Reset",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Delay (in seconds) before an interacted object resets or a destroyed object respawns.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityReset",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "BINARY_STATE"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "WATER"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "FUEL"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "RUBBLE"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Hint",
+            "Type": "SDG.Unturned.EObjectInteractabilityHint, Assembly-CSharp",
+            "DefaultValue": "DOOR",
+            "Description": "Hint used when the player looks at this object. Can be set to 'Custom' to use the @Interact localization property.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityHint",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "BINARY_STATE"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "DROPPER"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "NOTE"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Text_Lines",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Description": "Total number of lines to display on a note when it's interacted with.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityText",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "NOTE"
+                }
+            ],
+            "CountForRegexGroup": "object-interactability-note-lines"
+        },
+        {
+            "Key": "Interactability_Power",
+            "Type": "SDG.Unturned.EObjectInteractabilityPower, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Description": "Behavior of objects that require being powered.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityPower",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "BINARY_STATE"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "DROPPER"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Editor",
+            "Type": "SDG.Unturned.EObjectInteractabilityEditor, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Description": "Determines how this interactable object should appear in the level editor.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityEditor",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "BINARY_STATE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Nav",
+            "Type": "SDG.Unturned.EObjectInteractabilityNav, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Description": "Controls how this object's on/off state affects the 'Nav' game object.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityNav",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "BINARY_STATE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Drops",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "Number of options for item drops from this dropper object.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityDrops",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "DROPPER"
+                }
+            ],
+            "CountForRegexGroup": "object-interactability-drops",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Interactability_Reward_ID",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Interactability",
+                        "Operation": "eq",
+                        "Comparand": "DROPPER"
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Drop_(\\d+)",
+            "KeyIsRegex": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "object-interactability-drops",
+                    "RegexGroup": 1
+                }
+            ],
+            "Type": "Id",
+            "ElementType": "ITEM",
+            "DefaultValue": 0,
+            "Description": "An option for item drops from this dropper object.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityDrops"
+        },
+        {
+            "Key": "Interactability_Reward_ID",
+            "Type": "Id",
+            "ElementType": "SPAWN",
+            "DefaultValue": 0,
+            "Description": "Spawn table to use for drops from this dropper object. Takes priority over the item drop list.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityRewardID",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "DROPPER"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "RUBBLE"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ],
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Interactability_Drops",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Interactability",
+                        "Operation": "eq",
+                        "Comparand": "DROPPER"
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Effect",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "Effect to play when this object is interacted with or a section of rubble is destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityEffectGuid",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "BINARY_STATE"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "QUEST"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "RUBBLE"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Dialogue",
+            "Type": "AssetReferenceString",
+            "ElementType": "SDG.Unturned.DialogueAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "Dialogue asset to open when this dialogue object is interacted with.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityDialogueRef",
+            "Required":
+            {
+                "Variable": "Interactability",
+                "Operation": "eq",
+                "Comparand": "DIALOGUE"
+            },
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "DIALOGUE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Animation_Component_Path",
+            "Type": "String",
+            "DefaultValue": "Root",
+            "Description": "Transform path relative to object root with Animation component.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 10,
+            "Variable": "interactabilityChildPathOverride",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "BINARY_STATE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Emissive_Material_Mode",
+            "Type": "SDG.Unturned.EInteractableObjectBinaryStateEmissiveMaterialMode, Assembly-CSharp",
+            "DefaultValue": "Auto",
+            "Description": "Transform path relative to object root with Animation component.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 10,
+            "Variable": "iobsEmissiveMaterialMode",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "BINARY_STATE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Conditions",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Conditions that must be met to succesfully interact with this object.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#conditions-and-rewards",
+            "Priority": 9,
+            "Variable": "interactabilityConditionsList",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "BINARY_STATE"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "DIALOGUE"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "DROPPER"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "QUEST"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "NOTE"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Resource",
+            "Type": "UInt16",
+            "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Units of fuel or water that is stored in this object.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "interactabilityResource",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "WATER"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "FUEL"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Health",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "MinimumExclusive": 0,
+            "Required":
+            {
+                "Variable": "Interactability",
+                "Operation": "eq",
+                "Comparand": "RUBBLE"
+            },
+            "Description": "Total amount of health each section of rubble has.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "rubbleHealth",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Finale",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "Effect to play when this all rubble sections are destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Priority": 11,
+            "Variable": "rubbleFinaleGuid",
+            "Deprecated": true,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Decal",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Description": "Main texture for the decal.",
+            "Required":
+            {
+                "Variable": "Type",
+                "Operation": "eq",
+                "Comparand": "DECAL"
+            },
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                }
+            ]
+        }
+    ],
+    "Localization":
+    [
+        {
+            "Key": "Name",
+            "Type": "String",
+            "DefaultValue": "Name",
+            "Description": "Localized name of the item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#localization",
+            "Variable": "objectName"
+        },
+        {
+            "Key": "Interactability_Text_Line_(\\d+)",
+            "KeyIsRegex": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "object-interactability-note-lines",
+                    "RegexGroup": 1
+                }
+            ],
+            "Type": "RichTextString",
+            "DefaultValue": "#Self.Key",
+            "Variable": "interactabilityText",
+            "SupportsNewLines": true,
+            "Description": "A line in this object's note.",
+            "Required": true,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables"
+        },
+        {
+            "Key": "Interact",
+            "Type": "FormatString",
+            "ElementType": "1|T",
+            "DefaultValue": null,
+            "SupportsNewLines": true,
+            "Description": "Custom text when interacting with the object.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Required":
+            {
+                "Variable": "Interactability",
+                "Operation": "eq",
+                "Comparand": "QUEST"
+            },
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability_Hint",
+                    "Value": "CUSTOM"
+                }
+            ]
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EObjectType, Assembly-CSharp",
+            "DisplayName": "Object Type",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eobjecttype.html",
+            "Values":
+            [
+                {
+                    "Value": "LARGE",
+                    "Casing": "Large",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html",
+                    "Description": "Larger objects and buildings that make up the level."
+                },
+                {
+                    "Value": "MEDIUM",
+                    "Casing": "Medium",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html",
+                    "Description": "Medium objects that fill out the layout of large objects."
+                },
+                {
+                    "Value": "SMALL",
+                    "Casing": "Small",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html",
+                    "Description": "Smaller objects used for clutter and decoration."
+                },
+                {
+                    "Value": "NPC",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html",
+                    "Description": "NPCs that the player can interact or trade with."
+                },
+                {
+                    "Value": "DECAL",
+                    "Casing": "Decal",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html",
+                    "Description": "A flat texture that overlays other surfaces."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EObjectInteractability, Assembly-CSharp",
+            "DisplayName": "Object Interactability",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "Not interactable. Better to exclude the property completely."
+                },
+                {
+                    "Value": "BINARY_STATE",
+                    "Casing": "Binary_State",
+                    "Description": "These objects will change between their two states when interacted with – such as an open or closed door."
+                },
+                {
+                    "Value": "DROPPER",
+                    "Casing": "Dropper",
+                    "Description": "These objects can spawn items when interacted with."
+                },
+                {
+                    "Value": "NOTE",
+                    "Casing": "Note",
+                    "Description": "These objects can display lines of text when interacted with."
+                },
+                {
+                    "Value": "WATER",
+                    "Casing": "Water",
+                    "Description": "These objects can be siphoned for water."
+                },
+                {
+                    "Value": "FUEL",
+                    "Casing": "Fuel",
+                    "Description": "These objects can be siphoned for fuel."
+                },
+                {
+                    "Value": "RUBBLE",
+                    "Casing": "Rubble",
+                    "Description": "These objects are destructible. It is preferable to use @Rubble 'Destroy' instead of @Interactability 'Rubble'."
+                },
+                {
+                    "Value": "NPC",
+                    "Description": "These objects can provide access to dialogue, quests, and vendors."
+                },
+                {
+                    "Value": "QUEST",
+                    "Casing": "Quest",
+                    "Description": "These objects can be interacted with, but unlike other options they have no additional functionality."
+                },
+                {
+                    "Value": "DIALOGUE",
+                    "Casing": "Dialogue",
+                    "Description": "These objects open the dialogue screen - similar to NPCs - with a non-NPC appearance and custom interact text."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EObjectInteractabilityHint, Assembly-CSharp",
+            "DisplayName": "Object Interactability Hint",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Values":
+            [
+                {
+                    "Value": "DOOR",
+                    "Casing": "Door",
+                    "Description": "\"Open [F]\" or \"Close [F]\" message."
+                },
+                {
+                    "Value": "SWITCH",
+                    "Casing": "Switch",
+                    "Description": "\"On [F]\" or \"Off [F]\" message."
+                },
+                {
+                    "Value": "FIRE",
+                    "Casing": "Fire",
+                    "Description": "\"Light [F]\" or \"Extinguish [F]\" message."
+                },
+                {
+                    "Value": "GENERATOR",
+                    "Casing": "Generator",
+                    "Description": "\"Start [F]\" or \"Stop [F]\" message."
+                },
+                {
+                    "Value": "USE",
+                    "Casing": "Use",
+                    "Description": "\"Use [F]\" message."
+                },
+                {
+                    "Value": "CUSTOM",
+                    "Casing": "Custom",
+                    "Description": "Custom text pulled from the @($local$::SDG.Unturned.ObjectAsset, Assembly-CSharp::Interact) property. The interact key is formatted into {0}."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EObjectInteractabilityPower, Assembly-CSharp",
+            "DisplayName": "Object Interactability Power",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "Power is not required to interact with this object."
+                },
+                {
+                    "Value": "TOGGLE",
+                    "Casing": "Toggle",
+                    "Description": "Power is required to toggle this object but once it's toggled power is not required for it to stay that way."
+                },
+                {
+                    "Value": "STAY",
+                    "Casing": "Stay",
+                    "Description": "Power is required for this object to be enabled, and losing power will disable the object."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EObjectInteractabilityEditor, Assembly-CSharp",
+            "DisplayName": "Object Interactability Editor Display",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "The object's default state will be shown in the editor."
+                },
+                {
+                    "Value": "TOGGLE",
+                    "Casing": "Toggle",
+                    "Description": "The object's toggled state will be shown in the editor."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EObjectInteractabilityNav, Assembly-CSharp",
+            "DisplayName": "Object Interactability Nav Behavior",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "State doesn't affect AI collision."
+                },
+                {
+                    "Value": "ON",
+                    "Casing": "On",
+                    "Description": "AI collision is blocked when object state is ON."
+                },
+                {
+                    "Value": "OFF",
+                    "Casing": "Off",
+                    "Description": "AI collision is blocked when object state is OFF."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EInteractableObjectBinaryStateEmissiveMaterialMode, Assembly-CSharp",
+            "DisplayName": "IOBS Emissive Material Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Values":
+            [
+                {
+                    "Value": "Auto",
+                    "Description": "Create a material instance for child renderer of Toggle game object. Downside of this is exclusion from level batching texture atlas."
+                },
+                {
+                    "Value": "None",
+                    "Description": "Object does not have any toggleable emissive materials."
+                }
+            ]
+        },
+    ]
+}

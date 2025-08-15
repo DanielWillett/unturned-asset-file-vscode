@@ -219,4 +219,10 @@
   <data name="UNT1019" xml:space="preserve">
     <value>This property shouldn't reference the asset it's defined in.</value>
   </data>
+  <data name="UNT2013" xml:space="preserve">
+    <value>Type references must use assembly-qualified type names. These are formatted as the full type and the assembly name separated by a comma. For example: 'SDG.Unturned.Asset, Assembly-CSharp'.</value>
+  </data>
+  <data name="UNT103" xml:space="preserve">
+    <value>Type {0} is unknown and may not be assignable to '{1}'.</value>
+  </data>
 </root>

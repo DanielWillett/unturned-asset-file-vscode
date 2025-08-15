@@ -37,6 +37,7 @@ public class AssetInformation
     public AssetBundleVersionInfo?[]? AssetBundleVersions { get; set; }
     public SkillsetInfo?[]? Skillsets { get; set; }
     public SpecialityInfo?[]? Specialities { get; set; }
+    public Color32[]? SkinColors { get; set; }
     public int[]? EmissiveFaces { get; set; }
     public string? FaceTextureTemplate { get; set; }
     public string? EmissiveFaceTextureTemplate { get; set; }

@@ -1,9 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
+using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 [StructLayout(LayoutKind.Explicit, Size = 16)]
+[JsonConverter(typeof(ColorConverter))]
 public readonly struct Color : IEquatable<Color>, IComparable<Color>
 {
     [FieldOffset(0)]
@@ -110,5 +113,11 @@ public readonly struct Color : IEquatable<Color>, IComparable<Color>
     private static float Clamp01(float a)
     {
         return a < 1 ? a > 0 ? a : 0 : 1;
+    }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return ((Color32)this).ToString();
     }
 }

@@ -98,5 +98,5 @@ public abstract class BlueprintItemStringParseableSpecPropertyType :
     public abstract bool Equals(ISpecPropertyType<CustomSpecTypeInstance>? other);
     public abstract bool Equals(BlueprintItemStringParseableSpecPropertyType? other);
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

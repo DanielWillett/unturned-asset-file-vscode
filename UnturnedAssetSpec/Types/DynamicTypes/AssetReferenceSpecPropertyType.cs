@@ -324,5 +324,5 @@ public sealed class AssetReferenceSpecPropertyType :
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<Guid>? other) => other is AssetReferenceSpecPropertyType t && Equals(t);
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

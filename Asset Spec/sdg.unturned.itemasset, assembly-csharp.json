@@ -692,7 +692,7 @@
             "Key": "Blueprints",
             "Type": "LegacyCompatibleList",
             "ElementType": "SDG.Unturned.Blueprint, Assembly-CSharp",
-            "DefaultValue": 0,
+            "DefaultValue": null,
             "Description": "Blueprints defined for this item. Blueprints are crafting recipes that either consume this item or produce this item.",
             "Variable": "blueprints",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprints-int-0",
@@ -702,7 +702,7 @@
             "Key": "Actions",
             "Type": "LegacyCompatibleList",
             "ElementType": "SDG.Unturned.Action, Assembly-CSharp",
-            "DefaultValue": 0,
+            "DefaultValue": null,
             "Description": "Context menu actions defined for this item.",
             "Variable": "actions",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#actions-int-0",
@@ -868,6 +868,7 @@
         {
             "Key": "Description",
             "Type": "RichTextString",
+            "SupportsNewLines": true,
             "DefaultValue": "Description",
             "Description": "Localized description of the item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#localization",
@@ -1081,7 +1082,7 @@
                 {
                     "Key": "Critical",
                     "Type": "Boolean",
-                    "DefaultValue": "SDG.Unturned.Blueprint, Assembly-CSharp::InputItems_Critical",
+                    "DefaultValue": "@(SDG.Unturned.Blueprint, Assembly-CSharp::InputItems_Critical)",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#critical-bool-false",
                     "Description": "The player has to already have this supply to see the blueprint.",
                     "Variable": "isCritical"

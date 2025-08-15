@@ -63,6 +63,9 @@ public class OpenedFile : IWorkspaceFile
 
     public string AssetName { get; }
 
+    // todo:
+    public bool IsLocalization { get; }
+
     public string GetFullText()
     {
         lock (EditLock)

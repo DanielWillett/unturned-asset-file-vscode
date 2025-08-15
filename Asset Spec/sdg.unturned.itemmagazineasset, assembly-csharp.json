@@ -198,7 +198,7 @@
         },
         {
             "Key": "Explosive",
-            "Type": "Float32",
+            "Type": "Flag",
             "DefaultValue": false,
             "Description": "This magazine's bullets will create an explosion when they land. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#explosive-flag",

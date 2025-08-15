@@ -277,6 +277,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Type {0} is unknown and may not be assignable to &apos;{1}&apos;..
+        /// </summary>
+        internal static string UNT103 {
+            get {
+                return ResourceManager.GetString("UNT103", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected &apos;}&apos; at end of dictionary..
         /// </summary>
         internal static string UNT2001 {
@@ -363,6 +372,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string UNT2012_WithMessage {
             get {
                 return ResourceManager.GetString("UNT2012_WithMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type references must use assembly-qualified type names. These are formatted as the full type and the assembly name separated by a comma. For example: &apos;SDG.Unturned.Asset, Assembly-CSharp&apos;..
+        /// </summary>
+        internal static string UNT2013 {
+            get {
+                return ResourceManager.GetString("UNT2013", resourceCulture);
             }
         }
     }

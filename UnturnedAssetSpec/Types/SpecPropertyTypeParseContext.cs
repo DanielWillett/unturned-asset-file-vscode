@@ -36,7 +36,7 @@ public readonly ref struct SpecPropertyTypeParseContext
         EvaluationContext = evalContext;
     }
 
-    public static SpecPropertyTypeParseContext FromFileEvaluationContext(FileEvaluationContext evalContext, SpecProperty property, AssetFileNode? parentNode, AssetFileValueNode? valueNode, ICollection<DatDiagnosticMessage>? diagnostics = null)
+    public static SpecPropertyTypeParseContext FromFileEvaluationContext(FileEvaluationContext evalContext, SpecProperty? property, AssetFileNode? parentNode, AssetFileValueNode? valueNode, ICollection<DatDiagnosticMessage>? diagnostics = null)
     {
         return new SpecPropertyTypeParseContext(evalContext, diagnostics)
         {
@@ -44,7 +44,7 @@ public readonly ref struct SpecPropertyTypeParseContext
             Node = valueNode,
             Database = evalContext.Information,
             FileType = evalContext.FileType,
-            BaseKey = property.Key,
+            BaseKey = property?.Key,
             File = evalContext.File
         };
     }

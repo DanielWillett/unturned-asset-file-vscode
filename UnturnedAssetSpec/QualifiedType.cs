@@ -163,8 +163,10 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
         for (int i = fullTypeName.Length - 2; i >= 0; --i)
         {
             char c = fullTypeName[i];
-            if (c == '.' && !IsEscaped(fullTypeName, i))
+            if (c is '.' or '+' && !IsEscaped(fullTypeName, i))
+            {
                 return fullTypeName.Slice(i + 1);
+            }
         }
 
         return fullTypeName;

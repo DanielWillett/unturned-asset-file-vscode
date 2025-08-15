@@ -42,7 +42,6 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     private static readonly JsonEncodedText InclusiveWithProperty = JsonEncodedText.Encode("InclusiveWith");
     private static readonly JsonEncodedText DeprecatedProperty = JsonEncodedText.Encode("Deprecated");
     private static readonly JsonEncodedText PriorityProperty = JsonEncodedText.Encode("Priority");
-    private static readonly JsonEncodedText SimilarGroupingProperty = JsonEncodedText.Encode("SimilarGrouping");
 
     private static readonly JsonEncodedText HideInheritedProperty = JsonEncodedText.Encode("HideInherited");
 
@@ -77,8 +76,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         InclusiveWithProperty,              // 26
         DeprecatedProperty,                 // 27
         HideInheritedProperty,              // 28
-        PriorityProperty,                   // 29
-        SimilarGroupingProperty             // 30
+        PriorityProperty                    // 29
     ];
 
     /// <inheritdoc />
@@ -219,6 +217,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     if (reader.TokenType is JsonTokenType.StartArray or JsonTokenType.StartObject)
                     {
                         typeSwitch = reader;
+                        reader.Skip();
                         break;
                     }
 
@@ -267,7 +266,6 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                             }
                             break;
 
-                        case JsonTokenType.StartArray:
                         case JsonTokenType.StartObject:
                             try
                             {
@@ -303,27 +301,19 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     break;
 
                 case 16: // Description
-                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
-                        ThrowUnexpectedToken(reader.TokenType, propType);
-                    property.Description = reader.GetString();
+                    property.Description = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
                     break;
 
                 case 17: // Variable
-                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
-                        ThrowUnexpectedToken(reader.TokenType, propType);
-                    property.Variable = reader.GetString();
+                    property.Variable = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
                     break;
 
                 case 18: // Docs
-                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
-                        ThrowUnexpectedToken(reader.TokenType, propType);
-                    property.Docs = reader.GetString();
+                    property.Docs = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
                     break;
 
                 case 19: // Markdown
-                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
-                        ThrowUnexpectedToken(reader.TokenType, propType);
-                    property.Markdown = reader.GetString();
+                    property.Markdown = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
                     break;
 
                 case 20: // Minimum
@@ -364,9 +354,28 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     break;
 
                 case 27: // Deprecated
-                    if (reader.TokenType is not JsonTokenType.True and not JsonTokenType.False)
-                        ThrowUnexpectedToken(reader.TokenType, propType);
-                    property.Deprecated = reader.TokenType == JsonTokenType.True;
+                    switch (reader.TokenType)
+                    {
+                        case JsonTokenType.True:
+                            property.Deprecated = SpecDynamicValue.True;
+                            break;
+
+                        case JsonTokenType.False:
+                            property.Deprecated = SpecDynamicValue.False;
+                            break;
+
+                        case JsonTokenType.String:
+                            property.Deprecated = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, KnownTypes.Boolean);
+                            break;
+
+                        case JsonTokenType.StartObject:
+                            property.Deprecated = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowCondition | SpecDynamicValueContext.AllowSwitchCase, KnownTypes.Boolean);
+                            break;
+
+                        default:
+                            ThrowUnexpectedToken(reader.TokenType, propType);
+                            break;
+                    }
                     break;
 
                 case 28: // HideInherited
@@ -386,12 +395,6 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     if (reader.TokenType is not JsonTokenType.Number || !reader.TryGetInt32(out priority))
                         ThrowUnexpectedToken(reader.TokenType, propType);
                     property.Priority = priority;
-                    break;
-
-                case 30: // SimilarGrouping
-                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
-                        ThrowUnexpectedToken(reader.TokenType, propType);
-                    property.SimilarGrouping = reader.GetString();
                     break;
             }
         }
@@ -766,17 +769,20 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
         if (property.Description != null)
         {
-            writer.WriteString(DescriptionProperty, property.Description);
+            writer.WritePropertyName(DescriptionProperty);
+            property.Description.WriteToJsonWriter(writer, options);
         }
         
         if (property.Markdown != null)
         {
-            writer.WriteString(MarkdownProperty, property.Markdown);
+            writer.WritePropertyName(MarkdownProperty);
+            property.Markdown.WriteToJsonWriter(writer, options);
         }
         
         if (property.Docs != null)
         {
-            writer.WriteString(DocsProperty, property.Docs);
+            writer.WritePropertyName(DocsProperty);
+            property.Docs.WriteToJsonWriter(writer, options);
         }
         
         if (property.RequiredCondition != null)
@@ -830,14 +836,10 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             writer.WriteNumber(PriorityProperty, property.Priority);
         }
 
-        if (property.SimilarGrouping != null)
+        if (property.Deprecated != null && !property.Deprecated.Equals(SpecDynamicValue.False))
         {
-            writer.WriteString(SimilarGroupingProperty, property.SimilarGrouping);
-        }
-
-        if (property.Deprecated)
-        {
-            writer.WriteBoolean(DeprecatedProperty, true);
+            writer.WritePropertyName(DeprecatedProperty);
+            property.Deprecated.WriteToJsonWriter(writer, options);
         }
 
         if (property.FileCrossRef != null)
@@ -909,7 +911,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
         if (property.Variable != null)
         {
-            writer.WriteString(VariableProperty, property.Variable);
+            writer.WritePropertyName(VariableProperty);
+            property.Variable.WriteToJsonWriter(writer, options);
         }
 
         writer.WriteEndObject();
@@ -974,5 +977,5 @@ internal sealed class SpecPropertyTypeType : ISpecPropertyType<ISpecPropertyType
         return false;
     }
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

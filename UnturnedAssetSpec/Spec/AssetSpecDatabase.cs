@@ -141,6 +141,22 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         };
 
         Options.Converters.Add(new SpecPropertyTypeConverter());
+        Options.Converters.Add(new ColorConverter());
+        Options.Converters.Add(new Color32Converter());
+        Options.Converters.Add(new AssetSpecTypeConverter());
+        Options.Converters.Add(new BundleReferenceConverter());
+        Options.Converters.Add(new GuidOrIdConverter());
+        Options.Converters.Add(new InclusionConditionConverter());
+        Options.Converters.Add(new QualifiedTypeConverter());
+        Options.Converters.Add(new SpecBundleAssetConverter());
+        Options.Converters.Add(new SpecConditionConverter());
+        Options.Converters.Add(new SpecDynamicSwitchCaseValueConverter());
+        Options.Converters.Add(new SpecDynamicSwitchValueConverter());
+        Options.Converters.Add(new SpecDynamicValueConverter());
+        Options.Converters.Add(new SpecPropertyConverter());
+        Options.Converters.Add(new SpecTypeConverter());
+        Options.Converters.Add(new UnityEngineVersionConverter());
+        Options.Converters.Add(new TypeHierarchyConverter());
 
         Lazy<HttpClient> lazy = new Lazy<HttpClient>(LazyThreadSafetyMode.ExecutionAndPublication);
 

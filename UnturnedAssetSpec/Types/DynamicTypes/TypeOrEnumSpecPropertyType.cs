@@ -182,5 +182,5 @@ public sealed class TypeOrEnumSpecPropertyType :
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<QualifiedType>? other) => other is TypeOrEnumSpecPropertyType t && Equals(t);
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

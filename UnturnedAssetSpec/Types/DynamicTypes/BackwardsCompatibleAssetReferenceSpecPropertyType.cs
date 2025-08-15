@@ -233,5 +233,5 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType<GuidOrId>? other) => other is BackwardsCompatibleAssetReferenceSpecPropertyType t && Equals(t);
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

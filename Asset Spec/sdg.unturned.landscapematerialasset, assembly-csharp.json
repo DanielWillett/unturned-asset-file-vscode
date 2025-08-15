@@ -48,8 +48,511 @@
             "ElementType": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
             "PreventSelfReference": true,
             "DefaultValue": null,
-            "Description": "The default foliage to spawn on this material when baking it.",
-            "Variable": "foliage"
+            "Description": "Replacement for this material during the 'Christmas' holiday.",
+            "Variable": "christmasRedirect"
         },
+        {
+            "Key": "Halloween_Redirect",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
+            "PreventSelfReference": true,
+            "DefaultValue": null,
+            "Description": "Replacement for this material during the 'Halloween' holiday.",
+            "Variable": "halloweenRedirect"
+        },
+        {
+            "Key": "AprilFools_Redirect",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
+            "PreventSelfReference": true,
+            "DefaultValue": null,
+            "Description": "Replacement for this material during the 'April Fools' holiday.",
+            "Variable": "aprilFoolsRedirect"
+        },
+        {
+            "Key": "Use_Auto_Slope",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "If the material is only painted on terrain that is at a slope between the auto angles.",
+            "Variable": "useAutoSlope",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Auto_Min_Angle_Begin",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Slope",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
+                },
+                {
+                    "Key": "Auto_Min_Angle_End",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Slope",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
+                },
+                {
+                    "Key": "Auto_Max_Angle_Begin",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Slope",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
+                },
+                {
+                    "Key": "Auto_Max_Angle_End",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Slope",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
+                }
+            ],
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Auto_Min_Angle_Begin",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Slope",
+                        "Operation": "eq",
+                        "Comparand": false
+                    }
+                },
+                {
+                    "Key": "Auto_Min_Angle_End",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Slope",
+                        "Operation": "eq",
+                        "Comparand": false
+                    }
+                },
+                {
+                    "Key": "Auto_Max_Angle_Begin",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Slope",
+                        "Operation": "eq",
+                        "Comparand": false
+                    }
+                },
+                {
+                    "Key": "Auto_Max_Angle_End",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Slope",
+                        "Operation": "eq",
+                        "Comparand": false
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Auto_Min_Angle_Begin",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": 0.0,
+            "Maximum": "@Auto_Min_Angle_End",
+            "Description": "The lower bound of the minimum angle range between an up vector and a normal vector pointing out of the terrain. The painting weight linearly increases between @Auto_Min_Angle_Begin and @Auto_Min_Angle_End towards 1.",
+            "Variable": "autoMinAngleBegin",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Use_Auto_Slope",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Auto_Min_Angle_End",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": "@Auto_Min_Angle_Begin",
+            "Maximum": "@Auto_Max_Angle_Begin",
+            "Description": "The upper bound of the minimum angle range between an up vector and a normal vector pointing out of the terrain. The painting weight linearly increases between @Auto_Min_Angle_Begin and @Auto_Min_Angle_End towards 1.",
+            "Variable": "autoMinAngleEnd",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Use_Auto_Slope",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Auto_Max_Angle_Begin",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": "@Auto_Min_Angle_End",
+            "Maximum": "@Auto_Max_Angle_End",
+            "Description": "The lower bound of the maximum angle range between an up vector and a normal vector pointing out of the terrain. The painting weight linearly decreases between @Auto_Max_Angle_Begin and @Auto_Max_Angle_End towards 0.",
+            "Variable": "autoMinAngleBegin",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Use_Auto_Slope",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Auto_Max_Angle_End",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": "@Auto_Max_Angle_Begin",
+            "Maximum": 90.0,
+            "Description": "The upper bound of the maximum angle range between an up vector and a normal vector pointing out of the terrain. The painting weight linearly decreases between @Auto_Max_Angle_Begin and @Auto_Max_Angle_End towards 0.",
+            "Variable": "autoMinAngleEnd",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Use_Auto_Slope",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Use_Auto_Foundation",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Auto-painting will only occur under objects that don't have @(SDG.Unturned.ObjectAsset, Assembly-CSharp::Snowshoe) enabled.",
+            "Variable": "useAutoFoundation",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Auto_Ray_Radius",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Foundation",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
+                },
+                {
+                    "Key": "Auto_Ray_Length",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Foundation",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
+                },
+                {
+                    "Key": "Auto_Ray_Mask",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Foundation",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
+                }
+            ],
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Auto_Ray_Radius",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Foundation",
+                        "Operation": "eq",
+                        "Comparand": false
+                    }
+                },
+                {
+                    "Key": "Auto_Ray_Length",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Foundation",
+                        "Operation": "eq",
+                        "Comparand": false
+                    }
+                },
+                {
+                    "Key": "Auto_Ray_Mask",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Use_Auto_Foundation",
+                        "Operation": "eq",
+                        "Comparand": false
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Auto_Ray_Radius",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": 0.0,
+            "Description": "The radius of the ray used to check for objects on the terrain for each material coordinate.",
+            "Variable": "autoRayRadius",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Use_Auto_Foundation",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Auto_Ray_Length",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": 0.0,
+            "Description": "The height of the ray used to check for objects on the terrain for each material coordinate.",
+            "Variable": "autoRayLength",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Use_Auto_Foundation",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Auto_Ray_Mask",
+            "Type": "SDG.Unturned.ERayMask, Assembly-CSharp",
+            "DefaultValue": 0,
+            "Description": "The ray mask used to check for objects on the terrain for each material coordinate. This is a binary flag value but can also be separated by commas.",
+            "Variable": "autoRayMask",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Use_Auto_Foundation",
+                    "Value": true
+                }
+            ]
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.ERayMask, Assembly-CSharp",
+            "UnderlyingType": "Int32",
+            "IsFlags": true,
+            "DisplayName": "Ray Mask",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/layers.html",
+            "Values":
+            [
+                {
+                    "Value": "DEFAULT",
+                    "Casing": "Default",
+                    "Description": "Not usually used by Unturned.",
+                    "Deprecated": true,
+                    "NumericValue": 1
+                },
+                {
+                    "Value": "TRANSPARENT_FX",
+                    "Casing": "Transparent_FX",
+                    "Description": "Not usually used by Unturned.",
+                    "Deprecated": true,
+                    "NumericValue": 2
+                },
+                {
+                    "Value": "IGNORE_RAYCAST",
+                    "Casing": "Ignore_Raycast",
+                    "Description": "Not usually used by Unturned.",
+                    "Deprecated": true,
+                    "NumericValue": 4
+                },
+                {
+                    "Value": "BUILTIN_3",
+                    "Casing": "Builtin_3",
+                    "Description": "Not usually used by Unturned.",
+                    "Deprecated": true,
+                    "NumericValue": 8
+                },
+                {
+                    "Value": "WATER",
+                    "Casing": "Water",
+                    "Description": "Ocean and water tiles.",
+                    "NumericValue": 16
+                },
+                {
+                    "Value": "UI",
+                    "Casing": "UI",
+                    "Description": "uGUI and plugin UIs.",
+                    "NumericValue": 32
+                },
+                {
+                    "Value": "BUILTIN_6",
+                    "Casing": "Builtin_6",
+                    "Description": "Not usually used by Unturned.",
+                    "Deprecated": true,
+                    "NumericValue": 64
+                },
+                {
+                    "Value": "BUILTIN_7",
+                    "Casing": "Builtin_7",
+                    "Description": "Not usually used by Unturned.",
+                    "Deprecated": true,
+                    "NumericValue": 128
+                },
+                {
+                    "Value": "LOGIC",
+                    "Casing": "Logic",
+                    "Description": "Clickable overlays like the position, rotation and scale handles. Editor debug visuals that can be seen through walls are on this layer.",
+                    "NumericValue": 256
+                },
+                {
+                    "Value": "PLAYER",
+                    "Casing": "Player",
+                    "Description": "Character capsule (not body hitboxes). Exists for all players server-side, but only the local player client-side.",
+                    "NumericValue": 512
+                },
+                {
+                    "Value": "ENEMY",
+                    "Casing": "Enemy",
+                    "Description": "Player body hitboxes.",
+                    "NumericValue": 1024
+                },
+                {
+                    "Value": "VIEWMODEL",
+                    "Casing": "Viewmodel",
+                    "Description": "Local first-person arms and weapon.",
+                    "NumericValue": 2048
+                },
+                {
+                    "Value": "DEBRIS",
+                    "Casing": "Debris",
+                    "Description": "Typically small simulated objects like ragdolls, grenades, falling tree trunks, destroyed structures, and fragmented objects.",
+                    "NumericValue": 4096
+                },
+                {
+                    "Value": "ITEM",
+                    "Casing": "Item",
+                    "Description": "Dropped interactable items.",
+                    "NumericValue": 8192
+                },
+                {
+                    "Value": "RESOURCE",
+                    "Casing": "Resource",
+                    "Description": "Trees and boulders. Barricades attached to vehicles are moved to this layer.",
+                    "NumericValue": 16384
+                },
+                {
+                    "Value": "LARGE",
+                    "Casing": "Large",
+                    "Description": "Large props placed in the level editor.",
+                    "NumericValue": 32768
+                },
+                {
+                    "Value": "MEDIUM",
+                    "Casing": "Medium",
+                    "Description": "Medium props placed in the level editor.",
+                    "NumericValue": 65536
+                },
+                {
+                    "Value": "SMALL",
+                    "Casing": "Small",
+                    "Description": "Small props without collision placed in the level editor.",
+                    "NumericValue": 131072
+                },
+                {
+                    "Value": "SKY",
+                    "Casing": "Sky",
+                    "Description": "Distant effects without collision like the clouds and stars.",
+                    "NumericValue": 262144
+                },
+                {
+                    "Value": "ENVIRONMENT",
+                    "Casing": "Environment",
+                    "Description": "Roads, grass and pebbles.",
+                    "NumericValue": 524288
+                },
+                {
+                    "Value": "GROUND",
+                    "Casing": "Ground",
+                    "Description": "Landscape / terrain.",
+                    "NumericValue": 1048576
+                },
+                {
+                    "Value": "CLIP",
+                    "Casing": "Clip",
+                    "Description": "Invisible collision (world borders).",
+                    "NumericValue": 2097152
+                },
+                {
+                    "Value": "NAVMESH",
+                    "Casing": "Navmesh",
+                    "Description": "Invisible zombie-only collision. Navmesh graphs are generated from this collision, but the collision is also loaded on the server to help push zombies around.",
+                    "NumericValue": 4194304
+                },
+                {
+                    "Value": "ENTITY",
+                    "Casing": "Entity",
+                    "Description": "Zombie and animal body hitboxes.",
+                    "NumericValue": 8388608
+                },
+                {
+                    "Value": "AGENT",
+                    "Casing": "Agent",
+                    "Description": "Zombie and animal character capsules (not body hitboxes).",
+                    "NumericValue": 16777216
+                },
+                {
+                    "Value": "LADDER",
+                    "Casing": "Ladder",
+                    "Description": "Invisible climbable trigger.",
+                    "NumericValue": 33554432
+                },
+                {
+                    "Value": "VEHICLE",
+                    "Casing": "Vehicle",
+                    "Description": "All vehicle colliders.",
+                    "NumericValue": 67108864
+                },
+                {
+                    "Value": "BARRICADE",
+                    "Casing": "Barricade",
+                    "Description": "Barricade item placed in the world. Barricades attached to vehicles are moved to the Resource layer.",
+                    "NumericValue": 134217728
+                },
+                {
+                    "Value": "STRUCTURE",
+                    "Casing": "Structure",
+                    "Description": "Structure item placed in the world.",
+                    "NumericValue": 268435456
+                },
+                {
+                    "Value": "TIRE",
+                    "Casing": "Tire",
+                    "Description": "Wheel colliders. Allows wheels to mask what they collide with.",
+                    "NumericValue": 536870912
+                },
+                {
+                    "Value": "TRAP",
+                    "Casing": "Trap",
+                    "Description": "Typically trigger colliders including rocket launcher projectiles and kill volumes.",
+                    "NumericValue": 1073741824
+                },
+                {
+                    "Value": "GROUND2",
+                    "Casing": "Ground2",
+                    "Description": "No longer used after old maps were converted to terrain tiles. Previously this was for out-of-bounds terrain. Reserved for future use.",
+                    "NumericValue": -2147483648
+                }
+            ]
+        }
     ]
 }

@@ -488,7 +488,7 @@
         {
             "Key": "Bursts",
             "Type": "Int32",
-            "DefaultValue": false,
+            "DefaultValue": 0,
             "Minimum": 0,
             "Description": "When a value greater than 0 is provided, the weapon has a burst firing mode. A number of shots equal to this value is fired when using this mode.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#bursts-int32-0",

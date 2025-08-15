@@ -50,7 +50,7 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
             : file.File.Asset;
 
         List<SpecProperty> properties = fileType.Information.Properties
-            .Where(x => !x.Deprecated)
+            .Where(x => ReferenceEquals(x.Deprecated, SpecDynamicValue.False))
             .OrderByDescending(x => x.Priority)
             .ThenBy(x => x.Key)
             .ToList();
@@ -82,7 +82,7 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
             
             if (afterNode != null)
             {
-                bool shouldInsertLine = string.Equals(property.SimilarGrouping, afterProperty!.SimilarGrouping, StringComparison.Ordinal);
+                bool shouldInsertLine = true;
                 pos = new Position(
                     afterNode.Range.End.Line + (shouldInsertLine ? 1 : 2) - 1,
                     0

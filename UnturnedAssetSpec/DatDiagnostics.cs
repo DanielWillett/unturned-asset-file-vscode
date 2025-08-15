@@ -18,6 +18,11 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT102 = new DatDiagnostic("UNT102", DatDiagnosticSeverity.Hint);
 
+    /// <summary>
+    /// Displayed when a TypeReference may not be assignable to its element type.
+    /// </summary>
+    public static readonly DatDiagnostic UNT103 = new DatDiagnostic("UNT103", DatDiagnosticSeverity.Hint);
+
     /* Warnings */
 
     /// <summary>
@@ -161,5 +166,10 @@ public static class DatDiagnostics
     /// Malformed format string.
     /// </summary>
     public static readonly DatDiagnostic UNT2012 = new DatDiagnostic("UNT2012", DatDiagnosticSeverity.Error);
+
+    /// <summary>
+    /// TypeReference missing assembly-qualified name.
+    /// </summary>
+    public static readonly DatDiagnostic UNT2013 = new DatDiagnostic("UNT2013", DatDiagnosticSeverity.Error);
 
 }

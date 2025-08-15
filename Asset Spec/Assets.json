@@ -23,6 +23,19 @@
             "DisplayName": "Unity 2021 LTS"
         }
     ],
+    "SkinColors":
+    [
+        "#f4e6d2",
+        "#d9cab4",
+        "#bea582",
+        "#9d886b",
+        "#94764b",
+        "#706049",
+        "#534736",
+        "#4b3d31",
+        "#332c25",
+        "#231f1c"
+    ],
     "FaceCount": 32,
     "BeardCount": 16,
     "HairCount": 23,
@@ -464,6 +477,11 @@
             "SDG.Unturned.UseableVehicleBattery, Assembly-CSharp": { },
             "SDG.Unturned.UseableVehiclePaint, Assembly-CSharp": { },
             "SDG.Unturned.UseableWalkieTalkie, Assembly-CSharp": { }
+        },
+        "SDG.Unturned.GameMode, Assembly-CSharp":
+        {
+            "SDG.Unturned.ArenaGameMode, Assembly-CSharp": { },
+            "SDG.Unturned.SurvivalGameMode, Assembly-CSharp": { }
         }
     },
     "AssetAliases":

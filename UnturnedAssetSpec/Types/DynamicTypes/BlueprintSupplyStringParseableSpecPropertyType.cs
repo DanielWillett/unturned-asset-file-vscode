@@ -18,5 +18,5 @@ public sealed class BlueprintSupplyStringParseableSpecPropertyType :
     public override bool Equals(BlueprintItemStringParseableSpecPropertyType? other) => other is BlueprintSupplyStringParseableSpecPropertyType;
     public bool Equals(BlueprintSupplyStringParseableSpecPropertyType? other) => other != null;
 
-    void ISpecPropertyType.Visit<TVisitor>(TVisitor visitor) => visitor.Visit(this);
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }
