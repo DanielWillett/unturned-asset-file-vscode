@@ -80,6 +80,7 @@ internal sealed class UnturnedAssetFileLspServer
                         .AddSingleton<DocumentSymbolHandler>()
                         .AddSingleton<HoverHandler>()
                         .AddSingleton<OpenedFileTracker>()
+                        .AddSingleton<FileEvaluationContextFactory>()
                         .AddSingleton<IAssetSpecDatabase, LspAssetSpecDatabase>()
                         .AddSingleton<IWorkspaceEnvironment, LspWorkspaceEnvironment>()
                         .AddSingleton<LspInstallationEnvironment>()
