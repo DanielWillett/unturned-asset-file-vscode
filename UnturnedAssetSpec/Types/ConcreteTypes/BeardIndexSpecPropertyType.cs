@@ -21,6 +21,8 @@ public sealed class BeardIndexSpecPropertyType : BasicSpecPropertyType<BeardInde
     /// <inheritdoc />
     public override string DisplayName => "Beard (Index)";
 
+    protected override ISpecDynamicValue CreateValue(byte value) => new SpecDynamicConcreteConvertibleValue<byte>(value, this);
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
@@ -32,6 +34,11 @@ public sealed class BeardIndexSpecPropertyType : BasicSpecPropertyType<BeardInde
 
         dynamicValue = null!;
         return false;
+    }
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<byte>()?.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <inheritdoc />

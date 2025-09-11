@@ -1,0 +1,574 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ObjectNPCAsset, Assembly-CSharp",
+    "DisplayName": "NPC Level Object",
+    "Parent": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
+    "Category": "OBJECT",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Shirt",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
+            "Description": "Shirt for the NPC to wear.",
+            "Variable": "shirtGuid",
+            "Priority": 21
+        },
+        {
+            "Key": "Pants",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
+            "Description": "Pants for the NPC to wear.",
+            "Variable": "pantsGuid",
+            "Priority": 21
+        },
+        {
+            "Key": "Hat",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
+            "Description": "Hat for the NPC to wear.",
+            "Variable": "hatGuid",
+            "Priority": 21
+        },
+        {
+            "Key": "Backpack",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
+            "Description": "Backpack for the NPC to wear.",
+            "Variable": "backpackGuid",
+            "Priority": 21
+        },
+        {
+            "Key": "Vest",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
+            "Description": "Vest for the NPC to wear.",
+            "Variable": "vestGuid",
+            "Priority": 21
+        },
+        {
+            "Key": "Mask",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
+            "Description": "Mask for the NPC to wear.",
+            "Variable": "maskGuid",
+            "Priority": 21
+        },
+        {
+            "Key": "Glasses",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
+            "Description": "Glasses for the NPC to wear.",
+            "Variable": "glassesGuid",
+            "Priority": 21
+        },
+        {
+            "Key": "Has_Halloween_Outfit",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Whether or not this NPC defines a set of clothes to wear during the 'Halloween' holiday.",
+            "Priority": 19
+        },
+        {
+            "Key": "Halloween_Shirt",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Shirt for the NPC to wear during the 'Halloween' holiday.",
+            "Variable": "shirtGuid",
+            "Priority": 18,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Halloween_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Halloween_Pants",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Pants for the NPC to wear during the 'Halloween' holiday.",
+            "Variable": "pantsGuid",
+            "Priority": 18,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Halloween_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Halloween_Hat",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Hat for the NPC to wear during the 'Halloween' holiday.",
+            "Variable": "hatGuid",
+            "Priority": 18,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Halloween_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Halloween_Backpack",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Backpack for the NPC to wear during the 'Halloween' holiday.",
+            "Variable": "backpackGuid",
+            "Priority": 18,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Halloween_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Halloween_Vest",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Vest for the NPC to wear during the 'Halloween' holiday.",
+            "Variable": "vestGuid",
+            "Priority": 18,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Halloween_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Halloween_Mask",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Mask for the NPC to wear during the 'Halloween' holiday.",
+            "Variable": "maskGuid",
+            "Priority": 18,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Halloween_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Halloween_Glasses",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Glasses for the NPC to wear during the 'Halloween' holiday.",
+            "Variable": "glassesGuid",
+            "Priority": 18,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Halloween_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Has_Christmas_Outfit",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Whether or not this NPC defines a set of clothes to wear during the 'Christmas' holiday.",
+            "Priority": 20
+        },
+        {
+            "Key": "Christmas_Shirt",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Shirt for the NPC to wear during the 'Christmas' holiday.",
+            "Variable": "shirtGuid",
+            "Priority": 19,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Christmas_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Christmas_Pants",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Pants for the NPC to wear during the 'Christmas' holiday.",
+            "Variable": "pantsGuid",
+            "Priority": 19,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Christmas_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Christmas_Hat",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Hat for the NPC to wear during the 'Christmas' holiday.",
+            "Variable": "hatGuid",
+            "Priority": 19,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Christmas_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Christmas_Backpack",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Backpack for the NPC to wear during the 'Christmas' holiday.",
+            "Variable": "backpackGuid",
+            "Priority": 19,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Christmas_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Christmas_Vest",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Vest for the NPC to wear during the 'Christmas' holiday.",
+            "Variable": "vestGuid",
+            "Priority": 19,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Christmas_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Christmas_Mask",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Mask for the NPC to wear during the 'Christmas' holiday.",
+            "Variable": "maskGuid",
+            "Priority": 19,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Christmas_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Christmas_Glasses",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
+            "Description": "Glasses for the NPC to wear during the 'Christmas' holiday.",
+            "Variable": "glassesGuid",
+            "Priority": 19,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Christmas_Outfit",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Face",
+            "Type": "FaceIndex",
+            "DefaultValue": 0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
+            "Description": "The default face the NPC displays.",
+            "Variable": "face",
+            "Priority": 25
+        },
+        {
+            "Key": "Hair",
+            "Type": "FaceIndex",
+            "DefaultValue": 0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
+            "Description": "The default hair the NPC displays.",
+            "Variable": "hair",
+            "Priority": 25
+        },
+        {
+            "Key": "Beard",
+            "Type": "FaceIndex",
+            "DefaultValue": 0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
+            "Description": "The default beard the NPC displays.",
+            "Variable": "beard",
+            "Priority": 25
+        },
+        {
+            "Key": "Color_Skin",
+            "Type": "ColorRGBStrictHex",
+            "DefaultValue": "#ffffff",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
+            "Description": "The NPC's skin color.",
+            "Variable": "skin",
+            "Priority": 24
+        },
+        {
+            "Key": "Color_Hair",
+            "Type": "ColorRGBStrictHex",
+            "DefaultValue": "#ffffff",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
+            "Description": "The NPC's hair color.",
+            "Variable": "color",
+            "Priority": 24
+        },
+        {
+            "Key": "Backward",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
+            "Description": "Indicates that the NPC is left-handed.",
+            "Variable": "IsLeftHanded",
+            "Priority": 25
+        },
+        {
+            "Key": "Primary",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
+            "Description": "The weapon that's carried on the NPC's back.",
+            "Variable": "primaryWeaponGuid",
+            "Priority": 23
+        },
+        {
+            "Key": "Secondary",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
+            "Description": "The weapon that's carried on the NPC's hip.",
+            "Variable": "secondaryWeaponGuid",
+            "Priority": 23
+        },
+        {
+            "Key": "Tertiary",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
+            "Description": "Another item the NPC can carry.",
+            "Variable": "tertiaryWeaponGuid",
+            "Priority": 23
+        },
+        {
+            "Key": "Equipped",
+            "Type": "SDG.Unturned.ESlotType, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Except": [ "ANY" ],
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
+            "Description": "The item in the specified slot will be held in the character's hands, rather than carried.",
+            "Variable": "equipped",
+            "Priority": 22
+        },
+        {
+            "Key": "Dialogue",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.DialogueAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
+            "Description": "The dialogue to use when first interacting with the NPC.",
+            "Variable": "dialogueGuid",
+            "Priority": 22
+        },
+        {
+            "Key": "Pose",
+            "Type": "SDG.Unturned.ENPCPose, Assembly-CSharp",
+            "DefaultValue": "STAND",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
+            "Description": "The idle animation used for the NPC.",
+            "Variable": "pose",
+            "Priority": 22
+        },
+        {
+            "Key": "Pose_Lean",
+            "Type": "Float32",
+            "Minimum": -1.0,
+            "Maximum": 1.0,
+            "DefaultValue": 0.0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
+            "Description": "How far the NPC leans left or right, as a number from -1 to 1. Positive numbers learn to the NPC’s left, while negative numbers lean to the NPC’s right.",
+            "Variable": "poseLean",
+            "Priority": 22
+        },
+        {
+            "Key": "Pose_Pitch",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "Maximum": 180.0,
+            "DefaultValue": 90.0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
+            "Description": "How far the NPC leans forward or backward, in degrees. Numbers greater than 90 lean forward, while numbers less than 90 lean backward.",
+            "Variable": "posePitch",
+            "Priority": 22
+        },
+        {
+            "Key": "Pose_Head_Offset",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Pose",
+                            "Operation": "eq",
+                            "Comparand": "CROUCH"
+                        }
+                    ],
+                    "Value": 0.1
+                },
+                {
+                    "Value": 0.0
+                }
+            ],
+            "IncludedDefaultValue": 0.0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
+            "Description": "Offset of the NPC’s head from their body, in meters. Positive numbers offset it forward, while negative numbers offset it backward.",
+            "Variable": "poseHeadOffset",
+            "Priority": 22
+        },
+        {
+            "Key": "PlayerKnowsNameFlagID",
+            "Type": "FlagId",
+            "DefaultValue": 0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#npc-character-assets",
+            "Description": "The flag that must be set to true using a Flag_Bool reward for the player to be able to see the NPC's name. If the condition isn't met their name will display as '???'.",
+            "Variable": "playerKnowsNameFlagId",
+            "Priority": 25
+        }
+    ],
+    "Localization":
+    [
+        {
+            "Key": "Character",
+            "Type": "RichTextString",
+            "DefaultValue": "Character",
+            "Description": "Localized name of the NPC.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#localization",
+            "Variable": "npcName",
+            "Required": true
+        }
+    ],
+    "Types":
+    [
+        {
+            "DisplayName": "NPC Pose",
+            "Type": "SDG.Unturned.ENPCPose, Assembly-CSharp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
+            "Values":
+            [
+                {
+                    "Value": "STAND",
+                    "Casing": "Stand",
+                    "Description": "Standing straight up with the NPC's arms at their side or on their hips. The NPC will occasionally fidget or look around."
+                },
+                {
+                    "Value": "SIT",
+                    "Casing": "Sit",
+                    "Description": "Sitting as if in a chair with the NPC's hands on their knees."
+                },
+                {
+                    "Value": "ASLEEP",
+                    "Casing": "Asleep",
+                    "Description": "Standing straight up with the NPC's arms at their side with minimal movement. Can be rotated to be in a laying position."
+                },
+                {
+                    "Value": "PASSIVE",
+                    "Casing": "Passive",
+                    "Description": "Standing straight up with the NPC's arms at their side or on their hips. The NPC will occasionally fidget or look around. If a weapon is equipped it will always be on safety."
+                },
+                {
+                    "Value": "CROUCH",
+                    "Casing": "Crouch",
+                    "Description": "Crouching down with the NPC's arms at their side with minimal movement."
+                },
+                {
+                    "Value": "PRONE",
+                    "Casing": "Prone",
+                    "Description": "Laying prone on the ground with the NPC's arms in front of them."
+                },
+                {
+                    "Value": "UNDER_ARREST",
+                    "Casing": "Under_Arrest",
+                    "Description": "Standing straight up with the NPC's arms behind their back as if they were handcuffed."
+                },
+                {
+                    "Value": "REST",
+                    "Casing": "Rest",
+                    "Description": "Sitting on the ground with the NPC's hands in their lap."
+                },
+                {
+                    "Value": "SURRENDER",
+                    "Casing": "Surrender",
+                    "Description": "Standing straight up with the NPC's hands in the air."
+                }
+            ]
+        }
+    ]
+}

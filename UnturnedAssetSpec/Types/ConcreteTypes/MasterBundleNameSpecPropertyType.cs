@@ -1,4 +1,5 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -17,6 +18,8 @@ public sealed class MasterBundleNameSpecPropertyType : BasicSpecPropertyType<Mas
 
     /// <inheritdoc />
     public override string DisplayName => "Masterbundle Name";
+
+    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)

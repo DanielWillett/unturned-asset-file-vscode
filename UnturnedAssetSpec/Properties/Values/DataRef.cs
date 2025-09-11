@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -10,12 +10,12 @@ using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
-public interface IIndexableBangRef : IBangRefTarget
+public interface IIndexableDataRef : IDataRefTarget
 {
     int Index { get; set; }
 }
 
-public interface IPropertiesBangRef : IBangRefTarget
+public interface IPropertiesDataRef : IDataRefTarget
 {
     void SetProperty(ReadOnlySpan<char> property, ReadOnlySpan<char> value);
     IEnumerable<KeyValuePair<string, string>> EnumerateProperties();
@@ -24,20 +24,20 @@ public interface IPropertiesBangRef : IBangRefTarget
 /// <summary>
 /// References a special property of a target, such as the file name or if the target is included or not.
 /// </summary>
-public abstract class BangRef : IBangRefTarget, IEquatable<BangRef>, IEquatable<ISpecDynamicValue>
+public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<ISpecDynamicValue>
 {
-    public IBangRefTarget Target { get; }
+    public IDataRefTarget Target { get; }
     public ISpecPropertyType? ValueType { get; }
 
     public abstract string PropertyName { get; }
 
-    protected BangRef(IBangRefTarget target, ISpecPropertyType? valueType)
+    protected DataRef(IDataRefTarget target, ISpecPropertyType? valueType)
     {
         Target = target;
         ValueType = valueType;
     }
 
-    public virtual bool Equals(BangRef other)
+    public virtual bool Equals(DataRef other)
     {
         if (other == null || !Target.Equals(other.Target))
             return false;
@@ -47,23 +47,23 @@ public abstract class BangRef : IBangRefTarget, IEquatable<BangRef>, IEquatable<
         return other.ValueType != null && ValueType.Equals(other.ValueType);
     }
 
-    public bool Equals(IBangRefTarget other) => other is BangRef r && Equals(r);
+    public bool Equals(IDataRefTarget other) => other is DataRef r && Equals(r);
 
-    public bool Equals(ISpecDynamicValue other) => other is BangRef r && Equals(r);
+    public bool Equals(ISpecDynamicValue other) => other is DataRef r && Equals(r);
 
     public abstract bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition);
     public abstract bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
     public abstract bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value);
 
-    bool IBangRefTarget.EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext ctx) => Target.EvaluateIsIncluded(valueIncluded, in ctx);
-    string? IBangRefTarget.EvaluateKey(in FileEvaluationContext ctx) => Target.EvaluateKey(in ctx);
-    ISpecDynamicValue? IBangRefTarget.EvaluateValue(in FileEvaluationContext ctx) => Target.EvaluateValue(in ctx);
-    int IBangRefTarget.EvaluateKeyGroup(in FileEvaluationContext ctx, int index) => Target.EvaluateKeyGroup(in ctx, index);
+    bool IDataRefTarget.EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext ctx) => Target.EvaluateIsIncluded(valueIncluded, in ctx);
+    string? IDataRefTarget.EvaluateKey(in FileEvaluationContext ctx) => Target.EvaluateKey(in ctx);
+    ISpecDynamicValue? IDataRefTarget.EvaluateValue(in FileEvaluationContext ctx) => Target.EvaluateValue(in ctx);
+    int IDataRefTarget.EvaluateKeyGroup(in FileEvaluationContext ctx, int index) => Target.EvaluateKeyGroup(in ctx, index);
 
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
     {
-        IIndexableBangRef? indexable = this as IIndexableBangRef;
-        IPropertiesBangRef? properties = this as IPropertiesBangRef;
+        IIndexableDataRef? indexable = this as IIndexableDataRef;
+        IPropertiesDataRef? properties = this as IPropertiesDataRef;
 
         if (indexable == null && properties == null)
         {
@@ -123,24 +123,24 @@ public abstract class BangRef : IBangRefTarget, IEquatable<BangRef>, IEquatable<
     public override string ToString() => Target + "." + PropertyName;
 }
 
-public sealed class IncludedBangRef : BangRef, IEquatable<IncludedBangRef>
+public sealed class IncludedDataRef : DataRef, IEquatable<IncludedDataRef>
 {
-    public IncludedBangRef(IBangRefTarget target) : base(target, KnownTypes.Flag) { }
+    public IncludedDataRef(IDataRefTarget target) : base(target, KnownTypes.Flag) { }
 
     public override string PropertyName => "Included";
 
-    public override bool Equals(BangRef other) => other is IncludedBangRef b && Equals(b);
+    public override bool Equals(DataRef other) => other is IncludedDataRef b && Equals(b);
 
-    public bool Equals(IncludedBangRef other) => base.Equals(other);
+    public bool Equals(IncludedDataRef other) => base.Equals(other);
 
     public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
         if (condition.Comparand is not bool v)
         {
-            return condition.Operation.EvaluateNulls(false, true);
+            return condition.EvaluateNulls(false, true);
         }
 
-        return condition.Operation.Evaluate(
+        return condition.Evaluate(
             Target.EvaluateIsIncluded(false, in ctx),
             v,
             ctx.Information.Information
@@ -176,24 +176,24 @@ public sealed class IncludedBangRef : BangRef, IEquatable<IncludedBangRef>
     }
 }
 
-public sealed class ExcludedBangRef : BangRef, IEquatable<ExcludedBangRef>
+public sealed class ExcludedDataRef : DataRef, IEquatable<ExcludedDataRef>
 {
-    public ExcludedBangRef(IBangRefTarget target) : base(target, KnownTypes.Flag) { }
+    public ExcludedDataRef(IDataRefTarget target) : base(target, KnownTypes.Flag) { }
 
     public override string PropertyName => "Excluded";
 
-    public override bool Equals(BangRef other) => other is ExcludedBangRef b && Equals(b);
+    public override bool Equals(DataRef other) => other is ExcludedDataRef b && Equals(b);
 
-    public bool Equals(ExcludedBangRef other) => base.Equals(other);
+    public bool Equals(ExcludedDataRef other) => base.Equals(other);
 
     public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
         if (condition.Comparand is not bool v)
         {
-            return condition.Operation.EvaluateNulls(false, true);
+            return condition.EvaluateNulls(false, true);
         }
 
-        return condition.Operation.Evaluate(!Target.EvaluateIsIncluded(false, in ctx), v, ctx.Information.Information);
+        return condition.Evaluate(!Target.EvaluateIsIncluded(false, in ctx), v, ctx.Information.Information);
     }
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
@@ -225,24 +225,24 @@ public sealed class ExcludedBangRef : BangRef, IEquatable<ExcludedBangRef>
     }
 }
 
-public sealed class KeyBangRef : BangRef, IEquatable<KeyBangRef>
+public sealed class KeyDataRef : DataRef, IEquatable<KeyDataRef>
 {
-    public KeyBangRef(IBangRefTarget target) : base(target, KnownTypes.String) { }
+    public KeyDataRef(IDataRefTarget target) : base(target, KnownTypes.String) { }
 
     public override string PropertyName => "Key";
 
-    public override bool Equals(BangRef other) => other is KeyBangRef b && Equals(b);
+    public override bool Equals(DataRef other) => other is KeyDataRef b && Equals(b);
 
-    public bool Equals(KeyBangRef other) => base.Equals(other);
+    public bool Equals(KeyDataRef other) => base.Equals(other);
 
     public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
         if (condition.Comparand is not string v)
         {
-            return condition.Operation.EvaluateNulls(false, true);
+            return condition.EvaluateNulls(false, true);
         }
 
-        return condition.Operation.Evaluate(Target.EvaluateKey(in ctx), v, ctx.Information.Information);
+        return condition.Evaluate(Target.EvaluateKey(in ctx), v, ctx.Information.Information);
     }
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
@@ -267,22 +267,22 @@ public sealed class KeyBangRef : BangRef, IEquatable<KeyBangRef>
     }
 }
 
-public sealed class ValueBangRef : BangRef, IEquatable<ValueBangRef>
+public sealed class ValueDataRef : DataRef, IEquatable<ValueDataRef>
 {
-    public ValueBangRef(IBangRefTarget target) : base(target, KnownTypes.String) { }
+    public ValueDataRef(IDataRefTarget target) : base(target, KnownTypes.String) { }
 
     public override string PropertyName => "Value";
 
-    public override bool Equals(BangRef other) => other is ValueBangRef b && Equals(b);
+    public override bool Equals(DataRef other) => other is ValueDataRef b && Equals(b);
 
-    public bool Equals(ValueBangRef other) => base.Equals(other);
+    public bool Equals(ValueDataRef other) => base.Equals(other);
 
     public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
         ISpecDynamicValue? val = Target.EvaluateValue(in ctx);
         if (val == null)
         {
-            return condition.Operation.EvaluateNulls(true, condition.Comparand == null);
+            return condition.EvaluateNulls(true, condition.Comparand == null);
         }
 
         return val.EvaluateCondition(in ctx, in condition);
@@ -299,34 +299,34 @@ public sealed class ValueBangRef : BangRef, IEquatable<ValueBangRef>
     }
 }
 
-public sealed class KeyGroupsBangRef : BangRef, IEquatable<KeyGroupsBangRef>, IIndexableBangRef, IPropertiesBangRef
+public sealed class KeyGroupsDataRef : DataRef, IEquatable<KeyGroupsDataRef>, IIndexableDataRef, IPropertiesDataRef
 {
     public bool PreventSelfReference { get; set; }
 
     public int Index { get; set; }
 
-    public KeyGroupsBangRef(IBangRefTarget target) : base(target, KnownTypes.String) { }
+    public KeyGroupsDataRef(IDataRefTarget target) : base(target, KnownTypes.String) { }
 
     public override string PropertyName => "KeyGroups";
 
-    public override bool Equals(BangRef other) => other is KeyGroupsBangRef b && Equals(b);
+    public override bool Equals(DataRef other) => other is KeyGroupsDataRef b && Equals(b);
 
-    public bool Equals(KeyGroupsBangRef other) => base.Equals(other) && PreventSelfReference == other.PreventSelfReference && Index == other.Index;
+    public bool Equals(KeyGroupsDataRef other) => base.Equals(other) && PreventSelfReference == other.PreventSelfReference && Index == other.Index;
 
     public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
         int keyGroupValue = Target.EvaluateKeyGroup(in ctx, Index);
         if (condition.Comparand is not int expectedValue)
         {
-            return condition.Operation.EvaluateNulls(keyGroupValue < 0, true);
+            return condition.EvaluateNulls(keyGroupValue < 0, true);
         }
 
         if (keyGroupValue < 0)
         {
-            return condition.Operation.EvaluateNulls(true, false);
+            return condition.EvaluateNulls(true, false);
         }
 
-        return condition.Operation.Evaluate(keyGroupValue, expectedValue, ctx.Information.Information);
+        return condition.Evaluate(keyGroupValue, expectedValue, ctx.Information.Information);
     }
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
@@ -383,19 +383,19 @@ public sealed class KeyGroupsBangRef : BangRef, IEquatable<KeyGroupsBangRef>, II
     }
 }
 
-public sealed class AssetNameBangRef : BangRef, IEquatable<AssetNameBangRef>
+public sealed class AssetNameDataRef : DataRef, IEquatable<AssetNameDataRef>
 {
-    public AssetNameBangRef(IBangRefTarget target) : base(target, KnownTypes.String)
+    public AssetNameDataRef(IDataRefTarget target) : base(target, KnownTypes.String)
     {
-        if (target is not ThisBangRef)
+        if (target is not ThisDataRef)
             throw new ArgumentException("AssetName can only be used with #This.");
     }
 
     public override string PropertyName => "AssetName";
 
-    public override bool Equals(BangRef other) => other is AssetNameBangRef b && Equals(b);
+    public override bool Equals(DataRef other) => other is AssetNameDataRef b && Equals(b);
 
-    public bool Equals(AssetNameBangRef other) => base.Equals(other);
+    public bool Equals(AssetNameDataRef other) => base.Equals(other);
 
     public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
@@ -404,13 +404,13 @@ public sealed class AssetNameBangRef : BangRef, IEquatable<AssetNameBangRef>
         if (condition.Comparand is not string str)
         {
             if (condition.Comparand == null)
-                return condition.Operation.EvaluateNulls(isNull, true);
+                return condition.EvaluateNulls(isNull, true);
             str = condition.Comparand.ToString();
         }
 
         return isNull
-            ? condition.Operation.EvaluateNulls(true, false)
-            : condition.Operation.Evaluate(assetName, str, ctx.Information.Information);
+            ? condition.EvaluateNulls(true, false)
+            : condition.Evaluate(assetName, str, ctx.Information.Information);
     }
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)

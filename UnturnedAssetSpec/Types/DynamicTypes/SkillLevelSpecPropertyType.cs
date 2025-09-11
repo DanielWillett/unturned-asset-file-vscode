@@ -22,6 +22,8 @@ public sealed class SkillLevelSpecPropertyType :
 
     public string SkillsetOrProperty { get; }
 
+    protected override ISpecDynamicValue CreateValue(byte value) => new SpecDynamicConcreteConvertibleValue<byte>(value, this);
+
     public SkillLevelSpecPropertyType(string skillsetOrProperty)
     {
         SkillsetOrProperty = skillsetOrProperty;
@@ -37,6 +39,11 @@ public sealed class SkillLevelSpecPropertyType :
     public override string DisplayName => "Skill Level";
 
     string IElementTypeSpecPropertyType.ElementType => SkillsetOrProperty;
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<byte>()?.ToString();
+    }
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)

@@ -21,6 +21,13 @@ public sealed class Int64SpecPropertyType : BasicSpecPropertyType<Int64SpecPrope
     /// <inheritdoc />
     public override string DisplayName => "Signed 64-Bit Integer";
 
+    protected override ISpecDynamicValue CreateValue(long value) => new SpecDynamicConcreteConvertibleValue<long>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<long>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

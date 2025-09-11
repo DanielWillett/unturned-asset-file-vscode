@@ -311,6 +311,10 @@
         {
             "HasDataFiles": true
         },
+        "SDG.Unturned.ServerListCurationFile, Assembly-CSharp":
+        {
+            "HasDataFiles": true
+        },
         "SDG.Unturned.Asset, Assembly-CSharp":
         {
             "HasDataFiles": true,

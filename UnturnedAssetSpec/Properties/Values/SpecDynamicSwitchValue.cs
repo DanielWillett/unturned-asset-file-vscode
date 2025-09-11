@@ -446,7 +446,7 @@ public class SpecDynamicSwitchValue :
         SpecDynamicSwitchCaseValue? match = TryMatchCase(in ctx);
         if (match == null)
         {
-            return condition.Operation.EvaluateNulls(true, condition.Comparand == null);
+            return condition.EvaluateNulls(true, condition.Comparand == null);
         }
 
         return match.Value.EvaluateCondition(in ctx, in condition);

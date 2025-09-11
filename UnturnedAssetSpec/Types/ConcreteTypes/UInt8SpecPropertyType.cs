@@ -21,6 +21,13 @@ public sealed class UInt8SpecPropertyType : BasicSpecPropertyType<UInt8SpecPrope
     /// <inheritdoc />
     public override string DisplayName => "Unsigned 8-Bit Integer";
 
+    protected override ISpecDynamicValue CreateValue(byte value) => new SpecDynamicConcreteConvertibleValue<byte>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<byte>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

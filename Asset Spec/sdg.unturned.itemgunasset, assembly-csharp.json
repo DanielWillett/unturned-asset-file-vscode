@@ -1424,6 +1424,37 @@
             "Variable": "CasingEjectCountAfterReload"
         },
         {
+            "Key": "EjectCasingAfterShooting",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Trigger"
+                        },
+                        {
+                            "Variable": "Action",
+                            "Operation": "eq",
+                            "Comparand": "Minigun"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Determines whether or not particles should be emitted when a shot is fired.",
+            "Priority": 14,
+            "Variable": "EjectCasingAfterShooting",
+            "Version": "3.25.8.0",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ejectcasingaftershooting-bool"
+        },
+        {
             "Key": "RechamberAfterMagazineAttached",
             "Type": "SDG.Unturned.ERechamberGunAfterReloadMode, Assembly-CSharp",
             "DefaultValue": "IfAmmoWasEmpty",

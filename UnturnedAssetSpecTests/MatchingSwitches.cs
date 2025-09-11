@@ -20,7 +20,7 @@ public class MatchingSwitches
                 new SpecDynamicConcreteValue<ISpecPropertyType>(KnownTypes.Float32, SpecPropertyTypeType.Instance),
                 new OneOrMore<SpecDynamicSwitchCaseOrCondition>(
                 [
-                    new SpecDynamicSwitchCaseOrCondition(new SpecCondition(new PropertyRef("Uniform_Scale", null), ConditionOperation.Equal, true))
+                    new SpecDynamicSwitchCaseOrCondition(new SpecCondition(new PropertyRef("Uniform_Scale", null), ConditionOperation.Equal, true, false))
                 ])),
             new SpecDynamicSwitchCaseValue(
                 SpecDynamicSwitchCaseOperation.And,

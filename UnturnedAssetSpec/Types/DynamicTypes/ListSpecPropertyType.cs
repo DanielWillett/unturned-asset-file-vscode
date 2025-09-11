@@ -115,7 +115,7 @@ public sealed class ListSpecPropertyType<TElementType> :
     }
 
     /// <inheritdoc />
-    public bool Equals(ListSpecPropertyType<TElementType>? other) => other != null && InnerType.Equals(other.InnerType);
+    public bool Equals(ListSpecPropertyType<TElementType>? other) => other != null && InnerType.Equals(other.InnerType) && AllowSingle == other.AllowSingle;
 
     /// <inheritdoc />
     public bool Equals(ISpecPropertyType? other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
@@ -145,7 +145,7 @@ internal sealed class UnresolvedListSpecPropertyType :
         AllowSingle = allowSingle;
     }
 
-    public bool Equals(UnresolvedListSpecPropertyType? other) => other != null && InnerType.Equals(other.InnerType);
+    public bool Equals(UnresolvedListSpecPropertyType? other) => other != null && InnerType.Equals(other.InnerType) && AllowSingle == other.AllowSingle;
     public bool Equals(ISpecPropertyType? other) => other is UnresolvedListSpecPropertyType l && Equals(l);
     public override bool Equals(object? obj) => obj is UnresolvedListSpecPropertyType l && Equals(l);
     public override int GetHashCode() => InnerType.GetHashCode();

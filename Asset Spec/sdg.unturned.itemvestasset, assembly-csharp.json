@@ -7,7 +7,50 @@
     "Category": "ITEM",
     "VanillaIdLimit": 2000,
     "RequireId": true,
-    "Properties": [ ],
+    "Properties":
+    [
+        {
+            "Key": "Has_Fallback_Shirt",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not this asset provides a @Fallback_Shirt property.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vest-asset.html#properties",
+            "Variable": "hasFallbackShirt",
+            "Priority": 3,
+            "Version": "3.25.8.0",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Fallback_Shirt",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Has_Fallback_Shirt",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Fallback_Shirt",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "Shirt to display when the player is using this vest and has no shirt.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vest-asset.html#properties",
+            "Variable": "hasFallbackShirt",
+            "Priority": 3,
+            "Version": "3.25.8.0",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Fallback_Shirt",
+                    "Value": true
+                }
+            ]
+        }
+    ],
     "BundleAssets":
     [
         {

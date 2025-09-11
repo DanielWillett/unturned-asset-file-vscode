@@ -12,6 +12,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 [DebuggerDisplay("Type: {Type.GetTypeName()}")]
 public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecType?>
 {
+    /// <summary>
+    /// The GitHub commit (SHA) where this information was taken from, if any. Note that some information may have been pulled from other places.
+    /// </summary>
+    public string? Commit { get; set; }
+
     public QualifiedType Type { get; internal set; }
 
     public EnumSpecTypeValue Category { get; set; } = AssetCategory.None;
@@ -25,6 +30,8 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
     public bool RequireId { get; set; }
 
     public string DisplayName { get; set; } = string.Empty;
+
+    public Version? Version { get; set; }
 
     public OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; set; } = OneOrMore<KeyValuePair<string, object?>>.Null;
 

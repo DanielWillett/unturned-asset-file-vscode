@@ -94,7 +94,7 @@ public readonly struct UnityEngineVersion : IEquatable<UnityEngineVersion>, ICom
         if (Revision < other.Revision)
             return -1;
 
-        return string.Compare(Status, other.Status, StringComparison.Ordinal);
+        return statusLevel > 0 ? 0 : string.Compare(Status, other.Status, StringComparison.Ordinal);
     }
 
     /// <inheritdoc />

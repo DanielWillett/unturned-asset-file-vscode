@@ -35,6 +35,11 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
     OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
 
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<GuidOrId>()?.ToString();
+    }
+
     public BackwardsCompatibleAssetReferenceSpecPropertyType(QualifiedType elementType, bool canParseDictionary, OneOrMore<string> specialTypes)
     {
         CanParseDictionary = canParseDictionary;

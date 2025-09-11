@@ -1,9 +1,9 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
-public interface IBangRefTarget : IEquatable<IBangRefTarget>, ISpecDynamicValue
+public interface IDataRefTarget : IEquatable<IDataRefTarget>, ISpecDynamicValue
 {
     bool EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext ctx);
     string? EvaluateKey(in FileEvaluationContext ctx);

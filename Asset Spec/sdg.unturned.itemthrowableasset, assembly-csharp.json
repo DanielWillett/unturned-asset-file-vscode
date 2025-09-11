@@ -81,6 +81,16 @@
             ]
         },
         {
+            "Key": "Explode_On_Impact_Destroy_On_Client",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not clients destroy 'Throwable' prefab upon collision.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/throwable-asset.html#throwable-asset-properties",
+            "Variable": "ExplodeOnImpactDestroyOnClient",
+            "Priority": 6,
+            "Version": "3.25.8.0"
+        },
+        {
             "Key": "Fuse_Length",
             "Type": "Float32",
             "Minimum": 0.0,

@@ -21,6 +21,13 @@ public sealed class Float64SpecPropertyType : BasicSpecPropertyType<Float64SpecP
     /// <inheritdoc />
     public override string DisplayName => "Double-Precision Decimal";
 
+    protected override ISpecDynamicValue CreateValue(double value) => new SpecDynamicConcreteConvertibleValue<double>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<double>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

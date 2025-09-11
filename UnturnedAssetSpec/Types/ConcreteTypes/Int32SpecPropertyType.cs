@@ -21,6 +21,13 @@ public sealed class Int32SpecPropertyType : BasicSpecPropertyType<Int32SpecPrope
     /// <inheritdoc />
     public override string DisplayName => "Signed 32-Bit Integer";
 
+    protected override ISpecDynamicValue CreateValue(int value) => new SpecDynamicConcreteConvertibleValue<int>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<int>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

@@ -20,6 +20,13 @@ public sealed class RichTextStringSpecPropertyType : BasicSpecPropertyType<RichT
     /// <inheritdoc />
     public override string DisplayName => "Rich Text";
 
+    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcrete<string>();
+    }
+
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
     {

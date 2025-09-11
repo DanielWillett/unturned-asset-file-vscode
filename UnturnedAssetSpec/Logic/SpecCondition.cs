@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Numerics;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -15,8 +16,15 @@ public readonly struct SpecCondition : IEquatable<SpecCondition>
     public ISpecDynamicValue Variable { get; }
     public ConditionOperation Operation { get; }
     public object? Comparand { get; }
+    public bool IsInverted { get; }
 
-    public SpecCondition(ISpecDynamicValue variable, ConditionOperation operation, object? comparand)
+    [Pure]
+    internal bool Invert(bool value)
+    {
+        return IsInverted ? !value : value;
+    }
+
+    public SpecCondition(ISpecDynamicValue variable, ConditionOperation operation, object? comparand, bool isInverted)
     {
         Variable = variable;
         Operation = operation;
@@ -25,39 +33,48 @@ public readonly struct SpecCondition : IEquatable<SpecCondition>
 
     public bool TryGetOpposite(out SpecCondition condition)
     {
+        if (IsInverted)
+        {
+            condition = new SpecCondition(Variable, Operation, Comparand, false);
+            return true;
+        }
+
         switch (Operation)
         {
             case ConditionOperation.Included:
-                condition = new SpecCondition(Variable, ConditionOperation.Excluded, Comparand);
+                condition = new SpecCondition(Variable, ConditionOperation.Excluded, Comparand, false);
+                return true;
+            case ConditionOperation.Excluded:
+                condition = new SpecCondition(Variable, ConditionOperation.Included, Comparand, false);
                 return true;
             case ConditionOperation.Equal:
-                condition = new SpecCondition(Variable, ConditionOperation.NotEqual, Comparand);
+                condition = new SpecCondition(Variable, ConditionOperation.NotEqual, Comparand, false);
                 return true;
             case ConditionOperation.NotEqual:
-                condition = new SpecCondition(Variable, ConditionOperation.Equal, Comparand);
+                condition = new SpecCondition(Variable, ConditionOperation.Equal, Comparand, false);
                 return true;
             case ConditionOperation.EqualCaseInsensitive:
-                condition = new SpecCondition(Variable, ConditionOperation.NotEqualCaseInsensitive, Comparand);
+                condition = new SpecCondition(Variable, ConditionOperation.NotEqualCaseInsensitive, Comparand, false);
                 return true;
             case ConditionOperation.NotEqualCaseInsensitive:
-                condition = new SpecCondition(Variable, ConditionOperation.EqualCaseInsensitive, Comparand);
+                condition = new SpecCondition(Variable, ConditionOperation.EqualCaseInsensitive, Comparand, false);
                 return true;
             case ConditionOperation.GreaterThan:
-                condition = new SpecCondition(Variable, ConditionOperation.LessThanOrEqual, Comparand);
+                condition = new SpecCondition(Variable, ConditionOperation.LessThanOrEqual, Comparand, false);
                 return true;
             case ConditionOperation.LessThan:
-                condition = new SpecCondition(Variable, ConditionOperation.GreaterThanOrEqual, Comparand);
+                condition = new SpecCondition(Variable, ConditionOperation.GreaterThanOrEqual, Comparand, false);
                 return true;
             case ConditionOperation.GreaterThanOrEqual:
-                condition = new SpecCondition(Variable, ConditionOperation.LessThan, Comparand);
+                condition = new SpecCondition(Variable, ConditionOperation.LessThan, Comparand, false);
                 return true;
             case ConditionOperation.LessThanOrEqual:
-                condition = new SpecCondition(Variable, ConditionOperation.GreaterThan, Comparand);
+                condition = new SpecCondition(Variable, ConditionOperation.GreaterThan, Comparand, false);
+                return true;
+            default:
+                condition = new SpecCondition(Variable, Operation, Comparand, true);
                 return true;
         }
-
-        condition = default;
-        return false;
     }
 
     public bool Equals(SpecCondition other)
@@ -200,7 +217,16 @@ public static class ConditionOperationExtensions
         return Inequality[(int)op];
     }
 
-    public static bool EvaluateNulls(this ConditionOperation op, bool valueIsNull, bool comparandIsNull)
+    public static bool EvaluateNulls(this SpecCondition condition, bool valueIsNull, bool comparandIsNull)
+    {
+        bool eval = EvaluateNulls(condition.Operation, valueIsNull, comparandIsNull);
+        if (condition.IsInverted)
+            eval = !eval;
+
+        return eval;
+    }
+
+    private static bool EvaluateNulls(ConditionOperation op, bool valueIsNull, bool comparandIsNull)
     {
         if (!valueIsNull && !comparandIsNull)
             throw new ArgumentException("Expected at least one null value.");
@@ -321,15 +347,15 @@ public static class ConditionOperationExtensions
         return Comparer<T>.Default;
     }
 
-    public static bool Evaluate<T>(this ConditionOperation op, T value, T comparand, AssetInformation? information)
+    private static bool Evaluate<T>(ConditionOperation op, T value, T comparand, AssetInformation? information)
     {
         if (value == null)
         {
-            return op.EvaluateNulls(true, comparand == null);
+            return EvaluateNulls(op, true, comparand == null);
         }
         if (comparand == null)
         {
-            return op.EvaluateNulls(false, true);
+            return EvaluateNulls(op, false, true);
         }
 
         switch (op)
@@ -347,59 +373,59 @@ public static class ConditionOperationExtensions
                 return GetComparer<T>().Compare(value, comparand) >= 0;
 
             case ConditionOperation.Equal:
-            {
-                return value is string str ? string.Equals(str, (string)(object)comparand, StringComparison.Ordinal) : GetComparer<T>().Compare(value, comparand) == 0;
-            }
+                {
+                    return value is string str ? string.Equals(str, (string)(object)comparand, StringComparison.Ordinal) : GetComparer<T>().Compare(value, comparand) == 0;
+                }
 
             case ConditionOperation.NotEqual:
-            {
-                return value is string str ? !string.Equals(str, (string)(object)comparand, StringComparison.Ordinal) : GetComparer<T>().Compare(value, comparand) != 0;
-            }
+                {
+                    return value is string str ? !string.Equals(str, (string)(object)comparand, StringComparison.Ordinal) : GetComparer<T>().Compare(value, comparand) != 0;
+                }
 
             case ConditionOperation.NotEqualCaseInsensitive:
-            {
-                return value is string str ? !string.Equals(str, (string)(object)comparand, StringComparison.OrdinalIgnoreCase) : (GetComparer<T>().Compare(value, comparand) != 0);
-            }
+                {
+                    return value is string str ? !string.Equals(str, (string)(object)comparand, StringComparison.OrdinalIgnoreCase) : (GetComparer<T>().Compare(value, comparand) != 0);
+                }
 
             case ConditionOperation.Containing:
-            {
-                return value is string str && str.IndexOf((string)(object)comparand, StringComparison.Ordinal) >= 0;
-            }
+                {
+                    return value is string str && str.IndexOf((string)(object)comparand, StringComparison.Ordinal) >= 0;
+                }
 
             case ConditionOperation.StartingWith:
-            {
-                return value is string str && str.StartsWith((string)(object)comparand, StringComparison.Ordinal);
-            }
+                {
+                    return value is string str && str.StartsWith((string)(object)comparand, StringComparison.Ordinal);
+                }
 
             case ConditionOperation.EndingWith:
-            {
-                return value is string str && str.EndsWith((string)(object)comparand, StringComparison.Ordinal);
-            }
+                {
+                    return value is string str && str.EndsWith((string)(object)comparand, StringComparison.Ordinal);
+                }
 
             case ConditionOperation.Matching:
-            {
-                return value is string str && Regex.IsMatch((string)(object)comparand, str, RegexOptions.Singleline | RegexOptions.CultureInvariant);
-            }
+                {
+                    return value is string str && Regex.IsMatch((string)(object)comparand, str, RegexOptions.Singleline | RegexOptions.CultureInvariant);
+                }
 
             case ConditionOperation.ContainingCaseInsensitive:
-            {
-                return value is string str && str.IndexOf((string)(object)comparand, StringComparison.OrdinalIgnoreCase) >= 0;
-            }
+                {
+                    return value is string str && str.IndexOf((string)(object)comparand, StringComparison.OrdinalIgnoreCase) >= 0;
+                }
 
             case ConditionOperation.EqualCaseInsensitive:
-            {
-                return value is string str ? string.Equals(str, (string)(object)comparand, StringComparison.OrdinalIgnoreCase) : Comparer<T>.Default.Compare(value, comparand) == 0;
-            }
+                {
+                    return value is string str ? string.Equals(str, (string)(object)comparand, StringComparison.OrdinalIgnoreCase) : Comparer<T>.Default.Compare(value, comparand) == 0;
+                }
 
             case ConditionOperation.StartingWithCaseInsensitive:
-            {
-                return value is string str && str.StartsWith((string)(object)comparand, StringComparison.OrdinalIgnoreCase);
-            }
+                {
+                    return value is string str && str.StartsWith((string)(object)comparand, StringComparison.OrdinalIgnoreCase);
+                }
 
             case ConditionOperation.EndingWithCaseInsensitive:
-            {
-                return value is string str && str.EndsWith((string)(object)comparand, StringComparison.OrdinalIgnoreCase);
-            }
+                {
+                    return value is string str && str.EndsWith((string)(object)comparand, StringComparison.OrdinalIgnoreCase);
+                }
 
             case ConditionOperation.AssignableTo:
                 return value switch
@@ -408,7 +434,7 @@ public static class ConditionOperationExtensions
                     QualifiedType qType when information != null => information.IsAssignableFrom((QualifiedType)(object)comparand, qType),
                     _ => false
                 };
-            
+
             case ConditionOperation.AssignableFrom:
                 return value switch
                 {
@@ -416,12 +442,12 @@ public static class ConditionOperationExtensions
                     QualifiedType qType when information != null => information.IsAssignableFrom(qType, (QualifiedType)(object)comparand),
                     _ => false
                 };
-            
+
             case ConditionOperation.ReferenceIsOfType:
-            {
-                // todo
-                return false;
-            }
+                {
+                    // todo
+                    return false;
+                }
 
             case ConditionOperation.Included:
             case ConditionOperation.ValueIncluded:
@@ -433,6 +459,16 @@ public static class ConditionOperationExtensions
             default:
                 throw new ArgumentOutOfRangeException(nameof(op), op, null);
         }
+    }
+
+    public static bool Evaluate<T>(this SpecCondition c, T value, T comparand, AssetInformation? information)
+    {
+        ConditionOperation op = c.Operation;
+        bool result = Evaluate(op, value, comparand, information);
+        if (c.IsInverted)
+            result = !result;
+
+        return result;
     }
 }
 

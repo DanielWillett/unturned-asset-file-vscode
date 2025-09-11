@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -11,6 +11,8 @@ internal static class BoxedPrimitives
     public static readonly object I20 = (short)0;
     public static readonly object U20 = (ushort)0;
     public static readonly object I40 = 0;
+    public static readonly object I4M1 = -1;
+    public static readonly object I41 = 1;
     public static readonly object U40 = 0u;
     public static readonly object I80 = 0L;
     public static readonly object U80 = 0UL;

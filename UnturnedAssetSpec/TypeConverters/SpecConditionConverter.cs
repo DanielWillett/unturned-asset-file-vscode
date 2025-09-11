@@ -38,6 +38,7 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
     private static readonly JsonEncodedText VariableProperty = JsonEncodedText.Encode("Variable");
     private static readonly JsonEncodedText OperationProperty = JsonEncodedText.Encode("Operation");
     private static readonly JsonEncodedText ComparandProperty = JsonEncodedText.Encode("Comparand");
+    private static readonly JsonEncodedText InvertedProperty = JsonEncodedText.Encode("Inverted");
 
     /// <inheritdoc />
     public override SpecCondition Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -54,16 +55,16 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
 
             case JsonTokenType.True:
                 // always true
-                return new SpecCondition(SpecDynamicValue.True, ConditionOperation.Equal, true);
+                return new SpecCondition(SpecDynamicValue.True, ConditionOperation.Equal, BoxedPrimitives.True, false);
 
             case JsonTokenType.False:
             case JsonTokenType.Null:
                 // always false
-                return new SpecCondition(SpecDynamicValue.False, ConditionOperation.Equal, true);
+                return new SpecCondition(SpecDynamicValue.False, ConditionOperation.Equal, BoxedPrimitives.True, false);
 
             case JsonTokenType.String:
                 // check if property by this name is true
-                return new SpecCondition(SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, KnownTypes.Boolean), ConditionOperation.Equal, true);
+                return new SpecCondition(SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, KnownTypes.Boolean), ConditionOperation.Equal, BoxedPrimitives.True, false);
 
             default:
                 throw new JsonException($"Unexpected token {reader.TokenType} while reading SpecCondition.");
@@ -73,6 +74,7 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
         ConditionOperation? operation = null;
         bool hasComparand = false;
         object? comparand = null;
+        bool isInverted = false;
 
         while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
@@ -113,6 +115,13 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
                 comparand = obj;
                 hasComparand = true;
             }
+            else if (reader.ValueTextEquals(InvertedProperty.EncodedUtf8Bytes))
+            {
+                if (!reader.Read() || reader.TokenType is not JsonTokenType.True and not JsonTokenType.False and not JsonTokenType.Null)
+                    throw new JsonException("Failed to read 'Inverted' in SpecCondition.");
+
+                isInverted = reader.TokenType == JsonTokenType.True;
+            }
             else
             {
                 reader.Read();
@@ -129,22 +138,29 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
         if (!hasComparand)
             throw new JsonException("Missing 'Comparand' while reading SpecCondition.");
 
-        return new SpecCondition(variable, operation.Value, comparand);
+
+        SpecCondition c = new SpecCondition(variable, operation.Value, comparand, false);
+        if (!isInverted)
+            return c;
+
+        return c.TryGetOpposite(out SpecCondition c2) ? c2 : new SpecCondition(variable, operation.Value, comparand, true);
     }
 
     public static void Write(Utf8JsonWriter writer, SpecCondition value)
     {
         if (ReferenceEquals(SpecDynamicValue.True, value.Variable) && value is { Operation: ConditionOperation.Equal, Comparand: true })
         {
-            writer.WriteBooleanValue(true);
+            writer.WriteBooleanValue(!value.IsInverted);
             return;
         }
         if (ReferenceEquals(SpecDynamicValue.False, value.Variable) && value is { Operation: ConditionOperation.Equal, Comparand: true })
         {
-            writer.WriteBooleanValue(false);
+            writer.WriteBooleanValue(value.IsInverted);
             return;
         }
-        if (value.Variable is PropertyRef p && value is { Operation: ConditionOperation.Equal, Comparand: true })
+        if (value.Variable is PropertyRef p
+            && value is { Operation: ConditionOperation.Equal, Comparand: true, IsInverted: false }
+                     or { Operation: ConditionOperation.NotEqual, Comparand: true, IsInverted: true })
         {
             writer.WriteStringValue(p.ToString());
             return;
@@ -156,8 +172,12 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
         writer.WriteString(OperationProperty, Operations[(int)value.Operation]);
 
         writer.WritePropertyName(ComparandProperty);
-
         JsonHelper.WriteGenericValue(writer, value.Comparand);
+
+        if (value.IsInverted)
+        {
+            writer.WriteBoolean(InvertedProperty, true);
+        }
 
         writer.WriteEndObject();
     }

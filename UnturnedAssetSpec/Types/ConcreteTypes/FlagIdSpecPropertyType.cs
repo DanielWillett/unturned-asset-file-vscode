@@ -27,6 +27,11 @@ public sealed class FlagIdSpecPropertyType :
     /// <inheritdoc />
     public Type ValueType => typeof(ushort);
 
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<ushort>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
@@ -48,7 +53,7 @@ public sealed class FlagIdSpecPropertyType :
             return false;
         }
 
-        value = new SpecDynamicConcreteValue<ushort>(val, this);
+        value = new SpecDynamicConcreteConvertibleValue<ushort>(val, this);
         return true;
     }
 

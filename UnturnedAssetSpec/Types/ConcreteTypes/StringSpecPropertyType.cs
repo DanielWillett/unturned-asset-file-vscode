@@ -20,6 +20,13 @@ public sealed class StringSpecPropertyType : BasicSpecPropertyType<StringSpecPro
     /// <inheritdoc />
     public override string DisplayName => "Text";
 
+    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcrete<string>();
+    }
+
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
     {

@@ -1,0 +1,539 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ResourceAsset, Assembly-CSharp",
+    "DisplayName": "Resource",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html",
+    "Category": "RESOURCE",
+    "RequireId": true,
+    "VanillaIdLimit": 50,
+    "Properties":
+    [
+        {
+            "Key": "Bypass_ID_Limit",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows IDs to be less than 50 if this isn't the vanilla bundle.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Priority": 97
+        },
+        {
+            "Key": "Has_Clip_Prefab",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not this resource defines separate prefabs (@($bndl$::Resource_Clip), @($bndl$::Stump_Clip)) to be loaded on the server. This is not required and should be set to false in most cases.",
+            "Priority": 5
+        },
+        {
+            "Key": "Auto_Skybox",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Automatically render a card texture on startup and apply the texture to the @($bndl$::Skybox) model ('Model_0').",
+            "Priority": 5,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "$bndl$::Skybox",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Health",
+            "Type": "UInt16",
+            "MinimumExclusive": 0,
+            "DefaultValue": 0,
+            "Required": true,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "The total health of this resource.",
+            "Variable": "health",
+            "Priority": 9
+        },
+        {
+            "Key": "RandomAngleDeviation_Min",
+            "Type": "Float32",
+            "Minimum": -180.0,
+            "Maximum": "@RandomAngleDeviation_Max",
+            "DefaultValue": -5.0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Minimum angle in degrees away from the up direction, where 0 is upright.",
+            "Variable": "MinRandomAngleDeviation",
+            "Priority": 6
+        },
+        {
+            "Key": "RandomAngleDeviation_Max",
+            "Type": "Float32",
+            "Minimum": "@RandomAngleDeviation_Min",
+            "Maximum": 180.0,
+            "DefaultValue": 5.0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Maximum angle in degrees away from the up direction, where 0 is upright.",
+            "Variable": "MaxRandomAngleDeviation",
+            "Priority": 6
+        },
+        {
+            "Key": "Scale",
+            "Type": "Float32",
+            "Deprecated": true,
+            "Minimum": 1.0,
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Scale",
+                            "Operation": "value-included",
+                            "Comparand": null
+                        }
+                    ],
+                    "Value": 0.0
+                },
+                {
+                    "Value": "=MUL(=SUB(@RandomUniformScale_Max @RandomUniformScale_Min) 0.5)"
+                }
+            ],
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "The tree's in-game scale is a random number between 1.1 and the result of 1.1 + (Scale * 2).",
+            "Variable": "scale",
+            "Priority": 6
+        },
+        {
+            "Key": "RandomUniformScale_Min",
+            "Type": "Float32",
+            "Maximum": "@RandomUniformScale_Max",
+            "DefaultValue": 1.1,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Minimum scale. The same randomized value is used for all axes (uniform).",
+            "Variable": "MinRandomUniformScale",
+            "Priority": 6
+        },
+        {
+            "Key": "RandomUniformScale_Max",
+            "Type": "Float32",
+            "Minimum": "@RandomUniformScale_Min",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Scale",
+                            "Operation": "value-included",
+                            "Comparand": null
+                        }
+                    ],
+                    "Value": "=ADD(1.1 =MUL(@Scale 2.0))"
+                },
+                {
+                    "Value": 1.1
+                }
+            ],
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Maximum scale. The same randomized value is used for all axes (uniform).",
+            "Variable": "MaxRandomUniformScale",
+            "Priority": 6
+        },
+        {
+            "Key": "Vertical_Offset",
+            "Type": "Float32",
+            "DefaultValue": -0.75,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "A vertical offset above or below wherever this resource is placed, in meters.",
+            "Variable": "verticalOffset",
+            "Priority": 6
+        },
+        {
+            "Key": "Debris_Vertical_Offset",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Distance along tree's local up axis to offset debris spawn position.",
+            "Variable": "DebrisVerticalOffset",
+            "Priority": 6
+        },
+        {
+            "Key": "Explosion",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Effect to play when this resource is destroyed.",
+            "Variable": "explosionGuid",
+            "Priority": 7
+        },
+        {
+            "Key": "Log",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "DefaultValue": 0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "ID of an item that should be dropped when the resource is destroyed. Before multipliers, this item is dropped in bunches of 3 to 7. This is also the item that is given to the player when this resource is foraged.",
+            "Variable": "log",
+            "Priority": 8,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Reward_ID",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Stick",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "DefaultValue": 0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "ID of an item that should be dropped when the resource is destroyed. Before multipliers, this item is dropped in bunches of 2 to 5.",
+            "Variable": "stick",
+            "Priority": 8,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Reward_ID",
+                    "Value": "*"
+                },
+                {
+                    "Key": "Forage",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Reward_ID",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "DefaultValue": 0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "ID of an item spawn table to pull items from that should be dropped when this resource is destroyed or foraged.",
+            "Variable": "rewardID",
+            "Priority": 8,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Log",
+                    "Value": "*"
+                },
+                {
+                    "Key": "Stick",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Reward_XP",
+            "Type": "UInt32",
+            "DefaultValue": 0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Amount of experience to reward when the resource is destroyed.",
+            "Variable": "rewardXP",
+            "Priority": 8,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Forage",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Reward_Min",
+            "Type": "UInt8",
+            "DefaultValue": 6,
+            "IncludedDefaultValue": 0,
+            "Maximum": "@Reward_Max",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Minimum amount of item drops to reward.",
+            "Variable": "rewardMin",
+            "Priority": 8,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Reward_ID",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Reward_ID",
+                        "Operation": "gt",
+                        "Comparand": 0
+                    }
+                }
+            ],
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Forage",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Reward_Max",
+            "Type": "UInt8",
+            "DefaultValue": 9,
+            "IncludedDefaultValue": 0,
+            "Minimum": "@Reward_Min",
+            "Maximum": 100,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Maximum amount of item drops to reward.",
+            "Variable": "rewardMax",
+            "Priority": 8,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Reward_ID",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Reward_ID",
+                        "Operation": "gt",
+                        "Comparand": 0
+                    }
+                }
+            ],
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Forage",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "BladeID",
+            "Type": "BladeId",
+            "DefaultValue": 0,
+            "Description": "An arbitrary ID that weapons must also define to be able to damage this resource.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Priority": 7,
+            "Variable": "bladeID"
+        },
+        {
+            "Key": "Vulnerable_To_Fists",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Whether or not this resource can be damaged by punching.",
+            "Variable": "vulnerableToFists",
+            "Priority": 7
+        },
+        {
+            "Key": "Vulnerable_To_All_Melee_Weapons",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Whether or not this resource can be damaged by melee weapons that don't share a blade ID with this resource.",
+            "Variable": "vulnerableToAllMeleeWeapons",
+            "Priority": 7
+        },
+        {
+            "Key": "Ignore_Collision_Between_Stump_And_Debris",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Whether or not the @($bndl$::Stump) and @($bndl$::Debris) prefabs should be able to pass through each other.",
+            "Variable": "ShouldIgnoreCollisionBetweenStumpAndDebris",
+            "Priority": 5
+        },
+        {
+            "Key": "Reset",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Number of seconds after this resource is destroyed when it respawn.",
+            "Variable": "reset",
+            "Priority": 9
+        },
+        {
+            "Key": "Forage",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Whether or not this resource can be interacted with to collect rewards.",
+            "Variable": "isForage",
+            "Priority": 9
+        },
+        {
+            "Key": "Forage_Reward_Experience",
+            "Type": "UInt32",
+            "DefaultValue": 1,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Amount of experience to reward when the resource is foraged from.",
+            "Variable": "forageRewardExperience",
+            "Priority": 8,
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Forage",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "No_Debris",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Description": "Indicates that this resource does not have debris that should appear when it has been destroyed. This also affects item and explosion effect spawn positions.",
+            "Variable": "hasDebris",
+            "Priority": 5
+        },
+        {
+            "Key": "Holiday_Restriction",
+            "Type": "SDG.Unturned.ENPCHoliday, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Description": "When set, the only holiday during which this resource will be visible.",
+            "Priority": 4,
+            "Variable": "holidayRestriction",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties"
+        },
+        {
+            "Key": "Christmas_Redirect",
+            "Type": "AssetReferenceString",
+            "ElementType": "SDG.Unturned.ResourceAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "The resource to replace this resource with during the 'Christmas' holiday.",
+            "Priority": 4,
+            "Variable": "christmasRedirect",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties"
+        },
+        {
+            "Key": "Halloween_Redirect",
+            "Type": "AssetReferenceString",
+            "ElementType": "SDG.Unturned.ResourceAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "The resource to replace this resource with during the 'Halloween' holiday.",
+            "Priority": 4,
+            "Variable": "halloweenRedirect",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties"
+        },
+        {
+            "Key": "Chart",
+            "Type": "SDG.Unturned.EObjectChart, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Description": "Overrides the material used for this resource when rendering the level chart.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Priority": 9,
+            "Variable": "chart"
+        },
+        {
+            "Key": "Exclude_From_Level_Batching",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not this resource is excluded from the level batching process.",
+            "Priority": 5,
+            "Variable": "shouldExcludeFromLevelBatching",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties"
+        }
+    ],
+    "Localization":
+    [
+        {
+            "Key": "Name",
+            "Type": "RichTextString",
+            "Required": true,
+            "DefaultValue": "Name",
+            "Description": "Localized display name of the resource.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#localization",
+            "Variable": "resourceName"
+        },
+        {
+            "Key": "Interact",
+            "Type": "FormatString",
+            "ElementType": "1|T",
+            "DefaultValue": "Interact",
+            "Description": "Localized text displayed when the character looks at this resource. The keybind is formatted into '{0}'.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#localization",
+            "Variable": "interactabilityText",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Forage",
+                    "Value": true
+                }
+            ]
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Resource_Clip",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab of the resource (visible when this resource is alive) only loaded on the dedicated server. Should have collision but not renderers.",
+            "Deprecated": true,
+            "Required":
+            {
+                "Variable": "Has_Clip_Prefab",
+                "Operation": "eq",
+                "Comparand": true
+            },
+            "Variable": "modelGameObject",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Has_Clip_Prefab",
+                    "Value": false
+                }
+            ]
+        },
+        {
+            "AssetName": "Stump_Clip",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab of the stump (visible when this resource is not alive) only loaded on the dedicated server. Should have collision but not renderers.",
+            "Deprecated": true,
+            "Required":
+            {
+                "Variable": "Has_Clip_Prefab",
+                "Operation": "eq",
+                "Comparand": true
+            },
+            "Variable": "stumpGameObject",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Has_Clip_Prefab",
+                    "Value": false
+                }
+            ]
+        },
+        {
+            "AssetName": "Resource",
+            "Aliases": [ "Resource_Old" ],
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab of the resource loaded on the client (and dedicated server if @Has_Clip_Prefab is false), which is visible when this resource is alive.",
+            "Required": true,
+            "Variable": "modelGameObject"
+        },
+        {
+            "AssetName": "Stump",
+            "Aliases": [ "Stump_Old" ],
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab of the stump loaded on the client (and dedicated server if @Has_Clip_Prefab is false), which is visible when this resource is not alive.",
+            "Required": true,
+            "Variable": "stumpGameObject"
+        },
+        {
+            "AssetName": "Skybox",
+            "Aliases": [ "Skybox_Old" ],
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab of the model loaded on clients when this resource is very far away and alive.",
+            "Variable": "skyboxGameObject"
+        },
+        {
+            "AssetName": "Debris",
+            "Aliases": [ "Debris_Old" ],
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab of the resource that falls on the client when this resource is destroyed.",
+            "Variable": "debrisGameObject",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "No_Debris",
+                    "Value": true
+                }
+            ]
+        }
+    ]
+}

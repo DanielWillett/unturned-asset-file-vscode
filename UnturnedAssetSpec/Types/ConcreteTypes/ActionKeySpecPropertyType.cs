@@ -20,6 +20,8 @@ public sealed class ActionKeySpecPropertyType : BasicSpecPropertyType<ActionKeyS
     /// <inheritdoc />
     public override string DisplayName => "Action Button Label";
 
+    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
     {

@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -22,7 +22,10 @@ public sealed class ConditionSpecDynamicValue : ISpecDynamicValue, IEquatable<IS
     public bool EvaluateCondition(in FileEvaluationContext ctx)
     {
         SpecCondition c = Condition;
-        return c.Variable != null && c.Variable.EvaluateCondition(in ctx, in c);
+        bool eval = c.Variable != null && c.Variable.EvaluateCondition(in ctx, in c);
+        if (c.IsInverted)
+            eval = !eval;
+        return eval;
     }
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
@@ -30,8 +33,8 @@ public sealed class ConditionSpecDynamicValue : ISpecDynamicValue, IEquatable<IS
         bool value = EvaluateCondition(in ctx);
 
         return condition.Comparand is not bool b
-            ? condition.Operation.EvaluateNulls(false, true)
-            : condition.Operation.Evaluate(value, b, ctx.Information.Information);
+            ? condition.EvaluateNulls(false, true)
+            : condition.Evaluate(value, b, ctx.Information.Information);
     }
 
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
@@ -51,7 +54,7 @@ public sealed class ConditionSpecDynamicValue : ISpecDynamicValue, IEquatable<IS
 
     public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
     {
-        if (!TryEvaluateValue<bool>(in ctx, out bool val, out bool isNull))
+        if (!TryEvaluateValue(in ctx, out bool val, out bool isNull))
         {
             value = null;
             return false;

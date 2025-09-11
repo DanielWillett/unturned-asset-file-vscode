@@ -790,6 +790,22 @@
             ]
         },
         {
+            "Type": "SDG.Unturned.NPCFlagMathReward+ETextFormatMode, Assembly-CSharp",
+            "DisplayName": "Math Reward Text Format Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math",
+            "Values":
+            [
+                {
+                    "Value": "None",
+                    "Description": "Use text as-is without formatting. For backwards compatibility."
+                },
+                {
+                    "Value": "FlagValues",
+                    "Description": "Format flag A value into {0} and flag B value (or default) into {1}."
+                }
+            ]
+        },
+        {
             "Type": "SDG.Unturned.INPCCondition, Assembly-CSharp",
             "DisplayName": "Condition",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
@@ -2614,6 +2630,15 @@
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math",
                     "Variable": "operationType",
                     "Required": true
+                },
+                {
+                    "Key": "TextFormat",
+                    "Type": "SDG.Unturned.NPCFlagMathReward+ETextFormatMode, Assembly-CSharp",
+                    "DefaultValue": "None",
+                    "Description": "When set to 'FlagValues', formats flag A value into {0} and flag B value (or default) into {1}.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#flag-math",
+                    "Variable": "TextFormatMode",
+                    "Version": "3.25.8.0"
                 }
             ]
         },
@@ -2869,6 +2894,231 @@
                     "Description": "Overrides the default relevant distance of 128m when in multiplayer.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
                     "Variable": "OverrideRelevantDistance"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EObjectChart, Assembly-CSharp",
+            "DisplayName": "Chart Material",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eobjectchart.html",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "Use the default for this asset.",
+                    "Color": "#888888"
+                },
+                {
+                    "Value": "GROUND",
+                    "Casing": "Ground",
+                    "Description": "Uses a linearly interpolated value from 'Height_Strip' based on the current y-position of the object.",
+                    "Color": "#66875c"
+                },
+                {
+                    "Value": "IGNORE",
+                    "Casing": "Ignore",
+                    "Description": "Skip this asset, and use whatever is underneath.",
+                    "Color": "#888888"
+                },
+                {
+                    "Value": "HIGHWAY",
+                    "Casing": "Highway",
+                    "Description": "A concrete road larger than 16m. Uses the 1st pixel in 'Layer_Strip'.",
+                    "Color": "#e37728"
+                },
+                {
+                    "Value": "ROAD",
+                    "Casing": "Road",
+                    "Description": "A concrete road with a width at most 16m. Uses the 3rd pixel in 'Layer_Strip'.",
+                    "Color": "#bfbfbf"
+                },
+                {
+                    "Value": "STREET",
+                    "Casing": "Street",
+                    "Description": "A city street, generally used with level object streets. Uses the 2nd pixel in 'Layer_Strip'.",
+                    "Color": "#d9a236"
+                },
+                {
+                    "Value": "PATH",
+                    "Casing": "Path",
+                    "Description": "A non-concrete road. Uses the 4th pixel in 'Layer_Strip'.",
+                    "Color": "#8f846f"
+                },
+                {
+                    "Value": "LARGE",
+                    "Casing": "Large",
+                    "Description": "A large-sized object. Uses the 16th pixel in 'Layer_Strip'.",
+                    "Color": "#5a5a5a"
+                },
+                {
+                    "Value": "MEDIUM",
+                    "Casing": "Medium",
+                    "Description": "A medium-sized object. Uses the 17th pixel in 'Layer_Strip'.",
+                    "Color": "#787878"
+                },
+                {
+                    "Value": "WATER",
+                    "Casing": "Water",
+                    "Description": "The level's water color. Uses the 1st pixel in 'Height_Strip'.",
+                    "Color": "#305a59"
+                },
+                {
+                    "Value": "CLIFF",
+                    "Casing": "Cliff",
+                    "Description": "A cliff rock. Uses the 5th pixel in 'Layer_Strip'.",
+                    "Color": "#7f7f7f"
+                }
+            ]
+        },
+        {
+            "DisplayName": "Slot Type",
+            "Type": "SDG.Unturned.ESlotType, Assembly-CSharp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eslottype.html#doc-data-eslottype",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "Can only be equipped from the inventory (ie. by a hotkey)."
+                },
+                {
+                    "Value": "PRIMARY",
+                    "Casing": "Primary",
+                    "Description": "Can only be equipped from the primary (1) slot."
+                },
+                {
+                    "Value": "SECONDARY",
+                    "Casing": "Secondary",
+                    "Description": "Can only be equipped from the secondary (2) slot."
+                },
+                {
+                    "Value": "TERTIARY",
+                    "Casing": "Tertiary",
+                    "Description": "Only used for NPCs.",
+                    "Deprecated": true
+                },
+                {
+                    "Value": "ANY",
+                    "Casing": "Any",
+                    "Description": "Can be equipped from the primary (1) slot, secondary (2) slot, or from the inventory (ie. by a hotkey)."
+                }
+            ]
+        },
+        {
+            "DisplayName": "Vanilla Physics Material",
+            "Type": "SDG.Unturned.EPhysicsMaterial, Assembly-CSharp",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "No physics material."
+                },
+                {
+                    "Value": "CLOTH_DYNAMIC",
+                    "Casing": "Cloth_Dynamic",
+                    "Description": "Corresponds to the 'Cloth' physics material (cfb691d917ce43799184094940ee67bb)."
+                },
+                {
+                    "Value": "CLOTH_STATIC",
+                    "Casing": "Cloth_Static",
+                    "Description": "Corresponds to the 'Cloth' physics material (cfb691d917ce43799184094940ee67bb)."
+                },
+                {
+                    "Value": "TILE_DYNAMIC",
+                    "Casing": "Tile_Dynamic",
+                    "Description": "Corresponds to the 'Tile' physics material (a774706cb88d411a90fe9f0f8f575eec)."
+                },
+                {
+                    "Value": "TILE_STATIC",
+                    "Casing": "Tile_Static",
+                    "Description": "Corresponds to the 'Tile' physics material (a774706cb88d411a90fe9f0f8f575eec)."
+                },
+                {
+                    "Value": "CONCRETE_DYNAMIC",
+                    "Casing": "Concrete_Dynamic",
+                    "Description": "Corresponds to the 'Concrete' physics material (e3d2040c86584044a5189397bfa9b2c3)."
+                },
+                {
+                    "Value": "CONCRETE_STATIC",
+                    "Casing": "Concrete_Static",
+                    "Description": "Corresponds to the 'Concrete' physics material (e3d2040c86584044a5189397bfa9b2c3)."
+                },
+                {
+                    "Value": "FLESH_DYNAMIC",
+                    "Casing": "Flesh_Dynamic",
+                    "Description": "Corresponds to the 'Flesh' physics material (4cb9baff8283425fb6198a06a926a128)."
+                },
+                {
+                    "Value": "GRAVEL_DYNAMIC",
+                    "Casing": "Gravel_Dynamic",
+                    "Description": "Corresponds to the 'Gravel' physics material (33650ff924b34f8d9c5a0fd97418cd3e)."
+                },
+                {
+                    "Value": "GRAVEL_STATIC",
+                    "Casing": "Gravel_Static",
+                    "Description": "Corresponds to the 'Gravel' physics material (33650ff924b34f8d9c5a0fd97418cd3e)."
+                },
+                {
+                    "Value": "METAL_DYNAMIC",
+                    "Casing": "Metal_Dynamic",
+                    "Description": "Corresponds to the 'Metal_High' physics material (30eecfddde4d4192859dc7c49fc4c0db)."
+                },
+                {
+                    "Value": "METAL_STATIC",
+                    "Casing": "Metal_Static",
+                    "Description": "Corresponds to the 'Metal_Low' physics material (55ae36b285c74a57a43530ca2dd5b07f)."
+                },
+                {
+                    "Value": "METAL_SLIP",
+                    "Casing": "Metal_Slip",
+                    "Description": "Corresponds to the 'Metal_Slip' physics material (aaa9f4f45b844a7b965ce892eb476ee3)."
+                },
+                {
+                    "Value": "WOOD_DYNAMIC",
+                    "Casing": "Wood_Dynamic",
+                    "Description": "Corresponds to the 'Wood' physics material (31e8c91bfedd4f2fbebca6f5ca466e0f)."
+                },
+                {
+                    "Value": "WOOD_STATIC",
+                    "Casing": "Wood_Static",
+                    "Description": "Corresponds to the 'Wood' physics material (31e8c91bfedd4f2fbebca6f5ca466e0f)."
+                },
+                {
+                    "Value": "FOLIAGE_STATIC",
+                    "Casing": "Foliage_Static",
+                    "Description": "Corresponds to the 'Foliage' physics material (1c3a3c6664f14aa486d73528a5d9f92c)."
+                },
+                {
+                    "Value": "FOLIAGE_DYNAMIC",
+                    "Casing": "Foliage_Dynamic",
+                    "Description": "Corresponds to the 'Foliage' physics material (1c3a3c6664f14aa486d73528a5d9f92c)."
+                },
+                {
+                    "Value": "SNOW_STATIC",
+                    "Casing": "Snow_Static",
+                    "Description": "Corresponds to the 'Snow' physics material (1ec784ef96fa433e8fcb82fb5fe41c43)."
+                },
+                {
+                    "Value": "ICE_STATIC",
+                    "Casing": "Ice_Static",
+                    "Description": "Corresponds to the 'Ice' physics material (16ca1781f893452ea0b460e7191006e2)."
+                },
+                {
+                    "Value": "WATER_STATIC",
+                    "Casing": "Water_Static",
+                    "Description": "Corresponds to the 'Water' physics material (96af7303b18f4491a9f0dd75a67fee91)."
+                },
+                {
+                    "Value": "ALIEN_DYNAMIC",
+                    "Casing": "Alien_Dynamic",
+                    "Description": "Corresponds to the 'Alien' physics material (3c11f57bd9cd4355a689fc4383561ae3)."
+                },
+                {
+                    "Value": "SAND_STATIC",
+                    "Casing": "Sand_Static",
+                    "Description": "Corresponds to the 'Sand' physics material (50bac8b8bf8648fc88fd012ccd176f17)."
                 }
             ]
         }

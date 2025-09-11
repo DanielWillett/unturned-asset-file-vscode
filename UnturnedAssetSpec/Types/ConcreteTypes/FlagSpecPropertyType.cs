@@ -1,6 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -19,6 +20,8 @@ public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropert
 
     /// <inheritdoc />
     public override string DisplayName => "Flag";
+
+    protected override ISpecDynamicValue CreateValue(bool value) => SpecDynamicValue.Flag(value);
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
@@ -42,6 +45,11 @@ public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropert
 
         dynamicValue = null!;
         return false;
+    }
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<bool>()?.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <inheritdoc />

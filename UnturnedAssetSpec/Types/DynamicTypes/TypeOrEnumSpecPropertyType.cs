@@ -35,6 +35,11 @@ public sealed class TypeOrEnumSpecPropertyType :
     /// <inheritdoc />
     public Type ValueType => typeof(QualifiedType);
 
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<QualifiedType>()?.Type;
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

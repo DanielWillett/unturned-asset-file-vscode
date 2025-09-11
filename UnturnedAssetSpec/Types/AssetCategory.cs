@@ -42,7 +42,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Doesn't fall into a legacy category. In this case short IDs are not used.",
             Index = 0,
             Type = TypeOf,
-            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[1] = Item = new EnumSpecTypeValue
         {
@@ -51,7 +51,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Any item.",
             Index = 1,
             Type = TypeOf,
-            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[2] = Effect = new EnumSpecTypeValue
         {
@@ -60,7 +60,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Any world effect or UI.",
             Index = 2,
             Type = TypeOf,
-            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[3] = Object = new EnumSpecTypeValue
         {
@@ -69,7 +69,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Any level object or NPC.",
             Index = 3,
             Type = TypeOf,
-            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[4] = Resource = new EnumSpecTypeValue
         {
@@ -78,7 +78,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "A resource that can spawn on the map and be harvested.",
             Index = 4,
             Type = TypeOf,
-            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[5] = Vehicle = new EnumSpecTypeValue
         {
@@ -87,7 +87,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Any vehicle.",
             Index = 5,
             Type = TypeOf,
-            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[6] = Animal = new EnumSpecTypeValue
         {
@@ -96,7 +96,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Any animal.",
             Index = 6,
             Type = TypeOf,
-            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[7] = Mythic = new EnumSpecTypeValue
         {
@@ -105,7 +105,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "A mythical cosmetic effect.",
             Index = 7,
             Type = TypeOf,
-            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[8] = Skin = new EnumSpecTypeValue
         {
@@ -114,7 +114,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "An item or vehicle skin.",
             Index = 8,
             Type = TypeOf,
-            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[9] = Spawn = new EnumSpecTypeValue
         {
@@ -123,7 +123,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "An asset spawn for a map.",
             Index = 9,
             Type = TypeOf,
-            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
         };
         TypeOf.Values[10] = NPC = new EnumSpecTypeValue
         {
@@ -132,7 +132,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "A dialogue, quest, or vendor configuration.",
             Index = 10,
             Type = TypeOf,
-            ExtendedData = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
         };
     }
 

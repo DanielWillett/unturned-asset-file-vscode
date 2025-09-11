@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -12,26 +12,26 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 /// Represents the object containing the current property.
 /// </summary>
 /// <remarks>#This</remarks>
-public sealed class ThisBangRef : IEquatable<ISpecDynamicValue>, IEquatable<ThisBangRef>, IBangRefTarget
+public sealed class ThisDataRef : IEquatable<ISpecDynamicValue>, IEquatable<ThisDataRef>, IDataRefTarget
 {
-    public static readonly ThisBangRef Instance = new ThisBangRef();
+    public static readonly ThisDataRef Instance = new ThisDataRef();
 
-    static ThisBangRef() { }
-    private ThisBangRef() { }
+    static ThisDataRef() { }
+    private ThisDataRef() { }
 
     public ISpecPropertyType ValueType => KnownTypes.Flag;
     public bool EvaluateCondition(in SpecCondition condition, IAssetSpecDatabase specDatabase)
     {
-        return condition.Operation.Evaluate(true, condition.Comparand is true, specDatabase.Information);
+        return condition.Evaluate(true, condition.Comparand is true, specDatabase.Information);
     }
 
-    public bool Equals(ISpecDynamicValue other) => other is ThisBangRef;
+    public bool Equals(ISpecDynamicValue other) => other is ThisDataRef;
 
-    public bool Equals(IBangRefTarget other) => other is ThisBangRef;
+    public bool Equals(IDataRefTarget other) => other is ThisDataRef;
 
-    public bool Equals(ThisBangRef other) => other != null;
+    public bool Equals(ThisDataRef other) => other != null;
 
-    public override bool Equals(object? obj) => obj is ThisBangRef;
+    public override bool Equals(object? obj) => obj is ThisDataRef;
 
     public override int GetHashCode() => 0;
 
@@ -39,7 +39,7 @@ public sealed class ThisBangRef : IEquatable<ISpecDynamicValue>, IEquatable<This
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
-        return condition.Operation.EvaluateNulls(false, condition.Comparand == null);
+        return condition.EvaluateNulls(false, condition.Comparand == null);
     }
 
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)

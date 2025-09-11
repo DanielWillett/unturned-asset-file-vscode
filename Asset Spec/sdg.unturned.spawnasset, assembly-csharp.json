@@ -1,0 +1,328 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+    "DisplayName": "Spawn Table",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html",
+    "Category": "SPAWN",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Roots",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.SpawnTable, Assembly-CSharp",
+            "DefaultValue": false,
+            "Description": "Roots specify a list of other spawns where this spawn table will be inserted into with the given weight.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#roots",
+            "Priority": 2
+        },
+        {
+            "Key": "Tables",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.SpawnTable, Assembly-CSharp",
+            "DefaultValue": false,
+            "Description": "A list of items or spawns that can be resolved from this spawn asset.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#tables",
+            "Priority": 2
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.SpawnTable, Assembly-CSharp",
+            "DisplayName": "Spawn Table Entry",
+            "IsLegacyExpandedType": true,
+            "Properties":
+            [
+                {
+                    "Key": "Guid",
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Aliases":
+                    [
+                        {
+                            "Alias": "GUID",
+                            "LegacyExpansionFilter": "Legacy"
+                        }
+                    ],
+                    "Type": "AssetReferenceString",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Key",
+                                    "Operation": "eq-i",
+                                    "Comparand": "Root"
+                                }
+                            ],
+                            "Value": "Specifies the GUID of a root spawn to which this spawn will be attached to."
+                        },
+                        {
+                            "Value": "Specifies the GUID of a nested Spawn asset or some other resolved asset."
+                        }
+                    ],
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#tables",
+                    "Required":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "LegacyAssetId",
+                                "Operation": "eq",
+                                "Comparand": 0
+                            },
+                            {
+                                "Variable": "LegacySpawnId",
+                                "Operation": "eq",
+                                "Comparand": 0
+                            }
+                        ],
+                        "Value": true
+                    },
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Guid",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "And":
+                                [
+                                    {
+                                        "Variable": "#This.Key",
+                                        "Operation": "eq-i",
+                                        "Comparand": "Root"
+                                    },
+                                    {
+                                        "Variable": "Guid",
+                                        "Operation": "is-type",
+                                        "Comparand": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+                                        "Inverted": true
+                                    }
+                                ],
+                                "Value": true
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "LegacyAssetId",
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Aliases":
+                    [
+                        {
+                            "Alias": "Asset_ID",
+                            "LegacyExpansionFilter": "Legacy"
+                        }
+                    ],
+                    "Type": "Id",
+                    "DefaultValue": 0,
+                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                    "SpecialTypes": [ "SDG.Unturned.VehicleAsset, Assembly-CSharp", "SDG.Unturned.AnimalAsset, Assembly-CSharp" ],
+                    "Description": "Specifies the ID of a resolved asset.",
+                    "Deprecated": true,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#tables",
+                    "Required":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Guid",
+                                "Operation": "eq",
+                                "Comparand": "00000000000000000000000000000000"
+                            },
+                            {
+                                "Variable": "LegacySpawnId",
+                                "Operation": "eq",
+                                "Comparand": 0
+                            }
+                        ],
+                        "Value": true
+                    },
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "LegacyAssetId",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "#This.Key",
+                                "Operation": "eq-i",
+                                "Comparand": "Root"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "LegacySpawnId",
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Aliases":
+                    [
+                        {
+                            "Alias": "Spawn_ID",
+                            "LegacyExpansionFilter": "Legacy"
+                        }
+                    ],
+                    "Type": "Id",
+                    "DefaultValue": 0,
+                    "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+                    "Description":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Key",
+                                    "Operation": "eq-i",
+                                    "Comparand": "Root"
+                                }
+                            ],
+                            "Value": "Specifies the ID of a root spawn to which this spawn will be attached to."
+                        },
+                        {
+                            "Value": "Specifies the ID of a nested Spawn asset."
+                        }
+                    ],
+                    "Deprecated": true,
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#tables",
+                    "Required":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "LegacyAssetId",
+                                "Operation": "eq",
+                                "Comparand": 0
+                            },
+                            {
+                                "Variable": "Guid",
+                                "Operation": "eq",
+                                "Comparand": "00000000000000000000000000000000"
+                            }
+                        ],
+                        "Value": true
+                    }
+                },
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ERagdollEffect, Assembly-CSharp",
+            "DisplayName": "Ragdoll Effect",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "Standard ragdoll effect."
+                },
+                {
+                    "Value": "BRONZE",
+                    "Casing": "Bronze",
+                    "Description": "Turns the target into a solid bronze statue (Characters/RagdollMaterials/Bronze)."
+                },
+                {
+                    "Value": "SILVER",
+                    "Casing": "Silver",
+                    "Description": "Turns the target into a solid silver statue (Characters/RagdollMaterials/Silver)."
+                },
+                {
+                    "Value": "GOLD",
+                    "Casing": "Gold",
+                    "Description": "Turns the target into a solid golden statue (Characters/RagdollMaterials/Gold)."
+                },
+                {
+                    "Value": "ZERO_KELVIN",
+                    "Casing": "Zero_Kelvin",
+                    "Description": "Turns the target into a solid ice statue (Characters/RagdollMaterials/Zero_Kelvin)."
+                },
+                {
+                    "Value": "JADED",
+                    "Casing": "Jaded",
+                    "Description": "Turns the target into a solid jade statue (Characters/RagdollMaterials/Jaded)."
+                },
+                {
+                    "Value": "SOUL_CRYSTAL_GREEN",
+                    "Casing": "Soul_Crystal_Green",
+                    "Description": "Turns the target into a solid green crystal statue (Characters/RagdollMaterials/SoulCrystal_Green)."
+                },
+                {
+                    "Value": "SOUL_CRYSTAL_MAGENTA",
+                    "Casing": "Soul_Crystal_Magenta",
+                    "Description": "Turns the target into a solid magenta crystal statue (Characters/RagdollMaterials/SoulCrystal_Magenta)."
+                },
+                {
+                    "Value": "SOUL_CRYSTAL_RED",
+                    "Casing": "Soul_Crystal_Red",
+                    "Description": "Turns the target into a solid red crystal statue (Characters/RagdollMaterials/SoulCrystal_Red)."
+                },
+                {
+                    "Value": "SOUL_CRYSTAL_YELLOW",
+                    "Casing": "Soul_Crystal_Yellow",
+                    "Description": "Turns the target into a solid yellow crystal statue (Characters/RagdollMaterials/SoulCrystal_Yellow)."
+                }
+            ]
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Skin_Primary",
+            "Type": "UnityEngine.Material, UnityEngine.CoreModule",
+            "Description": "The material to apply to the skinned item or vehicle.",
+            "Variable": "primarySkin",
+            "Required": true
+        },
+        {
+            "AssetName": "Skin_Secondary_(\\d+)",
+            "KeyIsRegex": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "skin-secondary",
+                    "RegexGroup": 1,
+                    "UseValueOf": "Secondary_$1"
+                }
+            ],
+            "Type": "UnityEngine.Material, UnityEngine.CoreModule",
+            "Description": "The material to apply to an attachment with the given ID.",
+            "Variable": "secondarySkins",
+            "Required": true
+        },
+        {
+            "AssetName": "Skin_Attachment",
+            "Type": "UnityEngine.Material, UnityEngine.CoreModule",
+            "Description": "The material to apply to attachments with custom base textures.",
+            "Variable": "attachmentSkin"
+        },
+        {
+            "AssetName": "Skin_Tertiary",
+            "Type": "UnityEngine.Material, UnityEngine.CoreModule",
+            "Description": "The material to apply to attachments without custom base textures.",
+            "Variable": "tertiarySkin",
+            "Required":
+            {
+                "Variable": "Skin_Attachment",
+                "Operation": "included",
+                "Comparand": null
+            }
+        },
+        {
+            "AssetName": "Override_Mesh_(\\d+)",
+            "KeyIsRegex": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "skin-meshes",
+                    "RegexGroup": 1
+                }
+            ],
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "An object containing a Mesh Filter configured to use the desired mesh. One of these objects can also include 'Stat_Tracker' and 'Icon' transforms to set the corresponding location.",
+            "Variable": "overrideMeshes",
+            "Required": true
+        }
+    ]
+}

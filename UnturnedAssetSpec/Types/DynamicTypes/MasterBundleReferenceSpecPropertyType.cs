@@ -33,6 +33,11 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
 
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<BundleReference>()?.ToString();
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

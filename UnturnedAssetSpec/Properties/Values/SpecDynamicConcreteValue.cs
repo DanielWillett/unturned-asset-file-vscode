@@ -11,7 +11,7 @@ using System.Text.Json;
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 public sealed class SpecDynamicConcreteNullValue :
-    ISpecDynamicValue,
+    ISpecConcreteValue,
     IEquatable<SpecDynamicConcreteNullValue>,
     IEquatable<ISpecDynamicValue>
 {
@@ -39,11 +39,11 @@ public sealed class SpecDynamicConcreteNullValue :
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
         if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
-            return true;
+            return !condition.IsInverted;
         if (condition.Operation == ConditionOperation.Excluded)
-            return false;
+            return condition.IsInverted;
 
-        return condition.Operation.EvaluateNulls(true, condition.Comparand == null);
+        return condition.EvaluateNulls(true, condition.Comparand == null);
     }
 
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
@@ -63,13 +63,21 @@ public sealed class SpecDynamicConcreteNullValue :
     {
         writer.WriteNullValue();
     }
+
+    public bool TryEvaluateValue<TValue>(out TValue? value, out bool isNull)
+    {
+        isNull = true;
+        value = default;
+        return true;
+    }
 }
 
 [DebuggerDisplay("{Name,nq}")]
 public sealed class SpecDynamicConcreteEnumValue :
     IEquatable<SpecDynamicConcreteEnumValue>,
     IEquatable<ISpecDynamicValue>,
-    ICorrespondingTypeSpecDynamicValue
+    ICorrespondingTypeSpecDynamicValue,
+    ISpecConcreteValue
 {
     public EnumSpecType Type { get; }
     public int Value { get; }
@@ -127,43 +135,25 @@ public sealed class SpecDynamicConcreteEnumValue :
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
         if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
-            return true;
+            return !condition.IsInverted;
 
         if (condition.Operation == ConditionOperation.Excluded)
-            return false;
+            return condition.IsInverted;
 
         if (condition.Comparand is not string str
             || !Type.TryParse(str.AsSpan(), out EnumSpecTypeValue v, ignoreCase: condition.Operation.IsCaseInsensitive()))
         {
-            return condition.Operation.EvaluateNulls(Value < 0, true);
+            return condition.EvaluateNulls(Value < 0, true);
         }
 
         return Value < 0
-            ? condition.Operation.EvaluateNulls(true, false)
-            : condition.Operation.Evaluate(Value, v.Index, ctx.Information.Information);
+            ? condition.EvaluateNulls(true, false)
+            : condition.Evaluate(Value, v.Index, ctx.Information.Information);
     }
 
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
     {
-        isNull = Value < 0;
-        if (typeof(TValue) == typeof(string))
-        {
-            value = isNull
-                ? default
-                : SpecDynamicEquationTreeValueHelpers.As<string, TValue>(Type.Values[Value].Value);
-            return true;
-        }
-
-        if (typeof(TValue) == typeof(int))
-        {
-            value = isNull
-                ? default
-                : SpecDynamicEquationTreeValueHelpers.As<int, TValue>(Value);
-            return true;
-        }
-
-        value = default;
-        return false;
+        return TryEvaluateValue(out value, out isNull);
     }
 
     public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
@@ -180,6 +170,50 @@ public sealed class SpecDynamicConcreteEnumValue :
             writer.WriteStringValue(Type.Values[Value].Value);
     }
 
+    /// <inheritdoc />
+    public bool TryEvaluateValue<TValue>(out TValue? value, out bool isNull)
+    {
+        isNull = Value < 0;
+
+        if (typeof(TValue) == typeof(int))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<int, TValue>(Value);
+        else if (typeof(TValue) == typeof(EnumSpecTypeValue))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<EnumSpecTypeValue, TValue>(Type.Values[Value]);
+        else if (typeof(TValue) == typeof(string))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<string, TValue>(Type.Values[Value].Value);
+        else if (typeof(TValue) == typeof(uint))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<uint, TValue>((uint)Value);
+        else if (typeof(TValue) == typeof(long))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<long, TValue>(Value);
+        else if (typeof(TValue) == typeof(ulong))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<ulong, TValue>((ulong)Value);
+        else if (typeof(TValue) == typeof(short))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<short, TValue>(checked( (short)Value ));
+        else if (typeof(TValue) == typeof(ushort))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<ushort, TValue>(checked( (ushort)Value ));
+        else if (typeof(TValue) == typeof(sbyte))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<sbyte, TValue>(checked( (sbyte)Value ));
+        else if (typeof(TValue) == typeof(byte))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<byte, TValue>(checked( (byte)Value ));
+        else if (typeof(TValue) == typeof(float))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<float, TValue>(Value);
+        else if (typeof(TValue) == typeof(double))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<double, TValue>(Value);
+        else if (typeof(TValue) == typeof(decimal))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<decimal, TValue>(Value);
+        else if (typeof(TValue) == typeof(char))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<char, TValue>(checked( (char)Value ));
+        else if (typeof(TValue) == typeof(bool))
+            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<bool, TValue>(Value != 0);
+        else
+        {
+            value = default;
+            return false;
+        }
+
+        return true;
+    }
+
     public QualifiedType GetCorrespondingType(IAssetSpecDatabase database) => Value < 0 ? QualifiedType.None : Type.Values[Value].CorrespondingType;
 
 
@@ -187,7 +221,7 @@ public sealed class SpecDynamicConcreteEnumValue :
 }
 
 public abstract class SpecDynamicConcreteValue :
-    ISpecDynamicValue,
+    ISpecConcreteValue,
     IEquatable<SpecDynamicConcreteValue>,
     IEquatable<ISpecDynamicValue>
 {
@@ -217,33 +251,62 @@ public abstract class SpecDynamicConcreteValue :
     }
 
     public abstract bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition);
-    public abstract bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
+    public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
+    {
+        return TryEvaluateValue(out value, out isNull);
+    }
+    public abstract bool TryEvaluateValue<TValue>(out TValue? value, out bool isNull);
     public abstract bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value);
 
     public abstract void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options);
 }
 
-public sealed class SpecDynamicConcreteValue<T> :
+public class SpecDynamicConcreteConvertibleValue<T> : SpecDynamicConcreteValue<T> where T : IEquatable<T>, IConvertible
+{
+    /// <inheritdoc />
+    public SpecDynamicConcreteConvertibleValue(T? value, ISpecPropertyType<T>? type) : base(value, type) { }
+
+    /// <inheritdoc />
+    public SpecDynamicConcreteConvertibleValue(ISpecPropertyType<T>? type) : base(type) { }
+
+    /// <inheritdoc />
+    public override bool TryEvaluateValue<TValue>(out TValue value, out bool isNull)
+    {
+        if (base.TryEvaluateValue(out value, out isNull))
+        {
+            return true;
+        }
+
+        if (SpecDynamicEquationTreeValueHelpers.TryConvert(ValueIntl, IsNull, out value, out isNull))
+        {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+public class SpecDynamicConcreteValue<T> :
     SpecDynamicConcreteValue,
     IEquatable<SpecDynamicConcreteValue<T>>,
     IEquatable<T>,
     ISpecDynamicValue where T : IEquatable<T>
 {
-    private T? _value;
+    protected T? ValueIntl;
 
     /// <summary>
     /// The value of this dynamic value.
     /// </summary>
-    public T? Value => _value;
+    public T? Value => ValueIntl;
 
     public SpecDynamicConcreteValue(T? value, ISpecPropertyType<T>? type) : base(value == null, type)
     {
-        _value = value;
+        ValueIntl = value;
     }
 
     public SpecDynamicConcreteValue(ISpecPropertyType<T>? type) : base(true, type)
     {
-        _value = default!;
+        ValueIntl = default!;
     }
 
     /// <inheritdoc />
@@ -268,9 +331,9 @@ public sealed class SpecDynamicConcreteValue<T> :
     public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
         if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
-            return true;
+            return !condition.IsInverted;
         if (condition.Operation == ConditionOperation.Excluded)
-            return false;
+            return condition.IsInverted;
 
         if (condition.Comparand is not T comparand)
         {
@@ -280,38 +343,76 @@ public sealed class SpecDynamicConcreteValue<T> :
             }
             catch
             {
-                return condition.Operation.EvaluateNulls(IsNull, true);
+                return condition.EvaluateNulls(IsNull, true);
             }
         }
 
         return IsNull
-            ? condition.Operation.EvaluateNulls(true, comparand == null)
-            : condition.Operation.Evaluate(Value, comparand, ctx.Information.Information);
+            ? condition.EvaluateNulls(true, comparand == null)
+            : condition.Evaluate(Value, comparand, ctx.Information.Information);
     }
 
-    public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
+    public override bool TryEvaluateValue<TValue>(out TValue value, out bool isNull)
     {
         isNull = IsNull;
-        if (typeof(TValue) != typeof(T))
+        if (typeof(TValue) == typeof(T))
         {
             value = default!;
-            return false;
+            value = isNull ? default! : Unsafe.As<T, TValue>(ref ValueIntl!);
+            return true;
         }
 
-        if (isNull)
+        if (ValueType is IVectorSpecPropertyType v)
         {
-            value = default!;
+            ConvertVectorVisitor<TValue> visitor = default;
+            visitor.Value = this;
+            v.Visit(ref visitor);
+            value = visitor.OutValue!;
+            isNull = visitor.ValueIsNull;
+            return visitor.Converted;
         }
-        else
+
+        if (typeof(TValue) == typeof(string))
         {
-            value = Unsafe.As<T, TValue>(ref _value!);
+            if (isNull)
+            {
+                value = default!;
+                return true;
+            }
+
+            string? str = ValueIntl!.ToString();
+
+            value = Unsafe.As<string, TValue>(ref str);
+            return str != null;
         }
-        return true;
+
+        value = default!;
+        return false;
+    }
+
+    private struct ConvertVectorVisitor<TValue> : IVectorSpecPropertyTypeVisitor
+    {
+        public SpecDynamicConcreteValue<T> Value;
+        public TValue? OutValue;
+        public bool ValueIsNull;
+        public bool Converted;
+
+        /// <inheritdoc />
+        public void Visit<TVector>(IVectorSpecPropertyType<TVector> type) where TVector : IEquatable<TVector>
+        {
+            if (Converted)
+                return;
+
+            if (typeof(T) == typeof(TVector))
+            {
+                Converted = SpecDynamicEquationTreeValueHelpers.TryConvertVector(Unsafe.As<T, TVector>(ref Value.ValueIntl!), false, out OutValue, out ValueIsNull);
+            }
+        }
     }
 
     public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
     {
-        value = IsNull ? null : BoxedPrimitives.Box(ref _value);
+        value = IsNull ? null : BoxedPrimitives.Box(ref ValueIntl);
         return true;
     }
 
@@ -349,72 +450,72 @@ public sealed class SpecDynamicConcreteValue<T> :
 
         if (typeof(T) == typeof(bool))
         {
-            bool v = Unsafe.As<T, bool>(ref _value!);
+            bool v = Unsafe.As<T, bool>(ref ValueIntl!);
             writer.WriteBooleanValue(v);
         }
         else if (typeof(T) == typeof(byte))
         {
-            byte v = Unsafe.As<T, byte>(ref _value!);
+            byte v = Unsafe.As<T, byte>(ref ValueIntl!);
             writer.WriteNumberValue(v);
         }
         else if (typeof(T) == typeof(sbyte))
         {
-            sbyte v = Unsafe.As<T, sbyte>(ref _value!);
+            sbyte v = Unsafe.As<T, sbyte>(ref ValueIntl!);
             writer.WriteNumberValue(v);
         }
         else if (typeof(T) == typeof(ushort))
         {
-            ushort v = Unsafe.As<T, ushort>(ref _value!);
+            ushort v = Unsafe.As<T, ushort>(ref ValueIntl!);
             writer.WriteNumberValue(v);
         }
         else if (typeof(T) == typeof(short))
         {
-            short v = Unsafe.As<T, short>(ref _value!);
+            short v = Unsafe.As<T, short>(ref ValueIntl!);
             writer.WriteNumberValue(v);
         }
         else if (typeof(T) == typeof(uint))
         {
-            uint v = Unsafe.As<T, uint>(ref _value!);
+            uint v = Unsafe.As<T, uint>(ref ValueIntl!);
             writer.WriteNumberValue(v);
         }
         else if (typeof(T) == typeof(int))
         {
-            int v = Unsafe.As<T, int>(ref _value!);
+            int v = Unsafe.As<T, int>(ref ValueIntl!);
             writer.WriteNumberValue(v);
         }
         else if (typeof(T) == typeof(ulong))
         {
-            ulong v = Unsafe.As<T, ulong>(ref _value!);
+            ulong v = Unsafe.As<T, ulong>(ref ValueIntl!);
             writer.WriteNumberValue(v);
         }
         else if (typeof(T) == typeof(long))
         {
-            long v = Unsafe.As<T, long>(ref _value!);
+            long v = Unsafe.As<T, long>(ref ValueIntl!);
             writer.WriteNumberValue(v);
         }
         else if (typeof(T) == typeof(float))
         {
-            float v = Unsafe.As<T, float>(ref _value!);
+            float v = Unsafe.As<T, float>(ref ValueIntl!);
             writer.WriteNumberValue(v);
         }
         else if (typeof(T) == typeof(double))
         {
-            double v = Unsafe.As<T, double>(ref _value!);
+            double v = Unsafe.As<T, double>(ref ValueIntl!);
             writer.WriteNumberValue(v);
         }
         else if (typeof(T) == typeof(decimal))
         {
-            decimal v = Unsafe.As<T, decimal>(ref _value!);
+            decimal v = Unsafe.As<T, decimal>(ref ValueIntl!);
             writer.WriteNumberValue(v);
         }
         else if (typeof(T) == typeof(Guid))
         {
-            Guid v = Unsafe.As<T, Guid>(ref _value!);
+            Guid v = Unsafe.As<T, Guid>(ref ValueIntl!);
             writer.WriteStringValue(v);
         }
         else if (typeof(T) == typeof(GuidOrId))
         {
-            GuidOrId v = Unsafe.As<T, GuidOrId>(ref _value!);
+            GuidOrId v = Unsafe.As<T, GuidOrId>(ref ValueIntl!);
             if (v.IsId)
                 writer.WriteNumberValue(v.Id);
             else
@@ -422,17 +523,17 @@ public sealed class SpecDynamicConcreteValue<T> :
         }
         else if (typeof(T) == typeof(DateTime))
         {
-            DateTime v = Unsafe.As<T, DateTime>(ref _value!);
+            DateTime v = Unsafe.As<T, DateTime>(ref ValueIntl!);
             writer.WriteStringValue(v);
         }
         else if (typeof(T) == typeof(DateTimeOffset))
         {
-            DateTimeOffset v = Unsafe.As<T, DateTimeOffset>(ref _value!);
+            DateTimeOffset v = Unsafe.As<T, DateTimeOffset>(ref ValueIntl!);
             writer.WriteStringValue(v);
         }
         else if (typeof(T) == typeof(char))
         {
-            char v = Unsafe.As<T, char>(ref _value!);
+            char v = Unsafe.As<T, char>(ref ValueIntl!);
             unsafe
             {
                 ReadOnlySpan<char> span = new ReadOnlySpan<char>(&v, 1);
@@ -441,7 +542,18 @@ public sealed class SpecDynamicConcreteValue<T> :
         }
         else
         {
-            JsonSerializer.Serialize(writer, _value, options);
+            if (ValueType is IStringParseableSpecPropertyType stringParseable)
+            {
+                string? s = stringParseable.ToString(this);
+                if (s == null)
+                    writer.WriteNullValue();
+                else
+                    writer.WriteStringValue(s);
+            }
+            else
+            {
+                JsonSerializer.Serialize(writer, ValueIntl, options);
+            }
         }
     }
 }

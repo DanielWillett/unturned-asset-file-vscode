@@ -1,0 +1,170 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.PhysicsMaterialAsset, Assembly-CSharp",
+    "DisplayName": "Physics Material",
+    "Parent": "SDG.Unturned.PhysicsMaterialAssetBase, Assembly-CSharp",
+    "Category": "NONE",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "UnityNames",
+            "Type": "List",
+            "Minimum": 1,
+            "ElementType": "PhysicsMaterial",
+            "DefaultValue": "@UnityName",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "List of unity 'Physic Material' names this material represents. Each value must be unique to this asset.",
+            "Variable": "physicMaterialNames",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "UnityName",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "UnityName",
+            "Type": "PhysicsMaterial",
+            "DefaultValue": null,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "Unity 'Physic Material' name this material represents. Must be unique to this asset.",
+            "Variable": "physicMaterialNames",
+            "Required":
+            {
+                "Variable": "UnityNames",
+                "Operation": "excluded",
+                "Comparand": null
+            },
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "UnityNames",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Fallback",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.PhysicsMaterialAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "Base physics material which will be used for any properties that haven't been explicitly set.",
+            "Variable": "fallbackRef"
+        },
+        {
+            "Key": "WipDoNotUseTemp_BulletImpactEffect",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "The effect used for bullet impacts that hit a surface with this material. Currently experimental.",
+            "Variable": "bulletImpactEffect",
+            "Experimental": true
+        },
+        {
+            "Key": "TireMotionEffect",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "Effect to spawn underneath tires while driving on surfaces with this material.",
+            "Variable": "tireMotionEffect"
+        },
+        {
+            "Key": "Character_Friction_Mode",
+            "Type": "SDG.Unturned.EPhysicsMaterialCharacterFrictionMode, Assembly-CSharp",
+            "DefaultValue": "ImmediatelyResponsive",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "Whether or not this material supplies custom acceleration/deceleration properties for characters walking on surfaces with this material.",
+            "Variable": "characterFrictionMode"
+        },
+        {
+            "Key": "Character_Acceleration_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "The acceleration multiplier applied to the character when walking on surfaces with this material.",
+            "Variable": "characterAccelerationMultiplier",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Character_Friction_Mode",
+                    "Value": "Custom"
+                }
+            ]
+        },
+        {
+            "Key": "Character_Deceleration_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "The deceleration multiplier applied to the character when walking on surfaces with this material.",
+            "Variable": "characterDecelerationMultiplier",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Character_Friction_Mode",
+                    "Value": "Custom"
+                }
+            ]
+        },
+        {
+            "Key": "Character_Max_Speed_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "A multiplier for the maximum possible speed for a character walking on surfaces with this material.",
+            "Variable": "characterMaxSpeedMultiplier",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Character_Friction_Mode",
+                    "Value": "Custom"
+                }
+            ]
+        },
+        {
+            "Key": "IsArable",
+            "Type": "Boolean",
+            "DefaultValue": null,
+            "IncludedDefaultValue": false,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "Whether or not crops can be planted on surfaces with this material.",
+            "Variable": "isArable"
+        },
+        {
+            "Key": "HasOil",
+            "Type": "Boolean",
+            "DefaultValue": null,
+            "IncludedDefaultValue": false,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "Whether or not oil drills can be placed on surfaces with this material. Only applies to terrain materials.",
+            "Variable": "hasOil"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EPhysicsMaterialCharacterFrictionMode, Assembly-CSharp",
+            "DisplayName": "Physics Material Character Friction Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Values":
+            [
+                {
+                    "Value": "ImmediatelyResponsive",
+                    "Description": "Velocity is directly set to input velocity."
+                },
+                {
+                    "Value": "Custom",
+                    "Description": "Velocity is affected by acceleration and deceleration."
+                }
+            ]
+        }
+    ]
+}

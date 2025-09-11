@@ -1,7 +1,7 @@
 # Dynamic Values
 All property values are represented by the [ISpecDynamicValue](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.ISpecDynamicValue.html) interface.
 
-This interface supports dynamic values such as [Switch Statements](./switch-statements.md), [Equations](./equations.md), [Bang-Refs](./bang-refs.md), [Property References](./property-refs.md), [Custom Types](./custom-types.md), and concrete values.
+This interface supports dynamic values such as [Switch Statements](./switch-statements.md), [Equations](./equations.md), [Data-Refs](./data-refs.md), [Property References](./property-refs.md), [Custom Types](./custom-types.md), and concrete values.
 
 Certain properties may specify a default type, such as [Condition Variables](/api/DanielWillett.UnturnedDataFileLspServer.Data.Logic.SpecCondition.html#DanielWillett_UnturnedDataFileLspServer_Data_Logic_SpecCondition_Variable) which default to a property, but usually the default will be a concrete value.
 
@@ -68,12 +68,12 @@ See [Equations](./equations.md) for more information.
 "DefaultValue": "=ATAND(@Spread_Hip)"
 ```
 
-## Bang-Refs
-A 'Bang-Ref' is used to represent special hard-coded properties that can be useful in certain situations.
+## Data-Refs
+A 'Data-Ref' is used to represent special hard-coded properties that can be useful in certain situations.
 
-They can be prefixed with an `#` character to indicate a bang-ref.
+They can be prefixed with an `#` character to indicate a Data-Ref.
 
-See [Bang-Refs](./bang-refs.md) for more information.
+See [Data-Refs](./data-refs.md) for more information.
 
 ```json
 {

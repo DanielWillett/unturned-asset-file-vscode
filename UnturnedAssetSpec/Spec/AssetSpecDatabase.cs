@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -73,12 +74,15 @@ public interface IAssetSpecDatabase
 
 public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 {
-    public const string AssetFileUrl = "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/{0}.json";
+    public const string Repository = "DanielWillett/unturned-asset-file-vscode";
+    public const string AssetFileUrl = "https://raw.githubusercontent.com/" + Repository + "/refs/heads/master/Asset%20Spec/{0}.json";
     private const string EmbeddedResourceLocation = "DanielWillett.UnturnedDataFileLspServer.Data..Asset_Spec.{0}.json";
 
     public const string UnturnedName = "Unturned";
     public const string UnturnedAppId = "304930";
 
+    private readonly ISpecDatabaseCache? _cache;
+    private string? _commit;
     private JsonDocument? _statusJson;
 
     public string[]? NPCAchievementIds { get; private set; }
@@ -113,10 +117,11 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         ParentTypes = new Dictionary<QualifiedType, InverseTypeHierarchy>(0)
     };
 
-    public AssetSpecDatabase() : this(new InstallDirUtility(UnturnedName, UnturnedAppId)) { }
+    public AssetSpecDatabase(ISpecDatabaseCache? cache = null) : this(new InstallDirUtility(UnturnedName, UnturnedAppId), cache) { }
 
-    public AssetSpecDatabase(InstallDirUtility unturnedInstallDirectory)
+    public AssetSpecDatabase(InstallDirUtility unturnedInstallDirectory, ISpecDatabaseCache? cache = null)
     {
+        _cache = cache;
         UnturnedInstallDirectory = unturnedInstallDirectory;
         ValidActionButtons = Array.Empty<string>();
     }
@@ -129,8 +134,14 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         }
     }
 
+    [MemberNotNullWhen(true, "_cache")]
+    private bool IsCacheUpToDate { get; set; }
+
     public async Task InitializeAsync(CancellationToken token = default)
     {
+        IsCacheUpToDate = false;
+        _commit = null;
+
         Options ??= new JsonSerializerOptions
         {
             WriteIndented = true,
@@ -160,50 +171,18 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
         Lazy<HttpClient> lazy = new Lazy<HttpClient>(LazyThreadSafetyMode.ExecutionAndPublication);
 
-        AssetInformation? assetInfo;
-        using (Stream? stream = await GetFileAsync(
-            string.Format(AssetFileUrl, "Assets"),
-            "Assets",
-            lazy
-        ).ConfigureAwait(false))
+        if (_cache != null)
         {
-            if (stream != null)
+            string? latestCommit = await GetLatestCommitAsync(lazy.Value, token);
+            if (latestCommit != null)
             {
-                try
-                {
-                    assetInfo = await JsonSerializer.DeserializeAsync<AssetInformation>(stream, Options, token).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    Log("Error parsing Assets.json file.");
-                    Log(ex.ToString());
-                    assetInfo = null;
-                }
-            }
-            else
-            {
-                assetInfo = null;
+                _commit = latestCommit;
+                IsCacheUpToDate = _cache.IsUpToDateCache(latestCommit);
             }
         }
 
-        if (assetInfo == null && UseInternet)
-        {
-            using Stream? stream = await GetFileAsync(null, "Assets", lazy).ConfigureAwait(false);
-            if (stream != null)
-            {
-                try
-                {
-                    assetInfo = await JsonSerializer.DeserializeAsync<AssetInformation>(stream, Options, token).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    Log("Error parsing embedded Assets.json file.");
-                    Log(ex.ToString());
-                }
-            }
-        }
-
-        assetInfo ??= new AssetInformation();
+        AssetInformation assetInfo = await DownloadAssetInfoAsync(lazy, token);
+        
         Dictionary<string, QualifiedType>? aliases = assetInfo.AssetAliases;
         assetInfo.AssetAliases = new Dictionary<string, QualifiedType>(aliases?.Count ?? 0, StringComparer.OrdinalIgnoreCase);
         if (aliases != null)
@@ -279,6 +258,11 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         PerformFourthPass(types, passes);
 
         Types = types;
+
+        if (_cache != null)
+        {
+            await _cache.CacheNewFilesAsync(this, token);
+        }
         return;
 
         void Deprocess(Task[] tasks,
@@ -293,34 +277,45 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             {
                 foreach (InverseTypeHierarchy type in processList)
                 {
-                    string normalizedTypeName = type.Type.Normalized.Type.ToLowerInvariant();
-                    AssetSpecType? typeInfo;
+                    QualifiedType typeName = type.Type.Normalized;
+                    string normalizedTypeName = typeName.Type.ToLowerInvariant();
+                    AssetSpecType? typeInfo = null;
 
-                    using (Stream? stream = await GetFileAsync(
-                               string.Format(AssetFileUrl, Uri.EscapeDataString(normalizedTypeName)),
-                               normalizedTypeName,
-                               lazy
-                           ).ConfigureAwait(false))
+                    if (IsCacheUpToDate)
                     {
-                        if (stream != null)
+                        typeInfo = await _cache.GetCachedTypeAsync(typeName, token).ConfigureAwait(false);
+                    }
+
+                    if (typeInfo == null)
+                    {
+                        using (Stream? stream = await GetFileAsync(
+                                   string.Format(AssetFileUrl, Uri.EscapeDataString(normalizedTypeName)),
+                                   normalizedTypeName,
+                                   lazy
+                               ).ConfigureAwait(false))
                         {
-                            try
+                            if (stream != null)
                             {
-                                typeInfo = await JsonSerializer.DeserializeAsync<AssetSpecType>(stream, Options, token).ConfigureAwait(false);
-                            }
-                            catch (Exception ex)
-                            {
-                                lock (this)
+                                try
                                 {
-                                    Log($"Error parsing {normalizedTypeName}.json file.");
-                                    Log(ex.ToString());
+                                    typeInfo = await JsonSerializer.DeserializeAsync<AssetSpecType>(stream, Options, token).ConfigureAwait(false);
+                                    if (stream is MemoryStream)
+                                        typeInfo.Commit = _commit;
                                 }
+                                catch (Exception ex)
+                                {
+                                    lock (this)
+                                    {
+                                        Log($"Error parsing {normalizedTypeName}.json file.");
+                                        Log(ex.ToString());
+                                    }
+                                    typeInfo = null;
+                                }
+                            }
+                            else
+                            {
                                 typeInfo = null;
                             }
-                        }
-                        else
-                        {
-                            typeInfo = null;
                         }
                     }
 
@@ -361,6 +356,99 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             }, token);
             ++taskIndex;
         }
+    }
+
+    private static async Task<string?> GetLatestCommitAsync(HttpClient httpClient, CancellationToken token)
+    {
+        const string getLatestCommitUrl = $"https://api.github.com/repos/{Repository}/commits?per_page=1";
+
+        HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, getLatestCommitUrl);
+        msg.Headers.Add("Accept", "application/vnd.github+json");
+        msg.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
+        msg.Headers.Add("User-Agent", $"unturned-asset-file-vscode/{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}");
+
+        HttpResponseMessage response = await httpClient.SendAsync(msg, HttpCompletionOption.ResponseContentRead, token);
+
+        // read commit @ root[0].sha
+        using JsonDocument doc = await JsonDocument.ParseAsync(
+            await response.Content.ReadAsStreamAsync(),
+            new JsonDocumentOptions
+            {
+                AllowTrailingCommas = false,
+                CommentHandling = JsonCommentHandling.Disallow,
+                MaxDepth = 8
+            }, token);
+
+        JsonElement root = doc.RootElement;
+        if (root.ValueKind != JsonValueKind.Array)
+            return null;
+
+        JsonElement commitInfo;
+        using (JsonElement.ArrayEnumerator arrayEnumerator = root.EnumerateArray())
+        {
+            if (!arrayEnumerator.MoveNext())
+                return null;
+
+            commitInfo = arrayEnumerator.Current;
+        }
+
+        if (!commitInfo.TryGetProperty("sha"u8, out JsonElement sha) || sha.ValueKind != JsonValueKind.String)
+            return null;
+
+        return sha.GetString();
+    }
+
+    private async Task<AssetInformation> DownloadAssetInfoAsync(Lazy<HttpClient> lazy, CancellationToken token)
+    {
+        AssetInformation? assetInfo = null;
+
+        if (IsCacheUpToDate)
+        {
+            assetInfo = await _cache.GetCachedInformationAsync(token);
+            if (assetInfo != null)
+                return assetInfo;
+        }
+
+        using (Stream? stream = await GetFileAsync(
+                   string.Format(AssetFileUrl, "Assets"),
+                   "Assets",
+                   lazy
+               ).ConfigureAwait(false))
+        {
+            if (stream != null)
+            {
+                try
+                {
+                    assetInfo = await JsonSerializer.DeserializeAsync<AssetInformation>(stream, Options, token).ConfigureAwait(false);
+                    if (stream is MemoryStream)
+                        assetInfo.Commit = _commit;
+                }
+                catch (Exception ex)
+                {
+                    Log("Error parsing Assets.json file.");
+                    Log(ex.ToString());
+                }
+            }
+        }
+
+        if (assetInfo == null && UseInternet)
+        {
+            using Stream? stream = await GetFileAsync(null, "Assets", lazy).ConfigureAwait(false);
+            if (stream != null)
+            {
+                try
+                {
+                    assetInfo = await JsonSerializer.DeserializeAsync<AssetInformation>(stream, Options, token).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Log("Error parsing embedded Assets.json file.");
+                    Log(ex.ToString());
+                }
+            }
+        }
+
+        return assetInfo ?? new AssetInformation();
     }
 
     public void ForEachTypeInHierarchyWhile(ISpecType type, Func<ISpecType, bool> each)
@@ -1401,7 +1489,7 @@ public static class AssetSpecDatabaseExtensions
 
             SpecProperty[] props = isLocal || context == SpecPropertyContext.Localization && !isProp ? info.LocalizationProperties : info.Properties;
             SpecProperty? prop = Array.Find(props, p => p.Key.Equals(property, StringComparison.OrdinalIgnoreCase));
-            prop ??= Array.Find(props, p => p.Aliases.Contains(property, StringComparison.OrdinalIgnoreCase));
+            prop ??= Array.Find(props, p => p.Aliases.Any(x => string.Equals(x.Value, property, StringComparison.OrdinalIgnoreCase)));
 
             if (prop != null)
             {

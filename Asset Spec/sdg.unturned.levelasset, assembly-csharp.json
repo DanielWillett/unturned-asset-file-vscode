@@ -162,6 +162,16 @@
             "DefaultValue": null,
             "Variable": "terrainColorRules",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
+        },
+        {
+            "Key": "MaterialColorPropertyNames",
+            "Type": "List",
+            "ElementType": "String",
+            "DefaultValue": [ "_Color" ],
+            "Version": "3.25.8.0",
+            "Variable": "MaterialColorPropertyNames",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#cloud-override-properties",
+            "Description": "The particle system's material instance will have these color properties set to the level's cloud color."
         }
     ],
     "Types":
@@ -310,7 +320,7 @@
                 },
                 {
                     "Key": "Cost_Multiplier",
-                    "Type": "SkillLevel",
+                    "Type": "Float32",
                     "DefaultValue": 1.0,
                     "IncludedDefaultValue": 0.0,
                     "Description": "Multiplier for XP upgrade cost.",

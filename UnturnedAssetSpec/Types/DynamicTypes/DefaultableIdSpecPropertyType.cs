@@ -34,6 +34,11 @@ public class DefaultableIdSpecPropertyType :
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
     OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
 
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<int>()?.ToString();
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
@@ -91,7 +96,7 @@ public class DefaultableIdSpecPropertyType :
             return false;
         }
 
-        value = new SpecDynamicConcreteValue<int>(val, this);
+        value = new SpecDynamicConcreteConvertibleValue<int>(val, this);
         return true;
     }
 

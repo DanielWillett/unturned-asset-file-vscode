@@ -3,14 +3,11 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -22,6 +19,11 @@ public interface ISpecDynamicValue
     bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value);
 
     void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options);
+}
+
+public interface ISpecConcreteValue : ISpecDynamicValue
+{
+    bool TryEvaluateValue<TValue>(out TValue? value, out bool isNull);
 }
 
 public interface ICorrespondingTypeSpecDynamicValue : ISpecDynamicValue
@@ -39,7 +41,7 @@ public enum SpecDynamicValueContext
 {
     Optional = 0,
     AssumeProperty = 1,
-    AssumeBang = 2,
+    AssumeData = 2,
     AllowSwitchCase = 4,
     AllowCondition = 8,
     AllowSwitch = 16,
@@ -53,16 +55,16 @@ public static class SpecDynamicValue
 {
     public static SpecDynamicConcreteNullValue Null => SpecDynamicConcreteNullValue.Instance;
 
-    public static SpecDynamicConcreteValue<bool> True { get; } = new SpecDynamicConcreteValue<bool>(true, KnownTypes.Boolean);
-    public static SpecDynamicConcreteValue<bool> False { get; } = new SpecDynamicConcreteValue<bool>(false, KnownTypes.Boolean);
+    public static SpecDynamicConcreteConvertibleValue<bool> True { get; } = new SpecDynamicConcreteConvertibleValue<bool>(true, KnownTypes.Boolean);
+    public static SpecDynamicConcreteConvertibleValue<bool> False { get; } = new SpecDynamicConcreteConvertibleValue<bool>(false, KnownTypes.Boolean);
 
-    public static SpecDynamicConcreteValue<bool> Included { get; } = new SpecDynamicConcreteValue<bool>(true, KnownTypes.Flag);
-    public static SpecDynamicConcreteValue<bool> Excluded { get; } = new SpecDynamicConcreteValue<bool>(false, KnownTypes.Flag);
+    public static SpecDynamicConcreteConvertibleValue<bool> Included { get; } = new SpecDynamicConcreteConvertibleValue<bool>(true, KnownTypes.Flag);
+    public static SpecDynamicConcreteConvertibleValue<bool> Excluded { get; } = new SpecDynamicConcreteConvertibleValue<bool>(false, KnownTypes.Flag);
 
-    public static SpecDynamicConcreteValue<bool> Flag(bool v) => v ? Included : Excluded;
+    public static SpecDynamicConcreteConvertibleValue<bool> Flag(bool v) => v ? Included : Excluded;
 
-    public static SpecDynamicConcreteValue<bool> Boolean(bool v) => v ? True : False;
-    public static SpecDynamicConcreteValue<bool> Boolean(bool v, ISpecPropertyType? type)
+    public static SpecDynamicConcreteConvertibleValue<bool> Boolean(bool v) => v ? True : False;
+    public static SpecDynamicConcreteConvertibleValue<bool> Boolean(bool v, ISpecPropertyType? type)
     {
         if (ReferenceEquals(type, KnownTypes.Flag))
         {
@@ -71,47 +73,47 @@ public static class SpecDynamicValue
 
         if (!ReferenceEquals(type, KnownTypes.Boolean) && type is ISpecPropertyType<bool> b)
         {
-            return new SpecDynamicConcreteValue<bool>(v, b);
+            return new SpecDynamicConcreteConvertibleValue<bool>(v, b);
         }
 
         return Boolean(v);
     }
 
-    public static SpecDynamicConcreteValue<byte> UInt8(byte v) => new SpecDynamicConcreteValue<byte>(v, KnownTypes.UInt8);
-    public static SpecDynamicConcreteValue<byte> UInt8(byte v, ISpecPropertyType? type) => type is ISpecPropertyType<byte> b ? new SpecDynamicConcreteValue<byte>(v, b) : UInt8(v);
+    public static SpecDynamicConcreteConvertibleValue<byte> UInt8(byte v) => new SpecDynamicConcreteConvertibleValue<byte>(v, KnownTypes.UInt8);
+    public static SpecDynamicConcreteConvertibleValue<byte> UInt8(byte v, ISpecPropertyType? type) => type is ISpecPropertyType<byte> b ? new SpecDynamicConcreteConvertibleValue<byte>(v, b) : UInt8(v);
 
-    public static SpecDynamicConcreteValue<ushort> UInt16(ushort v) => new SpecDynamicConcreteValue<ushort>(v, KnownTypes.UInt16);
-    public static SpecDynamicConcreteValue<ushort> UInt16(ushort v, ISpecPropertyType? type) => type is ISpecPropertyType<ushort> b ? new SpecDynamicConcreteValue<ushort>(v, b) : UInt16(v);
+    public static SpecDynamicConcreteConvertibleValue<ushort> UInt16(ushort v) => new SpecDynamicConcreteConvertibleValue<ushort>(v, KnownTypes.UInt16);
+    public static SpecDynamicConcreteConvertibleValue<ushort> UInt16(ushort v, ISpecPropertyType? type) => type is ISpecPropertyType<ushort> b ? new SpecDynamicConcreteConvertibleValue<ushort>(v, b) : UInt16(v);
 
-    public static SpecDynamicConcreteValue<uint> UInt32(uint v) => new SpecDynamicConcreteValue<uint>(v, KnownTypes.UInt32);
-    public static SpecDynamicConcreteValue<uint> UInt32(uint v, ISpecPropertyType? type) => type is ISpecPropertyType<uint> b ? new SpecDynamicConcreteValue<uint>(v, b) : UInt32(v);
+    public static SpecDynamicConcreteConvertibleValue<uint> UInt32(uint v) => new SpecDynamicConcreteConvertibleValue<uint>(v, KnownTypes.UInt32);
+    public static SpecDynamicConcreteConvertibleValue<uint> UInt32(uint v, ISpecPropertyType? type) => type is ISpecPropertyType<uint> b ? new SpecDynamicConcreteConvertibleValue<uint>(v, b) : UInt32(v);
 
-    public static SpecDynamicConcreteValue<ulong> UInt64(ulong v) => new SpecDynamicConcreteValue<ulong>(v, KnownTypes.UInt64);
-    public static SpecDynamicConcreteValue<ulong> UInt64(ulong v, ISpecPropertyType? type) => type is ISpecPropertyType<ulong> b ? new SpecDynamicConcreteValue<ulong>(v, b) : UInt64(v);
+    public static SpecDynamicConcreteConvertibleValue<ulong> UInt64(ulong v) => new SpecDynamicConcreteConvertibleValue<ulong>(v, KnownTypes.UInt64);
+    public static SpecDynamicConcreteConvertibleValue<ulong> UInt64(ulong v, ISpecPropertyType? type) => type is ISpecPropertyType<ulong> b ? new SpecDynamicConcreteConvertibleValue<ulong>(v, b) : UInt64(v);
 
-    public static SpecDynamicConcreteValue<sbyte> Int8(sbyte v) => new SpecDynamicConcreteValue<sbyte>(v, KnownTypes.Int8);
-    public static SpecDynamicConcreteValue<sbyte> Int8(sbyte v, ISpecPropertyType? type) => type is ISpecPropertyType<sbyte> b ? new SpecDynamicConcreteValue<sbyte>(v, b) : Int8(v);
+    public static SpecDynamicConcreteConvertibleValue<sbyte> Int8(sbyte v) => new SpecDynamicConcreteConvertibleValue<sbyte>(v, KnownTypes.Int8);
+    public static SpecDynamicConcreteConvertibleValue<sbyte> Int8(sbyte v, ISpecPropertyType? type) => type is ISpecPropertyType<sbyte> b ? new SpecDynamicConcreteConvertibleValue<sbyte>(v, b) : Int8(v);
 
-    public static SpecDynamicConcreteValue<short> Int16(short v) => new SpecDynamicConcreteValue<short>(v, KnownTypes.Int16);
-    public static SpecDynamicConcreteValue<short> Int16(short v, ISpecPropertyType? type) => type is ISpecPropertyType<short> b ? new SpecDynamicConcreteValue<short>(v, b) : Int16(v);
+    public static SpecDynamicConcreteConvertibleValue<short> Int16(short v) => new SpecDynamicConcreteConvertibleValue<short>(v, KnownTypes.Int16);
+    public static SpecDynamicConcreteConvertibleValue<short> Int16(short v, ISpecPropertyType? type) => type is ISpecPropertyType<short> b ? new SpecDynamicConcreteConvertibleValue<short>(v, b) : Int16(v);
 
-    public static SpecDynamicConcreteValue<int> Int32(int v) => new SpecDynamicConcreteValue<int>(v, KnownTypes.Int32);
-    public static SpecDynamicConcreteValue<int> Int32(int v, ISpecPropertyType? type) => type is ISpecPropertyType<int> b ? new SpecDynamicConcreteValue<int>(v, b) : Int32(v);
+    public static SpecDynamicConcreteConvertibleValue<int> Int32(int v) => new SpecDynamicConcreteConvertibleValue<int>(v, KnownTypes.Int32);
+    public static SpecDynamicConcreteConvertibleValue<int> Int32(int v, ISpecPropertyType? type) => type is ISpecPropertyType<int> b ? new SpecDynamicConcreteConvertibleValue<int>(v, b) : Int32(v);
 
-    public static SpecDynamicConcreteValue<long> Int64(long v) => new SpecDynamicConcreteValue<long>(v, KnownTypes.Int64);
-    public static SpecDynamicConcreteValue<long> Int64(long v, ISpecPropertyType? type) => type is ISpecPropertyType<long> b ? new SpecDynamicConcreteValue<long>(v, b) : Int64(v);
+    public static SpecDynamicConcreteConvertibleValue<long> Int64(long v) => new SpecDynamicConcreteConvertibleValue<long>(v, KnownTypes.Int64);
+    public static SpecDynamicConcreteConvertibleValue<long> Int64(long v, ISpecPropertyType? type) => type is ISpecPropertyType<long> b ? new SpecDynamicConcreteConvertibleValue<long>(v, b) : Int64(v);
 
-    public static SpecDynamicConcreteValue<float> Float32(float v) => new SpecDynamicConcreteValue<float>(v, KnownTypes.Float32);
-    public static SpecDynamicConcreteValue<float> Float32(float v, ISpecPropertyType? type) => type is ISpecPropertyType<float> b ? new SpecDynamicConcreteValue<float>(v, b) : Float32(v);
+    public static SpecDynamicConcreteConvertibleValue<float> Float32(float v) => new SpecDynamicConcreteConvertibleValue<float>(v, KnownTypes.Float32);
+    public static SpecDynamicConcreteConvertibleValue<float> Float32(float v, ISpecPropertyType? type) => type is ISpecPropertyType<float> b ? new SpecDynamicConcreteConvertibleValue<float>(v, b) : Float32(v);
 
-    public static SpecDynamicConcreteValue<double> Float64(double v) => new SpecDynamicConcreteValue<double>(v, KnownTypes.Float64);
-    public static SpecDynamicConcreteValue<double> Float64(double v, ISpecPropertyType? type) => type is ISpecPropertyType<double> b ? new SpecDynamicConcreteValue<double>(v, b) : Float64(v);
+    public static SpecDynamicConcreteConvertibleValue<double> Float64(double v) => new SpecDynamicConcreteConvertibleValue<double>(v, KnownTypes.Float64);
+    public static SpecDynamicConcreteConvertibleValue<double> Float64(double v, ISpecPropertyType? type) => type is ISpecPropertyType<double> b ? new SpecDynamicConcreteConvertibleValue<double>(v, b) : Float64(v);
 
-    public static SpecDynamicConcreteValue<decimal> Float128(decimal v) => new SpecDynamicConcreteValue<decimal>(v, KnownTypes.Float128);
-    public static SpecDynamicConcreteValue<decimal> Float128(decimal v, ISpecPropertyType? type) => type is ISpecPropertyType<decimal> b ? new SpecDynamicConcreteValue<decimal>(v, b) : Float128(v);
+    public static SpecDynamicConcreteConvertibleValue<decimal> Float128(decimal v) => new SpecDynamicConcreteConvertibleValue<decimal>(v, KnownTypes.Float128);
+    public static SpecDynamicConcreteConvertibleValue<decimal> Float128(decimal v, ISpecPropertyType? type) => type is ISpecPropertyType<decimal> b ? new SpecDynamicConcreteConvertibleValue<decimal>(v, b) : Float128(v);
 
-    public static SpecDynamicConcreteValue<string> String(string v) => new SpecDynamicConcreteValue<string>(v, KnownTypes.String);
-    public static SpecDynamicConcreteValue<string> String(string v, ISpecPropertyType? type) => type is ISpecPropertyType<string> b ? new SpecDynamicConcreteValue<string>(v, b) : String(v);
+    public static SpecDynamicConcreteConvertibleValue<string> String(string v) => new SpecDynamicConcreteConvertibleValue<string>(v, KnownTypes.String);
+    public static SpecDynamicConcreteConvertibleValue<string> String(string v, ISpecPropertyType? type) => type is ISpecPropertyType<string> b ? new SpecDynamicConcreteConvertibleValue<string>(v, b) : String(v);
 
     public static SpecDynamicConcreteValue<Guid> Guid(Guid v) => new SpecDynamicConcreteValue<Guid>(v, KnownTypes.Guid);
     public static SpecDynamicConcreteValue<Guid> Guid(Guid v, ISpecPropertyType? type) => type is ISpecPropertyType<Guid> b ? new SpecDynamicConcreteValue<Guid>(v, b) : Guid(v);
@@ -120,8 +122,43 @@ public static class SpecDynamicValue
     public static SpecDynamicConcreteEnumValue Enum(EnumSpecTypeValue value) => new SpecDynamicConcreteEnumValue(value.Type, value.Index);
     public static SpecDynamicConcreteEnumValue EnumNull(EnumSpecType type) => new SpecDynamicConcreteEnumValue(type);
 
+    /// <exception cref="InvalidCastException"/>
+    public static T? AsConcrete<T>(this ISpecDynamicValue value)
+    {
+        if (value is not ISpecConcreteValue conc)
+            throw new InvalidCastException($"Failed to cast {value.ValueType} to {typeof(T)}, not a concrete type.");
+
+        if (!conc.TryEvaluateValue(out T? val, out bool isNull))
+            throw new InvalidCastException($"Failed to cast {value.ValueType} to {typeof(T)}.");
+
+        if (!isNull)
+            return val;
+
+        if (default(T) == null)
+            return default;
+
+        throw new InvalidCastException($"Failed to cast <null> to {typeof(T)}.");
+    }
+
+    /// <exception cref="InvalidCastException"/>
+    public static T? AsConcreteNullable<T>(this ISpecDynamicValue value) where T : struct
+    {
+        if (value is not ISpecConcreteValue conc)
+            throw new InvalidCastException($"Failed to cast {value.ValueType} to {typeof(T)}, not a concrete type.");
+
+        if (!conc.TryEvaluateValue(out T val, out bool isNull))
+            throw new InvalidCastException($"Failed to cast {value.ValueType} to {typeof(T)}.");
+
+        return isNull ? null : val;
+    }
+
     public static bool TryGetValueAsType<TValue>(in FileEvaluationContext ctx, ISpecDynamicValue val, out TValue? value, out bool isNull)
     {
+        if (val is ISpecConcreteValue concrete)
+        {
+            return concrete.TryEvaluateValue(out value, out isNull);
+        }
+
         Type? valueType = val.ValueType?.ValueType;
         if (valueType == null || valueType == typeof(TValue))
         {
@@ -469,7 +506,7 @@ public static class SpecDynamicValue
             return TryParseEquationTree(value.Slice(1), out reference, expectedType);
         }
 
-        // #(bang) @(prop) #bang @prop
+        // #(data) @(prop) #data @prop
         if (value.Length > 1 && value[0] is '#' or '@')
         {
             char c1 = value[0];
@@ -478,12 +515,12 @@ public static class SpecDynamicValue
                 return false;
 
             return c1 == '#'
-                ? TryParseBangRef(value, null, out reference)
+                ? TryParseDataRef(value, null, out reference)
                 : TryParsePropertyRef(value, null, out reference);
         }
 
         // basic prop ref or (prop) in an assume value
-        if (context is SpecDynamicValueContext.AssumeProperty or SpecDynamicValueContext.AssumeBang)
+        if (context is SpecDynamicValueContext.AssumeProperty or SpecDynamicValueContext.AssumeData)
         {
             int l = value.Length;
             if (!TryTrimParenthesis(ref value, 0))
@@ -492,8 +529,8 @@ public static class SpecDynamicValue
             if (l != value.Length)
                 optionalString = null;
 
-            return context == SpecDynamicValueContext.AssumeBang
-                ? TryParseBangRef(value, optionalString, out reference)
+            return context == SpecDynamicValueContext.AssumeData
+                ? TryParseDataRef(value, optionalString, out reference)
                 : TryParsePropertyRef(value, optionalString, out reference);
         }
 
@@ -841,7 +878,7 @@ public static class SpecDynamicValue
         return true;
     }
 
-    private static bool TryParseBangRef(ReadOnlySpan<char> value, string? optionalString, out ISpecDynamicValue reference)
+    private static bool TryParseDataRef(ReadOnlySpan<char> value, string? optionalString, out ISpecDynamicValue reference)
     {
         int dot = IndexOfAtCurrentDepth(value, 0, '.', '(');
         if (dot < 0)
@@ -851,40 +888,40 @@ public static class SpecDynamicValue
         if (nameSpace.Length != value.Length)
             optionalString = null;
 
-        IBangRefTarget target;
+        IDataRefTarget target;
         if (nameSpace.Equals("Self".AsSpan(), StringComparison.Ordinal))
         {
             if (dot >= value.Length - 1)
             {
-                reference = SelfBangRef.Instance;
+                reference = SelfDataRef.Instance;
                 return true;
             }
 
-            target = SelfBangRef.Instance;
+            target = SelfDataRef.Instance;
         }
         else if (nameSpace.Equals("This".AsSpan(), StringComparison.Ordinal))
         {
             if (dot >= value.Length - 1)
             {
-                reference = ThisBangRef.Instance;
+                reference = ThisDataRef.Instance;
                 return true;
             }
 
-            target = ThisBangRef.Instance;
+            target = ThisDataRef.Instance;
         }
         else
         {
             if (nameSpace.Equals("\\Self".AsSpan(), StringComparison.Ordinal))
             {
-                target = new PropertyBangRef("Self");
+                target = new PropertyDataRef("Self");
             }
             else if (nameSpace.Equals("\\This".AsSpan(), StringComparison.Ordinal))
             {
-                target = new PropertyBangRef("This");
+                target = new PropertyDataRef("This");
             }
             else
             {
-                target = new PropertyBangRef(optionalString ?? nameSpace.ToString());
+                target = new PropertyDataRef(optionalString ?? nameSpace.ToString());
             }
         }
 
@@ -920,33 +957,33 @@ public static class SpecDynamicValue
 
         if (propertyName.Equals("Excluded".AsSpan(), StringComparison.Ordinal))
         {
-            reference = new ExcludedBangRef(target);
+            reference = new ExcludedDataRef(target);
         }
         else if (propertyName.Equals("Included".AsSpan(), StringComparison.Ordinal))
         {
-            reference = new IncludedBangRef(target);
+            reference = new IncludedDataRef(target);
         }
         else if (propertyName.Equals("Key".AsSpan(), StringComparison.Ordinal))
         {
-            reference = new KeyBangRef(target);
+            reference = new KeyDataRef(target);
         }
         else if (propertyName.Equals("Value".AsSpan(), StringComparison.Ordinal))
         {
-            reference = new ValueBangRef(target);
+            reference = new ValueDataRef(target);
         }
         else if (propertyName.Equals("AssetName".AsSpan(), StringComparison.Ordinal))
         {
-            if (target is not ThisBangRef)
+            if (target is not ThisDataRef)
             {
                 reference = null!;
                 return false;
             }
 
-            reference = new AssetNameBangRef(target);
+            reference = new AssetNameDataRef(target);
         }
         else if (propertyName.Equals("KeyGroups".AsSpan(), StringComparison.Ordinal))
         {
-            reference = new KeyGroupsBangRef(target);
+            reference = new KeyGroupsDataRef(target);
         }
         else
         {
@@ -954,7 +991,7 @@ public static class SpecDynamicValue
             return false;
         }
 
-        if (reference is IIndexableBangRef indexable)
+        if (reference is IIndexableDataRef indexable)
         {
             if (indexerIndex == -1 || indexerIndex == data.Length - 1 || indexerIndex == dataIndex - 1)
             {
@@ -975,7 +1012,7 @@ public static class SpecDynamicValue
             indexable.Index = index;
         }
 
-        if (dataIndex != -1 && reference is IPropertiesBangRef properties)
+        if (dataIndex != -1 && reference is IPropertiesDataRef properties)
         {
             if (dataIndex == -1 || dataIndex == data.Length - 1 || dataIndex == indexerIndex - 1)
             {
@@ -1052,7 +1089,7 @@ public static class SpecDynamicValue
     {
         if (((int)context & 0b11) == 3)
         {
-            throw new ArgumentOutOfRangeException(nameof(context), "More than one of [ AssumeProperty, AssumeBang ].");
+            throw new ArgumentOutOfRangeException(nameof(context), "More than one of [ AssumeProperty, AssumeData ].");
         }
 
         while (reader.TokenType == JsonTokenType.Comment && reader.Read()) ;
@@ -1313,7 +1350,7 @@ public static class SpecDynamicValue
                 if (valueType == typeof(DateTime))
                 {
                     return reader.TryGetInt32(out int i4) && i4 == 0
-                        ? new SpecDynamicConcreteValue<DateTime>(DateTime.MinValue, expectedType as ISpecPropertyType<DateTime> ?? KnownTypes.DateTime)
+                        ? new SpecDynamicConcreteConvertibleValue<DateTime>(DateTime.MinValue, expectedType as ISpecPropertyType<DateTime> ?? KnownTypes.DateTime)
                         : invalidTypeThrowHandler(typeof(double), expectedType);
                 }
                 if (valueType == typeof(DateTimeOffset))
@@ -1324,7 +1361,7 @@ public static class SpecDynamicValue
                 }
                 if (valueType == typeof(char))
                 {
-                    return reader.TryGetUInt16(out ushort u2) ? new SpecDynamicConcreteValue<char>((char)u2, expectedType as ISpecPropertyType<char> ?? KnownTypes.Character) : invalidTypeThrowHandler(typeof(double), expectedType);
+                    return reader.TryGetUInt16(out ushort u2) ? new SpecDynamicConcreteConvertibleValue<char>((char)u2, expectedType as ISpecPropertyType<char> ?? KnownTypes.Character) : invalidTypeThrowHandler(typeof(double), expectedType);
                 }
 
                 break;
@@ -1335,7 +1372,7 @@ public static class SpecDynamicValue
                 {
                     if (reader.TryGetDateTime(out DateTime dt))
                     {
-                        return new SpecDynamicConcreteValue<DateTime>(dt, KnownTypes.DateTime);
+                        return new SpecDynamicConcreteConvertibleValue<DateTime>(dt, KnownTypes.DateTime);
                     }
                     if (JsonHelper.TryGetGuid(ref reader, out Guid guid))
                     {
@@ -1360,7 +1397,7 @@ public static class SpecDynamicValue
                 }
                 if (valueType == typeof(DateTime))
                 {
-                    return reader.TryGetDateTime(out DateTime dt) ? new SpecDynamicConcreteValue<DateTime>(dt, expectedType as ISpecPropertyType<DateTime> ?? KnownTypes.DateTime) : invalidTypeThrowHandler(typeof(string), expectedType);
+                    return reader.TryGetDateTime(out DateTime dt) ? new SpecDynamicConcreteConvertibleValue<DateTime>(dt, expectedType as ISpecPropertyType<DateTime> ?? KnownTypes.DateTime) : invalidTypeThrowHandler(typeof(string), expectedType);
                 }
                 if (valueType == typeof(DateTimeOffset))
                 {
@@ -1372,7 +1409,7 @@ public static class SpecDynamicValue
                     if (str.Length != 1)
                         invalidTypeThrowHandler(typeof(string), expectedType);
 
-                    return new SpecDynamicConcreteValue<char>(str[0], expectedType as ISpecPropertyType<char> ?? KnownTypes.Character);
+                    return new SpecDynamicConcreteConvertibleValue<char>(str[0], expectedType as ISpecPropertyType<char> ?? KnownTypes.Character);
                 }
                 if (expectedType is IStringParseableSpecPropertyType stringParseable)
                 {

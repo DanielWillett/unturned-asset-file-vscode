@@ -84,6 +84,8 @@ internal sealed class UnturnedAssetFileLspServer
                         .AddSingleton<IAssetSpecDatabase, LspAssetSpecDatabase>()
                         .AddSingleton<IWorkspaceEnvironment, LspWorkspaceEnvironment>()
                         .AddSingleton<LspInstallationEnvironment>()
+                        .AddSingleton<EnvironmentCache>()
+                        .AddSingleton<ISpecDatabaseCache, EnvironmentCache>(sp => sp.GetRequiredService<EnvironmentCache>())
                         .AddSingleton<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
                         .AddSingleton(new JsonSerializerOptions
                         {

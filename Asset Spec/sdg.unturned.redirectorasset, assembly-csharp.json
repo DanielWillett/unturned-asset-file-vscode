@@ -1,0 +1,50 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.RedirectorAsset, Assembly-CSharp",
+    "DisplayName": "Asset Redirector",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/redirector-asset.html",
+    "Category": "NONE",
+    "RequireId": false,
+    "Version": "3.24.4.0",
+    "Properties":
+    [
+        {
+            "Key": "AssetCategory",
+            "Type": "SDG.Unturned.EAssetType, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/redirector-asset.html#assetcategory-eassettype-none",
+            "Description": "The asset category the asset being redirected to belongs to. This property works together with @ID to redirect the ID of this category to @TargetAsset.",
+            "Variable": "assetCategory",
+            "Required":
+            {
+                "Variable": "ID",
+                "Operation": "gt",
+                "Comparand": 0
+            },
+            "InclusiveWith":
+            [
+                {
+                    "Key": "ID",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "ID",
+                        "Operation": "gt",
+                        "Comparand": 0
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "TargetAsset",
+            "Type": "AssetReferenceString",
+            "ElementType": "SDG.Unturned.Asset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Except": [ "00000000000000000000000000000000" ],
+            "Required": true,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/redirector-asset.html#targetasset-guid",
+            "Description": "The asset that is being redirected to."
+        }
+    ]
+}

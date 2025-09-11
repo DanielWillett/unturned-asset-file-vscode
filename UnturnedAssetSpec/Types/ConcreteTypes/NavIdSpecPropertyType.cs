@@ -21,6 +21,13 @@ public sealed class NavIdSpecPropertyType : BasicSpecPropertyType<NavIdSpecPrope
     /// <inheritdoc />
     public override string DisplayName => "Navmesh ID";
 
+    protected override ISpecDynamicValue CreateValue(byte value) => new SpecDynamicConcreteConvertibleValue<byte>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<byte>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

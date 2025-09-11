@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -43,6 +44,13 @@ public sealed class BooleanOrFlagSpecPropertyType : BasicSpecPropertyType<Boolea
         }
 
         return true;
+    }
+
+    protected override ISpecDynamicValue CreateValue(bool value) => new SpecDynamicConcreteConvertibleValue<bool>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<bool>()?.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <inheritdoc />

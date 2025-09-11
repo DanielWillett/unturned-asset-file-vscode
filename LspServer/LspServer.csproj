@@ -27,6 +27,8 @@
 		<PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1" />
 		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
 
+		<PackageReference Include="DanielWillett.SpeedBytes" Version="1.1.2" />
+
     <ProjectReference Include="../UnturnedAssetSpec/UnturnedAssetSpec.csproj" />
 	</ItemGroup>
 

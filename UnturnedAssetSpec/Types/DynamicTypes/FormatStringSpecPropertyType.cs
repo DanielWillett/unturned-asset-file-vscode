@@ -26,6 +26,13 @@ public sealed class FormatStringSpecPropertyType : BasicSpecPropertyType<FormatS
     /// </summary>
     public bool AllowRichText { get; }
 
+    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcrete<string>();
+    }
+
     public FormatStringSpecPropertyType(int argCount, bool allowRichText)
     {
         if (argCount <= 0)

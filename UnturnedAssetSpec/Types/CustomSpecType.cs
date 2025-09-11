@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 [DebuggerDisplay("Type: {Type.GetTypeName()}")]
-public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<CustomSpecTypeInstance>, IEquatable<CustomSpecType>, IAdditionalPropertyProvider
+public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<CustomSpecTypeInstance>, IEquatable<CustomSpecType>
 {
     // example value could be Condition for Conditions
     public const string PluralBaseKeyProperty = "PluralBaseKey";
@@ -21,6 +21,7 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
     public required SpecProperty[] Properties { get; set; }
     public required SpecProperty[] LocalizationProperties { get; set; }
     public required string? Docs { get; init; }
+    public Version? Version { get; init; }
     public bool IsLegacyExpandedType { get; init; }
 
     /// <summary>
@@ -294,14 +295,18 @@ public class CustomSpecTypeInstance : IEquatable<CustomSpecTypeInstance>, ISpecD
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
         if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
-            return true;
+            return !condition.IsInverted;
+
+        if (condition.Operation == ConditionOperation.Excluded)
+            return condition.IsInverted;
+
         if (condition.Comparand is not CustomSpecTypeInstance customInstance || !customInstance.Type.Equals(Type))
         {
-            return condition.Operation.EvaluateNulls(false, true);
+            return condition.EvaluateNulls(false, true);
         }
 
         bool equal = Equals(customInstance, condition.Operation.IsCaseInsensitive() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
-        return equal && condition.Operation.IsEquality() || !equal && condition.Operation.IsInequality();
+        return condition.Invert(equal && condition.Operation.IsEquality() || !equal && condition.Operation.IsInequality());
     }
 
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)

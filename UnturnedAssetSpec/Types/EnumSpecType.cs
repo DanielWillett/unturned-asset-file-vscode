@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 [DebuggerDisplay("Enum: {Type.GetTypeName()}")]
-public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<EnumSpecType>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType, IAdditionalPropertyProvider
+public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<EnumSpecType>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
     private AutoCompleteResult[]? _valueResults;
 
@@ -18,6 +18,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
     public required string DisplayName { get; init; }
     public required string? Docs { get; init; }
     public required EnumSpecTypeValue[] Values { get; init; }
+    public Version? Version { get; init; }
     public required OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; init; }
 
 #nullable disable
@@ -142,6 +143,15 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
         return false;
     }
 
+    /// <inheritdoc />
+    public string? ToString(ISpecDynamicValue value)
+    {
+        if (value is SpecDynamicConcreteEnumValue enumValue)
+            return enumValue.Name;
+
+        return value.AsConcrete<string>();
+    }
+
     public bool TryParse(ReadOnlySpan<char> span, out EnumSpecTypeValue v, bool ignoreCase = true)
     {
         span = span.Trim();
@@ -186,7 +196,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
 }
 
 [DebuggerDisplay("{Value,nq}")]
-public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, IComparable, IComparable<EnumSpecTypeValue>
+public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, IComparable, IComparable<EnumSpecTypeValue>, IAdditionalPropertyProvider
 {
     public required int Index { get; init; }
     public required EnumSpecType Type { get; init; }
@@ -196,9 +206,22 @@ public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, ICompa
     public QualifiedType RequiredBaseType { get; init; }
     public QualifiedType CorrespondingType { get; init; }
     public string? Description { get; init; }
+    public string? Docs { get; init; }
     public bool Deprecated { get; init; }
+    public Version? Version { get; init; }
 
-    public required OneOrMore<KeyValuePair<string, object?>> ExtendedData { get; init; }
+    /// <summary>
+    /// If only <see cref="Value"/> is filled out the JSON can be re-written as just a string.
+    /// </summary>
+    internal bool CanBeWrittenAsString => string.Equals(Casing, Value, StringComparison.Ordinal)
+                                          && RequiredBaseType.IsNull
+                                          && CorrespondingType.IsNull
+                                          && Description == null
+                                          && Docs == null
+                                          && !Deprecated
+                                          && AdditionalProperties.IsNull;
+
+    public required OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; init; }
     
     /// <inheritdoc />
     public bool Equals(EnumSpecTypeValue other) => Index == other.Index;

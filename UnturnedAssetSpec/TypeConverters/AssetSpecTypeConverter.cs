@@ -21,6 +21,7 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
     private static readonly JsonEncodedText LocalizationProperty = JsonEncodedText.Encode("Localization");
     private static readonly JsonEncodedText BundleAssetsProperty = JsonEncodedText.Encode("BundleAssets");
     private static readonly JsonEncodedText TypesProperty = JsonEncodedText.Encode("Types");
+    private static readonly JsonEncodedText VersionProperty = JsonEncodedText.Encode("Version");
 
     private static readonly JsonEncodedText[] Properties =
     [
@@ -34,7 +35,8 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
         PropertiesProperty,      // 7
         LocalizationProperty,    // 8
         BundleAssetsProperty,    // 9
-        TypesProperty            // 10
+        TypesProperty,           // 10
+        VersionProperty          // 11
     ];
 
     /// <inheritdoc />
@@ -178,6 +180,13 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
                 case 10: // Types
                     type.Types = ReadTypeList(ref reader, options, type);
                     break;
+
+                case 11: // Version
+                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+
+                    type.Version = reader.TokenType == JsonTokenType.String ? new Version(reader.GetString()!) : null;
+                    break;
             }
         }
 
@@ -303,6 +312,13 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
             writer.WriteBoolean(RequireIdProperty, true);
         }
 
+        if (value.Version != null)
+        {
+            writer.WriteString(VersionProperty, value.Version.ToString());
+        }
+
+        JsonHelper.WriteAdditionalProperties(writer, value, options);
+
         writer.WriteStartArray(PropertiesProperty);
         
         if (value.Properties != null)
@@ -312,7 +328,10 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
                 if (property?.Key == null)
                     continue;
 
-                SpecPropertyConverter.WriteProperty(writer, property, options);
+                if (!property.IsOverride)
+                {
+                    SpecPropertyConverter.WriteProperty(writer, property, options);
+                }
             }
         }
 
@@ -327,7 +346,10 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
                 if (localizationProperty?.Key == null)
                     continue;
 
-                SpecPropertyConverter.WriteProperty(writer, localizationProperty, options);
+                if (ReferenceEquals(localizationProperty.Owner, value))
+                {
+                    SpecPropertyConverter.WriteProperty(writer, localizationProperty, options);
+                }
             }
         }
 
@@ -350,16 +372,16 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
 
         writer.WriteStartArray(TypesProperty);
         
-        //if (value.Types != null)
-        //{
-        //    foreach (ISpecType? type in value.Types)
-        //    {
-        //        if (type == null)
-        //            continue;
-        //
-        //        SpecTypeConverter.Write(writer, type, options);
-        //    }
-        //}
+        if (value.Types != null)
+        {
+            foreach (ISpecType? type in value.Types)
+            {
+                if (type == null)
+                    continue;
+        
+                SpecTypeConverter.WriteType(writer, type, options);
+            }
+        }
 
         writer.WriteEndArray();
 

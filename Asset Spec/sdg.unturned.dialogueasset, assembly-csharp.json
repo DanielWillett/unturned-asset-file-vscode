@@ -14,7 +14,7 @@
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle.",
-            "Priority": -1
+            "Priority": 97
         },
         {
             "Key": "Messages",
@@ -251,7 +251,7 @@
                     "Description": "Conditions that must be met for response #(Self.KeyGroups[0]) to be shown.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "conditions",
-                    "CountForRegexGroup": "dialogue-message-conditions"
+                    "CountForRegexGroup": "dialogue-response-conditions"
                 },
                 {
                     "Key": "Rewards",

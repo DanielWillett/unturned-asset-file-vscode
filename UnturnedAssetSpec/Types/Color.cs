@@ -115,6 +115,11 @@ public readonly struct Color : IEquatable<Color>, IComparable<Color>
         return a < 1 ? a > 0 ? a : 0 : 1;
     }
 
+    public string ToHex(bool includeAlpha)
+    {
+        return ((Color32)this).ToHex(includeAlpha);
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {

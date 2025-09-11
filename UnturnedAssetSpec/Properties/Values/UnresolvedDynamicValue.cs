@@ -37,7 +37,7 @@ internal class UnresolvedDynamicValue : ISecondPassSpecDynamicValue, IDisposable
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
-        return condition.Operation.EvaluateNulls(true, condition.Comparand == null);
+        return condition.EvaluateNulls(true, condition.Comparand == null);
     }
 
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)

@@ -87,6 +87,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 12,
             "Variable": "interactability",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -125,6 +136,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 11,
             "Variable": "interactabilityRemote",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -147,6 +169,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 11,
             "Variable": "interactabilityDelay",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -177,9 +210,41 @@
             "Type": "Float32",
             "DefaultValue": 0.0,
             "Description": "Delay (in seconds) before an interacted object resets or a destroyed object respawns.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Docs":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Interactability",
+                            "Operation": "eq",
+                            "Comparand": "RUBBLE"
+                        }
+                    ],
+                    "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble"
+                },
+                {
+                    "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables"
+                }
+            ],
             "Priority": 11,
-            "Variable": "interactabilityReset",
+            "Variable":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Interactability",
+                            "Operation": "eq",
+                            "Comparand": "RUBBLE"
+                        }
+                    ],
+                    "Value": "rubbleReset"
+                },
+                {
+                    "Value": "interactabilityReset"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -223,6 +288,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 11,
             "Variable": "interactabilityHint",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -261,6 +337,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 11,
             "Variable": "interactabilityText",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -278,6 +365,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 11,
             "Variable": "interactabilityPower",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -311,6 +409,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 11,
             "Variable": "interactabilityEditor",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -327,6 +436,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 11,
             "Variable": "interactabilityNav",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -354,6 +474,14 @@
             "ExclusiveWith":
             [
                 {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
                     "Key": "Interactability_Reward_ID",
                     "Value": "*",
                     "Condition":
@@ -376,7 +504,7 @@
                 }
             ],
             "Type": "Id",
-            "ElementType": "ITEM",
+            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
             "DefaultValue": 0,
             "Description": "An option for item drops from this dropper object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
@@ -386,12 +514,44 @@
         {
             "Key": "Interactability_Reward_ID",
             "Type": "Id",
-            "ElementType": "SPAWN",
+            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
             "DefaultValue": 0,
             "Description": "Spawn table to use for drops from this dropper object. Takes priority over the item drop list.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Docs":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Interactability",
+                            "Operation": "eq",
+                            "Comparand": "RUBBLE"
+                        }
+                    ],
+                    "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble"
+                },
+                {
+                    "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables"
+                }
+            ],
             "Priority": 11,
-            "Variable": "interactabilityRewardID",
+            "Variable":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Interactability",
+                            "Operation": "eq",
+                            "Comparand": "RUBBLE"
+                        }
+                    ],
+                    "Value": "rubbleRewardID"
+                },
+                {
+                    "Value": "interactabilityRewardID"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -419,6 +579,14 @@
             "ExclusiveWith":
             [
                 {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
                     "Key": "Interactability_Drops",
                     "Value": "*",
                     "Condition":
@@ -436,9 +604,52 @@
             "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Effect to play when this object is interacted with or a section of rubble is destroyed.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Docs":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Interactability",
+                            "Operation": "eq",
+                            "Comparand": "RUBBLE"
+                        }
+                    ],
+                    "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble"
+                },
+                {
+                    "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables"
+                }
+            ],
             "Priority": 11,
-            "Variable": "interactabilityEffectGuid",
+            "Variable":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Interactability",
+                            "Operation": "eq",
+                            "Comparand": "RUBBLE"
+                        }
+                    ],
+                    "Value": "rubbleEffectGuid"
+                },
+                {
+                    "Value": "interactabilityEffectGuid"
+                }
+            ],
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -484,6 +695,17 @@
                 "Operation": "eq",
                 "Comparand": "DIALOGUE"
             },
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -500,6 +722,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 10,
             "Variable": "interactabilityChildPathOverride",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -516,6 +749,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 10,
             "Variable": "iobsEmissiveMaterialMode",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -533,6 +777,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#conditions-and-rewards",
             "Priority": 9,
             "Variable": "interactabilityConditionsList",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -571,7 +826,8 @@
                         "Value": true
                     }
                 }
-            ]
+            ],
+            "CountForRegexGroup": "object-interact-conditions"
         },
         {
             "Key": "Interactability_Resource",
@@ -582,6 +838,17 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 11,
             "Variable": "interactabilityResource",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -605,7 +872,8 @@
                         "Value": true
                     }
                 }
-            ]
+            ],
+            "CountForRegexGroup": "object-interact-rewards"
         },
         {
             "Key": "Interactability_Health",
@@ -619,9 +887,20 @@
                 "Comparand": "RUBBLE"
             },
             "Description": "Total amount of health each section of rubble has.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
             "Priority": 11,
             "Variable": "rubbleHealth",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -636,10 +915,20 @@
             "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Effect to play when this all rubble sections are destroyed.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
             "Priority": 11,
             "Variable": "rubbleFinaleGuid",
-            "Deprecated": true,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
             "InclusiveWith":
             [
                 {
@@ -648,6 +937,1647 @@
                 }
             ]
         },
+        {
+            "Key": "Interactability_Blade_ID",
+            "Type": "BladeId",
+            "DefaultValue": 0,
+            "Description": "An arbitrary ID that weapons must also define to be able to damage this object.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleBladeID",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Reward_Probability",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 0.0,
+            "Maximum": 1.0,
+            "Description": "The chance (0-1) of the player receiving a reward when they destroy a section of rubble.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleRewardProbability",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Rewards_Min",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Maximum": "@Interactability_Rewards_Max",
+            "Description": "Minimum amount of item drops to reward when a section of rubble is destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleRewardsMin",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Rewards_Max",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Minimum": "@Interactability_Rewards_Min",
+            "Description": "Maximum amount of item drops to reward when a section of rubble is destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleRewardsMax",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Reward_XP",
+            "Type": "UInt32",
+            "DefaultValue": 0,
+            "Description": "Amount of experience to reward when a section of rubble is destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleRewardXP",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Invulnerable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that rubble sections can only be damaged by weapons that have the @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Invulnerable) flag.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleIsVulnerable",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Proof_Explosion",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that rubble sections cannot be damaged by area-of-effect explosions.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleProofExplosion",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Can_Zombies_Damage",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Indicates that zombies can attack rubble sections when they get stuck on them.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleCanZombiesDamage",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Zombie_Damage_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Damage multiplier for damage done to rubble sections by zombies.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleZombieDamageMultiplier",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                },
+                {
+                    "Key": "Interactability_Can_Zombies_Damage",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Section_Destroyed_Alert_Radius",
+            "Type": "Float32",
+            "DefaultValue": -1.0,
+            "MinimumExclusive": 0.0,
+            "Description": "Radius (in meters) around a rubble section to alert zombies when it's destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleSectionDestroyedAlertRadius",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_All_Sections_Destroyed_Alert_Radius",
+            "Type": "Float32",
+            "DefaultValue": -1.0,
+            "MinimumExclusive": 0.0,
+            "Description": "Radius (in meters) around a rubble object to alert zombies when all sections are destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleAllSectionsDestroyedAlertRadius",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Interactability_Nav_Mode",
+            "Type": "SDG.Unturned.EObjectRubbleNavMode, Assembly-CSharp",
+            "DefaultValue": "Unaffected",
+            "Description": "Controls how rubble affects the 'Nav' prefab.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleNavMode",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble",
+            "Type": "SDG.Unturned.EObjectRubble, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Except": [ "NONE" ],
+            "Description": "Type of rubble to define.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 12,
+            "Variable": "rubble",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Reset",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Delay (in seconds) before a destroyed rubble section respawns.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleReset",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Health",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "MinimumExclusive": 0,
+            "Required":
+            {
+                "Variable": "Rubble",
+                "Operation": "eq",
+                "Comparand": "DESTROY"
+            },
+            "Description": "Total amount of health each section of rubble has.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleHealth",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Effect",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "Effect to play when a section of rubble is destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleEffectGuid",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Finale",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "Effect to play when this all rubble sections are destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleFinaleGuid",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Reward_ID",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "DefaultValue": 0,
+            "Description": "Spawn table to use for drops when a section of rubble is destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleRewardID",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Blade_ID",
+            "Type": "BladeId",
+            "DefaultValue": 0,
+            "Description": "An arbitrary ID that weapons must also define to be able to damage this object.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleBladeID",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Reward_Probability",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 0.0,
+            "Maximum": 1.0,
+            "Description": "The chance (0-1) of the player receiving a reward when they destroy a section of rubble.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleRewardProbability",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Rewards_Min",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Maximum": "@Rubble_Rewards_Max",
+            "Description": "Minimum amount of item drops to reward when a section of rubble is destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleRewardsMin",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Rewards_Max",
+            "Type": "UInt8",
+            "DefaultValue": 1,
+            "Minimum": "@Rubble_Rewards_Min",
+            "Maximum": 100,
+            "Description": "Maximum amount of item drops to reward when a section of rubble is destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleRewardsMax",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Reward_XP",
+            "Type": "UInt32",
+            "DefaultValue": 0,
+            "Description": "Amount of experience to reward when a section of rubble is destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleRewardXP",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Invulnerable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that rubble sections can only be damaged by weapons that have the @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Invulnerable) flag.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleIsVulnerable",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Proof_Explosion",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that rubble sections cannot be damaged by area-of-effect explosions.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleProofExplosion",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Can_Zombies_Damage",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Indicates that zombies can attack rubble sections when they get stuck on them.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleCanZombiesDamage",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Zombie_Damage_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Damage multiplier for damage done to rubble sections by zombies.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleZombieDamageMultiplier",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                },
+                {
+                    "Key": "Rubble_Can_Zombies_Damage",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Section_Destroyed_Alert_Radius",
+            "Type": "Float32",
+            "DefaultValue": -1.0,
+            "MinimumExclusive": 0.0,
+            "Description": "Radius (in meters) around a rubble section to alert zombies when it's destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleSectionDestroyedAlertRadius",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_All_Sections_Destroyed_Alert_Radius",
+            "Type": "Float32",
+            "DefaultValue": -1.0,
+            "MinimumExclusive": 0.0,
+            "Description": "Radius (in meters) around a rubble object to alert zombies when all sections are destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleAllSectionsDestroyedAlertRadius",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Nav_Mode",
+            "Type": "SDG.Unturned.EObjectRubbleNavMode, Assembly-CSharp",
+            "DefaultValue": "Unaffected",
+            "Description": "Controls how rubble affects the 'Nav' prefab.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleNavMode",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Editor",
+            "Type": "SDG.Unturned.EObjectRubbleEditor, Assembly-CSharp",
+            "DefaultValue": "ALIVE",
+            "Description": "Determines how this destructible object should appear in the level editor.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "rubbleEditor",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Has_Clip_Prefab",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not this object defines a separate prefab to be loaded on the server. This is not required and should be set to false in most cases.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "Priority": 18,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Has_Editor_Prefab",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not this object defines a separate prefab to be loaded in the editor.",
+            "Priority": 18,
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Snowshoe",
+            "Type": "Flag",
+            "DefaultValue": true,
+            "Description": "Indicates that this object should not leave a footprint when baking terrain materials.",
+            "Priority": 15,
+            "Variable": "isSnowshoe",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Chart",
+            "Type": "SDG.Unturned.EObjectChart, Assembly-CSharp",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "NPC"
+                        },
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "DECAL"
+                        }
+                    ],
+                    "Value": "IGNORE"
+                },
+                {
+                    "Value": "NONE"
+                }
+            ],
+            "IncludedDefaultValue": "NONE",
+            "Description": "Overrides the material used for this object when rendering the level chart.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "Priority": 15,
+            "Variable": "chart",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Fuel",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Deprecated": true,
+            "Description": "Indicates that fuel can be siphoned from this object. Use @Interactability with the 'Fuel' type instead.",
+            "Priority": 12,
+            "Variable": "isFuel",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Refill",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Deprecated": true,
+            "Description": "Indicates that water can be siphoned from this object. Use @Interactability with the 'Fuel' type instead.",
+            "Priority": 12,
+            "Variable": "isRefill",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Soft",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that vehicles should not take damage when colliding with this object.",
+            "Priority": 15,
+            "Variable": "isSoft",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Causes_Fall_Damage",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not players should take fall damage when landing on this object.",
+            "Priority": 15,
+            "Variable": "causesFallDamage",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Collision_Important",
+            "Type": "Flag",
+            "DefaultValue":
+            [
+                {
+                    "And": 
+                    {
+                        "Variable": "Type",
+                        "Operation": "eq",
+                        "Comparand": "LARGE"
+                    },
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Indicates that this object's collision should never be disabled in singleplayer.",
+            "Priority": 15,
+            "Variable": "isCollisionImportant",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "LARGE"
+                }
+            ]
+        },
+        {
+            "Key": "Exclude_From_Culling_Volumes",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Indicates that this object can not be hidden by culling volumes.",
+            "Priority": 15,
+            "Variable": "shouldExcludeFromCullingVolumes",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interior-culling",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "LOD",
+            "Type": "SDG.Unturned.EObjectLOD, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Description": "Determines how the 'interior' area is calculated for interior culling.",
+            "Priority": 16,
+            "Variable": "lod",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interior-culling",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "LOD_Bias",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 0.01,
+            "Description": "Multiplier for how far away objects within the 'interior' can be seen. This value is multiplied by 64 meters.",
+            "Priority": 16,
+            "Variable": "lodBias",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interior-culling",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "LOD",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "LOD",
+                        "Operation": "neq",
+                        "Comparand": "NONE"
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "LOD_Center",
+            "Type": "LegacyPosition",
+            "DefaultValue": "(0,0,0)",
+            "Description": "Position offset for the 'interior' area from the mesh bounds.",
+            "Priority": 16,
+            "Variable": "cullingVolumeLocalPositionOffset",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interior-culling",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "LOD",
+                    "Value": "MESH"
+                }
+            ]
+        },
+        {
+            "Key": "LOD_Size",
+            "Type": "LegacyScale",
+            "DefaultValue": "(0,0,0)",
+            "Description": "Size offset for the 'interior' area from the mesh bounds.",
+            "Priority": 16,
+            "Variable": "cullingVolumeSizeOffset",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interior-culling",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "LOD",
+                    "Value": "MESH"
+                }
+            ]
+        },
+        {
+            "Key": "Foliage",
+            "Type": "AssetReferenceString",
+            "DefaultValue": "00000000000000000000000000000000",
+            "ElementType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
+            "Description": "The collection of foliage that can be baked onto this object's surface.",
+            "Priority": 15,
+            "Variable": "foliage",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Use_Water_Height_Transparent_Sort",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Adds functionality to this object that changes the render queue position depending on whether or not the object is underwater. This fixes some transparency rendering issues when viewing the object through water.",
+            "Priority": 15,
+            "Variable": "useWaterHeightTransparentSort",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Add_Night_Light_Script",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Adds functionality to this object that enables a game object named 'Light' at night and disables it during the day.",
+            "Priority": 15,
+            "Variable": "shouldAddNightLightScript",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Add_Kill_Triggers",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not kill volumes should be added to any game objects named 'Kill' in this object's prefab. If the @Trigger prefab exists, the volumes will be added to children in that prefab instead of @Object.",
+            "Priority": 15,
+            "Variable": "shouldAddKillTriggers",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Allow_Structures",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Indicates that structures can be built on this object.",
+            "Priority": 15,
+            "Variable": "allowStructures",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Material_Palette",
+            "Type": "AssetReferenceString",
+            "DefaultValue": "00000000000000000000000000000000",
+            "ElementType": "SDG.Unturned.MaterialPaletteAsset, Assembly-CSharp",
+            "Description": "A default material palette that should be used to randomize the material of this object.",
+            "Priority": 15,
+            "Variable": "materialPalette",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Landmark_Quality",
+            "Type": "SDG.Unturned.EGraphicQuality, Assembly-CSharp",
+            "DefaultValue": "LOW",
+            "Except": [ "OFF" ],
+            "Description": "The minimum value of the Landmarks setting required for this object to be visible.",
+            "Priority": 15,
+            "Variable": "landmarkQuality",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Holiday_Restriction",
+            "Type": "SDG.Unturned.ENPCHoliday, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Description": "When set, the only holiday during which this object will be visible.",
+            "Priority": 14,
+            "Variable": "holidayRestriction",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
+        },
+        {
+            "Key": "Christmas_Redirect",
+            "Type": "AssetReferenceString",
+            "DefaultValue": "00000000000000000000000000000000",
+            "ElementType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
+            "Description": "The object to replace this object with during the 'Christmas' holiday.",
+            "Priority": 14,
+            "Variable": "christmasRedirect",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
+        },
+        {
+            "Key": "Halloween_Redirect",
+            "Type": "AssetReferenceString",
+            "DefaultValue": "00000000000000000000000000000000",
+            "ElementType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
+            "Description": "The object to replace this object with during the 'Halloween' holiday.",
+            "Priority": 14,
+            "Variable": "halloweenRedirect",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
+        },
+        {
+            "Key": "Is_Gore",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not this object is visible when the player has the Blood Spatters setting disabled.",
+            "Priority": 15,
+            "Variable": "isGore",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
+        },
+        {
+            "Key": "Exclude_From_Level_Batching",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "DECAL"
+                        },
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "NPC"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Whether or not this object is excluded from the level batching process.",
+            "Priority": 15,
+            "Variable": "shouldExcludeFromLevelBatching",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "Key": "Exclude_From_Satellite_Capture",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Holiday_Restriction",
+                            "Operation": "neq",
+                            "Comparand": "NONE"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Whether or not this object is visible on the baked satellite map.",
+            "Priority": 15,
+            "Variable": "ShouldExcludeFromSatelliteCapture",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
+        },
+        {
+            "Key": "Load_Nav_On_Server",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "MEDIUM"
+                        },
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "LARGE"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Whether or not this object collides with zombies in-game.",
+            "Priority": 15,
+            "Variable": "ShouldLoadNavOnServer",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
+        },
+        {
+            "Key": "Load_Nav_In_Editor",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "MEDIUM"
+                        },
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "LARGE"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Whether or not this object has collision when baking NPC navigation.",
+            "Priority": 15,
+            "Variable": "ShouldLoadNavInEditor",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
+        },
+        {
+            "Key": "Conditions",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "MEDIUM"
+                        },
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "LARGE"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Whether or not this object has collision when baking NPC navigation.",
+            "Priority": 15,
+            "Variable": "ShouldLoadNavInEditor",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
+        },
+        {
+            "Key": "Conditions",
+            "Type": "LegacyCompatibleList",
+            "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Conditions that must be met for this object to be visible.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#conditions-and-rewards",
+            "Priority": 13,
+            "Variable": "visibilityConditionsList"
+        },
+        {
+            "Key": "Is_Clutter",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not this object is visible when the player has the Load Clutter setting disabled.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "Priority": 15,
+            "Variable": "IsClutter"
+        }
     ],
     "BundleAssets":
     [
@@ -668,6 +2598,205 @@
                     "Value": "DECAL"
                 }
             ]
+        },
+        {
+            "AssetName": "Clip",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab only loaded on the dedicated server. Should have collision but not renderers.",
+            "Deprecated": true,
+            "Required":
+            {
+                "And":
+                [
+                    {
+                        "Variable": "Has_Clip_Prefab",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
+                    {
+                        "Variable": "Type",
+                        "Operation": "neq",
+                        "Comparand": "NPC"
+                    },
+                    {
+                        "Variable": "Type",
+                        "Operation": "neq",
+                        "Comparand": "DECAL"
+                    }
+                ],
+                "Value": true
+            },
+            "Variable": "legacyServerModel",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Has_Clip_Prefab",
+                    "Value": false
+                }
+            ]
+        },
+        {
+            "AssetName": "Object",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab loaded on the client, and on the dedicated server unless @Has_Clip_Prefab is true.",
+            "Required":
+            {
+                "And":
+                [
+                    {
+                        "Variable": "Type",
+                        "Operation": "neq",
+                        "Comparand": "NPC"
+                    },
+                    {
+                        "Variable": "Type",
+                        "Operation": "neq",
+                        "Comparand": "DECAL"
+                    }
+                ],
+                "Value": true
+            },
+            "Variable": "clientModel",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "AssetName": "Editor",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab loaded on the client, and on the dedicated server unless @Has_Clip_Prefab is true.",
+            "Required":
+            {
+                "And":
+                [
+                    {
+                        "Variable": "Has_Editor_Prefab",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
+                    {
+                        "Variable": "Type",
+                        "Operation": "neq",
+                        "Comparand": "NPC"
+                    },
+                    {
+                        "Variable": "Type",
+                        "Operation": "neq",
+                        "Comparand": "DECAL"
+                    }
+                ],
+                "Value": true
+            },
+            "Variable": "editorModel",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Has_Editor_Prefab",
+                    "Value": false
+                }
+            ]
+        },
+        {
+            "AssetName": "Skybox",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab loaded on clients that is visible when the object is very far away.",
+            "Variable": "skyboxGameObject",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "AssetName": "Nav",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab used by NPCs to navigate around the object.",
+            "Variable": "navGameObject",
+            "Required":
+            {
+                "Variable": "Type",
+                "Operation": "eq",
+                "Comparand": "LARGE"
+            },
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "AssetName": "Slots",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab used to indicate where doors, windows, etc. should be able to be placed at.",
+            "Variable": "slotsGameObject",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ]
+        },
+        {
+            "AssetName": "Triggers",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab used to add hard-coded triggers such as kill triggers to the object.",
+            "Variable": "slotsGameObject",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Add_Kill_Triggers",
+                    "Value": false
+                }
+            ]
         }
     ],
     "Localization":
@@ -676,8 +2805,24 @@
             "Key": "Name",
             "Type": "String",
             "DefaultValue": "Name",
-            "Description": "Localized name of the item.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#localization",
+            "Description": "Localized name of the object in the editor.",
+            "Docs":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Type",
+                            "Operation": "eq",
+                            "Comparand": "NPC"
+                        }
+                    ],
+                    "Value": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#localization"
+                },
+                {
+                    "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#localization"
+                }
+            ],
             "Variable": "objectName"
         },
         {
@@ -717,6 +2862,17 @@
                 {
                     "Key": "Interactability_Hint",
                     "Value": "CUSTOM"
+                }
+            ],
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
                 }
             ]
         }
@@ -935,5 +3091,113 @@
                 }
             ]
         },
+        {
+            "Type": "SDG.Unturned.EObjectRubbleNavMode, Assembly-CSharp",
+            "DisplayName": "Object Rubble Nav Effect",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Values":
+            [
+                {
+                    "Value": "Unaffected",
+                    "Description": "Destruction of rubble sections does not affect whether Nav game object is active or not."
+                },
+                {
+                    "Value": "DeactivateIfAllDead",
+                    "Description": "AI collision is blocked when any sections are alive. Once all sections are dead AI collision is unblocked."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EObjectRubble, Assembly-CSharp",
+            "DisplayName": "Rubble Type",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "No rubble. This shouldn't be used."
+                },
+                {
+                    "Value": "DESTROY",
+                    "Casing": "Destroy",
+                    "Description": "Each section of rubble can be individually destroyed."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EObjectRubbleEditor, Assembly-CSharp",
+            "DisplayName": "Object Rubble Editor Display",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Values":
+            [
+                {
+                    "Value": "ALIVE",
+                    "Casing": "Alive",
+                    "Description": "The object's rubble sections should be alive when viewed in the editor."
+                },
+                {
+                    "Value": "DEAD",
+                    "Casing": "Dead",
+                    "Description": "The object's rubble sections should be destroyed when viewed in the editor. An optional 'Editor' object can be placed in the root level of the 'Object' prefab which will be visible in it's place."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EObjectLOD, Assembly-CSharp",
+            "DisplayName": "Object Interior Culling Calculation Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interior-culling",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "The object does not participate in interior culling."
+                },
+                {
+                    "Value": "MESH",
+                    "Casing": "Mesh",
+                    "Description": "The interior is determined using the bounds of the mesh."
+                },
+                {
+                    "Value": "AREA",
+                    "Casing": "Area",
+                    "Description": "The interior is determined using the bounds of all Occlusion Area components on the object."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EGraphicQuality, Assembly-CSharp",
+            "DisplayName": "Graphics Quality",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
+            "Values":
+            [
+                {
+                    "Value": "OFF",
+                    "Casing": "Off",
+                    "Description": "The object is always visible."
+                },
+                {
+                    "Value": "LOW",
+                    "Casing": "Low",
+                    "Description": "The object is visible when the Landmarks setting is at least 'Low'."
+                },
+                {
+                    "Value": "MEDIUM",
+                    "Casing": "Medium",
+                    "Description": "The object is visible when the Landmarks setting is at least 'Medium'."
+                },
+                {
+                    "Value": "HIGH",
+                    "Casing": "High",
+                    "Description": "The object is visible when the Landmarks setting is at least 'High'."
+                },
+                {
+                    "Value": "ULTRA",
+                    "Casing": "Ultra",
+                    "Description": "The object is only visible when the Landmarks setting is set to 'Ultra'."
+                }
+            ]
+        }
     ]
 }

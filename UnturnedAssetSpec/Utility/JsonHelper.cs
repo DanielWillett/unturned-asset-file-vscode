@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
@@ -97,13 +99,7 @@ internal static class JsonHelper
 
         return new Utf8JsonReader(mem.Span, options);
     }
-
-    private static readonly object TrueBox = true;
-    private static readonly object FalseBox = false;
-    private static readonly object ZeroBox = 0;
-    private static readonly object OneBox = 1;
-    private static readonly object NegativeOneBox = -1;
-
+    
     public static bool TryReadGenericValue(ref Utf8JsonReader reader, out object? obj)
     {
         obj = null;
@@ -114,26 +110,42 @@ internal static class JsonHelper
 
             case JsonTokenType.True:
             case JsonTokenType.False:
-                obj = reader.GetBoolean() ? TrueBox : FalseBox;
+                obj = reader.GetBoolean() ? BoxedPrimitives.True : BoxedPrimitives.False;
                 return true;
 
             case JsonTokenType.Number:
                 if (reader.TryGetInt32(out int int32))
                     obj = int32 switch
                     {
-                        -1 => NegativeOneBox,
-                        0 => ZeroBox,
-                        1 => OneBox,
+                        -1 => BoxedPrimitives.I4M1,
+                        0 => BoxedPrimitives.I40,
+                        1 => BoxedPrimitives.I41,
                         _ => int32
                     };
                 else if (reader.TryGetUInt32(out uint uint32))
-                    obj = uint32;
+                    obj = uint32 switch
+                    {
+                        0 => BoxedPrimitives.U40,
+                        _ => uint32
+                    };
                 else if (reader.TryGetInt64(out long int64))
-                    obj = int64;
+                    obj = int64 switch
+                    {
+                        0 => BoxedPrimitives.I80,
+                        _ => int64
+                    };
                 else if (reader.TryGetUInt64(out ulong uint64))
-                    obj = uint64;
+                    obj = uint64 switch
+                    {
+                        0 => BoxedPrimitives.U80,
+                        _ => uint64
+                    };
                 else if (reader.TryGetDouble(out double dbl))
-                    obj = dbl;
+                    obj = uint64 switch
+                    {
+                        0 => BoxedPrimitives.R80,
+                        _ => dbl
+                    };
                 else
                     return false;
 
@@ -287,6 +299,20 @@ internal static class JsonHelper
                     writer.WriteStringValue(value.ToString());
                     break;
             }
+        }
+    }
+
+    public static void WriteAdditionalProperties<T>(Utf8JsonWriter writer, T value, JsonSerializerOptions options) where T : IAdditionalPropertyProvider
+    {
+        OneOrMore<KeyValuePair<string, object?>> additionalProperties = value.AdditionalProperties;
+
+        if (additionalProperties.IsNull)
+            return;
+
+        foreach (KeyValuePair<string, object?> kvp in additionalProperties)
+        {
+            writer.WritePropertyName(kvp.Key);
+            WriteGenericValue(writer, kvp.Value);
         }
     }
 

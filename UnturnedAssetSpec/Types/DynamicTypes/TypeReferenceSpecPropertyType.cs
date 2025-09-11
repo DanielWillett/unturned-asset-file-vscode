@@ -46,6 +46,11 @@ public sealed class TypeReferenceSpecPropertyType :
         ElementType = isObjectBase ? QualifiedType.None : elementType.Normalized;
     }
 
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<QualifiedType>()?.Type;
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

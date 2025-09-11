@@ -381,13 +381,26 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
 
     protected static string ArgToString(ISpecDynamicValue arg)
     {
-        if (arg is SpecDynamicEquationTreeValue or BangRef or PropertyRef)
-            return arg.ToString();
+        string prefix;
+        switch (arg)
+        {
+            case DataRef:
+                prefix = "#";
+                break;
+
+            case PropertyRef:
+                prefix = "$";
+                break;
+
+            default:
+                return arg.ToString();
+        }
 
         string str = arg.ToString();
         if (str.IndexOf(' ') >= 0)
-            return $"({str})";
-        return str;
+            return $"{prefix}({str})";
+
+        return prefix + str;
     }
 
     public abstract bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull);
@@ -430,10 +443,10 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
     {
         if (!TryEvaluateValue(in ctx, out T? val, out bool isNull))
         {
-            return condition.Operation.EvaluateNulls(isNull, false);
+            return condition.EvaluateNulls(isNull, false);
         }
 
-        return condition.Operation.Evaluate(val, value, ctx.Information.Information);
+        return condition.Evaluate(val, value, ctx.Information.Information);
     }
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
@@ -555,7 +568,7 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
                 return EvaluateCondition(in ctx, in condition, clr32);
         }
 
-        return condition.Operation.EvaluateNulls(true, true);
+        return condition.EvaluateNulls(true, true);
     }
 
     public abstract ISpecDynamicValue GetArgument(int index);

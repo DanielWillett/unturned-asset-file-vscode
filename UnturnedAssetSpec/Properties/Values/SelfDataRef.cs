@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -11,27 +11,27 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 /// Represents the current property.
 /// </summary>
 /// <remarks>#Self</remarks>
-public sealed class SelfBangRef : IEquatable<ISpecDynamicValue>, IEquatable<SelfBangRef>, IBangRefTarget
+public sealed class SelfDataRef : IEquatable<ISpecDynamicValue>, IEquatable<SelfDataRef>, IDataRefTarget
 {
-    public static readonly SelfBangRef Instance = new SelfBangRef();
+    public static readonly SelfDataRef Instance = new SelfDataRef();
 
-    static SelfBangRef() { }
-    private SelfBangRef() { }
+    static SelfDataRef() { }
+    private SelfDataRef() { }
 
     public ISpecPropertyType ValueType => KnownTypes.Flag;
 
     public bool EvaluateCondition(in SpecCondition condition, IAssetSpecDatabase specDatabase)
     {
-        return condition.Operation.Evaluate(true, condition.Comparand is true, specDatabase.Information);
+        return condition.Evaluate(true, condition.Comparand is true, specDatabase.Information);
     }
 
-    public bool Equals(ISpecDynamicValue other) => other is SelfBangRef;
+    public bool Equals(ISpecDynamicValue other) => other is SelfDataRef;
 
-    public bool Equals(IBangRefTarget other) => other is SelfBangRef;
+    public bool Equals(IDataRefTarget other) => other is SelfDataRef;
 
-    public bool Equals(SelfBangRef other) => other != null;
+    public bool Equals(SelfDataRef other) => other != null;
 
-    public override bool Equals(object? obj) => obj is SelfBangRef;
+    public override bool Equals(object? obj) => obj is SelfDataRef;
 
     public override int GetHashCode() => 0;
 
@@ -42,16 +42,22 @@ public sealed class SelfBangRef : IEquatable<ISpecDynamicValue>, IEquatable<Self
         PropertyRefInfo info = new PropertyRefInfo(ctx.Self);
         if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
         {
-            return info.GetIsIncluded(condition.Operation == ConditionOperation.Included, in ctx, ctx.Self, default, null);
+            bool eval = info.GetIsIncluded(condition.Operation == ConditionOperation.Included, in ctx, ctx.Self, default, null);
+            if (condition.IsInverted)
+                eval = !eval;
+            return eval;
         }
 
         if (condition.Operation == ConditionOperation.Excluded)
         {
-            return !info.GetIsIncluded(false, in ctx, ctx.Self, default, null);
+            bool eval = !info.GetIsIncluded(false, in ctx, ctx.Self, default, null);
+            if (condition.IsInverted)
+                eval = !eval;
+            return eval;
         }
 
         ISpecDynamicValue? val = info.GetValue(in ctx, ctx.Self, default, null);
-        return val?.EvaluateCondition(in ctx, in condition) ?? condition.Operation.EvaluateNulls(true, condition.Comparand == null);
+        return val?.EvaluateCondition(in ctx, in condition) ?? condition.EvaluateNulls(true, condition.Comparand == null);
     }
 
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)

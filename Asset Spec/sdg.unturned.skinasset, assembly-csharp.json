@@ -1,0 +1,285 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.SkinAsset, Assembly-CSharp",
+    "DisplayName": "Skin",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Category": "SKIN",
+    "RequireId": true,
+    "VanillaIdLimit": 2000,
+    "Properties":
+    [
+        {
+            "Key": "Bypass_ID_Limit",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
+            "Priority": 97
+        },
+        {
+            "Key": "Pattern",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that the material should be instantiated for each skin, allowing special properties to be different depending on the situation (like LightingTime and item base textures).",
+            "Variable": "isPattern",
+            "Priority": 6
+        },
+        {
+            "Key": "LightingTime",
+            "Type": "SDG.Unturned.ELightingTime, Assembly-CSharp",
+            "DefaultValue": null,
+            "IncludedDefaultValue": "DAWN",
+            "Description": "Sets '_SunColor', '_RaysColor', '_SkyColor', '_EquatorColor', and '_GroundColor' on the skin's material to the current map's color settings for the given time of day.",
+            "Variable": "lightingTime",
+            "Priority": 5,
+            "InclusiveWith": [ "Pattern" ]
+        },
+        {
+            "Key": "Sight",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this skin can be applied to paintable sight attachments.",
+            "Variable": "hasSight",
+            "Priority": 20
+        },
+        {
+            "Key": "Tactical",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this skin can be applied to paintable tactical attachments.",
+            "Variable": "hasTactical",
+            "Priority": 20
+        },
+        {
+            "Key": "Grip",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this skin can be applied to paintable grip attachments.",
+            "Variable": "hasGrip",
+            "Priority": 19
+        },
+        {
+            "Key": "Barrel",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this skin can be applied to paintable barrel attachments.",
+            "Variable": "hasBarrel",
+            "Priority": 18
+        },
+        {
+            "Key": "Magazine",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this skin can be applied to paintable magazines.",
+            "Variable": "hasMagazine",
+            "Priority": 18
+        },
+        {
+            "Key": "Hide_Magazine",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the magazine should be hidden when this skin is applied to a gun.",
+            "Variable": "ShouldHideMagazine",
+            "Priority": 17
+        },
+        {
+            "Key": "Ragdoll_Effect",
+            "Type": "SDG.Unturned.ERagdollEffect, Assembly-CSharp",
+            "DefaultValue": "NONE",
+            "Description": "The material to use for a solid statue ragdoll, if any.",
+            "Variable": "ragdollEffect",
+            "Priority": 3
+        },
+        {
+            "Key": "SpecialAudioOverrideDef",
+            "Type": "AudioReference",
+            "DefaultValue": null,
+            "Description": "Overrides the impact sound to play when this skin is applied to a melee weapon.",
+            "Variable": "specialAudioOverride",
+            "Priority": 1
+        },
+        {
+            "Key": "Secondary_Skins",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Description": "The number of attachment skin material overrides available in the bundle.",
+            "Variable": "secondarySkins",
+            "Priority": 10,
+            "CountForRegexGroup": "skin-secondary"
+        },
+        {
+            "Key": "Secondary_(\\d+)",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "Required": true,
+            "KeyIsRegex": true,
+            "KeyGroupUniqueValue": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "skin-secondary",
+                    "RegexGroup": 1
+                }
+            ],
+            "DefaultValue": 0,
+            "Description": "The item ID of an attachment for which this skin provides a custom material for. The material should be named 'Skin_Secondary_#' where # would be the value of this property.",
+            "Variable": "secondarySkins",
+            "Priority": 9
+        },
+        {
+            "Key": "Override_Meshes",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Description": "The number of mesh overrides defined in the bundle, which will replace the meshes (in order of LOD levels) on the item or vehicle this skin is applied to.",
+            "Variable": "overrideMeshes",
+            "Priority": 8,
+            "CountForRegexGroup": "skin-meshes"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.ELightingTime, Assembly-CSharp",
+            "DisplayName": "Lighting Time",
+            "Values":
+            [
+                {
+                    "Value": "DAWN",
+                    "Casing": "Dawn",
+                    "Description": "The lighting colors at 06:00 AM."
+                },
+                {
+                    "Value": "MIDDAY",
+                    "Casing": "Midday",
+                    "Description": "The lighting colors at 12:00 PM."
+                },
+                {
+                    "Value": "DUSK",
+                    "Casing": "Dusk",
+                    "Description": "The lighting colors at 06:00 PM."
+                },
+                {
+                    "Value": "MIDNIGHT",
+                    "Casing": "Midnight",
+                    "Description": "The lighting colors at 12:00 AM."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ERagdollEffect, Assembly-CSharp",
+            "DisplayName": "Ragdoll Effect",
+            "Values":
+            [
+                {
+                    "Value": "NONE",
+                    "Casing": "None",
+                    "Description": "Standard ragdoll effect."
+                },
+                {
+                    "Value": "BRONZE",
+                    "Casing": "Bronze",
+                    "Description": "Turns the target into a solid bronze statue (Characters/RagdollMaterials/Bronze)."
+                },
+                {
+                    "Value": "SILVER",
+                    "Casing": "Silver",
+                    "Description": "Turns the target into a solid silver statue (Characters/RagdollMaterials/Silver)."
+                },
+                {
+                    "Value": "GOLD",
+                    "Casing": "Gold",
+                    "Description": "Turns the target into a solid golden statue (Characters/RagdollMaterials/Gold)."
+                },
+                {
+                    "Value": "ZERO_KELVIN",
+                    "Casing": "Zero_Kelvin",
+                    "Description": "Turns the target into a solid ice statue (Characters/RagdollMaterials/Zero_Kelvin)."
+                },
+                {
+                    "Value": "JADED",
+                    "Casing": "Jaded",
+                    "Description": "Turns the target into a solid jade statue (Characters/RagdollMaterials/Jaded)."
+                },
+                {
+                    "Value": "SOUL_CRYSTAL_GREEN",
+                    "Casing": "Soul_Crystal_Green",
+                    "Description": "Turns the target into a solid green crystal statue (Characters/RagdollMaterials/SoulCrystal_Green)."
+                },
+                {
+                    "Value": "SOUL_CRYSTAL_MAGENTA",
+                    "Casing": "Soul_Crystal_Magenta",
+                    "Description": "Turns the target into a solid magenta crystal statue (Characters/RagdollMaterials/SoulCrystal_Magenta)."
+                },
+                {
+                    "Value": "SOUL_CRYSTAL_RED",
+                    "Casing": "Soul_Crystal_Red",
+                    "Description": "Turns the target into a solid red crystal statue (Characters/RagdollMaterials/SoulCrystal_Red)."
+                },
+                {
+                    "Value": "SOUL_CRYSTAL_YELLOW",
+                    "Casing": "Soul_Crystal_Yellow",
+                    "Description": "Turns the target into a solid yellow crystal statue (Characters/RagdollMaterials/SoulCrystal_Yellow)."
+                }
+            ]
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Skin_Primary",
+            "Type": "UnityEngine.Material, UnityEngine.CoreModule",
+            "Description": "The material to apply to the skinned item or vehicle.",
+            "Variable": "primarySkin",
+            "Required": true
+        },
+        {
+            "AssetName": "Skin_Secondary_(\\d+)",
+            "KeyIsRegex": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "skin-secondary",
+                    "RegexGroup": 1,
+                    "UseValueOf": "Secondary_$1"
+                }
+            ],
+            "Type": "UnityEngine.Material, UnityEngine.CoreModule",
+            "Description": "The material to apply to an attachment with the given ID.",
+            "Variable": "secondarySkins",
+            "Required": true
+        },
+        {
+            "AssetName": "Skin_Attachment",
+            "Type": "UnityEngine.Material, UnityEngine.CoreModule",
+            "Description": "The material to apply to attachments with custom base textures.",
+            "Variable": "attachmentSkin"
+        },
+        {
+            "AssetName": "Skin_Tertiary",
+            "Type": "UnityEngine.Material, UnityEngine.CoreModule",
+            "Description": "The material to apply to attachments without custom base textures.",
+            "Variable": "tertiarySkin",
+            "Required":
+            {
+                "Variable": "Skin_Attachment",
+                "Operation": "included",
+                "Comparand": null
+            }
+        },
+        {
+            "AssetName": "Override_Mesh_(\\d+)",
+            "KeyIsRegex": true,
+            "KeyGroups":
+            [
+                {
+                    "Name": "skin-meshes",
+                    "RegexGroup": 1
+                }
+            ],
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "An object containing a Mesh Filter configured to use the desired mesh. One of these objects can also include 'Stat_Tracker' and 'Icon' transforms to set the corresponding location.",
+            "Variable": "overrideMeshes",
+            "Required": true
+        }
+    ]
+}

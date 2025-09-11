@@ -25,6 +25,8 @@ public sealed class CaliberIdSpecPropertyType : BasicSpecPropertyType<CaliberIdS
     /// <inheritdoc />
     public override string DisplayName => "Caliber ID";
 
+    protected override ISpecDynamicValue CreateValue(ushort value) => new SpecDynamicConcreteConvertibleValue<ushort>(value, this);
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
@@ -36,6 +38,11 @@ public sealed class CaliberIdSpecPropertyType : BasicSpecPropertyType<CaliberIdS
 
         dynamicValue = null!;
         return false;
+    }
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<ushort>()?.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <inheritdoc />

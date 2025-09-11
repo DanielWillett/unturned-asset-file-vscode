@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -21,6 +22,8 @@ public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecP
 
     /// <inheritdoc />
     public override string DisplayName => "Boolean";
+
+    protected override ISpecDynamicValue CreateValue(bool value) => SpecDynamicValue.Boolean(value);
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
@@ -44,6 +47,11 @@ public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecP
 
         dynamicValue = null!;
         return false;
+    }
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<bool>()?.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <inheritdoc />

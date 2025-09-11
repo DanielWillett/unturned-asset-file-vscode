@@ -23,8 +23,13 @@ public abstract class BasicSpecPropertyType<TSpecPropertyType, TValue> :
             return false;
         }
 
-        value = val == null ? SpecDynamicValue.Null : new SpecDynamicConcreteValue<TValue>(val, this);
+        value = val == null ? SpecDynamicValue.Null : CreateValue(val);
         return true;
+    }
+
+    protected virtual ISpecDynamicValue CreateValue(TValue? value)
+    {
+        return new SpecDynamicConcreteValue<TValue>(value, this);
     }
 
     /// <inheritdoc />

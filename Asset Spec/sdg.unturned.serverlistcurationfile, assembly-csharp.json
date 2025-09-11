@@ -1,0 +1,424 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ServerListCurationFile, Assembly-CSharp",
+    "DisplayName": "Curated Server List File",
+    "Parent": null,
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html",
+    "Category": "NONE",
+    "RequireId": false,
+    "Version": "3.24.7.0",
+    "Properties":
+    [
+        {
+            "Key": "Name",
+            "Type": "LocalizableString",
+            "Required": true,
+            "Description": "The localizable name of this curated list.",
+            "Variable": "Name",
+            "Priority": 10,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#name-string"
+        },
+        {
+            "Key": "IconURL",
+            "Type": "Url",
+            "SpecialTypes": [ "image/png", "image/jpeg" ],
+            "Description": "Defines a public URL to the image for this curation list. Must be a PNG or JPEG/JPG file.",
+            "Variable": "IconUrl",
+            "Priority": 8,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#iconurl-string"
+        },
+        {
+            "Key": "Labels",
+            "Type": "List",
+            "ElementType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.ServerListCurationLabel, UnturnedAssetSpec",
+            "Description": "Defines a list of labels that can be applied by rules.",
+            "Variable": "labels",
+            "Priority": 6,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#labels-list-of-dictionaries",
+            "CountForRegexGroup": "server-list-curation-labels"
+        },
+        {
+            "Key": "Rules",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.ServerListCurationRule, Assembly-CSharp",
+            "Description": "Defines a list of rules that are applied to each discovered server in order.",
+            "Variable": "rules",
+            "Priority": 4,
+            "Required": true,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#rules-list-of-dictionaries",
+            "CountForRegexGroup": "server-list-curation-rules"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "DanielWillett.UnturnedDataFileLspServer.Data.Types.ServerListCurationLabel, UnturnedAssetSpec",
+            "DisplayName": "Curated Server List Label",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#labels-list-of-dictionaries",
+            "Properties":
+            [
+                {
+                    "Key": "Name",
+                    "Type": "String",
+                    "Description": "Identifier used to refer to this label from a rule.",
+                    "Required": true,
+                    "DefaultValue": null
+                },
+                {
+                    "Key": "Text",
+                    "Type": "LocalizableString",
+                    "LocalizationKeyOverride": "=CAT(Label_ @Name)",
+                    "Description": "The display name of this label.",
+                    "DefaultValue": true,
+                    "Required": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ServerListCurationRule, Assembly-CSharp",
+            "DisplayName": "Curated Server List Rule",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#rules-list-of-dictionaries",
+            "Properties":
+            [
+                {
+                    "Key": "Type",
+                    "Type": "SDG.Unturned.EServerListCurationRuleType, Assembly-CSharp",
+                    "Description": "Determines the kind of matching condition to use to match servers.",
+                    "Required": true,
+                    "DefaultValue": "Name",
+                    "Variable": "ruleType"
+                },
+                {
+                    "Key": "Action",
+                    "Type": "SDG.Unturned.EServerListCurationAction, Assembly-CSharp",
+                    "Description": "Determines what happens when this rule matches a server.",
+                    "Required": true,
+                    "DefaultValue": "Label",
+                    "Variable": "action"
+                },
+                {
+                    "Key": "Regexes",
+                    "Type": "List",
+                    "ElementType": "RegEx",
+                    "Description": "List of regular expressions, one of which must match against a server's name for this rule to match it.",
+                    "Required":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "Name"
+                            },
+                            {
+                                "Variable": "Regex",
+                                "Operation": "excluded",
+                                "Comparand": null
+                            }
+                        ],
+                        "Value": true
+                    },
+                    "DefaultValue": null,
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Regex",
+                            "Value": "*"
+                        },
+                        {
+                            "Key": "Type",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Type",
+                                "Operation": "neq",
+                                "Comparand": "Name"
+                            }
+                        }
+                    ],
+                    "Variable": "regexes"
+                },
+                {
+                    "Key": "Regex",
+                    "Type": "RegEx",
+                    "Description": "A regular expression which must match against a server's name for this rule to match it.",
+                    "Required":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "Name"
+                            },
+                            {
+                                "Variable": "Regexes",
+                                "Operation": "excluded",
+                                "Comparand": null
+                            }
+                        ],
+                        "Value": true
+                    },
+                    "DefaultValue": null,
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Regexes",
+                            "Value": "*"
+                        },
+                        {
+                            "Key": "Type",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Type",
+                                "Operation": "neq",
+                                "Comparand": "Name"
+                            }
+                        }
+                    ],
+                    "Variable": "regexes"
+                },
+                {
+                    "Key": "Filters",
+                    "Type": "List",
+                    "ElementType": "IPv4Range",
+                    "Description": "List of IPv4 ranges, one of which must match against a server's public IP for this rule to match it.",
+                    "Required":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "IPv4"
+                            },
+                            {
+                                "Variable": "Filter",
+                                "Operation": "excluded",
+                                "Comparand": null
+                            }
+                        ],
+                        "Value": true
+                    },
+                    "DefaultValue": null,
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Filter",
+                            "Value": "*"
+                        },
+                        {
+                            "Key": "Type",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Type",
+                                "Operation": "neq",
+                                "Comparand": "IPv4"
+                            }
+                        }
+                    ],
+                    "Variable": "ipv4Filters"
+                },
+                {
+                    "Key": "Filter",
+                    "Type": "IPv4Range",
+                    "Description": "An IPv4 range which must match against a server's public IP for this rule to match it.",
+                    "Required":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "IPv4"
+                            },
+                            {
+                                "Variable": "Filters",
+                                "Operation": "excluded",
+                                "Comparand": null
+                            }
+                        ],
+                        "Value": true
+                    },
+                    "DefaultValue": null,
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Filters",
+                            "Value": "*"
+                        },
+                        {
+                            "Key": "Type",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Type",
+                                "Operation": "neq",
+                                "Comparand": "IPv4"
+                            }
+                        }
+                    ],
+                    "Variable": "ipv4Filters"
+                },
+                {
+                    "Key": "Values",
+                    "Type": "List",
+                    "ElementType": "Steam64ID",
+                    "SpecialTypes": [ "3" ],
+                    "Description": "List of Steam server IDs (server codes), one of which must match against a server's code for this rule to match it.",
+                    "Required":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "ServerID"
+                            },
+                            {
+                                "Variable": "Value",
+                                "Operation": "excluded",
+                                "Comparand": null
+                            }
+                        ],
+                        "Value": true
+                    },
+                    "DefaultValue": null,
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Value",
+                            "Value": "*"
+                        },
+                        {
+                            "Key": "Type",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Type",
+                                "Operation": "neq",
+                                "Comparand": "ServerID"
+                            }
+                        }
+                    ],
+                    "Variable": "steamIds"
+                },
+                {
+                    "Key": "Value",
+                    "Type": "Steam64ID",
+                    "ElementType": "3",
+                    "Description": "A Steam server ID (server code) which must match against a server's code for this rule to match it.",
+                    "Required":
+                    {
+                        "And":
+                        [
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "ServerID"
+                            },
+                            {
+                                "Variable": "Values",
+                                "Operation": "excluded",
+                                "Comparand": null
+                            }
+                        ],
+                        "Value": true
+                    },
+                    "DefaultValue": null,
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Values",
+                            "Value": "*"
+                        },
+                        {
+                            "Key": "Type",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Type",
+                                "Operation": "neq",
+                                "Comparand": "ServerID"
+                            }
+                        }
+                    ],
+                    "Variable": "steamIds"
+                },
+                {
+                    "Key": "Label",
+                    "Type": "String",
+                    "MinimumExclusive": 0,
+                    "ListReference": "(SDG.Unturned.ServerListCurationFile, Assembly-CSharp::Labels).Name!",
+                    "Description": "The label to apply to this server if this rule matches it.",
+                    "Required":
+                    {
+                        "Variable": "Type",
+                        "Operation": "eq",
+                        "Comparand": "Label"
+                    },
+                    "DefaultValue": null,
+                    "Variable": "label"
+                },
+                {
+                    "Key": "Description",
+                    "Type": "String",
+                    "ListReference": "(SDG.Unturned.ServerListCurationFile, Assembly-CSharp::Labels).Name!",
+                    "Description": "The human-readable description of what this rule does. Not localizable.",
+                    "DefaultValue": "=CAT((Default description for rule at index ) #(Self.KeyGroups[0]))",
+                    "Variable": "description"
+                },
+                {
+                    "Key": "Inverted",
+                    "Type": "Boolean",
+                    "ListReference": "(SDG.Unturned.ServerListCurationFile, Assembly-CSharp::Labels).Name!",
+                    "Description": "Whether or not to negate if this rule matches. (Ex. match all servers that don't use this IP range).",
+                    "DefaultValue": false,
+                    "Variable": "inverted"
+                },
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EServerListCurationRuleType, Assembly-CSharp",
+            "DisplayName": "Curated Server List Rule Type",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#rules-list-of-dictionaries",
+            "Values":
+            [
+                {
+                    "Value": "Name",
+                    "Description": "Match server's name using one or more regular expression."
+                },
+                {
+                    "Value": "IPv4",
+                    "Description": "Match server's public IP using one or more CIDR addresses."
+                },
+                {
+                    "Value": "ServerID",
+                    "Description": "Match server's ID (also referred to as \"server code\" or Steam ID)."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EServerListCurationAction, Assembly-CSharp",
+            "DisplayName": "Curated Server List Match Action",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#rules-list-of-dictionaries",
+            "Values":
+            [
+                {
+                    "Value": "Label",
+                    "Description": "Apply a label and continues processing rules. @Allow and @Deny can apply labels too, however they will not continue to process other rules."
+                },
+                {
+                    "Value": "Allow",
+                    "Description": "Allow the server to remain in the list and stop processing rules. Servers are allowed by default but using @Allow will stop later @Deny rules from matching."
+                },
+                {
+                    "Value": "Deny",
+                    "Description": "Hide the server from the list (or move it to the bottom) and stop processing rules."
+                }
+            ]
+        }
+    ]
+}

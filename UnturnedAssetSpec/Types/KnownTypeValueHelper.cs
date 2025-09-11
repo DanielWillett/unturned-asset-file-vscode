@@ -673,4 +673,22 @@ public static class KnownTypeValueHelper
         assetRef = assetContext;
         return true;
     }
+
+    public static bool TryParseStrictHex(ReadOnlySpan<char> value, out Color32 color, bool alpha)
+    {
+        if (!value.IsEmpty
+            && value.Length == (alpha ? 9 : 7)
+            && uint.TryParse(value.Slice(1, value.Length - 1).ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint result))
+        {
+            color = new Color32(
+                alpha ? (byte)((result >> 24) & byte.MaxValue) : byte.MaxValue,
+                (byte)((result >> 16) & byte.MaxValue),
+                (byte)((result >> 8) & byte.MaxValue),
+                (byte)(result & byte.MaxValue)
+            );
+        }
+
+        color = Color32.White;
+        return false;
+    }
 }

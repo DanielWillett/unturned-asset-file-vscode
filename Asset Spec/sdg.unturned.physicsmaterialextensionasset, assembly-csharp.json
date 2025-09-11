@@ -1,0 +1,22 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.PhysicsMaterialExtensionAsset, Assembly-CSharp",
+    "DisplayName": "Physics Material Extension",
+    "Parent": "SDG.Unturned.PhysicsMaterialAssetBase, Assembly-CSharp",
+    "Category": "NONE",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Base",
+            "Type": "AssetReference",
+            "ElementType": "SDG.Unturned.PhysicsMaterialAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "The physics material to extend. Properties from the extension asset will be appended to the this asset (such as @AudioDefs).",
+            "Variable": "baseRef",
+            "Required": true
+        }
+    ]
+}

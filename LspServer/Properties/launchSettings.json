@@ -2,7 +2,10 @@
   "profiles": {
     "LspServer": {
       "commandName": "Project",
-      "hotReloadEnabled": false
+      "hotReloadEnabled": false,
+      "environmentVariables": {
+        "UNTURNED_ASSET_SPEC_CACHE_FOLDER": "./cache_test"
+      }
     }
   }
 }

@@ -21,6 +21,13 @@ public sealed class UInt64SpecPropertyType : BasicSpecPropertyType<UInt64SpecPro
     /// <inheritdoc />
     public override string DisplayName => "Unsigned 64-Bit Integer";
 
+    protected override ISpecDynamicValue CreateValue(ulong value) => new SpecDynamicConcreteConvertibleValue<ulong>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<ulong>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

@@ -111,6 +111,24 @@
             "Description": "List of crafting tags to provide to nearby players when this item is placed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
             "Variable": "PlaceableProvidedCraftingTags"
+        },
+        {
+            "Key": "ExplosionEffect_CopyModelPosition",
+            "Type": "Boolean",
+            "Description": "Whether or not the placeable destroy effect should spawn exactly at the placeable's position instead of slightly below it.",
+            "DefaultValue": false,
+            "Variable": "ExplosionEffectFlags",
+            "Version": "3.25.8.0",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties"
+        },
+        {
+            "Key": "ExplosionEffect_CopyModelRotation",
+            "Type": "Boolean",
+            "Description": "Whether or not the placeable destroy effect should spawn with the placeable's rotation.",
+            "DefaultValue": false,
+            "Variable": "ExplosionEffectFlags",
+            "Version": "3.25.8.0",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties"
         }
     ],
     "Types":

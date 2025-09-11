@@ -80,6 +80,38 @@ public sealed class ColorRGBALegacySpecPropertyType : ColorSpecPropertyType
     private protected override bool HasAlpha => true;
 }
 
+public sealed class ColorRGBStrictHexSpecPropertyType : ColorStrictHexSpecPropertyType
+{
+    public static readonly ColorRGBStrictHexSpecPropertyType Instance = new ColorRGBStrictHexSpecPropertyType();
+
+    static ColorRGBStrictHexSpecPropertyType() { }
+
+    /// <inheritdoc />
+    public override string Type => "ColorRGBStrictHex";
+
+    /// <inheritdoc />
+    public override string DisplayName => "Color (Hex; '#rrggbb')";
+
+    /// <inheritdoc />
+    private protected override bool HasAlpha => true;
+}
+
+public sealed class ColorRGBAStrictHexSpecPropertyType : ColorStrictHexSpecPropertyType
+{
+    public static readonly ColorRGBAStrictHexSpecPropertyType Instance = new ColorRGBAStrictHexSpecPropertyType();
+
+    static ColorRGBAStrictHexSpecPropertyType() { }
+
+    /// <inheritdoc />
+    public override string Type => "ColorRGBAStrictHex";
+
+    /// <inheritdoc />
+    public override string DisplayName => "Color (Hex; '#rrggbbaa')";
+
+    /// <inheritdoc />
+    private protected override bool HasAlpha => true;
+}
+
 public abstract class ColorSpecPropertyType :
     BaseColorSpecPropertyType<ColorSpecPropertyType, Color>,
     IStringParseableSpecPropertyType
@@ -89,6 +121,11 @@ public abstract class ColorSpecPropertyType :
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<Color>()?.ToHex(HasAlpha);
+    }
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
@@ -383,13 +420,68 @@ public abstract class ColorSpecPropertyType :
     }
 }
 
+public abstract class ColorStrictHexSpecPropertyType :
+    BaseColorSpecPropertyType<ColorStrictHexSpecPropertyType, Color>,
+    IStringParseableSpecPropertyType
+{
+    private protected abstract bool HasAlpha { get; }
+
+    /// <inheritdoc />
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<Color>()?.ToHex(HasAlpha);
+    }
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (KnownTypeValueHelper.TryParseColorHex(span, out Color32 value, HasAlpha))
+        {
+            dynamicValue = new SpecDynamicConcreteValue<Color>(value, this);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
+
+    /// <inheritdoc />
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out Color value)
+    {
+        if (parse.Node == null)
+        {
+            MissingNode(in parse, out value);
+            value = Color.Black;
+            return false;
+        }
+
+        if (parse.Node is AssetFileStringValueNode strValNode)
+        {
+            if (KnownTypeValueHelper.TryParseStrictHex(strValNode.Value.AsSpan(), out Color32 c32, HasAlpha))
+            {
+                value = c32;
+                return true;
+            }
+
+            value = Color.Black;
+            return false;
+        }
+
+        FailedToParse(in parse, out value);
+        value = Color.Black;
+        return false;
+    }
+}
+
 public abstract class BaseColorSpecPropertyType<TSelf, T>
     : BasicSpecPropertyType<TSelf, T>,
         IVectorSpecPropertyType<Color>,
         IVectorSpecPropertyType<Color32>
     where T : unmanaged, IEquatable<T> where TSelf : BaseColorSpecPropertyType<TSelf, T>
 {
-    void IVectorSpecPropertyType.Visit<TVisitor>(TVisitor visitor)
+    void IVectorSpecPropertyType.Visit<TVisitor>(ref TVisitor visitor)
     {
         visitor.Visit<Color>(this);
         visitor.Visit<Color32>(this);

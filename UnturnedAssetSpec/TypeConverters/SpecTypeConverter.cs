@@ -19,6 +19,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
     private static readonly JsonEncodedText PropertiesProperty = JsonEncodedText.Encode("Properties");
     private static readonly JsonEncodedText LocalizationProperty = JsonEncodedText.Encode("Localization");
     private static readonly JsonEncodedText StringParseableTypeProperty = JsonEncodedText.Encode("StringParseableType");
+    private static readonly JsonEncodedText VersionProperty = JsonEncodedText.Encode("Version");
 
     private static readonly JsonEncodedText[] Properties =
     [
@@ -30,7 +31,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         ValuesProperty,                 // 5
         PropertiesProperty,             // 6
         LocalizationProperty,           // 7
-        StringParseableTypeProperty     // 8
+        StringParseableTypeProperty,    // 8
+        VersionProperty                 // 9
     ];
 
     private static readonly JsonEncodedText ValueEnumProperty = JsonEncodedText.Encode("Value");
@@ -40,6 +42,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
     private static readonly JsonEncodedText DescriptionEnumProperty = JsonEncodedText.Encode("Description");
     private static readonly JsonEncodedText DeprecatedEnumProperty = JsonEncodedText.Encode("Deprecated");
     private static readonly JsonEncodedText DocsEnumProperty = JsonEncodedText.Encode("Docs");
+    private static readonly JsonEncodedText VersionEnumProperty = JsonEncodedText.Encode("Version");
 
     private static readonly JsonEncodedText[] EnumProperties =
     [
@@ -50,6 +53,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         DescriptionEnumProperty,       // 4
         DeprecatedEnumProperty,        // 5
         DocsEnumProperty,              // 6
+        VersionEnumProperty            // 7
     ];
 
     /// <inheritdoc />
@@ -79,6 +83,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         SpecProperty[]? properties = null, localProperties = null;
 
         OneOrMore<KeyValuePair<string, object?>> extraData = OneOrMore<KeyValuePair<string, object?>>.Null;
+
+        Version? version = null;
 
         while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
@@ -193,6 +199,13 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
 
                     stringParseableType = reader.GetString();
                     break;
+
+                case 9: // Version
+                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+
+                    version = reader.TokenType == JsonTokenType.String ? new Version(reader.GetString()!) : null;
+                    break;
             }
         }
 
@@ -224,14 +237,17 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                 DisplayName = displayName!,
                 Docs = docs,
                 Type = qt,
-                AdditionalProperties = extraData
+                AdditionalProperties = extraData,
+                Version = version
             };
 
             for (int i = 0; i < createdValues.Length; ++i)
             {
                 EnumValueInfo valueInfo = values[i];
-                ref EnumSpecTypeValue v = ref createdValues[i];
-                v = new EnumSpecTypeValue
+                if (valueInfo.Casing != null && !string.Equals(valueInfo.Value, valueInfo.Casing, StringComparison.OrdinalIgnoreCase))
+                    throw new JsonException($"ISpecType enum type \"{type}\" value \"{valueInfo.Value}\" has a mismatched casing: \"{valueInfo.Casing}\".");
+
+                createdValues[i] = new EnumSpecTypeValue
                 {
                     Index = i,
                     Value = valueInfo.Value,
@@ -241,7 +257,9 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                     Deprecated = valueInfo.Deprecated,
                     Description = valueInfo.Description,
                     RequiredBaseType = valueInfo.RequiredBaseType,
-                    ExtendedData = valueInfo.Properties
+                    AdditionalProperties = valueInfo.Properties,
+                    Docs = valueInfo.Docs,
+                    Version = valueInfo.Version
                 };
             }
 
@@ -261,7 +279,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
             Docs = docs,
             AdditionalProperties = extraData,
             IsLegacyExpandedType = isExpanded,
-            StringParsableType = stringParseableType
+            StringParsableType = stringParseableType,
+            Version = version
         };
 
         foreach (SpecProperty prop in properties)
@@ -276,7 +295,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
     {
         if (reader.TokenType == JsonTokenType.String)
         {
-            return new EnumValueInfo(reader.GetString(), null, QualifiedType.None, QualifiedType.None, null, false, null, OneOrMore<KeyValuePair<string, object?>>.Null);
+            return new EnumValueInfo(reader.GetString(), null, QualifiedType.None, QualifiedType.None, null, false, null, OneOrMore<KeyValuePair<string, object?>>.Null, null);
         }
 
         if (reader.TokenType == JsonTokenType.Null)
@@ -289,6 +308,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
 
         string? value = null, casing = null, description = null, docs = null, corrType = null, baseType = null;
         bool deprecated = false;
+
+        Version? version = null;
 
         OneOrMore<KeyValuePair<string, object?>> extraData = OneOrMore<KeyValuePair<string, object?>>.Null;
 
@@ -372,6 +393,13 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                         ThrowUnexpectedTokenEnumValue(reader.TokenType, propType);
                     docs = reader.GetString();
                     break;
+
+                case 7: // Version
+                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+
+                    version = reader.TokenType == JsonTokenType.String ? new Version(reader.GetString()!) : null;
+                    break;
             }
         }
 
@@ -380,7 +408,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
             throw new JsonException($"Missing property \"{ValueEnumProperty.ToString()}\" while reading enum value.");
         }
         
-        return new EnumValueInfo(value!, casing, baseType, corrType, description, deprecated, docs, extraData);
+        return new EnumValueInfo(value!, casing, baseType, corrType, description, deprecated, docs, extraData, version);
     }
 
     private static List<EnumValueInfo> ReadValueList(ref Utf8JsonReader reader, JsonSerializerOptions? options, string? typeName)
@@ -468,8 +496,112 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
             return;
         }
 
+        writer.WriteStartObject();
 
+        writer.WriteString(TypeProperty, value.Type.Type);
+        writer.WriteString(DisplayNameProperty, value.DisplayName);
+
+        if (value.Docs != null)
+            writer.WriteString(DocsProperty, value.Docs);
+
+        if (value.Version != null)
+            writer.WriteString(VersionProperty, value.Version.ToString());
+
+        switch (value)
+        {
+            case EnumSpecType enumType:
+                JsonHelper.WriteAdditionalProperties(writer, value, options);
+
+                writer.WritePropertyName(ValuesProperty);
+                writer.WriteStartArray();
+
+                for (int i = 0; i < enumType.Values.Length; i++)
+                {
+                    ref EnumSpecTypeValue property = ref enumType.Values[i];
+                    if (property.CanBeWrittenAsString)
+                    {
+                        writer.WriteStringValue(property.Value);
+                        continue;
+                    }
+
+                    writer.WriteStartObject();
+
+                    writer.WriteString(ValueEnumProperty, property.Value);
+                    if (!string.Equals(property.Value, property.Casing, StringComparison.Ordinal))
+                    {
+                        writer.WriteString(CasingEnumProperty, property.Casing);
+                    }
+
+                    if (!property.CorrespondingType.IsNull)
+                        writer.WriteString(CorrespondingTypeEnumProperty, property.CorrespondingType);
+                
+                    if (!property.RequiredBaseType.IsNull)
+                        writer.WriteString(CorrespondingTypeEnumProperty, property.RequiredBaseType);
+                
+                    if (property.Description != null)
+                        writer.WriteString(DescriptionEnumProperty, property.Description);
+                    if (property.Docs != null)
+                        writer.WriteString(DocsEnumProperty, property.Docs);
+
+                    if (property.Deprecated)
+                        writer.WriteBoolean(DeprecatedEnumProperty, true);
+
+                    if (property.Version != null)
+                        writer.WriteString(VersionProperty, property.Version.ToString());
+
+                    JsonHelper.WriteAdditionalProperties(writer, property, options);
+                    writer.WriteEndObject();
+                }
+
+                writer.WriteEndArray();
+                break;
+            
+            case CustomSpecType customType:
+                if (!value.Parent.IsNull)
+                    writer.WriteString(ParentProperty, value.Parent.Type);
+
+                if (customType.StringParsableType != null)
+                    writer.WriteString(StringParseableTypeProperty, customType.StringParsableType);
+
+                if (customType.IsLegacyExpandedType)
+                    writer.WriteBoolean(IsLegacyExpandedTypeProperty, true);
+
+                JsonHelper.WriteAdditionalProperties(writer, value, options);
+
+                writer.WritePropertyName(PropertiesProperty);
+                writer.WriteStartArray();
+
+                foreach (SpecProperty property in customType.Properties)
+                {
+                    if (!property.IsOverride)
+                    {
+                        SpecPropertyConverter.WriteProperty(writer, property, options);
+                    }
+                }
+
+                writer.WriteEndArray();
+
+                if (customType.LocalizationProperties.Length > 0)
+                {
+                    writer.WritePropertyName(LocalizationProperty);
+                    writer.WriteStartArray();
+
+                    foreach (SpecProperty property in customType.LocalizationProperties)
+                    {
+                        if (!property.IsOverride)
+                        {
+                            SpecPropertyConverter.WriteProperty(writer, property, options);
+                        }
+                    }
+
+                    writer.WriteEndArray();
+                }
+
+                break;
+        }
+        writer.WriteEndObject();
     }
+
 
     private record struct EnumValueInfo(
         string Value,
@@ -479,6 +611,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         string? Description,
         bool Deprecated,
         string? Docs,
-        OneOrMore<KeyValuePair<string, object?>> Properties
+        OneOrMore<KeyValuePair<string, object?>> Properties,
+        Version? Version
     );
 }

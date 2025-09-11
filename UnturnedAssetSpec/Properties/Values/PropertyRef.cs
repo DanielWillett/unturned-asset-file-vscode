@@ -81,16 +81,16 @@ public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
     {
         if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
         {
-            return GetIsIncluded(condition.Operation == ConditionOperation.Included, in ctx);
+            return condition.Invert(GetIsIncluded(condition.Operation == ConditionOperation.Included, in ctx));
         }
 
         if (condition.Operation == ConditionOperation.Excluded)
         {
-            return !GetIsIncluded(false, in ctx);
+            return condition.Invert(!GetIsIncluded(false, in ctx));
         }
 
         ISpecDynamicValue? val = GetValue(in ctx);
-        return val?.EvaluateCondition(in ctx, in condition) ?? condition.Operation.EvaluateNulls(true, condition.Comparand == null);
+        return val?.EvaluateCondition(in ctx, in condition) ?? condition.EvaluateNulls(true, condition.Comparand == null);
     }
 
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)

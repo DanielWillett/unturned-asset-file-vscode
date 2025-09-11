@@ -20,6 +20,11 @@ public sealed class TypeSpecPropertyType : BasicSpecPropertyType<TypeSpecPropert
     /// <inheritdoc />
     public override string DisplayName => "Type";
 
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<QualifiedType>()?.Type;
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

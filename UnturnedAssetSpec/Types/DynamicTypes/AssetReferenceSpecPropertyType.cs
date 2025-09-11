@@ -35,6 +35,11 @@ public sealed class AssetReferenceSpecPropertyType :
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
     OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
 
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<Guid>()?.ToString("N");
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

@@ -22,7 +22,7 @@
         {
             "Key": "Grow",
             "Type": "Id",
-            "ElementType": "ITEM",
+            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
             "DefaultValue": 0,
             "Description": "ID of the item to spawn when harvested.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",

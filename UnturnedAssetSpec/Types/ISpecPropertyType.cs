@@ -50,6 +50,8 @@ public interface ISpecialTypesSpecPropertyType : ISpecPropertyType
 public interface IStringParseableSpecPropertyType
 {
     bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue);
+
+    string? ToString(ISpecDynamicValue value);
 }
 
 public interface ISecondPassSpecPropertyType : ISpecPropertyType
@@ -78,7 +80,7 @@ internal interface IVectorSpecPropertyTypeVisitor
 /// </summary>
 internal interface IVectorSpecPropertyType : ISpecPropertyType
 {
-    new void Visit<TVisitor>(TVisitor visitor) where TVisitor : IVectorSpecPropertyTypeVisitor;
+    new void Visit<TVisitor>(ref TVisitor visitor) where TVisitor : IVectorSpecPropertyTypeVisitor;
 }
 
 /// <summary>

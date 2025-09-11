@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -10,11 +10,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 /// <summary>
 /// #Property, defaulting to <see cref="Property"/>.
 /// </summary>
-public sealed class PropertyBangRef : IEquatable<ISpecDynamicValue>, IEquatable<PropertyBangRef>, IBangRefTarget
+public sealed class PropertyDataRef : IEquatable<ISpecDynamicValue>, IEquatable<PropertyDataRef>, IDataRefTarget
 {
     public PropertyRef Property { get; }
 
-    public PropertyBangRef(string nameSpace)
+    public PropertyDataRef(string nameSpace)
     {
         Property = new PropertyRef(nameSpace.AsSpan(), nameSpace);
     }
@@ -23,16 +23,16 @@ public sealed class PropertyBangRef : IEquatable<ISpecDynamicValue>, IEquatable<
 
     public bool EvaluateCondition(in SpecCondition condition, IAssetSpecDatabase specDatabase)
     {
-        return condition.Operation.Evaluate(Property.PropertyName, condition.Comparand as string, specDatabase.Information);
+        return condition.Evaluate(Property.PropertyName, condition.Comparand as string, specDatabase.Information);
     }
 
-    public bool Equals(PropertyBangRef other) => other != null && Property.Equals(other.Property);
+    public bool Equals(PropertyDataRef other) => other != null && Property.Equals(other.Property);
 
-    public bool Equals(ISpecDynamicValue other) => other is PropertyBangRef r && Equals(r);
+    public bool Equals(ISpecDynamicValue other) => other is PropertyDataRef r && Equals(r);
 
-    public bool Equals(IBangRefTarget other) => other is PropertyBangRef r && Equals(r);
+    public bool Equals(IDataRefTarget other) => other is PropertyDataRef r && Equals(r);
 
-    public override bool Equals(object? obj) => obj is PropertyBangRef r && Equals(r);
+    public override bool Equals(object? obj) => obj is PropertyDataRef r && Equals(r);
 
     public override int GetHashCode() => Property == null ? 0 : Property.GetHashCode();
 

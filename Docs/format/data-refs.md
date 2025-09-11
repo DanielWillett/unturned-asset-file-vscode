@@ -1,12 +1,12 @@
-# Bang-Refs
+# Data-Refs
 
-'Bang-Refs' are a special type of property-ref that specifies a target and a property on that target. They are defined using the `#` character. Bang-ref properties all inherit [BangRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.BangRef.yml).
+'Data-Refs' are a special type of property-ref that specifies a target and a property on that target. They are defined using the `#` character. Data-ref properties all inherit [DataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.DataRef.yml).
 
-Indexable Bang-Ref properties implement [IIndexableBangRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IIndexableBangRef.yml) and properties with settings implement [IPropertiesBangRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IPropertiesBangRef.yml).
+Indexable Data-Ref properties implement [IIndexableDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IIndexableDataRef.yml) and properties with settings implement [IPropertiesDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IPropertiesDataRef.yml).
 
 ## Targets
 
-All Bang-Ref targets implement [IBangRefTarget](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IBangRefTarget.yml).
+All Data-Ref targets implement [IDataRefTarget](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IDataRefTarget.yml).
 
 | Target   | Description                                    |
 | -------- | ---------------------------------------------- | 
@@ -18,7 +18,7 @@ If a property is named 'This' or 'Self', it should be entered as `\This` or `\Se
 
 ## Properties
 
-All Bang-Ref targets can contain the following properties:
+All Data-Ref targets can contain the following properties:
 
 | Property | Description | Targets |
 | - | - | - |
@@ -36,7 +36,7 @@ Returns a boolean indicating whether or not the target is not included in the fi
 
 When used on `This` it targets the current property.
 
-Represented by the class: [ExcludedBangRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.ExcludedBangRef.yml).
+Represented by the class: [ExcludedDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.ExcludedDataRef.yml).
 
 *No properties, not indexable*
 
@@ -45,7 +45,7 @@ Returns a boolean indicating whether or not the target is included in the file.
 
 When used on `This` it targets the current property.
 
-Represented by the class: [IncludedBangRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IncludedBangRef.yml).
+Represented by the class: [IncludedDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IncludedDataRef.yml).
 
 *No properties, not indexable*
 
@@ -54,7 +54,7 @@ Returns the exact key used to specify this property, including aliases, casing, 
 
 When used on `This` it targets the current property.
 
-Represented by the class: [KeyBangRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.KeyBangRef.yml).
+Represented by the class: [KeyDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.KeyDataRef.yml).
 
 *No properties, not indexable*
 
@@ -63,7 +63,7 @@ Returns the value specified in this property. For flags, the value will be `true
 
 When used on `This` it targets the current property.
 
-Represented by the class: [ValueBangRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.ValueBangRef.yml).
+Represented by the class: [ValueDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.ValueDataRef.yml).
 
 *No properties, not indexable*
 
@@ -72,7 +72,7 @@ Returns the internal name of the currently opened asset (`Asset.name`), which is
 
 Not affected by the target, use `This` for consistancy.
 
-Represented by the class: [AssetNameBangRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.AssetNameBangRef.yml).
+Represented by the class: [AssetNameDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.AssetNameDataRef.yml).
 
 *No properties, not indexable*
 
@@ -83,7 +83,7 @@ An index can be included to reference a single key-group instead of the entire a
 
 The key group array contains all KeyGroup values in the current type hierarchy, from last to first, so if you have two nested keys such as in `Message_1_Page_2`, the array will be `[2, 1]`.
 
-Represented by the class: [KeyGroupsBangRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.KeyGroupsBangRef.yml).
+Represented by the class: [KeyGroupsDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.KeyGroupsDataRef.yml).
 
 Example:
 ```properties

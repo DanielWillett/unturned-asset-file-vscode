@@ -1,20 +1,20 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
-using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public interface ISpecType : IEquatable<ISpecType?>
+public interface ISpecType : IEquatable<ISpecType?>, IAdditionalPropertyProvider
 {
     QualifiedType Parent { get; }
     QualifiedType Type { get; }
     string DisplayName { get; }
     string? Docs { get; }
 
+    Version? Version { get; }
+
     AssetSpecType Owner { get; set; }
 
-    OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; }
     SpecProperty? FindProperty(string propertyName, SpecPropertyContext context);
 }
 

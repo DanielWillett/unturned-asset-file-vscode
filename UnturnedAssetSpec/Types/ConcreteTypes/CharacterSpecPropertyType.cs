@@ -20,6 +20,14 @@ public sealed class CharacterSpecPropertyType : BasicSpecPropertyType<CharacterS
     /// <inheritdoc />
     public override string DisplayName => "Character";
 
+    protected override ISpecDynamicValue CreateValue(char value) => new SpecDynamicConcreteConvertibleValue<char>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        char? c = value.AsConcreteNullable<char>();
+        return c.HasValue ? new string(c.Value, 1) : null;
+    }
+
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out char value)
     {
@@ -41,7 +49,7 @@ public sealed class CharacterSpecPropertyType : BasicSpecPropertyType<CharacterS
     {
         if (span.Length == 1)
         {
-            dynamicValue = new SpecDynamicConcreteValue<char>(span[0], this);
+            dynamicValue = new SpecDynamicConcreteConvertibleValue<char>(span[0], this);
             return true;
         }
 

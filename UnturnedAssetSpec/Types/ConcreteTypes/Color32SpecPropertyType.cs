@@ -80,6 +80,38 @@ public sealed class Color32RGBALegacySpecPropertyType : Color32SpecPropertyType
     private protected override bool HasAlpha => true;
 }
 
+public sealed class Color32RGBStrictHexSpecPropertyType : Color32StrictHexSpecPropertyType
+{
+    public static readonly Color32RGBStrictHexSpecPropertyType Instance = new Color32RGBStrictHexSpecPropertyType();
+
+    static Color32RGBStrictHexSpecPropertyType() { }
+
+    /// <inheritdoc />
+    public override string Type => "Color32RGBStrictHex";
+
+    /// <inheritdoc />
+    public override string DisplayName => "Color (Hex; '#rrggbb')";
+
+    /// <inheritdoc />
+    private protected override bool HasAlpha => true;
+}
+
+public sealed class Color32RGBAStrictHexSpecPropertyType : Color32StrictHexSpecPropertyType
+{
+    public static readonly Color32RGBAStrictHexSpecPropertyType Instance = new Color32RGBAStrictHexSpecPropertyType();
+
+    static Color32RGBAStrictHexSpecPropertyType() { }
+
+    /// <inheritdoc />
+    public override string Type => "Color32RGBAStrictHex";
+
+    /// <inheritdoc />
+    public override string DisplayName => "Color (Hex; '#rrggbbaa')";
+
+    /// <inheritdoc />
+    private protected override bool HasAlpha => true;
+}
+
 public abstract class Color32SpecPropertyType : BaseColorSpecPropertyType<Color32SpecPropertyType, Color32>, IStringParseableSpecPropertyType
 {
     private protected abstract VectorTypeParseOptions Options { get; }
@@ -87,6 +119,11 @@ public abstract class Color32SpecPropertyType : BaseColorSpecPropertyType<Color3
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<Color32>()?.ToHex(HasAlpha);
+    }
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
@@ -282,5 +319,60 @@ public abstract class Color32SpecPropertyType : BaseColorSpecPropertyType<Color3
 
         value = new Color32(a, r, g, b);
         return true;
+    }
+}
+
+public abstract class Color32StrictHexSpecPropertyType :
+    BaseColorSpecPropertyType<Color32StrictHexSpecPropertyType, Color32>,
+    IStringParseableSpecPropertyType
+{
+    private protected abstract bool HasAlpha { get; }
+
+    /// <inheritdoc />
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<Color32>()?.ToHex(HasAlpha);
+    }
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        if (KnownTypeValueHelper.TryParseColorHex(span, out Color32 value, HasAlpha))
+        {
+            dynamicValue = new SpecDynamicConcreteValue<Color32>(value, this);
+            return true;
+        }
+
+        dynamicValue = null!;
+        return false;
+    }
+
+    /// <inheritdoc />
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out Color32 value)
+    {
+        if (parse.Node == null)
+        {
+            MissingNode(in parse, out value);
+            value = Color.Black;
+            return false;
+        }
+
+        if (parse.Node is AssetFileStringValueNode strValNode)
+        {
+            if (KnownTypeValueHelper.TryParseStrictHex(strValNode.Value.AsSpan(), out Color32 c32, HasAlpha))
+            {
+                value = c32;
+                return true;
+            }
+
+            value = Color32.Black;
+            return false;
+        }
+
+        FailedToParse(in parse, out value);
+        value = Color32.Black;
+        return false;
     }
 }

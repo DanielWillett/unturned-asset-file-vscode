@@ -21,6 +21,11 @@ public sealed class DateTimeOffsetSpecPropertyType : BasicSpecPropertyType<DateT
     /// <inheritdoc />
     public override string DisplayName => "Timestamp + Timezone";
 
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<DateTimeOffset>()?.ToString("O", CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

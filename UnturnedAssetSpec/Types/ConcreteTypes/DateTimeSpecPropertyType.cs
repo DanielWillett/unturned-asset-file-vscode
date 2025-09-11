@@ -21,12 +21,19 @@ public sealed class DateTimeSpecPropertyType : BasicSpecPropertyType<DateTimeSpe
     /// <inheritdoc />
     public override string DisplayName => "Timestamp (UTC)";
 
+    protected override ISpecDynamicValue CreateValue(DateTime value) => new SpecDynamicConcreteConvertibleValue<DateTime>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<DateTime>()?.ToString("O", CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
         if (DateTime.TryParse(stringValue ?? span.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime dt))
         {
-            dynamicValue = new SpecDynamicConcreteValue<DateTime>(dt.ToUniversalTime(), this);
+            dynamicValue = new SpecDynamicConcreteConvertibleValue<DateTime>(dt.ToUniversalTime(), this);
             return true;
         }
 

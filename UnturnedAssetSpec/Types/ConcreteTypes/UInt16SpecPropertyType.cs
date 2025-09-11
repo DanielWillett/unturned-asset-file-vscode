@@ -21,6 +21,13 @@ public sealed class UInt16SpecPropertyType : BasicSpecPropertyType<UInt16SpecPro
     /// <inheritdoc />
     public override string DisplayName => "Unsigned 16-Bit Integer";
 
+    protected override ISpecDynamicValue CreateValue(ushort value) => new SpecDynamicConcreteConvertibleValue<ushort>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<ushort>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

@@ -1,11 +1,11 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json.Serialization;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -14,6 +14,10 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 /// </summary>
 public class AssetInformation
 {
+    /// <summary>
+    /// The GitHub commit (SHA) where this information was taken from, if any. Note that some information may have been pulled from other places.
+    /// </summary>
+    public string? Commit { get; set; }
 
 #nullable disable
     public Dictionary<string, QualifiedType> AssetAliases { get; set; }

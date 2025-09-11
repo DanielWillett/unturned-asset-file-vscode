@@ -1,6 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
+using System.Globalization;
 using System.Numerics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -13,6 +14,12 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
+
+    public string ToString(ISpecDynamicValue value)
+    {
+        Vector3 v = value.AsConcrete<Vector3>();
+        return $"({v.X.ToString(CultureInfo.InvariantCulture)},{v.Y.ToString(CultureInfo.InvariantCulture)},{v.Z.ToString(CultureInfo.InvariantCulture)})";
+    }
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
@@ -163,7 +170,7 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
         return true;
     }
 
-    void IVectorSpecPropertyType.Visit<TVisitor>(TVisitor visitor)
+    void IVectorSpecPropertyType.Visit<TVisitor>(ref TVisitor visitor)
     {
         visitor.Visit(this);
     }

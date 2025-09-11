@@ -31,6 +31,11 @@ public class IdSpecPropertyType :
     /// <inheritdoc />
     public Type ValueType => typeof(ushort);
 
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<ushort>()?.ToString();
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
@@ -91,7 +96,7 @@ public class IdSpecPropertyType :
             return false;
         }
 
-        value = new SpecDynamicConcreteValue<ushort>(val, this);
+        value = new SpecDynamicConcreteConvertibleValue<ushort>(val, this);
         return true;
     }
 

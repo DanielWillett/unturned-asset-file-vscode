@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
+using System.Reflection;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -27,6 +28,7 @@ public static class KnownTypes
         { "Int32", () => Int32 },
         { "Int64", () => Int64 },
         { "String", () => String },
+        { "RegEx", () => RegEx },
         { "RichTextString", () => RichTextString },
         { "Character", () => Character },
         { "Float32", () => Float32 },
@@ -38,10 +40,14 @@ public static class KnownTypes
         { "Color32RGBA", () => Color32RGBA },
         { "Color32RGBLegacy", () => Color32RGBLegacy },
         { "Color32RGBALegacy", () => Color32RGBALegacy },
+        { "Color32RGBStrictHex", () => Color32RGBStrictHex },
+        { "Color32RGBAStrictHex", () => Color32RGBAStrictHex },
         { "ColorRGB", () => ColorRGB },
         { "ColorRGBA", () => ColorRGBA },
         { "ColorRGBLegacy", () => ColorRGBLegacy },
         { "ColorRGBALegacy", () => ColorRGBALegacy },
+        { "ColorRGBStrictHex", () => ColorRGBStrictHex },
+        { "ColorRGBAStrictHex", () => ColorRGBAStrictHex },
         { "AudioReference", () => AudioReference },
         { "NavId", () => NavId },
         { "SpawnpointId", () => SpawnpointId },
@@ -66,13 +72,24 @@ public static class KnownTypes
         { "MapName", () => MapName },
         { "ActionKey", () => ActionKey },
         { "LocalizableString", () => LocalizableString },
+        { "LocalizableTargetString", () => LocalizableTargetString },
         { "Skill", () => Skill() },
         { "BlueprintSkill", () => Skill(true, true) },
         { "SteamItemDef", () => SteamItemDef },
         { "CaliberId", () => CaliberId },
         { "BladeId", () => BladeId },
-        { "PhysicsMaterial", () => String } // todo
+        { "PhysicsMaterial", () => String }, // todo
+        { "PhysicsMaterialLegacy", () => String }, // todo
+        { TypeOf<AssetCategory>(), () => AssetCategory.TypeOf },
+        { "SDG.Unturned.EAssetType, Assembly-CSharp", () => AssetCategory.TypeOf },
+        { "IPv4Range", () => IPv4Range },
+        { "Steam64ID", () => Steam64ID },
     };
+
+    private static string TypeOf<T>()
+    {
+        return Assembly.CreateQualifiedName(typeof(T).Assembly.GetName().Name, typeof(T).FullName);
+    }
 
     public static ISpecPropertyType? GetType(string knownType)
     {
@@ -253,6 +270,22 @@ public static class KnownTypes
             return List(resolvedElementType ?? new UnresolvedSpecPropertyType(elementType!), allowSingle);
         }
 
+        if (knownType.Equals("Dictionary", StringComparison.Ordinal))
+        {
+            string? elementType2 = specialTypes.FirstOrDefault();
+
+            ISpecPropertyType? resolvedElementType = string.IsNullOrEmpty(elementType)
+                ? String
+                : GetType(elementType!, elementType2, specialTypes.Remove(elementType2!), resolvedOnly);
+
+            if (resolvedOnly && resolvedElementType == null)
+            {
+                return null;
+            }
+
+            return Dictionary(resolvedElementType ?? new UnresolvedSpecPropertyType(elementType!));
+        }
+
         if (knownType.Equals("LegacyCompatibleList", StringComparison.Ordinal))
         {
             return LegacyCompatibleList(elementType);
@@ -293,6 +326,11 @@ public static class KnownTypes
             return FormatString(argCount, allowRichText);
         }
 
+        if (knownType.Equals("Url", StringComparison.Ordinal))
+        {
+            return elementType == null && specialTypes.IsNull ? Url : new UrlSpecPropertyType(elementType, specialTypes);
+        }
+
         return null;
     }
 
@@ -315,6 +353,7 @@ public static class KnownTypes
     public static ISpecPropertyType<long> Int64 => Int64SpecPropertyType.Instance;
 
     public static ISpecPropertyType<string> String => StringSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> RegEx => StringSpecPropertyType.Instance; // todo
 
     public static ISpecPropertyType<string> FilePathString(string? globPattern = null) =>
         string.IsNullOrEmpty(globPattern)
@@ -337,10 +376,14 @@ public static class KnownTypes
     public static ISpecPropertyType<Color32> Color32RGBA => Color32RGBASpecPropertyType.Instance;
     public static ISpecPropertyType<Color32> Color32RGBLegacy => Color32RGBLegacySpecPropertyType.Instance;
     public static ISpecPropertyType<Color32> Color32RGBALegacy => Color32RGBALegacySpecPropertyType.Instance;
+    public static ISpecPropertyType<Color32> Color32RGBStrictHex => Color32RGBStrictHexSpecPropertyType.Instance;
+    public static ISpecPropertyType<Color32> Color32RGBAStrictHex => Color32RGBAStrictHexSpecPropertyType.Instance;
     public static ISpecPropertyType<Color> ColorRGB => ColorRGBSpecPropertyType.Instance;
     public static ISpecPropertyType<Color> ColorRGBA => ColorRGBASpecPropertyType.Instance;
     public static ISpecPropertyType<Color> ColorRGBLegacy => ColorRGBLegacySpecPropertyType.Instance;
     public static ISpecPropertyType<Color> ColorRGBALegacy => ColorRGBALegacySpecPropertyType.Instance;
+    public static ISpecPropertyType<Color> ColorRGBStrictHex => ColorRGBStrictHexSpecPropertyType.Instance;
+    public static ISpecPropertyType<Color> ColorRGBAStrictHex => ColorRGBAStrictHexSpecPropertyType.Instance;
 
     public static ISpecPropertyType<Guid> AssetReference(QualifiedType elementType, OneOrMore<string> specialTypes = default)
         => new AssetReferenceSpecPropertyType(elementType, true, specialTypes);
@@ -418,12 +461,30 @@ public static class KnownTypes
         return (ISpecPropertyType)Activator.CreateInstance(type, innerType, allowSingle);
     }
 
+    public static ISpecPropertyType<EquatableArray<DictionaryPair<TValue>>> Dictionary<TValue>(ISpecPropertyType<TValue> innerType) where TValue : IEquatable<TValue>
+        => new DictionarySpecPropertyType<TValue>(innerType ?? throw new ArgumentNullException(nameof(innerType)));
+
+    public static ISpecPropertyType Dictionary(ISpecPropertyType innerType)
+    {
+        if (innerType == null)
+            throw new ArgumentNullException(nameof(innerType));
+
+        if (innerType is ISecondPassSpecPropertyType secondPassType)
+        {
+            return new UnresolvedDictionarySpecPropertyType(secondPassType);
+        }
+
+        Type type = typeof(DictionarySpecPropertyType<>).MakeGenericType(innerType.ValueType);
+        return (ISpecPropertyType)Activator.CreateInstance(type, innerType);
+    }
+
     public static ISpecPropertyType<string> MasterBundleName => MasterBundleNameSpecPropertyType.Instance;
     public static ISpecPropertyType<string> LegacyBundleName => LegacyBundleNameSpecPropertyType.Instance;
     public static ISpecPropertyType<int> AssetBundleVersion => AssetBundleVersionSpecPropertyType.Instance;
     public static ISpecPropertyType<string> MapName => MapNameSpecPropertyType.Instance;
     public static ISpecPropertyType<string> ActionKey => ActionKeySpecPropertyType.Instance;
     public static ISpecPropertyType<string> LocalizableString => LocalizableStringSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> LocalizableTargetString => LocalizableStringSpecPropertyType.TargetInstance;
 
     public static ISpecPropertyType<byte> SkillLevel(string skillsetOrPropertyName)
         => new SkillLevelSpecPropertyType(skillsetOrPropertyName);
@@ -450,4 +511,8 @@ public static class KnownTypes
     }
     public static ISpecPropertyType<QualifiedType> TypeReference(QualifiedType elementType)
         => new TypeReferenceSpecPropertyType(elementType);
+
+    public static ISpecPropertyType<string> Url => LocalizableStringSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> IPv4Range => StringSpecPropertyType.Instance; // todo
+    public static ISpecPropertyType<ulong> Steam64ID => UInt64SpecPropertyType.Instance; // todo
 }

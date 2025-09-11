@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -17,10 +18,13 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     private static readonly JsonEncodedText KeyGroupsProperty = JsonEncodedText.Encode("KeyGroups");
     private static readonly JsonEncodedText KeyGroupsRegexGroupProperty = JsonEncodedText.Encode("RegexGroup");
     private static readonly JsonEncodedText KeyGroupsNameProperty = JsonEncodedText.Encode("Name");
+    private static readonly JsonEncodedText KeyGroupsUseValueOfProperty = JsonEncodedText.Encode("UseValueOf");
     private static readonly JsonEncodedText FileCrossRefProperty = JsonEncodedText.Encode("FileCrossRef");
     private static readonly JsonEncodedText CountForRegexGroupProperty = JsonEncodedText.Encode("CountForRegexGroup");
     private static readonly JsonEncodedText ValueRegexGroupReferenceProperty = JsonEncodedText.Encode("ValueRegexGroupReference");
     private static readonly JsonEncodedText AliasesProperty = JsonEncodedText.Encode("Aliases");
+    private static readonly JsonEncodedText AliasesAliasProperty = JsonEncodedText.Encode("Alias");
+    private static readonly JsonEncodedText AliasesLegacyExpansionFilterProperty = JsonEncodedText.Encode("LegacyExpansionFilter");
     private static readonly JsonEncodedText TypeProperty = JsonEncodedText.Encode("Type");
     private static readonly JsonEncodedText SubtypeSwitchProperty = JsonEncodedText.Encode("SubtypeSwitch");
     private static readonly JsonEncodedText ElementTypeProperty = JsonEncodedText.Encode("ElementType");
@@ -42,6 +46,10 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     private static readonly JsonEncodedText InclusiveWithProperty = JsonEncodedText.Encode("InclusiveWith");
     private static readonly JsonEncodedText DeprecatedProperty = JsonEncodedText.Encode("Deprecated");
     private static readonly JsonEncodedText PriorityProperty = JsonEncodedText.Encode("Priority");
+    private static readonly JsonEncodedText ExperimentalProperty = JsonEncodedText.Encode("Experimental");
+    private static readonly JsonEncodedText ListReferenceProperty = JsonEncodedText.Encode("ListReference");
+    private static readonly JsonEncodedText KeyGroupUniqueValueProperty = JsonEncodedText.Encode("KeyGroupUniqueValue");
+    private static readonly JsonEncodedText KeyLegacyExpansionFilterProperty = JsonEncodedText.Encode("KeyLegacyExpansionFilter");
 
     private static readonly JsonEncodedText HideInheritedProperty = JsonEncodedText.Encode("HideInherited");
 
@@ -76,7 +84,11 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         InclusiveWithProperty,              // 26
         DeprecatedProperty,                 // 27
         HideInheritedProperty,              // 28
-        PriorityProperty                    // 29
+        PriorityProperty,                   // 29
+        ExperimentalProperty,               // 30
+        ListReferenceProperty,              // 31
+        KeyGroupUniqueValueProperty,        // 32
+        KeyLegacyExpansionFilterProperty    // 33
     ];
 
     /// <inheritdoc />
@@ -84,6 +96,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     {
         return ReadProperty(ref reader, options);
     }
+
+    [SkipLocalsInit]
     public static SpecProperty? ReadProperty(ref Utf8JsonReader reader, JsonSerializerOptions? options)
     {
         if (reader.TokenType == JsonTokenType.Null)
@@ -210,7 +224,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     break;
 
                 case 7: // Aliases
-                    property.Aliases = ReadStringArray(ref reader, in AliasesProperty, true);
+                    property.Aliases = ReadAliases(ref reader);
                     break;
 
                 case 8: // Type
@@ -396,7 +410,54 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                         ThrowUnexpectedToken(reader.TokenType, propType);
                     property.Priority = priority;
                     break;
+
+                case 30: // Experimental
+                    switch (reader.TokenType)
+                    {
+                        case JsonTokenType.True:
+                            property.Experimental = SpecDynamicValue.True;
+                            break;
+
+                        case JsonTokenType.False:
+                            property.Experimental = SpecDynamicValue.False;
+                            break;
+
+                        case JsonTokenType.String:
+                            property.Experimental = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, KnownTypes.Boolean);
+                            break;
+
+                        case JsonTokenType.StartObject:
+                            property.Experimental = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowCondition | SpecDynamicValueContext.AllowSwitchCase, KnownTypes.Boolean);
+                            break;
+
+                        default:
+                            ThrowUnexpectedToken(reader.TokenType, propType);
+                            break;
+                    }
+                    break;
+
+                case 31: // ListReference
+                    if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+                    property.ListReference = reader.GetString();
+                    break;
+
+                case 32: // KeyGroupUniqueValue
+                    if (reader.TokenType is not JsonTokenType.True and not JsonTokenType.False and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+                    property.KeyGroupUniqueValue = reader.TokenType == JsonTokenType.True;
+                    break;
+
+                case 33: // KeyLegacyExpansionFilter
+                    property.KeyLegacyExpansionFilter = ReadLegacyExpansionFilter(ref reader, in KeyLegacyExpansionFilterProperty);
+                    break;
             }
+        }
+
+        if (!property.KeyIsRegex)
+        {
+            property.KeyGroupUniqueValue = false;
+            property.KeyGroups = OneOrMore<RegexKeyGroup>.Null;
         }
 
         if (typeStr == null && typeSwitch.TokenType == JsonTokenType.None)
@@ -511,6 +572,23 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         return property;
     }
 
+    private static LegacyExpansionFilter ReadLegacyExpansionFilter(ref Utf8JsonReader reader, in JsonEncodedText prop, Func<int, string>? getPropStr = null, int index = -1)
+    {
+        if (reader.TokenType == JsonTokenType.Null)
+            return LegacyExpansionFilter.Either;
+
+        if (reader.TokenType != JsonTokenType.String)
+            ThrowUnexpectedToken(reader.TokenType, prop.ToString());
+
+        string str = reader.GetString();
+        if (str.Equals(nameof(LegacyExpansionFilter.Legacy), StringComparison.OrdinalIgnoreCase))
+            return LegacyExpansionFilter.Legacy;
+        if (str.Equals(nameof(LegacyExpansionFilter.Modern), StringComparison.OrdinalIgnoreCase))
+            return LegacyExpansionFilter.Modern;
+
+        throw new JsonException($"Invalid LegacyExpansionFilter value in property {getPropStr?.Invoke(index) ?? prop.ToString()}.");
+    }
+
     private static OneOrMore<ISpecDynamicValue> ReadExceptionList(
         PropertyTypeOrSwitch propertyType,
         ref Utf8JsonReader reader,
@@ -605,6 +683,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
             string? name = null;
             int group = -1;
+            string? useValueOf = null;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
@@ -620,6 +699,10 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 {
                     prop = 1;
                 }
+                else if (reader.ValueTextEquals(KeyGroupsUseValueOfProperty.EncodedUtf8Bytes))
+                {
+                    prop = 2;
+                }
 
                 if (!reader.Read())
                 {
@@ -630,23 +713,34 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     continue;
                 }
 
-                if (prop == 0)
+                switch (prop)
                 {
-                    if (reader.TokenType != JsonTokenType.Number || !reader.TryGetInt32(out int groupNum) || groupNum < 0)
-                    {
-                        throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}] property {KeyGroupsRegexGroupProperty.ToString()}, expected an integer value.");
-                    }
+                    case 0: // RegexGroup
+                        if (reader.TokenType != JsonTokenType.Number || !reader.TryGetInt32(out int groupNum) || groupNum < 0)
+                        {
+                            throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}] property {KeyGroupsRegexGroupProperty.ToString()}, expected an integer value.");
+                        }
 
-                    group = groupNum;
-                }
-                else
-                {
-                    if (reader.TokenType != JsonTokenType.String || reader.GetString() is not { Length: > 0 } nameStr)
-                    {
-                        throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}] property {KeyGroupsNameProperty.ToString()}, expected a string value.");
-                    }
+                        group = groupNum;
+                        break;
 
-                    name = nameStr;
+                    case 1: // Name
+                        if (reader.TokenType != JsonTokenType.String || reader.GetString() is not { Length: > 0 } nameStr)
+                        {
+                            throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}] property {KeyGroupsNameProperty.ToString()}, expected a string value.");
+                        }
+
+                        name = nameStr;
+                        break;
+
+                    case 2: // UseValueOf
+                        if (reader.TokenType != JsonTokenType.String || reader.GetString() is not { Length: > 0 } useValueOfStr)
+                        {
+                            throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}] property {KeyGroupsUseValueOfProperty.ToString()}, expected a string value.");
+                        }
+
+                        useValueOf = useValueOfStr;
+                        break;
                 }
             }
 
@@ -657,7 +751,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             if (group == -1)
                 throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}], missing \"{KeyGroupsRegexGroupProperty.ToString()}\".");
             
-            array = array.Add(new RegexKeyGroup(group, name));
+            array = array.Add(new RegexKeyGroup(group, name, useValueOf));
             ++index;
         }
 
@@ -694,6 +788,84 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         return array;
     }
 
+    private static OneOrMore<Alias> ReadAliases(ref Utf8JsonReader reader)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.String:
+                string str = reader.GetString();
+                return string.IsNullOrEmpty(str) ? OneOrMore<Alias>.Null : new OneOrMore<Alias>(new Alias(str));
+
+            case JsonTokenType.StartObject:
+                return new OneOrMore<Alias>(ReadAliasObject(ref reader, 0));
+
+            case JsonTokenType.Null:
+                return OneOrMore<Alias>.Null;
+
+            case JsonTokenType.StartArray: break;
+
+            default:
+                ThrowUnexpectedToken(reader.TokenType, AliasesProperty.ToString());
+                break;
+        }
+
+        OneOrMore<Alias> array = OneOrMore<Alias>.Null;
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType == JsonTokenType.StartObject)
+            {
+                Alias a = ReadAliasObject(ref reader, array.Length);
+                if (string.IsNullOrEmpty(a.Value))
+                    continue;
+
+                array = array.Add(a);
+                continue;
+            }
+
+            if (reader.TokenType != JsonTokenType.String)
+                ThrowUnexpectedToken(reader.TokenType, $"{AliasesProperty.ToString()}[{array.Length}]");
+
+            string? alias = reader.GetString();
+            if (string.IsNullOrEmpty(alias))
+                continue;
+
+            array = array.Add(new Alias(alias));
+        }
+
+        return array;
+
+        static Alias ReadAliasObject(ref Utf8JsonReader reader, int index)
+        {
+            string? alias = null;
+            LegacyExpansionFilter filter = LegacyExpansionFilter.Either;
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                    ThrowUnexpectedToken(JsonTokenType.PropertyName, AliasesProperty + "[" + index + "]");
+
+                reader.Read();
+
+                if (reader.ValueTextEquals(AliasesAliasProperty.EncodedUtf8Bytes))
+                {
+                    if (reader.TokenType is not JsonTokenType.String)
+                        ThrowUnexpectedToken(reader.TokenType, AliasesProperty + "[" + index + "]." + AliasesAliasProperty);
+
+                    alias = reader.GetString();
+                }
+                else if (reader.ValueTextEquals(AliasesLegacyExpansionFilterProperty.EncodedUtf8Bytes))
+                {
+                    filter = ReadLegacyExpansionFilter(ref reader, in AliasesProperty, static index => AliasesProperty + "[" + index + "]." + AliasesLegacyExpansionFilterProperty, index);
+                }
+                else
+                {
+                    reader.Skip();
+                }
+            }
+
+            return new Alias(alias ?? string.Empty, filter);
+        }
+    }
+
     private static void ThrowUnexpectedToken(JsonTokenType tokenType, int propType)
     {
         ThrowUnexpectedToken(tokenType, Properties[propType].ToString());
@@ -717,7 +889,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             return;
         }
 
-        if (property.IsHidden)
+        if (ReferenceEquals(property.Type.Type, HideInheritedPropertyType.Instance))
         {
             writer.WriteStartObject();
 
@@ -731,6 +903,11 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         writer.WriteStartObject();
 
         writer.WriteString(KeyProperty, property.Key);
+
+        if (property.KeyLegacyExpansionFilter is LegacyExpansionFilter.Legacy or LegacyExpansionFilter.Modern)
+        {
+            WriteLegacyExpansionFilter(writer, KeyLegacyExpansionFilterProperty, property.KeyLegacyExpansionFilter);
+        }
 
         ISpecPropertyType? propType = property.Type.Type;
         if (propType != null)
@@ -816,6 +993,9 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         {
             writer.WriteBoolean(KeyIsRegexProperty, true);
 
+            if (property.KeyGroupUniqueValue)
+                writer.WriteBoolean(KeyGroupUniqueValueProperty, true);
+
             writer.WriteStartArray(KeyGroupsProperty);
 
             foreach (RegexKeyGroup grp in property.KeyGroups)
@@ -824,6 +1004,9 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
                 writer.WriteString(KeyGroupsNameProperty, grp.Name);
                 writer.WriteNumber(KeyGroupsRegexGroupProperty, grp.Group);
+
+                if (grp.UseValueOf != null)
+                    writer.WriteString(KeyGroupsUseValueOfProperty, grp.UseValueOf);
 
                 writer.WriteEndObject();
             }
@@ -842,6 +1025,12 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             property.Deprecated.WriteToJsonWriter(writer, options);
         }
 
+        if (property.Experimental != null && !property.Experimental.Equals(SpecDynamicValue.False))
+        {
+            writer.WritePropertyName(ExperimentalProperty);
+            property.Experimental.WriteToJsonWriter(writer, options);
+        }
+
         if (property.FileCrossRef != null)
         {
             writer.WriteString(FileCrossRefProperty, property.FileCrossRef);
@@ -856,14 +1045,32 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         {
             writer.WriteString(ValueRegexGroupReferenceProperty, property.ValueRegexGroupReference);
         }
+        if (property.ListReference != null)
+        {
+            writer.WriteString(ListReferenceProperty, property.ListReference);
+        }
 
         if (!property.Aliases.IsNull)
         {
             writer.WriteStartArray(AliasesProperty);
-            foreach (string alias in property.Aliases)
+            for (int i = 0; i < property.Aliases.Length; i++)
             {
-                writer.WriteStringValue(alias);
+                Alias alias = property.Aliases[i];
+                if (alias.Filter is LegacyExpansionFilter.Legacy or LegacyExpansionFilter.Modern)
+                {
+                    writer.WriteStartObject();
+
+                    writer.WriteString(AliasesAliasProperty, alias.Value);
+                    WriteLegacyExpansionFilter(writer, AliasesLegacyExpansionFilterProperty, alias.Filter);
+
+                    writer.WriteEndObject();
+                }
+                else
+                {
+                    writer.WriteStringValue(alias.Value);
+                }
             }
+
             writer.WriteEndArray();
         }
 
@@ -909,6 +1116,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             InclusionConditionConverter.WriteCondition(writer, property.ExclusiveProperties, options);
         }
 
+        JsonHelper.WriteAdditionalProperties(writer, property, options);
+
         if (property.Variable != null)
         {
             writer.WritePropertyName(VariableProperty);
@@ -916,6 +1125,11 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         }
 
         writer.WriteEndObject();
+    }
+
+    private static void WriteLegacyExpansionFilter(Utf8JsonWriter writer, JsonEncodedText propertyName, LegacyExpansionFilter filter)
+    {
+        writer.WriteString(propertyName, filter == LegacyExpansionFilter.Legacy ? nameof(LegacyExpansionFilter.Legacy) : nameof(LegacyExpansionFilter.Modern));
     }
 }
 
@@ -976,6 +1190,9 @@ internal sealed class SpecPropertyTypeType : ISpecPropertyType<ISpecPropertyType
         dynamicValue = null!;
         return false;
     }
+
+    /// <inheritdoc />
+    public string? ToString(ISpecDynamicValue value) => value.AsConcrete<ISpecPropertyType>()?.Type;
 
     void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

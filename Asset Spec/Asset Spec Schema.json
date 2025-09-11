@@ -58,6 +58,10 @@
                     "title": "Zero or more characters of UTF-16 text."
                 },
                 {
+                    "const": "RegEx",
+                    "title": "A regular expression."
+                },
+                {
                     "const": "FilePathString",
                     "title": "Zero or more characters of UTF-16 text that represents a file path."
                 },
@@ -118,6 +122,14 @@
                     "title": "A color with red, green, blue, and alpha components."
                 },
                 {
+                    "const": "Color32RGBStrictHex",
+                    "title": "A hex color that follows the following format strictly: #ffffff."
+                },
+                {
+                    "const": "Color32RGBAStrictHex",
+                    "title": "A hex color that follows the following format strictly: #ffffffff."
+                },
+                {
                     "const": "ColorRGB",
                     "title": "A color with red, green, and blue components."
                 },
@@ -132,6 +144,14 @@
                 {
                     "const": "ColorRGBALegacy",
                     "title": "A color with red, green, blue, and alpha components."
+                },
+                {
+                    "const": "ColorRGBStrictHex",
+                    "title": "A hex color that follows the following format strictly: #ffffff."
+                },
+                {
+                    "const": "ColorRGBAStrictHex",
+                    "title": "A hex color that follows the following format strictly: #ffffffff."
                 },
                 {
                     "const": "AssetReference",
@@ -258,6 +278,10 @@
                     "title": "A list of values."
                 },
                 {
+                    "const": "Dictionary",
+                    "title": "A string dictionary of values."
+                },
+                {
                     "const": "ListOrSingle",
                     "title": "A list of values or one value."
                 },
@@ -314,16 +338,28 @@
                     "title": "An arbitrary ID that has to be shared between an attachment and weapon for them to be compatible."
                 },
                 {
+                    "const": "BladeId",
+                    "title": "An arbitrary ID that has to be shared between a tool and damagable actor for them to be compatible."
+                },
+                {
                     "const": "PhysicsMaterial",
-                    "title": "An physics material name."
+                    "title": "A physics material name."
                 },
                 {
                     "const": "PhysicsMaterialLegacy",
-                    "title": "An physics material name or legacy SDG.Unturned.EPhysicsMaterial."
+                    "title": "A physics material name or legacy SDG.Unturned.EPhysicsMaterial."
                 },
                 {
                     "const": "TypeReference",
                     "title": "A TypeReference<> taking an assembly-qualified type name."
+                },
+                {
+                    "const": "IPv4Range",
+                    "title": "An IPv4 range in the form: 0.0.0.0[/32][:27015[-27015]]."
+                },
+                {
+                    "const": "Steam64ID",
+                    "title": "A CSteamID in decimal format. Element type can define a numeric EAccountType to check."
                 },
                 {
                     "$ref": "#/$defs/switch"
@@ -343,6 +379,12 @@
                             "description": "The key of the flag or property.",
                             "type": "string"
                         },
+                        "KeyLegacyExpansionFilter":
+                        {
+                            "type": "string",
+                            "description": "Specifies whether the key can be used with only the legacy format or only the modern format. Don't include this property if it can be used with both.",
+                            "enum": [ "Legacy", "Modern" ]
+                        },
                         "SingleKeyOverride":
                         {
                             "type":
@@ -356,6 +398,11 @@
                         {
                             "type": "boolean",
                             "description": "If 'Key' is a regex expression to match properties."
+                        },
+                        "KeyGroupUniqueValue":
+                        {
+                            "type": "boolean",
+                            "description": "If every value in this key-group should be unique. Ignored if KeyIsRegex is not true."
                         },
                         "KeyGroups":
                         {
@@ -410,6 +457,15 @@
                             ],
                             "description": "The sorting priority of this property when displayed (descending)."
                         },
+                        "ListReference":
+                        {
+                            "type":
+                            [
+                                "string",
+                                "null"
+                            ],
+                            "description": "Reference to a set of values from a list. Example: 'Blueprints.Id'. If it ends with '!' it's an error to not reference a valid value."
+                        },
                         "ValueRegexGroupReference":
                         {
                             "type":
@@ -425,7 +481,22 @@
                             "type": "array",
                             "items":
                             {
-                                "type": "string"
+                                "type": [ "string", "object" ],
+                                "properties":
+                                {
+                                    "Alias":
+                                    {
+                                        "type": "string",
+                                        "description": "Other key that can be used for the flag or property."
+                                    },
+                                    "LegacyExpansionFilter":
+                                    {
+                                        "type": "string",
+                                        "description": "Specifies whether this alias can be used with only the legacy format or only the modern format. Don't include this property if it can be used with both.",
+                                        "enum": [ "Legacy", "Modern" ]
+                                    }
+                                },
+                                "required": [ "Alias" ]
                             }
                         },
                         "Type":
@@ -558,8 +629,7 @@
                                     [
                                         "string",
                                         "null"
-                                    ],
-                                    "format": "uri"
+                                    ]
                                 },
                                 {
                                     "$ref": "#/$defs/switch"
@@ -854,6 +924,19 @@
                         "Deprecated":
                         {
                             "description": "If this property shouldn't be used anymore or was left in for legacy features.",
+                            "oneOf":
+                            [
+                                {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
+                                }
+                            ]
+                        },
+                        "Experimental":
+                        {
+                            "description": "If this property is experimental and may change in the future.",
                             "oneOf":
                             [
                                 {
@@ -1316,10 +1399,14 @@
                     },
                     "Required":
                     {
-                        "type":
+                        "oneOf":
                         [
-                            "string",
-                            "boolean"
+                            {
+                                "$ref": "#/$defs/condition"
+                            },
+                            {
+                                "$ref": "#/$defs/switchCase"
+                            }
                         ],
                         "description": "If the prefab is required to exist (or doesn't make sense to not exist)."
                     },
@@ -1363,10 +1450,14 @@
                                 },
                                 "Required":
                                 {
-                                    "type":
+                                    "oneOf":
                                     [
-                                        "string",
-                                        "boolean"
+                                        {
+                                            "$ref": "#/$defs/condition"
+                                        },
+                                        {
+                                            "$ref": "#/$defs/switchCase"
+                                        }
                                     ],
                                     "description": "If the animation is required."
                                 },

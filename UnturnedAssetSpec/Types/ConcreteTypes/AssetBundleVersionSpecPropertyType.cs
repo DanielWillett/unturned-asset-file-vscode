@@ -21,7 +21,12 @@ public sealed class AssetBundleVersionSpecPropertyType : BasicSpecPropertyType<A
     public override string Type => "AssetBundleVersion";
 
     /// <inheritdoc />
+    public override string DisplayName => "Asset Bundle Version";
+
+    /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
+
+    protected override ISpecDynamicValue CreateValue(int value) => new SpecDynamicConcreteConvertibleValue<int>(value, this);
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
@@ -38,7 +43,10 @@ public sealed class AssetBundleVersionSpecPropertyType : BasicSpecPropertyType<A
     }
 
     /// <inheritdoc />
-    public override string DisplayName => "Asset Bundle Version";
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<int>()?.ToString(CultureInfo.InvariantCulture);
+    }
 
     /// <inheritdoc />
     public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters,

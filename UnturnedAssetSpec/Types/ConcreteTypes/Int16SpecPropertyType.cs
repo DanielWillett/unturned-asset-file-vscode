@@ -21,6 +21,13 @@ public sealed class Int16SpecPropertyType : BasicSpecPropertyType<Int16SpecPrope
     /// <inheritdoc />
     public override string DisplayName => "Signed 16-Bit Integer";
 
+    protected override ISpecDynamicValue CreateValue(short value) => new SpecDynamicConcreteConvertibleValue<short>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<short>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

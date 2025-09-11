@@ -1,0 +1,79 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.PhysicsMaterialAssetBase, Assembly-CSharp",
+    "DisplayName": "Base Physics Material",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Category": "NONE",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "AudioDefs",
+            "Type": "List",
+            "ElementType": "MasterBundleReference",
+            "SpecialTypes": [ "SDG.Unturned.OneShotAudioDefinition, Assembly-CSharp" ],
+            "KeyEnumType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.PhysicsMaterialAudioDef, UnturnedAssetSpec",
+            "KeyAllowExtraValues": true,
+            "DefaultValue": null,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Description": "List of clothing items to be worn in the preview image.",
+            "Variable": "audioDefs"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "DanielWillett.UnturnedDataFileLspServer.Data.Types.PhysicsMaterialAudioDef, UnturnedAssetSpec",
+            "DisplayName": "Known Physics Material Audio Def IDs",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
+            "Values":
+            [
+                {
+                    "Value": "BulletImpact",
+                    "Description": "Sound played when a bullet hits a surface with this physics material."
+                },
+                {
+                    "Value": "LegacyImpact",
+                    "Description": "Sound played when a vehicle, bayonet, trap, or punch hits a surface with this physics material. Falls back to 'MeleeImpact'."
+                },
+                {
+                    "Value": "MeleeImpact",
+                    "Description": "Sound played when a melee weapon hits a surface with this physics material. Falls back to 'LegacyImpact'."
+                },
+                {
+                    "Value": "FootstepRun",
+                    "Description": "Footstep sound played when an entity runs on a surface with this physics material."
+                },
+                {
+                    "Value": "FootstepWalk",
+                    "Description": "Footstep sound played when an entity walks on a surface with this physics material."
+                },
+                {
+                    "Value": "BipedLand",
+                    "Description": "Footstep sound played when a two-legged entity lands on a surface with this physics material after falling."
+                },
+                {
+                    "Value": "MegaZombieFootstep",
+                    "Description": "Footstep sound played when a mega zombie walks on a surface with this physics material."
+                },
+                {
+                    "Value": "ZombieFootstepWalk",
+                    "Description": "Footstep sound played when a zombie walks on a surface with this physics material. Falls back to 'FootstepWalk'."
+                },
+                {
+                    "Value": "ZombieFootstepRun",
+                    "Description": "Footstep sound played when a zombie runs on a surface with this physics material. Falls back to 'FootstepRun'."
+                },
+                {
+                    "Value": "MegaZombieLand",
+                    "Description": "Footstep sound played when a mega zombie lands on a surface with this physics material after falling. Falls back to 'BipedLand'."
+                },
+                {
+                    "Value": "ZombieBipedLand",
+                    "Description": "Footstep sound played when a zombie lands on a surface with this physics material after falling. Falls back to 'BipedLand'."
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,41 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ServerListCurationAsset, Assembly-CSharp",
+    "DisplayName": "Curated Server List (Asset)",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/server-browser-curation-asset.html",
+    "Category": "NONE",
+    "RequireId": false,
+    "Version": "3.24.7.0",
+    "Properties":
+    [
+        {
+            "Key": "IconAssetPath",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Description": "The icon for this curation list.",
+            "DefaultValue": null,
+            "Variable": "Icon",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/server-browser-curation-asset.html#server-browser-curation-assets",
+            "Priority": 8
+        },
+        {
+            "Key": "",
+            "Type": "SDG.Unturned.ServerListCurationFile, Assembly-CSharp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html",
+            "Variable": "curationFile"
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Icon",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "RedirectableAssetKey": "IconAssetPath",
+            "Description": "The icon for this curation list.",
+            "Variable": "Icon",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/server-browser-curation-asset.html#server-browser-curation-assets",
+            "ExclusiveWith": [ "IconURL" ] 
+        }
+    ]
+}

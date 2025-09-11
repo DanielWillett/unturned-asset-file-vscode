@@ -69,7 +69,7 @@ public sealed class CommaDelimitedStringSpecPropertyType :
             return false;
         }
 
-        value = val == null ? SpecDynamicValue.Null : new SpecDynamicConcreteValue<string>(val, this);
+        value = val == null ? SpecDynamicValue.Null : new SpecDynamicConcreteConvertibleValue<string>(val, this);
         return true;
     }
 

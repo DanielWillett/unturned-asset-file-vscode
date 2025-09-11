@@ -20,6 +20,11 @@ public sealed class GuidSpecPropertyType : BasicSpecPropertyType<GuidSpecPropert
     /// <inheritdoc />
     public override string DisplayName => "GUID";
 
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<Guid>()?.ToString("N");
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

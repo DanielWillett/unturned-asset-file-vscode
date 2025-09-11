@@ -21,6 +21,13 @@ public sealed class Float128SpecPropertyType : BasicSpecPropertyType<Float128Spe
     /// <inheritdoc />
     public override string DisplayName => "Decimal";
 
+    protected override ISpecDynamicValue CreateValue(decimal value) => new SpecDynamicConcreteConvertibleValue<decimal>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<decimal>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

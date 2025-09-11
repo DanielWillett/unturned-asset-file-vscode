@@ -26,6 +26,8 @@ public sealed class BladeIdSpecPropertyType : BasicSpecPropertyType<BladeIdSpecP
     /// <inheritdoc />
     public override string DisplayName => "Blade ID";
 
+    protected override ISpecDynamicValue CreateValue(byte value) => new SpecDynamicConcreteConvertibleValue<byte>(value, this);
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
@@ -37,6 +39,11 @@ public sealed class BladeIdSpecPropertyType : BasicSpecPropertyType<BladeIdSpecP
 
         dynamicValue = null!;
         return false;
+    }
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<byte>()?.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <inheritdoc />

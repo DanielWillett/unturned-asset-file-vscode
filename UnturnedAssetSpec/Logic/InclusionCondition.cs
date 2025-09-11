@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
@@ -17,11 +17,13 @@ public sealed class InclusionCondition : IEquatable<InclusionCondition?>
     public InclusionCondition(OneOrMore<PropertyRef> propertyNames)
     {
         PropertyNames = propertyNames;
+        Properties = OneOrMore<InclusionConditionProperty>.Null;
     }
 
     public InclusionCondition(OneOrMore<InclusionConditionProperty> properties)
     {
         Properties = properties;
+        PropertyNames = OneOrMore<PropertyRef>.Null;
     }
 
     public bool Equals(InclusionCondition? other) => other != null && PropertyNames.Equals(other.PropertyNames) && Properties.Equals(other.Properties);

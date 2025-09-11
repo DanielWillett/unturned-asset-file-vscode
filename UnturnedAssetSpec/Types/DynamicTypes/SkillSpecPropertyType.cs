@@ -4,7 +4,6 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -28,6 +27,8 @@ public sealed class SkillSpecPropertyType :
 
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName { get; }
+
+    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     public SkillSpecPropertyType(bool allowStandardSkills = true, bool allowBlueprintSkills = false)
     {
@@ -55,6 +56,11 @@ public sealed class SkillSpecPropertyType :
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Enum;
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcrete<string>();
+    }
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
@@ -109,7 +115,7 @@ public sealed class SkillSpecPropertyType :
                     });
                 }
             }
-            else if (enumType.TryParse(strValNode.Value.AsSpan(), out EnumSpecTypeValue enumValue) && enumValue.ExtendedData.TryGetValue("Skill", out object? val) && val is string str)
+            else if (enumType.TryParse(strValNode.Value.AsSpan(), out EnumSpecTypeValue enumValue) && enumValue.AdditionalProperties.TryGetValue("Skill", out object? val) && val is string str)
             {
                 if (!AllowStandardSkills)
                 {

@@ -14,6 +14,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, string>, IStringParseableSpecPropertyType, IEquatable<AssetTypeAlias>, IAutoCompleteSpecPropertyType, ISpecType
 {
     QualifiedType ISpecType.Type => Type;
+    Version? ISpecType.Version => null;
 
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName => "Asset Type";
@@ -33,6 +34,8 @@ public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, strin
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Enum;
+
+    protected override ISpecDynamicValue CreateValue(string? value) => new AssetTypeAliasValue(value!, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
@@ -78,6 +81,12 @@ public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, strin
         return true;
     }
 
+    /// <inheritdoc />
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcrete<string>();
+    }
+
     public bool Equals(AssetTypeAlias? other) => other != null;
     public bool Equals(ISpecType? other) => other is AssetTypeAlias;
     public override bool Equals(object? obj) => obj is AssetTypeAlias;
@@ -99,7 +108,7 @@ public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, strin
 
 }
 
-public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatable<AssetTypeAliasValue?>, IEquatable<ISpecDynamicValue?>
+public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatable<AssetTypeAliasValue?>, IEquatable<ISpecDynamicValue?>, ISpecConcreteValue
 {
     public string Value { get; }
     public ISpecPropertyType ValueType { get; }
@@ -119,7 +128,7 @@ public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatabl
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
         if (condition.Operation is ConditionOperation.Included or ConditionOperation.ValueIncluded)
-            return true;
+            return !condition.IsInverted;
         if (condition.Operation is ConditionOperation.AssignableTo or ConditionOperation.AssignableFrom)
         {
             QualifiedType correspondingType = GetCorrespondingType(ctx.Information);
@@ -128,27 +137,41 @@ public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatabl
                 if (condition.Comparand is string { Length: > 0 } str)
                     qt = new QualifiedType(str);
                 else
-                    return condition.Operation.EvaluateNulls(correspondingType.IsNull, true);
+                    return condition.EvaluateNulls(correspondingType.IsNull, true);
             }
 
             if (correspondingType.IsNull)
             {
-                return condition.Operation.EvaluateNulls(true, false);
+                return condition.EvaluateNulls(true, false);
             }
 
-            return condition.Operation == ConditionOperation.AssignableTo
+            return condition.Invert(condition.Operation == ConditionOperation.AssignableTo
                 ? ctx.Information.Information.IsAssignableTo(correspondingType, qt)
-                : ctx.Information.Information.IsAssignableFrom(correspondingType, qt);
+                : ctx.Information.Information.IsAssignableFrom(correspondingType, qt));
         }
 
         if (condition.Comparand is not string str2)
         {
-            return condition.Operation.EvaluateNulls(Value == null, true);
+            return condition.EvaluateNulls(Value == null, true);
         }
 
         return Value == null
-            ? condition.Operation.EvaluateNulls(true, false)
-            : condition.Operation.Evaluate(Value, str2, ctx.Information.Information);
+            ? condition.EvaluateNulls(true, false)
+            : condition.Evaluate(Value, str2, ctx.Information.Information);
+    }
+
+    public bool TryEvaluateValue<TValue>(out TValue? value, out bool isNull)
+    {
+        if (typeof(TValue) != typeof(string))
+        {
+            isNull = Value != null;
+            value = default;
+            return false;
+        }
+
+        value = SpecDynamicEquationTreeValueHelpers.As<QualifiedType, TValue>(Value);
+        isNull = Value != null;
+        return true;
     }
 
     public bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull)
@@ -161,16 +184,7 @@ public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatabl
             return true;
         }
 
-        if (typeof(TValue) != typeof(string))
-        {
-            isNull = Value != null;
-            value = default;
-            return false;
-        }
-
-        value = SpecDynamicEquationTreeValueHelpers.As<QualifiedType, TValue>(Value);
-        isNull = Value != null;
-        return true;
+        return TryEvaluateValue(out value, out isNull);
     }
 
     public bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)

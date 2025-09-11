@@ -21,6 +21,13 @@ public sealed class HairIndexSpecPropertyType : BasicSpecPropertyType<HairIndexS
     /// <inheritdoc />
     public override string DisplayName => "Hair (Index)";
 
+    protected override ISpecDynamicValue CreateValue(byte value) => new SpecDynamicConcreteConvertibleValue<byte>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<byte>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {

@@ -15,7 +15,8 @@
             "Description": "Whether or not this barricade defines a 'Clip' prefab in Unity.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
             "DefaultValue": true,
-            "Priority": 2
+            "Priority": 2,
+            "Variable": "hasClipPrefab"
         },
         {
             "Key": "PlacementPreviewPrefab",
@@ -216,7 +217,7 @@
                         {
                             "Variable": "Build",
                             "Operation": "eq",
-                            "Comparand": "CLAIM"
+                            "Comparand": "CHARGE"
                         }
                     ],
                     "Value": true
@@ -225,7 +226,7 @@
                     "Value": false
                 }
             ],
-            "Description": "Indicates that this barricade can be damaged by weapons that don't have the @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Invulnerable) flag.",
+            "Description": "Allows this barricade to be placed in another player/group's claimed area.",
             "Variable": "bypassClaim",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
         },

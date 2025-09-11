@@ -21,6 +21,13 @@ public sealed class Int8SpecPropertyType : BasicSpecPropertyType<Int8SpecPropert
     /// <inheritdoc />
     public override string DisplayName => "Signed 8-Bit Integer";
 
+    protected override ISpecDynamicValue CreateValue(sbyte value) => new SpecDynamicConcreteConvertibleValue<sbyte>(value, this);
+
+    public string? ToString(ISpecDynamicValue value)
+    {
+        return value.AsConcreteNullable<sbyte>()?.ToString(CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
