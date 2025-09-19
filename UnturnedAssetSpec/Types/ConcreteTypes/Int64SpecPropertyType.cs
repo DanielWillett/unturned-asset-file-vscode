@@ -49,7 +49,7 @@ public sealed class Int64SpecPropertyType : BasicSpecPropertyType<Int64SpecPrope
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode || !KnownTypeValueHelper.TryParseInt64(strValNode.Value, out value))
+        if (parse.Node is not IValueSourceNode strValNode || !KnownTypeValueHelper.TryParseInt64(strValNode.Value, out value))
         {
             return FailedToParse(in parse, out value);
         }

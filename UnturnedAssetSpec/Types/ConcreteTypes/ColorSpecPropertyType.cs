@@ -153,12 +153,12 @@ public abstract class ColorSpecPropertyType :
                 return false;
             }
 
-            AssetFileDictionaryValueNode? dict;
-            if (parse.Parent is AssetFileKeyValuePairNode { Parent: AssetFileDictionaryValueNode dict2 })
+            IDictionarySourceNode? dict;
+            if (parse.Parent is IPropertySourceNode { Parent: IDictionarySourceNode dict2 })
             {
                 dict = dict2;
             }
-            else if (parse.Parent is AssetFileDictionaryValueNode dict3)
+            else if (parse.Parent is IDictionarySourceNode dict3)
             {
                 dict = dict3;
             }
@@ -183,12 +183,12 @@ public abstract class ColorSpecPropertyType :
             return TryParseFromDictionary(in parse, dict, rKey, gKey, bKey, HasAlpha ? parse.BaseKey + "_A" : null, false, out value);
         }
 
-        if ((options & VectorTypeParseOptions.Object) != 0 && parse.Node is AssetFileDictionaryValueNode v3Struct)
+        if ((options & VectorTypeParseOptions.Object) != 0 && parse.Node is IDictionarySourceNode v3Struct)
         {
             return TryParseFromDictionary(in parse, v3Struct, "R", "G", "B", HasAlpha ? "A" : null, true, out value);
         }
 
-        if ((options & VectorTypeParseOptions.Composite) != 0 && parse.Node is AssetFileStringValueNode strValNode)
+        if ((options & VectorTypeParseOptions.Composite) != 0 && parse.Node is IValueSourceNode strValNode)
         {
             if (KnownTypeValueHelper.TryParseColorHex(strValNode.Value.AsSpan(), out Color32 c32, HasAlpha))
             {
@@ -205,7 +205,7 @@ public abstract class ColorSpecPropertyType :
         return false;
     }
 
-    protected bool TryParseFromDictionary(in SpecPropertyTypeParseContext parse, AssetFileDictionaryValueNode dict,
+    protected bool TryParseFromDictionary(in SpecPropertyTypeParseContext parse, IDictionarySourceNode dict,
         string rKey, string gKey, string bKey, string? aKey,
         bool shouldParseAsColor32,
         out Color value)
@@ -214,8 +214,7 @@ public abstract class ColorSpecPropertyType :
 
         string? rVal = null, gVal = null, bVal = null, aVal = null;
 
-        if (!dict.TryGetValue(rKey, out AssetFileValueNode? rKeyObj)
-            || rKeyObj is not AssetFileStringValueNode rString)
+        if (!dict.TryGetPropertyValue(rKey, out IValueSourceNode? rString))
         {
             rBad = true;
         }
@@ -224,8 +223,7 @@ public abstract class ColorSpecPropertyType :
             rVal = rString.Value;
         }
 
-        if (!dict.TryGetValue(gKey, out AssetFileValueNode? gKeyObj)
-            || gKeyObj is not AssetFileStringValueNode gString)
+        if (!dict.TryGetPropertyValue(gKey, out IValueSourceNode? gString))
         {
             gBad = true;
         }
@@ -234,8 +232,7 @@ public abstract class ColorSpecPropertyType :
             gVal = gString.Value;
         }
 
-        if (!dict.TryGetValue(bKey, out AssetFileValueNode? bKeyObj)
-            || bKeyObj is not AssetFileStringValueNode bString)
+        if (!dict.TryGetPropertyValue(bKey, out IValueSourceNode? bString))
         {
             bBad = true;
         }
@@ -244,8 +241,7 @@ public abstract class ColorSpecPropertyType :
             bVal = bString.Value;
         }
 
-        if (!dict.TryGetValue(aKey ?? string.Empty, out AssetFileValueNode? aKeyObj)
-            || aKeyObj is not AssetFileStringValueNode aString)
+        if (!dict.TryGetPropertyValue(aKey ?? string.Empty, out IValueSourceNode? aString))
         {
             aBad = aKey != null;
         }
@@ -262,7 +258,7 @@ public abstract class ColorSpecPropertyType :
                 {
                     Diagnostic = DatDiagnostics.UNT1007,
                     Message = string.Format(DiagnosticResources.UNT1007, parse.BaseKey, rKey),
-                    Range = rKeyObj?.Range ?? gKeyObj?.Range ?? bKeyObj?.Range?? aKeyObj?.Range ?? dict.Range
+                    Range = rString?.Range ?? gString?.Range ?? bString?.Range?? aString?.Range ?? dict.Range
                 });
             }
 
@@ -272,7 +268,7 @@ public abstract class ColorSpecPropertyType :
                 {
                     Diagnostic = DatDiagnostics.UNT1007,
                     Message = string.Format(DiagnosticResources.UNT1007, parse.BaseKey, gKey),
-                    Range = gKeyObj?.Range ?? rKeyObj?.Range ?? bKeyObj?.Range ?? aKeyObj?.Range ?? dict.Range
+                    Range = gString?.Range ?? rString?.Range ?? bString?.Range ?? aString?.Range ?? dict.Range
                 });
             }
 
@@ -282,7 +278,7 @@ public abstract class ColorSpecPropertyType :
                 {
                     Diagnostic = DatDiagnostics.UNT1007,
                     Message = string.Format(DiagnosticResources.UNT1007, parse.BaseKey, bKey),
-                    Range = bKeyObj?.Range ?? rKeyObj?.Range ?? gKeyObj?.Range ?? aKeyObj?.Range ?? dict.Range
+                    Range = bString?.Range ?? rString?.Range ?? gString?.Range ?? aString?.Range ?? dict.Range
                 });
             }
 
@@ -292,7 +288,7 @@ public abstract class ColorSpecPropertyType :
                 {
                     Diagnostic = DatDiagnostics.UNT1007,
                     Message = string.Format(DiagnosticResources.UNT1007, parse.BaseKey, aKey),
-                    Range = aKeyObj?.Range ?? rKeyObj?.Range ?? gKeyObj?.Range ?? bKeyObj?.Range ?? dict.Range
+                    Range = aString?.Range ?? rString?.Range ?? gString?.Range ?? bString?.Range ?? dict.Range
                 });
             }
         }
@@ -309,7 +305,7 @@ public abstract class ColorSpecPropertyType :
         {
             if (!KnownTypeValueHelper.TryParseUInt8(rVal!, out byte r8))
             {
-                good &= FailedToParse(in parse, out value, rKeyObj);
+                good &= FailedToParse(in parse, out value, rString);
                 r = 0;
             }
             else
@@ -318,7 +314,7 @@ public abstract class ColorSpecPropertyType :
             }
             if (!KnownTypeValueHelper.TryParseUInt8(gVal!, out byte g8))
             {
-                good &= FailedToParse(in parse, out value, gKeyObj);
+                good &= FailedToParse(in parse, out value, gString);
                 g = 0;
             }
             else
@@ -327,7 +323,7 @@ public abstract class ColorSpecPropertyType :
             }
             if (!KnownTypeValueHelper.TryParseUInt8(bVal!, out byte b8))
             {
-                good &= FailedToParse(in parse, out value, bKeyObj);
+                good &= FailedToParse(in parse, out value, bString);
                 b = 0;
             }
             else
@@ -338,7 +334,7 @@ public abstract class ColorSpecPropertyType :
             {
                 if (!KnownTypeValueHelper.TryParseUInt8(aVal!, out byte a8))
                 {
-                    good &= FailedToParse(in parse, out value, aKeyObj);
+                    good &= FailedToParse(in parse, out value, aString);
                 }
                 else
                 {
@@ -350,19 +346,19 @@ public abstract class ColorSpecPropertyType :
         {
             if (!KnownTypeValueHelper.TryParseFloat(rVal!, out r))
             {
-                good &= FailedToParse(in parse, out value, rKeyObj);
+                good &= FailedToParse(in parse, out value, rString);
             }
             if (!KnownTypeValueHelper.TryParseFloat(gVal!, out g))
             {
-                good &= FailedToParse(in parse, out value, gKeyObj);
+                good &= FailedToParse(in parse, out value, gString);
             }
             if (!KnownTypeValueHelper.TryParseFloat(bVal!, out b))
             {
-                good &= FailedToParse(in parse, out value, bKeyObj);
+                good &= FailedToParse(in parse, out value, bString);
             }
             if (aKey != null && !KnownTypeValueHelper.TryParseFloat(aVal!, out a))
             {
-                good &= FailedToParse(in parse, out value, aKeyObj);
+                good &= FailedToParse(in parse, out value, aString);
             }
         }
 
@@ -378,7 +374,7 @@ public abstract class ColorSpecPropertyType :
             {
                 parse.Log(new DatDiagnosticMessage
                 {
-                    Range = aKeyObj!.Range,
+                    Range = aString!.Range,
                     Diagnostic = DatDiagnostics.UNT1012,
                     Message = DiagnosticResources.UNT1012
                 });
@@ -388,7 +384,7 @@ public abstract class ColorSpecPropertyType :
             {
                 parse.Log(new DatDiagnosticMessage
                 {
-                    Range = rKeyObj!.Range,
+                    Range = rString!.Range,
                     Diagnostic = DatDiagnostics.UNT1012,
                     Message = DiagnosticResources.UNT1012
                 });
@@ -398,7 +394,7 @@ public abstract class ColorSpecPropertyType :
             {
                 parse.Log(new DatDiagnosticMessage
                 {
-                    Range = gKeyObj!.Range,
+                    Range = gString!.Range,
                     Diagnostic = DatDiagnostics.UNT1012,
                     Message = DiagnosticResources.UNT1012
                 });
@@ -408,7 +404,7 @@ public abstract class ColorSpecPropertyType :
             {
                 parse.Log(new DatDiagnosticMessage
                 {
-                    Range = bKeyObj!.Range,
+                    Range = bString!.Range,
                     Diagnostic = DatDiagnostics.UNT1012,
                     Message = DiagnosticResources.UNT1012
                 });
@@ -457,7 +453,7 @@ public abstract class ColorStrictHexSpecPropertyType :
             return false;
         }
 
-        if (parse.Node is AssetFileStringValueNode strValNode)
+        if (parse.Node is IValueSourceNode strValNode)
         {
             if (KnownTypeValueHelper.TryParseStrictHex(strValNode.Value.AsSpan(), out Color32 c32, HasAlpha))
             {

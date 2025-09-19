@@ -49,7 +49,7 @@ public sealed class Float128SpecPropertyType : BasicSpecPropertyType<Float128Spe
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode || !KnownTypeValueHelper.TryParseDecimal(strValNode.Value, out value))
+        if (parse.Node is not IValueSourceNode strValNode || !KnownTypeValueHelper.TryParseDecimal(strValNode.Value, out value))
         {
             return FailedToParse(in parse, out value);
         }

@@ -91,7 +91,7 @@ public sealed class AssetBundleVersionSpecPropertyType : BasicSpecPropertyType<A
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode || !KnownTypeValueHelper.TryParseInt32(strValNode.Value, out value))
+        if (parse.Node is not IValueSourceNode strValNode || !KnownTypeValueHelper.TryParseInt32(strValNode.Value, out value))
         {
             return FailedToParse(in parse, out value);
         }

@@ -381,7 +381,7 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
 
     protected static string ArgToString(ISpecDynamicValue arg)
     {
-        string prefix;
+        string? prefix;
         switch (arg)
         {
             case DataRef:
@@ -393,7 +393,8 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
                 break;
 
             default:
-                return arg.ToString();
+                prefix = null;
+                break;
         }
 
         string str = arg.ToString();

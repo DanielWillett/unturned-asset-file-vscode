@@ -174,7 +174,7 @@ public sealed class AssetReferenceSpecPropertyType :
         return true;
     }
 
-    internal static void CheckInappropriateAmount(in SpecPropertyTypeParseContext parse, AssetFileStringValueNode stringValue)
+    internal static void CheckInappropriateAmount(in SpecPropertyTypeParseContext parse, IValueSourceNode stringValue)
     {
         if (!parse.HasDiagnostics)
             return;
@@ -215,11 +215,11 @@ public sealed class AssetReferenceSpecPropertyType :
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is AssetFileStringValueNode stringValue)
+        if (parse.Node is IValueSourceNode stringValue)
         {
             if (SupportsThis && string.Equals(stringValue.Value, "this", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (parse.File != null && parse.File.GetGuid() is { } guid && guid != Guid.Empty)
+                if (parse.File is IAssetSourceFile { Guid: { } guid } && guid != Guid.Empty)
                 {
                     value = guid;
 
@@ -254,17 +254,17 @@ public sealed class AssetReferenceSpecPropertyType :
             return true;
         }
 
-        if (!CanParseDictionary || parse.Node is not AssetFileDictionaryValueNode dictionary)
+        if (!CanParseDictionary || parse.Node is not IDictionarySourceNode dictionary)
         {
             return FailedToParse(in parse, out value);
         }
 
-        if (!dictionary.TryGetValue("GUID", out AssetFileValueNode? node))
+        if (!dictionary.TryGetPropertyValue("GUID", out IAnyValueSourceNode? node))
         {
             return MissingProperty(in parse, "GUID", out value);
         }
 
-        if (node is not AssetFileStringValueNode stringValue2 || !KnownTypeValueHelper.TryParseGuid(stringValue2.Value, out value))
+        if (node is not IValueSourceNode stringValue2 || !KnownTypeValueHelper.TryParseGuid(stringValue2.Value, out value))
         {
             return FailedToParse(in parse, out value);
         }
@@ -279,13 +279,13 @@ public sealed class AssetReferenceSpecPropertyType :
         return parse.HasDiagnostics && parse.EvaluationContext.Self.TryGetAdditionalProperty("PreventSelfReference", out bool s) && s;
     }
 
-    internal static void CheckSelfRef(in SpecPropertyTypeParseContext parse, Guid value, AssetFileNode node, bool? preventSelfRef = null)
+    internal static void CheckSelfRef(in SpecPropertyTypeParseContext parse, Guid value, IValueSourceNode node, bool? preventSelfRef = null)
     {
         bool setting = preventSelfRef ?? GetPreventSelfRef(in parse);
         if (!setting)
             return;
 
-        if (parse.File != null && parse.File.GetGuid() is { } thisGuid && thisGuid != Guid.Empty && thisGuid == value)
+        if (parse.File is IAssetSourceFile { Guid: { } thisGuid } && thisGuid != Guid.Empty && thisGuid == value)
         {
             parse.Log(new DatDiagnosticMessage
             {
@@ -296,7 +296,7 @@ public sealed class AssetReferenceSpecPropertyType :
         }
     }
 
-    internal static void CheckSelfRef(in SpecPropertyTypeParseContext parse, ushort id, int assetCategory, AssetFileNode node, bool? preventSelfRef = null)
+    internal static void CheckSelfRef(in SpecPropertyTypeParseContext parse, ushort id, int assetCategory, IValueSourceNode node, bool? preventSelfRef = null)
     {
         if (assetCategory == 0)
             return;
@@ -305,10 +305,10 @@ public sealed class AssetReferenceSpecPropertyType :
         if (!setting)
             return;
 
-        if (parse.File?.GetId() is not { } thisId || thisId == 0 || thisId != id)
+        if (parse.File is not IAssetSourceFile { Id: { } thisId } assetFile || thisId == 0 || thisId != id)
             return;
 
-        EnumSpecTypeValue cat = parse.File.GetCategory(parse.Database);
+        AssetCategoryValue cat = assetFile.Category;
         if (cat.Index == 0 || cat.Index != assetCategory)
             return;
 

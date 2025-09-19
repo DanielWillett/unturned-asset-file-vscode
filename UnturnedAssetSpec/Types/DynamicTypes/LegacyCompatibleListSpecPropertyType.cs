@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -80,7 +81,7 @@ public sealed class LegacyCompatibleListSpecPropertyType :
             return false;
         }
 
-        if (parse.Node is AssetFileStringValueNode stringNode)
+        if (parse.Node is IValueSourceNode stringNode)
         {
             if (!KnownTypeValueHelper.TryParseUInt8(stringNode.Value, out byte conditionCount))
             {
@@ -111,21 +112,25 @@ public sealed class LegacyCompatibleListSpecPropertyType :
             return true;
         }
 
-        if (parse.Node is not AssetFileListValueNode list)
+        if (parse.Node is not IListSourceNode list)
         {
             return MissingNode(in parse, out value);
         }
 
-        if (list.Elements.Count == 0)
+        ImmutableArray<ISourceNode> children = list.Children;
+        if (children.Length == 0)
         {
             value = EquatableArray<CustomSpecTypeInstance>.Empty;
             return true;
         }
 
-        List<CustomSpecTypeInstance> output = new List<CustomSpecTypeInstance>(list.Elements.Count);
-        foreach (AssetFileValueNode node in list.Elements)
+        List<CustomSpecTypeInstance> output = new List<CustomSpecTypeInstance>(children.Length);
+        foreach (ISourceNode node in children)
         {
-            if (!TryParseObjectInstance(in parse, node, out CustomSpecTypeInstance instance, customType))
+            if (node is not IAnyValueSourceNode anyVal)
+                continue;
+
+            if (!TryParseObjectInstance(in parse, anyVal, out CustomSpecTypeInstance instance, customType))
             {
                 passed = false;
                 continue;
@@ -171,7 +176,7 @@ public sealed class LegacyCompatibleListSpecPropertyType :
     {
         instance = null!;
         
-        if (parse.BaseKey == null || parse.Parent is not AssetFileDictionaryValueNode dictionary)
+        if (parse.BaseKey == null || parse.Parent is not IDictionarySourceNode dictionary)
         {
             return MissingNode(in parse, out _);
         }
@@ -223,11 +228,11 @@ public sealed class LegacyCompatibleListSpecPropertyType :
         return instance != null;
     }
 
-    private bool TryParseObjectInstance(in SpecPropertyTypeParseContext parse, AssetFileValueNode node, out CustomSpecTypeInstance instance, CustomSpecType customType)
+    private bool TryParseObjectInstance(in SpecPropertyTypeParseContext parse, IAnyValueSourceNode node, out CustomSpecTypeInstance instance, CustomSpecType customType)
     {
         instance = null!;
         
-        if (node is not AssetFileDictionaryValueNode dictionary)
+        if (node is not IDictionarySourceNode dictionary)
         {
             return MissingNode(in parse, out _);
         }

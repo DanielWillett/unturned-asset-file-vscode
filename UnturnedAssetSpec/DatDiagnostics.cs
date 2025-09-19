@@ -23,6 +23,16 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT103 = new DatDiagnostic("UNT103", DatDiagnosticSeverity.Hint);
 
+    /// <summary>
+    /// Displayed when a MasterBundleOrContentReference type uses the legacy ContentReference format.
+    /// </summary>
+    public static readonly DatDiagnostic UNT104 = new DatDiagnostic("UNT104", DatDiagnosticSeverity.Hint);
+
+    /// <summary>
+    /// Displayed when a quoted string has an unnecssary comma after it.
+    /// </summary>
+    public static readonly DatDiagnostic UNT105 = new DatDiagnostic("UNT105", DatDiagnosticSeverity.Hint);
+
     /* Warnings */
 
     /// <summary>
@@ -119,6 +129,11 @@ public static class DatDiagnostics
     /// Self reference when it shouldn't happen.
     /// </summary>
     public static readonly DatDiagnostic UNT1019 = new DatDiagnostic("UNT1019", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// Maximum depth of parser exceeded.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1020 = new DatDiagnostic("UNT1020", DatDiagnosticSeverity.Warning);
 
     /* Errors */
 

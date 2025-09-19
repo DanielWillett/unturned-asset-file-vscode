@@ -182,8 +182,16 @@
                     "title": "A reference to a Unity object in the specified masterbundle."
                 },
                 {
+                    "const": "MasterBundleOrContentReference",
+                    "title": "A reference to a Unity object in the specified masterbundle, with either the MasterBundleReference or the ContentReference format. MasterBundleReference is preferred."
+                },
+                {
                     "const": "MasterBundleReferenceString",
                     "title": "A reference to a Unity object in the specified masterbundle, but the dictionary syntax isn't allowed."
+                },
+                {
+                    "const": "TranslationReference",
+                    "title": "No longer in the game, but used to be a reference to a localization token by namespace and token."
                 },
                 {
                     "const": "FaceIndex",
@@ -360,6 +368,10 @@
                 {
                     "const": "Steam64ID",
                     "title": "A CSteamID in decimal format. Element type can define a numeric EAccountType to check."
+                },
+                {
+                    "const": "Url",
+                    "title": "A URL with content type optionally supplied."
                 },
                 {
                     "$ref": "#/$defs/switch"

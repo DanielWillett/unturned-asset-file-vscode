@@ -75,7 +75,7 @@ public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropert
                 Range = parse.Parent?.Range ?? parse.Node.Range
             };
 
-            if (parse.Node is AssetFileStringValueNode stringValue
+            if (parse.Node is IValueSourceNode stringValue
                 && KnownTypeValueHelper.TryParseBoolean(stringValue.Value, out bool boolValue)
                 && !boolValue)
             {

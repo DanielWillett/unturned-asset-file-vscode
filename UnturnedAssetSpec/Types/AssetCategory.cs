@@ -7,6 +7,78 @@ using System.Globalization;
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 /// <summary>
+/// A reference to an instance of the <see cref="AssetCategory"/> enum.
+/// </summary>
+public readonly struct AssetCategoryValue : IEquatable<AssetCategoryValue>, IComparable<AssetCategoryValue>
+{
+    public static readonly AssetCategoryValue None = new AssetCategoryValue(0);
+    public static readonly AssetCategoryValue Item = new AssetCategoryValue(1);
+    public static readonly AssetCategoryValue Effect = new AssetCategoryValue(2);
+    public static readonly AssetCategoryValue Object = new AssetCategoryValue(3);
+    public static readonly AssetCategoryValue Resource = new AssetCategoryValue(4);
+    public static readonly AssetCategoryValue Vehicle = new AssetCategoryValue(5);
+    public static readonly AssetCategoryValue Animal = new AssetCategoryValue(6);
+    public static readonly AssetCategoryValue Mythic = new AssetCategoryValue(7);
+    public static readonly AssetCategoryValue Skin = new AssetCategoryValue(8);
+    public static readonly AssetCategoryValue Spawn = new AssetCategoryValue(9);
+    public static readonly AssetCategoryValue NPC = new AssetCategoryValue(10);
+
+    public int Index { get; }
+
+    public ref readonly EnumSpecTypeValue Enum => ref AssetCategory.TypeOf.Values[Index];
+
+    public string Value => Enum.Value;
+    public string Casing => Enum.Casing;
+
+    /// <summary>
+    /// Construct a reference to the asset category at index <paramref name="index"/>.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"/>
+    public AssetCategoryValue(int index)
+    {
+        if (index < 0 || index >= AssetCategory.TypeOf.Values.Length)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
+        Index = index;
+    }
+
+    /// <summary>
+    /// Construct a reference to the asset category named <paramref name="str"/>.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"/>
+    public AssetCategoryValue(string str)
+    {
+        if (!AssetCategory.TryParse(str, out int index))
+            throw new ArgumentOutOfRangeException(nameof(str));
+
+        Index = index;
+    }
+
+    public int CompareTo(AssetCategoryValue other)
+    {
+        return Index.CompareTo(other.Index);
+    }
+
+    public bool Equals(AssetCategoryValue other)
+    {
+        return Index == other.Index;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is AssetCategoryValue v && Equals(v);
+    }
+
+    public override int GetHashCode()
+    {
+        return Index;
+    }
+
+    public static bool operator ==(AssetCategoryValue left, AssetCategoryValue right) => left.Equals(right);
+    public static bool operator !=(AssetCategoryValue left, AssetCategoryValue right) => !left.Equals(right);
+}
+
+/// <summary>
 /// Special-case enum type for EAssetType.
 /// </summary>
 public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEquatable<EnumSpecType>, IComparable<AssetCategory>, IComparable<EnumSpecType>
@@ -42,7 +114,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Doesn't fall into a legacy category. In this case short IDs are not used.",
             Index = 0,
             Type = TypeOf,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
+            NumericValue = 0
         };
         TypeOf.Values[1] = Item = new EnumSpecTypeValue
         {
@@ -51,7 +124,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Any item.",
             Index = 1,
             Type = TypeOf,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
+            NumericValue = 1
         };
         TypeOf.Values[2] = Effect = new EnumSpecTypeValue
         {
@@ -60,7 +134,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Any world effect or UI.",
             Index = 2,
             Type = TypeOf,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
+            NumericValue = 2
         };
         TypeOf.Values[3] = Object = new EnumSpecTypeValue
         {
@@ -69,7 +144,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Any level object or NPC.",
             Index = 3,
             Type = TypeOf,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
+            NumericValue = 3
         };
         TypeOf.Values[4] = Resource = new EnumSpecTypeValue
         {
@@ -78,7 +154,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "A resource that can spawn on the map and be harvested.",
             Index = 4,
             Type = TypeOf,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
+            NumericValue = 4
         };
         TypeOf.Values[5] = Vehicle = new EnumSpecTypeValue
         {
@@ -87,7 +164,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Any vehicle.",
             Index = 5,
             Type = TypeOf,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
+            NumericValue = 5
         };
         TypeOf.Values[6] = Animal = new EnumSpecTypeValue
         {
@@ -96,7 +174,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "Any animal.",
             Index = 6,
             Type = TypeOf,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
+            NumericValue = 6
         };
         TypeOf.Values[7] = Mythic = new EnumSpecTypeValue
         {
@@ -105,7 +184,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "A mythical cosmetic effect.",
             Index = 7,
             Type = TypeOf,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
+            NumericValue = 7
         };
         TypeOf.Values[8] = Skin = new EnumSpecTypeValue
         {
@@ -114,7 +194,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "An item or vehicle skin.",
             Index = 8,
             Type = TypeOf,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
+            NumericValue = 8
         };
         TypeOf.Values[9] = Spawn = new EnumSpecTypeValue
         {
@@ -123,7 +204,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "An asset spawn for a map.",
             Index = 9,
             Type = TypeOf,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
+            NumericValue = 9
         };
         TypeOf.Values[10] = NPC = new EnumSpecTypeValue
         {
@@ -132,7 +214,8 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             Description = "A dialogue, quest, or vendor configuration.",
             Index = 10,
             Type = TypeOf,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null
+            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
+            NumericValue = 10
         };
     }
 
@@ -183,13 +266,30 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
         return TryParse(str.AsSpan(), out category);
     }
 
+    public static bool TryParse(string? str, out int index)
+    {
+        return TryParse(str.AsSpan(), out index);
+    }
+
     public static bool TryParse(ReadOnlySpan<char> str, out EnumSpecTypeValue category)
+    {
+        if (!TryParse(str, out int index))
+        {
+            category = default;
+            return false;
+        }
+
+        category = TypeOf.Values[index];
+        return true;
+    }
+
+    public static bool TryParse(ReadOnlySpan<char> str, out int index)
     {
         str = str.Trim();
 
         if (str.Length < 3)
         {
-            category = default;
+            index = 0;
             return false;
         }
 
@@ -199,12 +299,12 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             case 'n':
                 if (str.Equals("NONE".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    category = None;
+                    index = None.Index;
                     return true;
                 }
                 if (str.Equals("NPC".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    category = NPC;
+                    index = NPC.Index;
                     return true;
                 }
 
@@ -214,7 +314,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             case 'i':
                 if (str.Equals("ITEM".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    category = Item;
+                    index = Item.Index;
                     return true;
                 }
 
@@ -224,7 +324,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             case 'e':
                 if (str.Equals("EFFECT".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    category = Effect;
+                    index = Effect.Index;
                     return true;
                 }
 
@@ -234,7 +334,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             case 'o':
                 if (str.Equals("OBJECT".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    category = Effect;
+                    index = Effect.Index;
                     return true;
                 }
 
@@ -244,7 +344,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             case 'r':
                 if (str.Equals("RESOURCE".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    category = Resource;
+                    index = Resource.Index;
                     return true;
                 }
 
@@ -254,7 +354,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             case 'v':
                 if (str.Equals("VEHICLE".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    category = Vehicle;
+                    index = Vehicle.Index;
                     return true;
                 }
 
@@ -264,7 +364,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             case 'm':
                 if (str.Equals("MYTHIC".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    category = Mythic;
+                    index = Mythic.Index;
                     return true;
                 }
 
@@ -274,7 +374,7 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             case 'a':
                 if (str.Equals("ANIMAL".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    category = Animal;
+                    index = Animal.Index;
                     return true;
                 }
 
@@ -284,25 +384,25 @@ public sealed class AssetCategory : EnumSpecType, IEquatable<AssetCategory>, IEq
             case 's':
                 if (str.Equals("SKIN".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    category = Skin;
+                    index = Skin.Index;
                     return true;
                 }
                 if (str.Equals("SPAWN".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    category = Spawn;
+                    index = Spawn.Index;
                     return true;
                 }
 
                 break;
         }
 
-        if (char.IsDigit(str[0]) && int.TryParse(str.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out int num) && num is >= 0 and < 11)
+        if (char.IsDigit(str[0]) && int.TryParse(str.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out int num) && num >= 0 && num < TypeOf.Values.Length)
         {
-            category = TypeOf.Values[num];
+            index = num;
             return true;
         }
 
-        category = default;
+        index = 0;
         return false;
     }
 

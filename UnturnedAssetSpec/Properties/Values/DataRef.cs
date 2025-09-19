@@ -56,9 +56,11 @@ public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<
     public abstract bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value);
 
     bool IDataRefTarget.EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext ctx) => Target.EvaluateIsIncluded(valueIncluded, in ctx);
+    bool IDataRefTarget.EvaluateIsLegacy(in FileEvaluationContext ctx) => Target.EvaluateIsLegacy(in ctx);
     string? IDataRefTarget.EvaluateKey(in FileEvaluationContext ctx) => Target.EvaluateKey(in ctx);
     ISpecDynamicValue? IDataRefTarget.EvaluateValue(in FileEvaluationContext ctx) => Target.EvaluateValue(in ctx);
     int IDataRefTarget.EvaluateKeyGroup(in FileEvaluationContext ctx, int index) => Target.EvaluateKeyGroup(in ctx, index);
+    ValueTypeDataRefType IDataRefTarget.EvaluateValueType(in FileEvaluationContext ctx) => Target.EvaluateValueType(in ctx);
 
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
     {
@@ -425,7 +427,7 @@ public sealed class AssetNameDataRef : DataRef, IEquatable<AssetNameDataRef>
 
         try
         {
-            string? name = ctx.OpenedFile.AssetName;
+            string? name = (ctx.SourceFile as IAssetSourceFile)?.AssetName;
             if (string.IsNullOrEmpty(name))
             {
                 name = null;
@@ -446,7 +448,7 @@ public sealed class AssetNameDataRef : DataRef, IEquatable<AssetNameDataRef>
     {
         try
         {
-            string? name = ctx.OpenedFile.AssetName;
+            string? name = (ctx.OpenedFile.SourceFile as IAssetSourceFile)?.AssetName;
             value = string.IsNullOrEmpty(name) ? null : name;
             return true;
         }
@@ -456,4 +458,115 @@ public sealed class AssetNameDataRef : DataRef, IEquatable<AssetNameDataRef>
             return true;
         }
     }
+}
+
+public sealed class IsLegacyDataRef : DataRef, IEquatable<IsLegacyDataRef>
+{
+    public IsLegacyDataRef(IDataRefTarget target) : base(target, KnownTypes.Flag) { }
+
+    public override string PropertyName => "IsLegacy";
+
+    public override bool Equals(DataRef other) => other is IsLegacyDataRef b && Equals(b);
+
+    public bool Equals(IsLegacyDataRef other) => base.Equals(other);
+
+    public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
+    {
+        if (condition.Comparand is not bool v)
+        {
+            return condition.EvaluateNulls(false, true);
+        }
+
+        return condition.Evaluate(Target.EvaluateIsLegacy(in ctx), v, ctx.Information.Information);
+    }
+
+    public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
+    {
+        isNull = false;
+
+        bool v = Target.EvaluateIsLegacy(in ctx);
+
+        if (typeof(TValue) == typeof(string))
+        {
+            value = SpecDynamicEquationTreeValueHelpers.As<string, TValue>(v.ToString());
+            return true;
+        }
+
+        if (typeof(TValue) == typeof(bool))
+        {
+            value = Unsafe.As<bool, TValue>(ref v);
+            return true;
+        }
+
+        value = default!;
+        return false;
+    }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = Target.EvaluateIsLegacy(in ctx);
+        return true;
+    }
+}
+
+public sealed class ValueTypeDataRef : DataRef, IEquatable<ValueTypeDataRef>
+{
+    public ValueTypeDataRef(IDataRefTarget target) : base(target, KnownTypes.Flag) { }
+
+    public override string PropertyName => "ValueType";
+
+    public override bool Equals(DataRef other) => other is ValueTypeDataRef b && Equals(b);
+
+    public bool Equals(ValueTypeDataRef other) => base.Equals(other);
+
+    public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
+    {
+        if (condition.Comparand == null || !Enum.TryParse(condition.Comparand.ToString(), true, out ValueTypeDataRefType type))
+        {
+            return condition.EvaluateNulls(false, true);
+        }
+
+        return condition.Evaluate(Target.EvaluateValueType(in ctx), type, ctx.Information.Information);
+    }
+
+    public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
+    {
+        isNull = false;
+
+        ValueTypeDataRefType v = Target.EvaluateValueType(in ctx);
+
+        if (typeof(TValue) == typeof(string))
+        {
+            value = SpecDynamicEquationTreeValueHelpers.As<string, TValue>(v switch
+            {
+                ValueTypeDataRefType.Value => nameof(ValueTypeDataRefType.Value),
+                ValueTypeDataRefType.Dictionary => nameof(ValueTypeDataRefType.Dictionary),
+                ValueTypeDataRefType.List => nameof(ValueTypeDataRefType.List),
+                _ => v.ToString()
+            });
+            return true;
+        }
+
+        if (typeof(TValue) == typeof(ValueTypeDataRefType))
+        {
+            value = Unsafe.As<ValueTypeDataRefType, TValue>(ref v);
+            return true;
+        }
+
+        value = default!;
+        return false;
+    }
+
+    public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
+    {
+        value = Target.EvaluateValueType(in ctx);
+        return true;
+    }
+}
+
+public enum ValueTypeDataRefType
+{
+    Value,
+    Dictionary,
+    List
 }

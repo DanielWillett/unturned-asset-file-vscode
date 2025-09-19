@@ -34,13 +34,15 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
             return Task.FromResult(Empty);
         }
 
-        AssetFileType fileType = AssetFileType.FromFile(file.File, _spec);
+        ISourceFile sourceFile = file.SourceFile;
+
+        AssetFileType fileType = AssetFileType.FromFile(sourceFile, _spec);
         if (!fileType.IsValid)
         {
             return Task.FromResult(Empty);
         }
 
-        FileEvaluationContext context = new FileEvaluationContext(null!, fileType.Information, file.File, _environment, _installEnvironment, _spec, file);
+        FileEvaluationContext context = new FileEvaluationContext(null!, fileType.Information, sourceFile, _environment, _installEnvironment, _spec, file);
 
         List<SpecProperty> properties = fileType.Information.Properties
             .Where(x => ReferenceEquals(x.Deprecated, SpecDynamicValue.False))
@@ -69,7 +71,7 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
 
             outputProperties[i] = prop;
 
-            if (!propContext.TryGetValue(out ISpecDynamicValue? val, out AssetFileKeyValuePairNode? lineNode))
+            if (!propContext.TryGetValue(out ISpecDynamicValue? val, out IPropertySourceNode? lineNode))
                 continue;
 
             if (val != null && val.TryEvaluateValue(in propContext, out object? value))

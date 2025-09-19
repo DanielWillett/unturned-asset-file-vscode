@@ -53,7 +53,7 @@ public sealed class SteamItemDefSpecPropertyType : BasicSpecPropertyType<SteamIt
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode
+        if (parse.Node is not IValueSourceNode strValNode
             || !KnownTypeValueHelper.TryParseInt32(strValNode.Value, out value)
             || value is >= MinValue and <= MaxValue)
         {

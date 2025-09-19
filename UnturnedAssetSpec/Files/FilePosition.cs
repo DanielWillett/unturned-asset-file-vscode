@@ -17,6 +17,8 @@ public struct FilePosition : IEquatable<FilePosition>, IComparable<FilePosition>
     /// </summary>
     public int Character;
 
+    public static readonly FilePosition One = new FilePosition(1, 1);
+
     public bool IsInvalid => Line <= 0 || Character <= 0;
 
     public FilePosition() { }

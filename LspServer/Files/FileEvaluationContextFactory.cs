@@ -40,23 +40,23 @@ internal class FileEvaluationContextFactory
             return false;
         }
 
-        AssetFileTree tree = file.File;
+        ISourceFile sourceFile = file.SourceFile;
 
-        AssetFileType fileType = AssetFileType.FromFile(file.File, _specDatabase);
+        AssetFileType fileType = AssetFileType.FromFile(sourceFile, _specDatabase);
 
-        AssetFileNode? node = tree.GetNode(position.ToFilePosition());
-        GetRelationalNodes(node, out AssetFileValueNode? valueNode, out AssetFileKeyValuePairNode? parentNode, out AssetFileKeyNode? keyNode);
+        ISourceNode? node = sourceFile.GetNodeFromPosition(position.ToFilePosition());
+        GetRelationalNodes(node, out IAnyValueSourceNode? valueNode, out IPropertySourceNode? parentNode);
 
-        if (valueNode == null || keyNode == null)
+        if (valueNode == null || parentNode == null)
         {
             Unsafe.SkipInit(out ctx);
             return false;
         }
 
         SpecProperty? property = _specDatabase.FindPropertyInfo(
-            keyNode.Value,
+            parentNode.Key,
             fileType,
-            file.IsLocalization
+            sourceFile is ILocalizationSourceFile
                 ? SpecPropertyContext.Localization
                 : SpecPropertyContext.Property
         );
@@ -64,7 +64,7 @@ internal class FileEvaluationContextFactory
         FileEvaluationContext evalCtx = new FileEvaluationContext(
             property!,
             fileType.Information,
-            tree,
+            sourceFile,
             _workspaceEnvironment,
             _installationEnvironment,
             _specDatabase,
@@ -83,25 +83,25 @@ internal class FileEvaluationContextFactory
             return false;
         }
 
-        AssetFileTree tree = file.File;
+        ISourceFile sourceFile = file.SourceFile;
 
-        AssetFileType fileType = AssetFileType.FromFile(file.File, _specDatabase);
+        AssetFileType fileType = AssetFileType.FromFile(sourceFile, _specDatabase);
 
-        AssetFileNode? node = tree.GetNode(position.ToFilePosition());
-        GetRelationalNodes(node, out _, out _, out AssetFileKeyNode? keyNode);
+        ISourceNode? node = sourceFile.GetNodeFromPosition(position.ToFilePosition());
+        GetRelationalNodes(node, out _, out IPropertySourceNode? parentNode);
 
-        if (keyNode == null)
+        if (parentNode == null)
         {
             Unsafe.SkipInit(out ctx);
             return false;
         }
 
-        SpecProperty? property = _specDatabase.FindPropertyInfo(keyNode.Value, fileType, SpecPropertyContext.Property);
+        SpecProperty? property = _specDatabase.FindPropertyInfo(parentNode.Key, fileType, SpecPropertyContext.Property);
 
         ctx = new FileEvaluationContext(
             property!,
             fileType.Information,
-            tree,
+            sourceFile,
             _workspaceEnvironment,
             _installationEnvironment,
             _specDatabase,
@@ -110,32 +110,23 @@ internal class FileEvaluationContextFactory
         return property != null;
     }
 
-    private static void GetRelationalNodes(AssetFileNode? node, out AssetFileValueNode? valueNode, out AssetFileKeyValuePairNode? pairNode, out AssetFileKeyNode? keyNode)
+    private static void GetRelationalNodes(ISourceNode? node, out IAnyValueSourceNode? valueNode, out IPropertySourceNode? pairNode)
     {
         switch (node)
         {
-            case AssetFileKeyNode k:
-                pairNode = k.Parent as AssetFileKeyValuePairNode;
-                keyNode = k;
-                valueNode = pairNode?.Value;
-                break;
-
-            case AssetFileKeyValuePairNode kvp:
+            case IPropertySourceNode kvp:
                 pairNode = kvp;
-                keyNode = kvp.Key;
                 valueNode = kvp.Value;
                 break;
 
             case null:
                 pairNode = null;
-                keyNode = null;
                 valueNode = null;
                 break;
 
             default:
-                pairNode = node.Parent as AssetFileKeyValuePairNode;
-                keyNode = pairNode?.Key;
-                valueNode = node as AssetFileValueNode;
+                pairNode = node.Parent as IPropertySourceNode;
+                valueNode = node as IAnyValueSourceNode;
                 break;
         }
     }

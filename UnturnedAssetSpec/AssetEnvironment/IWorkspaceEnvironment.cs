@@ -10,6 +10,9 @@ public interface IWorkspaceEnvironment
 
 public interface IWorkspaceFile : IDisposable
 {
-    string AssetName { get; }
-    AssetFileTree File { get; }
+    /// <summary>
+    /// Full path to the file.
+    /// </summary>
+    string File { get; }
+    ISourceFile SourceFile { get; }
 }

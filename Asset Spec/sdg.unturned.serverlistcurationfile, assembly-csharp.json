@@ -69,7 +69,7 @@
                     "Type": "LocalizableString",
                     "LocalizationKeyOverride": "=CAT(Label_ @Name)",
                     "Description": "The display name of this label.",
-                    "DefaultValue": true,
+                    "DefaultValue": null,
                     "Required": true
                 }
             ]

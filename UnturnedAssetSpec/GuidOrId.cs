@@ -56,6 +56,13 @@ public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable
         IsId = true;
     }
 
+    public GuidOrId(ushort id, AssetCategoryValue category)
+    {
+        Id = id;
+        Category = (byte)category.Index;
+        IsId = true;
+    }
+
     public GuidOrId(ushort id, in EnumSpecTypeValue category)
     {
         Id = id;

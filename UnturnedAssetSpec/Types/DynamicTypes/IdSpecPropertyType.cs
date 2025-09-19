@@ -108,7 +108,7 @@ public class IdSpecPropertyType :
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode
+        if (parse.Node is not IValueSourceNode strValNode
             || !KnownTypeValueHelper.TryParseUInt16(strValNode.Value, out value))
         {
             return FailedToParse(in parse, out value);

@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 [JsonConverter(typeof(AssetSpecTypeConverter))]
 [DebuggerDisplay("Type: {Type.GetTypeName()}")]
-public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecType?>
+public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecType?>, ISpecPropertyType<CustomSpecTypeInstance>
 {
     /// <summary>
     /// The GitHub commit (SHA) where this information was taken from, if any. Note that some information may have been pulled from other places.
@@ -18,6 +18,31 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
     public string? Commit { get; set; }
 
     public QualifiedType Type { get; internal set; }
+
+    /// <inheritdoc />
+    public Type ValueType => typeof(CustomSpecTypeInstance);
+
+    /// <inheritdoc />
+    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+
+    /// <inheritdoc />
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (!TryParseValue(in parse, out CustomSpecTypeInstance? inst) || inst == null)
+        {
+            value = null!;
+            return false;
+        }
+
+        value = inst;
+        return true;
+    }
+
+    /// <inheritdoc />
+    public void Visit<TVisitor>(ref TVisitor visitor) where TVisitor : ISpecPropertyTypeVisitor
+    {
+        visitor.Visit(this);
+    }
 
     public EnumSpecTypeValue Category { get; set; } = AssetCategory.None;
 
@@ -30,6 +55,9 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
     public bool RequireId { get; set; }
 
     public string DisplayName { get; set; } = string.Empty;
+
+    /// <inheritdoc />
+    string ISpecPropertyType.Type => Type.Type;
 
     public Version? Version { get; set; }
 
@@ -65,6 +93,12 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
     public bool Equals(ISpecType? other) => other is AssetSpecType t && Type.Equals(t.Type);
 
     /// <inheritdoc />
+    public bool Equals(ISpecPropertyType? other) => other is AssetSpecType t && Equals(t);
+
+    /// <inheritdoc />
+    public bool Equals(ISpecPropertyType<CustomSpecTypeInstance>? other) => other is AssetSpecType t && Equals(t);
+
+    /// <inheritdoc />
     public override bool Equals(object? obj) => obj is AssetSpecType ti && Equals(ti);
 
     /// <inheritdoc />
@@ -97,5 +131,13 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
         }
 
         return null;
+    }
+
+    /// <inheritdoc />
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out CustomSpecTypeInstance? value)
+    {
+        // todo
+        value = null;
+        return false;
     }
 }

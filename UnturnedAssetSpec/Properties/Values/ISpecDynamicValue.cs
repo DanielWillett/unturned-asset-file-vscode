@@ -985,6 +985,28 @@ public static class SpecDynamicValue
         {
             reference = new KeyGroupsDataRef(target);
         }
+        else if (propertyName.Equals("IsLegacy".AsSpan(), StringComparison.Ordinal))
+        {
+            if (target is SelfDataRef
+                || target is PropertyDataRef { Property.Context: >= SpecPropertyContext.CrossReferenceUnspecified and <= SpecPropertyContext.CrossReferenceLocalization })
+            {
+                reference = null!;
+                return false;
+            }
+
+            reference = new IsLegacyDataRef(target);
+        }
+        else if (propertyName.Equals("ValueType".AsSpan(), StringComparison.Ordinal))
+        {
+            if (target is SelfDataRef
+                || target is PropertyDataRef { Property.Context: >= SpecPropertyContext.CrossReferenceUnspecified and <= SpecPropertyContext.CrossReferenceLocalization })
+            {
+                reference = null!;
+                return false;
+            }
+
+            reference = new ValueTypeDataRef(target);
+        }
         else
         {
             reference = null!;
@@ -1002,8 +1024,8 @@ public static class SpecDynamicValue
             ReadOnlySpan<char> indexSpan = dataIndex < indexerIndex ? data.Slice(indexerIndex + 1) : data.Slice(indexerIndex + 1, dataIndex - indexerIndex - 1);
             int endIndexer = indexSpan.IndexOf(']');
             if (endIndexer == -1
-                || endIndexer < indexerIndex + 2
-                || !int.TryParse(indexSpan.Slice(endIndexer).ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out int index))
+                || endIndexer < 1
+                || !int.TryParse(indexSpan.Slice(0, endIndexer).ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out int index))
             {
                 reference = null!;
                 return false;

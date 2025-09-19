@@ -1168,7 +1168,7 @@
         },
         {
             "Key": "Aiming_Movement_Speed_Multiplier",
-            "Type": "Boolean",
+            "Type": "Float32",
             "DefaultValue":
             [
                 {

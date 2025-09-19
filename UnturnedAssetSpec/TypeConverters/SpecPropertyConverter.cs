@@ -3,7 +3,6 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -177,9 +176,9 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             {
                 case -1:
                     // extra properties
-                    if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
+                    if (!JsonHelper.ShouldSkipAdditionalProperty(key) && JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
                     {
-                        extraData = extraData.Add(new KeyValuePair<string, object?>(key!, extraValue));
+                        extraData = extraData.Add(new KeyValuePair<string, object?>(key, extraValue));
                     }
                     break;
 
@@ -503,7 +502,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 ref minimumValue,
                 SpecDynamicValueContext.AllowSwitch,
                 options,
-                minimumIsExclusive ? MinimumExclusiveProperty : MinimumProperty
+                minimumIsExclusive ? MinimumExclusiveProperty : MinimumProperty,
+                numericFallback: true
             );
             property.ExceptionsAreWhitelist = true;
         }
@@ -515,7 +515,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 ref maximumValue,
                 SpecDynamicValueContext.AllowSwitch,
                 options,
-                maximumIsExclusive ? MaximumExclusiveProperty : MaximumProperty
+                maximumIsExclusive ? MaximumExclusiveProperty : MaximumProperty,
+                numericFallback: true
             );
             property.ExceptionsAreWhitelist = true;
         }
@@ -638,10 +639,17 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         ref Utf8JsonReader reader,
         SpecDynamicValueContext context,
         JsonSerializerOptions? options,
-        in JsonEncodedText property)
+        in JsonEncodedText property,
+        // minimums and maximums can be used to indicate min/max string length as well, which is what this is for
+        bool numericFallback = false)
     {
         if (propertyType is { IsSwitch: false, Type: UnresolvedSpecPropertyType unresolvedSpecPropertyType })
         {
+            if (numericFallback && reader.TokenType == JsonTokenType.Number && reader.TryGetInt32(out int v))
+            {
+                return SpecDynamicValue.Int32(v);
+            }
+
             return new UnresolvedDynamicValue(
                 unresolvedSpecPropertyType,
                 JsonDocument.ParseValue(ref reader),
@@ -657,6 +665,11 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         }
         catch (Exception ex)
         {
+            if (numericFallback && reader.TokenType == JsonTokenType.Number && reader.TryGetInt32(out int v))
+            {
+                return SpecDynamicValue.Int32(v);
+            }
+
             throw new JsonException($"Failed to read property \"{property.ToString()}\" while reading SpecProperty.", ex);
         }
     }

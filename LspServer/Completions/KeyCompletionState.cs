@@ -7,7 +7,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Completions;
 
 public struct KeyCompletionState
 {
-    public AssetFileNode? Node { get; }
+    public ISourceNode? Node { get; }
     public SpecProperty Property { get; set; }
     public OpenedFile File { get; }
     public FilePosition Position { get; }
@@ -15,7 +15,7 @@ public struct KeyCompletionState
     public InverseTypeHierarchy TypeHierarchy { get; }
     public string? Alias { get; set; }
 
-    public KeyCompletionState(AssetFileNode? node, FilePosition position, bool isOnNewLine, InverseTypeHierarchy typeHierarchy, string? alias, SpecProperty property, OpenedFile file)
+    public KeyCompletionState(ISourceNode? node, FilePosition position, bool isOnNewLine, InverseTypeHierarchy typeHierarchy, string? alias, SpecProperty property, OpenedFile file)
     {
         Node = node;
         Position = position;

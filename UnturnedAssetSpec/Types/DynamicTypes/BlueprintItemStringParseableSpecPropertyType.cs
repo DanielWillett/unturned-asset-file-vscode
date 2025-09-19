@@ -38,7 +38,7 @@ public abstract class BlueprintItemStringParseableSpecPropertyType :
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValue)
+        if (parse.Node is not IValueSourceNode strValue)
         {
             return FailedToParse(in parse, out value, parse.Node);
         }

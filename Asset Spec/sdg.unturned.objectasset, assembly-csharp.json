@@ -1245,6 +1245,34 @@
             ]
         },
         {
+            "Key": "Interactability_Respawn_All_Sections_Simultaneously",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not all other sections will respawn when any one section respawns.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleRespawnAllSectionsSimultaneously",
+            "Version": "3.25.8.2",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ]
+        },
+        {
             "Key": "Interactability_Nav_Mode",
             "Type": "SDG.Unturned.EObjectRubbleNavMode, Assembly-CSharp",
             "DefaultValue": "Unaffected",
@@ -1790,6 +1818,38 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
             "Priority": 11,
             "Variable": "RubbleAllSectionsDestroyedAlertRadius",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                },
+                {
+                    "Key": "Interactability",
+                    "Value": "RUBBLE"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Rubble",
+                    "Value": "*"
+                }
+            ]
+        },
+        {
+            "Key": "Rubble_Respawn_All_Sections_Simultaneously",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not all other sections will respawn when any one section respawns.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
+            "Priority": 11,
+            "Variable": "RubbleRespawnAllSectionsSimultaneously",
+            "Version": "3.25.8.2",
             "ExclusiveWith":
             [
                 {

@@ -14,12 +14,12 @@ public abstract class BaseSpecPropertyType<TValue>
 
     protected bool MissingNode(in SpecPropertyTypeParseContext parse, out TValue? value)
     {
-        if (parse.HasDiagnostics && parse.Parent is AssetFileKeyValuePairNode { Key: { } key })
+        if (parse.HasDiagnostics && parse.Parent is IPropertySourceNode property)
         {
             DatDiagnosticMessage message = new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT1005,
-                Message = string.Format(DiagnosticResources.UNT1005, key.Value),
+                Message = string.Format(DiagnosticResources.UNT1005, property.Key),
                 Range = parse.Parent.Range
             };
 
@@ -66,7 +66,7 @@ public abstract class BaseSpecPropertyType<TValue>
         return false;
     }
 
-    protected bool FailedToParse(in SpecPropertyTypeParseContext parse, out TValue? value, AssetFileNode? node = null)
+    protected bool FailedToParse(in SpecPropertyTypeParseContext parse, out TValue? value, ISourceNode? node = null)
     {
         node ??= parse.Node;
         if (parse.HasDiagnostics && node != null)
@@ -76,7 +76,7 @@ public abstract class BaseSpecPropertyType<TValue>
                 Diagnostic = DatDiagnostics.UNT2004,
                 Message = string.Format(
                     DiagnosticResources.UNT2004,
-                    parse.Node is AssetFileStringValueNode s ? s.Value : parse.Node!.ToString(),
+                    parse.Node is IValueSourceNode s ? s.Value : parse.Node!.ToString(),
                     DisplayName
                 ),
                 Range = parse.Node.Range

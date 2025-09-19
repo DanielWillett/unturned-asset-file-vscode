@@ -2,7 +2,7 @@
 <RunSettings>
   
   <!-- Configurations for data collectors -->
-  <DataCollectionRunSettings>
+  <!--<DataCollectionRunSettings>
     <DataCollectors>
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
@@ -14,7 +14,7 @@
         </Configuration>
       </DataCollector>
     </DataCollectors>
-  </DataCollectionRunSettings>
+  </DataCollectionRunSettings>-->
 
   <!-- Adapter Specific sections -->
 

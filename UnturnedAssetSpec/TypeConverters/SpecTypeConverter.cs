@@ -20,6 +20,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
     private static readonly JsonEncodedText LocalizationProperty = JsonEncodedText.Encode("Localization");
     private static readonly JsonEncodedText StringParseableTypeProperty = JsonEncodedText.Encode("StringParseableType");
     private static readonly JsonEncodedText VersionProperty = JsonEncodedText.Encode("Version");
+    private static readonly JsonEncodedText IsFlagsProperty = JsonEncodedText.Encode("IsFlags");
 
     private static readonly JsonEncodedText[] Properties =
     [
@@ -32,7 +33,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         PropertiesProperty,             // 6
         LocalizationProperty,           // 7
         StringParseableTypeProperty,    // 8
-        VersionProperty                 // 9
+        VersionProperty,                // 9
+        IsFlagsProperty                 // 10
     ];
 
     private static readonly JsonEncodedText ValueEnumProperty = JsonEncodedText.Encode("Value");
@@ -43,6 +45,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
     private static readonly JsonEncodedText DeprecatedEnumProperty = JsonEncodedText.Encode("Deprecated");
     private static readonly JsonEncodedText DocsEnumProperty = JsonEncodedText.Encode("Docs");
     private static readonly JsonEncodedText VersionEnumProperty = JsonEncodedText.Encode("Version");
+    private static readonly JsonEncodedText NumericValueEnumProperty = JsonEncodedText.Encode("NumericValue");
 
     private static readonly JsonEncodedText[] EnumProperties =
     [
@@ -53,7 +56,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         DescriptionEnumProperty,       // 4
         DeprecatedEnumProperty,        // 5
         DocsEnumProperty,              // 6
-        VersionEnumProperty            // 7
+        VersionEnumProperty,           // 7
+        NumericValueEnumProperty       // 8
     ];
 
     /// <inheritdoc />
@@ -76,7 +80,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
 
         string? type = null, displayName = null, docs = null, parent = null;
 
-        bool isExpanded = false;
+        bool isExpanded = false, isFlags = false;
         string? stringParseableType = null;
 
         List<EnumValueInfo>? values = null;
@@ -119,9 +123,9 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
             {
                 case -1:
                     // extra properties
-                    if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
+                    if (!JsonHelper.ShouldSkipAdditionalProperty(key) && JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
                     {
-                        extraData = extraData.Add(new KeyValuePair<string, object?>(key!, extraValue));
+                        extraData = extraData.Add(new KeyValuePair<string, object?>(key, extraValue));
                     }
                     break;
 
@@ -176,7 +180,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                     if (reader.TokenType is not JsonTokenType.StartArray)
                         ThrowUnexpectedToken(reader.TokenType, propType);
 
-                    properties = ReadPropertyList(ref reader, options, type, PropertiesProperty);
+                    properties = ReadPropertyList(ref reader, options, type, PropertiesProperty, SpecPropertyContext.Property);
                     break;
 
                 case 7: // Localization
@@ -188,7 +192,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                     if (reader.TokenType is not JsonTokenType.StartArray)
                         ThrowUnexpectedToken(reader.TokenType, propType);
 
-                    localProperties = ReadPropertyList(ref reader, options, type, LocalizationProperty);
+                    localProperties = ReadPropertyList(ref reader, options, type, LocalizationProperty, SpecPropertyContext.Localization);
                     break;
 
                 case 8: // StringParseableType
@@ -205,6 +209,12 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                         ThrowUnexpectedToken(reader.TokenType, propType);
 
                     version = reader.TokenType == JsonTokenType.String ? new Version(reader.GetString()!) : null;
+                    break;
+
+                case 10: // IsFlags
+                    if (reader.TokenType is not JsonTokenType.True and not JsonTokenType.False and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+                    isFlags = reader.TokenType == JsonTokenType.True;
                     break;
             }
         }
@@ -238,7 +248,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                 Docs = docs,
                 Type = qt,
                 AdditionalProperties = extraData,
-                Version = version
+                Version = version,
+                IsFlags = isFlags
             };
 
             for (int i = 0; i < createdValues.Length; ++i)
@@ -259,7 +270,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                     RequiredBaseType = valueInfo.RequiredBaseType,
                     AdditionalProperties = valueInfo.Properties,
                     Docs = valueInfo.Docs,
-                    Version = valueInfo.Version
+                    Version = valueInfo.Version,
+                    NumericValue = valueInfo.NumericValue
                 };
             }
 
@@ -295,7 +307,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
     {
         if (reader.TokenType == JsonTokenType.String)
         {
-            return new EnumValueInfo(reader.GetString(), null, QualifiedType.None, QualifiedType.None, null, false, null, OneOrMore<KeyValuePair<string, object?>>.Null, null);
+            return new EnumValueInfo(reader.GetString(), null, QualifiedType.None, QualifiedType.None, null, false, null, OneOrMore<KeyValuePair<string, object?>>.Null, null, null);
         }
 
         if (reader.TokenType == JsonTokenType.Null)
@@ -310,6 +322,8 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         bool deprecated = false;
 
         Version? version = null;
+
+        long? numericValue = null;
 
         OneOrMore<KeyValuePair<string, object?>> extraData = OneOrMore<KeyValuePair<string, object?>>.Null;
 
@@ -346,9 +360,9 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
             {
                 case -1:
                     // extra properties
-                    if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
+                    if (!JsonHelper.ShouldSkipAdditionalProperty(key) && JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
                     {
-                        extraData = extraData.Add(new KeyValuePair<string, object?>(key!, extraValue));
+                        extraData = extraData.Add(new KeyValuePair<string, object?>(key, extraValue));
                     }
                     break;
 
@@ -400,6 +414,23 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
 
                     version = reader.TokenType == JsonTokenType.String ? new Version(reader.GetString()!) : null;
                     break;
+
+                case 8: // NumericValue
+                    if (reader.TokenType is not JsonTokenType.Number and not JsonTokenType.Null)
+                        ThrowUnexpectedToken(reader.TokenType, propType);
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                        numericValue = null;
+                    else
+                    {
+                        if (reader.TryGetInt64(out long l))
+                            numericValue = l;
+                        else if (reader.TryGetUInt64(out ulong ul))
+                            numericValue = unchecked((long)ul);
+                        else
+                            ThrowUnexpectedToken(JsonTokenType.Number, propType);
+                    }
+                    break;
             }
         }
 
@@ -408,7 +439,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
             throw new JsonException($"Missing property \"{ValueEnumProperty.ToString()}\" while reading enum value.");
         }
         
-        return new EnumValueInfo(value!, casing, baseType, corrType, description, deprecated, docs, extraData, version);
+        return new EnumValueInfo(value!, casing, baseType, corrType, description, deprecated, docs, extraData, version, numericValue);
     }
 
     private static List<EnumValueInfo> ReadValueList(ref Utf8JsonReader reader, JsonSerializerOptions? options, string? typeName)
@@ -440,7 +471,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         return list;
     }
 
-    private static SpecProperty[] ReadPropertyList(ref Utf8JsonReader reader, JsonSerializerOptions? options, string? typeName, in JsonEncodedText propertyName)
+    private static SpecProperty[] ReadPropertyList(ref Utf8JsonReader reader, JsonSerializerOptions? options, string? typeName, in JsonEncodedText propertyName, SpecPropertyContext context)
     {
         List<SpecProperty> list = new List<SpecProperty>(16);
         int index = 0;
@@ -451,6 +482,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                 SpecProperty? prop = SpecPropertyConverter.ReadProperty(ref reader, options);
                 if (prop != null)
                 {
+                    prop.Context = context;
                     list.Add(prop);
                 }
             }
@@ -549,6 +581,9 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                     if (property.Version != null)
                         writer.WriteString(VersionProperty, property.Version.ToString());
 
+                    if (property.NumericValue.HasValue)
+                        writer.WriteNumber(NumericValueEnumProperty, property.NumericValue.Value);
+
                     JsonHelper.WriteAdditionalProperties(writer, property, options);
                     writer.WriteEndObject();
                 }
@@ -612,6 +647,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         bool Deprecated,
         string? Docs,
         OneOrMore<KeyValuePair<string, object?>> Properties,
-        Version? Version
+        Version? Version,
+        long? NumericValue
     );
 }

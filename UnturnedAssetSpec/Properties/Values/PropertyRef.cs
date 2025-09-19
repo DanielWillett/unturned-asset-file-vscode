@@ -60,6 +60,24 @@ public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
             : _info.GetIsIncluded(valueIncluded, in ctx, prop, default, null);
     }
 
+    public bool GetIsLegacy(in FileEvaluationContext ctx)
+    {
+        SpecProperty? prop = ResolveProperty(in ctx);
+        if (_crossReferenceProperty != null)
+            throw new InvalidOperationException("Cross-reference not supported.");
+
+        return PropertyRefInfo.EvaluateIsLegacy(prop, in ctx);
+    }
+
+    public ValueTypeDataRefType GetValueType(in FileEvaluationContext ctx)
+    {
+        SpecProperty? prop = ResolveProperty(in ctx);
+        if (_crossReferenceProperty != null)
+            throw new InvalidOperationException("Cross-reference not supported.");
+
+        return PropertyRefInfo.EvaluateValueType(prop, in ctx);
+    }
+
     public SpecProperty? ResolveProperty(in FileEvaluationContext ctx)
     {
         if (_hasCache)
@@ -265,15 +283,15 @@ public readonly struct PropertyRefInfo
 
     internal static bool EvaluateIsIncluded(SpecProperty? property, bool valueIncluded, in FileEvaluationContext context)
     {
-        if (property != null && context.File.TryGetProperty(property, out AssetFileKeyValuePairNode prop2))
+        if (property != null && context.SourceFile.TryGetProperty(property, out IPropertySourceNode? prop2))
         {
             if (!valueIncluded)
                 return true;
 
-            if (prop2.Value == null)
+            if (!prop2.HasValue)
                 return false;
 
-            if (prop2.Value is AssetFileStringValueNode strValNode)
+            if (prop2 is { ValueKind: ValueTypeDataRefType.Value, Value: IValueSourceNode strValNode })
             {
                 if (string.IsNullOrWhiteSpace(strValNode.Value) && !strValNode.IsQuoted)
                     return false;
@@ -283,6 +301,25 @@ public readonly struct PropertyRefInfo
         }
 
         return false;
+    }
+
+    internal static bool EvaluateIsLegacy(SpecProperty? property, in FileEvaluationContext context)
+    {
+        if (property?.Owner is not CustomSpecType { IsLegacyExpandedType: true } t)
+            return false;
+
+        // todo
+        return false;
+    }
+
+    internal static ValueTypeDataRefType EvaluateValueType(SpecProperty? property, in FileEvaluationContext context)
+    {
+        if (property != null && context.SourceFile.TryResolveProperty(property, out IPropertySourceNode? node))
+        {
+            return node.ValueKind;
+        }
+
+        return ValueTypeDataRefType.Value;
     }
 
     public bool GetIsIncluded(bool valueIncluded, in FileEvaluationContext ctx, SpecProperty? prop, PropertyRefInfo crossReferencePropertyInfo, SpecProperty? crossReferenceProperty)
@@ -312,7 +349,7 @@ public readonly struct PropertyRefInfo
             return CrossReference(in ctx, crossReferencePropertyInfo, crossReferenceProperty);
         }
 
-        if (!ctx.File.TryGetProperty(prop, out AssetFileKeyValuePairNode node))
+        if (!ctx.SourceFile.TryGetProperty(prop, out IPropertySourceNode? node))
         {
             return prop.DefaultValue;
         }
@@ -395,7 +432,7 @@ public readonly struct PropertyRefInfo
 
         PropertyRefInfo crossValueInfo = new PropertyRefInfo(PropertyName.AsSpan(), PropertyName);
 
-        FileEvaluationContext crossValueCtx = new FileEvaluationContext(in ctx, workspaceFile.File, workspaceFile);
+        FileEvaluationContext crossValueCtx = new FileEvaluationContext(in ctx, workspaceFile);
 
         crossValueInfo.ResolveProperty(in crossValueCtx, out SpecProperty? crossedProperty, out PropertyRefInfo crossCrossPropertyInfo);
 
@@ -478,7 +515,7 @@ public readonly struct PropertyRefInfo
 
         PropertyRefInfo crossValueInfo = new PropertyRefInfo(PropertyName.AsSpan(), PropertyName);
 
-        FileEvaluationContext crossValueCtx = new FileEvaluationContext(in ctx, workspaceFile.File, workspaceFile);
+        FileEvaluationContext crossValueCtx = new FileEvaluationContext(in ctx, workspaceFile);
 
         crossValueInfo.ResolveProperty(in crossValueCtx, out SpecProperty? crossedProperty, out PropertyRefInfo crossCrossPropertyInfo);
 

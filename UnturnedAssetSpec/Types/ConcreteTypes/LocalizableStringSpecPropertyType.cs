@@ -36,7 +36,7 @@ public sealed class LocalizableStringSpecPropertyType : BasicSpecPropertyType<Lo
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode)
+        if (parse.Node is not IValueSourceNode strValNode)
         {
             return FailedToParse(in parse, out value);
         }

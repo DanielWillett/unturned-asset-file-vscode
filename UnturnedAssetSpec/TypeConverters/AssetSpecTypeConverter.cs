@@ -88,9 +88,9 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
             {
                 case -1:
                     // extra properties
-                    if (JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
+                    if (!JsonHelper.ShouldSkipAdditionalProperty(key) && JsonHelper.TryReadGenericValue(ref reader, out object? extraValue))
                     {
-                        type.AdditionalProperties = type.AdditionalProperties.Add(new KeyValuePair<string, object?>(key!, extraValue));
+                        type.AdditionalProperties = type.AdditionalProperties.Add(new KeyValuePair<string, object?>(key, extraValue));
                     }
                     break;
 
@@ -165,15 +165,15 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
                     break;
 
                 case 7: // Properties
-                    type.Properties = ReadPropertyList(ref reader, options, type, in PropertiesProperty);
+                    type.Properties = ReadPropertyList(ref reader, options, type, in PropertiesProperty, SpecPropertyContext.Property);
                     break;
 
                 case 8: // Localization
-                    type.LocalizationProperties = ReadPropertyList(ref reader, options, type, in LocalizationProperty);
+                    type.LocalizationProperties = ReadPropertyList(ref reader, options, type, in LocalizationProperty, SpecPropertyContext.Localization);
                     break;
 
                 case 9: // BundleAssets
-                    //info.BundleAssets = ReadPropertyList(ref reader, options, in LocalizationProperty);
+                    //info.BundleAssets = ReadPropertyList(ref reader, options, in LocalizationProperty, SpecPropertyContext.BundleAsset);
                     reader.Skip();
                     break;
 
@@ -242,7 +242,7 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
         return list.ToArray();
     }
 
-    private static SpecProperty[] ReadPropertyList(ref Utf8JsonReader reader, JsonSerializerOptions? options, AssetSpecType type, in JsonEncodedText propertyName)
+    private static SpecProperty[] ReadPropertyList(ref Utf8JsonReader reader, JsonSerializerOptions? options, AssetSpecType type, in JsonEncodedText propertyName, SpecPropertyContext context)
     {
         List<SpecProperty> list = new List<SpecProperty>(32);
         int index = 0;
@@ -253,6 +253,7 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
                 SpecProperty? prop = SpecPropertyConverter.ReadProperty(ref reader, options);
                 if (prop != null)
                 {
+                    prop.Context = context;
                     prop.Owner = type;
                     list.Add(prop);
                 }

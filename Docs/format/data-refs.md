@@ -28,6 +28,8 @@ All Data-Ref targets can contain the following properties:
 | Value | The value given for this property. | any |
 | AssetName | The internal name of the asset. This is usually the file name. | `This` |
 | KeyGroups | Array of key groups used for RegEx keys. | any |
+| IsLegacy | Whether or not the currently parsing property is being parsed in the legacy format (ex. with blueprints, spawn tables, etc using the v1 format). | `This`, `@Property` |
+| ValueType | Which type of value this property provides: 'Value', 'List', or 'Dictionary' | `This`, `@Property` |
 
 Properties are currently hard-coded and can't be extended.
 
@@ -123,6 +125,51 @@ Caliber_2_Name Custom Bow
 ```
 
 Index can be used to reference a specific key group. Indexing is zero-based so 1 must be subtracted from the RegEx group number.
+
+### IsLegacy
+Equal to `true` if the target is in a type such as the `LegacyCompatibleList` and the legacy (v1) format is being used.
+
+This property can not target cross-referenced properties or `#Self`.
+
+Example:
+```properties
+GUID e2691008f3d746c9bde7bd28258f28d9
+Type Spawn
+ID 330
+
+Tables 3
+# IsLegacy = true for this property
+Table_0_Asset_ID 1
+Table_0_Weight 10
+Table_1_Asset_ID 4
+Table_1_Weight 10
+Table_2_Asset_ID 6
+Table_2_Weight 10
+
+Tables
+[
+    {
+        # IsLegacy = false for this property
+        LegacyAssetId 1
+        Weight 10
+    }
+    {
+        LegacyAssetId 4
+        Weight 10
+    }
+    {
+        LegacyAssetId 6
+        Weight 10
+    }
+]
+```
+
+### ValueType
+Returns a string value indicating which type of value the property provides, which is one of the following: 'Value', 'List', or 'Dictionary'.
+
+This property can not target cross-referenced properties or `#Self`.
+
+By default 'Value' will be returned if the property isn't present or doesn't have any kind of value.
 
 #### Settings
 ##### PreventSelfReference `bool`

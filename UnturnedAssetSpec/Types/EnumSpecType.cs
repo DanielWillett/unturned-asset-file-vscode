@@ -19,6 +19,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
     public required string? Docs { get; init; }
     public required EnumSpecTypeValue[] Values { get; init; }
     public Version? Version { get; init; }
+    public bool IsFlags { get; init; }
     public required OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; init; }
 
 #nullable disable
@@ -70,7 +71,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
     {
         if (parse.Node == null)
         {
-            if (parse.HasDiagnostics && parse.Parent is AssetFileKeyValuePairNode { Key: { } key })
+            if (parse.HasDiagnostics && parse.Parent is IPropertySourceNode { Key: { } key })
             {
                 DatDiagnosticMessage message = new DatDiagnosticMessage
                 {
@@ -86,7 +87,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
             return false;
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode)
+        if (parse.Node is not IValueSourceNode strValNode)
         {
             if (parse.HasDiagnostics)
             {
@@ -95,7 +96,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
                     Diagnostic = DatDiagnostics.UNT2004,
                     Message = string.Format(
                         DiagnosticResources.UNT2004,
-                        parse.Node is AssetFileStringValueNode s ? s.Value : parse.Node.ToString(),
+                        parse.Node is IValueSourceNode s ? s.Value : parse.Node.ToString(),
                         DisplayName
                     ),
                     Range = parse.Node.Range
@@ -209,6 +210,7 @@ public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, ICompa
     public string? Docs { get; init; }
     public bool Deprecated { get; init; }
     public Version? Version { get; init; }
+    public long? NumericValue { get; init; }
 
     /// <summary>
     /// If only <see cref="Value"/> is filled out the JSON can be re-written as just a string.

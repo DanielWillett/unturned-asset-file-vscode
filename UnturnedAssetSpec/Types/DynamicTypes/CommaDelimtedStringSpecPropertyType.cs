@@ -81,7 +81,7 @@ public sealed class CommaDelimitedStringSpecPropertyType :
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode stringNode)
+        if (parse.Node is not IValueSourceNode stringNode)
         {
             return FailedToParse(in parse, out value);
         }
@@ -108,7 +108,7 @@ public sealed class CommaDelimitedStringSpecPropertyType :
 
     private abstract class ParseHandler
     {
-        public abstract void ProcessDiagnostics(in SpecPropertyTypeParseContext parse, AssetFileStringValueNode stringNode);
+        public abstract void ProcessDiagnostics(in SpecPropertyTypeParseContext parse, IValueSourceNode stringNode);
     }
 
     private class ParseHandler<TParseHandler> : ParseHandler where TParseHandler : IEquatable<TParseHandler>
@@ -121,11 +121,12 @@ public sealed class CommaDelimitedStringSpecPropertyType :
         }
 
         /// <inheritdoc />
-        public override void ProcessDiagnostics(in SpecPropertyTypeParseContext parse, AssetFileStringValueNode stringNode)
+        public override void ProcessDiagnostics(in SpecPropertyTypeParseContext parse, IValueSourceNode stringNode)
         {
             string values = stringNode.Value;
             int lastIndex = -1;
             FilePosition start = stringNode.Range.Start, end = stringNode.Range.End;
+            int index = 0;
             while (lastIndex + 1 < values.Length)
             {
                 int commaIndex = values.IndexOf(',', lastIndex + 1);
@@ -152,15 +153,18 @@ public sealed class CommaDelimitedStringSpecPropertyType :
                 if (length <= 0)
                     continue;
 
-                AssetFileValueNode node = new AssetFileStringValueNode
-                {
-                    Value = values.Substring(startIndex, length),
-                    Range = new FileRange(start.Line, start.Character + startIndex, end.Line, start.Character + startIndex + length),
-                    StartIndex = stringNode.StartIndex + startIndex,
-                    EndIndex = stringNode.StartIndex + startIndex + length,
-                    IsQuoted = false,
-                    Parent = stringNode
-                };
+                AnySourceNodeProperties props = default;
+                props.Index = index;
+                ++index;
+
+                props.FirstCharacterIndex = stringNode.FirstCharacterIndex + startIndex;
+                props.LastCharacterIndex = props.FirstCharacterIndex + length;
+                props.Range = new FileRange(start.Line, start.Character + startIndex, end.Line, start.Character + startIndex + length);
+                props.ChildIndex = index;
+                props.Depth = stringNode.Depth;
+
+                ValueNode node = ValueNode.Create(values.Substring(startIndex, length), false, Comment.None, in props);
+                node.SetParentInfo(stringNode.File, stringNode.Parent);
 
                 SpecPropertyTypeParseContext ctx = parse with
                 {

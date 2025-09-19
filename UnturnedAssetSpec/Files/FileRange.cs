@@ -33,6 +33,9 @@ public struct FileRange : IEquatable<FileRange>, IComparable<FileRange>, ICompar
         End.Character = endCharacter;
     }
 
+    /// <inheritdoc />
+    public override string ToString() => $"{Start} - {End}";
+
     public void Deconstruct(out FilePosition start, out FilePosition end)
     {
         start = Start;

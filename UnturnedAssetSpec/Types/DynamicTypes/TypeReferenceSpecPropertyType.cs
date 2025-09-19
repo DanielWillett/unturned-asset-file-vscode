@@ -88,19 +88,19 @@ public sealed class TypeReferenceSpecPropertyType :
         string? asmQualifiedType;
         FileRange range;
 
-        if (parse.Node is AssetFileStringValueNode stringValue)
+        if (parse.Node is IValueSourceNode stringValue)
         {
             asmQualifiedType = stringValue.Value;
             range = stringValue.Range;
         }
-        else if (parse.Node is AssetFileDictionaryValueNode dictionary)
+        else if (parse.Node is IDictionarySourceNode dictionary)
         {
-            if (!dictionary.TryGetValue("Type", out AssetFileValueNode? node))
+            if (!dictionary.TryGetPropertyValue("Type", out IAnyValueSourceNode? node))
             {
                 return MissingProperty(in parse, "Type", out value);
             }
 
-            if (node is not AssetFileStringValueNode stringValue2)
+            if (node is not IValueSourceNode stringValue2)
             {
                 return FailedToParse(in parse, out value);
             }

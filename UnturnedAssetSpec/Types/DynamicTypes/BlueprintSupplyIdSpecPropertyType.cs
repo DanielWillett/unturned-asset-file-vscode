@@ -26,9 +26,15 @@ public sealed class BlueprintIdSpecPropertyType :
             return MissingNode(in parse, out value);
         }
 
-        Guid? guid = parse.File?.GetGuid();
-        ushort? id = parse.File?.GetId();
-        if (parse.Node is AssetFileStringValueNode strValNode && strValNode.Value.Equals("this", StringComparison.OrdinalIgnoreCase))
+        Guid? guid = null;
+        ushort? id = null;
+        if (parse.File is IAssetSourceFile asset)
+        {
+            guid = asset.Guid;
+            id = asset.Id;
+        }
+
+        if (parse.Node is IValueSourceNode strValNode && strValNode.Value.Equals("this", StringComparison.OrdinalIgnoreCase))
         {
             if (guid.HasValue && guid.Value != Guid.Empty)
             {

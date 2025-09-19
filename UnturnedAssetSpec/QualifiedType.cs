@@ -377,3 +377,58 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
     public static implicit operator QualifiedType(string? type) => new QualifiedType(type!);
     public static implicit operator QualifiedType(Type? type) => type == null ? None : new QualifiedType(type.AssemblyQualifiedName ?? type.FullName ?? type.Name);
 }
+
+/// <summary>
+/// A type alias or <see cref="QualifiedType"/>.
+/// </summary>
+public readonly struct QualifiedOrAliasedType : IEquatable<QualifiedOrAliasedType>
+{
+    public bool IsAlias { get; }
+    public bool IsNull => Type.IsNull;
+    public QualifiedType Type { get; }
+
+    public QualifiedOrAliasedType(string alias)
+    {
+        IsAlias = true;
+        Type = new QualifiedType(alias);
+    }
+
+    public QualifiedOrAliasedType(QualifiedType type)
+    {
+        IsAlias = false;
+        Type = type.Normalized;
+    }
+
+    public bool Equals(QualifiedOrAliasedType other)
+    {
+        if (other.IsAlias != IsAlias)
+            return false;
+
+        if (IsAlias)
+            return string.Equals(Type, other.Type, StringComparison.OrdinalIgnoreCase);
+
+        return Type.Equals(other.Type);
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is QualifiedOrAliasedType qt && Equals(qt);
+    }
+
+    public override int GetHashCode()
+    {
+        int hc = StringComparer.OrdinalIgnoreCase.GetHashCode(Type.Type);
+
+        if (IsAlias) hc = ~hc;
+
+        return hc;
+    }
+
+    public override string ToString()
+    {
+        string t = Type.Type;
+        if (IsAlias)
+            t += " (Alias)";
+        return t;
+    }
+}

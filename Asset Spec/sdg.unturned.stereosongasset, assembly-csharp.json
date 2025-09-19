@@ -1,0 +1,89 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.StereoSongAsset, Assembly-CSharp",
+    "DisplayName": "Stereo Song",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/stereo-song-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Title",
+            "Type":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "#Self.ValueType",
+                            "Operation": "eq",
+                            "Comparand": "Dictionary"
+                        }
+                    ],
+                    "Value": "TranslationReference"
+                },
+                {
+                    "Value": "LocalizableString"
+                }
+            ],
+            "LocalizationKeyOverride": "Name",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "#Self.ValueType",
+                            "Operation": "eq",
+                            "Comparand": "Dictionary"
+                        }
+                    ],
+                    "Value": null
+                },
+                {
+                    "Value": null
+                }
+            ],
+            "Description": "The localizable title of this song.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/stereo-song-asset.html#asset-properties-reference",
+            "Priority": 5,
+            "Deprecated":
+            {
+                "Variable": "#Self.ValueType",
+                "Operation": "eq",
+                "Comparand": "Dictionary"
+            },
+            "Variable": "titleText",
+            "Required": true
+        },
+        {
+            "Key": "Song",
+            "Type": "MasterBundleOrContentReference",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Description": "The audio clip to play.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/stereo-song-asset.html#asset-properties-reference",
+            "Priority": 4,
+            "Variable": "songMbRef",
+            "Required": true
+        },
+        {
+            "Key": "Link_URL",
+            "Type": "Url",
+            "DefaultValue": null,
+            "Description": "An external link for the song, usually used as credit.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/stereo-song-asset.html#asset-properties-reference",
+            "Priority": 2,
+            "Variable": "linkURL"
+        },
+        {
+            "Key": "Is_Loop",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not this song should restart when it's finished playing.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/stereo-song-asset.html#asset-properties-reference",
+            "Priority": 3,
+            "Variable": "isLoop"
+        }
+    ]
+}

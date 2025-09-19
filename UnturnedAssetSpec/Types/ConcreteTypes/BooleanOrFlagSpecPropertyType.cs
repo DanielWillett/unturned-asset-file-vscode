@@ -62,7 +62,7 @@ public sealed class BooleanOrFlagSpecPropertyType : BasicSpecPropertyType<Boolea
             return true;
         }
 
-        if (parse.Node is AssetFileStringValueNode stringValue
+        if (parse.Node is IValueSourceNode stringValue
             && KnownTypeValueHelper.TryParseBoolean(stringValue.Value, out bool boolValue))
         {
             value = boolValue;

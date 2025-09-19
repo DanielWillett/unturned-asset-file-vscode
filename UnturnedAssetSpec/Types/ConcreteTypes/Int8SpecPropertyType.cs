@@ -49,7 +49,7 @@ public sealed class Int8SpecPropertyType : BasicSpecPropertyType<Int8SpecPropert
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode || !KnownTypeValueHelper.TryParseInt8(strValNode.Value, out value))
+        if (parse.Node is not IValueSourceNode strValNode || !KnownTypeValueHelper.TryParseInt8(strValNode.Value, out value))
         {
             return FailedToParse(in parse, out value);
         }

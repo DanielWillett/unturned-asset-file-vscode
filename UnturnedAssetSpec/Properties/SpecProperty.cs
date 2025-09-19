@@ -26,6 +26,11 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     public LegacyExpansionFilter KeyLegacyExpansionFilter { get; set; } = LegacyExpansionFilter.Either;
 
     /// <summary>
+    /// The context of this property, either 'Property', 'Localization', or 'BundleAsset'.
+    /// </summary>
+    public SpecPropertyContext Context { get; set; } = SpecPropertyContext.Property;
+
+    /// <summary>
     /// Import properties have an empty key and are used to layer one type into another.
     /// </summary>
     /// <remarks>See ServerListCurationAsset for an example.</remarks>

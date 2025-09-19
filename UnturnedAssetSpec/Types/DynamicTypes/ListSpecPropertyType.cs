@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Collections.Immutable;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -60,7 +61,7 @@ public sealed class ListSpecPropertyType<TElementType> :
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileListValueNode listNode)
+        if (parse.Node is not IListSourceNode listNode)
         {
             if (!AllowSingle)
                 return FailedToParse(in parse, out value);
@@ -75,13 +76,17 @@ public sealed class ListSpecPropertyType<TElementType> :
             return true;
         }
 
-        EquatableArray<TElementType> eqArray = new EquatableArray<TElementType>(listNode.Elements.Count);
+        ImmutableArray<ISourceNode> children = listNode.Children;
+        EquatableArray<TElementType> eqArray = new EquatableArray<TElementType>(children.Length);
 
         bool parsedAll = true;
         int index = 0;
-        foreach (AssetFileValueNode node in listNode.Elements)
+        foreach (ISourceNode node in children)
         {
-            if (!TryParseElement(node, listNode, in parse, out TElementType element))
+            if (node is not IAnyValueSourceNode anyVal)
+                continue;
+
+            if (!TryParseElement(anyVal, listNode, in parse, out TElementType element))
             {
                 value = eqArray;
                 parsedAll = false;
@@ -103,7 +108,7 @@ public sealed class ListSpecPropertyType<TElementType> :
         return parsedAll;
     }
 
-    private bool TryParseElement(AssetFileValueNode node, AssetFileNode? parent, in SpecPropertyTypeParseContext parse, out TElementType element)
+    private bool TryParseElement(IAnyValueSourceNode node, ISourceNode? parent, in SpecPropertyTypeParseContext parse, out TElementType element)
     {
         SpecPropertyTypeParseContext context = parse with
         {

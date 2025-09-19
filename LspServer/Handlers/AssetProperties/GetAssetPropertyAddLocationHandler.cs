@@ -33,7 +33,9 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
             return Task.FromResult(Invalid);
         }
 
-        AssetFileType fileType = AssetFileType.FromFile(file.File, _spec);
+        ISourceFile sourceFile = file.SourceFile;
+
+        AssetFileType fileType = AssetFileType.FromFile(sourceFile, _spec);
         if (!fileType.IsValid)
         {
             return Task.FromResult(Invalid);
@@ -45,10 +47,18 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
             return Task.FromResult(Invalid);
         }
 
-        AssetFileDictionaryValueNode asset = file.File.Metadata != null && property.CanBeInMetadata
-            ? file.File.Metadata
-            : file.File.Asset;
-
+        IDictionarySourceNode asset;
+        if (sourceFile is IAssetSourceFile assetSourceFile)
+        {
+            asset = property.CanBeInMetadata
+                ? assetSourceFile.GetMetadataDictionary() ?? assetSourceFile.AssetData
+                : assetSourceFile.AssetData;
+        }
+        else
+        {
+            asset = sourceFile;
+        }
+        
         List<SpecProperty> properties = fileType.Information.Properties
             .Where(x => ReferenceEquals(x.Deprecated, SpecDynamicValue.False))
             .OrderByDescending(x => x.Priority)
@@ -57,10 +67,10 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
 
         int lines;
         Position pos;
-        if (asset.Pairs.Count == 0)
+        if (asset.Children.Length == 0)
         {
-            lines = asset.IsRoot ? 2 : 0;
-            pos = asset.IsRoot
+            lines = asset.IsRootNode ? 2 : 0;
+            pos = asset.IsRootNode
                 ? new Position(asset.Range.End.Line - 1, 0)
                 : new Position(asset.Range.End.Line - 1, asset.Range.End.Character - 1);
         }
@@ -68,17 +78,17 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
         {
             int index = properties.FindIndex(x => x.Key.Equals(request.Key));
 
-            (SpecProperty? property, AssetFileKeyValuePairNode? node) after = default;
+            (SpecProperty? property, IPropertySourceNode? node) after = default;
             if (index != -1)
             {
                 after = properties
                     .Take(index)
                     .Reverse()
-                    .Select(x => file.File.TryGetProperty(x, out AssetFileKeyValuePairNode node) ? (property, node) : (null, null))
+                    .Select(x => file.SourceFile.TryGetProperty(x, out IPropertySourceNode? node) ? (property, node) : (null, null))
                     .FirstOrDefault(x => x.property != null);
             }
 
-            (SpecProperty? afterProperty, AssetFileKeyValuePairNode? afterNode) = after;
+            (SpecProperty? afterProperty, IPropertySourceNode? afterNode) = after;
             
             if (afterNode != null)
             {
@@ -92,8 +102,8 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
             }
             else
             {
-                lines = asset.IsRoot ? 2 : 0;
-                pos = asset.IsRoot
+                lines = asset.IsRootNode ? 2 : 0;
+                pos = asset.IsRootNode
                     ? new Position(asset.Range.End.Line - 1, 0)
                     : new Position(asset.Range.End.Line - 2, asset.Range.End.Character - 1);
             }

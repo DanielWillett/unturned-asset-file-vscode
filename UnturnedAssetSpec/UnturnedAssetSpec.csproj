@@ -20,14 +20,15 @@
 
 	<ItemGroup>
 	  <PackageReference Include="System.Text.Json" Version="4.7.1" />
-	  <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" Condition="$(DefineConstants.Contains('EMIT'))" />
+	  <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" Condition="$(DefineConstants.Contains('EMIT')) And '$(TargetFramework)' != 'netstandard2.1'" />
 	  <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
 	  <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Bcl.Numerics" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Bcl.Numerics" Version="8.0.0" Condition="'$(TargetFramework)' != 'netstandard2.1'" />
     <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+		<PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
   </ItemGroup>
 
 	<ItemGroup>

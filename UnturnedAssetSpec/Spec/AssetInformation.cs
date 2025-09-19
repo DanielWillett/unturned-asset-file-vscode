@@ -211,7 +211,7 @@ public class AssetInformation
             return;
 
         arr ??= typeStack.ToArray();
-        parentTypes[hierarchy.Type] = new InverseTypeHierarchy(hierarchy, typeStack.ToArray(), true);
+        parentTypes[hierarchy.Type] = new InverseTypeHierarchy(hierarchy, arr, true);
         if (hierarchy.ChildTypes is not { Count: > 0 })
             return;
 
@@ -314,6 +314,8 @@ public class InverseTypeHierarchy
 {
     public TypeHierarchy Hierarchy { get; }
     public QualifiedType Type { get; }
+
+    // [0] = lowest, [^1] = direct parent
     public QualifiedType[] ParentTypes { get; }
     public bool IsValid { get; }
     public bool IsAbstract { get; }

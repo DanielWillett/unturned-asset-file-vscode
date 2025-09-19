@@ -72,7 +72,7 @@
         },
         {
             "Key": "SpotLight_Color",
-            "Type": "Color",
+            "Type": "ColorRGBLegacy",
             "DefaultValue": "#f5df93",
             "Description": "Color of the tactical light's beam.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-color-color-f5df93",

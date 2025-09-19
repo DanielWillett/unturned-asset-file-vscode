@@ -87,6 +87,16 @@ public sealed class SelfDataRef : IEquatable<ISpecDynamicValue>, IEquatable<Self
         return false;
     }
 
+    public bool EvaluateIsLegacy(in FileEvaluationContext ctx)
+    {
+        return PropertyRefInfo.EvaluateIsLegacy(ctx.Self, in ctx);
+    }
+
+    public ValueTypeDataRefType EvaluateValueType(in FileEvaluationContext ctx)
+    {
+        return PropertyRefInfo.EvaluateValueType(ctx.Self, in ctx);
+    }
+
     public bool EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext ctx)
     {
         return PropertyRefInfo.EvaluateIsIncluded(ctx.Self, valueIncluded, in ctx);
@@ -94,8 +104,8 @@ public sealed class SelfDataRef : IEquatable<ISpecDynamicValue>, IEquatable<Self
 
     public string? EvaluateKey(in FileEvaluationContext ctx)
     {
-        return ctx.File.TryGetProperty(ctx.Self, out AssetFileKeyValuePairNode kvp)
-            ? kvp.Key.Value
+        return ctx.SourceFile.TryGetProperty(ctx.Self, out IPropertySourceNode? property)
+            ? property.Key
             : null;
     }
 

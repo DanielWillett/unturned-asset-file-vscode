@@ -54,6 +54,16 @@ public sealed class ThisDataRef : IEquatable<ISpecDynamicValue>, IEquatable<This
         return false;
     }
 
+    public bool EvaluateIsLegacy(in FileEvaluationContext ctx)
+    {
+        return PropertyRefInfo.EvaluateIsLegacy(ctx.Self, in ctx);
+    }
+
+    public ValueTypeDataRefType EvaluateValueType(in FileEvaluationContext ctx)
+    {
+        return PropertyRefInfo.EvaluateValueType(ctx.Self, in ctx);
+    }
+
     public bool EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext ctx)
     {
         return PropertyRefInfo.EvaluateIsIncluded(ctx.Self, valueIncluded, in ctx);

@@ -1400,14 +1400,6 @@
                     "Description": "List of tags that all need to be available nearby to craft this blueprint."
                 },
                 {
-                    "Key": "TargetItem",
-                    "Type": "BlueprintSupplyIdString",
-                    "DefaultValue": "@SDG.Unturned.Asset::GUID",
-                    "Description": "The item that gets repaired or filled, defaulting to the item this blueprint is defined in.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#operation-eblueprintoperation-none",
-                    "Variable": "TargetItem"
-                },
-                {
                     "Key": "CategoryTag",
                     "Type": "AssetReference",
                     "ElementType": "SDG.Unturned.TagAsset, Assembly-CSharp",

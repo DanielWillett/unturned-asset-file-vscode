@@ -58,42 +58,24 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
             return new RelatedFullDocumentDiagnosticReport { Items = new Container<Diagnostic>() };
         }
 
-        AssetFileTree tree = file.File;
+        ISourceFile tree = file.SourceFile;
 
         AssetFileType type = AssetFileType.FromFile(tree, _specDictionary);
 
-        List<DatDiagnosticMessage> datDiags = new List<DatDiagnosticMessage>();
+        DiagnosticsNodeVisitor visitor = new DiagnosticsNodeVisitor(_specDictionary, _workspace, _installationEnvironment, type);
 
-        foreach (AssetFileNode node in tree)
+        if (tree is IAssetSourceFile asset)
         {
-            if (node is not AssetFileKeyValuePairNode kvp)
-                continue;
-
-            SpecProperty? property = _specDictionary.FindPropertyInfo(kvp.Key.Value, type);
-            if (property == null)
-                continue;
-
-            FileEvaluationContext ctx = new FileEvaluationContext(
-                property,
-                property.Owner,
-                tree,
-                _workspace,
-                _installationEnvironment,
-                _specDictionary,
-                file
-            );
-
-            ISpecPropertyType? propType = property.Type.GetType(in ctx);
-            if (propType == null)
-                continue;
-
-            SpecPropertyTypeParseContext parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(ctx, property, kvp, kvp.Value, datDiags);
-
-            propType.TryParseValue(in parse, out _);
+            asset.GetMetadataDictionary()?.Visit(ref visitor);
+            asset.AssetData.Visit(ref visitor);
+        }
+        else
+        {
+            tree.Visit(ref visitor);
         }
 
-        List<Diagnostic> diagnostics = new List<Diagnostic>(datDiags.Count);
-        foreach (DatDiagnosticMessage msg in datDiags)
+        List<Diagnostic> diagnostics = new List<Diagnostic>(visitor.Diagnostics.Count);
+        foreach (DatDiagnosticMessage msg in visitor.Diagnostics)
         {
             diagnostics.Add(new Diagnostic
             {
@@ -109,5 +91,50 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
         {
             Items = diagnostics
         };
+    }
+
+    private class DiagnosticsNodeVisitor(
+        IAssetSpecDatabase database,
+        IWorkspaceEnvironment workspace,
+        InstallationEnvironment installEnvironment,
+        AssetFileType type
+    ) : TopLevelNodeVisitor, IDiagnosticSink
+    {
+        /// <inheritdoc />
+        protected override bool IgnoreMetadata => true;
+
+        public readonly List<DatDiagnosticMessage> Diagnostics = new List<DatDiagnosticMessage>();
+
+        /// <inheritdoc />
+        protected override void AcceptProperty(IPropertySourceNode node)
+        {
+            SpecProperty? property = database.FindPropertyInfo(node.Key, type);
+            if (property == null)
+                return;
+
+            FileEvaluationContext ctx = new FileEvaluationContext(
+                property,
+                property.Owner,
+                node.File,
+                workspace,
+                installEnvironment,
+                database,
+                node.File.WorkspaceFile
+            );
+
+            ISpecPropertyType? propType = property.Type.GetType(in ctx);
+            if (propType == null)
+                return;
+
+            SpecPropertyTypeParseContext parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(ctx, property, node, node.Value, Diagnostics);
+
+            propType.TryParseValue(in parse, out _);
+        }
+
+        /// <inheritdoc />
+        public void AcceptDiagnostic(DatDiagnosticMessage diagnostic)
+        {
+            Diagnostics.Add(diagnostic);
+        }
     }
 }

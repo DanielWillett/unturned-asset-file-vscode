@@ -55,11 +55,21 @@ public sealed class PropertyDataRef : IEquatable<ISpecDynamicValue>, IEquatable<
         return Property.GetIsIncluded(valueIncluded, in context);
     }
 
+    public ValueTypeDataRefType EvaluateValueType(in FileEvaluationContext ctx)
+    {
+        return Property.GetValueType(in ctx);
+    }
+
+    public bool EvaluateIsLegacy(in FileEvaluationContext ctx)
+    {
+        return Property.GetIsLegacy(in ctx);
+    }
+
     public string? EvaluateKey(in FileEvaluationContext context)
     {
         SpecProperty? property = Property.ResolveProperty(in context);
-        return property != null && context.File.TryGetProperty(property, out AssetFileKeyValuePairNode kvp)
-            ? kvp.Key.Value
+        return property != null && context.SourceFile.TryGetProperty(property, out IPropertySourceNode? kvp)
+            ? kvp.Key
             : null;
     }
 

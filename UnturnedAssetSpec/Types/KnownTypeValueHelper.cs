@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Text.RegularExpressions;
@@ -470,6 +471,46 @@ public static class KnownTypeValueHelper
         }
 
         return !string.IsNullOrEmpty(path);
+    }
+    
+    public static bool TryParseTranslationReference(ReadOnlySpan<char> str, [MaybeNullWhen(false)] out string @namespace, [MaybeNullWhen(false)] out string token)
+    {
+        @namespace = null;
+        token = null;
+
+        if (str.IsEmpty)
+            return false;
+
+        // delimeters: '#', '::'
+        int index1 = str.IndexOf('#');
+        int index2 = str.IndexOf(':');
+
+        if (index1 == 0)
+        {
+            str = str.Slice(1);
+            index1 = str.IndexOf('#');
+            if (index2 >= 0)
+                --index2;
+        }
+
+        if (index1 < 0 && index2 < 0)
+            return false;
+
+        int index;
+        if ((index1 < 0 || index2 < index1) && index2 > 0 && index2 < str.Length - 2 && str[index2 + 1] == ':')
+        {
+            index = index2;
+        }
+        else if (index2 > 0 && index2 < str.Length - 1)
+        {
+            index = index1;
+        }
+        else return false;
+
+
+        @namespace = str.Slice(0, index).ToString();
+        token = str.Slice(index + 2).ToString();
+        return true;
     }
 
     public static bool TryParseMasterBundleReference(ReadOnlySpan<char> str, out string name, out string path)

@@ -8,7 +8,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 public readonly struct AutoCompleteParameters
 {
     public IAssetSpecDatabase Database { get; }
-    public AssetFileTree File { get; }
+    public ISourceNode File { get; }
     public IWorkspaceFile OpenedFile { get; }
     public FilePosition Position { get; }
     public AssetFileType FileType { get; }
@@ -16,7 +16,7 @@ public readonly struct AutoCompleteParameters
     public IWorkspaceEnvironment Workspace { get; }
     public InstallationEnvironment Environment { get; }
 
-    public AutoCompleteParameters(IAssetSpecDatabase database, AssetFileTree file, FilePosition position, AssetFileType fileType, SpecProperty property, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IWorkspaceFile openedFile)
+    public AutoCompleteParameters(IAssetSpecDatabase database, ISourceNode file, FilePosition position, AssetFileType fileType, SpecProperty property, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IWorkspaceFile openedFile)
     {
         Database = database;
         File = file;

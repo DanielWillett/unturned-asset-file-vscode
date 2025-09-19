@@ -70,6 +70,8 @@ public interface IAssetSpecDatabase
     /// Initialize the database.
     /// </summary>
     Task InitializeAsync(CancellationToken token = default);
+
+    void LogMessage(string message);
 }
 
 public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
@@ -115,6 +117,11 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         AssetCategories = new Dictionary<QualifiedType, string>(0),
         Types = new Dictionary<QualifiedType, TypeHierarchy>(0),
         ParentTypes = new Dictionary<QualifiedType, InverseTypeHierarchy>(0)
+    };
+
+    public static AssetSpecDatabase FromOffline() => new AssetSpecDatabase(new InstallDirUtility("\0", "\0"))
+    {
+        UseInternet = false
     };
 
     public AssetSpecDatabase(ISpecDatabaseCache? cache = null) : this(new InstallDirUtility(UnturnedName, UnturnedAppId), cache) { }
@@ -356,6 +363,12 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             }, token);
             ++taskIndex;
         }
+    }
+
+    /// <inheritdoc />
+    void IAssetSpecDatabase.LogMessage(string message)
+    {
+        Log(message);
     }
 
     private static async Task<string?> GetLatestCommitAsync(HttpClient httpClient, CancellationToken token)
@@ -1361,6 +1374,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         public IReadOnlyList<string> ValidActionButtons => _db.ValidActionButtons;
         public IReadOnlyDictionary<QualifiedType, AssetSpecType> Types { get; }
         public Task InitializeAsync(CancellationToken token = default) => _db.InitializeAsync(token);
+        public void LogMessage(string message) => _db.Log(message);
     }
 }
 

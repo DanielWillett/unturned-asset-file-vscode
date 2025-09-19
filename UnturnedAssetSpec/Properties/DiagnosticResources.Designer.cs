@@ -19,7 +19,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class DiagnosticResources {
@@ -93,6 +93,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string UNT1004 {
             get {
                 return ResourceManager.GetString("UNT1004", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Double-quotation marks can not be escaped in non-quoted strings. Use quoted strings if the first character needs to be a double-quotation mark. For example: &quot;\&quot;Value\&quot;&quot;, which parses to [&quot;Value&quot;]..
+        /// </summary>
+        internal static string UNT1004_LeadingEscapedSlash {
+            get {
+                return ResourceManager.GetString("UNT1004_LeadingEscapedSlash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trailing unescaped backslash. Use two backslashes to escape a backslash: &apos;\\&apos;..
+        /// </summary>
+        internal static string UNT1004_Trailing {
+            get {
+                return ResourceManager.GetString("UNT1004_Trailing", resourceCulture);
             }
         }
         
@@ -277,11 +295,38 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This document exceeds the maximum depth of the parser, which is {0} levels..
+        /// </summary>
+        internal static string UNT1020 {
+            get {
+                return ResourceManager.GetString("UNT1020", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type {0} is unknown and may not be assignable to &apos;{1}&apos;..
         /// </summary>
         internal static string UNT103 {
             get {
                 return ResourceManager.GetString("UNT103", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The MasterBundleReference (&quot;MasterBundle&quot;, &quot;AssetPath&quot;) format is preferred here over the legacy ContentReference (&quot;Name&quot;, &quot;Path&quot;) format..
+        /// </summary>
+        internal static string UNT104 {
+            get {
+                return ResourceManager.GetString("UNT104", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unnecessary trailing comma after quoted string..
+        /// </summary>
+        internal static string UNT105 {
+            get {
+                return ResourceManager.GetString("UNT105", resourceCulture);
             }
         }
         

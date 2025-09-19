@@ -84,11 +84,11 @@ internal class KeyCompletionHandler : ICompletionHandler
         TextEditOrInsertReplaceEdit? edit;
 
         SpecProperty property = state.Property;
-        bool needsQuotes = state.Node is AssetFileKeyNode { IsQuoted: true } || property.Key.Any(char.IsWhiteSpace);
+        bool needsQuotes = state.Node is IPropertySourceNode { KeyIsQuoted: true } || property.Key.Any(char.IsWhiteSpace);
 
         string keyText = needsQuotes ? $"\"{property.Key}\"" : property.Key;
         FilePosition position = state.Position;
-        if (state is { IsOnNewLine: true, Node: not AssetFileListValueNode })
+        if (state is { IsOnNewLine: true, Node: not IListSourceNode })
         {
             edit = TextEditOrInsertReplaceEdit.From(new TextEdit
             {
@@ -119,7 +119,7 @@ internal class KeyCompletionHandler : ICompletionHandler
         FileEvaluationContext ctx = new FileEvaluationContext(
             property,
             property.Owner,
-            state.File.File,
+            state.File.SourceFile,
             _workspace,
             _installationEnvironment,
             _specDictionary,
@@ -183,27 +183,27 @@ internal class KeyCompletionHandler : ICompletionHandler
 
         ReadOnlySpan<char> line = ReadOnlySpan<char>.Empty;// lineIndex.SliceLine(position.Line, endColumn: position.Character - 1);
         bool isOnNewLine = line.IsWhiteSpace();
+        
+        ISourceFile sourceFile = file.SourceFile;
 
-        AssetFileTree tree = file.File;
+        AssetFileType fileType = AssetFileType.FromFile(sourceFile, _specDictionary);
 
-        AssetFileType fileType = AssetFileType.FromFile(file.File, _specDictionary);
-
-        AssetFileNode? activeNode = tree.GetNode(position);
+        ISourceNode? activeNode = sourceFile.GetNodeFromPosition(position);
 
         InverseTypeHierarchy hierarchy = _specDictionary.Information.GetParentTypes(fileType.Type);
 
-        AssetFileKeyNode? key = activeNode as AssetFileKeyNode;
-        if (key == null && activeNode is AssetFileStringValueNode strValue)
+        IPropertySourceNode? propNode = activeNode as IPropertySourceNode;
+        if (propNode == null && activeNode is IValueSourceNode strValue)
         {
-            key = (strValue.Parent as AssetFileKeyValuePairNode)?.Key;
+            propNode = strValue.Parent as IPropertySourceNode;
         }
 
-        if (key != null && _specDictionary.FindPropertyInfo(key.Value, fileType, SpecPropertyContext.Property) is { } property && position.Character >= key.Range.End.Character)
+        if (propNode != null && _specDictionary.FindPropertyInfo(propNode.Key, fileType, SpecPropertyContext.Property) is { } property && position.Character >= propNode.Range.End.Character)
         {
             FileEvaluationContext ctx = new FileEvaluationContext(
                 property,
                 fileType.Information,
-                tree,
+                sourceFile,
                 _workspace,
                 _installationEnvironment,
                 _specDictionary,
@@ -216,7 +216,7 @@ internal class KeyCompletionHandler : ICompletionHandler
 
             AutoCompleteParameters p = new AutoCompleteParameters(
                 _specDictionary,
-                tree,
+                sourceFile,
                 position,
                 fileType,
                 property,
@@ -246,7 +246,7 @@ internal class KeyCompletionHandler : ICompletionHandler
             return completions;
         }
         
-        if (activeNode is AssetFileKeyNode || isOnNewLine && activeNode is not AssetFileListValueNode)
+        if (activeNode is IPropertySourceNode || isOnNewLine && activeNode is not IListSourceNode)
         {
             KeyCompletionState state = new KeyCompletionState(activeNode, position, isOnNewLine, hierarchy, null, null!, file);
 

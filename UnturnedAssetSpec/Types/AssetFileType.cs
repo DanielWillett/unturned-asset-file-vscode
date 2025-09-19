@@ -14,14 +14,14 @@ public readonly struct AssetFileType : IEquatable<AssetFileType>
 
     public bool IsValid => Information is not null;
 
-    public AssetFileType(AssetSpecType information, string? alias)
+    private AssetFileType(AssetSpecType information, string? alias)
     {
         Type = information.Type;
         Alias = alias;
         Information = information;
     }
 
-    public AssetFileType(QualifiedType type, string? alias)
+    private AssetFileType(QualifiedType type, string? alias)
     {
         Type = type;
         Alias = alias;
@@ -34,21 +34,14 @@ public readonly struct AssetFileType : IEquatable<AssetFileType>
         return info != null ? new AssetFileType(info, null) : new AssetFileType(QualifiedType.AssetBaseType, null);
     }
 
-    public static AssetFileType FromFile(AssetFileTree file, IAssetSpecDatabase spec)
+    public static AssetFileType FromFile(ISourceFile file, IAssetSpecDatabase spec)
     {
-        string? type = file.GetType(out bool systemType);
-        if (type == null)
-        {
+        QualifiedType type = file.ActualType;
+        if (type.IsNull)
             return default;
-        }
 
-        if (systemType || !spec.Information.AssetAliases.TryGetValue(type, out QualifiedType qt))
-        {
-            qt = new QualifiedType(type);
-        }
-
-        spec.Types.TryGetValue(qt, out AssetSpecType? info);
-        return info != null ? new AssetFileType(info, null) : new AssetFileType(qt, null);
+        spec.Types.TryGetValue(type, out AssetSpecType? info);
+        return info != null ? new AssetFileType(info, null) : new AssetFileType(type, null);
     }
 
     /// <inheritdoc />

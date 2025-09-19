@@ -51,6 +51,14 @@ internal static class JsonHelper
         catch { /* ignored */ }
     }
 
+    /// <summary>
+    /// Skips any properties starting with '$'.
+    /// </summary>
+    public static bool ShouldSkipAdditionalProperty([NotNullWhen(false)] string? key)
+    {
+        return string.IsNullOrEmpty(key) || key![0] == '$';
+    }
+
     public static Utf8JsonReader CreateUtf8JsonReader(JsonDocument document, JsonReaderOptions options)
     {
         ReadOnlyMemory<byte> mem;

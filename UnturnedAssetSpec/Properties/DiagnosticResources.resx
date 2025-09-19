@@ -225,4 +225,19 @@
   <data name="UNT103" xml:space="preserve">
     <value>Type {0} is unknown and may not be assignable to '{1}'.</value>
   </data>
+  <data name="UNT104" xml:space="preserve">
+    <value>The MasterBundleReference ("MasterBundle", "AssetPath") format is preferred here over the legacy ContentReference ("Name", "Path") format.</value>
+  </data>
+  <data name="UNT1004_Trailing" xml:space="preserve">
+    <value>Trailing unescaped backslash. Use two backslashes to escape a backslash: '\\'.</value>
+  </data>
+  <data name="UNT1004_LeadingEscapedSlash" xml:space="preserve">
+    <value>Double-quotation marks can not be escaped in non-quoted strings. Use quoted strings if the first character needs to be a double-quotation mark. For example: "\"Value\"", which parses to ["Value"].</value>
+  </data>
+  <data name="UNT1020" xml:space="preserve">
+    <value>This document exceeds the maximum depth of the parser, which is {0} levels.</value>
+  </data>
+  <data name="UNT105" xml:space="preserve">
+    <value>Unnecessary trailing comma after quoted string.</value>
+  </data>
 </root>

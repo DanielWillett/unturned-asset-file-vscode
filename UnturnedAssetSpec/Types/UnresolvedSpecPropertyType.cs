@@ -54,8 +54,25 @@ internal sealed class UnresolvedSpecPropertyType :
             return specPropertyType;
         }
 
-        if (TryResolveType(assetFile, database, out ISpecPropertyType propType))
+        ISpecPropertyType propType;
+
+        int nsIndex = Value.IndexOf("::", StringComparison.Ordinal);
+        if (nsIndex > 0 && nsIndex < Value.Length - 2)
+        {
+            if (database.Types.TryGetValue(new QualifiedType(Value.Substring(0, nsIndex)), out AssetSpecType t))
+            {
+                if (TryResolveType(t, database, out propType, Value.Substring(nsIndex + 2)))
+                    return propType;
+            }
+        }
+
+        if (TryResolveType(assetFile, database, out propType, Value))
             return propType;
+
+        if (database.Types.TryGetValue(new QualifiedType(Value), out AssetSpecType type))
+        {
+            return type;
+        }
 
         throw new SpecTypeResolveException($"Failed to resolve type: \"{Value}\".");
     }
@@ -63,23 +80,23 @@ internal sealed class UnresolvedSpecPropertyType :
     /// <inheritdoc />
     public override string ToString() => DisplayName;
 
-    private bool TryResolveType(ISpecType type, IAssetSpecDatabase database, out ISpecPropertyType propType)
+    private static bool TryResolveType(ISpecType type, IAssetSpecDatabase database, out ISpecPropertyType propType, string value)
     {
         if (type is AssetSpecType nestedAssetType)
         {
             foreach (ISpecType t in nestedAssetType.Types)
             {
-                if (TryResolveType(t, database, out propType))
+                if (TryResolveType(t, database, out propType, value))
                     return true;
             }
 
             if (!nestedAssetType.Parent.IsNull && database.Types.TryGetValue(nestedAssetType.Parent, out AssetSpecType info))
             {
-                if (TryResolveType(info, database, out propType))
+                if (TryResolveType(info, database, out propType, value))
                     return true;
             }
         }
-        else if (type is ISpecPropertyType propertyType && type.Type.Equals(Value))
+        else if (type is ISpecPropertyType propertyType && type.Type.Equals(value))
         {
             propType = propertyType;
             return true;

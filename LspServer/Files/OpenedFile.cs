@@ -14,6 +14,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 #if DEBUG
 using System.ComponentModel;
 #endif
@@ -31,6 +32,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 [DebuggerDisplay("{Uri} - {LineCount, nq} L, {_contentSegment.Count,nq} C")]
 public class OpenedFile : IWorkspaceFile
 {
+    private const SourceNodeTokenizerOptions ReadFileOptions = SourceNodeTokenizerOptions.Lazy | SourceNodeTokenizerOptions.Metadata;
 
 #if KEEP_VIRTUAL_FILE_SYSTEM
     private readonly string _virtualFile;
@@ -38,10 +40,11 @@ public class OpenedFile : IWorkspaceFile
 #endif
 
     private readonly ILogger _logger;
+    private readonly IAssetSpecDatabase _database;
 
     private readonly bool _obsessivelyValidate;
 
-    private AssetFileTree? _tree;
+    private ISourceFile? _sourceFile;
 
     internal object EditLock = new object();
     internal object UpdateLock = new object();
@@ -61,15 +64,72 @@ public class OpenedFile : IWorkspaceFile
     private readonly bool _useVirtualFiles;
 #endif
 
-    public string AssetName { get; }
-
-    // todo:
-    public bool IsLocalization { get; }
-
+    /// <summary>
+    /// Returns the complete text content as a string.
+    /// </summary>
     public string GetFullText()
     {
         lock (EditLock)
+        {
+            if (_contentSegment.Count == 0)
+                return string.Empty;
+
             return new string(_content, _contentSegment.Offset, _contentSegment.Count);
+        }
+    }
+
+    public delegate void SpanAction<TState>(ReadOnlySpan<char> span, ref TState state);
+
+    /// <summary>
+    /// Performs an operation on the full text of the file.
+    /// </summary>
+    public void OperateOnFullSpan(Action<ReadOnlySpan<char>> action)
+    {
+        action?.Invoke(_contentSegment.AsSpan());
+    }
+
+    /// <summary>
+    /// Performs an operation on the full text of the file, passing a state parameter.
+    /// </summary>
+    public void OperateOnFullSpan<TState>(ref TState state, SpanAction<TState> action)
+    {
+        action?.Invoke(_contentSegment.AsSpan(), ref state);
+    }
+
+    /// <summary>
+    /// Performs an operation on the full text of the file.
+    /// </summary>
+    public void ForEachLine(Action<ReadOnlySpan<char>> lineAction)
+    {
+        if (lineAction == null)
+            return;
+
+        lock (EditLock)
+        {
+            for (int i = 0; i < _lines.Length; ++i)
+            {
+                ArraySegment<char> seg = GetLineIntl(i + 1);
+                lineAction(seg.AsSpan());
+            }
+        }
+    }
+
+    /// <summary>
+    /// Performs an operation on each line of the file, passing a state parameter.
+    /// </summary>
+    public void ForEachLine<TState>(ref TState state, SpanAction<TState> lineAction)
+    {
+        if (lineAction == null)
+            return;
+
+        lock (EditLock)
+        {
+            for (int i = 0; i < _lines.Length; ++i)
+            {
+                ArraySegment<char> seg = GetLineIntl(i + 1);
+                lineAction(seg.AsSpan(), ref state);
+            }
+        }
     }
 
     /// <summary>
@@ -77,26 +137,32 @@ public class OpenedFile : IWorkspaceFile
     /// </summary>
     public int LineCount => _lineCount;
 
-    public AssetFileTree File
+    public ISourceFile SourceFile
     {
         get
         {
-            AssetFileTree? tree = _tree;
-            if (tree != null)
-                return tree;
+            ISourceFile? file = _sourceFile;
+            if (file != null)
+                return file;
 
             lock (EditLock)
             {
-                tree = _tree;
-                if (tree != null)
-                    return tree;
+                file = _sourceFile;
+                if (file != null)
+                    return file;
 
-                DatTokenizer tokenizer = new DatTokenizer(new ReadOnlySpan<char>(_content, _contentSegment.Offset, _contentSegment.Count));
-                tree = AssetFileTree.Create(ref tokenizer);
-                _tree = tree;
+                using SourceNodeTokenizer tokenizer = new SourceNodeTokenizer(
+                    new ReadOnlyMemory<char>(_content, _contentSegment.Offset, _contentSegment.Count),
+                    ReadFileOptions
+                );
+
+                SourceNodeTokenizer.RootInfo info = SourceNodeTokenizer.RootInfo.Asset(this, _database);
+
+                file = tokenizer.ReadRootDictionary(info);
+                _sourceFile = file;
             }
 
-            return tree;
+            return file;
         }
     }
 
@@ -116,27 +182,18 @@ public class OpenedFile : IWorkspaceFile
         }
     }
 
+    public string File { get; }
+
 #pragma warning disable CS8618, CS9264
-    public OpenedFile(DocumentUri uri, ReadOnlySpan<char> text, ILogger logger, bool obsessivelyValidate = false, bool useVirtualFiles = false)
+    public OpenedFile(DocumentUri uri, ReadOnlySpan<char> text, ILogger logger, IAssetSpecDatabase database, bool obsessivelyValidate = false, bool useVirtualFiles = false)
     {
         _logger = logger;
+        _database = database;
         _obsessivelyValidate = obsessivelyValidate;
         Uri = uri;
 
         string path = uri.GetFileSystemPath();
-        string fileName = Path.GetFileName(path);
-        if (string.Equals(fileName, "Asset.dat", StringComparison.Ordinal))
-        {
-            string? dirName = Path.GetDirectoryName(path);
-            fileName = dirName != null ? Path.GetFileName(dirName) : "Asset";
-        }
-        else
-        {
-            fileName = Path.GetFileNameWithoutExtension(fileName);
-        }
-
-        AssetName = fileName;
-
+        File = path;
 #if KEEP_VIRTUAL_FILE_SYSTEM
         _useVirtualFiles = useVirtualFiles;
         _virtualFile = Path.Combine(UnturnedAssetFileLspServer.DebugPath, Path.GetFileName(path) + ".txt");
@@ -259,7 +316,7 @@ public class OpenedFile : IWorkspaceFile
 
     private void InvalidateText()
     {
-        _tree = null;
+        _sourceFile = null;
 #if KEEP_VIRTUAL_FILE_SYSTEM
         UpdateVirtualFile();
 #endif

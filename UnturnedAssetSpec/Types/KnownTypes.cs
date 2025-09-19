@@ -49,6 +49,7 @@ public static class KnownTypes
         { "ColorRGBStrictHex", () => ColorRGBStrictHex },
         { "ColorRGBAStrictHex", () => ColorRGBAStrictHex },
         { "AudioReference", () => AudioReference },
+        { "TranslationReference", () => TranslationReference },
         { "NavId", () => NavId },
         { "SpawnpointId", () => SpawnpointId },
         { "FlagId", () => FlagId },
@@ -181,6 +182,13 @@ public static class KnownTypes
         if (knownType.Equals("MasterBundleReference", StringComparison.Ordinal))
         {
             return MasterBundleReference(string.IsNullOrEmpty(elementType)
+                ? new QualifiedType("UnityEngine.Object, UnityEngine.CoreModule")
+                : new QualifiedType(elementType!));
+        }
+
+        if (knownType.Equals("MasterBundleOrContentReference", StringComparison.Ordinal))
+        {
+            return MasterBundleOrContentReference(string.IsNullOrEmpty(elementType)
                 ? new QualifiedType("UnityEngine.Object, UnityEngine.CoreModule")
                 : new QualifiedType(elementType!));
         }
@@ -400,6 +408,8 @@ public static class KnownTypes
     public static ISpecPropertyType<BundleReference> ContentReference(QualifiedType elementType)
         => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.ContentReference);
     public static ISpecPropertyType<BundleReference> AudioReference => MasterBundleReferenceSpecPropertyType.AudioReference;
+    public static ISpecPropertyType<BundleReference> MasterBundleOrContentReference(QualifiedType elementType)
+        => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.MasterBundleOrContentReference);
 
     public static ISpecPropertyType<GuidOrId> GuidOrId(QualifiedType elementType, OneOrMore<string> specialTypes = default)
         => new GuidOrIdSpecPropertyType(elementType, specialTypes);
@@ -512,7 +522,8 @@ public static class KnownTypes
     public static ISpecPropertyType<QualifiedType> TypeReference(QualifiedType elementType)
         => new TypeReferenceSpecPropertyType(elementType);
 
-    public static ISpecPropertyType<string> Url => LocalizableStringSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> Url => UrlSpecPropertyType.Instance;
     public static ISpecPropertyType<string> IPv4Range => StringSpecPropertyType.Instance; // todo
     public static ISpecPropertyType<ulong> Steam64ID => UInt64SpecPropertyType.Instance; // todo
+    public static ISpecPropertyType<BundleReference> TranslationReference => MasterBundleReferenceSpecPropertyType.TranslationReference;
 }

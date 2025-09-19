@@ -49,7 +49,7 @@ public sealed class Float64SpecPropertyType : BasicSpecPropertyType<Float64SpecP
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode || !KnownTypeValueHelper.TryParseDouble(strValNode.Value, out value))
+        if (parse.Node is not IValueSourceNode strValNode || !KnownTypeValueHelper.TryParseDouble(strValNode.Value, out value))
         {
             return FailedToParse(in parse, out value);
         }

@@ -58,78 +58,91 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
             return new SymbolInformationOrDocumentSymbolContainer();
         }
 
-        AssetFileTree tree = file.File;
+        ISourceFile sourceFile = file.SourceFile;
 
-        AssetFileType type = AssetFileType.FromFile(tree, _specDictionary);
+        AssetFileType type = AssetFileType.FromFile(sourceFile, _specDictionary);
 
-        List<SymbolInformationOrDocumentSymbol> symbols = new List<SymbolInformationOrDocumentSymbol>();
+        DocumentSymbolInformationVisitor visitor = new DocumentSymbolInformationVisitor(_specDictionary, _workspace, _installationEnvironment, type);
 
-        foreach (AssetFileNode node in tree)
+        sourceFile.Visit(ref visitor);
+
+        return visitor.Symbols;
+    }
+
+    public class DocumentSymbolInformationVisitor(
+        IAssetSpecDatabase database,
+        IWorkspaceEnvironment workspaceEnvironment,
+        InstallationEnvironment installEnvironment,
+        AssetFileType type
+    ) : OrderedNodeVisitor
+    {
+        public readonly List<SymbolInformationOrDocumentSymbol> Symbols = new List<SymbolInformationOrDocumentSymbol>(256);
+
+        protected override bool IgnoreMetadata => true;
+
+        /// <inheritdoc />
+        protected override void AcceptProperty(IPropertySourceNode node)
         {
-            if (node is AssetFileKeyNode keyNode)
-            {
-                SpecProperty? property = _specDictionary.FindPropertyInfo(keyNode.Value, type);
-                if (property == null)
-                    continue;
+            SpecProperty? property = database.FindPropertyInfo(node.Key, type);
+            if (property == null)
+                return;
 
+            FileEvaluationContext ctx = new FileEvaluationContext(
+                property,
+                property.Owner,
+                node.File,
+                workspaceEnvironment,
+                installEnvironment,
+                database,
+                node.File.WorkspaceFile
+            );
+
+            ISpecPropertyType? propType = property.Type.GetType(in ctx);
+            if (propType == null)
+                return;
+
+            Range range = node.Range.ToRange();
+            Symbols.Add(new SymbolInformationOrDocumentSymbol(new DocumentSymbol
+            {
+                Range = range,
+                Kind = SymbolKind.Property,
+                Deprecated = false,
+                SelectionRange = range,
+                Detail = propType.DisplayName,
+                Name = property.Key
+            }));
+        }
+
+        protected override void AcceptValue(IValueSourceNode node)
+        {
+            string? propertyName = (node.Parent as IPropertySourceNode)?.Key;
+            SpecProperty? property = propertyName == null ? null : database.FindPropertyInfo(propertyName, type);
+            Range range = node.Range.ToRange();
+
+            ISpecPropertyType? propType = null;
+            if (property != null)
+            {
                 FileEvaluationContext ctx = new FileEvaluationContext(
                     property,
                     property.Owner,
-                    tree,
-                    _workspace,
-                    _installationEnvironment,
-                    _specDictionary,
-                    file
+                    node.File,
+                    workspaceEnvironment,
+                    installEnvironment,
+                    database,
+                    node.File.WorkspaceFile
                 );
 
-                ISpecPropertyType? propType = property.Type.GetType(in ctx);
-                if (propType == null)
-                    continue;
-
-                Range range = node.Range.ToRange();
-                symbols.Add(new SymbolInformationOrDocumentSymbol(new DocumentSymbol
-                {
-                    Range = range,
-                    Kind = SymbolKind.Property,
-                    Deprecated = false,
-                    SelectionRange = range,
-                    Detail = propType.DisplayName,
-                    Name = property.Key
-                }));
+                propType = property.Type.GetType(in ctx);
             }
-            else if (node is AssetFileStringValueNode strValue)
+
+            Symbols.Add(new SymbolInformationOrDocumentSymbol(new DocumentSymbol
             {
-                string? propertyName = (strValue.Parent as AssetFileKeyValuePairNode)?.Key?.Value;
-                SpecProperty? property = propertyName == null ? null : _specDictionary.FindPropertyInfo(propertyName, type);
-                Range range = node.Range.ToRange();
-
-                ISpecPropertyType? propType = null;
-                if (property != null)
-                {
-                    FileEvaluationContext ctx = new FileEvaluationContext(
-                        property,
-                        property.Owner,
-                        tree,
-                        _workspace,
-                        _installationEnvironment,
-                        _specDictionary,
-                        file
-                    );
-
-                    propType = property.Type.GetType(in ctx);
-                }
-
-                symbols.Add(new SymbolInformationOrDocumentSymbol(new DocumentSymbol
-                {
-                    Range = range,
-                    Kind = propType?.GetSymbolKind() ?? SymbolKind.String,
-                    Deprecated = false,
-                    SelectionRange = range,
-                    Name = strValue.Value
-                }));
-            }
+                Range = range,
+                Kind = propType?.GetSymbolKind() ?? SymbolKind.String,
+                Deprecated = false,
+                SelectionRange = range,
+                Name = node.Value
+            }));
         }
-
-        return symbols;
     }
 }

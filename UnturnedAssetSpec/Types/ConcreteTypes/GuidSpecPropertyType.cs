@@ -46,7 +46,7 @@ public sealed class GuidSpecPropertyType : BasicSpecPropertyType<GuidSpecPropert
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode strValNode || !KnownTypeValueHelper.TryParseGuid(strValNode.Value, out value))
+        if (parse.Node is not IValueSourceNode strValNode || !KnownTypeValueHelper.TryParseGuid(strValNode.Value, out value))
         {
             return FailedToParse(in parse, out value);
         }

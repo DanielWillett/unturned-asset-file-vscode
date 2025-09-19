@@ -58,19 +58,23 @@ public sealed class DictionarySpecPropertyType<TElementType> :
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileDictionaryValueNode dictNode)
+        if (parse.Node is not IDictionarySourceNode dictNode)
         {
             return FailedToParse(in parse, out value);
         }
 
-        EquatableArray<DictionaryPair<TElementType>> eqArray = new EquatableArray<DictionaryPair<TElementType>>(dictNode.Pairs.Count);
+        EquatableArray<DictionaryPair<TElementType>> eqArray = new EquatableArray<DictionaryPair<TElementType>>(dictNode.Children.Length);
 
         bool parsedAll = true;
         int index = 0;
-        foreach (AssetFileKeyValuePairNode node in dictNode.Pairs)
+        foreach (ISourceNode node in dictNode.Children)
         {
-            string key = node.Key.Value;
-            if (node.Value == null)
+            if (node is not IPropertySourceNode property)
+                continue;
+
+            string key = property.Key;
+            IAnyValueSourceNode? val = property.Value;
+            if (val == null)
             {
                 if (parse.HasDiagnostics)
                 {
@@ -88,7 +92,7 @@ public sealed class DictionarySpecPropertyType<TElementType> :
                 continue;
             }
 
-            if (!TryParseElement(node.Value, dictNode, in parse, out TElementType element))
+            if (!TryParseElement(val, dictNode, in parse, out TElementType element))
             {
                 parsedAll = false;
             }
@@ -109,7 +113,7 @@ public sealed class DictionarySpecPropertyType<TElementType> :
         return parsedAll;
     }
 
-    private bool TryParseElement(AssetFileValueNode node, AssetFileNode? parent, in SpecPropertyTypeParseContext parse, out TElementType element)
+    private bool TryParseElement(IAnyValueSourceNode node, ISourceNode? parent, in SpecPropertyTypeParseContext parse, out TElementType element)
     {
         SpecPropertyTypeParseContext context = parse with
         {

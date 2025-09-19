@@ -74,9 +74,9 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
         if (options == CustomSpecTypeParseOptions.Legacy && !IsLegacyExpandedType)
             return false;
 
-        if (parse.Node is not AssetFileDictionaryValueNode dictionary || options == CustomSpecTypeParseOptions.Legacy && parse.BaseKey == null)
+        if (parse.Node is not IDictionarySourceNode dictionary || options == CustomSpecTypeParseOptions.Legacy && parse.BaseKey == null)
         {
-            if (!string.IsNullOrEmpty(StringParsableType) && parse.Node is AssetFileStringValueNode stringValue)
+            if (!string.IsNullOrEmpty(StringParsableType) && parse.Node is IValueSourceNode stringValue)
             {
                 ISpecPropertyType? type = KnownTypes.GetType(StringParsableType!, null, OneOrMore<string>.Null, resolvedOnly: true);
                 if (type == null)
@@ -143,7 +143,7 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
                 else
                     fullKey = baseKey + "_" + fullKey;
 
-                if (!dictionary.TryGetValue(fullKey, out AssetFileKeyValuePairNode kvp))
+                if (!dictionary.TryGetProperty(fullKey, out IPropertySourceNode? kvp))
                 {
                     properties.Add(new CustomSpecTypeProperty(null, property, fullKey));
                 }
@@ -172,7 +172,7 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
         {
             foreach (SpecProperty property in Properties)
             {
-                if (!dictionary.TryGetValue(property.Key, out AssetFileKeyValuePairNode kvp))
+                if (!dictionary.TryGetProperty(property.Key, out IPropertySourceNode? kvp))
                 {
                     properties.Add(new CustomSpecTypeProperty(null, property, property.Key));
                     continue;

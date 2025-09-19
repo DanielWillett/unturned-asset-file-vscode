@@ -45,12 +45,12 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
                 return MissingNode(in parse, out value);
             }
 
-            AssetFileDictionaryValueNode? dict;
-            if (parse.Parent is AssetFileKeyValuePairNode { Parent: AssetFileDictionaryValueNode dict2 })
+            IDictionarySourceNode? dict;
+            if (parse.Parent is IPropertySourceNode { Parent: IDictionarySourceNode dict2 })
             {
                 dict = dict2;
             }
-            else if (parse.Parent is AssetFileDictionaryValueNode dict3)
+            else if (parse.Parent is IDictionarySourceNode dict3)
             {
                 dict = dict3;
             }
@@ -71,12 +71,12 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
             return TryParseFromDictionary(in parse, dict, xKey, yKey, zKey, out value);
         }
 
-        if ((options & VectorTypeParseOptions.Object) != 0 && parse.Node is AssetFileDictionaryValueNode v3Struct)
+        if ((options & VectorTypeParseOptions.Object) != 0 && parse.Node is IDictionarySourceNode v3Struct)
         {
             return TryParseFromDictionary(in parse, v3Struct, "X", "Y", "Z", out value);
         }
 
-        if ((options & VectorTypeParseOptions.Composite) != 0 && parse.Node is AssetFileStringValueNode strValNode)
+        if ((options & VectorTypeParseOptions.Composite) != 0 && parse.Node is IValueSourceNode strValNode)
         {
             return KnownTypeValueHelper.TryParseVector3Components(strValNode.Value.AsSpan(), out value);
         }
@@ -84,14 +84,13 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
         return FailedToParse(in parse, out value);
     }
 
-    protected bool TryParseFromDictionary(in SpecPropertyTypeParseContext parse, AssetFileDictionaryValueNode dict, string xKey, string yKey, string zKey, out Vector3 value)
+    protected bool TryParseFromDictionary(in SpecPropertyTypeParseContext parse, IDictionarySourceNode dict, string xKey, string yKey, string zKey, out Vector3 value)
     {
         bool xBad = false, yBad = false, zBad = false;
 
         string? xVal = null, yVal = null, zVal = null;
 
-        if (!dict.TryGetValue(xKey, out AssetFileValueNode? xKeyObj)
-            || xKeyObj is not AssetFileStringValueNode xString)
+        if (!dict.TryGetPropertyValue(xKey, out IValueSourceNode? xString))
         {
             xBad = true;
         }
@@ -100,8 +99,7 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
             xVal = xString.Value;
         }
 
-        if (!dict.TryGetValue(yKey, out AssetFileValueNode? yKeyObj)
-            || yKeyObj is not AssetFileStringValueNode yString)
+        if (!dict.TryGetPropertyValue(yKey, out IValueSourceNode? yString))
         {
             yBad = true;
         }
@@ -110,8 +108,7 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
             yVal = yString.Value;
         }
 
-        if (!dict.TryGetValue(zKey, out AssetFileValueNode? zKeyObj)
-            || zKeyObj is not AssetFileStringValueNode zString)
+        if (!dict.TryGetPropertyValue(zKey, out IValueSourceNode? zString))
         {
             zBad = true;
         }
@@ -128,7 +125,7 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
                 {
                     Diagnostic = DatDiagnostics.UNT1007,
                     Message = string.Format(DiagnosticResources.UNT1007, parse.BaseKey, xKey),
-                    Range = xKeyObj?.Range ?? yKeyObj?.Range ?? zKeyObj?.Range ?? dict.Range
+                    Range = xString?.Range ?? yString?.Range ?? zString?.Range ?? dict.Range
                 });
             }
 
@@ -138,7 +135,7 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
                 {
                     Diagnostic = DatDiagnostics.UNT1007,
                     Message = string.Format(DiagnosticResources.UNT1007, parse.BaseKey, yKey),
-                    Range = yKeyObj?.Range ?? zKeyObj?.Range ?? xKeyObj?.Range ?? dict.Range
+                    Range = yString?.Range ?? zString?.Range ?? xString?.Range ?? dict.Range
                 });
             }
 
@@ -148,7 +145,7 @@ public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3Spe
                 {
                     Diagnostic = DatDiagnostics.UNT1007,
                     Message = string.Format(DiagnosticResources.UNT1007, parse.BaseKey, zKey),
-                    Range = zKeyObj?.Range ?? yKeyObj?.Range ?? xKeyObj?.Range ?? dict.Range
+                    Range = zString?.Range ?? yString?.Range ?? xString?.Range ?? dict.Range
                 });
             }
         }

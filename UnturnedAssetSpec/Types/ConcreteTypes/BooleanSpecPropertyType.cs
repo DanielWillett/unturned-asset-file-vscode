@@ -75,7 +75,7 @@ public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecP
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is AssetFileStringValueNode stringValue && KnownTypeValueHelper.TryParseBoolean(stringValue.Value, out bool boolValue))
+        if (parse.Node is IValueSourceNode stringValue && KnownTypeValueHelper.TryParseBoolean(stringValue.Value, out bool boolValue))
         {
             value = boolValue;
         }

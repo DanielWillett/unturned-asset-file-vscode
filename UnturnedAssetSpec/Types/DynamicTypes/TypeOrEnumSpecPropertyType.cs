@@ -127,7 +127,7 @@ public sealed class TypeOrEnumSpecPropertyType :
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is not AssetFileStringValueNode stringNode)
+        if (parse.Node is not IValueSourceNode stringNode)
         {
             return FailedToParse(in parse, out value);
         }

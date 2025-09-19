@@ -11,7 +11,15 @@ public sealed class MasterBundleReferenceSpecPropertyType :
     IEquatable<MasterBundleReferenceSpecPropertyType?>,
     IStringParseableSpecPropertyType
 {
-    public static readonly MasterBundleReferenceSpecPropertyType AudioReference = new MasterBundleReferenceSpecPropertyType();
+    public static readonly MasterBundleReferenceSpecPropertyType AudioReference = new MasterBundleReferenceSpecPropertyType(
+        new QualifiedType("UnityEngine.AudioClip, UnityEngine.AudioModule"),
+        MasterBundleReferenceType.AudioReference
+    );
+
+    public static readonly MasterBundleReferenceSpecPropertyType TranslationReference = new MasterBundleReferenceSpecPropertyType(
+        QualifiedType.None,
+        MasterBundleReferenceType.TranslationReference
+    );
 
     static MasterBundleReferenceSpecPropertyType() { }
 
@@ -51,12 +59,6 @@ public sealed class MasterBundleReferenceSpecPropertyType :
         return false;
     }
 
-    private MasterBundleReferenceSpecPropertyType()
-        : this(new QualifiedType("UnityEngine.AudioClip, UnityEngine.AudioModule"), MasterBundleReferenceType.AudioReference)
-    {
-
-    }
-
     public MasterBundleReferenceSpecPropertyType(QualifiedType elementType, MasterBundleReferenceType referenceType)
     {
         ReferenceType = referenceType;
@@ -65,6 +67,8 @@ public sealed class MasterBundleReferenceSpecPropertyType :
             MasterBundleReferenceType.AudioReference => "AudioReference",
             MasterBundleReferenceType.ContentReference => "ContentReference",
             MasterBundleReferenceType.MasterBundleReferenceString => "MasterBundleReferenceString",
+            MasterBundleReferenceType.MasterBundleOrContentReference => "MasterBundleOrContentReference",
+            MasterBundleReferenceType.TranslationReference => "TranslationReference",
             _ => "MasterBundleReference"
         };
 
@@ -73,15 +77,17 @@ public sealed class MasterBundleReferenceSpecPropertyType :
             MasterBundleReferenceType.AudioReference => "Audio Reference",
             MasterBundleReferenceType.ContentReference => "Content Reference",
             MasterBundleReferenceType.MasterBundleReferenceString => "Masterbundle Reference (Legacy)",
+            MasterBundleReferenceType.MasterBundleOrContentReference => "Masterbundle or Content Reference",
+            MasterBundleReferenceType.TranslationReference => "Legacy Translation Token Reference",
             _ => "Masterbundle Reference"
         };
 
         ElementType = elementType;
         
-        if (elementType.Type == null || referenceType == MasterBundleReferenceType.AudioReference)
+        if (elementType.Type == null || referenceType is MasterBundleReferenceType.AudioReference or MasterBundleReferenceType.TranslationReference)
             return;
 
-        DisplayName += $" for {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
+        DisplayName += $" to {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
     }
 
     /// <inheritdoc />
@@ -105,40 +111,86 @@ public sealed class MasterBundleReferenceSpecPropertyType :
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is AssetFileStringValueNode stringValue)
+        if (parse.Node is IValueSourceNode stringValue)
         {
-            if (!KnownTypeValueHelper.TryParseMasterBundleReference(stringValue.Value, out string name, out string path))
+            string? name, path;
+            if (ReferenceType == MasterBundleReferenceType.TranslationReference)
             {
-                return FailedToParse(in parse, out value);
+                if (!KnownTypeValueHelper.TryParseTranslationReference(stringValue.Value, out name, out path))
+                {
+                    return FailedToParse(in parse, out value);
+                }
+            }
+            else
+            {
+                if (!KnownTypeValueHelper.TryParseMasterBundleReference(stringValue.Value, out name, out path))
+                {
+                    return FailedToParse(in parse, out value);
+                }
+
+                //if (string.IsNullOrEmpty(name))
+                //{
+                //    // todo: check if in master bundle if name is null
+                //    name = "<<current master bundle>>";
+                //}
             }
 
-            //if (string.IsNullOrEmpty(name))
-            //{
-            //    // todo: check if in master bundle if name is null
-            //    name = "<<current master bundle>>";
-            //}
+            MasterBundleReferenceType rType = ReferenceType;
+            if (rType is MasterBundleReferenceType.MasterBundleReference or MasterBundleReferenceType.MasterBundleOrContentReference)
+                rType = MasterBundleReferenceType.MasterBundleReferenceString;
 
-            value = new BundleReference(name, path, ReferenceType);
+            value = new BundleReference(name, path, rType);
             return true;
         }
 
-        if (parse.Node is not AssetFileDictionaryValueNode dictionary
-            || ReferenceType is not MasterBundleReferenceType.MasterBundleReference and not MasterBundleReferenceType.ContentReference)
+        if (parse.Node is not IDictionarySourceNode dictionary
+            || ReferenceType is not MasterBundleReferenceType.MasterBundleReference and not MasterBundleReferenceType.ContentReference and not MasterBundleReferenceType.MasterBundleOrContentReference)
         {
             return FailedToParse(in parse, out value);
         }
 
+        if (ReferenceType != MasterBundleReferenceType.MasterBundleOrContentReference)
+            return TryParseReferenceType(dictionary, in parse, out value, ReferenceType);
+
+        SpecPropertyTypeParseContext parseCtx = parse.WithoutDiagnostics();
+
+        bool masterBundleRef = TryParseReferenceType(dictionary, in parse, out BundleReference masterBundleReference, MasterBundleReferenceType.MasterBundleReference);
+
+        if (!TryParseReferenceType(dictionary, in parseCtx, out value, MasterBundleReferenceType.ContentReference))
+        {
+            value = masterBundleReference;
+            return masterBundleRef;
+        }
+
+        parse.Log(new DatDiagnosticMessage
+        {
+            Diagnostic = DatDiagnostics.UNT104,
+            Message = DiagnosticResources.UNT104,
+            Range = dictionary.Range
+        });
+
+        if (masterBundleRef)
+        {
+            value = masterBundleReference;
+        }
+        
+        return true;
+
+    }
+
+    private bool TryParseReferenceType(IDictionarySourceNode dictionary, in SpecPropertyTypeParseContext parse, out BundleReference value, MasterBundleReferenceType rType)
+    {
         string nameProperty = ReferenceType == MasterBundleReferenceType.ContentReference ? "Name" : "MasterBundle";
         string pathProperty = ReferenceType == MasterBundleReferenceType.ContentReference ? "Path" : "AssetPath";
 
-        dictionary.TryGetValue(nameProperty, out AssetFileValueNode? nameNode);
+        dictionary.TryGetPropertyValue(nameProperty, out IValueSourceNode? nameNode);
 
-        if (!dictionary.TryGetValue(pathProperty, out AssetFileValueNode? pathNode) || pathNode is not AssetFileStringValueNode pathValue)
+        if (!dictionary.TryGetPropertyValue(pathProperty, out IValueSourceNode? pathNode))
         {
             return MissingProperty(in parse, pathProperty, out value);
         }
 
-        value = new BundleReference((nameNode as AssetFileStringValueNode)?.Value ?? string.Empty, pathValue.Value, ReferenceType);
+        value = new BundleReference(nameNode?.Value ?? string.Empty, pathNode.Value, rType);
         return true;
     }
 
@@ -160,5 +212,21 @@ public enum MasterBundleReferenceType
     MasterBundleReference,
     MasterBundleReferenceString,
     ContentReference,
-    AudioReference
+    AudioReference,
+    MasterBundleOrContentReference,
+
+    /// <summary>
+    /// TranslationReference is an old structure that was used to reference legacy translation tokens.
+    /// <code>
+    /// {
+	///     Namespace SDG
+	///     Token Stereo_Songs.Unturned_Theme.Title
+	/// }
+    /// </code>
+    /// It could also be represented like these:
+    /// <para><c>SDG::Stereo_Songs.Unturned_Theme.Title</c></para>
+    /// <para><c>SDG#Stereo_Songs.Unturned_Theme.Title</c></para>
+    /// </summary>
+    /// <remarks>It has been removed from the game but still remains in the documentation for StereoSongAsset.</remarks>
+    TranslationReference
 }

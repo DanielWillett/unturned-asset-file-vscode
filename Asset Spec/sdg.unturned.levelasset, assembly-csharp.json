@@ -164,6 +164,18 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
         },
         {
+            "Key": "Skillset_Loadouts",
+            "Type": "Dictionary",
+            "DictionaryKeyKnownType": "SDG.Unturned.EPlayerSkillset, Assembly-CSharp",
+            "ElementType": "List",
+            "SpecialTypes": [ "SDG.Unturned.LevelAsset+DefaultLoadoutItem, Assembly-CSharp" ],
+            "DefaultValue": null,
+            "Version": "3.25.8.2",
+            "Variable": "DefaultSkillsetLoadouts",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
+            "Description": "Set of default items to grant when a given skillset spawns in."
+        },
+        {
             "Key": "MaterialColorPropertyNames",
             "Type": "List",
             "ElementType": "String",
@@ -297,7 +309,7 @@
                     "Required": true,
                     "Description": "Name of the skill.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
-                    "Priority": 4
+                    "Priority": 6
                 },
                 {
                     "Key": "Default_Level",
@@ -306,7 +318,7 @@
                     "Description": "The default skill level for new players.",
                     "Variable": "defaultLevel",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
-                    "Priority": 3
+                    "Priority": 5
                 },
                 {
                     "Key": "Max_Unlockable_Level",
@@ -316,7 +328,7 @@
                     "Description": "Maximum skill level attainable through gameplay. Levels exceeding the usual maximum level do not have any effect.",
                     "Variable": "maxUnlockableLevel",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
-                    "Priority": 2
+                    "Priority": 4
                 },
                 {
                     "Key": "Cost_Multiplier",
@@ -325,6 +337,26 @@
                     "IncludedDefaultValue": 0.0,
                     "Description": "Multiplier for XP upgrade cost.",
                     "Variable": "costMultiplier",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
+                    "Priority": 3
+                },
+                {
+                    "Key": "Base_Cost",
+                    "Type": "Int32",
+                    "DefaultValue": -1,
+                    "Minimum": 0,
+                    "Description": "Overrides the cost of upgrading a skill to level 1.",
+                    "Variable": "baseCostOverride",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
+                    "Priority": 2
+                },
+                {
+                    "Key": "Per_Level_Cost_Increase",
+                    "Type": "Int32",
+                    "DefaultValue": -1,
+                    "Minimum": 0,
+                    "Description": "Overrides the amount the cost of upgrading a skill increases each level (@Base_Cost + (toLevel - 1) * @Per_Level_Cost_Increase).",
+                    "Variable": "perLevelCostIncreaseOverride",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
                     "Priority": 1
                 }
@@ -377,6 +409,45 @@
                     "Description": "If the difference between values is greater than this threshold, the colors are not too similar.",
                     "Variable": "valueThreshold",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#terrain-color-properties"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.LevelAsset+DefaultLoadoutItem, Assembly-CSharp",
+            "DisplayName": "Default Loadout Item",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
+            "Properties":
+            [
+                {
+                    "Key": "Asset",
+                    "Type": "BcAssetReference",
+                    "ElementType": "ITEM",
+                    "SpecialTypes": [ "SDG.Unturned.SpawnAsset, Assembly-CSharp" ],
+                    "DefaultValue": "#000000",
+                    "Required": true,
+                    "Description": "The item or spawn table to spawn in. Legacy IDs will be interpreted as items.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
+                    "Priority": 3,
+                    "Variable": "assetRef"
+                },
+                {
+                    "Key": "Amount",
+                    "Type": "Int32",
+                    "DefaultValue": 1,
+                    "Minimum": 1,
+                    "Description": "The total amount of @Asset items to give. If @Asset is a spawn table, it will be resolved once and the same item will be given this many times.",
+                    "Variable": "amount",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
+                    "Priority": 2
+                },
+                {
+                    "Key": "Origin",
+                    "Type": "SDG.Unturned.EItemOrigin, Assembly-CSharp",
+                    "DefaultValue": "WORLD",
+                    "Description": "The origin of the item, which influences the state (attachments, water/fuel level, etc.) of the item when it's spawned in.",
+                    "Variable": "origin",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
+                    "Priority": 1
                 }
             ]
         }

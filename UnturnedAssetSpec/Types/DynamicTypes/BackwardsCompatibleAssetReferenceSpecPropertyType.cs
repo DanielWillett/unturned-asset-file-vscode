@@ -155,22 +155,22 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
             return MissingNode(in parse, out value);
         }
 
-        if (parse.Node is AssetFileStringValueNode stringValue)
+        if (parse.Node is IValueSourceNode stringValue)
         {
             if (SupportsThis && string.Equals(stringValue.Value, "this", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (parse.File != null)
+                if (parse.File is IAssetSourceFile asset)
                 {
-                    if (parse.File.GetGuid() is { } guid2 && guid2 != Guid.Empty)
+                    if (asset.Guid is { } guid2 && guid2 != Guid.Empty)
                     {
                         value = new GuidOrId(guid2);
                         return true;
                     }
 
-                    EnumSpecTypeValue category;
-                    if (parse.File.GetId() is { } id2 && id2 != 0 && (category = parse.File.GetCategory(parse.Database)) != AssetCategory.None)
+                    AssetCategoryValue category;
+                    if (asset.Id is { } id2 && id2 != 0 && (category = asset.Category) != AssetCategoryValue.None)
                     {
-                        value = new GuidOrId(id2, in category);
+                        value = new GuidOrId(id2, category);
                         return true;
                     }
                 }
@@ -194,21 +194,21 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
             return TryParse(stringValue.Value.AsSpan(), stringValue.Value, out value) || FailedToParse(in parse, out value);
         }
 
-        if (!CanParseDictionary || parse.Node is not AssetFileDictionaryValueNode dictionary)
+        if (!CanParseDictionary || parse.Node is not IDictionarySourceNode dictionary)
         {
             return FailedToParse(in parse, out value);
         }
 
-        if (!dictionary.TryGetValue("GUID", out AssetFileValueNode? node))
+        if (!dictionary.TryGetPropertyValue("GUID", out IAnyValueSourceNode? node))
         {
-            if (!dictionary.TryGetValue("ID", out AssetFileValueNode? idNode)
-                || !dictionary.TryGetValue("Type", out AssetFileValueNode? typeNode))
+            if (!dictionary.TryGetPropertyValue("ID", out IAnyValueSourceNode? idNode)
+                || !dictionary.TryGetPropertyValue("Type", out IAnyValueSourceNode? typeNode))
             {
                 return MissingProperty(in parse, "GUID", out value);
             }
 
-            if (idNode is not AssetFileStringValueNode strIdNode
-                || typeNode is not AssetFileStringValueNode strTypeNode
+            if (idNode is not IValueSourceNode strIdNode
+                || typeNode is not IValueSourceNode strTypeNode
                 || !KnownTypeValueHelper.TryParseUInt16(strIdNode.Value, out ushort id)
                 || !AssetCategory.TryParse(strTypeNode.Value, out EnumSpecTypeValue category)
                 || category == AssetCategory.None)
@@ -220,7 +220,7 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
             return true;
         }
 
-        if (node is not AssetFileStringValueNode strGuidNode || !KnownTypeValueHelper.TryParseGuid(strGuidNode.Value, out Guid guid))
+        if (node is not IValueSourceNode strGuidNode || !KnownTypeValueHelper.TryParseGuid(strGuidNode.Value, out Guid guid))
         {
             return FailedToParse(in parse, out value);
         }
