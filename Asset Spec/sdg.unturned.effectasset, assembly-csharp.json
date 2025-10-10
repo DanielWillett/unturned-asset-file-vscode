@@ -39,7 +39,7 @@
             "Description": "Number of splatter variations available.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
             "Variable": "splatters",
-            "CountForRegexGroup": "effect-splatters"
+            "CountForTemplateGroup": "effect-splatters"
         },
         {
             "Key": "Splatters",
@@ -248,15 +248,9 @@
             "Variable": "effect"
         },
         {
-            "AssetName": "Splatter_(\\d+)",
-            "AssetNameIsRegex": true,
-            "AssetNameGroups":
-            [
-                {
-                    "Name": "effect-splatters",
-                    "RegexGroup": 1
-                }
-            ],
+            "AssetName": "Splatter_*",
+            "Template": true,
+            "TemplateGroups": [ "effect-splatters" ],
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "A splatter effect variation.",
             "Required": true,

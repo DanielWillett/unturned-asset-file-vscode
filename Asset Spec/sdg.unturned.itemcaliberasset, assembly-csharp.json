@@ -18,21 +18,15 @@
             "Variable": "calibers",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#calibers-uint8-0",
             "Priority": 1,
-            "CountForRegexGroup": "item-caliber-calibers"
+            "CountForTemplateGroup": "item-caliber-calibers"
         },
         {
-            "Key": "Caliber_(\\d+)",
+            "Key": "Caliber_*",
             "Type": "CaliberId",
-            "KeyIsRegex": true,
+            "Template": true,
+            "TemplateGroups": [ "item-caliber-calibers" ],
             "DefaultValue": 0,
             "Required": true,
-            "KeyGroups":
-            [
-                {
-                    "Name": "item-caliber-calibers",
-                    "RegexGroup": 1
-                }
-            ],
             "Description": "An arbitrary ID that has to be shared between an attachment and weapon for them to be compatible.",
             "Variable": "calibers",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#caliber-uint16-0",

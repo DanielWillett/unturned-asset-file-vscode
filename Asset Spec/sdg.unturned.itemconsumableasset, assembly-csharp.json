@@ -220,7 +220,7 @@
             "Description": "Rewards applied when consuming this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#rewards",
             "Variable": "questRewardsList",
-            "CountForRegexGroup": "consumable-rewards",
+            "CountForTemplateGroup": "consumable-rewards",
             "Priority": 3
         },
         {

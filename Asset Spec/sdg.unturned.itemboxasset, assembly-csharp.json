@@ -38,21 +38,15 @@
             "Variable": "drops",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
             "Priority": 3,
-            "CountForRegexGroup": "item-box-drops"
+            "CountForTemplateGroup": "item-box-drops"
         },
         {
-            "Key": "Drop_(\\d+)",
+            "Key": "Drop_*",
             "Type": "SteamItemDef",
-            "KeyIsRegex": true,
+            "Template": true,
+            "TemplateGroups": [ "item-box-drops" ],
             "DefaultValue": 0,
             "Required": true,
-            "KeyGroups":
-            [
-                {
-                    "Name": "item-box-drops",
-                    "RegexGroup": 1
-                }
-            ],
             "Description": "The itemdefid of an item in the box, which is visually displayed as a UI element when showing box contents.",
             "Variable": "drops",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",

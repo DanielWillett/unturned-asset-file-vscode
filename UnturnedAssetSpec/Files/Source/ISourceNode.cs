@@ -137,6 +137,19 @@ public interface IPropertySourceNode : ISourceNode
     /// </summary>
     /// <remarks>If this node is a flag, this property will be equal to <see cref="ValueTypeDataRefType.Value"/>.</remarks>
     ValueTypeDataRefType ValueKind { get; }
+
+    /// <summary>
+    /// Gets the value as a string without necessarily instantiating the value node.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Called on a dictionary or list node.</exception>
+    /// <returns>Null if there is no value, otherwise the value without quotes.</returns>
+    string? GetValueString(out bool isQuoted);
+
+    /// <summary>
+    /// Gets the range of the value without necessarily instantiating the value node.
+    /// </summary>
+    /// <returns>Zero if there is no value, otherwise the range of the value.</returns>
+    FileRange GetValueRange();
 }
 
 /// <summary>
@@ -197,11 +210,9 @@ public enum SourceNodeType
     Whitespace,
 
     /// <summary>
-    /// A comment taking up one or more lines, all of which occupy their own lines.
+    /// A comment taking up it's own line.
     /// <code>
-    /// // Comment 1
-    /// // Comment 2
-    /// // Comment 3
+    /// // Comment
     /// </code>
     /// </summary>
     Comment,

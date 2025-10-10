@@ -78,14 +78,14 @@ Represented by the class: [AssetNameDataRef](/api/DanielWillett.UnturnedDataFile
 
 *No properties, not indexable*
 
-### Key Groups
-Read more about key groups [here](./property-key-groups.md). Returns the value of the given key group for this object. Returns -1 if there are no key groups, otherwise returns which number the property is currently on.
+### Template Groups
+Read more about key groups [here](./property-template-groups.md). Returns the value of the given template group for this object. Returns -1 if there are no template groups, otherwise returns which number the property is currently on.
 
-An index can be included to reference a single key-group instead of the entire array. Indices must be a non-negative integer. Indices are zero-based, where RegEx groups are one-based, so you need to subtract 1 from the RegEx group number.
+An index can be included to reference a single template group instead of the entire array. Indices must be a non-negative integer. The first '#' is index 0, the second is index 1, etc.
 
-The key group array contains all KeyGroup values in the current type hierarchy, from last to first, so if you have two nested keys such as in `Message_1_Page_2`, the array will be `[2, 1]`.
+The template group array contains all template group values in the current type hierarchy, from last to first, so if you have two nested keys such as in `Message_1_Page_2`, the array will be `[2, 1]`.
 
-Represented by the class: [KeyGroupsDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.KeyGroupsDataRef.yml).
+Represented by the class: [TemplateGroupsDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.TemplateGroupsDataRef.yml).
 
 Example:
 ```properties
@@ -98,27 +98,15 @@ Caliber_2_Name Custom Bow
 ```
 ```json
 {
-    "Key": "Caliber_(\\d+)",
-    "KeyIsRegex": true,
+    "Key": "Caliber_*",
+    "Template": true,
     "Required": true,
-    "KeyGroups":
-    [
-        {
-            "Name": "calibers",
-            "RegexGroup": 1
-        }
-    ]
+    "TemplateGroups": [ "calibers" ]
 },
 {
-    "Key": "Caliber_(\\d+)_Name",
-    "KeyIsRegex": true,
-    "KeyGroups":
-    [
-        {
-            "Name": "calibers",
-            "RegexGroup": 1
-        }
-    ],
+    "Key": "Caliber_*_Name",
+    "Required": true,
+    "TemplateGroups": [ "calibers" ],
     // defaults to the ID of the caliber, would complete to @Caliber_2
     "DefaultValue": "@Caliber_#(Self.KeyGroups[0])"
 }

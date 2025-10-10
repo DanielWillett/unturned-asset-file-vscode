@@ -115,7 +115,7 @@ public sealed class SelfDataRef : IEquatable<ISpecDynamicValue>, IEquatable<Self
         return info.GetValue(in ctx, ctx.Self, default, null);
     }
 
-    public int EvaluateKeyGroup(in FileEvaluationContext ctx, int index)
+    public int EvaluateTemplateGroup(in FileEvaluationContext ctx, int index)
     {
         // todo;
         throw new NotImplementedException();

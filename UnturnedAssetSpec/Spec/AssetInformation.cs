@@ -28,7 +28,7 @@ public class AssetInformation
     [JsonConverter(typeof(TypeDictionaryConverter<TypeHierarchy>))]
     public Dictionary<QualifiedType, TypeHierarchy> Types { get; set; }
 
-    [JsonConverter(typeof(TypeDictionaryConverter<InverseTypeHierarchy>))]
+    [JsonIgnore] // generated at runtime from Types
     public Dictionary<QualifiedType, InverseTypeHierarchy> ParentTypes { get; set; }
 
     public int FaceCount { get; set; } = 32;
@@ -186,10 +186,10 @@ public class AssetInformation
 
             Stack<QualifiedType> typeStack = new Stack<QualifiedType>();
             Dictionary<QualifiedType, InverseTypeHierarchy> parentTypes = new Dictionary<QualifiedType, InverseTypeHierarchy>(96);
+            QualifiedType[]? arrNull = null;
             foreach (KeyValuePair<QualifiedType, TypeHierarchy> h in Types)
             {
                 h.Value.Type = h.Key;
-                QualifiedType[]? arrNull = null;
                 RegenParentTypes(h.Value, typeStack, ref arrNull, parentTypes);
             }
 
@@ -216,9 +216,9 @@ public class AssetInformation
             return;
 
         typeStack.Push(hierarchy.Type);
+        QualifiedType[]? arrNull = null;
         foreach (TypeHierarchy h in hierarchy.ChildTypes.Values)
         {
-            QualifiedType[]? arrNull = null;
             h.HasDataFiles |= hierarchy.HasDataFiles;
             h.Parent = hierarchy;
             RegenParentTypes(h, typeStack, ref arrNull, parentTypes);
@@ -315,7 +315,7 @@ public class InverseTypeHierarchy
     public TypeHierarchy Hierarchy { get; }
     public QualifiedType Type { get; }
 
-    // [0] = lowest, [^1] = direct parent
+    // [0] = direct parent, [^1] = lowest
     public QualifiedType[] ParentTypes { get; }
     public bool IsValid { get; }
     public bool IsAbstract { get; }

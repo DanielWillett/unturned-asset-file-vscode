@@ -8,72 +8,42 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 /// <remarks>Ex: All properties in a dictionary or all values in a list.</remarks>
 public abstract class TopLevelNodeVisitor : NodeVisitor, ISourceNodeVisitor
 {
-    void ISourceNodeVisitor.AcceptCommentOnly(ICommentSourceNode node)
-    {
-        TryDispose();
-    }
+    void ISourceNodeCommentOnlyVisitor.AcceptCommentOnly(ICommentSourceNode node) { }
 
-    void ISourceNodeVisitor.AcceptWhiteSpace(IWhiteSpaceSourceNode node)
-    {
-        TryDispose();
-    }
+    void ISourceNodeWhiteSpaceVisitor.AcceptWhiteSpace(IWhiteSpaceSourceNode node) { }
 
-    void ISourceNodeVisitor.AcceptDictionary(IDictionarySourceNode node)
+    void ISourceNodeDictionaryVisitor.AcceptDictionary(IDictionarySourceNode node)
     {
         lock (node.File.TreeSync)
         {
-            try
+            ImmutableArray<ISourceNode> nodes = node.Children;
+            for (int i = 0; i < nodes.Length; ++i)
             {
-                ImmutableArray<ISourceNode> nodes = node.Children;
-                for (int i = 0; i < nodes.Length; ++i)
-                {
-                    AcceptAnyIntl(nodes[i]);
-                }
-            }
-            finally
-            {
-                TryDispose();
+                AcceptAnyIntl(nodes[i]);
             }
         }
     }
 
-    void ISourceNodeVisitor.AcceptList(IListSourceNode node)
+    void ISourceNodeListVisitor.AcceptList(IListSourceNode node)
     {
         lock (node.File.TreeSync)
         {
-            try
+            ImmutableArray<ISourceNode> nodes = node.Children;
+            for (int i = 0; i < nodes.Length; ++i)
             {
-                ImmutableArray<ISourceNode> nodes = node.Children;
-                for (int i = 0; i < nodes.Length; ++i)
-                {
-                    AcceptAnyIntl(nodes[i]);
-                }
-            }
-            finally
-            {
-                TryDispose();
+                AcceptAnyIntl(nodes[i]);
             }
         }
     }
 
-    void ISourceNodeVisitor.AcceptValue(IValueSourceNode node)
-    {
-        TryDispose();
-    }
+    void ISourceNodeValueVisitor.AcceptValue(IValueSourceNode node) { }
 
-    void ISourceNodeVisitor.AcceptProperty(IPropertySourceNode node)
+    void ISourceNodePropertyVisitor.AcceptProperty(IPropertySourceNode node)
     {
         lock (node.File.TreeSync)
         {
-            try
-            {
-                IAnyValueSourceNode? value = node.Value;
-                AcceptAnyValueIntl(value);
-            }
-            finally
-            {
-                TryDispose();
-            }
+            IAnyValueSourceNode? value = node.Value;
+            AcceptAnyValueIntl(value);
         }
     }
 

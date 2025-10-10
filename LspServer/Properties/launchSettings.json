@@ -2,10 +2,21 @@
   "profiles": {
     "LspServer": {
       "commandName": "Project",
-      "hotReloadEnabled": false,
       "environmentVariables": {
         "UNTURNED_ASSET_SPEC_CACHE_FOLDER": "./cache_test"
-      }
+      },
+      "hotReloadEnabled": false
+    },
+    "VSCode": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\danny\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe",
+      "commandLineArgs": "\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Unturned\\Bundles\" --log danielwillett.unturned-data-file-lsp:trace",
+      "workingDirectory": "A:\\repos\\UnturnedAssetFileLsp\\LspServer\\bin\\Debug\\net9.0",
+      "environmentVariables": {
+        "UNTURNED_LSP_DEBUG": "1"
+      },
+      "remoteDebugEnabled": false,
+      "authenticationMode": null
     }
   }
 }

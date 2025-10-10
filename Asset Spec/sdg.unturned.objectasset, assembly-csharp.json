@@ -355,7 +355,7 @@
                     "Value": "NOTE"
                 }
             ],
-            "CountForRegexGroup": "object-interactability-note-lines"
+            "CountForTemplateGroup": "object-interactability-note-lines"
         },
         {
             "Key": "Interactability_Power",
@@ -470,7 +470,7 @@
                     "Value": "DROPPER"
                 }
             ],
-            "CountForRegexGroup": "object-interactability-drops",
+            "CountForTemplateGroup": "object-interactability-drops",
             "ExclusiveWith":
             [
                 {
@@ -494,15 +494,9 @@
             ]
         },
         {
-            "Key": "Interactability_Drop_(\\d+)",
-            "KeyIsRegex": true,
-            "KeyGroups":
-            [
-                {
-                    "Name": "object-interactability-drops",
-                    "RegexGroup": 1
-                }
-            ],
+            "Key": "Interactability_Drop_*",
+            "Template": true,
+            "TemplateGroups": [ "object-interactability-drops" ],
             "Type": "Id",
             "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
             "DefaultValue": 0,
@@ -827,7 +821,7 @@
                     }
                 }
             ],
-            "CountForRegexGroup": "object-interact-conditions"
+            "CountForTemplateGroup": "object-interact-conditions"
         },
         {
             "Key": "Interactability_Resource",
@@ -873,7 +867,7 @@
                     }
                 }
             ],
-            "CountForRegexGroup": "object-interact-rewards"
+            "CountForTemplateGroup": "object-interact-rewards"
         },
         {
             "Key": "Interactability_Health",
@@ -2886,15 +2880,9 @@
             "Variable": "objectName"
         },
         {
-            "Key": "Interactability_Text_Line_(\\d+)",
-            "KeyIsRegex": true,
-            "KeyGroups":
-            [
-                {
-                    "Name": "object-interactability-note-lines",
-                    "RegexGroup": 1
-                }
-            ],
+            "Key": "Interactability_Text_Line_*",
+            "Template": true,
+            "TemplateGroups": [ "object-interactability-note-lines" ],
             "Type": "RichTextString",
             "DefaultValue": "#Self.Key",
             "Variable": "interactabilityText",

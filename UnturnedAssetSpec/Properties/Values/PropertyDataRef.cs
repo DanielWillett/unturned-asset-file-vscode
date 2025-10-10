@@ -78,10 +78,10 @@ public sealed class PropertyDataRef : IEquatable<ISpecDynamicValue>, IEquatable<
         return Property.GetValue(in context);
     }
 
-    public int EvaluateKeyGroup(in FileEvaluationContext context, int index)
+    public int EvaluateTemplateGroup(in FileEvaluationContext context, int index)
     {
         SpecProperty? property = Property.ResolveProperty(in context);
-        if (property is not { KeyIsRegex: true })
+        if (property is not { IsTemplate: true })
             return -1;
 
         // todo:

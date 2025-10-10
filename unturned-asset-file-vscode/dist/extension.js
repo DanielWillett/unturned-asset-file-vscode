@@ -17605,8 +17605,8 @@ var require_main4 = __commonJS({
         }
       }
       createMessageTransports(encoding) {
-        function getEnvironment(env, fork) {
-          if (!env && !fork) {
+        function getEnvironment(env2, fork) {
+          if (!env2 && !fork) {
             return void 0;
           }
           const result = /* @__PURE__ */ Object.create(null);
@@ -17615,8 +17615,8 @@ var require_main4 = __commonJS({
             result["ELECTRON_RUN_AS_NODE"] = "1";
             result["ELECTRON_NO_ASAR"] = "1";
           }
-          if (env) {
-            Object.keys(env).forEach((key) => result[key] = env[key]);
+          if (env2) {
+            Object.keys(env2).forEach((key) => result[key] = env2[key]);
           }
           return result;
         }
@@ -18176,11 +18176,18 @@ async function activate(context) {
     await import_vscode5.window.showErrorMessage('LSP executible not found at "' + dllPath + '".');
     client = void 0;
   } else {
-    let serverOptions = {
-      run: { command: "dotnet", args: [dllPath] },
-      debug: { command: "dotnet", args: [dllPath] }
+    const isDebug = process.env.UNTURNED_LSP_DEBUG === "1";
+    const options = {
+      env: isDebug ? {
+        "UNTURNED_LSP_DEBUG": "1"
+      } : {}
     };
-    let clientOptions = {
+    const args = [dllPath, "--clientProcessId", process.pid.toString()];
+    const serverOptions = {
+      run: { command: "dotnet", args, options },
+      debug: { command: "dotnet", args, options }
+    };
+    const clientOptions = {
       documentSelector: [
         {
           pattern: "**/*.{dat,asset}",

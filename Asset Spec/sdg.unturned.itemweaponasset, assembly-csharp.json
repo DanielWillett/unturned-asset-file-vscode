@@ -17,21 +17,16 @@
             "Variable": "bladeIDs",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
             "Priority": 2,
-            "CountForRegexGroup": "item-weapon-bladeid"
+            "CountForTemplateGroup": "item-weapon-bladeid"
         },
         {
-            "Key": "BladeID_(\\d+)",
+            "Key": "BladeID_*",
             "Type": "BladeId",
-            "KeyIsRegex": true,
+            "Template": true,
+            "TemplateGroups": [ "item-weapon-bladeid" ],
             "DefaultValue": "@BladeID",
             "Required": true,
-            "KeyGroups":
-            [
-                {
-                    "Name": "item-weapon-bladeid",
-                    "RegexGroup": 1
-                }
-            ],
+            "TemplateGroupUniqueValue": true,
             "Description": "An arbitrary ID that has to be shared between an object or resource and a weapon.",
             "Variable": "bladeIDs",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",

@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -209,7 +210,6 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
         assetInfo.GetParentTypes(default);
         assetInfo.ParentTypes ??= new Dictionary<QualifiedType, InverseTypeHierarchy>(0);
-
 
         Task statusTask = DownloadStatusAsync(assetInfo, token);
         Task downloadActionButtons = DownloadPlayerDashboardInventoryLocalizationAsync(assetInfo, token);
@@ -1382,6 +1382,11 @@ public static class AssetSpecDatabaseExtensions
 {
     public static ISpecType? FindType(this IAssetSpecDatabase db, string type, AssetFileType fileType)
     {
+        if (db.Types.TryGetValue(new QualifiedType(type, isCaseInsensitive: true), out AssetSpecType? otherAssetType))
+        {
+            return otherAssetType;
+        }
+
         type = QualifiedType.NormalizeType(type);
         if (AssetCategory.TypeOf.Type.Equals(type))
         {

@@ -185,7 +185,7 @@ public class InstallationEnvironmentTest
         
         await Task.WhenAny(_waitForUpdate.Task, Task.Delay(10000));
 
-        Assert.That(_waitForUpdate.Task.IsCompletedSuccessfully);
+        Assert.That(_waitForUpdate.Task.IsCompleted);
 
         // file still exists
         Assert.That(_runner.FindFile(new Guid("334dcdd23701482f99cb2ea87e52e826")).Single(), Is.EqualTo(_waitForUpdate.Task.Result));
@@ -206,7 +206,7 @@ public class InstallationEnvironmentTest
         
         await Task.WhenAny(_waitForUpdate.Task, Task.Delay(10000));
 
-        Assert.That(_waitForUpdate.Task.IsCompletedSuccessfully);
+        Assert.That(_waitForUpdate.Task.IsCompleted);
 
         // file GUID was changed
         Assert.That(_runner.FindFile(new Guid("86510e2d8de7482ea1a9f42a64064865")).Single(), Is.EqualTo(_waitForUpdate.Task.Result));
@@ -228,7 +228,7 @@ public class InstallationEnvironmentTest
         
         await Task.WhenAny(_waitForUpdate.Task, Task.Delay(10000));
 
-        Assert.That(_waitForUpdate.Task.IsCompletedSuccessfully);
+        Assert.That(_waitForUpdate.Task.IsCompleted);
 
         // file ID was changed
         Assert.That(_runner.FindFile(2, AssetCategory.Item).Single(), Is.EqualTo(_waitForUpdate.Task.Result));
@@ -246,7 +246,7 @@ public class InstallationEnvironmentTest
 
         await Task.WhenAny(_waitForUpdate.Task, Task.Delay(10000));
 
-        Assert.That(_waitForUpdate.Task.IsCompletedSuccessfully);
+        Assert.That(_waitForUpdate.Task.IsCompleted);
 
         // file ID was changed
         Assert.That(_waitForUpdate.Task.Result.FriendlyName, Is.EqualTo("Test Asset 1 (Changed)"));
@@ -297,7 +297,7 @@ public class InstallationEnvironmentTest
 
         await Task.WhenAny(_waitForUpdate.Task, Task.Delay(10000));
 
-        Assert.That(_waitForUpdate.Task.IsCompletedSuccessfully);
+        Assert.That(_waitForUpdate.Task.IsCompleted);
 
         Assert.That(file.IsRemoved);
 
@@ -319,7 +319,7 @@ public class InstallationEnvironmentTest
 
         await Task.WhenAny(_waitForUpdate.Task, Task.Delay(10000));
 
-        Assert.That(_waitForUpdate.Task.IsCompletedSuccessfully);
+        Assert.That(_waitForUpdate.Task.IsCompleted);
 
         Assert.That(file.IsRemoved);
 
@@ -373,7 +373,7 @@ public class InstallationEnvironmentTest
 
         await Task.WhenAny(_waitForUpdate.Task, Task.Delay(10000));
 
-        Assert.That(_waitForUpdate.Task.IsCompletedSuccessfully);
+        Assert.That(_waitForUpdate.Task.IsCompleted);
 
         Assert.That(_runner.FileCount, Is.EqualTo(0));
         Assert.That(file.IsRemoved);
@@ -434,7 +434,7 @@ public class InstallationEnvironmentTest
         await Task.WhenAny(_waitForUpdate.Task, Task.Delay(10000));
 
         Assert.That(_runner.FileCount, Is.EqualTo(2));
-        Assert.That(_waitForUpdate.Task.IsCompletedSuccessfully);
+        Assert.That(_waitForUpdate.Task.IsCompleted);
 
         // file still exists
         Assert.That(_runner.FindFile(new Guid("5fce3a69054b4001bb4d46bb19d239d8")), Is.EqualTo(_waitForUpdate.Task.Result));

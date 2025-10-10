@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -36,5 +37,31 @@ internal static class StringHelper
         }
 
         return false;
+    }
+
+    public static int CountDigits(int value)
+    {
+        return value != 0 ? 1 + (int)Math.Log10(Math.Abs(value)) : 1;
+    }
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+    public static void AppendSpan(StringBuilder sb, ReadOnlySpan<char> span)
+    {
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+        sb.Append(span);
+#else
+        if (span.IsEmpty)
+            return;
+
+        unsafe
+        {
+            fixed (char* ptr = span)
+            {
+                sb.Append(ptr, span.Length);
+            }
+        }
+#endif
     }
 }

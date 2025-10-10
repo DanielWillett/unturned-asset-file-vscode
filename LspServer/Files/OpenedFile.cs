@@ -14,6 +14,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 #if DEBUG
 using System.ComponentModel;
@@ -394,6 +395,23 @@ public class OpenedFile : IWorkspaceFile
         {
             ArraySegment<char> segment = GetLineIntl(lineNum, includeNewLine);
             return segment.Array == null ? null : new string(segment.Array, segment.Offset, segment.Count);
+        }
+    }
+    
+    /// <summary>
+    /// Gets the number of characters on the given 1-indexed line.
+    /// </summary>
+    public int GetLineLength(int lineNum, bool includeNewLine = false)
+    {
+        lock (EditLock)
+        {
+            --lineNum;
+
+            if (lineNum < 0 || lineNum >= _lineCount)
+                return 0;
+
+            LineInfo line = _lines[lineNum];
+            return includeNewLine ? line.Length : line.ContentLength;
         }
     }
 

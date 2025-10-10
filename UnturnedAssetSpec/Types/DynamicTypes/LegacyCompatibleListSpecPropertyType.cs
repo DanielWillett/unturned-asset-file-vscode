@@ -201,12 +201,9 @@ public sealed class LegacyCompatibleListSpecPropertyType :
 
         SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(parse.EvaluationContext, parse.Diagnostics)
         {
-            Database = parse.Database,
-            FileType = parse.FileType,
             Node = dictionary,
             BaseKey = baseKey,
-            Parent = dictionary,
-            File = parse.File
+            Parent = dictionary
         };
 
         if (!customType.TryParseValue(in context, out CustomSpecTypeInstance? type, CustomSpecTypeParseOptions.Legacy))
@@ -239,12 +236,9 @@ public sealed class LegacyCompatibleListSpecPropertyType :
 
         SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(parse.EvaluationContext, parse.Diagnostics)
         {
-            Database = parse.Database,
-            FileType = parse.FileType,
             Node = dictionary,
             BaseKey = string.Empty,
-            Parent = dictionary.Parent,
-            File = parse.File
+            Parent = dictionary.Parent
         };
 
         if (!customType.TryParseValue(in context, out CustomSpecTypeInstance? type, CustomSpecTypeParseOptions.Object))

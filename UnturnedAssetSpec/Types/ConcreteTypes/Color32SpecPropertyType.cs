@@ -114,9 +114,6 @@ public sealed class Color32RGBAStrictHexSpecPropertyType : Color32StrictHexSpecP
 
 public abstract class Color32SpecPropertyType : BaseColorSpecPropertyType<Color32SpecPropertyType, Color32>, IStringParseableSpecPropertyType
 {
-    private protected abstract VectorTypeParseOptions Options { get; }
-    private protected abstract bool HasAlpha { get; }
-
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
 
@@ -322,9 +319,7 @@ public abstract class Color32StrictHexSpecPropertyType :
     BaseColorSpecPropertyType<Color32StrictHexSpecPropertyType, Color32>,
     IStringParseableSpecPropertyType
 {
-    private protected abstract bool HasAlpha { get; }
-
-    /// <inheritdoc />
+    private protected override VectorTypeParseOptions Options => VectorTypeParseOptions.Composite;
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
 
     public string? ToString(ISpecDynamicValue value)

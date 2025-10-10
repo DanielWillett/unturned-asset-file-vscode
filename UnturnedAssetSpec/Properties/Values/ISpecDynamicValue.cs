@@ -41,7 +41,7 @@ public enum SpecDynamicValueContext
 {
     Optional = 0,
     AssumeProperty = 1,
-    AssumeData = 2,
+    AssumeDataRef = 2,
     AllowSwitchCase = 4,
     AllowCondition = 8,
     AllowSwitch = 16,
@@ -520,7 +520,7 @@ public static class SpecDynamicValue
         }
 
         // basic prop ref or (prop) in an assume value
-        if (context is SpecDynamicValueContext.AssumeProperty or SpecDynamicValueContext.AssumeData)
+        if (context is SpecDynamicValueContext.AssumeProperty or SpecDynamicValueContext.AssumeDataRef)
         {
             int l = value.Length;
             if (!TryTrimParenthesis(ref value, 0))
@@ -529,7 +529,7 @@ public static class SpecDynamicValue
             if (l != value.Length)
                 optionalString = null;
 
-            return context == SpecDynamicValueContext.AssumeData
+            return context == SpecDynamicValueContext.AssumeDataRef
                 ? TryParseDataRef(value, optionalString, out reference)
                 : TryParsePropertyRef(value, optionalString, out reference);
         }
@@ -981,9 +981,9 @@ public static class SpecDynamicValue
 
             reference = new AssetNameDataRef(target);
         }
-        else if (propertyName.Equals("KeyGroups".AsSpan(), StringComparison.Ordinal))
+        else if (propertyName.Equals("TemplateGroups".AsSpan(), StringComparison.Ordinal))
         {
-            reference = new KeyGroupsDataRef(target);
+            reference = new TemplateGroupsDataRef(target);
         }
         else if (propertyName.Equals("IsLegacy".AsSpan(), StringComparison.Ordinal))
         {

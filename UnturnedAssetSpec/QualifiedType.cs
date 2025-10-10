@@ -1,6 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using System;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;
@@ -10,6 +11,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data;
 /// </summary>
 /// <remarks>Types are case-sensitive.</remarks>
 [JsonConverter(typeof(QualifiedTypeConverter))]
+[DebuggerDisplay("{Type}")]
 public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<string>, IComparable<QualifiedType>, IComparable
 {
     private readonly bool _isCaseInsensitive;
@@ -381,6 +383,7 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
 /// <summary>
 /// A type alias or <see cref="QualifiedType"/>.
 /// </summary>
+[DebuggerDisplay("{ToString()}")]
 public readonly struct QualifiedOrAliasedType : IEquatable<QualifiedOrAliasedType>
 {
     public bool IsAlias { get; }
@@ -410,7 +413,7 @@ public readonly struct QualifiedOrAliasedType : IEquatable<QualifiedOrAliasedTyp
         return Type.Equals(other.Type);
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is QualifiedOrAliasedType qt && Equals(qt);
     }

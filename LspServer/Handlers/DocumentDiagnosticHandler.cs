@@ -118,8 +118,7 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
                 node.File,
                 workspace,
                 installEnvironment,
-                database,
-                node.File.WorkspaceFile
+                database
             );
 
             ISpecPropertyType? propType = property.Type.GetType(in ctx);

@@ -1,3 +1,4 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -6,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -14,10 +14,13 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 [DebuggerDisplay("{Key}")]
 public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPropertyProvider
 {
+    private TemplateProcessor? _keyTemplateProcessor;
+    private TemplateProcessor[] _aliasTemplateProcessors;
+
     /// <summary>
-    /// The key of the flag or property.
+    /// The key of the flag or property. Will be empty for imported types.
     /// </summary>
-    /// <remarks>Will be empty for imported types.</remarks>
+    /// <remarks>Contains '#' characters to represent template groups, not '*'. Key is unescaped.</remarks>
     public required string Key { get; set; }
 
     /// <summary>
@@ -34,10 +37,10 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     /// Import properties have an empty key and are used to layer one type into another.
     /// </summary>
     /// <remarks>See ServerListCurationAsset for an example.</remarks>
-    public bool IsImport => Key.Length == 0 && Type.Type is CustomSpecType;
+    public bool IsImport => Key.Length == 0 && Type.Type is IPropertiesSpecType;
 
     /// <inheritdoc cref="IsImport"/>
-    public bool TryGetImportType(out CustomSpecType type)
+    public bool TryGetImportType(out IPropertiesSpecType type)
     {
         if (!IsImport)
         {
@@ -45,7 +48,7 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
             return false;
         }
 
-        type = (CustomSpecType)Type.Type!;
+        type = (IPropertiesSpecType)Type.Type!;
         return true;
     }
 
@@ -57,7 +60,7 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     public required PropertyTypeOrSwitch Type { get; set; }
 
     /// <summary>
-    /// If <see cref="KeyIsRegex"/> is <see langword="true"/>, the singular version of the key which would not be regex (ex. <c>Blade</c> for <c>Blade_#</c>).
+    /// If <see cref="IsTemplate"/> is <see langword="true"/>, the singular version of the key which would not be regex (ex. <c>Blade</c> for <c>Blade_#</c>).
     /// </summary>
     public string? SingleKeyOverride { get; set; }
 
@@ -87,14 +90,15 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     public string? FileCrossRef { get; set; }
 
     /// <summary>
-    /// The regex-group for which this property is a count for.
+    /// The template group for which this property is a count for.
     /// </summary>
-    public string? CountForRegexGroup { get; set; }
+    public string? CountForTemplateGroup { get; set; }
 
     /// <summary>
-    /// The 'Key regex-group[ RelatedKey...]' of which this property references, where key is a reference to another type.
+    /// A data-ref to another key's template group (such as #($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).TemplateGroups[0] ) to reference the blueprint ID of another item.
     /// </summary>
-    public string? ValueRegexGroupReference { get; set; }
+    /// <remarks>Valid values will be the present indices in the other property's template groups.</remarks>
+    public TemplateGroupsDataRef? ValueTemplateGroupReference { get; set; }
 
     /// <summary>
     /// Reference to a set of values from a list. Example: 'Blueprints.Id'. If it ends with '!' it's an error to not reference a valid value.
@@ -117,14 +121,14 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     public bool CanBeInMetadata { get; set; }
 
     /// <summary>
-    /// If <see cref="Key"/> is a regex expression to match properties.
+    /// If <see cref="Key"/> is a template expression to match properties.
     /// </summary>
-    public bool KeyIsRegex { get; set; }
+    public bool IsTemplate { get; set; }
 
     /// <summary>
-    /// If each value should be unique in the key-group set.
+    /// If each value should be unique in the set of properties with the same key group set.
     /// </summary>
-    public bool KeyGroupUniqueValue { get; set; }
+    public bool TemplateGroupUniqueValue { get; set; }
 
     /// <summary>
     /// If this property shouldn't be used anymore or was left in for legacy features.
@@ -193,9 +197,9 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     public bool ExceptionsAreWhitelist { get; set; }
 
     /// <summary>
-    /// If <see cref="KeyIsRegex"/> is <see langword="true"/>, then this is a list of groups by name to match with other properties within the given regex group.
+    /// If <see cref="IsTemplate"/> is <see langword="true"/>, then this is a list of groups by name to match with other properties within the given template group.
     /// </summary>
-    public OneOrMore<RegexKeyGroup> KeyGroups { get; set; } = OneOrMore<RegexKeyGroup>.Null;
+    public OneOrMore<TemplateGroup> TemplateGroups { get; set; } = OneOrMore<TemplateGroup>.Null;
 
     /// <summary>
     /// Properties that must also exist if this property exists.
@@ -293,6 +297,48 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
         return Owner != null ? Owner.Type.Type + "." + Key : Key;
     }
 
+    public TemplateProcessor KeyTemplateProcessor => _keyTemplateProcessor ?? TemplateProcessor.None;
+
+    public TemplateProcessor GetAliasTemplateProcessor(int index)
+    {
+        if (_aliasTemplateProcessors == null || index < 0 || index >= _aliasTemplateProcessors.Length)
+            return TemplateProcessor.None;
+
+        return _aliasTemplateProcessors[index];
+    }
+
+    internal void CreateTemplateProcessors()
+    {
+        if (!IsTemplate)
+            return;
+
+        string key = Key;
+        _keyTemplateProcessor = TemplateProcessor.CreateForKey(ref key);
+        Key = key;
+
+        if (Aliases.IsNull)
+            return;
+
+        Alias[] newAliases = Aliases.ToArray();
+        TemplateProcessor[] aliasTemplateProcessors = new TemplateProcessor[newAliases.Length];
+        bool allAreNone = true;
+        for (int i = 0; i < aliasTemplateProcessors.Length; ++i)
+        {
+            ref Alias a = ref newAliases[i];
+            string aliasName = a.Value;
+            TemplateProcessor p = TemplateProcessor.CreateForKey(ref aliasName);
+            if (!ReferenceEquals(aliasName, a.Value))
+                a = new Alias(aliasName, a.Filter);
+
+            aliasTemplateProcessors[i] = p;
+            if (p != TemplateProcessor.None)
+                allAreNone = false;
+        }
+
+        if (!allAreNone)
+            _aliasTemplateProcessors = aliasTemplateProcessors;
+    }
+
     public bool Equals(SpecProperty? other)
     {
         if (other is null) return false;
@@ -306,21 +352,21 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Description, other.Description)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Markdown, other.Markdown)
               || !string.Equals(FileCrossRef, other.FileCrossRef, StringComparison.Ordinal)
-              || !string.Equals(CountForRegexGroup, other.CountForRegexGroup, StringComparison.Ordinal)
-              || !string.Equals(ValueRegexGroupReference, other.ValueRegexGroupReference, StringComparison.Ordinal)
+              || !string.Equals(CountForTemplateGroup, other.CountForTemplateGroup, StringComparison.Ordinal)
+              || !EqualityComparer<DataRef?>.Default.Equals(ValueTemplateGroupReference, other.ValueTemplateGroupReference)
               || !string.Equals(ListReference, other.ListReference, StringComparison.Ordinal)
               || !string.Equals(SubtypeSwitch, other.SubtypeSwitch, StringComparison.Ordinal)
               || !Aliases.Equals(other.Aliases)
               || CanBeInMetadata != other.CanBeInMetadata
-              || KeyIsRegex != other.KeyIsRegex
-              || KeyGroupUniqueValue != other.KeyGroupUniqueValue
+              || IsTemplate != other.IsTemplate
+              || TemplateGroupUniqueValue != other.TemplateGroupUniqueValue
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Deprecated, other.Deprecated)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Experimental, other.Experimental)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Version, other.Version)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(RequiredCondition, other.RequiredCondition)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(DefaultValue, other.DefaultValue)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(IncludedDefaultValue, other.IncludedDefaultValue)
-              || !KeyGroups.Equals(other.KeyGroups)
+              || !TemplateGroups.Equals(other.TemplateGroups)
               || !EqualityComparer<ISpecType?>.Default.Equals(Owner, other.Owner)
               || Priority != other.Priority
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(Docs, other.Docs)
@@ -368,21 +414,21 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
         Description = Description,
         Markdown = Markdown,
         FileCrossRef = FileCrossRef,
-        CountForRegexGroup = CountForRegexGroup,
-        ValueRegexGroupReference = ValueRegexGroupReference,
+        CountForTemplateGroup = CountForTemplateGroup,
+        ValueTemplateGroupReference = ValueTemplateGroupReference,
         ListReference = ListReference,
         SubtypeSwitch = SubtypeSwitch,
         Aliases = Aliases,
         CanBeInMetadata = CanBeInMetadata,
-        KeyIsRegex = KeyIsRegex,
-        KeyGroupUniqueValue = KeyGroupUniqueValue,
+        IsTemplate = IsTemplate,
+        TemplateGroupUniqueValue = TemplateGroupUniqueValue,
         Deprecated = Deprecated,
         Experimental = Experimental,
         Version = Version,
         RequiredCondition = RequiredCondition,
         DefaultValue = DefaultValue,
         IncludedDefaultValue = IncludedDefaultValue,
-        KeyGroups = KeyGroups,
+        TemplateGroups = TemplateGroups,
         Owner = Owner,
         Priority = Priority,
         Docs = Docs,

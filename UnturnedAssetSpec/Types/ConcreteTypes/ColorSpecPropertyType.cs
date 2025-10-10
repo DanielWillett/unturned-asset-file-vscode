@@ -1,6 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -116,9 +117,6 @@ public abstract class ColorSpecPropertyType :
     BaseColorSpecPropertyType<ColorSpecPropertyType, Color>,
     IStringParseableSpecPropertyType
 {
-    private protected abstract VectorTypeParseOptions Options { get; }
-    private protected abstract bool HasAlpha { get; }
-
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
 
@@ -420,9 +418,7 @@ public abstract class ColorStrictHexSpecPropertyType :
     BaseColorSpecPropertyType<ColorStrictHexSpecPropertyType, Color>,
     IStringParseableSpecPropertyType
 {
-    private protected abstract bool HasAlpha { get; }
-
-    /// <inheritdoc />
+    private protected override VectorTypeParseOptions Options => VectorTypeParseOptions.Composite;
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
 
     public string? ToString(ISpecDynamicValue value)
@@ -474,9 +470,13 @@ public abstract class ColorStrictHexSpecPropertyType :
 public abstract class BaseColorSpecPropertyType<TSelf, T>
     : BasicSpecPropertyType<TSelf, T>,
         IVectorSpecPropertyType<Color>,
-        IVectorSpecPropertyType<Color32>
+        IVectorSpecPropertyType<Color32>,
+        ILegacyCompositeTypeProvider
     where T : unmanaged, IEquatable<T> where TSelf : BaseColorSpecPropertyType<TSelf, T>
 {
+    private protected abstract VectorTypeParseOptions Options { get; }
+    private protected abstract bool HasAlpha { get; }
+
     void IVectorSpecPropertyType.Visit<TVisitor>(ref TVisitor visitor)
     {
         visitor.Visit<Color>(this);
@@ -692,5 +692,33 @@ public abstract class BaseColorSpecPropertyType<TSelf, T>
     {
         byte v = Clamp(scalar);
         return new Color32(v, v, v, v);
+    }
+
+    bool ILegacyCompositeTypeProvider.IsEnabled => (Options & VectorTypeParseOptions.Legacy) != 0;
+
+    void ILegacyCompositeTypeProvider.VisitLinkedProperties<TVisitor>(
+        in FileEvaluationContext context, SpecProperty property, IDictionarySourceNode propertyRoot, ref TVisitor propertyVisitor, OneOrMore<int> templateGroupIndices)
+    {
+        if (property.IsTemplate)
+        {
+            // Color_(\d+)
+
+        }
+        if (propertyRoot.TryGetProperty(property.Key + "_R", out IPropertySourceNode? node))
+        {
+            propertyVisitor.AcceptProperty(node);
+        }
+        if (propertyRoot.TryGetProperty(property.Key + "_G", out node))
+        {
+            propertyVisitor.AcceptProperty(node);
+        }
+        if (propertyRoot.TryGetProperty(property.Key + "_B", out node))
+        {
+            propertyVisitor.AcceptProperty(node);
+        }
+        if (HasAlpha && propertyRoot.TryGetProperty(property.Key + "_A", out node))
+        {
+            propertyVisitor.AcceptProperty(node);
+        }
     }
 }

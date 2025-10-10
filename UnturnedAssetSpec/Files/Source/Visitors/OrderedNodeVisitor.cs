@@ -13,17 +13,11 @@ public abstract class OrderedNodeVisitor : NodeVisitor, ISourceNodeVisitor
     protected virtual void AcceptEndDictionary(IDictionarySourceNode dictionary) { }
     protected virtual void AcceptEndProperty(IPropertySourceNode property) { }
 
-    void ISourceNodeVisitor.AcceptCommentOnly(ICommentSourceNode node)
-    {
-        TryDispose();
-    }
+    void ISourceNodeCommentOnlyVisitor.AcceptCommentOnly(ICommentSourceNode node) { }
 
-    void ISourceNodeVisitor.AcceptWhiteSpace(IWhiteSpaceSourceNode node)
-    {
-        TryDispose();
-    }
+    void ISourceNodeWhiteSpaceVisitor.AcceptWhiteSpace(IWhiteSpaceSourceNode node) { }
 
-    void ISourceNodeVisitor.AcceptDictionary(IDictionarySourceNode node)
+    void ISourceNodeDictionaryVisitor.AcceptDictionary(IDictionarySourceNode node)
     {
         lock (node.File.TreeSync)
         {
@@ -31,7 +25,7 @@ public abstract class OrderedNodeVisitor : NodeVisitor, ISourceNodeVisitor
         }
     }
 
-    void ISourceNodeVisitor.AcceptList(IListSourceNode node)
+    void ISourceNodeListVisitor.AcceptList(IListSourceNode node)
     {
         lock (node.File.TreeSync)
         {
@@ -39,12 +33,9 @@ public abstract class OrderedNodeVisitor : NodeVisitor, ISourceNodeVisitor
         }
     }
 
-    void ISourceNodeVisitor.AcceptValue(IValueSourceNode node)
-    {
-        TryDispose();
-    }
+    void ISourceNodeValueVisitor.AcceptValue(IValueSourceNode node) { }
 
-    void ISourceNodeVisitor.AcceptProperty(IPropertySourceNode node)
+    void ISourceNodePropertyVisitor.AcceptProperty(IPropertySourceNode node)
     {
         lock (node.File.TreeSync)
         {
@@ -55,16 +46,9 @@ public abstract class OrderedNodeVisitor : NodeVisitor, ISourceNodeVisitor
                     break;
 
                 case IValueSourceNode value:
-                    try
-                    {
-                        Token.ThrowIfCancellationRequested();
-                        Comment = value as ICommentSourceNode;
-                        AcceptValue(value);
-                    }
-                    finally
-                    {
-                        TryDispose();
-                    }
+                    Token.ThrowIfCancellationRequested();
+                    Comment = value as ICommentSourceNode;
+                    AcceptValue(value);
                     break;
             }
         }
@@ -72,63 +56,56 @@ public abstract class OrderedNodeVisitor : NodeVisitor, ISourceNodeVisitor
 
     private void StepThroughContainerIntl(IAnyChildrenSourceNode listOrDict)
     {
-        try
+        _tokenCanCancel = Token.CanBeCanceled;
+        if (_tokenCanCancel)
+            Token.ThrowIfCancellationRequested();
+
+        ImmutableArray<ISourceNode> children = listOrDict.Children;
+        if (children.IsDefaultOrEmpty)
+            return;
+
+        for (ISourceNode? node = children[0]; node != null ; node = GetNextNode(node, listOrDict))
         {
-            _tokenCanCancel = Token.CanBeCanceled;
             if (_tokenCanCancel)
                 Token.ThrowIfCancellationRequested();
 
-            ImmutableArray<ISourceNode> children = listOrDict.Children;
-            if (children.IsDefaultOrEmpty)
-                return;
-
-            for (ISourceNode? node = children[0]; node != null ; node = GetNextNode(node, listOrDict))
+            SourceNodeType type = node.Type;
+            Comment = node as ICommentSourceNode;
+            switch (type)
             {
-                if (_tokenCanCancel)
-                    Token.ThrowIfCancellationRequested();
+                case SourceNodeType.Whitespace:
+                    if (!IgnoreMetadata)
+                        AcceptWhiteSpace((IWhiteSpaceSourceNode)node);
+                    break;
 
-                SourceNodeType type = node.Type;
-                Comment = node as ICommentSourceNode;
-                switch (type)
-                {
-                    case SourceNodeType.Whitespace:
-                        if (!IgnoreMetadata)
-                            AcceptWhiteSpace((IWhiteSpaceSourceNode)node);
-                        break;
+                case SourceNodeType.Comment:
+                    if (!IgnoreMetadata)
+                    {
+                        Comment = null;
+                        AcceptCommentOnly((ICommentSourceNode)node);
+                    }
+                    break;
 
-                    case SourceNodeType.Comment:
-                        if (!IgnoreMetadata)
-                        {
-                            Comment = null;
-                            AcceptCommentOnly((ICommentSourceNode)node);
-                        }
-                        break;
+                case SourceNodeType.Property:
+                case SourceNodeType.PropertyWithComment:
+                    AcceptProperty((IPropertySourceNode)node);
+                    break;
 
-                    case SourceNodeType.Property:
-                    case SourceNodeType.PropertyWithComment:
-                        AcceptProperty((IPropertySourceNode)node);
-                        break;
+                case SourceNodeType.Value:
+                case SourceNodeType.ValueWithComment:
+                    AcceptValue((IValueSourceNode)node);
+                    break;
 
-                    case SourceNodeType.Value:
-                    case SourceNodeType.ValueWithComment:
-                        AcceptValue((IValueSourceNode)node);
-                        break;
+                case SourceNodeType.List:
+                case SourceNodeType.ListWithComment:
+                    AcceptList((IListSourceNode)node);
+                    break;
 
-                    case SourceNodeType.List:
-                    case SourceNodeType.ListWithComment:
-                        AcceptList((IListSourceNode)node);
-                        break;
-
-                    case SourceNodeType.Dictionary:
-                    case SourceNodeType.DictionaryWithComment:
-                        AcceptDictionary((IDictionarySourceNode)node);
-                        break;
-                }
+                case SourceNodeType.Dictionary:
+                case SourceNodeType.DictionaryWithComment:
+                    AcceptDictionary((IDictionarySourceNode)node);
+                    break;
             }
-        }
-        finally
-        {
-            TryDispose();
         }
     }
 

@@ -2,9 +2,16 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
-public readonly struct RegexKeyGroup : IEquatable<RegexKeyGroup>
+public readonly struct TemplateGroup : IEquatable<TemplateGroup>
 {
+    /// <summary>
+    /// The one-based index of the group.
+    /// </summary>
     public int Group { get; }
+
+    /// <summary>
+    /// The name of the group common to an asset tree.
+    /// </summary>
     public string Name { get; }
 
     /// <summary>
@@ -13,11 +20,11 @@ public readonly struct RegexKeyGroup : IEquatable<RegexKeyGroup>
     /// <remarks>The value of this property will be formatted into the key instead of the index.</remarks>
     public string? UseValueOf { get; }
 
-    public RegexKeyGroup(int group, string name, string? useValueOf) : this(group, name)
+    public TemplateGroup(int group, string name, string? useValueOf) : this(group, name)
     {
         UseValueOf = useValueOf;
     }
-    public RegexKeyGroup(int group, string name)
+    public TemplateGroup(int group, string name)
     {
         Group = group;
         Name = name;
@@ -35,14 +42,14 @@ public readonly struct RegexKeyGroup : IEquatable<RegexKeyGroup>
         return hash;
     }
 
-    public override bool Equals(object? obj) => obj is RegexKeyGroup g && Equals(g);
-    public bool Equals(RegexKeyGroup other)
+    public override bool Equals(object? obj) => obj is TemplateGroup g && Equals(g);
+    public bool Equals(TemplateGroup other)
     {
         return Group == other.Group
                && string.Equals(Name, other.Name, StringComparison.Ordinal)
                && string.Equals(UseValueOf, other.UseValueOf, StringComparison.OrdinalIgnoreCase);
     }
 
-    public static bool operator ==(RegexKeyGroup left, RegexKeyGroup right) => left.Equals(right);
-    public static bool operator !=(RegexKeyGroup left, RegexKeyGroup right) => !left.Equals(right);
+    public static bool operator ==(TemplateGroup left, TemplateGroup right) => left.Equals(right);
+    public static bool operator !=(TemplateGroup left, TemplateGroup right) => !left.Equals(right);
 }

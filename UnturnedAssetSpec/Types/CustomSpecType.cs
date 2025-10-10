@@ -153,12 +153,9 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
                         new FileEvaluationContext(in parse.EvaluationContext, property),
                         parse.Diagnostics)
                     {
-                        Database = parse.Database,
-                        FileType = parse.FileType,
                         Node = kvp.Value,
                         Parent = kvp,
-                        BaseKey = fullKey,
-                        File = parse.File
+                        BaseKey = fullKey
                     };
 
                     if (!property.Type.TryParseValue(in context, out ISpecDynamicValue? propertyValue))
@@ -182,12 +179,9 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
                     new FileEvaluationContext(in parse.EvaluationContext, property),
                     parse.Diagnostics)
                 {
-                    Database = parse.Database,
-                    FileType = parse.FileType,
                     Node = kvp.Value,
                     Parent = kvp,
-                    BaseKey = property.Key,
-                    File = parse.File
+                    BaseKey = property.Key
                 };
 
                 if (!property.Type.TryParseValue(in context, out ISpecDynamicValue? propertyValue))

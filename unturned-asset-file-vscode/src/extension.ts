@@ -1,7 +1,7 @@
 import { existsSync } from 'fs';
 import { join } from 'path';
-import { commands, Disposable, ExtensionContext, window, workspace } from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions, State } from 'vscode-languageclient/node';
+import { commands, Disposable, env, ExtensionContext, window, workspace } from 'vscode';
+import { ExecutableOptions, LanguageClient, LanguageClientOptions, ServerOptions, State } from 'vscode-languageclient/node';
 
 import { AssetPropertiesViewProvider } from './views/asset-properties';
 
@@ -12,6 +12,7 @@ import { refreshAssetProperties } from './commands/refresh-asset-properties';
 
 // request handlers
 import { GetDocumentText, handleGetDocumentText } from './jsonrpc/get-document-text';
+import { getEnvironmentData } from 'worker_threads';
 
 
 export const languageId = "unturned-data-file";
@@ -53,12 +54,21 @@ export async function activate(context: ExtensionContext): Promise<void>
     }
     else
     {
-        let serverOptions: ServerOptions = {
-            run: { command: 'dotnet', args: [dllPath] },
-            debug: { command: 'dotnet', args: [dllPath] }
+        const isDebug = process.env.UNTURNED_LSP_DEBUG === "1";
+        const options: ExecutableOptions = {
+            env: isDebug
+                ? {
+                    "UNTURNED_LSP_DEBUG": "1"
+                }
+                : {}
+        };
+        const args = [ dllPath, "--clientProcessId", process.pid.toString() ];
+        const serverOptions: ServerOptions = {
+            run: { command: 'dotnet', args: args, options: options },
+            debug: { command: 'dotnet', args: args, options: options }
         };
 
-        let clientOptions: LanguageClientOptions = {
+        const clientOptions: LanguageClientOptions = {
             documentSelector: [
                 {
                     pattern: "**/*.{dat,asset}",

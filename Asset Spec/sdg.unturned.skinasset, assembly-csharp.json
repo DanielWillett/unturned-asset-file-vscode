@@ -105,22 +105,16 @@
             "Description": "The number of attachment skin material overrides available in the bundle.",
             "Variable": "secondarySkins",
             "Priority": 10,
-            "CountForRegexGroup": "skin-secondary"
+            "CountForTemplateGroup": "skin-secondary"
         },
         {
-            "Key": "Secondary_(\\d+)",
+            "Key": "Secondary_*",
             "Type": "Id",
+            "Template": true,
+            "TemplateGroups": [ "skin-secondary" ],
             "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
             "Required": true,
-            "KeyIsRegex": true,
-            "KeyGroupUniqueValue": true,
-            "KeyGroups":
-            [
-                {
-                    "Name": "skin-secondary",
-                    "RegexGroup": 1
-                }
-            ],
+            "TemplateGroupUniqueValue": true,
             "DefaultValue": 0,
             "Description": "The item ID of an attachment for which this skin provides a custom material for. The material should be named 'Skin_Secondary_#' where # would be the value of this property.",
             "Variable": "secondarySkins",
@@ -133,7 +127,7 @@
             "Description": "The number of mesh overrides defined in the bundle, which will replace the meshes (in order of LOD levels) on the item or vehicle this skin is applied to.",
             "Variable": "overrideMeshes",
             "Priority": 8,
-            "CountForRegexGroup": "skin-meshes"
+            "CountForTemplateGroup": "skin-meshes"
         }
     ],
     "Types":
@@ -233,13 +227,12 @@
             "Required": true
         },
         {
-            "AssetName": "Skin_Secondary_(\\d+)",
-            "KeyIsRegex": true,
-            "KeyGroups":
+            "AssetName": "Skin_Secondary_*",
+            "Template": true,
+            "TemplateGroups":
             [
                 {
                     "Name": "skin-secondary",
-                    "RegexGroup": 1,
                     "UseValueOf": "Secondary_$1"
                 }
             ],
@@ -267,15 +260,9 @@
             }
         },
         {
-            "AssetName": "Override_Mesh_(\\d+)",
-            "KeyIsRegex": true,
-            "KeyGroups":
-            [
-                {
-                    "Name": "skin-meshes",
-                    "RegexGroup": 1
-                }
-            ],
+            "AssetName": "Override_Mesh_*",
+            "Template": true,
+            "TemplateGroups": [ "skin-meshes" ],
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "An object containing a Mesh Filter configured to use the desired mesh. One of these objects can also include 'Stat_Tracker' and 'Icon' transforms to set the corresponding location.",
             "Variable": "overrideMeshes",

@@ -8,6 +8,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Runtime.CompilerServices;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Files;
+
 internal class FileEvaluationContextFactory
 {
     private readonly OpenedFileTracker _fileTracker;
@@ -27,13 +28,14 @@ internal class FileEvaluationContextFactory
         _installationEnvironment = installationEnvironment;
     }
 
-    public bool TryCreate(Position position, DocumentUri uri, out SpecPropertyTypeParseContext ctx)
+    public bool TryCreate(Position position, DocumentUri uri, out SpecPropertyTypeParseContext ctx, out ISourceNode? node)
     {
-        return TryCreate(position, uri, null, out ctx);
+        return TryCreate(position, uri, null, out ctx, out node);
     }
     
-    public bool TryCreate(Position position, DocumentUri uri, ICollection<DatDiagnosticMessage>? diagnosticSink, out SpecPropertyTypeParseContext ctx)
+    public bool TryCreate(Position position, DocumentUri uri, ICollection<DatDiagnosticMessage>? diagnosticSink, out SpecPropertyTypeParseContext ctx, out ISourceNode? node)
     {
+        node = null;
         if (!_fileTracker.Files.TryGetValue(uri, out OpenedFile? file))
         {
             Unsafe.SkipInit(out ctx);
@@ -44,7 +46,7 @@ internal class FileEvaluationContextFactory
 
         AssetFileType fileType = AssetFileType.FromFile(sourceFile, _specDatabase);
 
-        ISourceNode? node = sourceFile.GetNodeFromPosition(position.ToFilePosition());
+        node = sourceFile.GetNodeFromPosition(position.ToFilePosition());
         GetRelationalNodes(node, out IAnyValueSourceNode? valueNode, out IPropertySourceNode? parentNode);
 
         if (valueNode == null || parentNode == null)
@@ -67,8 +69,7 @@ internal class FileEvaluationContextFactory
             sourceFile,
             _workspaceEnvironment,
             _installationEnvironment,
-            _specDatabase,
-            file
+            _specDatabase
         );
 
         ctx = SpecPropertyTypeParseContext.FromFileEvaluationContext(evalCtx, property, parentNode, valueNode, diagnosticSink);
@@ -104,8 +105,7 @@ internal class FileEvaluationContextFactory
             sourceFile,
             _workspaceEnvironment,
             _installationEnvironment,
-            _specDatabase,
-            file
+            _specDatabase
         );
         return property != null;
     }

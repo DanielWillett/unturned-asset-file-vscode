@@ -73,6 +73,11 @@ public readonly record struct CommentPrefix(int Slashes, int Spaces)
     private const string _1_2 = "/  ";
 
     /// <summary>
+    /// The '// ' comment prefix.
+    /// </summary>
+    public static readonly CommentPrefix Default = new CommentPrefix(2, 1);
+
+    /// <summary>
     /// Total length of the prefix as a string.
     /// </summary>
     public int Length => Slashes + Spaces;

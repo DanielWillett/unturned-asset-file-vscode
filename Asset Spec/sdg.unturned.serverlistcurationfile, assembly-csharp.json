@@ -35,7 +35,7 @@
             "Variable": "labels",
             "Priority": 6,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#labels-list-of-dictionaries",
-            "CountForRegexGroup": "server-list-curation-labels"
+            "CountForTemplateGroup": "server-list-curation-labels"
         },
         {
             "Key": "Rules",
@@ -46,7 +46,7 @@
             "Priority": 4,
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#rules-list-of-dictionaries",
-            "CountForRegexGroup": "server-list-curation-rules"
+            "CountForTemplateGroup": "server-list-curation-rules"
         }
     ],
     "Types":
@@ -367,7 +367,7 @@
                     "Type": "String",
                     "ListReference": "(SDG.Unturned.ServerListCurationFile, Assembly-CSharp::Labels).Name!",
                     "Description": "The human-readable description of what this rule does. Not localizable.",
-                    "DefaultValue": "=CAT((Default description for rule at index ) #(Self.KeyGroups[0]))",
+                    "DefaultValue": "=CAT((Default description for rule at index ) #(Self.TemplateGroups[0]))",
                     "Variable": "description"
                 },
                 {

@@ -1,3 +1,4 @@
+#if NET
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Files;
@@ -58,3 +59,4 @@ internal class EnvironmentCacheTests
         }
     }
 }
+#endif

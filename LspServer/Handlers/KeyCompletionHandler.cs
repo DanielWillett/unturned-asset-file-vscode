@@ -122,8 +122,7 @@ internal class KeyCompletionHandler : ICompletionHandler
             state.File.SourceFile,
             _workspace,
             _installationEnvironment,
-            _specDictionary,
-            state.File
+            _specDictionary
         );
 
         ISpecPropertyType? type = property.Type.GetType(in ctx);
@@ -206,8 +205,7 @@ internal class KeyCompletionHandler : ICompletionHandler
                 sourceFile,
                 _workspace,
                 _installationEnvironment,
-                _specDictionary,
-                file
+                _specDictionary
             );
 
             ISpecPropertyType? type = property.Type.GetType(in ctx);

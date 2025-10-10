@@ -10,5 +10,5 @@ public interface IDataRefTarget : IEquatable<IDataRefTarget>, ISpecDynamicValue
     ValueTypeDataRefType EvaluateValueType(in FileEvaluationContext ctx);
     string? EvaluateKey(in FileEvaluationContext ctx);
     ISpecDynamicValue? EvaluateValue(in FileEvaluationContext ctx);
-    int EvaluateKeyGroup(in FileEvaluationContext ctx, int index);
+    int EvaluateTemplateGroup(in FileEvaluationContext ctx, int index);
 }

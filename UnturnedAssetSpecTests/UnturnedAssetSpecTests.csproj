@@ -1,18 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;net481</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-      
+
+    <LangVersion>14.0</LangVersion>
 
     <EnableStaticNativeInstrumentation>False</EnableStaticNativeInstrumentation>
     <EnableDynamicNativeInstrumentation>False</EnableDynamicNativeInstrumentation>
     
     <RunSettingsFilePath>$(MSBuildProjectDirectory)\..\test.runsettings</RunSettingsFilePath>
+    
+    <AppDesignerFolder>FileProperties</AppDesignerFolder>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +29,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.5" />
 
     <ProjectReference Include="../UnturnedAssetSpec/UnturnedAssetSpec.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+
     <ProjectReference Include="../LspServer/LspServer.csproj" />
+
   </ItemGroup>
 
   <ItemGroup>

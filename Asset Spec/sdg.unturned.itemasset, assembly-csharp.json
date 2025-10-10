@@ -696,7 +696,7 @@
             "Description": "Blueprints defined for this item. Blueprints are crafting recipes that either consume this item or produce this item.",
             "Variable": "blueprints",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprints-int-0",
-            "CountForRegexGroup": "item-blueprints"
+            "CountForTemplateGroup": "item-blueprints"
         },
         {
             "Key": "Actions",
@@ -706,7 +706,7 @@
             "Description": "Context menu actions defined for this item.",
             "Variable": "actions",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#actions-int-0",
-            "CountForRegexGroup": "item-actions"
+            "CountForTemplateGroup": "item-actions"
         },
         {
             "Key": "Add_Default_Actions",
@@ -799,7 +799,7 @@
                     "Value": true
                 }
             ],
-            "CountForRegexGroup": "item-deleted-0-quality-rewards"
+            "CountForTemplateGroup": "item-deleted-0-quality-rewards"
         },
         {
             "Key": "Destroy_Item_Colliders",
@@ -1230,7 +1230,7 @@
                     "DefaultValue": null,
                     "Description": "Input items defined for this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#inputitems-list-of-doc-item-asset-blueprints-inputitem",
-                    "CountForRegexGroup": "item-blueprints-supplies",
+                    "CountForTemplateGroup": "item-blueprints-supplies",
                     "Variable": "supplies"
                 },
                 {
@@ -1240,7 +1240,7 @@
                     "DefaultValue": null,
                     "Description": "Output items defined for this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#outputitems-list-of-doc-item-asset-blueprints-outputitem",
-                    "CountForRegexGroup": "item-blueprints-outputs",
+                    "CountForTemplateGroup": "item-blueprints-outputs",
                     "Variable": "outputs"
                 },
                 {
@@ -1337,7 +1337,7 @@
                     "Description": "Conditions that must be met for this blueprint to be visible and craftable.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "questConditionsList",
-                    "CountForRegexGroup": "item-blueprints-conditions"
+                    "CountForTemplateGroup": "item-blueprints-conditions"
                 },
                 {
                     "Key": "Rewards",
@@ -1346,7 +1346,7 @@
                     "Description": "Rewards applied after crafting this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "questRewardsList",
-                    "CountForRegexGroup": "item-blueprints-rewards"
+                    "CountForTemplateGroup": "item-blueprints-rewards"
                 },
                 {
                     "Key": "Searchable",

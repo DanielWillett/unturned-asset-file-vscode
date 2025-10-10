@@ -80,7 +80,7 @@ public sealed class ThisDataRef : IEquatable<ISpecDynamicValue>, IEquatable<This
         return value;
     }
 
-    public int EvaluateKeyGroup(in FileEvaluationContext ctx, int index)
+    public int EvaluateTemplateGroup(in FileEvaluationContext ctx, int index)
     {
         // todo;
         throw new NotSupportedException();

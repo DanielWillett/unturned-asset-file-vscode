@@ -8,12 +8,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 public struct FileRange : IEquatable<FileRange>, IComparable<FileRange>, IComparable
 {
     /// <summary>
-    /// Index from one of the line the character is on.
+    /// First character in the selection (inclusive).
     /// </summary>
     public FilePosition Start;
 
     /// <summary>
-    /// Index from one of the character in its line.
+    /// Last character in the selection (inclusive).
     /// </summary>
     public FilePosition End;
 

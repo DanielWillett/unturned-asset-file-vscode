@@ -28,10 +28,10 @@ internal abstract class AnySourceNode : ISourceNode
     public int FirstCharacterIndex { get; private set; }
     public int LastCharacterIndex { get; private set; }
 
-    internal virtual void SetParentInfo(ISourceFile file, ISourceNode parent)
+    internal virtual void SetParentInfo(ISourceFile? file, ISourceNode parent)
     {
         Parent = parent;
-        File = file;
+        File = file!;
     }
 
     protected void SetParentInfoOfChildren(ISourceNode[] values)
@@ -43,6 +43,7 @@ internal abstract class AnySourceNode : ISourceNode
         }
     }
 
+    // ReSharper disable once NotNullOrRequiredMemberIsNotInitialized
     protected AnySourceNode(in AnySourceNodeProperties properties)
     {
         Range = properties.Range;

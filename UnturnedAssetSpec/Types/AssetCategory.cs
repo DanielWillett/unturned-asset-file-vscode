@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -9,6 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <summary>
 /// A reference to an instance of the <see cref="AssetCategory"/> enum.
 /// </summary>
+[DebuggerDisplay("{Value,nq}")]
 public readonly struct AssetCategoryValue : IEquatable<AssetCategoryValue>, IComparable<AssetCategoryValue>
 {
     public static readonly AssetCategoryValue None = new AssetCategoryValue(0);
@@ -64,7 +66,9 @@ public readonly struct AssetCategoryValue : IEquatable<AssetCategoryValue>, ICom
         return Index == other.Index;
     }
 
-    public override bool Equals(object obj)
+    public override string ToString() => Value;
+
+    public override bool Equals(object? obj)
     {
         return obj is AssetCategoryValue v && Equals(v);
     }

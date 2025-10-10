@@ -1,3 +1,4 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Files;
@@ -31,12 +32,12 @@ internal class HoverHandler : IHoverHandler
     /// <inheritdoc />
     public Task<Hover?> Handle(HoverParams request, CancellationToken cancellationToken)
     {
-        if (!_evalFactory.TryCreate(request.Position, request.TextDocument.Uri, out SpecPropertyTypeParseContext ctx) && ctx.Node == null)
+        if (!_evalFactory.TryCreate(request.Position, request.TextDocument.Uri, out SpecPropertyTypeParseContext ctx, out ISourceNode? hoverNode) && hoverNode == null)
         {
             return Task.FromResult<Hover?>(null);
         }
 
-        Range range = ctx.Node!.Range.ToRange();
+        Range range = hoverNode!.Range.ToRange();
 
         string? desc;
         SpecProperty? prop = ctx.EvaluationContext.Self;
@@ -53,12 +54,34 @@ internal class HoverHandler : IHoverHandler
             desc = prop.Key;
         }
 
+        if (prop != null)
+        {
+            if (ctx.EvaluationContext.TryGetValue(out ISpecDynamicValue? value))
+            {
+                if (value == null)
+                {
+                    desc += Environment.NewLine + "Value: **null**";
+                }
+                else if (value.ValueType is IStringParseableSpecPropertyType sp)
+                {
+                    if (sp.ToString(value) is not { Length: > 0 } str)
+                        desc += Environment.NewLine + "Value: **null**";
+                    else
+                        desc += $"{Environment.NewLine}Value: `{str}`";
+                }
+                else
+                {
+                    desc += Environment.NewLine + "*Has Value*";
+                }
+            }
+        }
+
         return Task.FromResult<Hover?>(new Hover
         {
             Range = range,
             Contents = new MarkedStringsOrMarkupContent(new MarkupContent
             {
-                Kind = MarkupKind.PlainText,
+                Kind = MarkupKind.Markdown,
                 Value = desc
             })
         });

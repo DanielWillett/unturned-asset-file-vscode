@@ -12,10 +12,11 @@ public readonly ref struct SpecPropertyTypeParseContext
 
     public required IAnyValueSourceNode? Node { get; init; }
     public required ISourceNode? Parent { get; init; }
-    public required IAssetSpecDatabase Database { get; init; }
-    public ISourceFile? File { get; init; }
     public string? BaseKey { get; init; }
-    public required AssetFileType FileType { get; init; }
+
+    public IAssetSpecDatabase Database => EvaluationContext.Information;
+    public ISourceFile? File => EvaluationContext.SourceFile;
+    public AssetFileType FileType => EvaluationContext.FileType;
 
     public ICollection<DatDiagnosticMessage>? Diagnostics { get; }
 
@@ -28,10 +29,7 @@ public readonly ref struct SpecPropertyTypeParseContext
 
         return new SpecPropertyTypeParseContext(EvaluationContext, null)
         {
-            Database = Database,
             BaseKey = BaseKey,
-            FileType = FileType,
-            File = File,
             Node = Node,
             Parent = Parent
         };
@@ -58,10 +56,7 @@ public readonly ref struct SpecPropertyTypeParseContext
         {
             Parent = parentNode,
             Node = valueNode,
-            Database = evalContext.Information,
-            FileType = evalContext.FileType,
-            BaseKey = property?.Key,
-            File = evalContext.SourceFile
+            BaseKey = property?.Key
         };
     }
 

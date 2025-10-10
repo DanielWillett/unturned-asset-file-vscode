@@ -15,7 +15,7 @@
             "Description": "Conditions that must be met to grant the rewards.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards-list-asset.html#rewards-list-assets",
             "Variable": "conditionsList",
-            "CountForRegexGroup": "npc-rewardlist-conditions"
+            "CountForTemplateGroup": "npc-rewardlist-conditions"
         },
         {
             "Key": "Rewards",
@@ -24,7 +24,7 @@
             "Description": "Rewards to grant upon activation.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards-list-asset.html#rewards-list-assets",
             "Variable": "rewardsList",
-            "CountForRegexGroup": "npc-rewardlist-rewards"
+            "CountForTemplateGroup": "npc-rewardlist-rewards"
         }
     ]
 }

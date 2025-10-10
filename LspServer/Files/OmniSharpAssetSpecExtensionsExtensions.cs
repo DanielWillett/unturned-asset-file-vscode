@@ -19,12 +19,12 @@ public static class OmniSharpAssetSpecExtensionsExtensions
 
     public static FileRange ToFileRange(this Range range)
     {
-        return new FileRange(range.Start.Line + 1, range.Start.Character + 1, range.End.Line + 1, range.End.Character + 1);
+        return new FileRange(range.Start.Line + 1, range.Start.Character + 1, range.End.Line + 1, range.End.Character);
     }
 
     public static Range ToRange(this FileRange range)
     {
-        return new Range(range.Start.Line - 1, range.Start.Character - 1, range.End.Line - 1, range.End.Character - 1);
+        return new Range(range.Start.Line - 1, range.Start.Character - 1, range.End.Line - 1, range.End.Character);
     }
 
     public static SymbolKind GetSymbolKind(this ISpecPropertyType type)

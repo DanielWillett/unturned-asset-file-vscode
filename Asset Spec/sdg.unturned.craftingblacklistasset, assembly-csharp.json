@@ -92,7 +92,7 @@
                     "Variable": "index",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
                     "FileCrossRef": "Item",
-                    "ValueRegexGroupReference": "#($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).KeyGroups[0]",
+                    "ValueTemplateGroupReference": "($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).TemplateGroups[0]",
                     "ExclusiveWith": [ "BlueprintName" ]
                 },
                 {

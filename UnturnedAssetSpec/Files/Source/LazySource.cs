@@ -8,7 +8,6 @@ internal struct LazySource
     internal ReadOnlyMemory<char> Segment { get; }
     internal ValueTypeDataRefType ExpectedType { get; }
     internal object? CachedNode { get; set; }
-    internal int NodeCount { get; set; }
     internal SourceNodeTokenizerOptions Options { get; set; }
     internal long PositionOffset { get; set; }
     internal long IndexDepthOffset { get; set; }

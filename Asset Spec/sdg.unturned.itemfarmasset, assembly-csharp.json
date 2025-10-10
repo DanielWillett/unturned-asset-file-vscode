@@ -130,7 +130,7 @@
             "Description": "Rewards applied when harvesting this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
             "Variable": "harvestRewardsList",
-            "CountForRegexGroup": "farm-rewards",
+            "CountForTemplateGroup": "farm-rewards",
             "Priority": 4
         }
     ]

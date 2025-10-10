@@ -126,7 +126,7 @@
             "Description": "The number of 'Roar_#' audio clips to load from the Unity bundle. Roar sounds are played when the animal attacks.",
             "Variable": "roars",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
-            "CountForRegexGroup": "animal-roars"
+            "CountForTemplateGroup": "animal-roars"
         },
         {
             "Key": "Panics",
@@ -135,7 +135,7 @@
             "Description": "The number of 'Panic_#' audio clips to load from the Unity bundle. Panic sounds are played when the animal is damaged.",
             "Variable": "panics",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
-            "CountForRegexGroup": "animal-panics"
+            "CountForTemplateGroup": "animal-panics"
         },
         {
             "Key": "Attack_Anim_Variants",
@@ -145,7 +145,7 @@
             "Description": "The number of 'Attack_#' animations attached to the Animation component of the animal's 'Character' object.",
             "Variable": "attackAnimVariantsCount",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
-            "CountForRegexGroup": "animal-anim-attack"
+            "CountForTemplateGroup": "animal-anim-attack"
         },
         {
             "Key": "Eat_Anim_Variants",
@@ -155,7 +155,7 @@
             "Description": "The number of 'Eat' or 'Eat_#' animations attached to the Animation component of the animal's 'Character' object.",
             "Variable": "eatAnimVariantsCount",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
-            "CountForRegexGroup": "animal-anim-eat"
+            "CountForTemplateGroup": "animal-anim-eat"
         },
         {
             "Key": "Glance_Anim_Variants",
@@ -165,7 +165,7 @@
             "Description": "The number of 'Glance_#' animations attached to the Animation component of the animal's 'Character' object.",
             "Variable": "glanceAnimVariantsCount",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
-            "CountForRegexGroup": "animal-anim-glance"
+            "CountForTemplateGroup": "animal-anim-glance"
         },
         {
             "Key": "Startle_Anim_Variants",
@@ -175,7 +175,7 @@
             "Description": "The number of 'Startle' or 'Startle_#' animations attached to the Animation component of the animal's 'Character' object.",
             "Variable": "startleAnimVariantsCount",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#animal-properties",
-            "CountForRegexGroup": "animal-anim-startle"
+            "CountForTemplateGroup": "animal-anim-startle"
         },
         {
             "Key": "Horizontal_Attack_Range",
@@ -293,50 +293,26 @@
                     "Required": true
                 },
                 {
-                    "Name": "Attack_(\\d+)",
-                    "AssetNameIsRegex": true,
-                    "AssetNameGroups":
-                    [
-                        {
-                            "Name": "animal-anim-attack",
-                            "RegexGroup": 1
-                        }
-                    ]
+                    "Name": "Attack_*",
+                    "Template": true,
+                    "TemplateGroups": [ "animal-anim-attack" ]
                 },
                 {
-                    "Name": "Eat_(\\d+)",
+                    "Name": "Eat_*",
                     "SingleNameOverride": "Eat",
-                    "AssetNameIsRegex": true,
-                    "AssetNameGroups":
-                    [
-                        {
-                            "Name": "animal-anim-eat",
-                            "RegexGroup": 1
-                        }
-                    ]
+                    "Template": true,
+                    "TemplateGroups": [ "animal-anim-eat" ]
                 },
                 {
-                    "Name": "Glance_(\\d+)",
-                    "AssetNameIsRegex": true,
-                    "AssetNameGroups":
-                    [
-                        {
-                            "Name": "animal-anim-glance",
-                            "RegexGroup": 1
-                        }
-                    ]
+                    "Name": "Glance_*",
+                    "Template": true,
+                    "TemplateGroups": [ "animal-anim-glance" ]
                 },
                 {
-                    "Name": "Startle_(\\d+)",
+                    "Name": "Startle_*",
                     "SingleNameOverride": "Startle",
-                    "AssetNameIsRegex": true,
-                    "AssetNameGroups":
-                    [
-                        {
-                            "Name": "animal-anim-startle",
-                            "RegexGroup": 1
-                        }
-                    ]
+                    "Template": true,
+                    "TemplateGroups": [ "animal-anim-startle" ]
                 }
             ],
             "Variable": "client"
@@ -362,50 +338,26 @@
                     "Required": true
                 },
                 {
-                    "Name": "Attack_(\\d+)",
-                    "AssetNameIsRegex": true,
-                    "AssetNameGroups":
-                    [
-                        {
-                            "Name": "animal-anim-attack",
-                            "RegexGroup": 1
-                        }
-                    ]
+                    "Name": "Attack_*",
+                    "Template": true,
+                    "TemplateGroups": [ "animal-anim-attack" ]
                 },
                 {
-                    "Name": "Eat_(\\d+)",
+                    "Name": "Eat_*",
                     "SingleNameOverride": "Eat",
-                    "AssetNameIsRegex": true,
-                    "AssetNameGroups":
-                    [
-                        {
-                            "Name": "animal-anim-eat",
-                            "RegexGroup": 1
-                        }
-                    ]
+                    "Template": true,
+                    "TemplateGroups": [ "animal-anim-eat" ]
                 },
                 {
-                    "Name": "Glance_(\\d+)",
-                    "AssetNameIsRegex": true,
-                    "AssetNameGroups":
-                    [
-                        {
-                            "Name": "animal-anim-glance",
-                            "RegexGroup": 1
-                        }
-                    ]
+                    "Name": "Glance_*",
+                    "Template": true,
+                    "TemplateGroups": [ "animal-anim-glance" ]
                 },
                 {
-                    "Name": "Startle_(\\d+)",
+                    "Name": "Startle_*",
                     "SingleNameOverride": "Startle",
-                    "AssetNameIsRegex": true,
-                    "AssetNameGroups":
-                    [
-                        {
-                            "Name": "animal-anim-startle",
-                            "RegexGroup": 1
-                        }
-                    ]
+                    "Template": true,
+                    "TemplateGroups": [ "animal-anim-startle" ]
                 }
             ],
             "Variable": "server"
@@ -425,30 +377,18 @@
             "Variable": "ragdoll"
         },
         {
-            "AssetName": "Roar_(\\d+)",
-            "AssetNameIsRegex": true,
-            "AssetNameGroups":
-            [
-                {
-                    "Name": "animal-roars",
-                    "RegexGroup": 1
-                }
-            ],
+            "AssetName": "Roar_*",
+            "Template": true,
+            "TemplateGroups": [ "animal-roars" ],
             "Description": "Randomly selected roar sound.",
             "Required": true,
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Variable": "roars"
         },
         {
-            "AssetName": "Panic_(\\d+)",
-            "AssetNameIsRegex": true,
-            "AssetNameGroups":
-            [
-                {
-                    "Name": "animal-panics",
-                    "RegexGroup": 1
-                }
-            ],
+            "AssetName": "Panic_*",
+            "Template": true,
+            "TemplateGroups": [ "animal-panics" ],
             "Description": "Randomly selected panic sound.",
             "Required": true,
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",

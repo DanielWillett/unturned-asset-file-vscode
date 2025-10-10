@@ -42,7 +42,7 @@ internal class DictionaryNode : AnySourceNode, IDictionarySourceNode
         StringDictionary<IPropertySourceNode>? p = _properties;
         if (p == null)
         {
-            _ = Values;
+            RebuildProperties();
             p = _properties;
             if (p == null)
             {
@@ -71,7 +71,7 @@ internal class DictionaryNode : AnySourceNode, IDictionarySourceNode
         SetParentInfoOfChildren(values);
     }
 
-    internal override void SetParentInfo(ISourceFile file, ISourceNode parent)
+    internal override void SetParentInfo(ISourceFile? file, ISourceNode parent)
     {
         base.SetParentInfo(file, parent);
         SetParentInfoOfChildren(Values);

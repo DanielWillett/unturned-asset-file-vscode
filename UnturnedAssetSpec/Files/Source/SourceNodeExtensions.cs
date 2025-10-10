@@ -1,7 +1,9 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using System.Threading;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -136,7 +138,7 @@ public static class SourceNodeExtensions
         /// </summary>
         public bool TryGetProperty(SpecProperty property, [MaybeNullWhen(false)] out IPropertySourceNode propertyNode)
         {
-            if (property.KeyIsRegex || property.Key.Length == 0)
+            if (property.IsTemplate || property.Key.Length == 0)
             {
                 propertyNode = null;
                 return false;
@@ -283,16 +285,13 @@ public static class SourceNodeExtensions
             {
                 root.Visit(ref visitor);
             }
-            catch (BreakException)
-            {
-                return visitor.BestMatch;
-            }
+            catch (BreakException) { }
             finally
             {
                 src.Dispose();
             }
 
-            return null;
+            return visitor.BestMatch;
         }
     }
 
@@ -304,7 +303,7 @@ public static class SourceNodeExtensions
 
         protected override void AcceptNode(ISourceNode node)
         {
-            if (node.FirstCharacterIndex >= index && node.LastCharacterIndex <= index)
+            if (node.FirstCharacterIndex >= index && node.LastCharacterIndex <= index + 1)
             {
                 if (BestMatch == null || BestMatch.FirstCharacterIndex <= node.FirstCharacterIndex)
                     BestMatch = node;
@@ -326,14 +325,14 @@ public static class SourceNodeExtensions
 
         protected override void AcceptNode(ISourceNode node)
         {
-            if (node.Range.Contains(position))
+            if (node.Range.Contains(position) || (node.Range.End.Line == position.Line && position.Character == node.Range.End.Character + 1))
             {
                 if (BestMatch == null || BestMatch.FirstCharacterIndex <= node.FirstCharacterIndex)
                     BestMatch = node;
                 return;
             }
 
-            if (BestMatch != null && BestMatch.Range.End.Line > position.Line)
+            if (BestMatch != null && BestMatch.Range.End.Line < node.Range.Start.Line)
             {
                 throw new BreakException();
             }

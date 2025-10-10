@@ -67,10 +67,30 @@ internal sealed class RootAssetNode : RootDictionaryNode, IAssetSourceFile
                 if (localFile.Equals(fileName, StringComparison.Ordinal))
                     continue;
 
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+                ReadOnlySpan<char> langName = Path.GetFileNameWithoutExtension(localFile.AsSpan());
+                if (langName.IsWhiteSpace() || !char.IsUpper(langName[0]))
+                    continue;
+#else
+                string langName = Path.GetFileNameWithoutExtension(localFile);
+                if (string.IsNullOrWhiteSpace(langName) || !char.IsUpper(langName[0]))
+                    continue;
+#endif
+
                 ReferencedWorkspaceFile workspaceFile = new ReferencedWorkspaceFile(localFile, database, this, static (file, state) =>
                 {
+                    string text;
+                    try
+                    {
+                        text = System.IO.File.ReadAllText(file.File);
+                    }
+                    catch (SystemException)
+                    {
+                        return null!;
+                    }
+
                     using SourceNodeTokenizer tokenizer = new SourceNodeTokenizer(
-                        System.IO.File.ReadAllText(file.File),
+                        text,
                         SourceNodeTokenizerOptions.None
                     );
                     return tokenizer.ReadRootDictionary(SourceNodeTokenizer.RootInfo.Localization(file, file.Database, (IAssetSourceFile)state!));

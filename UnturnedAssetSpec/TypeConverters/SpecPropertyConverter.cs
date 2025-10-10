@@ -13,14 +13,13 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 {
     private static readonly JsonEncodedText KeyProperty = JsonEncodedText.Encode("Key");
     private static readonly JsonEncodedText SingleKeyOverrideProperty = JsonEncodedText.Encode("SingleKeyOverride");
-    private static readonly JsonEncodedText KeyIsRegexProperty = JsonEncodedText.Encode("KeyIsRegex");
-    private static readonly JsonEncodedText KeyGroupsProperty = JsonEncodedText.Encode("KeyGroups");
-    private static readonly JsonEncodedText KeyGroupsRegexGroupProperty = JsonEncodedText.Encode("RegexGroup");
-    private static readonly JsonEncodedText KeyGroupsNameProperty = JsonEncodedText.Encode("Name");
-    private static readonly JsonEncodedText KeyGroupsUseValueOfProperty = JsonEncodedText.Encode("UseValueOf");
+    private static readonly JsonEncodedText TemplateProperty = JsonEncodedText.Encode("Template");
+    private static readonly JsonEncodedText TemplateGroupsProperty = JsonEncodedText.Encode("TemplateGroups");
+    private static readonly JsonEncodedText TemplateGroupsNameProperty = JsonEncodedText.Encode("Name");
+    private static readonly JsonEncodedText TemplateGroupsUseValueOfProperty = JsonEncodedText.Encode("UseValueOf");
     private static readonly JsonEncodedText FileCrossRefProperty = JsonEncodedText.Encode("FileCrossRef");
-    private static readonly JsonEncodedText CountForRegexGroupProperty = JsonEncodedText.Encode("CountForRegexGroup");
-    private static readonly JsonEncodedText ValueRegexGroupReferenceProperty = JsonEncodedText.Encode("ValueRegexGroupReference");
+    private static readonly JsonEncodedText CountForTemplateGroupProperty = JsonEncodedText.Encode("CountForTemplateGroup");
+    private static readonly JsonEncodedText ValueTemplateGroupReferenceProperty = JsonEncodedText.Encode("ValueTemplateGroupReference");
     private static readonly JsonEncodedText AliasesProperty = JsonEncodedText.Encode("Aliases");
     private static readonly JsonEncodedText AliasesAliasProperty = JsonEncodedText.Encode("Alias");
     private static readonly JsonEncodedText AliasesLegacyExpansionFilterProperty = JsonEncodedText.Encode("LegacyExpansionFilter");
@@ -47,7 +46,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     private static readonly JsonEncodedText PriorityProperty = JsonEncodedText.Encode("Priority");
     private static readonly JsonEncodedText ExperimentalProperty = JsonEncodedText.Encode("Experimental");
     private static readonly JsonEncodedText ListReferenceProperty = JsonEncodedText.Encode("ListReference");
-    private static readonly JsonEncodedText KeyGroupUniqueValueProperty = JsonEncodedText.Encode("KeyGroupUniqueValue");
+    private static readonly JsonEncodedText TemplateGroupUniqueValueProperty = JsonEncodedText.Encode("TemplateGroupUniqueValue");
     private static readonly JsonEncodedText KeyLegacyExpansionFilterProperty = JsonEncodedText.Encode("KeyLegacyExpansionFilter");
 
     private static readonly JsonEncodedText HideInheritedProperty = JsonEncodedText.Encode("HideInherited");
@@ -56,11 +55,11 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     [
         KeyProperty,                        // 0
         SingleKeyOverrideProperty,          // 1
-        KeyIsRegexProperty,                 // 2
-        KeyGroupsProperty,                  // 3
+        TemplateProperty,                   // 2
+        TemplateGroupsProperty,             // 3
         FileCrossRefProperty,               // 4
-        CountForRegexGroupProperty,         // 5
-        ValueRegexGroupReferenceProperty,   // 6
+        CountForTemplateGroupProperty,      // 5
+        ValueTemplateGroupReferenceProperty,// 6
         AliasesProperty,                    // 7
         TypeProperty,                       // 8
         SubtypeSwitchProperty,              // 9
@@ -86,7 +85,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         PriorityProperty,                   // 29
         ExperimentalProperty,               // 30
         ListReferenceProperty,              // 31
-        KeyGroupUniqueValueProperty,        // 32
+        TemplateGroupUniqueValueProperty,   // 32
         KeyLegacyExpansionFilterProperty    // 33
     ];
 
@@ -194,14 +193,14 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     property.SingleKeyOverride = reader.GetString();
                     break;
 
-                case 2: // KeyIsRegex
+                case 2: // Template
                     if (reader.TokenType is not JsonTokenType.True and not JsonTokenType.False)
                         ThrowUnexpectedToken(reader.TokenType, propType);
-                    property.KeyIsRegex = reader.TokenType == JsonTokenType.True;
+                    property.IsTemplate = reader.TokenType == JsonTokenType.True;
                     break;
 
-                case 3: // KeyGroups
-                    ReadKeyGroups(ref reader, property);
+                case 3: // TemplateGroups
+                    ReadTemplateGroups(ref reader, property);
                     break;
 
                 case 4: // FileCrossRef
@@ -210,16 +209,23 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     property.FileCrossRef = reader.GetString();
                     break;
 
-                case 5: // CountForRegexGroup
+                case 5: // CountForTemplateGroup
                     if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
                         ThrowUnexpectedToken(reader.TokenType, propType);
-                    property.CountForRegexGroup = reader.GetString();
+                    property.CountForTemplateGroup = reader.GetString();
                     break;
 
-                case 6: // ValueRegexGroupReference
+                case 6: // ValueTemplateGroupReference
                     if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
                         ThrowUnexpectedToken(reader.TokenType, propType);
-                    property.ValueRegexGroupReference = reader.GetString();
+                    if (!SpecDynamicValue.TryParse(reader.GetString(), SpecDynamicValueContext.AssumeDataRef, null, out ISpecDynamicValue value)
+                        || value is not TemplateGroupsDataRef dr
+                        || dr.Index == -1)
+                    {
+                        throw new JsonException($"Unable to parse dataref when reading SpecProperty.\"{Properties[propType].ToString()}\".");
+                    }
+
+                    property.ValueTemplateGroupReference = dr;
                     break;
 
                 case 7: // Aliases
@@ -441,10 +447,10 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     property.ListReference = reader.GetString();
                     break;
 
-                case 32: // KeyGroupUniqueValue
+                case 32: // TemplateGroupUniqueValue
                     if (reader.TokenType is not JsonTokenType.True and not JsonTokenType.False and not JsonTokenType.Null)
                         ThrowUnexpectedToken(reader.TokenType, propType);
-                    property.KeyGroupUniqueValue = reader.TokenType == JsonTokenType.True;
+                    property.TemplateGroupUniqueValue = reader.TokenType == JsonTokenType.True;
                     break;
 
                 case 33: // KeyLegacyExpansionFilter
@@ -453,10 +459,15 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             }
         }
 
-        if (!property.KeyIsRegex)
+        if (string.IsNullOrEmpty(property.Key) || !property.IsTemplate)
         {
-            property.KeyGroupUniqueValue = false;
-            property.KeyGroups = OneOrMore<RegexKeyGroup>.Null;
+            property.IsTemplate = false;
+            property.TemplateGroupUniqueValue = false;
+            property.TemplateGroups = OneOrMore<TemplateGroup>.Null;
+        }
+        else
+        {
+            property.CreateTemplateProcessors();
         }
 
         if (typeStr == null && typeSwitch.TokenType == JsonTokenType.None)
@@ -467,7 +478,12 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 return property;
             }
 
-            throw new JsonException($"Missing {TypeProperty.ToString()} property while reading SpecProperty.");
+            throw new JsonException($"Missing \"{TypeProperty.ToString()}\" property while reading SpecProperty.");
+        }
+
+        if (property.Key == null)
+        {
+            throw new JsonException($"Missing \"{KeyProperty.ToString()}\" property while reading SpecProperty.");
         }
 
         PropertyTypeOrSwitch propertyType;
@@ -674,53 +690,64 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         }
     }
 
-    private static void ReadKeyGroups(ref Utf8JsonReader reader, SpecProperty property)
+    private static void ReadTemplateGroups(ref Utf8JsonReader reader, SpecProperty property)
     {
-        OneOrMore<RegexKeyGroup> array = OneOrMore<RegexKeyGroup>.Null;
+        OneOrMore<TemplateGroup> array = OneOrMore<TemplateGroup>.Null;
         if (reader.TokenType != JsonTokenType.StartArray)
         {
             if (reader.TokenType == JsonTokenType.Null)
             {
-                property.KeyGroups = array;
+                property.TemplateGroups = array;
                 return;
             }
 
-            ThrowUnexpectedToken(reader.TokenType, KeyGroupsProperty.ToString());
+            ThrowUnexpectedToken(reader.TokenType, TemplateGroupsProperty.ToString());
         }
 
         int index = 0;
         while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
         {
+            string? name;
             if (reader.TokenType != JsonTokenType.StartObject)
-                ThrowUnexpectedToken(reader.TokenType, KeyGroupsProperty.ToString());
+            {
+                switch (reader.TokenType)
+                {
+                    case JsonTokenType.String:
+                        name = reader.GetString();
+                        array = array.Add(new TemplateGroup(array.Length + 1, name));
+                        continue;
 
-            string? name = null;
-            int group = -1;
+                    case JsonTokenType.Null:
+                        continue;
+
+                    default:
+                        ThrowUnexpectedToken(reader.TokenType, TemplateGroupsProperty.ToString());
+                        break;
+                }
+            }
+
+            name = null;
             string? useValueOf = null;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
                 if (reader.TokenType != JsonTokenType.PropertyName)
-                    ThrowUnexpectedToken(reader.TokenType, KeyGroupsProperty.ToString());
+                    ThrowUnexpectedToken(reader.TokenType, TemplateGroupsProperty.ToString());
 
                 int prop = -1;
-                if (reader.ValueTextEquals(KeyGroupsRegexGroupProperty.EncodedUtf8Bytes))
+                if (reader.ValueTextEquals(TemplateGroupsNameProperty.EncodedUtf8Bytes))
                 {
                     prop = 0;
                 }
-                else if (reader.ValueTextEquals(KeyGroupsNameProperty.EncodedUtf8Bytes))
+                else if (reader.ValueTextEquals(TemplateGroupsUseValueOfProperty.EncodedUtf8Bytes))
                 {
                     prop = 1;
-                }
-                else if (reader.ValueTextEquals(KeyGroupsUseValueOfProperty.EncodedUtf8Bytes))
-                {
-                    prop = 2;
                 }
 
                 if (!reader.Read())
                 {
                     if (prop != -1)
-                        throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}] property {(prop == 0 ? KeyGroupsRegexGroupProperty : KeyGroupsNameProperty).ToString()}.");
+                        throw new JsonException($"Failed to read SpecProperty.TemplateGroups[{index}] property {(prop == 0 ? TemplateGroupsNameProperty : TemplateGroupsUseValueOfProperty).ToString()}.");
 
                     reader.Skip();
                     continue;
@@ -728,28 +755,19 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
                 switch (prop)
                 {
-                    case 0: // RegexGroup
-                        if (reader.TokenType != JsonTokenType.Number || !reader.TryGetInt32(out int groupNum) || groupNum < 0)
-                        {
-                            throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}] property {KeyGroupsRegexGroupProperty.ToString()}, expected an integer value.");
-                        }
-
-                        group = groupNum;
-                        break;
-
-                    case 1: // Name
+                    case 0: // Name
                         if (reader.TokenType != JsonTokenType.String || reader.GetString() is not { Length: > 0 } nameStr)
                         {
-                            throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}] property {KeyGroupsNameProperty.ToString()}, expected a string value.");
+                            throw new JsonException($"Failed to read SpecProperty.TemplateGroups[{index}] property {TemplateGroupsNameProperty.ToString()}, expected a string value.");
                         }
 
                         name = nameStr;
                         break;
 
-                    case 2: // UseValueOf
+                    case 1: // UseValueOf
                         if (reader.TokenType != JsonTokenType.String || reader.GetString() is not { Length: > 0 } useValueOfStr)
                         {
-                            throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}] property {KeyGroupsUseValueOfProperty.ToString()}, expected a string value.");
+                            throw new JsonException($"Failed to read SpecProperty.TemplateGroups[{index}] property {TemplateGroupsUseValueOfProperty.ToString()}, expected a string value.");
                         }
 
                         useValueOf = useValueOfStr;
@@ -757,18 +775,14 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 }
             }
 
-            if (name == null && group == -1)
-                throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}], missing \"{KeyGroupsNameProperty.ToString()}\", \"{KeyGroupsRegexGroupProperty.ToString()}\".");
             if (name == null)
-                throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}], missing \"{KeyGroupsNameProperty.ToString()}\".");
-            if (group == -1)
-                throw new JsonException($"Failed to read SpecProperty.KeyGroups[{index}], missing \"{KeyGroupsRegexGroupProperty.ToString()}\".");
+                throw new JsonException($"Failed to read SpecProperty.TemplateGroups[{index}], missing \"{TemplateGroupsNameProperty.ToString()}\".");
             
-            array = array.Add(new RegexKeyGroup(group, name, useValueOf));
+            array = array.Add(new TemplateGroup(array.Length + 1, name, useValueOf));
             ++index;
         }
 
-        property.KeyGroups = array;
+        property.TemplateGroups = array;
     }
 
     private static OneOrMore<string> ReadStringArray(ref Utf8JsonReader reader, in JsonEncodedText text, bool allowOne)
@@ -915,7 +929,11 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
         writer.WriteStartObject();
 
-        writer.WriteString(KeyProperty, property.Key);
+        string key = property.Key;
+        if (property.IsTemplate)
+            key = TemplateProcessor.EscapeKey(key, property.KeyTemplateProcessor);
+
+        writer.WriteString(KeyProperty, key);
 
         if (property.KeyLegacyExpansionFilter is LegacyExpansionFilter.Legacy or LegacyExpansionFilter.Modern)
         {
@@ -1002,24 +1020,61 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             writer.WriteString(SingleKeyOverrideProperty, property.SingleKeyOverride);
         }
 
-        if (property.KeyIsRegex)
+        if (property.IsTemplate)
         {
-            writer.WriteBoolean(KeyIsRegexProperty, true);
+            writer.WriteBoolean(TemplateProperty, true);
 
-            if (property.KeyGroupUniqueValue)
-                writer.WriteBoolean(KeyGroupUniqueValueProperty, true);
+            if (property.TemplateGroupUniqueValue)
+                writer.WriteBoolean(TemplateGroupUniqueValueProperty, true);
 
-            writer.WriteStartArray(KeyGroupsProperty);
+            writer.WriteStartArray(TemplateGroupsProperty);
 
-            foreach (RegexKeyGroup grp in property.KeyGroups)
+            OneOrMore<TemplateGroup> templateGroups = property.TemplateGroups;
+
+            int last = 0;
+            bool needsSorted = false;
+            foreach (TemplateGroup grp in templateGroups)
             {
+                if (grp.Group <= last)
+                {
+                    needsSorted = true;
+                    break;
+                }
+            }
+
+            if (needsSorted)
+            {
+                TemplateGroup[] group = templateGroups.ToArray();
+                Array.Sort(group, (g1, g2) => g1.Group.CompareTo(g2.Group));
+                templateGroups = new OneOrMore<TemplateGroup>(group);
+            }
+
+            last = 0;
+            int index = 0;
+            foreach (TemplateGroup grp in templateGroups)
+            {
+                if (grp.Group == last)
+                    continue;
+
+                last = grp.Group;
+
+                ++index;
+                while (index < last)
+                {
+                    ++index;
+                    writer.WriteNullValue();
+                }
+
+                if (string.IsNullOrEmpty(grp.UseValueOf))
+                {
+                    writer.WriteStringValue(grp.Name);
+                    continue;
+                }
+
                 writer.WriteStartObject();
 
-                writer.WriteString(KeyGroupsNameProperty, grp.Name);
-                writer.WriteNumber(KeyGroupsRegexGroupProperty, grp.Group);
-
-                if (grp.UseValueOf != null)
-                    writer.WriteString(KeyGroupsUseValueOfProperty, grp.UseValueOf);
+                writer.WriteString(TemplateGroupsNameProperty, grp.Name);
+                writer.WriteString(TemplateGroupsUseValueOfProperty, grp.UseValueOf);
 
                 writer.WriteEndObject();
             }
@@ -1049,14 +1104,15 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             writer.WriteString(FileCrossRefProperty, property.FileCrossRef);
         }
 
-        if (property.CountForRegexGroup != null)
+        if (property.CountForTemplateGroup != null)
         {
-            writer.WriteString(CountForRegexGroupProperty, property.CountForRegexGroup);
+            writer.WriteString(CountForTemplateGroupProperty, property.CountForTemplateGroup);
         }
 
-        if (property.ValueRegexGroupReference != null)
+        if (property.ValueTemplateGroupReference != null)
         {
-            writer.WriteString(ValueRegexGroupReferenceProperty, property.ValueRegexGroupReference);
+            writer.WritePropertyName(ValueTemplateGroupReferenceProperty);
+            property.ValueTemplateGroupReference.WriteToJsonWriter(writer, options);
         }
         if (property.ListReference != null)
         {
@@ -1069,18 +1125,22 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             for (int i = 0; i < property.Aliases.Length; i++)
             {
                 Alias alias = property.Aliases[i];
+                string aliasKey = alias.Value;
+                if (property.IsTemplate)
+                    aliasKey = TemplateProcessor.EscapeKey(aliasKey, property.GetAliasTemplateProcessor(i));
+
                 if (alias.Filter is LegacyExpansionFilter.Legacy or LegacyExpansionFilter.Modern)
                 {
                     writer.WriteStartObject();
 
-                    writer.WriteString(AliasesAliasProperty, alias.Value);
+                    writer.WriteString(AliasesAliasProperty, aliasKey);
                     WriteLegacyExpansionFilter(writer, AliasesLegacyExpansionFilterProperty, alias.Filter);
 
                     writer.WriteEndObject();
                 }
                 else
                 {
-                    writer.WriteStringValue(alias.Value);
+                    writer.WriteStringValue(aliasKey);
                 }
             }
 

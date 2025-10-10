@@ -26,7 +26,7 @@
             "Variable": "characterMeshOverride3pLODs",
             "DefaultValue": 0,
             "Priority": 3,
-            "CountForRegexGroup": "shirt-3p-character-mesh-overrides"
+            "CountForTemplateGroup": "shirt-3p-character-mesh-overrides"
         },
         {
             "Key": "Has_Character_Material_Override",
@@ -78,16 +78,10 @@
             "Required": "@Has_1P_Character_Mesh_Override"
         },
         {
-            "AssetName": "Character_Mesh_3P_Override_(\\d+)",
-            "Aliases": [ "Character_Mesh_Override_(\\d+)" ],
-            "AssetNameIsRegex": true,
-            "AssetNameGroups":
-            [
-                {
-                    "Name": "shirt-3p-character-mesh-overrides",
-                    "RegexGroup": 1
-                }
-            ],
+            "AssetName": "Character_Mesh_3P_Override_*",
+            "Aliases": [ "Character_Mesh_Override_*" ],
+            "Template": true,
+            "TemplateGroups": [ "shirt-3p-character-mesh-overrides" ],
             "Required": true,
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "characterMeshOverride3pLODs",

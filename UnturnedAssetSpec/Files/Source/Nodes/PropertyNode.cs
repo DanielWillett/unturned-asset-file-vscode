@@ -9,6 +9,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 internal class PropertyNode : AnySourceNode, IPropertySourceNode
 {
     private IAnyValueSourceNode? _value;
+    private string? _valueString;
+    private bool _valueStringIsQuoted;
 
     internal LazySource ValueSource { get; set; }
     private bool _hasValue;
@@ -71,19 +73,116 @@ internal class PropertyNode : AnySourceNode, IPropertySourceNode
         }
     }
 
-    internal override void SetParentInfo(ISourceFile file, ISourceNode parent)
+    internal override void SetParentInfo(ISourceFile? file, ISourceNode parent)
     {
         base.SetParentInfo(file, parent);
         if (_value != null)
         {
-            lock (File.TreeSync)
+            if (file != null)
+            {
+                lock (file.TreeSync)
+                {
+                    if (_value is AnySourceNode n)
+                    {
+                        n.SetParentInfo(file, this);
+                    }
+                }
+            }
+            else
             {
                 if (_value is AnySourceNode n)
                 {
-                    n.SetParentInfo(file, this);
+                    n.SetParentInfo(null, this);
                 }
             }
         }
+    }
+
+    public FileRange GetValueRange()
+    {
+        if (_hasValue)
+        {
+            lock (File.TreeSync)
+            {
+                if (_hasValue)
+                {
+                    return _value?.Range ?? default;
+                }
+            }
+        }
+
+        LazySource src = ValueSource;
+
+        ReadOnlySpan<char> segment = src.Segment.Span;
+        if (segment.IsEmpty)
+        {
+            return default;
+        }
+
+        using SourceNodeTokenizer t = new SourceNodeTokenizer(segment);
+        t.SkipToken(out FileRange range);
+        return range;
+    }
+
+    public string? GetValueString(out bool isQuoted)
+    {
+        string? valueString = _valueString;
+        if (valueString != null)
+        {
+            isQuoted = _valueStringIsQuoted;
+            return valueString;
+        }
+
+        // get the string value without necessarily instantiating the node
+        if (_hasValue)
+        {
+            lock (File.TreeSync)
+            {
+                if (_hasValue)
+                {
+                    if (_value is not IValueSourceNode n)
+                    {
+                        if (_value == null)
+                        {
+                            isQuoted = false;
+                            return null;
+                        }
+
+                        throw new InvalidOperationException("Expected value.");
+                    }
+
+                    (string value, isQuoted) = (n.Value, n.IsQuoted);
+                    _valueStringIsQuoted = isQuoted;
+                    _valueString = value;
+                    return value;
+                }
+            }
+        }
+
+        LazySource src = ValueSource;
+
+        ReadOnlySpan<char> segment = src.Segment.Span; 
+        if (segment.IsEmpty)
+        {
+            isQuoted = false;
+            return null;
+        }
+
+        if (src.ExpectedType != ValueTypeDataRefType.Value)
+        {
+            throw new InvalidOperationException("Expected value.");
+        }
+
+        using SourceNodeTokenizer t = new SourceNodeTokenizer(segment);
+
+        isQuoted = segment[0] == '\"';
+
+        string str = isQuoted
+            ? t.ReadQuotedString(out _, out _)
+            : t.ReadNonQuotedString(out _, out _, isKey: false);
+
+        _valueString = str;
+        return str;
     }
 
     protected static bool EqualsHelper(PropertyNode n1, PropertyNode n2)
@@ -98,6 +197,11 @@ internal class PropertyNode : AnySourceNode, IPropertySourceNode
 
     public override string ToString()
     {
+        if (File == null)
+        {
+            return KeyIsQuoted ? $"\"{Key}\"" : Key;
+        }
+
         IAnyValueSourceNode? v;
         string key;
         lock (File.TreeSync)
@@ -107,9 +211,9 @@ internal class PropertyNode : AnySourceNode, IPropertySourceNode
         }
 
         if (v == null)
-            return key;
+            return KeyIsQuoted ? $"\"{key}\"" : key;
 
-        return $"{key} {v}";
+        return KeyIsQuoted ? $"\"{key}\" {v}" : $"{key} {v}";
     }
 
     public override void Visit<TVisitor>(ref TVisitor visitor)

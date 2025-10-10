@@ -59,7 +59,7 @@ public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<
     bool IDataRefTarget.EvaluateIsLegacy(in FileEvaluationContext ctx) => Target.EvaluateIsLegacy(in ctx);
     string? IDataRefTarget.EvaluateKey(in FileEvaluationContext ctx) => Target.EvaluateKey(in ctx);
     ISpecDynamicValue? IDataRefTarget.EvaluateValue(in FileEvaluationContext ctx) => Target.EvaluateValue(in ctx);
-    int IDataRefTarget.EvaluateKeyGroup(in FileEvaluationContext ctx, int index) => Target.EvaluateKeyGroup(in ctx, index);
+    int IDataRefTarget.EvaluateTemplateGroup(in FileEvaluationContext ctx, int index) => Target.EvaluateTemplateGroup(in ctx, index);
     ValueTypeDataRefType IDataRefTarget.EvaluateValueType(in FileEvaluationContext ctx) => Target.EvaluateValueType(in ctx);
 
     public void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options)
@@ -301,39 +301,39 @@ public sealed class ValueDataRef : DataRef, IEquatable<ValueDataRef>
     }
 }
 
-public sealed class KeyGroupsDataRef : DataRef, IEquatable<KeyGroupsDataRef>, IIndexableDataRef, IPropertiesDataRef
+public sealed class TemplateGroupsDataRef : DataRef, IEquatable<TemplateGroupsDataRef>, IIndexableDataRef, IPropertiesDataRef
 {
     public bool PreventSelfReference { get; set; }
 
-    public int Index { get; set; }
+    public int Index { get; set; } = -1;
 
-    public KeyGroupsDataRef(IDataRefTarget target) : base(target, KnownTypes.String) { }
+    public TemplateGroupsDataRef(IDataRefTarget target) : base(target, KnownTypes.String) { }
 
-    public override string PropertyName => "KeyGroups";
+    public override string PropertyName => "TemplateGroups";
 
-    public override bool Equals(DataRef other) => other is KeyGroupsDataRef b && Equals(b);
+    public override bool Equals(DataRef other) => other is TemplateGroupsDataRef b && Equals(b);
 
-    public bool Equals(KeyGroupsDataRef other) => base.Equals(other) && PreventSelfReference == other.PreventSelfReference && Index == other.Index;
+    public bool Equals(TemplateGroupsDataRef other) => base.Equals(other) && PreventSelfReference == other.PreventSelfReference && Index == other.Index;
 
     public override bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
-        int keyGroupValue = Target.EvaluateKeyGroup(in ctx, Index);
+        int templateGroupValue = Target.EvaluateTemplateGroup(in ctx, Index);
         if (condition.Comparand is not int expectedValue)
         {
-            return condition.EvaluateNulls(keyGroupValue < 0, true);
+            return condition.EvaluateNulls(templateGroupValue < 0, true);
         }
 
-        if (keyGroupValue < 0)
+        if (templateGroupValue < 0)
         {
             return condition.EvaluateNulls(true, false);
         }
 
-        return condition.Evaluate(keyGroupValue, expectedValue, ctx.Information.Information);
+        return condition.Evaluate(templateGroupValue, expectedValue, ctx.Information.Information);
     }
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue value, out bool isNull)
     {
-        int v = Target.EvaluateKeyGroup(in ctx, Index);
+        int v = Target.EvaluateTemplateGroup(in ctx, Index);
         if (v < 0)
         {
             value = default!;
@@ -360,7 +360,7 @@ public sealed class KeyGroupsDataRef : DataRef, IEquatable<KeyGroupsDataRef>, II
 
     public override bool TryEvaluateValue(in FileEvaluationContext ctx, out object? value)
     {
-        int v = Target.EvaluateKeyGroup(in ctx, Index);
+        int v = Target.EvaluateTemplateGroup(in ctx, Index);
         if (v < 0)
         {
             value = null;
@@ -448,7 +448,7 @@ public sealed class AssetNameDataRef : DataRef, IEquatable<AssetNameDataRef>
     {
         try
         {
-            string? name = (ctx.OpenedFile.SourceFile as IAssetSourceFile)?.AssetName;
+            string? name = (ctx.SourceFile as IAssetSourceFile)?.AssetName;
             value = string.IsNullOrEmpty(name) ? null : name;
             return true;
         }

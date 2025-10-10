@@ -404,42 +404,47 @@
                                 "string",
                                 "null"
                             ],
-                            "description": "If 'KeyIsRegex', the singular version of the key which would not be regex (ex. Blade for Blade_#)."
+                            "description": "If 'Template', the singular version of the key which would not be a template (ex. Blade for Blade_#)."
                         },
-                        "KeyIsRegex":
+                        "Template":
                         {
                             "type": "boolean",
-                            "description": "If 'Key' is a regex expression to match properties."
+                            "description": "If 'Key' is a template expression to match properties with indices."
                         },
-                        "KeyGroupUniqueValue":
+                        "TemplateGroupUniqueValue":
                         {
                             "type": "boolean",
-                            "description": "If every value in this key-group should be unique. Ignored if KeyIsRegex is not true."
+                            "description": "If every value in this template group should be unique. Ignored if 'Template' is not true."
                         },
-                        "KeyGroups":
+                        "TemplateGroups":
                         {
                             "type":
                             [
                                 "array",
                                 "null"
                             ],
-                            "description": "If 'KeyIsRegex', then this is a list of groups by name to match with other properties within the given regex group.",
+                            "description": "If 'Template', then this is a list of groups by name to match with other properties within the given template group.",
                             "items":
                             {
-                                "type": "object",
-                                "properties":
-                                {
-                                    "RegexGroup":
-                                    {
-                                        "type": "number",
-                                        "description": "The regex group (starting from 1) that acts as the identifier for this group."
-                                    },
-                                    "Name":
+                                "oneOf": [
                                     {
                                         "type": "string",
                                         "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "Name": {
+                                                "type": "string",
+                                                "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                                            },
+                                            "UseValueOf": {
+                                                "type": "string",
+                                                "description": "The name of a property with $n formatted for each template group (like $1 for group 1's value)."
+                                            }
+                                        }
                                     }
-                                }
+                                ]
                             }
                         },
                         "FileCrossRef":
@@ -451,14 +456,14 @@
                             ],
                             "description": "Designates a property that selects the cross-ref file for any properties starting with $cr$::"
                         },
-                        "CountForRegexGroup":
+                        "CountForTemplateGroup":
                         {
                             "type":
                             [
                                 "string",
                                 "null"
                             ],
-                            "description": "The regex-group for which this property is a count for."
+                            "description": "The template group for which this property is a count for."
                         },
                         "Priority":
                         {
@@ -478,14 +483,14 @@
                             ],
                             "description": "Reference to a set of values from a list. Example: 'Blueprints.Id'. If it ends with '!' it's an error to not reference a valid value."
                         },
-                        "ValueRegexGroupReference":
+                        "ValueTemplateGroupReference":
                         {
                             "type":
                             [
                                 "string",
                                 "null"
                             ],
-                            "description": "The 'Key regex-group[ RelatedKey...]' of which this property references, where key is a reference to another type."
+                            "description": "A data-ref to another key's template group (such as ($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).TemplateGroups[0] ) to reference the blueprint ID of another item. Valid values will be the present indices in the other property's template groups."
                         },
                         "Aliases":
                         {
@@ -1310,12 +1315,12 @@
                             "string",
                             "null"
                         ],
-                        "description": "If 'AssetNameIsRegex', the singular version of the asset name which would not be regex."
+                        "description": "If 'Template', the singular version of the asset name which would not be template."
                     },
-                    "AssetNameIsRegex":
+                    "Template":
                     {
                         "type": "boolean",
-                        "description": "If 'AssetName' is a regex expression to match properties."
+                        "description": "If 'AssetName' is a template expression to match properties."
                     },
                     "Docs":
                     {
@@ -1327,30 +1332,18 @@
                         ],
                         "format": "uri"
                     },
-                    "AssetNameGroups":
+                    "TemplateGroups":
                     {
                         "type":
                         [
                             "array",
                             "null"
                         ],
-                        "description": "If 'AssetNameIsRegex', then this is a list of groups by name to match with other properties within the given regex group.",
+                        "description": "If 'Template', then this is a list of groups by name to match with other properties within the given template group.",
                         "items":
                         {
-                            "type": "object",
-                            "properties":
-                            {
-                                "RegexGroup":
-                                {
-                                    "type": "number",
-                                    "description": "The regex group (starting from 1) that acts as the identifier for this group."
-                                },
-                                "Name":
-                                {
-                                    "type": "string",
-                                    "description": "Unique name of this group (amongst the this asset type's hierarchy)."
-                                }
-                            }
+                            "type": "string",
+                            "description": "Unique name of this group (amongst the this asset type's hierarchy)."
                         }
                     },
                     "InclusiveWith":
@@ -1480,12 +1473,12 @@
                                         "string",
                                         "null"
                                     ],
-                                    "description": "If 'NameIsRegex', the singular version of the name which would not be regex."
+                                    "description": "If 'Template', the singular version of the name which would not be a template."
                                 },
-                                "NameIsRegex":
+                                "Template":
                                 {
                                     "type": "boolean",
-                                    "description": "If 'Name' is a regex expression to match properties."
+                                    "description": "If 'Name' is a template expression to match properties."
                                 },
                                 "InclusiveWith":
                                 {
@@ -1525,30 +1518,18 @@
                                     },
                                     "description": "List of properties and optional values that should exist if this exists."
                                 },
-                                "NameGroups":
+                                "TemplateGroups":
                                 {
                                     "type":
                                     [
                                         "array",
                                         "null"
                                     ],
-                                    "description": "If 'NameIsRegex', then this is a list of groups by name to match with other properties within the given regex group.",
+                                    "description": "If 'Template', then this is a list of groups by name to match with other properties within the given template group.",
                                     "items":
                                     {
-                                        "type": "object",
-                                        "properties":
-                                        {
-                                            "RegexGroup":
-                                            {
-                                                "type": "number",
-                                                "description": "The regex group (starting from 1) that acts as the identifier for this group."
-                                            },
-                                            "Name":
-                                            {
-                                                "type": "string",
-                                                "description": "Unique name of this group (amongst the this asset type's hierarchy)."
-                                            }
-                                        }
+                                        "type": "string",
+                                        "description": "Unique name of this group (amongst the this asset type's hierarchy)."
                                     }
                                 }
                             }

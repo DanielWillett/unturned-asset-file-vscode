@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Globalization;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Files;
@@ -12,6 +14,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Server.WorkDone;
 using OmniSharp.Extensions.LanguageServer.Server;
 using Serilog;
 using System.Reflection;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 
@@ -22,6 +25,10 @@ internal sealed class UnturnedAssetFileLspServer
     public const string LanguageId = "unturned-data-file";
 
     private static ILogger<UnturnedAssetFileLspServer> _logger = null!;
+
+    public static int? ClientProcessId { get; private set; }
+
+    private static Timer? _closeTimer;
 
     public static readonly TextDocumentSelector AssetFileSelector = new TextDocumentSelector(new TextDocumentFilter
     {
@@ -47,6 +54,13 @@ internal sealed class UnturnedAssetFileLspServer
 #endif
             .MinimumLevel.Debug()
             .CreateLogger();
+
+#if DEBUG
+        if (Environment.GetEnvironmentVariable("UNTURNED_LSP_DEBUG") == "1")
+        {
+            Debugger.Launch();
+        }
+#endif
 
         ILanguageServer server = await LanguageServer.From(bldr =>
         {
@@ -96,6 +110,13 @@ internal sealed class UnturnedAssetFileLspServer
                 })
                 .OnInitialize(async (server, request, token) =>
                 {
+                    string[] args = Environment.GetCommandLineArgs();
+                    int index = Array.IndexOf(args, "--clientProcessId");
+                    if (index >= 0 && index < args.Length - 1 && int.TryParse(args[index + 1], NumberStyles.Any, CultureInfo.InvariantCulture, out int pid))
+                    {
+                        ClientProcessId = pid;
+                    }
+
                     IWorkDoneObserver workDoneManager = server.WorkDoneManager.For(
                         request,
                         new WorkDoneProgressBegin
@@ -134,18 +155,55 @@ internal sealed class UnturnedAssetFileLspServer
 
                     await Task.Delay(500, token);
                 })
-                .OnInitialized((_, _, _, _) =>
+                .OnInitialized((server, _, _, _) =>
                 {
                     _initObserver?.OnCompleted();
                     _initObserver = null;
 
+#if DEBUG
+                    _logger.LogInformation("LSP initialized, client PID: {0}, server PID: {1} ({2}).", ClientProcessId, Environment.ProcessId, Environment.CommandLine);
+#else
                     _logger.LogInformation("LSP initialized.");
+#endif
+
+                    if (ClientProcessId.HasValue)
+                    {
+                        _closeTimer = new Timer(static state =>
+                        {
+                            if (CheckClientProcessAlive())
+                                return;
+
+                            ILanguageServer server = (ILanguageServer)state!;
+
+                            // ReSharper disable once AccessToDisposedClosure
+                            _closeTimer?.Dispose();
+                            server.Dispose();
+                            Environment.Exit(0);
+                        }, server, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+                    }
 
                     return Task.CompletedTask;
                 });
         });
 
         await server.WaitForExit.ConfigureAwait(false);
+        _closeTimer?.Dispose();
+    }
+
+    private static bool CheckClientProcessAlive()
+    {
+        if (!ClientProcessId.HasValue)
+            return false;
+
+        Process? process = null;
+
+        try
+        {
+            process = Process.GetProcessById(ClientProcessId.Value);
+        }
+        catch (ArgumentException) { }
+
+        return process is { HasExited: false };
     }
 
     private static IWorkDoneObserver? _initObserver;

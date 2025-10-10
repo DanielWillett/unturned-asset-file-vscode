@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -101,12 +100,6 @@ public abstract class NodeVisitor
     {
         AcceptAnyValue(node);
     }
-
-    protected void TryDispose()
-    {
-        if (this is IDisposable disposable)
-            disposable.Dispose();
-    }
 }
 
 /// <summary>
@@ -114,93 +107,51 @@ public abstract class NodeVisitor
 /// </summary>
 public abstract class IdentityNodeVisitor : NodeVisitor, ISourceNodeVisitor
 {
-    void ISourceNodeVisitor.AcceptCommentOnly(ICommentSourceNode node)
+    void ISourceNodeCommentOnlyVisitor.AcceptCommentOnly(ICommentSourceNode node)
     {
-        try
-        {
-            Token.ThrowIfCancellationRequested();
-            if (IgnoreMetadata)
-                return;
+        Token.ThrowIfCancellationRequested();
+        if (IgnoreMetadata)
+            return;
 
-            Comment = null;
-            AcceptCommentOnly(node);
-        }
-        finally
-        {
-            TryDispose();
-        }
+        Comment = null;
+        AcceptCommentOnly(node);
     }
 
-    void ISourceNodeVisitor.AcceptWhiteSpace(IWhiteSpaceSourceNode node)
+    void ISourceNodeWhiteSpaceVisitor.AcceptWhiteSpace(IWhiteSpaceSourceNode node)
     {
-        try
-        {
-            Token.ThrowIfCancellationRequested();
-            if (IgnoreMetadata)
-                return;
+        Token.ThrowIfCancellationRequested();
+        if (IgnoreMetadata)
+            return;
 
-            Comment = node as ICommentSourceNode;
-            AcceptWhiteSpace(node);
-        }
-        finally
-        {
-            TryDispose();
-        }
+        Comment = node as ICommentSourceNode;
+        AcceptWhiteSpace(node);
     }
 
-    void ISourceNodeVisitor.AcceptDictionary(IDictionarySourceNode node)
+    void ISourceNodeDictionaryVisitor.AcceptDictionary(IDictionarySourceNode node)
     {
-        try
-        {
-            Token.ThrowIfCancellationRequested();
-            Comment = node as ICommentSourceNode;
-            AcceptDictionary(node);
-        }
-        finally
-        {
-            TryDispose();
-        }
+        Token.ThrowIfCancellationRequested();
+        Comment = node as ICommentSourceNode;
+        AcceptDictionary(node);
     }
 
-    void ISourceNodeVisitor.AcceptList(IListSourceNode node)
+    void ISourceNodeListVisitor.AcceptList(IListSourceNode node)
     {
-        try
-        {
-            Token.ThrowIfCancellationRequested();
-            Comment = node as ICommentSourceNode;
-            AcceptList(node);
-        }
-        finally
-        {
-            TryDispose();
-        }
+        Token.ThrowIfCancellationRequested();
+        Comment = node as ICommentSourceNode;
+        AcceptList(node);
     }
 
-    void ISourceNodeVisitor.AcceptValue(IValueSourceNode node)
+    void ISourceNodeValueVisitor.AcceptValue(IValueSourceNode node)
     {
-        try
-        {
-            Token.ThrowIfCancellationRequested();
-            Comment = node as ICommentSourceNode;
-            AcceptValue(node);
-        }
-        finally
-        {
-            TryDispose();
-        }
+        Token.ThrowIfCancellationRequested();
+        Comment = node as ICommentSourceNode;
+        AcceptValue(node);
     }
 
-    void ISourceNodeVisitor.AcceptProperty(IPropertySourceNode node)
+    void ISourceNodePropertyVisitor.AcceptProperty(IPropertySourceNode node)
     {
-        try
-        {
-            Token.ThrowIfCancellationRequested();
-            Comment = node as ICommentSourceNode;
-            AcceptProperty(node);
-        }
-        finally
-        {
-            TryDispose();
-        }
+        Token.ThrowIfCancellationRequested();
+        Comment = node as ICommentSourceNode;
+        AcceptProperty(node);
     }
 }

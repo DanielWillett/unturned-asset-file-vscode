@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿#if NET
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
@@ -18,11 +19,12 @@ public class OpenedFileTests
     private IAssetSpecDatabase _database;
 
     [SetUp]
-    public void SetUp()
+    public async Task SetUp()
     {
         _loggerFactory = LoggerFactory.Create(l => l.AddSimpleConsole());
         _logger = _loggerFactory.CreateLogger<OpenedFileTests>();
         _database = AssetSpecDatabase.FromOffline();
+        await _database.InitializeAsync();
     }
 
     [TearDown]
@@ -825,3 +827,4 @@ public class OpenedFileTests
         return bldr.ToString();
     }
 }
+#endif

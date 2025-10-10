@@ -6,6 +6,7 @@ using System;
 using System.Buffers;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
@@ -165,7 +166,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
     private void Restart()
     {
         _index = -1;
-        _position = FilePosition.One;
+        _position = new FilePosition(1, 0);
         _prevLineCharCount = 0;
 
         // skip UTF8 BOM if present
@@ -270,7 +271,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             range.Start = _position;
         }
 
-        range.End = new FilePosition(_position.Line, _position.Character + allCommentLength);
+        range.End = new FilePosition(_position.Line, _position.Character + allCommentLength - 1);
 
         _readLastCharacterIndex = _index + allCommentLength - 1;
         _index += allCommentLength;
@@ -296,7 +297,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             allCommentLength = _file.Length - _index;
 
         range.Start = _position;
-        range.End = new FilePosition(_position.Line, _position.Character + allCommentLength);
+        range.End = new FilePosition(_position.Line, _position.Character + allCommentLength - 1);
 
         _readLastCharacterIndex = _index + allCommentLength - 1;
         _index += allCommentLength;
@@ -319,6 +320,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
     /// </summary>
     public ISourceFile ReadRootDictionary(RootInfo rootInfo)
     {
+        Restart();
         return (ISourceFile)ParseListOrDictionary(0, true, false, in rootInfo, -1, -1, out _);
     }
 
@@ -338,7 +340,12 @@ public ref partial struct SourceNodeTokenizer : IDisposable
         
         public static RootInfo Asset(IWorkspaceFile file, IAssetSpecDatabase database)
         {
-            return new RootInfo(null!, file, database, RootType.Localization);
+            return new RootInfo(null!, file, database, RootType.Asset);
+        }
+        
+        public static RootInfo Other(IWorkspaceFile file, IAssetSpecDatabase database)
+        {
+            return new RootInfo(null!, file, database, RootType.Other);
         }
         
         private RootInfo(IAssetSourceFile asset, IWorkspaceFile file, IAssetSpecDatabase database, RootType type)
@@ -387,10 +394,12 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             case '"':
                 GetAnyNodeProperties(0, out AnySourceNodeProperties props);
                 string str = ReadQuotedString(out FileRange range, out _);
+                int lastCharIndex = _readLastCharacterIndex;
                 Comment comment;
                 if ((_options & SourceNodeTokenizerOptions.Metadata) != 0)
                 {
-                    if (!TryReadComment(out comment, CommentPosition.EndOfLine, ref range))
+                    FileRange commentRange = range;
+                    if (!TryReadComment(out comment, CommentPosition.EndOfLine, ref commentRange))
                         comment = Comment.None;
 
                     if (!isListValue)
@@ -405,13 +414,14 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                 }
                 else
                 {
+                    SkipComment(out _);
                     unhandledComments = OneOrMore<Comment>.Null;
                     comment = Comment.None;
                 }
 
                 props.Index = index;
                 props.ChildIndex = childIndex;
-                props.LastCharacterIndex = _readLastCharacterIndex + _indexOffset;
+                props.LastCharacterIndex = lastCharIndex + _indexOffset;
                 props.Range = range;
                 TransformRange(ref props.Range);
                 props.Depth = depth + _depthOffset;
@@ -573,7 +583,8 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                         props.LastCharacterIndex = _readLastCharacterIndex + _indexOffset;
                         if (isList)
                         {
-                            TryReadComment(out comment, CommentPosition.EndOfLine, ref props.Range);
+                            FileRange r = default;
+                            TryReadComment(out comment, CommentPosition.EndOfLine, ref r);
                             AddToNodeList(ValueNode.Create(str, true, comment, in props));
                         }
                         else
@@ -649,7 +660,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                         str = ReadNonQuotedString(out range, out _, isKey: !isList);
                         props.Range = range;
                         TransformRange(ref props.Range);
-                        props.LastCharacterIndex = _index + _indexOffset;
+                        props.LastCharacterIndex = _readLastCharacterIndex + _indexOffset;
                         if (isList)
                         {
                             AddToNodeList(ValueNode.Create(str, false, Comment.None, in props));
@@ -692,7 +703,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             array = new ArraySegment<ISourceNode>(_nodeList!, startNodeListIndex, _nodeListSize - startNodeListIndex).ToArray();
 
         RemoveRangeFromNodeList(startNodeListIndex, _nodeListSize - startNodeListIndex);
-        thisObjRange.End = _position;
+        thisObjRange.End = didClose ? _position : new FilePosition(_position.Line - 1, _prevLineCharCount);
 
         comments = beginComment.Content == null
             ? OneOrMore<Comment>.Null
@@ -850,13 +861,24 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                 }
             }
 
-            int endIndex = _index - 1;
-            lazySource = new LazySource(_fileMemory.Slice(startIndex, endIndex - startIndex + 1), type)
+            long rangeOffset;
+            if (_position.Line == 1)
             {
-                PositionOffset = ((long)position.Line << 32) | (long)position.Character,
+                rangeOffset = ((long)(position.Line + _positionOffset.Line - 1) << 32)
+                              | (long)(position.Character + _positionOffset.Character - 1);
+            }
+            else
+            {
+                rangeOffset = ((long)(position.Line + _positionOffset.Line - 1) << 32)
+                              | (long)(position.Character - 1);
+            }
+
+            lazySource = new LazySource(_fileMemory.Slice(startIndex, _readLastCharacterIndex - startIndex + 1), type)
+            {
+                PositionOffset = rangeOffset,
                 Options = _options,
-                NodeCount = 1,
-                IndexDepthOffset = ((long)startIndex << 32) | (long)propertyDepth
+                IndexDepthOffset = ((long)(startIndex + _indexOffset) << 32)
+                                   | (long)(propertyDepth + _depthOffset)
             };
 
             SkipWhiteSpace();
@@ -881,10 +903,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                 _ => ParseValueIntl(propertyDepth, false, -1, -1, out comments)
             };
 
-            lazySource = new LazySource(value, type)
-            {
-                NodeCount = 1
-            };
+            lazySource = new LazySource(value, type);
         }
     }
 
@@ -924,7 +943,12 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                     SkipToNextToken();
                     return new string(_file[firstChar], 1);
             }
-            outString = step.ToString();
+            if (!_fileMemory.IsEmpty
+                && step.Length == _fileMemory.Length
+                && MemoryMarshal.TryGetString(_fileMemory, out string originalString, out int st, out int ln) && st == 0 && ln == step.Length)
+                outString = originalString;
+            else
+                outString = step.ToString();
             readLength = outString.Length;
         }
         else
@@ -933,7 +957,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 
             do
             {
-                AppendSpan(_stringBuilder, step);
+                StringHelper.AppendSpan(_stringBuilder, step);
                 if (escStepper.IsTrailing || escStepper.Character is '\r' or '\n')
                 {
                     LogDiagnostic_UnexpectedEscapeSequence(_position.Character + escStepper.Index - 1, escStepper.Character);
@@ -958,7 +982,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                 escStepper.IsTrailing = true;
             }
 
-            AppendSpan(_stringBuilder, step);
+            StringHelper.AppendSpan(_stringBuilder, step);
 
             outString = _stringBuilder.ToString();
             _stringBuilder.Clear();
@@ -1111,7 +1135,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 
             do
             {
-                AppendSpan(_stringBuilder, step);
+                StringHelper.AppendSpan(_stringBuilder, step);
                 if (escStepper.IsTrailing || escStepper.Character is '\r' or '\n')
                 {
                     LogDiagnostic_UnexpectedEscapeSequence(_position.Character + escStepper.Index, escStepper.Character);
@@ -1137,7 +1161,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                 LogDiagnostic_StringQuotesNotTerminated(_position.Character + escStepper.Index);
             }
 
-            AppendSpan(_stringBuilder, step);
+            StringHelper.AppendSpan(_stringBuilder, step);
 
             outString = _stringBuilder.ToString();
             _stringBuilder.Clear();
@@ -1257,24 +1281,6 @@ public ref partial struct SourceNodeTokenizer : IDisposable
         SkipToNextToken();
     }
 
-    private static void AppendSpan(StringBuilder sb, ReadOnlySpan<char> span)
-    {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
-        sb.Append(span);
-#else
-        if (span.IsEmpty)
-            return;
-
-        unsafe
-        {
-            fixed (char* ptr = span)
-            {
-                sb.Append(ptr, span.Length);
-            }
-        }
-#endif
-    }
-
     private static bool TryGetEscapeCharacter(char c, out char ctrl)
     {
         switch (c)
@@ -1330,7 +1336,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             }
             else
             {
-                if (pendingChars > 0)
+                if (_char != '\n' && pendingChars > 0)
                 {
                     _position.Character += pendingChars + 1;
                 }
