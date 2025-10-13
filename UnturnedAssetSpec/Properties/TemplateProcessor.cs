@@ -48,7 +48,14 @@ public sealed class TemplateProcessor
                         break;
 
                     case '\\':
-                        if (index + 1 < text.Length && text[index + 1] != '*')
+                        if (index + 1 >= text.Length)
+                        {
+                            if (i == segments.Length - 1)
+                                sb.Append('\\');
+                            else
+                                sb.Append(@"\\");
+                        }
+                        else if (text[index + 1] != '*')
                             sb.Append('\\');
                         else
                             sb.Append(@"\\");
@@ -117,7 +124,7 @@ public sealed class TemplateProcessor
                 outputStringLength += (slashCt - 1) / 2 + 1;
 
                 index += slashCt;
-                if (index < span.Length - slashCt)
+                if (index < span.Length)
                 {
                     if (slashCt % 2 == 1)
                     {
@@ -174,7 +181,7 @@ public sealed class TemplateProcessor
             }
 
             int nextIndex = index + 1;
-            if (nextIndex == span.Length)
+            if (nextIndex >= span.Length)
             {
                 index = span.Length;
                 break;
@@ -250,7 +257,7 @@ public sealed class TemplateProcessor
         key = sb.ToString();
 #endif
 
-        return new TemplateProcessor(segments, outputStringLength);
+        return new TemplateProcessor(segments, outputStringLength, hasEnd);
 
         static void SinkSegment(ref OneOrMore<ReadOnlyMemory<char>> segments, StringBuilder? sb, string key, int lastStartPos, int index)
         {
@@ -282,10 +289,11 @@ public sealed class TemplateProcessor
         _segments = OneOrMore<ReadOnlyMemory<char>>.Null;
     }
 
-    private TemplateProcessor(OneOrMore<ReadOnlyMemory<char>> segments, int totalSegmentLength)
+    private TemplateProcessor(OneOrMore<ReadOnlyMemory<char>> segments, int totalSegmentLength, bool hasEndingTemplateGroup)
     {
         _segments = segments;
         _totalSegmentLength = totalSegmentLength;
+        _hasEndingTemplateGroup = hasEndingTemplateGroup;
     }
 
     public string CreateKey(string key, OneOrMore<int> indices)

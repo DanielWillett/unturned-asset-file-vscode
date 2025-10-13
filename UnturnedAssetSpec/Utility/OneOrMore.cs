@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 /// <summary>
 /// Stores one or more generic values efficiently.
 /// </summary>
+[CollectionBuilder(typeof(OneOrMoreExtensions), nameof(OneOrMoreExtensions.Create))]
 public readonly struct OneOrMore<T> : IEquatable<OneOrMore<T>>, IEquatable<T>, IEnumerable<T>
 {
     /// <summary>
@@ -124,6 +124,12 @@ public readonly struct OneOrMore<T> : IEquatable<OneOrMore<T>>, IEquatable<T>, I
             return;
         }
 
+        if (count == 1)
+        {
+            Value = values[0];
+            return;
+        }
+
         T[] newArray = new T[count];
         count = 0;
         newArray[0] = values[0];
@@ -193,6 +199,12 @@ public readonly struct OneOrMore<T> : IEquatable<OneOrMore<T>>, IEquatable<T>, I
             T[] array = new T[count];
             values.CopyTo(array, 0);
             Values = array;
+            return;
+        }
+
+        if (count == 1)
+        {
+            Value = values[0];
             return;
         }
 
@@ -1081,6 +1093,73 @@ public struct OneOrMoreEnumerator<T> : IEnumerator<T>
 
 public static class OneOrMoreExtensions
 {
+    /// <summary>
+    /// Create a <see cref="OneOrMore{T}"/> using a read-only span. Used by the <see cref="CollectionBuilderAttribute"/> for <see cref="OneOrMore{T}"/>.
+    /// </summary>
+    [SkipLocalsInit, Pure]
+    public static OneOrMore<T> Create<T>(ReadOnlySpan<T> span)
+    {
+        IEqualityComparer<T> comparer;
+        switch (span.Length)
+        {
+            case 0:
+                return OneOrMore<T>.Null;
+
+            case 1:
+                return new OneOrMore<T>(span[0]);
+
+            case 2:
+                comparer = EqualityComparer<T>.Default;
+                return comparer.Equals(span[0], span[1])
+                    ? new OneOrMore<T>(span[0])
+                    : new OneOrMore<T>([ span[0], span[1] ]);
+        }
+
+        comparer = EqualityComparer<T>.Default;
+        // remove duplicates
+        int count = span.Length;
+        LightweightBitArray dupeMask = new LightweightBitArray(count);
+
+        for (int i = 0; i < span.Length; ++i)
+        {
+            if (i > 0 && dupeMask[i])
+                continue;
+
+            T val = span[i];
+            for (int j = i + 1; j < span.Length; ++j)
+            {
+                if (i != 0 && dupeMask[j] || !comparer.Equals(val, span[j]))
+                    continue;
+
+                dupeMask[j] = true;
+                --count;
+            }
+        }
+
+        if (count == span.Length)
+        {
+            return new OneOrMore<T>(span.ToArray());
+        }
+
+        if (count == 1)
+        {
+            return new OneOrMore<T>(span[0]);
+        }
+
+        T[] newArray = new T[count];
+        count = 0;
+        newArray[0] = span[0];
+        for (int i = 1; i < span.Length; ++i)
+        {
+            if (dupeMask[i])
+                continue;
+
+            newArray[++count] = span[i];
+        }
+
+        return new OneOrMore<T>(newArray);
+    }
+
     /// <summary>
     /// Adds all values from a <see cref="OneOrMore{T}"/> to <paramref name="list"/>.
     /// </summary>
