@@ -155,6 +155,26 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
         },
         {
+            "Key": "CloudOverride_Prefab",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Prefab to instantiate and attach to lighting.",
+            "DefaultValue": null,
+            "Variable": "CloudOverridePrefab",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#cloud-override-properties",
+            "Version": "3.25.8.0"
+        },
+        {
+            "Key": "CloudOverride_ParticleSystems",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.LevelAsset+CloudOverrideParticleSystemsPath, Assembly-CSharp",
+            "Description": "List of particle system configurations attached to the object specified in @CloudOverride_Prefab.",
+            "DefaultValue": null,
+            "Variable": "CloudOverrideParticleSystemPaths",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#cloud-override-properties",
+            "Version": "3.25.8.0"
+        },
+        {
             "Key": "TerrainColors",
             "Type": "List",
             "ElementType": "SDG.Unturned.LevelAsset+TerrainColorRule, Assembly-CSharp",
@@ -176,14 +196,13 @@
             "Description": "Set of default items to grant when a given skillset spawns in."
         },
         {
-            "Key": "MaterialColorPropertyNames",
-            "Type": "List",
-            "ElementType": "String",
-            "DefaultValue": [ "_Color" ],
-            "Version": "3.25.8.0",
-            "Variable": "MaterialColorPropertyNames",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#cloud-override-properties",
-            "Description": "The particle system's material instance will have these color properties set to the level's cloud color."
+            "Key": "UnderwaterFogDensity",
+            "Type": "Float32",
+            "DefaultValue": 0.075,
+            "Version": "3.25.10.0",
+            "Variable": "UnderwaterFogDensity",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
+            "Description": "Overrides fog effect intensity while the camera is underwater."
         }
     ],
     "Types":
@@ -348,7 +367,8 @@
                     "Description": "Overrides the cost of upgrading a skill to level 1.",
                     "Variable": "baseCostOverride",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
-                    "Priority": 2
+                    "Priority": 2,
+                    "Version": "3.25.8.2"
                 },
                 {
                     "Key": "Per_Level_Cost_Increase",
@@ -358,7 +378,8 @@
                     "Description": "Overrides the amount the cost of upgrading a skill increases each level (@Base_Cost + (toLevel - 1) * @Per_Level_Cost_Increase).",
                     "Variable": "perLevelCostIncreaseOverride",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skill-rule-properties",
-                    "Priority": 1
+                    "Priority": 1,
+                    "Version": "3.25.8.2"
                 }
             ]
         },
@@ -415,6 +436,7 @@
         {
             "Type": "SDG.Unturned.LevelAsset+DefaultLoadoutItem, Assembly-CSharp",
             "DisplayName": "Default Loadout Item",
+            "Version": "3.25.8.2",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
             "Properties":
             [
@@ -448,6 +470,56 @@
                     "Variable": "origin",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
                     "Priority": 1
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.LevelAsset+CloudOverrideParticleSystemsPath, Assembly-CSharp",
+            "DisplayName": "Cloud Override Particle System",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#cloud-override-properties",
+            "Version": "3.25.8.0",
+            "Properties":
+            [
+                {
+                    "Key": "Path",
+                    "Type": "String",
+                    "DefaultValue": null,
+                    "Required": true,
+                    "Description": "Path to a Particle System component relative to @CloudOverride_Prefab. This renderer should likely use the Unturned \"Particles/Standard Surface (ZClip False)\" shader to prevent a harsh transition with low max draw distance.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#cloud-override-properties",
+                    "Priority": 4,
+                    "Variable": "ComponentPath"
+                },
+                {
+                    "Key": "RateOverTimeScale",
+                    "Type": "Float32",
+                    "DefaultValue": 0,
+                    "Required": true,
+                    "Description": "Particle System's emission rate is multiplied by current time of day's cloud slider value (between zero and one) scaled by this value.",
+                    "Variable": "RateOverTimeScale",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#cloud-override-properties",
+                    "Priority": 3
+                },
+                {
+                    "Key": "MaterialColorPropertyNames",
+                    "Type": "List",
+                    "ElementType": "String",
+                    "DefaultValue": [ "_Color" ],
+                    "Variable": "MaterialColorPropertyNames",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#cloud-override-properties",
+                    "Description": "The particle system's material instance will have these color properties set to the level's cloud color.",
+                    "Priority": 1
+                },
+                {
+                    "Key": "WarmupTime",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Minimum": 0.0,
+                    "Variable": "WarmupTime",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#cloud-override-properties",
+                    "Description": "When restarting the particle system it is simulated this number of seconds.",
+                    "Priority": 2,
+                    "Version": "3.25.8.4"
                 }
             ]
         }

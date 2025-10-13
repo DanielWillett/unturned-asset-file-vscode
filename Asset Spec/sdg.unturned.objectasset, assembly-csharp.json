@@ -2923,6 +2923,31 @@
                     "Value": "NPC"
                 }
             ]
+        },
+        {
+            "Key": "Dialogue_Name",
+            "Type": "String",
+            "DefaultValue": "@Name",
+            "Description": "Overrides character name in dialogue.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#localization",
+            "Required":
+            {
+                "Variable": "Interactability",
+                "Operation": "eq",
+                "Comparand": "DIALOGUE"
+            },
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "Version": "3.25.10.0"
         }
     ],
     "Types":

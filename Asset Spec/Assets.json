@@ -400,6 +400,7 @@
                 "SDG.Unturned.ItemToolAsset, Assembly-CSharp":
                 {
                     "SDG.Unturned.ItemVehiclePaintToolAsset, Assembly-CSharp": { },
+                    "SDG.Unturned.ItemVehicleLockpickToolAsset, Assembly-CSharp": { },
                     "SDG.Unturned.ItemVehicleRepairToolAsset, Assembly-CSharp":
                     {
                         "SDG.Unturned.ItemTireAsset, Assembly-CSharp": { }

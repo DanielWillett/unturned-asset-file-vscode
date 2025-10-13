@@ -146,6 +146,28 @@
             "InclusiveWith": [ "Explosive" ]
         },
         {
+            "Key": "Explosion_Plays_Impact_Effects",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not per-surface effects like blood splatter are created. Defaults to true, but can be disabled particularly if a performance issue (e.g., an explosive many-pellet shotgun shell).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#explosion-plays-impact-effects-bool-true",
+            "Variable": "ExplosionPlaysImpactEffects",
+            "Priority": 3,
+            "InclusiveWith": [ "Explosive" ],
+            "Version": "3.25.10.0"
+        },
+        {
+            "Key": "Explosion_Penetrate_Buildables",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not explosion damage passes through buildable items.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#explosion-plays-impact-effects-bool-true",
+            "Variable": "ExplosionPenetratesBuildables",
+            "Priority": 3,
+            "InclusiveWith": [ "Explosive" ],
+            "Version": "3.25.10.0"
+        },
+        {
             "Key": "Explosion",
             "Type": "GuidOrId",
             "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
@@ -232,6 +254,15 @@
             "Description": "The model that appears on the gun when the item is attached.",
             "Variable": "magazine",
             "Required": true
+        },
+        {
+            "AssetName": "Projectile",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Description": "Overrides Projectile prefab. Note that the gun this magazine is attached to must launch projectiles.",
+            "Variable": "ProjectilePrefabOverride",
+            "Required": true,
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#unity-setup",
+            "Version": "3.25.10.0"
         }
     ]
 }

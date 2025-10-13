@@ -12,7 +12,7 @@
         {
             "Key": "PaintColor",
             "Type": "Color32RGB",
-            "Description": "Vehicle’s color will be replaced with this when used.",
+            "Description": "Vehicle's color will be replaced with this when used.",
             "DefaultValue": null,
             "Variable": "PaintColor",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vehicle-paint-tool-asset.html#vehicle-paint-tool-asset-properties",

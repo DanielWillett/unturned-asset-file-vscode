@@ -1,0 +1,35 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemVehicleLockpickToolAsset, Assembly-CSharp",
+    "DisplayName": "Vehicle Lockpick Tool Item",
+    "Parent": "SDG.Unturned.ItemToolAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vehicle-lockpick-tool-asset.html",
+    "Version": "3.25.10.0",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "FailureEffect",
+            "Type": "BcAssetReference",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Description": "Effect to play when lockpicking fails.",
+            "DefaultValue": null,
+            "Variable": "FailureEffect",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vehicle-lockpick-tool-asset.html#vehicle-lockpick-tool-asset-properties",
+            "Priority": 2
+        },
+        {
+            "Key": "FailureProbability",
+            "Type": "Float32",
+            "Description": "Normalized percentage chance of lockpicking failing. Defaults to zero. The \"Use_Failure\" animation is played instead of \"Use\" if lockpicking fails.",
+            "DefaultValue": 0.0,
+            "Minimum": 0.0,
+            "Maximum": 1.0,
+            "Variable": "FailureProbability",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vehicle-lockpick-tool-asset.html#vehicle-lockpick-tool-asset-properties",
+            "Priority": 1
+        }
+    ]
+}

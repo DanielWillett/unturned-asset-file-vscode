@@ -2869,13 +2869,35 @@
                     "Required": true
                 },
                 {
+                    "Key": "AtPlayerPosition",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Variable": "AtPlayerPosition",
+                    "Description": "Whether or not to spawn the effect at the target player's position.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
+                    "Required":
+                    {
+                        "Variable": "Spawnpoint",
+                        "Operation": "excluded",
+                        "Comparand": null
+                    },
+                    "ExclusiveWith": [ "Spawnpoint" ],
+                    "Version": "3.25.8.4"
+                },
+                {
                     "Key": "Spawnpoint",
                     "Type": "SpawnpointId",
                     "DefaultValue": null,
                     "Description": "The ID of the spawnpoint node to spawn the effect at in the map editor.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
                     "Variable": "Spawnpoint",
-                    "Required": true
+                    "Required":
+                    {
+                        "Variable": "AtPlayerPosition",
+                        "Operation": "neq",
+                        "Comparand": true
+                    },
+                    "ExclusiveWith": [ "AtPlayerPosition" ]
                 },
                 {
                     "Key": "IsReliable",
