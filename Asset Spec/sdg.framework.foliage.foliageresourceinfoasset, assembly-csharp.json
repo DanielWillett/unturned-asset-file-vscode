@@ -25,6 +25,15 @@
             "Description": "The distance around a resource that needs to be clear for it to be placed. Snowshoe objects do not block resources.",
             "Variable": "obstructionRadius",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference"
+        },
+        {
+            "Key": "Legacy_Rotation_and_Scale",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "If true, the legacy random rotation and scale properties from the resource are used.",
+            "Variable": "UsesLegacyRotationAndScale",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference",
+            "Version": "3.25.10.0"
         }
     ]
 }

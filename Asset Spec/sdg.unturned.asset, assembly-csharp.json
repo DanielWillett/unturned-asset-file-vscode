@@ -3143,6 +3143,46 @@
                     "Description": "Corresponds to the 'Sand' physics material (50bac8b8bf8648fc88fd012ccd176f17)."
                 }
             ]
+        },
+        {
+            "Type": "SDG.Unturned.LevelAsset+DefaultLoadoutItem, Assembly-CSharp",
+            "DisplayName": "Default Loadout Item",
+            "Version": "3.25.8.2",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
+            "Properties":
+            [
+                {
+                    "Key": "Asset",
+                    "Type": "BcAssetReference",
+                    "ElementType": "ITEM",
+                    "SpecialTypes": [ "SDG.Unturned.SpawnAsset, Assembly-CSharp" ],
+                    "DefaultValue": "#000000",
+                    "Required": true,
+                    "Description": "The item or spawn table to spawn in. Legacy IDs will be interpreted as items.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
+                    "Priority": 3,
+                    "Variable": "assetRef"
+                },
+                {
+                    "Key": "Amount",
+                    "Type": "Int32",
+                    "DefaultValue": 1,
+                    "Minimum": 1,
+                    "Description": "The total amount of @Asset items to give. If @Asset is a spawn table, it will be resolved once and the same item will be given this many times.",
+                    "Variable": "amount",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
+                    "Priority": 2
+                },
+                {
+                    "Key": "Origin",
+                    "Type": "SDG.Unturned.EItemOrigin, Assembly-CSharp",
+                    "DefaultValue": "WORLD",
+                    "Description": "The origin of the item, which influences the state (attachments, water/fuel level, etc.) of the item when it's spawned in.",
+                    "Variable": "origin",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
+                    "Priority": 1
+                }
+            ]
         }
     ]
 }

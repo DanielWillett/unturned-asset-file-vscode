@@ -17,7 +17,7 @@
             "Description": "Number of columns (horizontal storage space).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
             "Variable": "storage_x",
-            "Priority": 5
+            "Priority": 6
         },
         {
             "Key": "Storage_Y",
@@ -27,7 +27,7 @@
             "Description": "Number of rows (vertical storage space).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
             "Variable": "storage_y",
-            "Priority": 5
+            "Priority": 6
         },
         {
             "Key": "Display",
@@ -36,7 +36,7 @@
             "Description": "The first item in this storage will be visibly displayed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
             "Variable": "isDisplay",
-            "Priority": 4
+            "Priority": 5
         },
         {
             "Key": "Should_Close_When_Outside_Range",
@@ -45,7 +45,18 @@
             "Description": "Whether or not the storage should automatically close when the player is outside of the interaction range.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
             "Variable": "shouldCloseWhenOutsideRange",
-            "Priority": 3
+            "Priority": 4
+        },
+        {
+            "Key": "Default_Contained_Items",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.LevelAsset+DefaultLoadoutItem, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Default items to add to the storage when it's placed..",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
+            "Variable": "DefaultContainedItems",
+            "Priority": 3,
+            "Version": "3.25.10.0"
         }
     ]
 }

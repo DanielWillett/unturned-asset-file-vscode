@@ -1641,6 +1641,11 @@
                             ]
                         }
                     },
+                    "IsFlags":
+                    {
+                        "type": "boolean",
+                        "description": "If this enum is a [Flags] enum and should be parsed by comma-separated values."
+                    },
                     "Properties":
                     {
                         "description": "List of all properties that can be defined.",

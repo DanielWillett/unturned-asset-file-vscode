@@ -19,8 +19,12 @@
             "DisplayName": "Unity 2020 LTS"
         },
         {
-            "EndVersion": "2021.3.29f1",
+            "EndVersion": "2021.3.45f2",
             "DisplayName": "Unity 2021 LTS"
+        },
+        {
+            "EndVersion": "2022.3.62f2",
+            "DisplayName": "Unity 2022 LTS"
         }
     ],
     "SkinColors":

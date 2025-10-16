@@ -238,6 +238,38 @@
             "Variable": "isEligibleForAutoStatDescriptions"
         },
         {
+            "Key": "Description_Excludes",
+            "Type": "SDG.Unturned.EItemDescriptionFlags, Assembly-CSharp",
+            "DefaultValue": "LegacyContent",
+            "Description": "Description elements to exclude from the auto-generated item description.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#use-auto-stat-descriptions-bool-true",
+            "Variable": "PreferredDescriptionFlags",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Use_Auto_Stat_Descriptions",
+                    "Value": true
+                }
+            ],
+            "Version": "3.25.10.0"
+        },
+        {
+            "Key": "Description_Includes",
+            "Type": "SDG.Unturned.EItemDescriptionFlags, Assembly-CSharp",
+            "DefaultValue": "LegacyContent",
+            "Description": "Description elements to include in the auto-generated item description.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#use-auto-stat-descriptions-bool-true",
+            "Variable": "PreferredDescriptionFlags",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Use_Auto_Stat_Descriptions",
+                    "Value": false
+                }
+            ],
+            "Version": "3.25.10.0"
+        },
+        {
             "Key": "Procedurally_Animate_Inertia",
             "Type": "Boolean",
             "DefaultValue": true,
@@ -2339,6 +2371,34 @@
                     "Value": "Heal",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#player-damage",
                     "Description": "Anyone hit by the weapon will have their Broken Bones status effect removed."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EItemDescriptionFlags, Assembly-CSharp",
+            "DisplayName": "Item Description Options",
+            "IsFlags": true,
+            "Values":
+            [
+                {
+                    "Value": "LegacyContent",
+                    "Description": "Do not add any of the newer info to the description. Equivalent to setting @Use_Auto_Stat_Descriptions to false.",
+                    "NumericValue": 0
+                },
+                {
+                    "Value": "GunAttachments",
+                    "Description": "Include names of gun's attachments in the description.",
+                    "NumericValue": 1
+                },
+                {
+                    "Value": "Uncategorized",
+                    "Description": "Include any other info without its own flag.",
+                    "NumericValue": 2
+                },
+                {
+                    "Value": "All",
+                    "Description": "Add as much info to the description as possible. Equivalent to setting @Use_Auto_Stat_Descriptions to true.",
+                    "NumericValue": 3
                 }
             ]
         }
