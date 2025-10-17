@@ -354,9 +354,11 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                     }
                     else
                     {
+                        QualifiedType t = new QualifiedType(typeInfo.Type.Type, isCaseInsensitive: true);
+                        typeInfo.Type = t;
                         lock (types)
                         {
-                            types[typeInfo.Type] = typeInfo;
+                            types[t] = typeInfo;
                         }
                     }
                 }
@@ -1407,6 +1409,9 @@ public static class AssetSpecDatabaseExtensions
             type = type.Substring(divIndex + 2);
         }
 
+        if (fileType.Type.IsNull)
+            return null;
+
         if (assetType == null)
         {
             foreach (ISpecType t in fileType.Information.Types)
@@ -1419,7 +1424,8 @@ public static class AssetSpecDatabaseExtensions
         }
 
         InverseTypeHierarchy hierarchy = db.Information.GetParentTypes(assetType != null ? new QualifiedType(assetType) : fileType.Type);
-
+        
+        string typeName = type;
         for (int i = 0; i < hierarchy.ParentTypes.Length; ++i)
         {
             QualifiedType qt = hierarchy.ParentTypes[hierarchy.ParentTypes.Length - i - 1];
@@ -1429,7 +1435,7 @@ public static class AssetSpecDatabaseExtensions
                 continue;
             }
 
-            ISpecType? t = Array.Find(info.Types, p => p.Type.Equals(type));
+            ISpecType? t = Array.Find(info.Types, p => p.Type.Equals(typeName));
 
             if (t != null)
             {

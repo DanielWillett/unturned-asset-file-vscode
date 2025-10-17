@@ -84,7 +84,7 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
                 after = properties
                     .Take(index)
                     .Reverse()
-                    .Select(x => file.SourceFile.TryGetProperty(x, out IPropertySourceNode? node) ? (property, node) : (null, null))
+                    .Select(x => file.SourceFile.TryGetProperty(x, out IPropertySourceNode? node, PropertyResolutionContext.Modern) ? (property, node) : (null, null))
                     .FirstOrDefault(x => x.property != null);
             }
 

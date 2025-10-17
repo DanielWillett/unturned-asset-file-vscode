@@ -13,6 +13,89 @@ public sealed class TemplateProcessor
     private readonly bool _hasEndingTemplateGroup;
     private readonly int _totalSegmentLength;
 
+    /// <summary>
+    /// The number of indicies that can be substituted.
+    /// </summary>
+    public int TemplateCount { get; }
+
+    /// <summary>
+    /// Attempts to parse numbers from a key value.
+    /// </summary>
+    /// <exception cref="ArgumentException">Not enough space in <paramref name="output"/>.</exception>
+    public bool TryParseKeyValues(ReadOnlySpan<char> key, Span<int> output, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+    {
+        if (_segments.IsNull)
+            return true;
+
+        if (TemplateCount < output.Length)
+            throw new ArgumentException($"Span not large enough: output. Expected at least {TemplateCount} template spots.");
+
+        if (key.Length < _totalSegmentLength)
+            return false;
+
+        int workingKeyIndex = 0;
+        int numberIndex = 0;
+        for (int i = 0; i < _segments.Length; ++i)
+        {
+            ReadOnlySpan<char> segment = _segments[i].Span;
+            ReadOnlySpan<char> segmentPortion = key.Slice(workingKeyIndex);
+            if (!segmentPortion.StartsWith(segment, comparison))
+                return false;
+            
+            workingKeyIndex += segment.Length;
+            if (i == _segments.Length - 1 && !_hasEndingTemplateGroup)
+                continue;
+
+            if (workingKeyIndex >= key.Length)
+                break;
+
+            char nextSpanFirstCharacter = '\0';
+            int segIndex = i + 1;
+            while (segIndex < _segments.Length)
+            {
+                if (_segments[segIndex].IsEmpty)
+                {
+                    ++segIndex;
+                    continue;
+                }
+
+                nextSpanFirstCharacter = _segments[segIndex].Span[0];
+                break;
+            }
+
+            int endIndex = -1;
+            if (nextSpanFirstCharacter != '\0')
+            {
+                endIndex = key.Slice(workingKeyIndex).IndexOf(nextSpanFirstCharacter);
+            }
+
+            if (endIndex == -1)
+                endIndex = key.Length - workingKeyIndex;
+
+            ReadOnlySpan<char> number = key.Slice(workingKeyIndex, endIndex);
+            int numberValue;
+            if (number.Length == 1 && number[0] is >= '0' and <= '9')
+                numberValue = number[0] - '0';
+            else
+            {
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+                if (!int.TryParse(number, NumberStyles.None, CultureInfo.InvariantCulture, out numberValue))
+                    return false;
+#else
+                if (!int.TryParse(number.ToString(), NumberStyles.None, CultureInfo.InvariantCulture, out numberValue))
+                    return false;
+#endif
+            }
+
+            output[numberIndex] = numberValue;
+            ++numberIndex;
+
+            workingKeyIndex += number.Length;
+        }
+
+        return numberIndex == TemplateCount;
+    }
+
     public static string EscapeKey(string key, TemplateProcessor processor)
     {
         ReadOnlySpan<char> stops = [ '\\', '*' ];
@@ -294,6 +377,7 @@ public sealed class TemplateProcessor
         _segments = segments;
         _totalSegmentLength = totalSegmentLength;
         _hasEndingTemplateGroup = hasEndingTemplateGroup;
+        TemplateCount = segments.Length - (!hasEndingTemplateGroup ? 1 : 0);
     }
 
     public string CreateKey(string key, OneOrMore<int> indices)
@@ -313,12 +397,11 @@ public sealed class TemplateProcessor
 
         int inputLength = useOneOrMore ? oneOrMore.Length : span.Length;
 
-        int numberCount = _segments.Length - (!_hasEndingTemplateGroup ? 1 : 0);
-        if (inputLength < numberCount)
+        if (inputLength < TemplateCount)
             throw new ArgumentOutOfRangeException(nameof(oneOrMore));
 
         int totalDigitCount = 0;
-        for (int i = 0; i < numberCount; ++i)
+        for (int i = 0; i < TemplateCount; ++i)
         {
             int num = useOneOrMore ? oneOrMore[i] : span[i];
             totalDigitCount += StringHelper.CountDigits(num);

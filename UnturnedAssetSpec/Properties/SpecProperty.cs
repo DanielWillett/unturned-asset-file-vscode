@@ -15,7 +15,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPropertyProvider
 {
     private TemplateProcessor? _keyTemplateProcessor;
-    private TemplateProcessor[] _aliasTemplateProcessors;
+    private TemplateProcessor[]? _aliasTemplateProcessors;
 
     /// <summary>
     /// The key of the flag or property. Will be empty for imported types.

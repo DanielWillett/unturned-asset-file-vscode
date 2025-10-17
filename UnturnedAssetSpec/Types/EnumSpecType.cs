@@ -221,7 +221,8 @@ public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, ICompa
                                           && Description == null
                                           && Docs == null
                                           && !Deprecated
-                                          && AdditionalProperties.IsNull;
+                                          && AdditionalProperties.IsNull
+                                          && !NumericValue.HasValue;
 
     public required OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; init; }
     

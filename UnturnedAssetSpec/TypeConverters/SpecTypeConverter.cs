@@ -544,6 +544,9 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
             case EnumSpecType enumType:
                 JsonHelper.WriteAdditionalProperties(writer, value, options);
 
+                if (enumType.IsFlags)
+                    writer.WriteBoolean(IsFlagsProperty, true);
+
                 writer.WritePropertyName(ValuesProperty);
                 writer.WriteStartArray();
 

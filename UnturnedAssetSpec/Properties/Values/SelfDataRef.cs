@@ -104,7 +104,7 @@ public sealed class SelfDataRef : IEquatable<ISpecDynamicValue>, IEquatable<Self
 
     public string? EvaluateKey(in FileEvaluationContext ctx)
     {
-        return ctx.SourceFile.TryGetProperty(ctx.Self, out IPropertySourceNode? property)
+        return ctx.SourceFile.TryGetProperty(ctx.Self, out IPropertySourceNode? property, ctx.PropertyContext)
             ? property.Key
             : null;
     }

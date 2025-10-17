@@ -1,92 +1,13 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
 using System.Threading;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 public static class SourceNodeExtensions
 {
-    //extension(SourceNodeType type)
-    //{
-    //    public bool IsAcceptablePropertyValue
-    //    {
-    //        get
-    //        {
-    //            return type
-    //                is SourceNodeType.Value      or SourceNodeType.ValueWithComment
-    //                or SourceNodeType.Dictionary or SourceNodeType.DictionaryWithComment
-    //                or SourceNodeType.List       or SourceNodeType.ListWithComment;
-    //        }
-    //    }
-    //
-    //    public bool IsAcceptableListValue
-    //    {
-    //        get
-    //        {
-    //            return type
-    //                is SourceNodeType.Value      or SourceNodeType.ValueWithComment
-    //                or SourceNodeType.Dictionary or SourceNodeType.DictionaryWithComment
-    //                or SourceNodeType.List       or SourceNodeType.ListWithComment
-    //                or SourceNodeType.Comment
-    //                or SourceNodeType.Whitespace;
-    //        }
-    //    }
-    //
-    //    public bool IsAcceptableDictionaryValue
-    //    {
-    //        get
-    //        {
-    //            return type
-    //                is SourceNodeType.Property or SourceNodeType.PropertyWithComment
-    //                or SourceNodeType.Comment
-    //                or SourceNodeType.Whitespace;
-    //        }
-    //    }
-    //
-    //    public bool IsProperty
-    //    {
-    //        get
-    //        {
-    //            return type is SourceNodeType.Property or SourceNodeType.PropertyWithComment;
-    //        }
-    //    }
-    //
-    //    public bool IsValue
-    //    {
-    //        get
-    //        {
-    //            return type is SourceNodeType.Value or SourceNodeType.ValueWithComment;
-    //        }
-    //    }
-    //
-    //    public bool IsList
-    //    {
-    //        get
-    //        {
-    //            return type is SourceNodeType.List or SourceNodeType.ListWithComment;
-    //        }
-    //    }
-    //
-    //    public bool IsDictionary
-    //    {
-    //        get
-    //        {
-    //            return type is SourceNodeType.Dictionary or SourceNodeType.DictionaryWithComment;
-    //        }
-    //    }
-    //
-    //    public bool IsMetadata
-    //    {
-    //        get
-    //        {
-    //            return type is SourceNodeType.Comment or SourceNodeType.Whitespace;
-    //        }
-    //    }
-    //}
-
     extension(IDictionarySourceNode node)
     {
         /// <summary>
@@ -136,23 +57,31 @@ public static class SourceNodeExtensions
         /// <summary>
         /// Try to get a property by it's key or alias.
         /// </summary>
-        public bool TryGetProperty(SpecProperty property, [MaybeNullWhen(false)] out IPropertySourceNode propertyNode)
+        /// <remarks>Does not support template properties.</remarks>
+        public bool TryGetProperty(SpecProperty property, [MaybeNullWhen(false)] out IPropertySourceNode propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
         {
-            if (property.IsTemplate || property.Key.Length == 0)
+            if (property.IsTemplate || property.IsImport)
             {
                 propertyNode = null;
                 return false;
             }
 
-            if (node.TryGetProperty(property.Key, out propertyNode))
-                return true;
+            if (FilterMatches(property.KeyLegacyExpansionFilter, context))
+            {
+                if (node.TryGetProperty(property.Key, out propertyNode))
+                    return true;
+            }
 
             foreach (Alias alias in property.Aliases)
             {
+                if (!FilterMatches(alias.Filter, context))
+                    continue;
+
                 if (node.TryGetProperty(alias.Value, out propertyNode))
                     return true;
             }
 
+            propertyNode = null;
             return false;
         }
     }
@@ -197,19 +126,19 @@ public static class SourceNodeExtensions
         /// Gets a property of this asset from the root level of the asset data. This properly handles 'Metadata' properties.
         /// </summary>
         /// <remarks>Also will look for localization properties in the corresponding localization files, and vice versa with asset properties.</remarks>
-        public bool TryResolveProperty(SpecProperty property, [MaybeNullWhen(false)] out IPropertySourceNode propertyNode)
+        public bool TryResolveProperty(SpecProperty property, [MaybeNullWhen(false)] out IPropertySourceNode propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
         {
             if (root is ILocalizationSourceFile local && property.Context != SpecPropertyContext.Localization)
                 root = local.Asset;
 
             if (root is not IAssetSourceFile asset)
-                return root.TryGetProperty(property, out propertyNode);
+                return root.TryGetProperty(property, out propertyNode, context);
 
             if (property.Context == SpecPropertyContext.Localization)
             {
                 foreach (ILocalizationSourceFile localFile in asset.Localization)
                 {
-                    if (localFile.TryResolveProperty(property, out propertyNode))
+                    if (localFile.TryResolveProperty(property, out propertyNode, context))
                         return true;
                 }
 
@@ -218,7 +147,7 @@ public static class SourceNodeExtensions
             }
 
             if (!property.CanBeInMetadata)
-                return asset.AssetData.TryGetProperty(property, out propertyNode);
+                return asset.AssetData.TryGetProperty(property, out propertyNode, context);
 
             IDictionarySourceNode? assetData = asset.GetAssetDataDictionary();
             IDictionarySourceNode? metadata = asset.GetMetadataDictionary();
@@ -229,13 +158,13 @@ public static class SourceNodeExtensions
 
                 if (!dict.TryGetProperty(property, out propertyNode) && dict != root)
                 {
-                    hasValue = root.TryGetProperty(property, out propertyNode);
+                    hasValue = root.TryGetProperty(property, out propertyNode, context);
                 }
                 else hasValue = true;
             }
-            else if (!property.Key.Equals("GUID", StringComparison.OrdinalIgnoreCase))
+            else if (!property.Key.Equals("GUID", StringComparison.OrdinalIgnoreCase) || property.Owner is not AssetSpecType)
             {
-                hasValue = assetData.TryGetProperty(property, out propertyNode);
+                hasValue = assetData.TryGetProperty(property, out propertyNode, context);
             }
             else
             {
@@ -293,6 +222,15 @@ public static class SourceNodeExtensions
 
             return visitor.BestMatch;
         }
+    }
+
+    private static bool FilterMatches(LegacyExpansionFilter filter, PropertyResolutionContext context)
+    {
+        return context switch
+        {
+            PropertyResolutionContext.Legacy => filter != LegacyExpansionFilter.Modern,
+            _ => filter != LegacyExpansionFilter.Legacy
+        };
     }
 
     private class GetNodeFromIndexVisitor(int index, bool ignoreMetadata) : OrderedNodeVisitor

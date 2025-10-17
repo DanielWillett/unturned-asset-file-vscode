@@ -697,7 +697,7 @@ public abstract class BaseColorSpecPropertyType<TSelf, T>
     bool ILegacyCompositeTypeProvider.IsEnabled => (Options & VectorTypeParseOptions.Legacy) != 0;
 
     void ILegacyCompositeTypeProvider.VisitLinkedProperties<TVisitor>(
-        in FileEvaluationContext context, SpecProperty property, IDictionarySourceNode propertyRoot, ref TVisitor propertyVisitor, OneOrMore<int> templateGroupIndices)
+        in FileEvaluationContext context, SpecProperty property, IDictionarySourceNode propertyRoot, ref TVisitor propertyVisitor, PropertyBreadcrumbs propertyBreadcrumbs)
     {
         if (property.IsTemplate)
         {

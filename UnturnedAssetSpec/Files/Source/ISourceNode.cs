@@ -1,6 +1,8 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
@@ -169,6 +171,9 @@ public interface IValueSourceNode : IAnyValueSourceNode
     string Value { get; }
 }
 
+/// <summary>
+/// A node that can have multiple children, like a list or dictionary.
+/// </summary>
 public interface IAnyChildrenSourceNode : IAnyValueSourceNode
 {
     /// <summary>
@@ -183,10 +188,32 @@ public interface IAnyChildrenSourceNode : IAnyValueSourceNode
     ImmutableArray<ISourceNode> Children { get; }
 }
 
+internal sealed class SourceNodeIndexComparer : IComparer<ISourceNode>
+{
+    public static readonly SourceNodeIndexComparer Instance = new SourceNodeIndexComparer();
+
+    static SourceNodeIndexComparer() { }
+    private SourceNodeIndexComparer() { }
+
+    public int Compare(ISourceNode x, ISourceNode y)
+    {
+        if (x == null)
+            return y == null ? 0 : -1;
+
+        return y == null ? 1 : x.Index.CompareTo(y.Index);
+    }
+}
+
 /// <summary>
 /// A node that represents a list of values.
 /// </summary>
-public interface IListSourceNode : IAnyChildrenSourceNode;
+public interface IListSourceNode : IAnyChildrenSourceNode
+{
+    /// <summary>
+    /// Try to get an element by index.
+    /// </summary>
+    bool TryGetElement(int index, [MaybeNullWhen(false)] out IAnyValueSourceNode node);
+}
 
 /// <summary>
 /// A node that represents a list of properties.

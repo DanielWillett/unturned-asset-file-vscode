@@ -1,8 +1,8 @@
-using System;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -17,8 +17,9 @@ public readonly struct FileEvaluationContext
     public readonly IWorkspaceEnvironment Workspace;
     public readonly InstallationEnvironment Environment;
     public readonly IAssetSpecDatabase Information;
+    public readonly PropertyResolutionContext PropertyContext;
 
-    public FileEvaluationContext(SpecProperty self, ISpecType @this, ISourceFile file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information)
+    public FileEvaluationContext(SpecProperty self, ISpecType @this, ISourceFile file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information, PropertyResolutionContext propertyContext)
     {
         Self = self;
         This = @this;
@@ -27,11 +28,13 @@ public readonly struct FileEvaluationContext
         Workspace = workspace;
         Environment = environment;
         Information = information;
+        PropertyContext = propertyContext;
     }
 
-    public FileEvaluationContext(in FileEvaluationContext self, SpecProperty newProperty)
+    public FileEvaluationContext(in FileEvaluationContext self, SpecProperty newProperty, PropertyResolutionContext propertyContext)
     {
         Self = newProperty;
+        PropertyContext = propertyContext;
         This = newProperty.Owner;
         SourceFile = self.SourceFile;
         FileType = self.FileType;
@@ -42,6 +45,7 @@ public readonly struct FileEvaluationContext
 
     public FileEvaluationContext(in FileEvaluationContext self, IWorkspaceFile openedFile)
     {
+        PropertyContext = PropertyResolutionContext.Modern;
         Self = null!;
         This = null!;
         SourceFile = openedFile.SourceFile;
@@ -61,7 +65,7 @@ public readonly struct FileEvaluationContext
         if (diagnostics is { IsReadOnly: true })
             throw new ArgumentException("Diagnostics collection is readonly.", nameof(diagnostics));
 
-        if (!SourceFile.TryResolveProperty(Self, out property))
+        if (!SourceFile.TryResolveProperty(Self, out property, PropertyContext))
         {
             value = Self.DefaultValue!;
             return value != null;

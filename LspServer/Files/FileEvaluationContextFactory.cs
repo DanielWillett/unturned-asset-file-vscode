@@ -55,6 +55,7 @@ internal class FileEvaluationContextFactory
             return false;
         }
 
+        // todo: needs to work with nested objects and legacy types
         SpecProperty? property = _specDatabase.FindPropertyInfo(
             parentNode.Key,
             fileType,
@@ -69,7 +70,8 @@ internal class FileEvaluationContextFactory
             sourceFile,
             _workspaceEnvironment,
             _installationEnvironment,
-            _specDatabase
+            _specDatabase,
+            PropertyResolutionContext.Modern
         );
 
         ctx = SpecPropertyTypeParseContext.FromFileEvaluationContext(evalCtx, property, parentNode, valueNode, diagnosticSink);
@@ -78,6 +80,7 @@ internal class FileEvaluationContextFactory
 
     public bool TryCreate(Position position, DocumentUri uri, out FileEvaluationContext ctx)
     {
+        // todo: needs to work with nested objects and legacy types
         if (!_fileTracker.Files.TryGetValue(uri, out OpenedFile? file))
         {
             Unsafe.SkipInit(out ctx);
@@ -105,7 +108,8 @@ internal class FileEvaluationContextFactory
             sourceFile,
             _workspaceEnvironment,
             _installationEnvironment,
-            _specDatabase
+            _specDatabase,
+            PropertyResolutionContext.Modern
         );
         return property != null;
     }

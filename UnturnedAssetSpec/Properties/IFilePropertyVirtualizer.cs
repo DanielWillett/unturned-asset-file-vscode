@@ -1,6 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
@@ -13,7 +12,7 @@ public interface IFilePropertyVirtualizer
     IEnumerable<IFileProperty> EnumerateProperties(ISourceFile file);
 
     IFileProperty? FindProperty(ISourceFile file, SpecProperty property);
-    IFileProperty? FindProperty(ISourceFile file, SpecProperty property, OneOrMore<int> keyIndices);
+    IFileProperty? FindProperty(ISourceFile file, SpecProperty property, PropertyBreadcrumbs propertyBreadcrumbs);
 }
 
 /// <summary>

@@ -118,7 +118,9 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
                 node.File,
                 workspace,
                 installEnvironment,
-                database
+                database,
+                // todo: should support legacy and nested types
+                PropertyResolutionContext.Modern
             );
 
             ISpecPropertyType? propType = property.Type.GetType(in ctx);

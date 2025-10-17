@@ -283,7 +283,7 @@ public readonly struct PropertyRefInfo
 
     internal static bool EvaluateIsIncluded(SpecProperty? property, bool valueIncluded, in FileEvaluationContext context)
     {
-        if (property != null && context.SourceFile.TryGetProperty(property, out IPropertySourceNode? prop2))
+        if (property != null && context.SourceFile.TryGetProperty(property, out IPropertySourceNode? prop2, context.PropertyContext))
         {
             if (!valueIncluded)
                 return true;
@@ -314,7 +314,7 @@ public readonly struct PropertyRefInfo
 
     internal static ValueTypeDataRefType EvaluateValueType(SpecProperty? property, in FileEvaluationContext context)
     {
-        if (property != null && context.SourceFile.TryResolveProperty(property, out IPropertySourceNode? node))
+        if (property != null && context.SourceFile.TryResolveProperty(property, out IPropertySourceNode? node, context.PropertyContext))
         {
             return node.ValueKind;
         }
@@ -349,7 +349,7 @@ public readonly struct PropertyRefInfo
             return CrossReference(in ctx, crossReferencePropertyInfo, crossReferenceProperty);
         }
 
-        if (!ctx.SourceFile.TryGetProperty(prop, out IPropertySourceNode? node))
+        if (!ctx.SourceFile.TryGetProperty(prop, out IPropertySourceNode? node, ctx.PropertyContext))
         {
             return prop.DefaultValue;
         }
@@ -376,7 +376,7 @@ public readonly struct PropertyRefInfo
             return null;
         }
 
-        FileEvaluationContext crossRefCtx = new FileEvaluationContext(in ctx, crossReferenceProperty);
+        FileEvaluationContext crossRefCtx = new FileEvaluationContext(in ctx, crossReferenceProperty, PropertyResolutionContext.Modern);
 
         ISpecDynamicValue? crossRef = crossReferencePropertyInfo.GetValue(in crossRefCtx, crossReferenceProperty, default, null);
         if (crossRef == null)
@@ -442,7 +442,7 @@ public readonly struct PropertyRefInfo
             return null;
         }
 
-        crossValueCtx = new FileEvaluationContext(in crossValueCtx, crossedProperty);
+        crossValueCtx = new FileEvaluationContext(in crossValueCtx, crossedProperty, PropertyResolutionContext.Modern);
 
         return crossValueInfo.GetValue(in crossValueCtx, crossedProperty, default, null);
     }
@@ -459,7 +459,7 @@ public readonly struct PropertyRefInfo
             return false;
         }
 
-        FileEvaluationContext crossRefCtx = new FileEvaluationContext(in ctx, crossReferenceProperty);
+        FileEvaluationContext crossRefCtx = new FileEvaluationContext(in ctx, crossReferenceProperty, PropertyResolutionContext.Modern);
 
         ISpecDynamicValue? crossRef = crossReferencePropertyInfo.GetValue(in crossRefCtx, crossReferenceProperty, default, null);
         if (crossRef == null)
@@ -525,7 +525,7 @@ public readonly struct PropertyRefInfo
             return false;
         }
 
-        crossValueCtx = new FileEvaluationContext(in crossValueCtx, crossedProperty);
+        crossValueCtx = new FileEvaluationContext(in crossValueCtx, crossedProperty, PropertyResolutionContext.Modern);
 
         return crossValueInfo.GetIsIncluded(valueIncluded, in crossValueCtx, crossedProperty, default, null);
     }

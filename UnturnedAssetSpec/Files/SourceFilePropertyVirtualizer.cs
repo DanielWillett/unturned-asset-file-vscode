@@ -5,8 +5,6 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -34,7 +32,8 @@ internal class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
             file,
             _workspaceEnvironment,
             _installationEnvironment,
-            _database
+            _database,
+            PropertyResolutionContext.Modern
         );
     }
 
@@ -45,10 +44,10 @@ internal class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
 
     public IFileProperty? FindProperty(ISourceFile file, SpecProperty property)
     {
-        return FindProperty(file, property, OneOrMore<int>.Null);
+        return FindProperty(file, property, PropertyBreadcrumbs.Root);
     }
 
-    public IFileProperty? FindProperty(ISourceFile file, SpecProperty property, OneOrMore<int> keyIndices)
+    public IFileProperty? FindProperty(ISourceFile file, SpecProperty property, PropertyBreadcrumbs breadcrumbs)
     {
         AssetFileType fileType = AssetFileType.FromFile(file, _database);
 
@@ -90,7 +89,8 @@ internal class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
                 assetType,
                 _workspaceEnvironment,
                 _installationEnvironment,
-                _database
+                _database,
+                PropertyResolutionContext.Modern
             );
         }
 
@@ -113,7 +113,7 @@ internal class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
             LinkedPropertyVisit visitor = default;
             visitor.List = new PooledList<IPropertySourceNode>();
             GetEvalCtx(out FileEvaluationContext evalCtx, property, file);
-            compType.VisitLinkedProperties(in evalCtx, property, assetData, ref visitor, keyIndices);
+            compType.VisitLinkedProperties(in evalCtx, property, assetData, ref visitor, breadcrumbs);
 
             IPropertySourceNode[] nodes = visitor.List.ToArray();
             visitor.List.Dispose();
@@ -125,53 +125,56 @@ internal class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
                 assetType,
                 _workspaceEnvironment,
                 _installationEnvironment,
-                _database
+                _database,
+                PropertyResolutionContext.Modern
             );
         }
 
         if (property.IsTemplate)
         {
-            Regex regex = new Regex(property.Key, RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.CultureInvariant);
-            foreach (ISourceNode node in assetData.Children)
-            {
-                if (node is not IPropertySourceNode prop || regex.Match(prop.Key) is not { Success: true } match)
-                    continue;
-
-                GroupCollection groups = match.Groups;
-                int groupIndex = 0;
-                bool wasMatch = true;
-                for (int i = 0; i < property.TemplateGroups.Length; ++i)
-                {
-                    wasMatch = false;
-                    // todo: UseValueOf support
-                    TemplateGroup tmpGroup = property.TemplateGroups[i];
-                    if (tmpGroup.Group >= groups.Count || tmpGroup.UseValueOf != null || groupIndex >= keyIndices.Length)
-                        break;
-
-                    int keyIndex = keyIndices[groupIndex];
-                    ++groupIndex;
-                    if (!int.TryParse(groups[tmpGroup.Group].Value, NumberStyles.Number, CultureInfo.InvariantCulture, out int groupValue))
-                        break;
-
-                    if (groupValue != keyIndex)
-                        break;
-
-                    wasMatch = true;
-                }
-
-                if (wasMatch)
-                {
-                    return new BasicProperty(
-                        property,
-                        prop,
-                        file,
-                        assetType,
-                        _workspaceEnvironment,
-                        _installationEnvironment,
-                        _database
-                    );
-                }
-            }
+            // property.Key
+            //Regex regex = new Regex(property.Key, RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.CultureInvariant);
+            //foreach (ISourceNode node in assetData.Children)
+            //{
+            //    if (node is not IPropertySourceNode prop || regex.Match(prop.Key) is not { Success: true } match)
+            //        continue;
+            //
+            //    GroupCollection groups = match.Groups;
+            //    int groupIndex = 0;
+            //    bool wasMatch = true;
+            //    for (int i = 0; i < property.TemplateGroups.Length; ++i)
+            //    {
+            //        wasMatch = false;
+            //        // todo: UseValueOf support
+            //        TemplateGroup tmpGroup = property.TemplateGroups[i];
+            //        if (tmpGroup.Group >= groups.Count || tmpGroup.UseValueOf != null || groupIndex >= keyIndices.Length)
+            //            break;
+            //
+            //        int keyIndex = keyIndices[groupIndex];
+            //        ++groupIndex;
+            //        if (!int.TryParse(groups[tmpGroup.Group].Value, NumberStyles.Number, CultureInfo.InvariantCulture, out int groupValue))
+            //            break;
+            //
+            //        if (groupValue != keyIndex)
+            //            break;
+            //
+            //        wasMatch = true;
+            //    }
+            //
+            //    if (wasMatch)
+            //    {
+            //        return new BasicProperty(
+            //            property,
+            //            prop,
+            //            file,
+            //            assetType,
+            //            _workspaceEnvironment,
+            //            _installationEnvironment,
+            //            _database,
+            //            PropertyResolutionContext.Modern
+            //        );
+            //    }
+            //}
         }
 
         return null;
@@ -193,12 +196,14 @@ internal abstract class BaseProperty(
     AssetSpecType type,
     IWorkspaceEnvironment workspaceEnvironment,
     InstallationEnvironment installationEnvironment,
-    IAssetSpecDatabase database)
+    IAssetSpecDatabase database,
+    PropertyResolutionContext context)
 {
     protected readonly IWorkspaceEnvironment WorkspaceEnvironment = workspaceEnvironment;
     protected readonly InstallationEnvironment InstallationEnvironment = installationEnvironment;
     protected readonly IAssetSpecDatabase Database = database;
     protected readonly ISourceFile File = file;
+    protected readonly PropertyResolutionContext Context = context;
 
     public SpecProperty Property { get; } = property;
 
@@ -212,7 +217,8 @@ internal abstract class BaseProperty(
             File,
             WorkspaceEnvironment,
             InstallationEnvironment,
-            Database
+            Database,
+            Context
         );
     }
 
@@ -235,8 +241,9 @@ internal class BasicProperty(
     AssetSpecType type,
     IWorkspaceEnvironment workspaceEnvironment,
     InstallationEnvironment installationEnvironment,
-    IAssetSpecDatabase database)
-    : BaseProperty(property, file, type, workspaceEnvironment, installationEnvironment, database), IFileProperty
+    IAssetSpecDatabase database,
+    PropertyResolutionContext context)
+    : BaseProperty(property, file, type, workspaceEnvironment, installationEnvironment, database, context), IFileProperty
 {
     public bool TryGetValue(out ISpecDynamicValue? value)
     {
@@ -259,8 +266,9 @@ internal class LegacyCompositeTypeProperty(
     AssetSpecType type,
     IWorkspaceEnvironment workspaceEnvironment,
     InstallationEnvironment installationEnvironment,
-    IAssetSpecDatabase database)
-    : BaseProperty(property, file, type, workspaceEnvironment, installationEnvironment, database), IFileProperty
+    IAssetSpecDatabase database,
+    PropertyResolutionContext context)
+    : BaseProperty(property, file, type, workspaceEnvironment, installationEnvironment, database, context), IFileProperty
 {
     public IPropertySourceNode[] Nodes { get; } = nodes;
 

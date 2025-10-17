@@ -1,6 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -23,6 +22,6 @@ public interface ILegacyCompositeTypeProvider : ISpecPropertyType
         SpecProperty property,
         IDictionarySourceNode propertyRoot,
         ref TVisitor propertyVisitor,
-        OneOrMore<int> templateGroupIndices
+        PropertyBreadcrumbs breadcrumbs
     ) where TVisitor : ISourceNodePropertyVisitor;
 }

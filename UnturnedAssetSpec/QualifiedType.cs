@@ -117,6 +117,15 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
         return ExtractTypeName(Type.AsSpan()).ToString();
     }
 
+    public string GetFullTypeName()
+    {
+        ExtractParts(Type, out ReadOnlySpan<char> fullTypeName, out _);
+        if (fullTypeName.IsEmpty || fullTypeName.Length == Type.Length)
+            return Type;
+
+        return fullTypeName.ToString();
+    }
+
     public static string NormalizeType(string type)
     {
         return new QualifiedType(type).Normalized.Type;
@@ -349,7 +358,7 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return (_isCaseInsensitive ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal).GetHashCode(Normalized.Type ?? string.Empty);
+        return StringComparer.OrdinalIgnoreCase.GetHashCode(Normalized.Type ?? string.Empty);
     }
 
     /// <inheritdoc />

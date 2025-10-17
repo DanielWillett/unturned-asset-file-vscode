@@ -28,7 +28,7 @@ public readonly struct AssetFileType : IEquatable<AssetFileType>
         Information = null;
     }
 
-    public static AssetFileType FromAsset(IAssetSpecDatabase spec)
+    public static AssetFileType AssetBaseType(IAssetSpecDatabase spec)
     {
         spec.Types.TryGetValue(QualifiedType.AssetBaseType, out AssetSpecType? info);
         return info != null ? new AssetFileType(info, null) : new AssetFileType(QualifiedType.AssetBaseType, null);

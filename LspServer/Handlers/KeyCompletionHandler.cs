@@ -116,13 +116,15 @@ internal class KeyCompletionHandler : ICompletionHandler
             });
         }
 
+        // todo: needs to work with nested objects and legacy types
         FileEvaluationContext ctx = new FileEvaluationContext(
             property,
             property.Owner,
             state.File.SourceFile,
             _workspace,
             _installationEnvironment,
-            _specDictionary
+            _specDictionary,
+            PropertyResolutionContext.Modern
         );
 
         ISpecPropertyType? type = property.Type.GetType(in ctx);
@@ -199,13 +201,15 @@ internal class KeyCompletionHandler : ICompletionHandler
 
         if (propNode != null && _specDictionary.FindPropertyInfo(propNode.Key, fileType, SpecPropertyContext.Property) is { } property && position.Character >= propNode.Range.End.Character)
         {
+            // todo: needs to work with nested objects and legacy types
             FileEvaluationContext ctx = new FileEvaluationContext(
                 property,
                 fileType.Information,
                 sourceFile,
                 _workspace,
                 _installationEnvironment,
-                _specDictionary
+                _specDictionary,
+                PropertyResolutionContext.Modern
             );
 
             ISpecPropertyType? type = property.Type.GetType(in ctx);

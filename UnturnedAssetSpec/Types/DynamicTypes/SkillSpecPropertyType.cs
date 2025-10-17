@@ -98,7 +98,7 @@ public sealed class SkillSpecPropertyType :
 
                 if (blueprintSkillType == null)
                 {
-                    _blueprintSkillType = blueprintSkillType = parse.Database.FindType(BlueprintSkill, AssetFileType.FromAsset(parse.Database));
+                    _blueprintSkillType = blueprintSkillType = parse.Database.FindType(BlueprintSkill, AssetFileType.AssetBaseType(parse.Database));
                     _cacheDb = parse.Database;
                 }
             }

@@ -68,7 +68,7 @@ public sealed class PropertyDataRef : IEquatable<ISpecDynamicValue>, IEquatable<
     public string? EvaluateKey(in FileEvaluationContext context)
     {
         SpecProperty? property = Property.ResolveProperty(in context);
-        return property != null && context.SourceFile.TryGetProperty(property, out IPropertySourceNode? kvp)
+        return property != null && context.SourceFile.TryGetProperty(property, out IPropertySourceNode? kvp, context.PropertyContext)
             ? kvp.Key
             : null;
     }

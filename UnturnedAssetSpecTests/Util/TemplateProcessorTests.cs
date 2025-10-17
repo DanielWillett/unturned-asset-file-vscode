@@ -42,8 +42,14 @@ public class TemplateProcessorTests
 
         OneOrMore<int> ind = Enumerable.Range(0, key.Count(x => x == '*')).ToArray();
 
-        Assert.That(Regex.IsMatch(tp.CreateKey(k2, ind), key.Replace("*", "(\\d+)")));
+        string createdKey = tp.CreateKey(k2, ind);
+        Assert.That(Regex.IsMatch(createdKey, key.Replace("*", "(\\d+)")));
         Assert.That(Regex.IsMatch(tp.CreateKey(k2, ind.ToArray().AsSpan()), key.Replace("*", "(\\d+)")));
+
+        Span<int> sp = stackalloc int[tp.TemplateCount];
+        Assert.That(tp.TryParseKeyValues(createdKey, sp), Is.True);
+
+        Assert.That(ind, Is.EqualTo(OneOrMoreExtensions.Create(sp)));
     }
 
     [Test]
@@ -62,8 +68,14 @@ public class TemplateProcessorTests
 
         OneOrMore<int> ind = [ 1, 2 ];
 
-        Assert.That(tp.CreateKey(k2, ind), Is.EqualTo(@"Test\With_1_*_\2_Others"));
+        string createdKey = tp.CreateKey(k2, ind);
+        Assert.That(createdKey, Is.EqualTo(@"Test\With_1_*_\2_Others"));
         Assert.That(tp.CreateKey(k2, ind.ToArray().AsSpan()), Is.EqualTo(@"Test\With_1_*_\2_Others"));
+
+        Span<int> sp = stackalloc int[tp.TemplateCount];
+        Assert.That(tp.TryParseKeyValues(createdKey, sp), Is.True);
+
+        Assert.That(ind, Is.EqualTo(OneOrMoreExtensions.Create(sp)));
     }
 
     [Test]
@@ -82,6 +94,10 @@ public class TemplateProcessorTests
 
         Assert.That(tp.CreateKey(k2, OneOrMore<int>.Null), Is.EqualTo(@"*"));
         Assert.That(tp.CreateKey(k2, ReadOnlySpan<int>.Empty), Is.EqualTo(@"*"));
+
+        Span<int> sp = stackalloc int[tp.TemplateCount];
+        Assert.That(tp.TryParseKeyValues(keyConverted, sp), Is.True);
+        Assert.That(sp.Length, Is.EqualTo(0));
     }
 
     [Test]
@@ -100,7 +116,13 @@ public class TemplateProcessorTests
 
         OneOrMore<int> indices = [ 1 ];
 
-        Assert.That(tp.CreateKey(k2, indices), Is.EqualTo(@"Test_1_Name\"));
+        string createdKey = tp.CreateKey(k2, indices);
+        Assert.That(createdKey, Is.EqualTo(@"Test_1_Name\"));
         Assert.That(tp.CreateKey(k2, indices.ToArray().AsSpan()), Is.EqualTo(@"Test_1_Name\"));
+
+        Span<int> sp = stackalloc int[tp.TemplateCount];
+        Assert.That(tp.TryParseKeyValues(createdKey, sp), Is.True);
+
+        Assert.That(indices, Is.EqualTo(OneOrMoreExtensions.Create(sp)));
     }
 }

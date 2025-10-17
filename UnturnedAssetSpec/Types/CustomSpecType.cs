@@ -150,7 +150,7 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
                 else
                 {
                     SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(
-                        new FileEvaluationContext(in parse.EvaluationContext, property),
+                        new FileEvaluationContext(in parse.EvaluationContext, property, PropertyResolutionContext.Legacy),
                         parse.Diagnostics)
                     {
                         Node = kvp.Value,
@@ -176,7 +176,7 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
                 }
 
                 SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(
-                    new FileEvaluationContext(in parse.EvaluationContext, property),
+                    new FileEvaluationContext(in parse.EvaluationContext, property, PropertyResolutionContext.Modern),
                     parse.Diagnostics)
                 {
                     Node = kvp.Value,

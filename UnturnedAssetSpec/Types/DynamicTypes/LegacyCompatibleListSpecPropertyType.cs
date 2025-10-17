@@ -157,7 +157,7 @@ public sealed class LegacyCompatibleListSpecPropertyType :
             return;
         }
 
-        AssetFileType fileType = AssetFileType.FromAsset(specDatabase);
+        AssetFileType fileType = AssetFileType.AssetBaseType(specDatabase);
 
         lock (this)
         {
