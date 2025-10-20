@@ -1,9 +1,9 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 using MediatR;
+using Newtonsoft.Json;
 using OmniSharp.Extensions.JsonRpc;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Protocol;
 
@@ -13,6 +13,6 @@ public interface IDiscoverAssetPropertiesHandler : IJsonRpcRequestHandler<Discov
 [Parallel, Method("unturnedDataFile/assetProperties", Direction.ClientToServer)]
 public class DiscoverAssetPropertiesParams : IRequest<Container<AssetProperty>>
 {
-    [JsonPropertyName("document")]
+    [JsonProperty("document")]
     public required DocumentUri Document { get; set; }
 }
