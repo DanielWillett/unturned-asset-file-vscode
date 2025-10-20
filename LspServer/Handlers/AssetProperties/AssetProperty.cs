@@ -8,7 +8,7 @@ public class AssetProperty
     [JsonProperty("key")]
     public required string Key { get; set; }
 
-    [JsonProperty("range"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonProperty("range")]
     public Range? Range { get; set; }
 
     [JsonProperty("value")]
