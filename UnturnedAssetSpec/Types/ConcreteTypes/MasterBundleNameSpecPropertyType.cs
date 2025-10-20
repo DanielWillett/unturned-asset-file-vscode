@@ -7,6 +7,8 @@ public sealed class MasterBundleNameSpecPropertyType : BasicSpecPropertyType<Mas
 {
     public static readonly MasterBundleNameSpecPropertyType Instance = new MasterBundleNameSpecPropertyType();
 
+    public override int GetHashCode() => 37;
+
     static MasterBundleNameSpecPropertyType() { }
     private MasterBundleNameSpecPropertyType() { }
 

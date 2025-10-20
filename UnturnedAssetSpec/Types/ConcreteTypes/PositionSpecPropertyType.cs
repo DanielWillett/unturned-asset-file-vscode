@@ -5,6 +5,8 @@ public sealed class PositionSpecPropertyType : Vector3SpecPropertyType
     public static PositionSpecPropertyType Instance = new PositionSpecPropertyType();
     static PositionSpecPropertyType() { }
 
+    public override int GetHashCode() => 40;
+
     /// <inheritdoc />
     public override string Type => "Position";
 
@@ -20,6 +22,8 @@ public sealed class PositionOrLegacySpecPropertyType : Vector3SpecPropertyType
     public static PositionOrLegacySpecPropertyType Instance = new PositionOrLegacySpecPropertyType();
     static PositionOrLegacySpecPropertyType() { }
 
+    public override int GetHashCode() => 41;
+
     /// <inheritdoc />
     public override string Type => "PositionOrLegacy";
 
@@ -34,6 +38,8 @@ public sealed class LegacyPositionSpecPropertyType : Vector3SpecPropertyType
 {
     public static LegacyPositionSpecPropertyType Instance = new LegacyPositionSpecPropertyType();
     static LegacyPositionSpecPropertyType() { }
+
+    public override int GetHashCode() => 42;
 
     /// <inheritdoc />
     public override string Type => "LegacyPosition";

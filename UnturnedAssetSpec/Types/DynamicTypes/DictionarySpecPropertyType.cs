@@ -12,7 +12,7 @@ public sealed class DictionarySpecPropertyType<TElementType> :
     BaseSpecPropertyType<EquatableArray<DictionaryPair<TElementType>>>,
     ISpecPropertyType<EquatableArray<DictionaryPair<TElementType>>>,
     IEquatable<DictionarySpecPropertyType<TElementType>?>,
-    IElementTypeSpecPropertyType
+    IDictionaryTypeSpecPropertyType
     where TElementType : IEquatable<TElementType>
 {
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -28,8 +28,14 @@ public sealed class DictionarySpecPropertyType<TElementType> :
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     public ISpecPropertyType<TElementType> InnerType { get; }
+    ISpecPropertyType IDictionaryTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
 
     string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
+
+    public override int GetHashCode()
+    {
+        return 68 ^ InnerType.GetHashCode();
+    }
 
     public DictionarySpecPropertyType(ISpecPropertyType<TElementType> innerType)
     {
@@ -137,7 +143,7 @@ public sealed class DictionarySpecPropertyType<TElementType> :
 }
 
 /// <summary>
-/// A key-value-pair used by <see cref="DictionarySpecPropertyType{TElementType}"/>.
+/// A case-insensitive key-value-pair used by <see cref="DictionarySpecPropertyType{TElementType}"/>.
 /// </summary>
 /// <typeparam name="TElementType">The value type.</typeparam>
 [DebuggerDisplay("{ToString(),nq}")]
@@ -183,9 +189,12 @@ public readonly struct DictionaryPair<TElementType> : IEquatable<DictionaryPair<
 internal sealed class UnresolvedDictionarySpecPropertyType :
     IEquatable<UnresolvedDictionarySpecPropertyType?>,
     ISecondPassSpecPropertyType,
+    IDictionaryTypeSpecPropertyType,
     IDisposable
 {
     public ISecondPassSpecPropertyType InnerType { get; }
+    ISpecPropertyType IDictionaryTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
+    string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
 
     public string DisplayName => "Dictionary";
     public string Type => "Dictionary";

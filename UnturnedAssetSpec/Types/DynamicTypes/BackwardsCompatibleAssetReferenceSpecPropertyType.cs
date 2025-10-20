@@ -40,6 +40,13 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
         return value.AsConcreteNullable<GuidOrId>()?.ToString();
     }
 
+    public override int GetHashCode()
+    {
+        // 59 - 62
+        return (59 + (CanParseDictionary ? 1 : 0) + (SupportsThis ? 1 : 0) * 2)
+               ^ HashCode.Combine(ElementType, OtherElementTypes);
+    }
+
     public BackwardsCompatibleAssetReferenceSpecPropertyType(QualifiedType elementType, bool canParseDictionary, OneOrMore<string> specialTypes)
     {
         CanParseDictionary = canParseDictionary;

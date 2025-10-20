@@ -52,6 +52,11 @@ public class IdSpecPropertyType :
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
     OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
 
+    public override int GetHashCode()
+    {
+        return 72 ^ HashCode.Combine(Category.Index, ElementType, OtherElementTypes);
+    }
+
     public IdSpecPropertyType(EnumSpecTypeValue category, OneOrMore<string> specialTypes)
         : this(
             category,

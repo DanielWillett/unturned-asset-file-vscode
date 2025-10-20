@@ -12,7 +12,7 @@ internal sealed class HideInheritedPropertyType : ISpecPropertyType, IEquatable<
     public bool Equals(HideInheritedPropertyType? other) => other != null;
     public bool Equals(ISpecPropertyType? other) => other is HideInheritedPropertyType;
     public override bool Equals(object? obj) => obj is HideInheritedPropertyType;
-    public override int GetHashCode() => 0;
+    public override int GetHashCode() => int.MaxValue - 1;
 
     public string DisplayName => "Hide Inherited";
     public string Type => string.Empty;

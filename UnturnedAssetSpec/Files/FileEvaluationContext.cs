@@ -19,6 +19,11 @@ public readonly struct FileEvaluationContext
     public readonly IAssetSpecDatabase Information;
     public readonly PropertyResolutionContext PropertyContext;
 
+    public FileEvaluationContext(SpecProperty self, ISourceFile file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information, PropertyResolutionContext propertyContext)
+        : this(self, self.Owner, file, workspace, environment, information, propertyContext)
+    {
+
+    }
     public FileEvaluationContext(SpecProperty self, ISpecType @this, ISourceFile file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information, PropertyResolutionContext propertyContext)
     {
         Self = self;

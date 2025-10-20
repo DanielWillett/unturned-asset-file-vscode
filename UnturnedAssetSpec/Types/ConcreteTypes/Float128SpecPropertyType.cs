@@ -9,6 +9,8 @@ public sealed class Float128SpecPropertyType : BasicSpecPropertyType<Float128Spe
 {
     public static readonly Float128SpecPropertyType Instance = new Float128SpecPropertyType();
 
+    public override int GetHashCode() => 24;
+
     static Float128SpecPropertyType() { }
     private Float128SpecPropertyType() { }
 

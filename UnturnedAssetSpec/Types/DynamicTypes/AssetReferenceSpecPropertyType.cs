@@ -53,6 +53,13 @@ public sealed class AssetReferenceSpecPropertyType :
         return false;
     }
 
+    public override int GetHashCode()
+    {
+        // 55 - 58
+        return (55 + (CanParseDictionary ? 1 : 0) + (SupportsThis ? 1 : 0) * 2)
+               ^ HashCode.Combine(ElementType, OtherElementTypes);
+    }
+
     public AssetReferenceSpecPropertyType(QualifiedType elementType, bool canParseDictionary, OneOrMore<string> specialTypes)
     {
         CanParseDictionary = canParseDictionary;

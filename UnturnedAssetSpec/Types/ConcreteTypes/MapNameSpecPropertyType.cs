@@ -7,6 +7,8 @@ public sealed class MapNameSpecPropertyType : BasicSpecPropertyType<MapNameSpecP
 {
     public static readonly MapNameSpecPropertyType Instance = new MapNameSpecPropertyType();
 
+    public override int GetHashCode() => 36;
+
     static MapNameSpecPropertyType() { }
     private MapNameSpecPropertyType() { }
 

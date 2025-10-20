@@ -187,6 +187,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &quot;This&quot; keyword can be used to reference the current asset instead of using an ID or GUID..
+        /// </summary>
+        internal static string UNT101_CodeFix_Annotation_Desc {
+            get {
+                return ResourceManager.GetString("UNT101_CodeFix_Annotation_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use &quot;This&quot; Keyword.
+        /// </summary>
+        internal static string UNT101_CodeFix_Annotation_Label {
+            get {
+                return ResourceManager.GetString("UNT101_CodeFix_Annotation_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Paths should only use forward slashes to maintain compatibility with Unity and Unix-based operating systems..
         /// </summary>
         internal static string UNT1010 {

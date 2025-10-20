@@ -9,6 +9,8 @@ public sealed class ColorRGBSpecPropertyType : ColorSpecPropertyType
 {
     public static readonly ColorRGBSpecPropertyType Instance = new ColorRGBSpecPropertyType();
 
+    public override int GetHashCode() => 10;
+
     static ColorRGBSpecPropertyType() { }
 
     /// <inheritdoc />
@@ -27,6 +29,8 @@ public sealed class ColorRGBSpecPropertyType : ColorSpecPropertyType
 public sealed class ColorRGBASpecPropertyType : ColorSpecPropertyType
 {
     public static readonly ColorRGBASpecPropertyType Instance = new ColorRGBASpecPropertyType();
+
+    public override int GetHashCode() => 11;
 
     static ColorRGBASpecPropertyType() { }
 
@@ -47,6 +51,8 @@ public sealed class ColorRGBLegacySpecPropertyType : ColorSpecPropertyType
 {
     public static readonly ColorRGBLegacySpecPropertyType Instance = new ColorRGBLegacySpecPropertyType();
 
+    public override int GetHashCode() => 12;
+
     static ColorRGBLegacySpecPropertyType() { }
 
     /// <inheritdoc />
@@ -65,6 +71,8 @@ public sealed class ColorRGBLegacySpecPropertyType : ColorSpecPropertyType
 public sealed class ColorRGBALegacySpecPropertyType : ColorSpecPropertyType
 {
     public static readonly ColorRGBALegacySpecPropertyType Instance = new ColorRGBALegacySpecPropertyType();
+
+    public override int GetHashCode() => 13;
 
     static ColorRGBALegacySpecPropertyType() { }
 
@@ -85,6 +93,8 @@ public sealed class ColorRGBStrictHexSpecPropertyType : ColorStrictHexSpecProper
 {
     public static readonly ColorRGBStrictHexSpecPropertyType Instance = new ColorRGBStrictHexSpecPropertyType();
 
+    public override int GetHashCode() => 14;
+
     static ColorRGBStrictHexSpecPropertyType() { }
 
     /// <inheritdoc />
@@ -100,6 +110,8 @@ public sealed class ColorRGBStrictHexSpecPropertyType : ColorStrictHexSpecProper
 public sealed class ColorRGBAStrictHexSpecPropertyType : ColorStrictHexSpecPropertyType
 {
     public static readonly ColorRGBAStrictHexSpecPropertyType Instance = new ColorRGBAStrictHexSpecPropertyType();
+
+    public override int GetHashCode() => 15;
 
     static ColorRGBAStrictHexSpecPropertyType() { }
 

@@ -42,6 +42,17 @@ public interface IElementTypeSpecPropertyType : ISpecPropertyType
 {
     string? ElementType { get; }
 }
+
+public interface IListTypeSpecPropertyType : IElementTypeSpecPropertyType
+{
+    ISpecPropertyType? GetInnerType(IAssetSpecDatabase database);
+}
+
+public interface IDictionaryTypeSpecPropertyType : IElementTypeSpecPropertyType
+{
+    ISpecPropertyType? GetInnerType(IAssetSpecDatabase database);
+}
+
 public interface ISpecialTypesSpecPropertyType : ISpecPropertyType
 {
     OneOrMore<string?> SpecialTypes { get; }

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
-internal class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
+public class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
 {
     private readonly IAssetSpecDatabase _database;
     private readonly IWorkspaceEnvironment _workspaceEnvironment;
@@ -47,7 +47,7 @@ internal class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
         return FindProperty(file, property, PropertyBreadcrumbs.Root);
     }
 
-    public IFileProperty? FindProperty(ISourceFile file, SpecProperty property, PropertyBreadcrumbs breadcrumbs)
+    public IFileProperty? FindProperty(ISourceFile file, SpecProperty property, in PropertyBreadcrumbs breadcrumbs)
     {
         AssetFileType fileType = AssetFileType.FromFile(file, _database);
 
@@ -111,12 +111,18 @@ internal class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
         if (type is ILegacyCompositeTypeProvider { IsEnabled: true } compType)
         {
             LinkedPropertyVisit visitor = default;
-            visitor.List = new PooledList<IPropertySourceNode>();
+            IPropertySourceNode[] nodes;
             GetEvalCtx(out FileEvaluationContext evalCtx, property, file);
-            compType.VisitLinkedProperties(in evalCtx, property, assetData, ref visitor, breadcrumbs);
-
-            IPropertySourceNode[] nodes = visitor.List.ToArray();
-            visitor.List.Dispose();
+            visitor.List = new PooledList<IPropertySourceNode>();
+            try
+            {
+                compType.VisitLinkedProperties(in evalCtx, property, assetData, ref visitor, breadcrumbs);
+                nodes = visitor.List.ToArray();
+            }
+            finally
+            {
+                visitor.List.Dispose();
+            }
 
             return new LegacyCompositeTypeProperty(
                 property,
@@ -178,6 +184,48 @@ internal class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
         }
 
         return null;
+    }
+
+    /// <inheritdoc />
+    public SpecProperty? GetProperty(IPropertySourceNode propertyNode, out PropertyResolutionContext context)
+    {
+        AssetFileType fileType = AssetFileType.FromFile(propertyNode.File, _database);
+        PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromNode(propertyNode);
+        return GetProperty(propertyNode, in fileType, in bc, out context);
+    }
+
+    /// <inheritdoc />
+    public SpecProperty? GetProperty(IPropertySourceNode node, in AssetFileType fileType, in PropertyBreadcrumbs propertyBreadcrumbs, out PropertyResolutionContext context)
+    {
+        context = PropertyResolutionContext.Modern;
+
+        if (node.File is IAssetSourceFile
+            && ReferenceEquals(node.File, node.Parent)
+            && (string.Equals(node.Key, "Metadata", StringComparison.OrdinalIgnoreCase) || string.Equals(node.Key, "Asset", StringComparison.OrdinalIgnoreCase)))
+        {
+            // Skip "Asset" and "Metadata" properties
+            return null;
+        }
+
+        string propertyName = node.Key;
+        if (!propertyBreadcrumbs.TryGetDictionaryAndType(
+                node.File,
+                in fileType,
+                _database,
+                out _,
+                out ISpecType? type))
+        {
+            return null;
+        }
+
+        AssetSpecDatabaseExtensions.PropertyFindResult result = _database.FindPropertyInfoByKey(
+            propertyName,
+            type,
+            PropertyResolutionContext.Modern,
+            context: node.File is ILocalizationSourceFile ? SpecPropertyContext.Localization : SpecPropertyContext.Property
+        );
+
+        return result.Property;
     }
 
     private struct LinkedPropertyVisit : ISourceNodePropertyVisitor

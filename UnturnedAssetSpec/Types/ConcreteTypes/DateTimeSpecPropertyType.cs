@@ -9,6 +9,8 @@ public sealed class DateTimeSpecPropertyType : BasicSpecPropertyType<DateTimeSpe
 {
     public static readonly DateTimeSpecPropertyType Instance = new DateTimeSpecPropertyType();
 
+    public override int GetHashCode() => 17;
+
     static DateTimeSpecPropertyType() { }
     private DateTimeSpecPropertyType() { }
 

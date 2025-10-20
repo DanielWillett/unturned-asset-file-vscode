@@ -8,6 +8,8 @@ public sealed class CharacterSpecPropertyType : BasicSpecPropertyType<CharacterS
 {
     public static readonly CharacterSpecPropertyType Instance = new CharacterSpecPropertyType();
 
+    public override int GetHashCode() => 8;
+
     static CharacterSpecPropertyType() { }
     private CharacterSpecPropertyType() { }
 

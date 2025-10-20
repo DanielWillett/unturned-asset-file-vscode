@@ -13,6 +13,8 @@ public sealed class CaliberIdSpecPropertyType : BasicSpecPropertyType<CaliberIdS
 {
     public static readonly CaliberIdSpecPropertyType Instance = new CaliberIdSpecPropertyType();
 
+    public override int GetHashCode() => 7;
+
     static CaliberIdSpecPropertyType() { }
     private CaliberIdSpecPropertyType() { }
 

@@ -1,9 +1,8 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using Microsoft.Extensions.Logging;
-using OmniSharp.Extensions.LanguageServer.Protocol;
-using System.Text;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using Microsoft.Extensions.Logging;
+using OmniSharp.Extensions.LanguageServer.Protocol;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Files;
 
@@ -33,7 +32,7 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment
 
         try
         {
-            return new OpenedFile(uri, File.ReadAllText(datFile.FilePath, Encoding.UTF8), _logger, _database);
+            return StaticSourceFile.FromAssetFile(datFile.FilePath, _database, SourceNodeTokenizerOptions.Lazy);
         }
         catch (Exception ex)
         {
@@ -49,6 +48,9 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment
 
         /// <inheritdoc />
         public ISourceFile SourceFile => file.SourceFile;
+
+        /// <inheritdoc />
+        public string GetFullText() => file.GetFullText();
 
         /// <inheritdoc />
         public void Dispose() { }

@@ -7,6 +7,7 @@
 
 #endif
 
+using System.Collections.Immutable;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,6 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 #if DEBUG
 using System.ComponentModel;
@@ -31,7 +31,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 /// Incrementally tracked text file.
 /// </summary>
 [DebuggerDisplay("{Uri} - {LineCount, nq} L, {_contentSegment.Count,nq} C")]
-public class OpenedFile : IWorkspaceFile
+public class OpenedFile : IMutableWorkspaceFile
 {
     private const SourceNodeTokenizerOptions ReadFileOptions = SourceNodeTokenizerOptions.Lazy | SourceNodeTokenizerOptions.Metadata;
 
@@ -50,6 +50,8 @@ public class OpenedFile : IWorkspaceFile
     internal object EditLock = new object();
     internal object UpdateLock = new object();
 
+    object IMutableWorkspaceFile.SyncRoot => EditLock;
+
     private bool _hasChanged;
     private FileRange _changeRange;
     private FileRange _fullRangeBeforeChange;
@@ -59,6 +61,16 @@ public class OpenedFile : IWorkspaceFile
     private int _lineCount;
 
     private ArraySegment<char> _contentSegment;
+
+    /// <summary>
+    /// The version this file is on, if supported.
+    /// </summary>
+    public int? Version { get; internal set; }
+
+    /// <summary>
+    /// Allows code to listen for updates from <see cref="UpdateText"/>.
+    /// </summary>
+    public IFileUpdateListener? UpdateListener { get; internal set; }
 
     public bool IsFaulted { get; private set; }
 #if KEEP_VIRTUAL_FILE_SYSTEM
@@ -79,12 +91,10 @@ public class OpenedFile : IWorkspaceFile
         }
     }
 
-    public delegate void SpanAction<TState>(ReadOnlySpan<char> span, ref TState state);
-
     /// <summary>
     /// Performs an operation on the full text of the file.
     /// </summary>
-    public void OperateOnFullSpan(Action<ReadOnlySpan<char>> action)
+    public void OperateOnFullSpan(SpanAction action)
     {
         action?.Invoke(_contentSegment.AsSpan());
     }
@@ -98,9 +108,9 @@ public class OpenedFile : IWorkspaceFile
     }
 
     /// <summary>
-    /// Performs an operation on the full text of the file.
+    /// Performs an operation on each line of the file.
     /// </summary>
-    public void ForEachLine(Action<ReadOnlySpan<char>> lineAction)
+    public void ForEachLine(SpanAction lineAction)
     {
         if (lineAction == null)
             return;
@@ -186,6 +196,7 @@ public class OpenedFile : IWorkspaceFile
     public string File { get; }
 
 #pragma warning disable CS8618, CS9264
+    // ReSharper disable once UnusedParameter.Local
     public OpenedFile(DocumentUri uri, ReadOnlySpan<char> text, ILogger logger, IAssetSpecDatabase database, bool obsessivelyValidate = false, bool useVirtualFiles = false)
     {
         _logger = logger;
@@ -264,6 +275,8 @@ public class OpenedFile : IWorkspaceFile
         {
             AssertFileHasValidIndex();
         }
+        // ReSharper disable once RedundantCatchClause
+#pragma warning disable CS0168
         catch (Exception ex)
         {
 #if KEEP_VIRTUAL_FILE_SYSTEM
@@ -275,6 +288,7 @@ public class OpenedFile : IWorkspaceFile
         AssertFileHasValidIndex();
 #endif
     }
+#pragma warning restore CS0168
 
 
     /// <summary>
@@ -300,13 +314,14 @@ public class OpenedFile : IWorkspaceFile
         }
     }
 
-    private bool SetFullTextIntl(ReadOnlySpan<char> text)
+    private bool SetFullTextIntl(ReadOnlySpan<char> text, string? annotationId = null)
     {
         if (text.SequenceEqual(_contentSegment.AsSpan()))
         {
             return false;
         }
 
+        UpdateListener?.RecordFullReplace(text, annotationId);
         char[] content = new char[text.Length + 16];
         text.CopyTo(content);
 
@@ -324,7 +339,54 @@ public class OpenedFile : IWorkspaceFile
     }
 
     /// <summary>
-    /// Apply incremental updates to this document.
+    /// Clamps a range so that it falls within the document.
+    /// </summary>
+    internal FileRange ClampRange(FileRange range)
+    {
+        FilePosition pos1 = range.Start;
+        FilePosition pos2 = range.End;
+
+        int lineNum1 = pos1.Line - 1;
+        if (lineNum1 >= _lineCount)
+        {
+            // start pos is on bad line then nothing can be
+            pos1.Line = _lineCount;
+            pos2.Line = _lineCount;
+            pos1.Character = _lines[_lineCount - 1].Length;
+            pos2.Character = pos1.Character;
+            return new FileRange(pos1, pos2);
+        }
+
+        int lineNum2 = pos2.Line - 1;
+        if (lineNum2 >= _lineCount)
+        {
+            pos2.Line = _lineCount;
+            pos2.Character = _lines[_lineCount - 1].Length;
+        }
+        else if (pos2.Character > _lines[lineNum2].Length)
+        {
+            pos2.Character = _lines[lineNum2].Length;
+        }
+        else
+        {
+            if (pos1.Character > _lines[lineNum1].Length)
+                pos1.Character = _lines[lineNum1].Length;
+            else
+                return range;
+        }
+
+        if (pos1.Character > _lines[lineNum1].Length)
+            pos1.Character = _lines[lineNum1].Length;
+
+        return new FileRange(pos1, pos2);
+    }
+
+    private OpenedFileUpdater? _updater;
+
+    void IMutableWorkspaceFile.UpdateText<TState>(TState state, Action<IMutableWorkspaceFileUpdater, TState> fileUpdate) => UpdateText(state, fileUpdate);
+
+    /// <summary>
+    /// Apply incremental updates to this document, passing a state parameter.
     /// </summary>
     public void UpdateText<TState>(TState state, Action<OpenedFileUpdater, TState> fileUpdate)
     {
@@ -336,8 +398,9 @@ public class OpenedFile : IWorkspaceFile
             lock (EditLock)
             {
                 _hasChanged = false;
-                OpenedFileUpdater file = new OpenedFileUpdater(this);
-                fileUpdate(file, state);
+                _updater ??= new OpenedFileUpdater(this);
+                _updater.Reset();
+                fileUpdate(_updater, state);
                 broadcast = _hasChanged;
                 range = _changeRange;
                 InvalidateText();
@@ -347,6 +410,8 @@ public class OpenedFile : IWorkspaceFile
                 BroadcastUpdate(range);
         }
     }
+
+    void IMutableWorkspaceFile.UpdateText(Action<IMutableWorkspaceFileUpdater> fileUpdate) => UpdateText(fileUpdate);
 
     /// <summary>
     /// Apply incremental updates to this document.
@@ -361,8 +426,9 @@ public class OpenedFile : IWorkspaceFile
             lock (EditLock)
             {
                 _hasChanged = false;
-                OpenedFileUpdater file = new OpenedFileUpdater(this);
-                fileUpdate(file);
+                _updater ??= new OpenedFileUpdater(this);
+                _updater.Reset();
+                fileUpdate(_updater);
                 broadcast = _hasChanged;
                 range = _changeRange;
                 InvalidateText();
@@ -643,13 +709,21 @@ public class OpenedFile : IWorkspaceFile
             ++lineIndex;
         }
 
-        if (lastLine != size - 1 || lastLine == 0)
+        if (lastLine != size || lastLine == 0)
         {
             bool hasReset = size > 1 && _content[size - 1] == '\r';
             ref LineInfo line = ref lineArray[lineIndex];
             line.StartIndex = lastLine;
             line.Length = size - lastLine;
             line.ContentLength = line.Length - (hasReset ? 1 : 0);
+        }
+        else
+        {
+            // empty last line
+            ref LineInfo line = ref lineArray[lineIndex];
+            line.StartIndex = size;
+            line.Length = 0;
+            line.ContentLength = 0;
         }
 
         _lineCount = lineIndex + 1;
@@ -721,43 +795,58 @@ public class OpenedFile : IWorkspaceFile
         {
             Length += l;
             ContentLength += l;
+#if DEBUG
+            if (Length < 0 || ContentLength < 0)
+                throw new InvalidOperationException("Somehow reached negative length.");
+#endif
         }
 
     }
 
-    public readonly struct OpenedFileUpdater
+    public class OpenedFileUpdater(OpenedFile file) : IMutableWorkspaceFileUpdater
     {
-        private readonly OpenedFile _file;
+        private readonly OpenedFile _file = file;
 
         [ExcludeFromCodeCoverage]
         public OpenedFile File => _file;
 
-        public OpenedFileUpdater(OpenedFile file)
+        internal void Reset()
         {
-            _file = file;
-            _file._fullRangeBeforeChange = file.FullRange;
+            _file._fullRangeBeforeChange = _file.FullRange;
         }
+
+        void IMutableWorkspaceFileUpdater.InsertText(FilePosition position, ReadOnlySpan<char> text, string? annotationId) => InsertText(position, text, annotationId);
 
         /// <summary>
         /// Inserts text at a specific position in the document.
         /// </summary>
-        public OpenedFileUpdater InsertText(FilePosition position, ReadOnlySpan<char> text)
+        public OpenedFileUpdater InsertText(FilePosition position, ReadOnlySpan<char> text, string? annotationId = null)
         {
 #if KEEP_VIRTUAL_FILE_SYSTEM
             _file.WriteEdit($"file.InsertText(({position.Line}, {position.Character}), \"{Escape(text)}\");");
 #endif
+            _file.UpdateListener?.RecordInsert(position, text, annotationId);
             int charIndex = _file.GetIndexIntl(position, clamp: true);
             return InsertTextIntl(charIndex, text);
         }
 
+        void IMutableWorkspaceFileUpdater.InsertText(int charIndex, ReadOnlySpan<char> text, string? annotationId) => InsertText(charIndex, text, annotationId);
+
         /// <summary>
         /// Inserts text at after specific character in the document.
         /// </summary>
-        public OpenedFileUpdater InsertText(int charIndex, ReadOnlySpan<char> text)
+        public OpenedFileUpdater InsertText(int charIndex, ReadOnlySpan<char> text, string? annotationId = null)
         {
 #if KEEP_VIRTUAL_FILE_SYSTEM
             _file.WriteEdit($"file.InsertText({charIndex}, \"{Escape(text)}\");");
 #endif
+            IFileUpdateListener? ul = _file.UpdateListener;
+            if (ul != null)
+            {
+                FilePosition position = _file.GetPositionIntl(charIndex, clampCharacter: true, clampLine: true);
+                ul.RecordInsert(position, text, annotationId);
+            }
+
             return InsertTextIntl(charIndex, text);
         }
 
@@ -793,10 +882,12 @@ public class OpenedFile : IWorkspaceFile
             return this;
         }
 
+        void IMutableWorkspaceFileUpdater.RemoveText(FileRange range, string? annotationId) => RemoveText(range, annotationId);
+
         /// <summary>
         /// Removes text between two positions in the document.
         /// </summary>
-        public OpenedFileUpdater RemoveText(FileRange range)
+        public OpenedFileUpdater RemoveText(FileRange range, string? annotationId = null)
         {
 #if KEEP_VIRTUAL_FILE_SYSTEM
             _file.WriteEdit($"file.RemoveText((({range.Start.Line}, {range.Start.Character}), ({range.End.Line}, {range.End.Character})));");
@@ -804,19 +895,30 @@ public class OpenedFile : IWorkspaceFile
             if (range.Start == range.End)
                 return this;
 
+            _file.UpdateListener?.RecordRemove(range, annotationId);
             int startIndex = _file.GetIndexIntl(range.Start, true);
             int endIndex = _file.GetIndexIntl(range.End, true);
             return RemoveTextIntl(startIndex, endIndex);
         }
 
+        void IMutableWorkspaceFileUpdater.RemoveText(int startIndex, int endIndex, string? annotationId) => RemoveText(startIndex, endIndex, annotationId);
+
         /// <summary>
         /// Removes text between and including two specific characters in the document.
         /// </summary>
-        public OpenedFileUpdater RemoveText(int startIndex, int endIndex)
+        public OpenedFileUpdater RemoveText(int startIndex, int endIndex, string? annotationId = null)
         {
 #if KEEP_VIRTUAL_FILE_SYSTEM
             _file.WriteEdit($"file.RemoveText({startIndex}, {endIndex});");
 #endif
+            IFileUpdateListener? ul = _file.UpdateListener;
+            if (ul != null)
+            {
+                FilePosition start = _file.GetPositionIntl(startIndex, clampCharacter: true, clampLine: true);
+                FilePosition end = _file.GetPositionIntl(endIndex, clampCharacter: true, clampLine: true);
+                ul.RecordRemove(new FileRange(start, end), annotationId);
+            }
+
             return RemoveTextIntl(startIndex, endIndex);
         }
 
@@ -845,10 +947,12 @@ public class OpenedFile : IWorkspaceFile
             return this;
         }
 
+        void IMutableWorkspaceFileUpdater.ReplaceText(FileRange range, ReadOnlySpan<char> text, string? annotationId) => ReplaceText(range, text, annotationId);
+
         /// <summary>
-        /// Removes text between two positions in the document.
+        /// Replaces text between two positions in the document.
         /// </summary>
-        public OpenedFileUpdater ReplaceText(FileRange range, ReadOnlySpan<char> text)
+        public OpenedFileUpdater ReplaceText(FileRange range, ReadOnlySpan<char> text, string? annotationId = null)
         {
 #if KEEP_VIRTUAL_FILE_SYSTEM
             _file.WriteEdit($"file.ReplaceText((({range.Start.Line}, {range.Start.Character}), ({range.End.Line}, {range.End.Character})), \"{Escape(text)}\");");
@@ -856,21 +960,32 @@ public class OpenedFile : IWorkspaceFile
             int startIndex = _file.GetIndexIntl(range.Start, true);
             if (range.Start == range.End)
             {
+                _file.UpdateListener?.RecordInsert(range.Start, text, annotationId);
                 return InsertTextIntl(startIndex, text);
             }
 
+            _file.UpdateListener?.RecordReplace(range, text, annotationId);
             int endIndex = _file.GetIndexIntl(range.End, true);
             return ReplaceTextIntl(startIndex, endIndex, text);
         }
 
+        void IMutableWorkspaceFileUpdater.ReplaceText(int startIndex, int endIndex, ReadOnlySpan<char> text, string? annotationId) => ReplaceText(startIndex, endIndex, text, annotationId);
+
         /// <summary>
-        /// Removes text between two specific characters in the document.
+        /// Replaces text between two specific characters in the document.
         /// </summary>
-        public OpenedFileUpdater ReplaceText(int startIndex, int endIndex, ReadOnlySpan<char> text)
+        public OpenedFileUpdater ReplaceText(int startIndex, int endIndex, ReadOnlySpan<char> text, string? annotationId = null)
         {
 #if KEEP_VIRTUAL_FILE_SYSTEM
             _file.WriteEdit($"file.RemoveText({startIndex}, {endIndex}, \"{Escape(text)}\");");
 #endif
+            IFileUpdateListener? ul = _file.UpdateListener;
+            if (ul != null)
+            {
+                FilePosition start = _file.GetPositionIntl(startIndex, clampCharacter: true, clampLine: true);
+                FilePosition end = _file.GetPositionIntl(endIndex, clampCharacter: true, clampLine: true);
+                ul.RecordReplace(new FileRange(start, end), text, annotationId);
+            }
             return ReplaceTextIntl(startIndex, endIndex, text);
         }
 
@@ -938,11 +1053,18 @@ public class OpenedFile : IWorkspaceFile
             _file._contentSegment = new ArraySegment<char>(newCharacterArray, 0, oldSize);
         }
 
-        public OpenedFileUpdater SetFullText(ReadOnlySpan<char> text)
+        void IMutableWorkspaceFileUpdater.SetFullText(ReadOnlySpan<char> text, string? annotationId) => SetFullText(text, annotationId);
+
+        public OpenedFileUpdater SetFullText(ReadOnlySpan<char> text, string? annotationId = null)
         {
             _file._changeRange = _file._fullRangeBeforeChange;
             _file.SetFullTextIntl(text);
             return this;
+        }
+
+        void IMutableWorkspaceFileUpdater.AddAnnotation(string annotationId, string label, string? description, bool? needsConfirmation)
+        {
+            _file.UpdateListener?.RecordNewAnnotation(annotationId, label, description, needsConfirmation);
         }
 
         private void IndexTextRemoval(int index, ReadOnlySpan<char> text)

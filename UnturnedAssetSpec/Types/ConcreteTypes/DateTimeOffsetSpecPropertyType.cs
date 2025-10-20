@@ -9,6 +9,8 @@ public sealed class DateTimeOffsetSpecPropertyType : BasicSpecPropertyType<DateT
 {
     public static readonly DateTimeOffsetSpecPropertyType Instance = new DateTimeOffsetSpecPropertyType();
 
+    public override int GetHashCode() => 16;
+
     static DateTimeOffsetSpecPropertyType() { }
     private DateTimeOffsetSpecPropertyType() { }
 

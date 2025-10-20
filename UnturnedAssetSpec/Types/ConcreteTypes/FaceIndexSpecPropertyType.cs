@@ -9,6 +9,8 @@ public sealed class FaceIndexSpecPropertyType : BasicSpecPropertyType<FaceIndexS
 {
     public static readonly FaceIndexSpecPropertyType Instance = new FaceIndexSpecPropertyType();
 
+    public override int GetHashCode() => 21;
+
     static FaceIndexSpecPropertyType() { }
     private FaceIndexSpecPropertyType() { }
 

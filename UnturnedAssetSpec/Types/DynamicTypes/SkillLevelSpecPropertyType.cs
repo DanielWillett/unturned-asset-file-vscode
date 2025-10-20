@@ -24,6 +24,11 @@ public sealed class SkillLevelSpecPropertyType :
 
     protected override ISpecDynamicValue CreateValue(byte value) => new SpecDynamicConcreteConvertibleValue<byte>(value, this);
 
+    public override int GetHashCode()
+    {
+        return 77 ^ (SkillsetOrProperty?.GetHashCode() ?? 0);
+    }
+
     public SkillLevelSpecPropertyType(string skillsetOrProperty)
     {
         SkillsetOrProperty = skillsetOrProperty;

@@ -8,6 +8,8 @@ public sealed class ActionKeySpecPropertyType : BasicSpecPropertyType<ActionKeyS
 {
     public static readonly ActionKeySpecPropertyType Instance = new ActionKeySpecPropertyType();
 
+    public override int GetHashCode() => 1;
+
     static ActionKeySpecPropertyType() { }
     private ActionKeySpecPropertyType() { }
 

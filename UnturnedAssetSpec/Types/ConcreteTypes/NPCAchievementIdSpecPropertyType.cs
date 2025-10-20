@@ -8,7 +8,11 @@ public sealed class NPCAchievementIdSpecPropertyType :
     BasicSpecPropertyType<NPCAchievementIdSpecPropertyType, string>
 {
     public static readonly NPCAchievementIdSpecPropertyType Instance = new NPCAchievementIdSpecPropertyType();
+
+    public override int GetHashCode() => 39;
+
     static NPCAchievementIdSpecPropertyType() { }
+    private NPCAchievementIdSpecPropertyType() { }
 
     /// <inheritdoc />
     public override string Type => "NPCAchievementId";

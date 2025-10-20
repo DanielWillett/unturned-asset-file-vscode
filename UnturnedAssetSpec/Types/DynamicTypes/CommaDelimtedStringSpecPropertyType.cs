@@ -31,6 +31,13 @@ public sealed class CommaDelimitedStringSpecPropertyType :
 
     string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
 
+    public override int GetHashCode()
+    {
+        // note: using string because InnerType could change in Transform()
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        return 66 ^ (InnerType.Type?.GetHashCode() ?? 0);
+    }
+
     public CommaDelimitedStringSpecPropertyType(ISpecPropertyType innerType)
     {
         InnerType = innerType;

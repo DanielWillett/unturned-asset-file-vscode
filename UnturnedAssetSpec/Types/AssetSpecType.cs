@@ -72,6 +72,37 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
 
     AssetSpecType ISpecType.Owner { get => this; set => throw new NotSupportedException(); }
 
+    /// <summary>
+    /// Temporarily add a property for unit test purposes.
+    /// </summary>
+    internal IDisposable AddRootPropertyForTest(SpecPropertyContext context, SpecProperty property)
+    {
+        SpecProperty[] props = this.GetProperties(context);
+
+        SpecProperty[] newArray = new SpecProperty[props.Length + 1];
+        newArray[^1] = property;
+        Array.Copy(props, 0, newArray, 0, props.Length);
+        this.SetProperties(newArray, context);
+        return new AddedTestProperty(this, property, context);
+    }
+
+    private class AddedTestProperty(AssetSpecType type, SpecProperty property, SpecPropertyContext context) : IDisposable
+    {
+        public void Dispose()
+        {
+            SpecProperty[] props = type.GetProperties(context);
+
+            int index = Array.IndexOf(props, property);
+            if (index < 0)
+                return;
+
+            SpecProperty[] newArray = new SpecProperty[props.Length - 1];
+            Array.Copy(props, 0, newArray, 0, index);
+            Array.Copy(props, index + 1, newArray, index, props.Length - (index + 1));
+            type.SetProperties(newArray, context);
+        }
+    }
+
     public bool Equals(AssetSpecType? other)
     {
         if (other == null)

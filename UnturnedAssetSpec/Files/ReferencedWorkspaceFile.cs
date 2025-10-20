@@ -1,12 +1,14 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 using System.IO;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 internal class ReferencedWorkspaceFile : IWorkspaceFile
 {
+    private readonly string _fullText;
+
     public IAssetSpecDatabase Database { get; }
 
     /// <inheritdoc />
@@ -15,11 +17,18 @@ internal class ReferencedWorkspaceFile : IWorkspaceFile
     /// <inheritdoc />
     public ISourceFile SourceFile { get; }
 
-    public ReferencedWorkspaceFile(string file, IAssetSpecDatabase database, object? state, Func<ReferencedWorkspaceFile, object?, ISourceFile> factory)
+    /// <inheritdoc />
+    public string GetFullText()
+    {
+        return _fullText;
+    }
+
+    public ReferencedWorkspaceFile(string file, IAssetSpecDatabase database, object? state, string text, Func<ReferencedWorkspaceFile, object?, string, ISourceFile> factory)
     {
         Database = database;
         File = Path.GetFullPath(file);
-        SourceFile = factory(this, state);
+        SourceFile = factory(this, state, text);
+        _fullText = text;
     }
 
     /// <inheritdoc />

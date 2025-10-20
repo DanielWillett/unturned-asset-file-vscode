@@ -31,6 +31,11 @@ public sealed class TypeReferenceSpecPropertyType :
 
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
 
+    public override int GetHashCode()
+    {
+        return 83 ^ ElementType.GetHashCode();
+    }
+
     public TypeReferenceSpecPropertyType(QualifiedType elementType)
     {
         bool isObjectBase = elementType.Type == null

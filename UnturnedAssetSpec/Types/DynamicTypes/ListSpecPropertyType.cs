@@ -11,7 +11,7 @@ public sealed class ListSpecPropertyType<TElementType> :
     BaseSpecPropertyType<EquatableArray<TElementType>>,
     ISpecPropertyType<EquatableArray<TElementType>>,
     IEquatable<ListSpecPropertyType<TElementType>?>,
-    IElementTypeSpecPropertyType
+    IListTypeSpecPropertyType
     where TElementType : IEquatable<TElementType>
 {
 
@@ -30,8 +30,15 @@ public sealed class ListSpecPropertyType<TElementType> :
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     public ISpecPropertyType<TElementType> InnerType { get; }
+    ISpecPropertyType IListTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
 
     string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
+
+    public override int GetHashCode()
+    {
+        // 74 - 75
+        return (74 + (AllowSingle ? 1 : 0)) ^ InnerType.GetHashCode();
+    }
 
     public ListSpecPropertyType(ISpecPropertyType<TElementType> innerType, bool allowSingle)
     {
@@ -134,9 +141,12 @@ public sealed class ListSpecPropertyType<TElementType> :
 internal sealed class UnresolvedListSpecPropertyType :
     IEquatable<UnresolvedListSpecPropertyType?>,
     ISecondPassSpecPropertyType,
+    IListTypeSpecPropertyType,
     IDisposable
 {
     public ISecondPassSpecPropertyType InnerType { get; }
+    ISpecPropertyType IListTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
+    string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
 
     public bool AllowSingle { get; }
     public string DisplayName => "List";

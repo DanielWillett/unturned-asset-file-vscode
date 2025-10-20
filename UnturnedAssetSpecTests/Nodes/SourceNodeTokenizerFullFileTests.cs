@@ -90,7 +90,7 @@ Key "Value" // inline comment
 
         FixLineEnds(unix, ref file, out int endlLen);
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(file, options);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(file, options);
 
         ISourceFile sourceFile = tok.ReadRootDictionary(SourceNodeTokenizer.RootInfo.Asset(new TestWorkspaceFile(), _database));
 
@@ -435,5 +435,8 @@ Key "Value" // inline comment
 
         /// <inheritdoc />
         public ISourceFile SourceFile => null;
+
+        /// <inheritdoc />
+        public string GetFullText() => null;
     }
 }

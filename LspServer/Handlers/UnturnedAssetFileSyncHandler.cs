@@ -89,10 +89,16 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
     {
         //_logger.LogInformation("Received didOpenTextDocument: {0}", request.TextDocument.Uri);
         OpenedFile file = _fileTracker.Files.AddOrUpdate(request.TextDocument.Uri,
-            u => _fileTracker.CreateFile(u, request.TextDocument.Text),
+            u =>
+            {
+                OpenedFile file = _fileTracker.CreateFile(u, request.TextDocument.Text);
+                file.Version = request.TextDocument.Version;
+                return file;
+            },
             (_, v) =>
             {
                 v.SetFullText(request.TextDocument.Text);
+                v.Version = request.TextDocument.Version;
                 return v;
             }
         );
@@ -135,6 +141,8 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
                     }
                 }
             });
+
+            file.Version = request.TextDocument.Version;
         }
         catch
         {
@@ -165,6 +173,7 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
             if (_fileTracker.Files.TryGetValue(document, out OpenedFile? file))
             {
                 file.SetFullText(response.Text);
+                file.Version = response.Version;
                 _logger.LogWarning("File text updated.");
             }
             else
@@ -193,10 +202,22 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
 
         //_logger.LogInformation("Received didSaveTextDocument: {0}", request.TextDocument.Uri);
         OpenedFile file = _fileTracker.Files.AddOrUpdate(request.TextDocument.Uri,
-            u => _fileTracker.CreateFile(u, request.Text),
+            u =>
+            {
+                OpenedFile v = _fileTracker.CreateFile(u, request.Text);
+                if (request.TextDocument is OptionalVersionedTextDocumentIdentifier o)
+                    v.Version = o.Version;
+                else if (request.TextDocument is VersionedTextDocumentIdentifier t)
+                    v.Version = t.Version;
+                return v;
+            },
             (_, v) =>
             {
                 v.SetFullText(request.Text);
+                if (request.TextDocument is OptionalVersionedTextDocumentIdentifier o)
+                    v.Version = o.Version;
+                else if (request.TextDocument is VersionedTextDocumentIdentifier t)
+                    v.Version = t.Version;
                 return v;
             }
         );

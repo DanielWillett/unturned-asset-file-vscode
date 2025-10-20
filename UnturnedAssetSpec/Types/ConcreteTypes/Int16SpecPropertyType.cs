@@ -9,6 +9,8 @@ public sealed class Int16SpecPropertyType : BasicSpecPropertyType<Int16SpecPrope
 {
     public static readonly Int16SpecPropertyType Instance = new Int16SpecPropertyType();
 
+    public override int GetHashCode() => 29;
+
     static Int16SpecPropertyType() { }
     private Int16SpecPropertyType() { }
 

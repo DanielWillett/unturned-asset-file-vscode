@@ -1,6 +1,5 @@
-using System.Diagnostics;
-using System.Globalization;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using DanielWillett.UnturnedDataFileLspServer.Handlers;
@@ -13,16 +12,20 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.WorkDone;
 using OmniSharp.Extensions.LanguageServer.Server;
 using Serilog;
+using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
-using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer;
 
 internal sealed class UnturnedAssetFileLspServer
 {
     public const string LanguageId = "unturned-data-file";
+    public const string DiagnosticSource = "unturned-dat";
 
     private static ILogger<UnturnedAssetFileLspServer> _logger = null!;
 
@@ -80,6 +83,8 @@ internal sealed class UnturnedAssetFileLspServer
                 .WithHandler<KeyCompletionHandler>()
                 .WithHandler<DiscoverAssetPropertiesHandler>()
                 .WithHandler<GetAssetPropertyAddLocationHandler>()
+                .WithHandler<CodeActionRequestHandler>()
+                .WithHandler<DocumentDiagnosticHandler>()
                 .WithServerInfo(new ServerInfo
                 {
                     Name = "Unturned Data File LSP",
@@ -97,6 +102,8 @@ internal sealed class UnturnedAssetFileLspServer
                         .AddSingleton<FileEvaluationContextFactory>()
                         .AddSingleton<IAssetSpecDatabase, LspAssetSpecDatabase>()
                         .AddSingleton<IWorkspaceEnvironment, LspWorkspaceEnvironment>()
+                        .AddSingleton<IFilePropertyVirtualizer, SourceFilePropertyVirtualizer>()
+                        .AddSingleton<GlobalCodeFixes>()
                         .AddSingleton<LspInstallationEnvironment>()
                         .AddSingleton<EnvironmentCache>()
                         .AddSingleton<ISpecDatabaseCache, EnvironmentCache>(sp => sp.GetRequiredService<EnvironmentCache>())

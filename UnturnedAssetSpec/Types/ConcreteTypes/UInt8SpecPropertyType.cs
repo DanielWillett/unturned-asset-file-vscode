@@ -9,6 +9,8 @@ public sealed class UInt8SpecPropertyType : BasicSpecPropertyType<UInt8SpecPrope
 {
     public static readonly UInt8SpecPropertyType Instance = new UInt8SpecPropertyType();
 
+    public override int GetHashCode() => 54;
+
     static UInt8SpecPropertyType() { }
     private UInt8SpecPropertyType() { }
 

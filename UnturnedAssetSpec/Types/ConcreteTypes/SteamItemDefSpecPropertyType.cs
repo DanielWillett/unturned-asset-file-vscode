@@ -9,6 +9,8 @@ public sealed class SteamItemDefSpecPropertyType : BasicSpecPropertyType<SteamIt
 {
     public static readonly SteamItemDefSpecPropertyType Instance = new SteamItemDefSpecPropertyType();
 
+    public override int GetHashCode() => 48;
+
     public const int MinValue = 1;
     public const int MaxValue = 999_999_999;
 

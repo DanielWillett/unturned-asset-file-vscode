@@ -10,7 +10,7 @@ public partial class SourceNodeTokenizerTests
     {
         const string test = "\"Text\"";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
 
@@ -28,7 +28,7 @@ public partial class SourceNodeTokenizerTests
     {
         const string test = "\"\"";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, 2)));
@@ -46,7 +46,7 @@ public partial class SourceNodeTokenizerTests
     {
         const string test = "\"String";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, 7)));
@@ -64,7 +64,7 @@ public partial class SourceNodeTokenizerTests
     {
         string endl = unix ? "\n" : "\r\n";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"String{endl}AnotherKey Value", diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"String{endl}AnotherKey Value", diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, 7)));
@@ -82,7 +82,7 @@ public partial class SourceNodeTokenizerTests
     {
         const string test = "\"";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, 1)));
@@ -106,7 +106,7 @@ public partial class SourceNodeTokenizerTests
     [TestCase(@"""\""\\\""""", "\"\\\"")]
     public void ReadEscapeSequenceString(string toParse, string expected)
     {
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(toParse, diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(toParse, diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, toParse.Length)));
@@ -122,7 +122,7 @@ public partial class SourceNodeTokenizerTests
     [Test]
     public void ReadWithExtraData()
     {
-        SourceNodeTokenizer tok = new SourceNodeTokenizer("\"String\" // Comment", diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer("\"String\" // Comment", diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, 8)));
@@ -140,7 +140,7 @@ public partial class SourceNodeTokenizerTests
     {
         const string test = "\"Str\\ing\"";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, 9)));
@@ -160,7 +160,7 @@ public partial class SourceNodeTokenizerTests
 
         string test = $"\"String\",{endl}OtherProperty Value";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, 8)));
@@ -179,7 +179,7 @@ public partial class SourceNodeTokenizerTests
     {
         const string test = "\"String\",";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, 8)));
@@ -198,7 +198,7 @@ public partial class SourceNodeTokenizerTests
     {
         const string test = "\"String\\";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, 8)));
@@ -216,7 +216,7 @@ public partial class SourceNodeTokenizerTests
     {
         const string test = "\"St\\tring\\";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(test, diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, 10)));
@@ -234,7 +234,7 @@ public partial class SourceNodeTokenizerTests
     {
         string endl = unix ? "\n" : "\r\n";
         
-        SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"String\\{endl}AnotherKey Value", diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"String\\{endl}AnotherKey Value", diagnosticSink: DiagnosticSink);
 
         string str = tok.ReadQuotedString(out FileRange range, out ReadOnlySpan<char> rangeSpan);
         Assert.That(range, Is.EqualTo(new FileRange(1, 1, 1, 8)));

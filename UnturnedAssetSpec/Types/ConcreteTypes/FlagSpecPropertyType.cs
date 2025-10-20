@@ -9,6 +9,8 @@ public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropert
 {
     public static readonly FlagSpecPropertyType Instance = new FlagSpecPropertyType();
 
+    public override int GetHashCode() => 23;
+
     static FlagSpecPropertyType() { }
     private FlagSpecPropertyType() { }
 

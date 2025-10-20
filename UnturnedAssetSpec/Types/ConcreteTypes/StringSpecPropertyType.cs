@@ -8,6 +8,8 @@ public sealed class StringSpecPropertyType : BasicSpecPropertyType<StringSpecPro
 {
     public static readonly StringSpecPropertyType Instance = new StringSpecPropertyType();
 
+    public override int GetHashCode() => 49;
+
     static StringSpecPropertyType() { }
     private StringSpecPropertyType() { }
 

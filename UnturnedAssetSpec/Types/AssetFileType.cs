@@ -44,6 +44,26 @@ public readonly struct AssetFileType : IEquatable<AssetFileType>
         return info != null ? new AssetFileType(info, null) : new AssetFileType(type, null);
     }
 
+    public static AssetFileType FromType(QualifiedOrAliasedType type, IAssetSpecDatabase spec)
+    {
+        if (type.IsNull)
+            return default;
+
+        QualifiedType fullType;
+        if (type.IsAlias)
+        {
+            if (!spec.Information.AssetAliases.TryGetValue(type.Type.Type, out fullType))
+                return default;
+        }
+        else
+        {
+            fullType = type.Type.CaseInsensitive;
+        }
+
+        spec.Types.TryGetValue(fullType, out AssetSpecType? info);
+        return info != null ? new AssetFileType(info, null) : new AssetFileType(fullType, null);
+    }
+
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is AssetFileType t && Equals(t);
 

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
@@ -9,29 +10,34 @@ using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using System.Diagnostics;
+using OmniSharp.Extensions.LanguageServer.Protocol;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 
 internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
 {
     private readonly OpenedFileTracker _fileTracker;
-    private readonly IAssetSpecDatabase _specDictionary;
+    private readonly IAssetSpecDatabase _specDatabase;
     private readonly ILogger<DocumentSymbolHandler> _logger;
     private readonly IWorkspaceEnvironment _workspace;
+    private readonly IFilePropertyVirtualizer _virtualizer;
     private readonly InstallationEnvironment _installationEnvironment;
 
     public DocumentDiagnosticHandler(
         OpenedFileTracker fileTracker,
-        IAssetSpecDatabase specDictionary,
+        IAssetSpecDatabase specDatabase,
         ILogger<DocumentSymbolHandler> logger,
         IWorkspaceEnvironment workspace,
-        InstallationEnvironment installationEnvironment)
+        InstallationEnvironment installationEnvironment,
+        IFilePropertyVirtualizer virtualizer)
     {
         _fileTracker = fileTracker;
-        _specDictionary = specDictionary;
+        _specDatabase = specDatabase;
         _logger = logger;
         _workspace = workspace;
         _installationEnvironment = installationEnvironment;
+        _virtualizer = virtualizer;
     }
 
     /// <inheritdoc />
@@ -42,94 +48,84 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
         {
             DocumentSelector = UnturnedAssetFileLspServer.AssetFileSelector,
             InterFileDependencies = true,
-            WorkspaceDiagnostics = true
+            WorkspaceDiagnostics = false
         };
     }
 
     /// <inheritdoc />
     public override async Task<RelatedDocumentDiagnosticReport> Handle(DocumentDiagnosticParams request, CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-
-        _logger.LogInformation("Document diagnostic pull request received.");
-
-        if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))
-        {
-            return new RelatedFullDocumentDiagnosticReport { Items = new Container<Diagnostic>() };
-        }
-
-        ISourceFile tree = file.SourceFile;
-
-        AssetFileType type = AssetFileType.FromFile(tree, _specDictionary);
-
-        DiagnosticsNodeVisitor visitor = new DiagnosticsNodeVisitor(_specDictionary, _workspace, _installationEnvironment, type);
-
-        if (tree is IAssetSourceFile asset)
-        {
-            asset.GetMetadataDictionary()?.Visit(ref visitor);
-            asset.AssetData.Visit(ref visitor);
-        }
-        else
-        {
-            tree.Visit(ref visitor);
-        }
-
-        List<Diagnostic> diagnostics = new List<Diagnostic>(visitor.Diagnostics.Count);
-        foreach (DatDiagnosticMessage msg in visitor.Diagnostics)
-        {
-            diagnostics.Add(new Diagnostic
-            {
-                Code = new DiagnosticCode(msg.Diagnostic.ErrorId),
-                Source = "unturned-dat",
-                Message = msg.Message,
-                Range = msg.Range.ToRange(),
-                Tags = msg.Diagnostic == DatDiagnostics.UNT1018 ? new Container<DiagnosticTag>(DiagnosticTag.Deprecated) : null
-            });
-        }
-
         return new RelatedFullDocumentDiagnosticReport
         {
-            Items = diagnostics
+            Items = new Container<Diagnostic>()
         };
+
+        //Debugger.Launch();
+        //_logger.LogInformation("Document diagnostic pull request received.");
+        //
+        //if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))
+        //{
+        //    return new RelatedFullDocumentDiagnosticReport { Items = new Container<Diagnostic>() };
+        //}
+        //
+        //ISourceFile tree = file.SourceFile;
+        //
+        //DiagnosticsNodeVisitor visitor = new DiagnosticsNodeVisitor(_specDatabase, _virtualizer, _workspace, _installationEnvironment);
+        //
+        //if (tree is IAssetSourceFile asset)
+        //{
+        //    asset.GetMetadataDictionary()?.Visit(ref visitor);
+        //    asset.AssetData.Visit(ref visitor);
+        //}
+        //else
+        //{
+        //    tree.Visit(ref visitor);
+        //}
+        //
+        //List<Diagnostic> diagnostics = new List<Diagnostic>(visitor.Diagnostics.Count);
+        //foreach (DatDiagnosticMessage msg in visitor.Diagnostics)
+        //{
+        //    diagnostics.Add(new Diagnostic
+        //    {
+        //        Code = new DiagnosticCode(msg.Diagnostic.ErrorId),
+        //        Source = UnturnedAssetFileLspServer.DiagnosticSource,
+        //        Message = msg.Message,
+        //        Range = msg.Range.ToRange(),
+        //        Tags = msg.Diagnostic == DatDiagnostics.UNT1018 ? new Container<DiagnosticTag>(DiagnosticTag.Deprecated) : null
+        //    });
+        //}
+        //
+        //return new RelatedFullDocumentDiagnosticReport
+        //{
+        //    Items = diagnostics
+        //};
     }
 
-    private class DiagnosticsNodeVisitor(
-        IAssetSpecDatabase database,
-        IWorkspaceEnvironment workspace,
-        InstallationEnvironment installEnvironment,
-        AssetFileType type
-    ) : TopLevelNodeVisitor, IDiagnosticSink
+    private class DiagnosticsNodeVisitor : ResolvedPropertyNodeVisitor, IDiagnosticSink
     {
         /// <inheritdoc />
         protected override bool IgnoreMetadata => true;
 
         public readonly List<DatDiagnosticMessage> Diagnostics = new List<DatDiagnosticMessage>();
 
-        /// <inheritdoc />
-        protected override void AcceptProperty(IPropertySourceNode node)
+        public DiagnosticsNodeVisitor(IAssetSpecDatabase database,
+            IFilePropertyVirtualizer virtualizer,
+            IWorkspaceEnvironment workspace,
+            InstallationEnvironment installEnvironment)
+            : base(virtualizer, database, installEnvironment, workspace)
         {
-            SpecProperty? property = database.FindPropertyInfo(node.Key, type);
-            if (property == null)
-                return;
+        }
 
-            FileEvaluationContext ctx = new FileEvaluationContext(
-                property,
-                property.Owner,
-                node.File,
-                workspace,
-                installEnvironment,
-                database,
-                // todo: should support legacy and nested types
-                PropertyResolutionContext.Modern
-            );
-
-            ISpecPropertyType? propType = property.Type.GetType(in ctx);
-            if (propType == null)
-                return;
-
-            SpecPropertyTypeParseContext parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(ctx, property, node, node.Value, Diagnostics);
-
-            propType.TryParseValue(in parse, out _);
+        /// <inheritdoc />
+        protected override void AcceptResolvedProperty(
+            SpecProperty property,
+            ISpecPropertyType propertyType,
+            in SpecPropertyTypeParseContext parseCtx,
+            IPropertySourceNode node,
+            PropertyBreadcrumbs breadcrumbs)
+        {
+            SpecPropertyTypeParseContext ctx = parseCtx.WithDiagnostics(Diagnostics);
+            propertyType.TryParseValue(in ctx, out _);
         }
 
         /// <inheritdoc />

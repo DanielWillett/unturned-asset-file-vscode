@@ -13,6 +13,8 @@ public sealed class FlagIdSpecPropertyType :
 {
     public static readonly FlagIdSpecPropertyType Instance = new FlagIdSpecPropertyType();
 
+    public override int GetHashCode() => 22;
+
     static FlagIdSpecPropertyType() { }
 
     /// <inheritdoc cref="ISpecPropertyType" />

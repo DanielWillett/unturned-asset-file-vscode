@@ -12,34 +12,33 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class LegacyCompatibleListSpecPropertyType :
     BaseSpecPropertyType<EquatableArray<CustomSpecTypeInstance>>,
     ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>>,
-    IElementTypeSpecPropertyType,
+    IListTypeSpecPropertyType,
     IEquatable<LegacyCompatibleListSpecPropertyType>
 {
-    private readonly ISpecType? _specifiedBaseType;
-
-    private IAssetSpecDatabase? _cachedSpecDatabase;
-    private ISpecType? _baseType;
+    private readonly ISpecType _specifiedBaseType;
 
     public override string Type => "LegacyCompatibleList";
     public Type ValueType => typeof(EquatableArray<CustomSpecTypeInstance>);
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
-    string? IElementTypeSpecPropertyType.ElementType => ElementType.Type;
+    string IElementTypeSpecPropertyType.ElementType => _specifiedBaseType.Type;
 
-    public QualifiedType ElementType { get; }
     public override string DisplayName { get; }
+
+    ISpecPropertyType? IListTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database)
+    {
+        return _specifiedBaseType as ISpecPropertyType;
+    }
+
+    public override int GetHashCode()
+    {
+        return 73 ^ _specifiedBaseType.GetHashCode();
+    }
 
     public LegacyCompatibleListSpecPropertyType(ISpecType type)
     {
         _specifiedBaseType = type;
-        ElementType = type.Type;
         DisplayName = $"List of {type.DisplayName} (Legacy Compatible)";
-    }
-
-    public LegacyCompatibleListSpecPropertyType(QualifiedType elementType)
-    {
-        ElementType = elementType;
-        DisplayName = elementType.IsNull ? "List (Legacy Compatible)" : $"List of {elementType.GetTypeName()} (Legacy Compatible)";
     }
 
     public bool Equals(ISpecPropertyType? other) => other is LegacyCompatibleListSpecPropertyType;
@@ -64,15 +63,14 @@ public sealed class LegacyCompatibleListSpecPropertyType :
     {
         bool passed = true;
 
-        CheckCache(parse.Database, out ISpecType? conditionBaseType);
-        if (conditionBaseType is not CustomSpecType customType)
+        if (_specifiedBaseType is not CustomSpecType customType)
         {
             if (parse.HasDiagnostics)
             {
                 parse.Log(new DatDiagnosticMessage
                 {
                     Range = parse.Node?.Range ?? parse.Parent?.Range ?? default,
-                    Message = string.Format(DiagnosticResources.UNT2005, ElementType.Type),
+                    Message = string.Format(DiagnosticResources.UNT2005, _specifiedBaseType.Type),
                     Diagnostic = DatDiagnostics.UNT2005
                 });
             }
@@ -146,30 +144,6 @@ public sealed class LegacyCompatibleListSpecPropertyType :
 
         value = new EquatableArray<CustomSpecTypeInstance>(output);
         return true;
-    }
-
-
-    private void CheckCache(IAssetSpecDatabase specDatabase, out ISpecType? conditionBaseType)
-    {
-        if (_specifiedBaseType != null)
-        {
-            conditionBaseType = _specifiedBaseType;
-            return;
-        }
-
-        AssetFileType fileType = AssetFileType.AssetBaseType(specDatabase);
-
-        lock (this)
-        {
-            if (_cachedSpecDatabase == specDatabase)
-            {
-                conditionBaseType = _baseType;
-                return;
-            }
-
-            _baseType = conditionBaseType = specDatabase.FindType(ElementType.Type, fileType);
-            _cachedSpecDatabase = specDatabase;
-        }
     }
 
     private bool TryParseLegacyInstance(in SpecPropertyTypeParseContext parse, int index, out CustomSpecTypeInstance instance, CustomSpecType customType)
@@ -261,4 +235,54 @@ public sealed class LegacyCompatibleListSpecPropertyType :
     }
 
     void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
+}
+
+internal sealed class UnresolvedLegacyCompatibleListSpecPropertyType :
+    IEquatable<UnresolvedLegacyCompatibleListSpecPropertyType?>,
+    ISecondPassSpecPropertyType,
+    IListTypeSpecPropertyType,
+    IDisposable
+{
+    public ISecondPassSpecPropertyType InnerType { get; }
+    ISpecPropertyType IListTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
+    string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
+
+    public string DisplayName => "LegacyCompatibleList";
+    public string Type => "LegacyCompatibleList";
+    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+    public Type ValueType => typeof(EquatableArray<CustomSpecTypeInstance>);
+
+    public UnresolvedLegacyCompatibleListSpecPropertyType(ISecondPassSpecPropertyType innerType)
+    {
+        InnerType = innerType ?? throw new ArgumentNullException(nameof(innerType));
+    }
+
+    public bool Equals(UnresolvedLegacyCompatibleListSpecPropertyType? other) => other != null && InnerType.Equals(other.InnerType);
+    public bool Equals(ISpecPropertyType? other) => other is UnresolvedLegacyCompatibleListSpecPropertyType l && Equals(l);
+    public override bool Equals(object? obj) => obj is UnresolvedLegacyCompatibleListSpecPropertyType l && Equals(l);
+    public override int GetHashCode() => InnerType.GetHashCode();
+    public override string ToString() => $"Unresolved Legacy-Compatible List of {InnerType.Type}";
+    public void Dispose()
+    {
+        if (InnerType is IDisposable d)
+            d.Dispose();
+    }
+
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        value = null!;
+        return false;
+    }
+
+    public ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile)
+    {
+        if (InnerType.Transform(property, database, assetFile) is not ISpecType type)
+        {
+            throw new Exception($"Type {InnerType} is not a custom type.");
+        }
+
+        return KnownTypes.LegacyCompatibleList(type);
+    }
+
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) { }
 }

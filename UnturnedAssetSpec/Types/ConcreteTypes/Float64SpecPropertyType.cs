@@ -9,6 +9,8 @@ public sealed class Float64SpecPropertyType : BasicSpecPropertyType<Float64SpecP
 {
     public static readonly Float64SpecPropertyType Instance = new Float64SpecPropertyType();
 
+    public override int GetHashCode() => 26;
+
     static Float64SpecPropertyType() { }
     private Float64SpecPropertyType() { }
 

@@ -9,6 +9,8 @@ public sealed class Float32SpecPropertyType : BasicSpecPropertyType<Float32SpecP
 {
     public static readonly Float32SpecPropertyType Instance = new Float32SpecPropertyType();
 
+    public override int GetHashCode() => 25;
+
     static Float32SpecPropertyType() { }
     private Float32SpecPropertyType() { }
 

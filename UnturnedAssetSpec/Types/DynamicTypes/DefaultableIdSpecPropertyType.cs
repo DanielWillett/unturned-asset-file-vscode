@@ -52,6 +52,13 @@ public class DefaultableIdSpecPropertyType :
         return false;
     }
 
+    public override int GetHashCode()
+    {
+        // note: using string because InnerType could change in Transform()
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        return 67 ^ HashCode.Combine(Category.Index, ElementType, OtherElementTypes);
+    }
+
     public DefaultableIdSpecPropertyType(EnumSpecTypeValue category, OneOrMore<string> specialTypes)
         : this(
             category,

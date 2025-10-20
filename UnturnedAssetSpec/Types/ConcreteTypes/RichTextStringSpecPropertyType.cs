@@ -8,6 +8,8 @@ public sealed class RichTextStringSpecPropertyType : BasicSpecPropertyType<RichT
 {
     public static readonly RichTextStringSpecPropertyType Instance = new RichTextStringSpecPropertyType();
 
+    public override int GetHashCode() => 43;
+
     static RichTextStringSpecPropertyType() { }
     private RichTextStringSpecPropertyType() { }
 

@@ -37,12 +37,22 @@ internal class HoverHandler : IHoverHandler
             return Task.FromResult<Hover?>(null);
         }
 
-        Range range = hoverNode!.Range.ToRange();
+        FileRange range = hoverNode!.Range;
 
         string? desc;
         SpecProperty? prop = ctx.EvaluationContext.Self;
         if (prop == null)
         {
+            if (ctx.Node?.Parent is IListSourceNode list)
+            {
+                desc = list.Parent is IPropertySourceNode p ? $"{p.Key}[{ctx.Node.Index}]" : $"#{ctx.Node.Index}";
+                return Task.FromResult<Hover?>(new Hover
+                {
+                    Range = range.ToRange(),
+                    Contents = new MarkedStringsOrMarkupContent(new MarkedString(desc))
+                });
+            }
+
             desc = "Unknown property";
         }
         else if (prop.Description == null
@@ -71,14 +81,22 @@ internal class HoverHandler : IHoverHandler
                 }
                 else
                 {
-                    desc += Environment.NewLine + "*Has Value*";
+                    switch (ctx.Node)
+                    {
+                        case IListSourceNode list:
+                            desc += $"{Environment.NewLine}List [ n = {list.Count} ]";
+                            break;
+                        case IDictionarySourceNode dict:
+                            desc += $"{Environment.NewLine}Dictionary {{ n = {dict.Count} }}";
+                            break;
+                    }
                 }
             }
         }
 
         return Task.FromResult<Hover?>(new Hover
         {
-            Range = range,
+            Range = range.ToRange(),
             Contents = new MarkedStringsOrMarkupContent(new MarkupContent
             {
                 Kind = MarkupKind.Markdown,

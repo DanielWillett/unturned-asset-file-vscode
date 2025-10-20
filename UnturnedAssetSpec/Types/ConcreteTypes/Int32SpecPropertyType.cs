@@ -9,6 +9,8 @@ public sealed class Int32SpecPropertyType : BasicSpecPropertyType<Int32SpecPrope
 {
     public static readonly Int32SpecPropertyType Instance = new Int32SpecPropertyType();
 
+    public override int GetHashCode() => 30;
+
     static Int32SpecPropertyType() { }
     private Int32SpecPropertyType() { }
 

@@ -3370,15 +3370,15 @@ var require_main2 = __commonJS({
         }
         URI2.is = is;
       })(URI || (exports3.URI = URI = {}));
-      var integer;
-      (function(integer2) {
-        integer2.MIN_VALUE = -2147483648;
-        integer2.MAX_VALUE = 2147483647;
+      var integer2;
+      (function(integer3) {
+        integer3.MIN_VALUE = -2147483648;
+        integer3.MAX_VALUE = 2147483647;
         function is(value) {
-          return typeof value === "number" && integer2.MIN_VALUE <= value && value <= integer2.MAX_VALUE;
+          return typeof value === "number" && integer3.MIN_VALUE <= value && value <= integer3.MAX_VALUE;
         }
-        integer2.is = is;
-      })(integer || (exports3.integer = integer = {}));
+        integer3.is = is;
+      })(integer2 || (exports3.integer = integer2 = {}));
       var uinteger;
       (function(uinteger2) {
         uinteger2.MIN_VALUE = 0;
@@ -4834,10 +4834,10 @@ var require_main2 = __commonJS({
           return toString.call(value) === "[object Number]" && min <= value && value <= max;
         }
         Is2.numberRange = numberRange;
-        function integer2(value) {
+        function integer3(value) {
           return toString.call(value) === "[object Number]" && -2147483648 <= value && value <= 2147483647;
         }
-        Is2.integer = integer2;
+        Is2.integer = integer3;
         function uinteger2(value) {
           return toString.call(value) === "[object Number]" && 0 <= value && value <= 2147483647;
         }
@@ -18146,10 +18146,10 @@ async function handleGetDocumentText(e) {
   try {
     const bytes = await import_vscode4.workspace.fs.readFile(import_vscode4.Uri.file(e.document));
     const decoder = new TextDecoder();
-    return { text: decoder.decode(bytes) };
+    return { text: decoder.decode(bytes), version: void 0 };
   } catch (e2) {
     console.error(e2);
-    return { text: void 0 };
+    return { text: void 0, version: void 0 };
   }
 }
 

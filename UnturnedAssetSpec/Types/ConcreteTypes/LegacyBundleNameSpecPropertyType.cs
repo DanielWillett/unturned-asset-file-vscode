@@ -7,6 +7,8 @@ public sealed class LegacyBundleNameSpecPropertyType : BasicSpecPropertyType<Leg
 {
     public static readonly LegacyBundleNameSpecPropertyType Instance = new LegacyBundleNameSpecPropertyType();
 
+    public override int GetHashCode() => 33;
+
     static LegacyBundleNameSpecPropertyType() { }
     private LegacyBundleNameSpecPropertyType() { }
 

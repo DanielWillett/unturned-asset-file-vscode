@@ -14,6 +14,8 @@ public sealed class BladeIdSpecPropertyType : BasicSpecPropertyType<BladeIdSpecP
 {
     public static readonly BladeIdSpecPropertyType Instance = new BladeIdSpecPropertyType();
 
+    public override int GetHashCode() => 4;
+
     static BladeIdSpecPropertyType() { }
     private BladeIdSpecPropertyType() { }
 

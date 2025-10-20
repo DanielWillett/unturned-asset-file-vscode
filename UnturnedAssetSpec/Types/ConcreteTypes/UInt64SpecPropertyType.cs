@@ -9,6 +9,8 @@ public sealed class UInt64SpecPropertyType : BasicSpecPropertyType<UInt64SpecPro
 {
     public static readonly UInt64SpecPropertyType Instance = new UInt64SpecPropertyType();
 
+    public override int GetHashCode() => 53;
+
     static UInt64SpecPropertyType() { }
     private UInt64SpecPropertyType() { }
 

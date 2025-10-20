@@ -11,6 +11,12 @@ public sealed class BlueprintIdSpecPropertyType :
 {
     public static readonly BlueprintIdSpecPropertyType Instance = new BlueprintIdSpecPropertyType(true);
     public static readonly BlueprintIdSpecPropertyType StringInstance = new BlueprintIdSpecPropertyType(false);
+
+    public override int GetHashCode()
+    {
+        return 64;
+    }
+
     static BlueprintIdSpecPropertyType() { }
 
     /// <inheritdoc cref="ISpecPropertyType" />

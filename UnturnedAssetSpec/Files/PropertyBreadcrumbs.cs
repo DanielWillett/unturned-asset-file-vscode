@@ -1,4 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -144,14 +146,14 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
                 {
                     case IListSourceNode list:
                         ISourceNode n = list.Parent as IPropertySourceNode ?? (ISourceNode)list;
-                        sections[--sectionCt] = new PropertyBreadcrumbSection(null, n, PropertyResolutionContext.Modern, lastIndex);
+                        sections[--sectionCt] = new PropertyBreadcrumbSection(n, PropertyResolutionContext.Modern, lastIndex);
                         lastIndex = parent.Index;
                         break;
 
                     case IDictionarySourceNode dict:
-                        if (dict.Parent is IPropertySourceNode)
+                        if (dict.Parent is IPropertySourceNode prop)
                         {
-                            sections[--sectionCt] = new PropertyBreadcrumbSection(null, parent.Parent, PropertyResolutionContext.Modern);
+                            sections[--sectionCt] = new PropertyBreadcrumbSection(prop, PropertyResolutionContext.Modern);
                             lastIndex = -1;
                             break;
                         }
@@ -179,65 +181,167 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
                 return file.TryResolveProperty(property, out propertyNode, PropertyResolutionContext.Modern);
             }
 
-            ref PropertyBreadcrumbSection lastSection = ref _sections[^1];
-            if (nodePath == null && lastSection.ParentNode != null)
-            {
-                propertyNode = null;
-                return lastSection.GetValueNode() is IDictionarySourceNode d
-                       && d.TryGetProperty(property, out propertyNode, PropertyResolutionContext.Modern);
-            }
-
-            int startIndex = 0;
-            if (nodePath == null)
-            {
-                for (int i = _sections.Length - 1; i >= 0; --i)
-                {
-                    ISourceNode? node = _sections[i].ParentNode;
-                    if (node != null && ReferenceEquals(node.Parent, file))
-                    {
-                        startIndex = i;
-                        break;
-                    }
-                }
-            }
-
-            IAnyChildrenSourceNode? dictionary = file;
-            if (dictionary is IAssetSourceFile a)
-                dictionary = a.AssetData;
-
-            for (int i = startIndex; i < _sections.Length; ++i)
-            {
-                ref PropertyBreadcrumbSection section = ref _sections[i];
-                dictionary = section.GetValueNode(dictionary);
-                if (dictionary == null)
-                {
-                    propertyNode = null;
-                    return false;
-                }
-
-                if (nodePath != null)
-                {
-                    if (dictionary.Parent is IListSourceNode l)
-                    {
-                        if (l.Parent is IPropertySourceNode prop)
-                            nodePath.Add(prop);
-                        nodePath.Add(dictionary);
-                    }
-                    else if (dictionary.Parent is IPropertySourceNode prop)
-                        nodePath.Add(prop);
-                    else
-                        nodePath.Add(dictionary);
-                }
-            }
-
-            if (dictionary is not IDictionarySourceNode dict)
+            AssetFileType fileType = default;
+            if (!TryGetDictionaryAndTypeIntl(file, out IDictionarySourceNode? dictionary, null, in fileType, out _, nodePath))
             {
                 propertyNode = null;
                 return false;
             }
 
-            return dict.TryGetProperty(property, out propertyNode, PropertyResolutionContext.Modern);
+            return dictionary.TryGetProperty(property, out propertyNode, PropertyResolutionContext.Modern);
         }
+    }
+
+    /// <summary>
+    /// Try to find the the object type this breadcrumb points to.
+    /// </summary>
+    public bool TryGetDictionaryAndType(ISourceFile file, in AssetFileType fileType, IAssetSpecDatabase database, [MaybeNullWhen(false)] out IDictionarySourceNode dictionary, [MaybeNullWhen(false)] out ISpecType type, ICollection<ISourceNode>? nodePath = null)
+    {
+        if (database == null)
+            throw new ArgumentNullException(nameof(database));
+        lock (file.TreeSync)
+        {
+            return TryGetDictionaryAndTypeIntl(file, out dictionary, database, in fileType, out type, nodePath) && type != null;
+        }
+    }
+
+    /// <summary>
+    /// Try to find the the dictionary this breadcrumb points to.
+    /// </summary>
+    public bool TryGetDictionary(ISourceFile file, [MaybeNullWhen(false)] out IDictionarySourceNode dictionary, ICollection<ISourceNode>? nodePath = null)
+    {
+        lock (file.TreeSync)
+        {
+            AssetFileType type = default;
+            return TryGetDictionaryAndTypeIntl(file, out dictionary, null, in type, out _, nodePath);
+        }
+    }
+
+    private bool TryGetDictionaryAndTypeIntl(ISourceFile file, [MaybeNullWhen(false)] out IDictionarySourceNode referencedDictionary, IAssetSpecDatabase? database, in AssetFileType fileType, out ISpecType? type, ICollection<ISourceNode>? nodePath)
+    {
+        type = null;
+        if (IsRoot)
+        {
+            referencedDictionary = file;
+            if (database != null)
+            {
+                type = fileType.Information;
+            }
+            return true;
+        }
+
+        SpecPropertyContext context = file is ILocalizationSourceFile
+            ? SpecPropertyContext.Localization
+            : SpecPropertyContext.Property;
+
+        ref PropertyBreadcrumbSection lastSection = ref _sections[^1];
+        if (database == null && nodePath == null && lastSection.ParentNode != null)
+        {
+            referencedDictionary = lastSection.GetValueNode() as IDictionarySourceNode;
+            return referencedDictionary != null;
+        }
+
+        int startIndex = 0;
+        if (database == null && nodePath == null)
+        {
+            for (int i = _sections.Length - 1; i >= 0; --i)
+            {
+                ISourceNode? node = _sections[i].ParentNode;
+                if (node != null && ReferenceEquals(node.Parent, file))
+                {
+                    startIndex = i;
+                    break;
+                }
+            }
+        }
+        
+        IAnyChildrenSourceNode? dictionary = file;
+        if (dictionary is IAssetSourceFile a)
+            dictionary = a.AssetData;
+
+        ISpecType? typeOwner = fileType.Information;
+        int skipType = 0;
+
+        for (int i = startIndex; i < _sections.Length; ++i)
+        {
+            ref PropertyBreadcrumbSection section = ref _sections[i];
+            if (database != null && typeOwner != null && skipType <= 0)
+            {
+                SpecProperty? property = section.Property as SpecProperty;
+                if (property == null && section.ParentNode is IPropertySourceNode propNode)
+                {
+                    property = database.FindPropertyInfoByKey(propNode.Key, typeOwner, PropertyResolutionContext.Modern, requireCanBeInMetadata: false, context).Property;
+                }
+
+                if (property == null)
+                    typeOwner = null;
+                else
+                {
+                    ISpecPropertyType? typeOrListType = property.Type.Type;
+                    skipType = 0;
+                    typeOwner = null;
+                    while (typeOrListType != null)
+                    {
+                        switch (typeOrListType)
+                        {
+                            case ISpecType t:
+                                typeOwner = t;
+                                break;
+
+                            case IListTypeSpecPropertyType list:
+                                ISpecPropertyType? innerType = list.GetInnerType(database);
+                                if (innerType == null)
+                                    break;
+                                ++skipType;
+                                typeOrListType = innerType;
+                                continue;
+
+                            case IDictionaryTypeSpecPropertyType dict:
+                                innerType = dict.GetInnerType(database);
+                                if (innerType == null)
+                                    break;
+                                ++skipType;
+                                typeOrListType = innerType;
+                                continue;
+                        }
+
+                        break;
+                    }
+                }
+            }
+            else if (skipType > 0)
+            {
+                --skipType;
+            }
+
+            dictionary = section.GetValueNode(dictionary);
+            if (dictionary == null)
+            {
+                referencedDictionary = null;
+                return false;
+            }
+
+            if (skipType > 0 && dictionary is IDictionarySourceNode { Parent: IListSourceNode })
+                --skipType;
+
+            if (nodePath != null)
+            {
+                if (dictionary.Parent is IListSourceNode l)
+                {
+                    if (l.Parent is IPropertySourceNode prop)
+                        nodePath.Add(prop);
+                    nodePath.Add(dictionary);
+                }
+                else if (dictionary.Parent is IPropertySourceNode prop)
+                    nodePath.Add(prop);
+                else
+                    nodePath.Add(dictionary);
+            }
+        }
+
+        type = skipType > 0 ? null : typeOwner;
+        referencedDictionary = dictionary as IDictionarySourceNode;
+        return referencedDictionary != null;
     }
 
     /// <inheritdoc />
@@ -314,27 +418,60 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
 /// <remarks>Lists can optionally define an <see cref="Index"/>, or -1.</remarks>
 public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
 {
-
-
+    // index or -1
     public int Index;
-    public readonly SpecProperty? Property;
+
+    // either null, SpecProperty, or string (for generic dictionary)
+    public readonly object? Property;
     
     // either list or property
     public readonly ISourceNode? ParentNode;
     
     public readonly PropertyResolutionContext Context;
 
-    public PropertyBreadcrumbSection(SpecProperty? property, ISourceNode? parentNode, PropertyResolutionContext context)
+    public PropertyBreadcrumbSection(PropertyResolutionContext context, int index)
+    {
+        Context = context;
+        Index = index;
+    }
+
+    public PropertyBreadcrumbSection(SpecProperty property, PropertyResolutionContext context)
     {
         Property = property;
+        Context = context;
+        Index = -1;
+    }
+
+    public PropertyBreadcrumbSection(SpecProperty property, PropertyResolutionContext context, int index)
+    {
+        Property = property;
+        Context = context;
+        Index = index;
+    }
+
+    public PropertyBreadcrumbSection(string key, PropertyResolutionContext context)
+    {
+        Property = key;
+        Context = context;
+        Index = -1;
+    }
+
+    public PropertyBreadcrumbSection(string key, PropertyResolutionContext context, int index)
+    {
+        Property = key;
+        Context = context;
+        Index = index;
+    }
+
+    public PropertyBreadcrumbSection(ISourceNode parentNode, PropertyResolutionContext context)
+    {
         ParentNode = parentNode;
         Context = context;
         Index = -1;
     }
 
-    public PropertyBreadcrumbSection(SpecProperty? property, ISourceNode? parentNode, PropertyResolutionContext context, int index)
+    public PropertyBreadcrumbSection(ISourceNode parentNode, PropertyResolutionContext context, int index)
     {
-        Property = property;
         ParentNode = parentNode;
         Context = context;
         Index = index;
@@ -368,8 +505,22 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
         switch (parentNode)
         {
             case IDictionarySourceNode dict:
-                if (Property == null || !dict.TryGetProperty(Property, out IPropertySourceNode? propSrc, PropertyResolutionContext.Modern))
-                    return null;
+                IPropertySourceNode? propSrc;
+                switch (Property)
+                {
+                    default:
+                        return null;
+
+                    case string str:
+                        if (!dict.TryGetProperty(str, out propSrc))
+                            return null;
+                        break;
+
+                    case SpecProperty prop:
+                        if (!dict.TryGetProperty(prop, out propSrc, PropertyResolutionContext.Modern))
+                            return null;
+                        break;
+                }
                 value = propSrc.Value;
                 break;
 
@@ -414,7 +565,7 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
         return ParentNode switch
         {
             IPropertySourceNode prop => prop.Key,
-            null => Property?.Key ?? string.Empty,
+            null => Property as string ?? (Property as SpecProperty)?.Key ?? string.Empty,
             _ => string.Empty
         };
     }

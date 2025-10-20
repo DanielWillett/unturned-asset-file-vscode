@@ -826,5 +826,54 @@ public class OpenedFileTests
 
         return bldr.ToString();
     }
+
+    [Test]
+    public void RemoveMultipleLinesAtEndOfFile([Values("\n", "\r\n")] string newLine)
+    {
+        string file = """
+                      GUID cb4352c6fcb044c2b58e6edfa5644904
+                      Type Arrest_End
+                      Rarity Uncommon
+                      Useable Arrest_End
+                      ID 1196
+
+                      Size_X 1
+                      Size_Y 1
+                      Size_Z 0.3
+
+
+                      Blueprints
+                      [
+                          {
+                              OutputItems
+                              [
+                                  this
+                                  cb4352c6fcb044c2b58e6edfa5644904
+                                  1196
+                              ]
+                          }
+                      ]
+
+                      Actions 
+                      {
+
+                      }
+                      """;
+
+        file = file.Replace("\r", string.Empty).Replace("\n", newLine);
+
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), file, _logger, _database, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // {L22 C2 - L27 C1}
+            file.RemoveText(new FileRange(22, 2, 27, 1));
+        });
+
+        runner.AssertFileHasValidIndex();
+
+        Console.WriteLine(runner.GetFullText());
+    }
+
 }
 #endif

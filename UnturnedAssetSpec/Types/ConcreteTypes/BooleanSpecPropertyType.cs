@@ -11,6 +11,8 @@ public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecP
 {
     public static readonly BooleanSpecPropertyType Instance = new BooleanSpecPropertyType();
 
+    public override int GetHashCode() => 6;
+
     static BooleanSpecPropertyType() { }
     private BooleanSpecPropertyType() { }
 

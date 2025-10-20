@@ -31,6 +31,11 @@ public sealed class UrlSpecPropertyType :
 
     OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => MimeTypes!;
 
+    public override int GetHashCode()
+    {
+        return 84 ^ MimeTypes.GetHashCode(StringComparison.OrdinalIgnoreCase);
+    }
+
     public UrlSpecPropertyType(OneOrMore<string> mimeTypes)
     {
         MimeTypes = mimeTypes;

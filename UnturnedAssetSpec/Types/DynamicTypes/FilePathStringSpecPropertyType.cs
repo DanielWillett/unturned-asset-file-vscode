@@ -38,6 +38,11 @@ public sealed class FilePathStringSpecPropertyType :
 
     string? IElementTypeSpecPropertyType.ElementType => GlobPattern;
 
+    public override int GetHashCode()
+    {
+        return 69 ^ (GlobPattern?.GetHashCode() ?? 0);
+    }
+
     public FilePathStringSpecPropertyType(string? globPattern = null)
     {
         GlobPattern = globPattern;

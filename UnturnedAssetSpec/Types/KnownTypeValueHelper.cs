@@ -132,7 +132,8 @@ public static class KnownTypeValueHelper
                 value = new QualifiedType(
                     systemType.AssemblyQualifiedName != null
                         ? QualifiedType.NormalizeType(systemType.AssemblyQualifiedName)
-                        : systemType.FullName ?? systemType.Name
+                        : systemType.FullName ?? systemType.Name,
+                    isCaseInsensitive: true
                 );
             }
             else

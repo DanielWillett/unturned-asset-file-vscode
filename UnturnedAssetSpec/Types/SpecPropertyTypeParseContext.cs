@@ -35,6 +35,16 @@ public readonly ref struct SpecPropertyTypeParseContext
         };
     }
 
+    public SpecPropertyTypeParseContext WithDiagnostics(ICollection<DatDiagnosticMessage> diagnostics)
+    {
+        return new SpecPropertyTypeParseContext(EvaluationContext, diagnostics)
+        {
+            BaseKey = BaseKey,
+            Node = Node,
+            Parent = Parent
+        };
+    }
+
     public SpecPropertyTypeParseContext(ICollection<DatDiagnosticMessage> diagnostics) : this(default, diagnostics)
     {
 

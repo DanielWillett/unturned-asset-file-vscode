@@ -8,6 +8,8 @@ public sealed class Color32RGBSpecPropertyType : Color32SpecPropertyType
 {
     public static readonly Color32RGBSpecPropertyType Instance = new Color32RGBSpecPropertyType();
 
+    public override int GetHashCode() => 9;
+
     static Color32RGBSpecPropertyType() { }
     
     /// <inheritdoc />

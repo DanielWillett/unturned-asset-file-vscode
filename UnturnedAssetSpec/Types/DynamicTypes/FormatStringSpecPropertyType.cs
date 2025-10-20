@@ -33,6 +33,12 @@ public sealed class FormatStringSpecPropertyType : BasicSpecPropertyType<FormatS
         return value.AsConcrete<string>();
     }
 
+    public override int GetHashCode()
+    {
+        // 70 - 71
+        return (70 + (AllowRichText ? 1 : 0)) ^ (ArgumentCount * 397);
+    }
+
     public FormatStringSpecPropertyType(int argCount, bool allowRichText)
     {
         if (argCount <= 0)

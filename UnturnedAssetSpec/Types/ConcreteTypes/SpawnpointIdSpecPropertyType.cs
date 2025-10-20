@@ -7,6 +7,8 @@ public sealed class SpawnpointIdSpecPropertyType : BasicSpecPropertyType<Spawnpo
 {
     public static readonly SpawnpointIdSpecPropertyType Instance = new SpawnpointIdSpecPropertyType();
 
+    public override int GetHashCode() => 47;
+
     static SpawnpointIdSpecPropertyType() { }
     private SpawnpointIdSpecPropertyType() { }
 

@@ -12,6 +12,8 @@ public sealed class AssetBundleVersionSpecPropertyType : BasicSpecPropertyType<A
 {
     public static readonly AssetBundleVersionSpecPropertyType Instance = new AssetBundleVersionSpecPropertyType();
 
+    public override int GetHashCode() => 2;
+
     private static AutoCompleteResult[]? _autoComplete;
 
     static AssetBundleVersionSpecPropertyType() { }

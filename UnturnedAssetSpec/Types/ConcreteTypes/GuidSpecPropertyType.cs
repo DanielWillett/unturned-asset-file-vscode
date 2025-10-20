@@ -8,6 +8,8 @@ public sealed class GuidSpecPropertyType : BasicSpecPropertyType<GuidSpecPropert
 {
     public static readonly GuidSpecPropertyType Instance = new GuidSpecPropertyType();
 
+    public override int GetHashCode() => 27;
+
     static GuidSpecPropertyType() { }
     private GuidSpecPropertyType() { }
 

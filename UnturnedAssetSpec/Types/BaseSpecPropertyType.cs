@@ -88,4 +88,6 @@ public abstract class BaseSpecPropertyType<TValue>
         value = default;
         return false;
     }
+
+    public abstract override int GetHashCode();
 }

@@ -46,7 +46,7 @@ public abstract class BasicSpecPropertyType<TSpecPropertyType, TValue> :
     public abstract bool TryParseValue(in SpecPropertyTypeParseContext parse, out TValue? value);
 
     public override bool Equals(object? obj) => obj is BasicSpecPropertyType<TSpecPropertyType, TValue>;
-    public override int GetHashCode() => 0;
+    public override int GetHashCode() => Type.GetHashCode();
     public override string ToString() => Type;
 
     void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);

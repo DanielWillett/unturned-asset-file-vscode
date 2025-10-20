@@ -16,6 +16,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -73,6 +74,11 @@ public interface IAssetSpecDatabase
     Task InitializeAsync(CancellationToken token = default);
 
     void LogMessage(string message);
+
+    /// <summary>
+    /// Invokes a task when initialization finishes.
+    /// </summary>
+    Task OnInitialize(Func<IAssetSpecDatabase, Task> action);
 }
 
 public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
@@ -87,6 +93,8 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     private readonly ISpecDatabaseCache? _cache;
     private string? _commit;
     private JsonDocument? _statusJson;
+    private List<OnInitializeState>? _initializeListeners = new List<OnInitializeState>();
+    private readonly object _initLock = new object();
 
     public string[]? NPCAchievementIds { get; private set; }
     public Version? CurrentGameVersion { get; private set; }
@@ -145,6 +153,30 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     [MemberNotNullWhen(true, "_cache")]
     private bool IsCacheUpToDate { get; set; }
 
+    public Task OnInitialize(Func<IAssetSpecDatabase, Task> action)
+    {
+        OnInitializeState state;
+        state.Callback = action;
+
+        lock (_initLock)
+        {
+            if (_initializeListeners == null)
+            {
+                return state.Callback(this);
+            }
+
+            state.Task = new TaskCompletionSource<int>();
+            _initializeListeners.Add(state);
+            return state.Task.Task;
+        }
+    }
+
+    private struct OnInitializeState
+    {
+        public Func<IAssetSpecDatabase, Task> Callback;
+        public TaskCompletionSource<int> Task;
+    }
+
     public async Task InitializeAsync(CancellationToken token = default)
     {
         IsCacheUpToDate = false;
@@ -196,7 +228,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         if (aliases != null)
         {
             foreach (KeyValuePair<string, QualifiedType> kvp in aliases)
-                assetInfo.AssetAliases.Add(kvp.Key, kvp.Value);
+                assetInfo.AssetAliases.Add(kvp.Key, kvp.Value.CaseInsensitive);
         }
 
         assetInfo.AssetCategories ??= new Dictionary<QualifiedType, string>(0);
@@ -266,10 +298,29 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
         Types = types;
 
+        OnInitializeState[]? initializeListeners;
+        lock (_initLock)
+        {
+            initializeListeners = _initializeListeners?.ToArray();
+            _initializeListeners = null;
+        }
+
+        if (initializeListeners != null)
+        {
+            Task[] initTasks = new Task[initializeListeners.Length];
+            for (int i = 0; i < initializeListeners.Length; ++i)
+            {
+                initTasks[i] = initializeListeners[i].Callback(this);
+            }
+
+            await Task.WhenAll(initTasks).ConfigureAwait(false);
+        }
+
         if (_cache != null)
         {
             await _cache.CacheNewFilesAsync(this, token);
         }
+
         return;
 
         void Deprocess(Task[] tasks,
@@ -372,7 +423,6 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     {
         Log(message);
     }
-
     private static async Task<string?> GetLatestCommitAsync(HttpClient httpClient, CancellationToken token)
     {
         const string getLatestCommitUrl = $"https://api.github.com/repos/{Repository}/commits?per_page=1";
@@ -1377,6 +1427,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         public IReadOnlyDictionary<QualifiedType, AssetSpecType> Types { get; }
         public Task InitializeAsync(CancellationToken token = default) => _db.InitializeAsync(token);
         public void LogMessage(string message) => _db.Log(message);
+        public Task OnInitialize(Func<IAssetSpecDatabase, Task> action) => _db.OnInitialize(action);
     }
 }
 
@@ -1446,6 +1497,206 @@ public static class AssetSpecDatabaseExtensions
         return null;
     }
 
+    public static ISpecType? FindParentType(this IAssetSpecDatabase db, ISpecType subType)
+    {
+        QualifiedType typeName = subType.Parent;
+        if (typeName.IsNull)
+            return null;
+
+        if (typeName.Equals(subType.Type))
+            throw new InvalidOperationException("Type is parent of itself.");
+        
+        if (subType is AssetSpecType)
+        {
+            db.Types.TryGetValue(typeName.CaseInsensitive, out AssetSpecType? otherAssetType);
+            return otherAssetType;
+        }
+
+        for (AssetSpecType? assetType = subType.Owner; assetType != null; assetType = (AssetSpecType?)db.FindParentType(assetType))
+        {
+            ISpecType[] types = assetType.Types;
+            for (int i = 0; i < types.Length; ++i)
+            {
+                if (types[i].Type.Equals(typeName))
+                    return types[i];
+            }
+        }
+
+        return null;
+    }
+
+    private static int _maxTemplateProcessorCount = 4;
+
+    /// <summary>
+    /// Result information from <see cref="AssetSpecDatabaseExtensions.FindPropertyInfoByKey"/>.
+    /// </summary>
+    public struct PropertyFindResult
+    {
+        /// <summary>
+        /// Indicies for the property if it's a template.
+        /// </summary>
+        public OneOrMore<int> Indices;
+
+        /// <summary>
+        /// The property found.
+        /// </summary>
+        public SpecProperty? Property;
+        
+        /// <summary>
+        /// The case-corrected key used.
+        /// </summary>
+        public string? Key;
+
+        /// <summary>
+        /// Alias index or -1.
+        /// </summary>
+        public int Alias;
+    }
+
+    /// <summary>
+    /// Searches for a property by the key entered into a document and it's type.
+    /// </summary>
+    public static PropertyFindResult FindPropertyInfoByKey(this IAssetSpecDatabase db, string key, ISpecType fileType, PropertyResolutionContext resolutionContext, bool requireCanBeInMetadata = false, SpecPropertyContext context = SpecPropertyContext.Property)
+    {
+        if (context is not SpecPropertyContext.Localization and not SpecPropertyContext.Property and not SpecPropertyContext.BundleAsset)
+            throw new ArgumentOutOfRangeException(nameof(context));
+
+        if (fileType == null)
+            throw new ArgumentNullException(nameof(fileType));
+
+        Span<int> templateParse = stackalloc int[_maxTemplateProcessorCount];
+
+        for (ISpecType? type = fileType; type != null; type = db.FindParentType(type))
+        {
+            PropertyFindResult foundProperty = SearchForProperty(type, type, key, templateParse, context, resolutionContext, requireCanBeInMetadata);
+            if (foundProperty.Property != null)
+                return foundProperty;
+        }
+
+        return new PropertyFindResult
+        {
+            Alias = -1,
+            Indices = OneOrMore<int>.Null,
+            Key = null,
+            Property = null
+        };
+
+        static PropertyFindResult SearchForProperty(ISpecType type, ISpecType originalType, string key, Span<int> templateParse, SpecPropertyContext context, PropertyResolutionContext resolutionContext, bool requireMetadata)
+        {
+            SpecProperty[] properties = type.GetProperties(context);
+            scoped Span<int> output = templateParse;
+            for (int i = 0; i < properties.Length; ++i)
+            {
+                SpecProperty prop = properties[i];
+                if (prop.IsHidden)
+                    continue;
+
+                if (requireMetadata && !prop.CanBeInMetadata)
+                    continue;
+             
+                if (prop.TryGetImportType(out IPropertiesSpecType importType) && !ReferenceEquals(originalType, importType))
+                {
+                    PropertyFindResult importedProperty = SearchForProperty(type, originalType, key, templateParse, context, resolutionContext, requireMetadata);
+                    if (importedProperty.Property != null)
+                        return importedProperty;
+                    
+                    continue;
+                }
+
+                if (!prop.IsTemplate)
+                {
+                    if (SourceNodeExtensions.FilterMatches(prop.KeyLegacyExpansionFilter, resolutionContext) && prop.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return new PropertyFindResult
+                        {
+                            Indices = OneOrMore<int>.Null,
+                            Key = prop.Key,
+                            Property = prop,
+                            Alias = -1
+                        };
+                    }
+
+                    for (int aliasIndex = 0; aliasIndex < prop.Aliases.Length; ++aliasIndex)
+                    {
+                        Alias alias = prop.Aliases[aliasIndex];
+
+                        if (!SourceNodeExtensions.FilterMatches(alias.Filter, resolutionContext)
+                            || !alias.Value.Equals(key, StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        return new PropertyFindResult
+                        {
+                            Indices = OneOrMore<int>.Null,
+                            Key = alias.Value,
+                            Alias = aliasIndex,
+                            Property = prop
+                        };
+                    }
+
+                    continue;
+                }
+
+                int expectedCount;
+                if (SourceNodeExtensions.FilterMatches(prop.KeyLegacyExpansionFilter, resolutionContext))
+                {
+                    expectedCount = prop.KeyTemplateProcessor.TemplateCount;
+                    if (output.Length < expectedCount)
+                    {
+                        _maxTemplateProcessorCount = expectedCount;
+                        // ReSharper disable once StackAllocInsideLoop
+                        output = stackalloc int[expectedCount];
+                    }
+
+                    if (prop.KeyTemplateProcessor.TryParseKeyValues(key.AsSpan(), output, StringComparison.OrdinalIgnoreCase))
+                    {
+                        ReadOnlySpan<int> indicies = output.Slice(0, expectedCount);
+                        return new PropertyFindResult
+                        {
+                            Indices = [.. indicies],
+                            Key = prop.KeyTemplateProcessor.CreateKey(key, indicies),
+                            Property = prop,
+                            Alias = -1
+                        };
+                    }
+                }
+
+                for (int aliasIndex = 0; aliasIndex < prop.Aliases.Length; ++aliasIndex)
+                {
+                    if (!SourceNodeExtensions.FilterMatches(prop.Aliases[aliasIndex].Filter, resolutionContext))
+                        continue;
+
+                    TemplateProcessor p = prop.GetAliasTemplateProcessor(aliasIndex);
+                    expectedCount = p.TemplateCount;
+                    if (output.Length < expectedCount)
+                    {
+                        _maxTemplateProcessorCount = expectedCount;
+                        // ReSharper disable once StackAllocInsideLoop
+                        output = stackalloc int[expectedCount];
+                    }
+
+                    if (!p.TryParseKeyValues(key.AsSpan(), output, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    ReadOnlySpan<int> indicies = output.Slice(0, expectedCount);
+                    return new PropertyFindResult
+                    {
+                        Indices = [ ..indicies ],
+                        Key = p.CreateKey(key, indicies),
+                        Property = prop,
+                        Alias = aliasIndex
+                    };
+                }
+            }
+
+            return default;
+        }
+    }
+
+    /// <summary>
+    /// Searches for a property by it's spec-formatted identifier.
+    /// </summary>
     public static SpecProperty? FindPropertyInfo(this IAssetSpecDatabase db, string property, AssetFileType fileType, SpecPropertyContext context = SpecPropertyContext.Property)
     {
         if (context is not SpecPropertyContext.Localization and not SpecPropertyContext.Property and not SpecPropertyContext.BundleAsset)

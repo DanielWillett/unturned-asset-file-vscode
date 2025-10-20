@@ -59,6 +59,11 @@ public sealed class MasterBundleReferenceSpecPropertyType :
         return false;
     }
 
+    public override int GetHashCode()
+    {
+        return 76 ^ HashCode.Combine(ReferenceType, ElementType);
+    }
+
     public MasterBundleReferenceSpecPropertyType(QualifiedType elementType, MasterBundleReferenceType referenceType)
     {
         ReferenceType = referenceType;

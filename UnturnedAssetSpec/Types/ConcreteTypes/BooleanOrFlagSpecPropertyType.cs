@@ -11,6 +11,8 @@ public sealed class BooleanOrFlagSpecPropertyType : BasicSpecPropertyType<Boolea
 {
     public static readonly BooleanOrFlagSpecPropertyType Instance = new BooleanOrFlagSpecPropertyType();
 
+    public override int GetHashCode() => 5;
+
     static BooleanOrFlagSpecPropertyType() { }
     private BooleanOrFlagSpecPropertyType() { }
 

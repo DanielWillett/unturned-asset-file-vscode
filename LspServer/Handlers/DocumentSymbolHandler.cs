@@ -8,6 +8,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using System.Diagnostics;
 using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
@@ -169,6 +170,9 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
             FileRange range = node.Range;
             range.End.Character = file.GetLineLength(range.End.Line);
 
+#if false//DEBUG
+            range = file.ClampRange(range);
+#endif
             Range r = range.ToRange();
             Levels.Peek().Children.Add(new DocumentSymbol
             {
@@ -176,7 +180,7 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
                 Detail = valueString,
                 Kind = kind,
                 Range = r,
-                SelectionRange = hasChildren
+                SelectionRange = false && hasChildren
                     ? new Range(r.Start, new Position(r.Start.Line, r.Start.Character + 1))
                     : r,
                 Children = builder.GetContainer()
@@ -233,7 +237,11 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
                 Kind = kind,
                 Detail = valueString,
                 Children = builder.GetContainer(),
+#if false//DEBUG
+                Range = file.ClampRange(range).ToRange(),
+#else
                 Range = range.ToRange(),
+#endif
                 SelectionRange = selectionRange.ToRange()
             };
 

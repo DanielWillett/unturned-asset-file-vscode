@@ -8,6 +8,8 @@ public sealed class TypeSpecPropertyType : BasicSpecPropertyType<TypeSpecPropert
 {
     public static readonly TypeSpecPropertyType Instance = new TypeSpecPropertyType();
 
+    public override int GetHashCode() => 50;
+
     static TypeSpecPropertyType() { }
     private TypeSpecPropertyType() { }
 

@@ -9,7 +9,7 @@ public partial class SourceNodeTokenizerTests
     {
         string endl = unix ? "\n" : "\r\n";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"Key\" \"Value\"{endl}OtherKey", diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"Key\" \"Value\"{endl}OtherKey", diagnosticSink: DiagnosticSink);
 
         Assert.That(tok.ReadQuotedString(out _, out ReadOnlySpan<char> keyRange), Is.EqualTo("Key"));
         Assert.That(keyRange.ToString(), Is.EqualTo(@"""Key"""));
@@ -33,7 +33,7 @@ public partial class SourceNodeTokenizerTests
     {
         string endl = unix ? "\n" : "\r\n";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"Key\" Value{endl}OtherKey", diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"Key\" Value{endl}OtherKey", diagnosticSink: DiagnosticSink);
 
         Assert.That(tok.ReadQuotedString(out _, out ReadOnlySpan<char> keyRange), Is.EqualTo("Key"));
         Assert.That(keyRange.ToString(), Is.EqualTo(@"""Key"""));
@@ -55,7 +55,7 @@ public partial class SourceNodeTokenizerTests
     [Test]
     public void SkipQuotedValueToEnd()
     {
-        SourceNodeTokenizer tok = new SourceNodeTokenizer("\"Key\" \"Value\"", diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer("\"Key\" \"Value\"", diagnosticSink: DiagnosticSink);
 
         Assert.That(tok.ReadQuotedString(out _, out ReadOnlySpan<char> keyRange), Is.EqualTo("Key"));
         Assert.That(keyRange.ToString(), Is.EqualTo(@"""Key"""));
@@ -75,7 +75,7 @@ public partial class SourceNodeTokenizerTests
     [Test]
     public void SkipNonQuotedValueToEnd()
     {
-        SourceNodeTokenizer tok = new SourceNodeTokenizer("\"Key\" Value", diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer("\"Key\" Value", diagnosticSink: DiagnosticSink);
 
         Assert.That(tok.ReadQuotedString(out _, out ReadOnlySpan<char> keyRange), Is.EqualTo("Key"));
         Assert.That(keyRange.ToString(), Is.EqualTo(@"""Key"""));
@@ -97,7 +97,7 @@ public partial class SourceNodeTokenizerTests
     {
         string endl = unix ? "\n" : "\r\n";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"Key\" \"Value\"{endl}", diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"Key\" \"Value\"{endl}", diagnosticSink: DiagnosticSink);
 
         Assert.That(tok.ReadQuotedString(out _, out ReadOnlySpan<char> keyRange), Is.EqualTo("Key"));
         Assert.That(keyRange.ToString(), Is.EqualTo(@"""Key"""));
@@ -119,7 +119,7 @@ public partial class SourceNodeTokenizerTests
     {
         string endl = unix ? "\n" : "\r\n";
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"Key\" Value{endl}", diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer($"\"Key\" Value{endl}", diagnosticSink: DiagnosticSink);
 
         Assert.That(tok.ReadQuotedString(out _, out ReadOnlySpan<char> keyRange), Is.EqualTo("Key"));
         Assert.That(keyRange.ToString(), Is.EqualTo(@"""Key"""));
@@ -213,7 +213,7 @@ public partial class SourceNodeTokenizerTests
 
         FixLineEnds(unix, ref text, out int endlLen);
 
-        SourceNodeTokenizer tok = new SourceNodeTokenizer(text, diagnosticSink: DiagnosticSink);
+        using SourceNodeTokenizer tok = new SourceNodeTokenizer(text, diagnosticSink: DiagnosticSink);
 
         Assert.That(tok.ReadQuotedString(out _, out ReadOnlySpan<char> keyRange), Is.EqualTo("Key"));
         Assert.That(keyRange.ToString(), Is.EqualTo(@"""Key"""));

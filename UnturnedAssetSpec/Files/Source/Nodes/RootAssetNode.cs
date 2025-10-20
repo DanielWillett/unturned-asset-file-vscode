@@ -77,17 +77,20 @@ internal sealed class RootAssetNode : RootDictionaryNode, IAssetSourceFile
                     continue;
 #endif
 
-                ReferencedWorkspaceFile workspaceFile = new ReferencedWorkspaceFile(localFile, database, this, static (file, state) =>
+                string? text;
+                try
                 {
-                    string text;
-                    try
-                    {
-                        text = System.IO.File.ReadAllText(file.File);
-                    }
-                    catch (SystemException)
-                    {
+                    text = System.IO.File.ReadAllText(file.File);
+                }
+                catch (SystemException)
+                {
+                    text = null;
+                }
+
+                ReferencedWorkspaceFile workspaceFile = new ReferencedWorkspaceFile(localFile, database, this, text!, static (file, state, text) =>
+                {
+                    if (text == null)
                         return null!;
-                    }
 
                     using SourceNodeTokenizer tokenizer = new SourceNodeTokenizer(
                         text,
@@ -97,7 +100,10 @@ internal sealed class RootAssetNode : RootDictionaryNode, IAssetSourceFile
                 });
 
                 if (workspaceFile.SourceFile is not ILocalizationSourceFile local)
+                {
+                    workspaceFile.Dispose();
                     continue;
+                }
 
                 if (local.LanguageName.Equals("English", StringComparison.Ordinal))
                 {
@@ -155,7 +161,7 @@ internal sealed class RootAssetNode : RootDictionaryNode, IAssetSourceFile
                     }
                     else
                     {
-                        type = new QualifiedOrAliasedType(parsedType);
+                        type = QualifiedOrAliasedType.FromType(parsedType);
                         actualType = parsedType;
                     }
                 }
@@ -182,13 +188,13 @@ internal sealed class RootAssetNode : RootDictionaryNode, IAssetSourceFile
                 else if (Database.Information.AssetAliases.TryGetValue(typeProp.Value, out QualifiedType parsedActualType))
                 {
                     actualType = parsedActualType;
-                    type = new QualifiedOrAliasedType(typeProp.Value);
+                    type = QualifiedOrAliasedType.FromAlias(typeProp.Value);
                 }
                 else
                 {
-                    parsedActualType = new QualifiedType(typeProp.Value);
+                    parsedActualType = new QualifiedType(typeProp.Value, isCaseInsensitive: true);
                     actualType = parsedActualType;
-                    type = new QualifiedOrAliasedType(parsedActualType);
+                    type = QualifiedOrAliasedType.FromType(parsedActualType);
                 }
             }
 

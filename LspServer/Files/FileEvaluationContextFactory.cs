@@ -14,18 +14,21 @@ internal class FileEvaluationContextFactory
     private readonly OpenedFileTracker _fileTracker;
     private readonly IAssetSpecDatabase _specDatabase;
     private readonly IWorkspaceEnvironment _workspaceEnvironment;
+    private readonly IFilePropertyVirtualizer _propertyVirtualizer;
     private readonly InstallationEnvironment _installationEnvironment;
 
     public FileEvaluationContextFactory(
         OpenedFileTracker fileTracker,
         IAssetSpecDatabase specDatabase,
         IWorkspaceEnvironment workspaceEnvironment,
-        InstallationEnvironment installationEnvironment)
+        InstallationEnvironment installationEnvironment,
+        IFilePropertyVirtualizer propertyVirtualizer)
     {
         _fileTracker = fileTracker;
         _specDatabase = specDatabase;
         _workspaceEnvironment = workspaceEnvironment;
         _installationEnvironment = installationEnvironment;
+        _propertyVirtualizer = propertyVirtualizer;
     }
 
     public bool TryCreate(Position position, DocumentUri uri, out SpecPropertyTypeParseContext ctx, out ISourceNode? node)
@@ -51,17 +54,29 @@ internal class FileEvaluationContextFactory
 
         if (valueNode == null || parentNode == null)
         {
-            Unsafe.SkipInit(out ctx);
+            ctx = new SpecPropertyTypeParseContext(
+                new FileEvaluationContext(
+                    null!,
+                    null!,
+                    sourceFile,
+                    _workspaceEnvironment,
+                    _installationEnvironment,
+                    _specDatabase,
+                    PropertyResolutionContext.Modern),
+                null)
+            {
+                Node = valueNode,
+                Parent = null
+            };
             return false;
         }
 
-        // todo: needs to work with nested objects and legacy types
-        SpecProperty? property = _specDatabase.FindPropertyInfo(
-            parentNode.Key,
-            fileType,
-            sourceFile is ILocalizationSourceFile
-                ? SpecPropertyContext.Localization
-                : SpecPropertyContext.Property
+        PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(parentNode);
+        SpecProperty? property = _propertyVirtualizer.GetProperty(
+            parentNode,
+            in fileType,
+            in breadcrumbs,
+            out PropertyResolutionContext context
         );
 
         FileEvaluationContext evalCtx = new FileEvaluationContext(
@@ -71,7 +86,7 @@ internal class FileEvaluationContextFactory
             _workspaceEnvironment,
             _installationEnvironment,
             _specDatabase,
-            PropertyResolutionContext.Modern
+            context
         );
 
         ctx = SpecPropertyTypeParseContext.FromFileEvaluationContext(evalCtx, property, parentNode, valueNode, diagnosticSink);
@@ -80,7 +95,6 @@ internal class FileEvaluationContextFactory
 
     public bool TryCreate(Position position, DocumentUri uri, out FileEvaluationContext ctx)
     {
-        // todo: needs to work with nested objects and legacy types
         if (!_fileTracker.Files.TryGetValue(uri, out OpenedFile? file))
         {
             Unsafe.SkipInit(out ctx);
@@ -96,11 +110,25 @@ internal class FileEvaluationContextFactory
 
         if (parentNode == null)
         {
-            Unsafe.SkipInit(out ctx);
+            ctx = new FileEvaluationContext(
+                null!,
+                null!,
+                sourceFile,
+                _workspaceEnvironment,
+                _installationEnvironment,
+                _specDatabase,
+                PropertyResolutionContext.Modern
+            );
             return false;
         }
 
-        SpecProperty? property = _specDatabase.FindPropertyInfo(parentNode.Key, fileType, SpecPropertyContext.Property);
+        PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(parentNode);
+        SpecProperty? property = _propertyVirtualizer.GetProperty(
+            parentNode,
+            in fileType,
+            in breadcrumbs,
+            out PropertyResolutionContext context
+        );
 
         ctx = new FileEvaluationContext(
             property!,
@@ -109,7 +137,7 @@ internal class FileEvaluationContextFactory
             _workspaceEnvironment,
             _installationEnvironment,
             _specDatabase,
-            PropertyResolutionContext.Modern
+            context
         );
         return property != null;
     }

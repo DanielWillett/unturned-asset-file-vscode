@@ -296,7 +296,21 @@ public static class KnownTypes
 
         if (knownType.Equals("LegacyCompatibleList", StringComparison.Ordinal))
         {
-            return LegacyCompatibleList(elementType);
+            if (elementType == null)
+                return null;
+
+            string? elementType2 = specialTypes.FirstOrDefault();
+
+            ISpecType? resolvedElementType = string.IsNullOrEmpty(elementType)
+                ? null
+                : GetType(elementType, elementType2, specialTypes.Remove(elementType2!), resolvedOnly) as ISpecType;
+
+            if (resolvedOnly && resolvedElementType == null)
+                return null;
+            
+            return resolvedElementType == null
+                ? LegacyCompatibleList(new UnresolvedSpecPropertyType(elementType))
+                : LegacyCompatibleList(resolvedElementType);
         }
 
         if (knownType.Equals("SkillLevel", StringComparison.Ordinal))
@@ -503,9 +517,13 @@ public static class KnownTypes
         => new SkillSpecPropertyType(allowStandardSkills, allowBlueprintSkills);
 
     public static ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>> LegacyCompatibleList(ISpecType type)
-        => new LegacyCompatibleListSpecPropertyType(type);
-    public static ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>> LegacyCompatibleList(QualifiedType type)
-        => new LegacyCompatibleListSpecPropertyType(type);
+    {
+        return new LegacyCompatibleListSpecPropertyType(type);
+    }
+    public static ISpecPropertyType LegacyCompatibleList(ISecondPassSpecPropertyType type)
+    {
+        return new UnresolvedLegacyCompatibleListSpecPropertyType(type);
+    }
 
     public static ISpecPropertyType<int> SteamItemDef => SteamItemDefSpecPropertyType.Instance;
     public static ISpecPropertyType<ushort> CaliberId => CaliberIdSpecPropertyType.Instance;

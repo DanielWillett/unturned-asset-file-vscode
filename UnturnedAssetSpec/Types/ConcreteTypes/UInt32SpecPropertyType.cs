@@ -9,6 +9,8 @@ public sealed class UInt32SpecPropertyType : BasicSpecPropertyType<UInt32SpecPro
 {
     public static readonly UInt32SpecPropertyType Instance = new UInt32SpecPropertyType();
 
+    public override int GetHashCode() => 52;
+
     static UInt32SpecPropertyType() { }
     private UInt32SpecPropertyType() { }
 

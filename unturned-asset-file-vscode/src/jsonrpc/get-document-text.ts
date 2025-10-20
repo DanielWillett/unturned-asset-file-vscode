@@ -1,5 +1,5 @@
 import { workspace, Uri } from 'vscode';
-import { RequestType } from 'vscode-languageclient';
+import { integer, RequestType } from 'vscode-languageclient';
 
 export const GetDocumentText = new RequestType<GetDocumentTextParams, GetDocumentTextResponse, void>("unturnedDataFile/getDocumentContent");
 
@@ -10,6 +10,7 @@ export interface GetDocumentTextParams
 export interface GetDocumentTextResponse
 {
     readonly text: string | undefined;
+    readonly version: integer | undefined;
 }
 
 export async function handleGetDocumentText(e: GetDocumentTextParams): Promise<GetDocumentTextResponse>
@@ -20,11 +21,11 @@ export async function handleGetDocumentText(e: GetDocumentTextParams): Promise<G
 
         const decoder = new TextDecoder();
 
-        return { text: decoder.decode(bytes) };
+        return { text: decoder.decode(bytes), version: undefined };
     }
     catch (e)
     {
         console.error(e);
-        return { text: undefined };
+        return { text: undefined, version: undefined };
     }
 }

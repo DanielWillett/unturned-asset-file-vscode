@@ -1,22 +1,22 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 
 public class AssetProperty
 {
-    [JsonPropertyName("key")]
+    [JsonProperty("key")]
     public required string Key { get; set; }
 
-    [JsonPropertyName("range"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonProperty("range"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public Range? Range { get; set; }
 
-    [JsonPropertyName("value")]
+    [JsonProperty("value")]
     public object? Value { get; set; }
 
-    [JsonPropertyName("description")]
+    [JsonProperty("description")]
     public string? Description { get; set; }
 
-    [JsonPropertyName("markdown")]
+    [JsonProperty("markdown")]
     public string? Markdown { get; set; }
 }

@@ -9,6 +9,8 @@ public sealed class NavIdSpecPropertyType : BasicSpecPropertyType<NavIdSpecPrope
 {
     public static readonly NavIdSpecPropertyType Instance = new NavIdSpecPropertyType();
 
+    public override int GetHashCode() => 38;
+
     static NavIdSpecPropertyType() { }
     private NavIdSpecPropertyType() { }
 

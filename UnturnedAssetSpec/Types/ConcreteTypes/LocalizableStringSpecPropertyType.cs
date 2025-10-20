@@ -9,6 +9,8 @@ public sealed class LocalizableStringSpecPropertyType : BasicSpecPropertyType<Lo
     public static readonly LocalizableStringSpecPropertyType Instance = new LocalizableStringSpecPropertyType(false);
     public static readonly LocalizableStringSpecPropertyType TargetInstance = new LocalizableStringSpecPropertyType(true);
 
+    public override int GetHashCode() => _isTarget ? 34 : 35;
+
     private readonly bool _isTarget;
 
     static LocalizableStringSpecPropertyType() { }

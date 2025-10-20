@@ -30,6 +30,12 @@ public sealed class SkillSpecPropertyType :
 
     protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
+    public override int GetHashCode()
+    {
+        // 78 - 81
+        return 78 + (AllowBlueprintSkills ? 1 : 0) + (AllowStandardSkills ? 1 : 0) * 2;
+    }
+
     public SkillSpecPropertyType(bool allowStandardSkills = true, bool allowBlueprintSkills = false)
     {
         AllowStandardSkills = allowStandardSkills;

@@ -7,6 +7,11 @@ public sealed class BlueprintOutputStringParseableSpecPropertyType :
     ISpecPropertyType<CustomSpecTypeInstance>,
     IEquatable<BlueprintOutputStringParseableSpecPropertyType?>
 {
+    public override int GetHashCode()
+    {
+        return 63;
+    }
+
     public override string Type => "DanielWillett.UnturnedDataFileLspServer.Data.Types.BlueprintOutputStringParseableSpecPropertyType, UnturnedAssetSpec";
 
     public override string DisplayName => "Blueprint Output Item";

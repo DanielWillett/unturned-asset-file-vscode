@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -84,6 +85,80 @@ public static class SourceNodeExtensions
             propertyNode = null;
             return false;
         }
+
+        /// <summary>
+        /// Gets a property of this asset from the root level of the asset data. This properly handles 'Metadata' properties.
+        /// </summary>
+        /// <remarks>Also will look for localization properties in the corresponding localization files, and vice versa with asset properties.</remarks>
+        public bool TryResolveProperty(SpecProperty property, [MaybeNullWhen(false)] out IPropertySourceNode propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+        {
+            if (node is ILocalizationSourceFile local && property.Context != SpecPropertyContext.Localization)
+                node = local.Asset;
+
+            if (node is not IAssetSourceFile asset)
+                return node.TryGetProperty(property, out propertyNode, context);
+
+            if (property.Context == SpecPropertyContext.Localization)
+            {
+                foreach (ILocalizationSourceFile localFile in asset.Localization)
+                {
+                    if (localFile.TryResolveProperty(property, out propertyNode, context))
+                        return true;
+                }
+
+                propertyNode = null;
+                return false;
+            }
+
+            if (!property.CanBeInMetadata)
+                return asset.AssetData.TryGetProperty(property, out propertyNode, context);
+
+            IDictionarySourceNode? assetData = asset.GetAssetDataDictionary();
+            IDictionarySourceNode? metadata = asset.GetMetadataDictionary();
+            bool hasValue;
+            if (metadata != null || assetData == null)
+            {
+                IDictionarySourceNode dict = metadata ?? node;
+
+                if (!dict.TryGetProperty(property, out propertyNode) && dict != node)
+                {
+                    hasValue = node.TryGetProperty(property, out propertyNode, context);
+                }
+                else hasValue = true;
+            }
+            else if (!property.Key.Equals("GUID", StringComparison.OrdinalIgnoreCase) || property.Owner is not AssetSpecType)
+            {
+                hasValue = assetData.TryGetProperty(property, out propertyNode, context);
+            }
+            else
+            {
+                propertyNode = null;
+                hasValue = false;
+            }
+
+            return hasValue;
+
+        }
+    }
+
+    extension(IPropertySourceNode property)
+    {
+        /// <summary>
+        /// Checks if a property should be included given a set of <see cref="PropertyInclusionFlags"/>.
+        /// </summary>
+        public bool IsIncluded(PropertyInclusionFlags inclusionFlags)
+        {
+            if ((inclusionFlags & PropertyInclusionFlags.All) == PropertyInclusionFlags.All)
+                return true;
+
+            RootDictionaryPosition pos = property.GetRootAssetNode(out _);
+            return pos switch
+            {
+                RootDictionaryPosition.Metadata => (inclusionFlags & PropertyInclusionFlags.Metadata) != 0,
+                RootDictionaryPosition.Asset or RootDictionaryPosition.Root => (inclusionFlags & PropertyInclusionFlags.AssetOrRoot) != 0,
+                _ => (inclusionFlags & PropertyInclusionFlags.NonRootProperties) != 0
+            };
+        }
     }
 
     extension(IAssetSourceFile root)
@@ -120,59 +195,53 @@ public static class SourceNodeExtensions
         }
     }
 
-    extension(ISourceFile root)
+    extension(ISourceNode root)
     {
         /// <summary>
-        /// Gets a property of this asset from the root level of the asset data. This properly handles 'Metadata' properties.
+        /// Determines whether this node is the root node, the Assets dictionary node, or the Metadata dictionary node.
         /// </summary>
-        /// <remarks>Also will look for localization properties in the corresponding localization files, and vice versa with asset properties.</remarks>
-        public bool TryResolveProperty(SpecProperty property, [MaybeNullWhen(false)] out IPropertySourceNode propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+        /// <param name="rootDictionary">The dictionary where this node exists, or <see langword="null"/> if 'Other' is returned.</param>
+        /// <returns>The position, or 'Other' if it's not a recognized node.</returns>
+        public RootDictionaryPosition GetRootAssetNode(out IDictionarySourceNode? rootDictionary)
         {
-            if (root is ILocalizationSourceFile local && property.Context != SpecPropertyContext.Localization)
-                root = local.Asset;
+            IPropertySourceNode? prop;
 
-            if (root is not IAssetSourceFile asset)
-                return root.TryGetProperty(property, out propertyNode, context);
-
-            if (property.Context == SpecPropertyContext.Localization)
+            switch (root)
             {
-                foreach (ILocalizationSourceFile localFile in asset.Localization)
+                case ISourceFile assetSrc:
+                    rootDictionary = assetSrc;
+                    return RootDictionaryPosition.Root;
+
+                case IPropertySourceNode property:
+                    prop = property;
+                    rootDictionary = property.Value as IDictionarySourceNode;
+                    break;
+
+                case IDictionarySourceNode { Parent: IPropertySourceNode dictProperty } dict:
+                    prop = dictProperty;
+                    rootDictionary = dict;
+                    break;
+
+                default:
+                    rootDictionary = null;
+                    return RootDictionaryPosition.Other;
+            }
+
+            if (root.File is IAssetSourceFile)
+            {
+                if (string.Equals(prop.Key, "Asset", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (localFile.TryResolveProperty(property, out propertyNode, context))
-                        return true;
+                    return rootDictionary == null ? RootDictionaryPosition.Other : RootDictionaryPosition.Asset;
                 }
 
-                propertyNode = null;
-                return false;
-            }
-
-            if (!property.CanBeInMetadata)
-                return asset.AssetData.TryGetProperty(property, out propertyNode, context);
-
-            IDictionarySourceNode? assetData = asset.GetAssetDataDictionary();
-            IDictionarySourceNode? metadata = asset.GetMetadataDictionary();
-            bool hasValue;
-            if (metadata != null || assetData == null)
-            {
-                IDictionarySourceNode dict = metadata ?? root;
-
-                if (!dict.TryGetProperty(property, out propertyNode) && dict != root)
+                if (string.Equals(prop.Key, "Metadata", StringComparison.OrdinalIgnoreCase))
                 {
-                    hasValue = root.TryGetProperty(property, out propertyNode, context);
+                    return rootDictionary == null ? RootDictionaryPosition.Other : RootDictionaryPosition.Metadata;
                 }
-                else hasValue = true;
-            }
-            else if (!property.Key.Equals("GUID", StringComparison.OrdinalIgnoreCase) || property.Owner is not AssetSpecType)
-            {
-                hasValue = assetData.TryGetProperty(property, out propertyNode, context);
-            }
-            else
-            {
-                propertyNode = null;
-                hasValue = false;
             }
 
-            return hasValue;
+            rootDictionary = null;
+            return RootDictionaryPosition.Other;
         }
     }
 
@@ -224,7 +293,7 @@ public static class SourceNodeExtensions
         }
     }
 
-    private static bool FilterMatches(LegacyExpansionFilter filter, PropertyResolutionContext context)
+    internal static bool FilterMatches(LegacyExpansionFilter filter, PropertyResolutionContext context)
     {
         return context switch
         {
@@ -278,4 +347,12 @@ public static class SourceNodeExtensions
     }
 
     private sealed class BreakException : Exception;
+}
+
+public enum RootDictionaryPosition
+{
+    Root,
+    Asset,
+    Metadata,
+    Other
 }

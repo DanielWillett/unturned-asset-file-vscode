@@ -9,6 +9,8 @@ public sealed class UInt16SpecPropertyType : BasicSpecPropertyType<UInt16SpecPro
 {
     public static readonly UInt16SpecPropertyType Instance = new UInt16SpecPropertyType();
 
+    public override int GetHashCode() => 51;
+
     static UInt16SpecPropertyType() { }
     private UInt16SpecPropertyType() { }
 

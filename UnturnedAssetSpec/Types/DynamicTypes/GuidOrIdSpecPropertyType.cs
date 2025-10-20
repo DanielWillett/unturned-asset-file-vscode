@@ -60,6 +60,11 @@ public sealed class GuidOrIdSpecPropertyType :
         return false;
     }
 
+    public override int GetHashCode()
+    {
+        return 72 ^ HashCode.Combine(ElementType, OtherElementTypes);
+    }
+
     public GuidOrIdSpecPropertyType(QualifiedType elementType, OneOrMore<string> specialTypes = default)
     {
         ElementType = elementType;

@@ -9,6 +9,8 @@ public sealed class BeardIndexSpecPropertyType : BasicSpecPropertyType<BeardInde
 {
     public static readonly BeardIndexSpecPropertyType Instance = new BeardIndexSpecPropertyType();
 
+    public override int GetHashCode() => 3;
+
     static BeardIndexSpecPropertyType() { }
     private BeardIndexSpecPropertyType() { }
 

@@ -9,6 +9,8 @@ public sealed class HairIndexSpecPropertyType : BasicSpecPropertyType<HairIndexS
 {
     public static readonly HairIndexSpecPropertyType Instance = new HairIndexSpecPropertyType();
 
+    public override int GetHashCode() => 28;
+
     static HairIndexSpecPropertyType() { }
     private HairIndexSpecPropertyType() { }
 

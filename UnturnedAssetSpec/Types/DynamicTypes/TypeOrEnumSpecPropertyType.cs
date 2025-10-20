@@ -63,6 +63,11 @@ public sealed class TypeOrEnumSpecPropertyType :
         return false;
     }
 
+    public override int GetHashCode()
+    {
+        return 82 ^ HashCode.Combine(ElementType, EnumType);
+    }
+
     public TypeOrEnumSpecPropertyType(QualifiedType elementType, QualifiedType enumType)
     {
         ElementType = elementType;

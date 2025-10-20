@@ -12,7 +12,10 @@ public interface IFilePropertyVirtualizer
     IEnumerable<IFileProperty> EnumerateProperties(ISourceFile file);
 
     IFileProperty? FindProperty(ISourceFile file, SpecProperty property);
-    IFileProperty? FindProperty(ISourceFile file, SpecProperty property, PropertyBreadcrumbs propertyBreadcrumbs);
+    IFileProperty? FindProperty(ISourceFile file, SpecProperty property, in PropertyBreadcrumbs propertyBreadcrumbs);
+
+    SpecProperty? GetProperty(IPropertySourceNode propertyNode, out PropertyResolutionContext context);
+    SpecProperty? GetProperty(IPropertySourceNode propertyNode, in AssetFileType fileType, in PropertyBreadcrumbs propertyBreadcrumbs, out PropertyResolutionContext context);
 }
 
 /// <summary>

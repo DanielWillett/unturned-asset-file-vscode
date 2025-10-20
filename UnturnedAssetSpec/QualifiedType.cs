@@ -399,17 +399,34 @@ public readonly struct QualifiedOrAliasedType : IEquatable<QualifiedOrAliasedTyp
     public bool IsNull => Type.IsNull;
     public QualifiedType Type { get; }
 
-    public QualifiedOrAliasedType(string alias)
+    private QualifiedOrAliasedType(string alias)
     {
         IsAlias = true;
         Type = new QualifiedType(alias);
     }
 
-    public QualifiedOrAliasedType(QualifiedType type)
+    private QualifiedOrAliasedType(QualifiedType type)
     {
         IsAlias = false;
         Type = type.Normalized;
     }
+
+    public static QualifiedOrAliasedType FromAlias(string alias)
+    {
+        return new QualifiedOrAliasedType(alias);
+    }
+
+    public static QualifiedOrAliasedType FromType(string typeAssemblyQualifiedName)
+    {
+        return new QualifiedOrAliasedType(new QualifiedType(typeAssemblyQualifiedName, isCaseInsensitive: true));
+    }
+
+    public static QualifiedOrAliasedType FromType(QualifiedType type)
+    {
+        return new QualifiedOrAliasedType(type.CaseInsensitive);
+    }
+
+    public static implicit operator QualifiedOrAliasedType(QualifiedType type) => new QualifiedOrAliasedType(type);
 
     public bool Equals(QualifiedOrAliasedType other)
     {
