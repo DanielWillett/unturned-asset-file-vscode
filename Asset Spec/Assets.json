@@ -544,6 +544,7 @@
         "Tire": "SDG.Unturned.ItemTireAsset, Assembly-CSharp",
         "Oil_Pump": "SDG.Unturned.ItemOilPumpAsset, Assembly-CSharp",
         "Vehicle_Paint_Tool": "SDG.Unturned.ItemVehiclePaintToolAsset, Assembly-CSharp",
+        "Vehicle_Lockpick_Tool": "SDG.Unturned.ItemVehicleLockpickToolAsset, Assembly-CSharp",
         "Effect": "SDG.Unturned.EffectAsset, Assembly-CSharp",
         "Large": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
         "Medium": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
