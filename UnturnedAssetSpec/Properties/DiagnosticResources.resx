@@ -241,9 +241,9 @@
     <value>Unnecessary trailing comma after quoted string.</value>
   </data>
   <data name="UNT101_CodeFix_Annotation_Label" xml:space="preserve">
-    <value>Use "This" Keyword</value>
+    <value>Use "this" Keyword</value>
   </data>
   <data name="UNT101_CodeFix_Annotation_Desc" xml:space="preserve">
-    <value>The "This" keyword can be used to reference the current asset instead of using an ID or GUID.</value>
+    <value>The "this" keyword can be used to reference the current asset instead of using an ID or GUID.</value>
   </data>
 </root>

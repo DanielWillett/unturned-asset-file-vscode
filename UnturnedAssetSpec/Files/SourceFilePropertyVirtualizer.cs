@@ -138,49 +138,21 @@ public class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
 
         if (property.IsTemplate)
         {
-            // property.Key
-            //Regex regex = new Regex(property.Key, RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.CultureInvariant);
-            //foreach (ISourceNode node in assetData.Children)
-            //{
-            //    if (node is not IPropertySourceNode prop || regex.Match(prop.Key) is not { Success: true } match)
-            //        continue;
-            //
-            //    GroupCollection groups = match.Groups;
-            //    int groupIndex = 0;
-            //    bool wasMatch = true;
-            //    for (int i = 0; i < property.TemplateGroups.Length; ++i)
-            //    {
-            //        wasMatch = false;
-            //        // todo: UseValueOf support
-            //        TemplateGroup tmpGroup = property.TemplateGroups[i];
-            //        if (tmpGroup.Group >= groups.Count || tmpGroup.UseValueOf != null || groupIndex >= keyIndices.Length)
-            //            break;
-            //
-            //        int keyIndex = keyIndices[groupIndex];
-            //        ++groupIndex;
-            //        if (!int.TryParse(groups[tmpGroup.Group].Value, NumberStyles.Number, CultureInfo.InvariantCulture, out int groupValue))
-            //            break;
-            //
-            //        if (groupValue != keyIndex)
-            //            break;
-            //
-            //        wasMatch = true;
-            //    }
-            //
-            //    if (wasMatch)
-            //    {
-            //        return new BasicProperty(
-            //            property,
-            //            prop,
-            //            file,
-            //            assetType,
-            //            _workspaceEnvironment,
-            //            _installationEnvironment,
-            //            _database,
-            //            PropertyResolutionContext.Modern
-            //        );
-            //    }
-            //}
+            if (!breadcrumbs.TryGetProperty(file, property, out IPropertySourceNode? propNode))
+            {
+                return null;
+            }
+
+            return new BasicProperty(
+                property,
+                propNode,
+                file,
+                assetType, 
+                _workspaceEnvironment,
+                _installationEnvironment,
+                _database,
+                PropertyResolutionContext.Modern
+            );
         }
 
         return null;
@@ -275,6 +247,7 @@ internal abstract class BaseProperty(
         GetEvalCtx(out FileEvaluationContext ctx);
         parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(
             ctx,
+            PropertyBreadcrumbs.Root,
             Property,
             propertyNode,
             propertyNode.Value

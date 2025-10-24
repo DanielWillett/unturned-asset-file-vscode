@@ -19,12 +19,14 @@ using System.Text;
 using System.Text.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Diagnostics;
+using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace DanielWillett.UnturnedDataFileLspServer;
 
 internal sealed class UnturnedAssetFileLspServer
 {
-    public const string LanguageId = "unturned-data-file";
+    public const string LanguageId = "unturned-dat";
     public const string DiagnosticSource = "unturned-dat";
 
     private static ILogger<UnturnedAssetFileLspServer> _logger = null!;
@@ -33,10 +35,14 @@ internal sealed class UnturnedAssetFileLspServer
 
     private static Timer? _closeTimer;
 
+    public const string FileWatcherGlobPattern = "{**/*.dat,**/*.asset,**/Config_*Difficulty.txt}";
+
+    public static readonly Matcher FileWatcherMatcher = new Matcher().AddInclude("**/*.asset").AddInclude("**/*.dat");
+
     public static readonly TextDocumentSelector AssetFileSelector = new TextDocumentSelector(new TextDocumentFilter
     {
         Language = LanguageId,
-        Pattern = "**/*.{dat,asset}"
+        Pattern = FileWatcherGlobPattern
     });
 
     public static string DebugPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "UnturnedDatLSP");
@@ -59,7 +65,7 @@ internal sealed class UnturnedAssetFileLspServer
             .CreateLogger();
 
 #if DEBUG
-        if (Environment.GetEnvironmentVariable("UNTURNED_LSP_DEBUG") == "1")
+        //if (Environment.GetEnvironmentVariable("UNTURNED_LSP_DEBUG") == "1")
         {
             Debugger.Launch();
         }
@@ -82,9 +88,10 @@ internal sealed class UnturnedAssetFileLspServer
                 .WithHandler<DocumentSymbolHandler>()
                 .WithHandler<KeyCompletionHandler>()
                 .WithHandler<DiscoverAssetPropertiesHandler>()
+                .WithHandler<LspWorkspaceEnvironment>()
                 .WithHandler<GetAssetPropertyAddLocationHandler>()
                 .WithHandler<CodeActionRequestHandler>()
-                .WithHandler<DocumentDiagnosticHandler>()
+                //.WithHandler<DocumentDiagnosticHandler>()
                 .WithServerInfo(new ServerInfo
                 {
                     Name = "Unturned Data File LSP",
@@ -101,13 +108,15 @@ internal sealed class UnturnedAssetFileLspServer
                         .AddSingleton<OpenedFileTracker>()
                         .AddSingleton<FileEvaluationContextFactory>()
                         .AddSingleton<IAssetSpecDatabase, LspAssetSpecDatabase>()
-                        .AddSingleton<IWorkspaceEnvironment, LspWorkspaceEnvironment>()
+                        .AddSingleton<LspWorkspaceEnvironment>()
+                        .AddSingleton<DiagnosticsManager>()
                         .AddSingleton<IFilePropertyVirtualizer, SourceFilePropertyVirtualizer>()
                         .AddSingleton<GlobalCodeFixes>()
                         .AddSingleton<LspInstallationEnvironment>()
                         .AddSingleton<EnvironmentCache>()
                         .AddSingleton<ISpecDatabaseCache, EnvironmentCache>(sp => sp.GetRequiredService<EnvironmentCache>())
                         .AddSingleton<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
+                        .AddSingleton<IWorkspaceEnvironment>(sp => sp.GetRequiredService<LspWorkspaceEnvironment>())
                         .AddSingleton(new JsonSerializerOptions
                         {
                             WriteIndented = true
@@ -167,6 +176,9 @@ internal sealed class UnturnedAssetFileLspServer
                     _initObserver?.OnCompleted();
                     _initObserver = null;
 
+                    // warmup services
+                    _ = server.Services.GetRequiredService<DiagnosticsManager>();
+
 #if DEBUG
                     _logger.LogInformation("LSP initialized, client PID: {0}, server PID: {1} ({2}).", ClientProcessId, Environment.ProcessId, Environment.CommandLine);
 #else
@@ -219,7 +231,11 @@ internal sealed class UnturnedAssetFileLspServer
     {
         IAssetSpecDatabase db = serviceProvider.GetRequiredService<IAssetSpecDatabase>();
 
+#if DEBUG
+        db.UseInternet = false;
+#else
         db.UseInternet = true;
+#endif
 
         _logger.LogInformation("Initializing asset specs...");
         await db.InitializeAsync(token).ConfigureAwait(false);

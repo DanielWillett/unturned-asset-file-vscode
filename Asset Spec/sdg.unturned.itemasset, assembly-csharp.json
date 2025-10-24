@@ -1278,7 +1278,7 @@
                 {
                     "Key": "Effect",
                     "Type": "BcAssetReference",
-                    "ElementType": "EFFECT",
+                    "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "Reference to an effect that will be spawned when this blueprint is crafted.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#effect-asset-pointer-to-doc-assets-effect",

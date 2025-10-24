@@ -266,19 +266,27 @@ public class InstallationEnvironment : IDisposable
 
             FileSystemWatcher watcher = new FileSystemWatcher(dir, "*");
 
-            watcher.NotifyFilter = NotifyFilters.LastWrite
-                                   | NotifyFilters.FileName
-                                   | NotifyFilters.DirectoryName
-                                   | NotifyFilters.CreationTime;
-            watcher.IncludeSubdirectories = true;
-            watcher.EnableRaisingEvents = true;
+            try
+            {
+                watcher.NotifyFilter = NotifyFilters.LastWrite
+                                       | NotifyFilters.FileName
+                                       | NotifyFilters.DirectoryName
+                                       | NotifyFilters.CreationTime;
+                watcher.IncludeSubdirectories = true;
+                watcher.EnableRaisingEvents = true;
 
-            watcher.Changed += FileWatcherFileUpdated;
-            watcher.Deleted += FileWatcherFileRemoved;
-            watcher.Created += FileWatcherFileUpdated;
-            watcher.Renamed += FileWatcherFileRenamed;
+                watcher.Changed += FileWatcherFileUpdated;
+                watcher.Deleted += FileWatcherFileRemoved;
+                watcher.Created += FileWatcherFileUpdated;
+                watcher.Renamed += FileWatcherFileRenamed;
 
-            _sourceDirs.Add(new SourceDirectory(watcher, dir));
+                _sourceDirs.Add(new SourceDirectory(watcher, dir));
+            }
+            catch
+            {
+                watcher.Dispose();
+                throw;
+            }
         }
 
         return true;

@@ -29,6 +29,11 @@ public interface IAssetSpecDatabase
     bool UseInternet { get; set; }
 
     /// <summary>
+    /// If the database finished initializing.
+    /// </summary>
+    bool IsInitialized { get; }
+
+    /// <summary>
     /// JSON options used to read files.
     /// </summary>
     JsonSerializerOptions? Options { get; set; }
@@ -111,6 +116,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     /// Allow downloading the latest version of files from the internet instead of using a possibly outdated embedded version.
     /// </summary>
     public bool UseInternet { get; set; }
+    public bool IsInitialized { get; private set; }
 
     // for debugging
     public bool MultiThreaded { get; set; } = true;
@@ -315,6 +321,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
             await Task.WhenAll(initTasks).ConfigureAwait(false);
         }
+        IsInitialized = true;
 
         if (_cache != null)
         {
@@ -1405,6 +1412,8 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             _db = db;
             Types = types;
         }
+
+        public bool IsInitialized => false;
 
         public bool UseInternet
         {

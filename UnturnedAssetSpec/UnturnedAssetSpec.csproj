@@ -2,49 +2,64 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-		<Nullable>enable</Nullable>
-		<LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
 
-		<RootNamespace>DanielWillett.UnturnedDataFileLspServer.Data</RootNamespace>
+    <RootNamespace>DanielWillett.UnturnedDataFileLspServer.Data</RootNamespace>
 
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-		<DefineConstants>$(DefineConstants);EMIT</DefineConstants>
+    <DefineConstants>$(DefineConstants);EMIT</DefineConstants>
+
+    <StrongNameKeyPath>C:\Strong Name Keys\UnturnedAssetSpec\UnturnedAssetSpec.dll.snk</StrongNameKeyPath>
   </PropertyGroup>
 
-	<ItemGroup>
-		<EmbeddedResource Include="../Asset Spec/**">
-			<Link>%(RecursiveDir)/Asset Spec/%(Filename)%(Extension)</Link>
-		</EmbeddedResource>
-	</ItemGroup>
+  <PropertyGroup Condition="exists($(StrongNameKeyPath))">
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(StrongNameKeyPath)</AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign>
+  </PropertyGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="System.Text.Json" Version="4.7.1" />
-	  <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" Condition="$(DefineConstants.Contains('EMIT')) And '$(TargetFramework)' != 'netstandard2.1'" />
-	  <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
-	  <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="6.0.0" />
+
+  <ItemGroup>
+    <EmbeddedResource Include="../Asset Spec/**">
+      <Link>%(RecursiveDir)/Asset Spec/%(Filename)%(Extension)</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Remove="UnturnedAssetSpec.csproj.Backup.tmp" />
+    <None Remove="UnturnedAssetSpec.dll.publickey" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="4.7.1" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" Condition="$(DefineConstants.Contains('EMIT')) And '$(TargetFramework)' != 'netstandard2.1'" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
+    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="6.0.0" />
     <PackageReference Include="Microsoft.Bcl.Numerics" Version="8.0.0" Condition="'$(TargetFramework)' != 'netstandard2.1'" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" Condition="'$(TargetFramework)' != 'netstandard2.1'" />
     <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-		<PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
   </ItemGroup>
 
-	<ItemGroup>
-	  <Compile Update="Properties\DiagnosticResources.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>DiagnosticResources.resx</DependentUpon>
-	  </Compile>
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\DiagnosticResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DiagnosticResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
 
-	<ItemGroup>
-	  <EmbeddedResource Update="Properties\DiagnosticResources.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>DiagnosticResources.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	</ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\DiagnosticResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DiagnosticResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"name": "Unturned Data File",
-	"scopeName": "source.unturned-data-file",
+	"scopeName": "source.unturned-dat",
 	"fileTypes": [ ".dat", ".asset" ],
 	"foldingStartMarker": "[\\{\\[]\\s*$",
 	"foldingStopMarker": "^\\s*[\\]\\}]",

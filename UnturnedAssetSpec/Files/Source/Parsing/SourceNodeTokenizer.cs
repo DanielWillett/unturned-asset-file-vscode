@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -15,11 +16,23 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 public enum SourceNodeTokenizerOptions
 {
     None = 0,
+
+    /// <summary>
+    /// Parsed data includes comments and whitespace.
+    /// </summary>
     Metadata     = 1 << 0,
+    
+    /// <summary>
+    /// Property values are not resolved until they're first accessed.
+    /// </summary>
     Lazy         = 1 << 1,
+    
+    /// <summary>
+    /// Indicates that assets read with this tokenizer shouldn't attempt to load related localization files.
+    /// </summary>
+    SkipLocalizationInAssets = 1 << 2,
 
-
-    Default = 0
+    Default = None
 }
 
 public ref partial struct SourceNodeTokenizer : IDisposable
@@ -425,7 +438,6 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                 props.Range = range;
                 TransformRange(ref props.Range);
                 props.Depth = depth + _depthOffset;
-                SkipToNextToken();
                 return ValueNode.Create(str, true, comment, in props);
 
             default:
@@ -438,7 +450,6 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                 TransformRange(ref props.Range);
                 props.Depth = depth + _depthOffset;
                 unhandledComments = OneOrMore<Comment>.Null;
-                SkipToNextToken();
                 return ValueNode.Create(str, false, Comment.None, in props);
         }
     }
@@ -467,6 +478,10 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 
         FileRange thisObjRange = default;
         thisObjRange.Start = _position;
+        if (isRoot)
+            ++thisObjRange.Start.Character;
+
+        OneOrMore<KeyValuePair<string, object?>> additionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null;
 
         int startNodeListIndex = _nodeListSize;
         int startIndex = _index;
@@ -547,13 +562,14 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                 {
                     case '/':
                         FilePosition st = _position;
-                        if ((_options & SourceNodeTokenizerOptions.Metadata) == 0)
+                        bool couldBeAdditionalProp = isRoot && _position.Line == 1 + additionalProperties.Length;
+                        if (!couldBeAdditionalProp && (_options & SourceNodeTokenizerOptions.Metadata) == 0)
                         {
                             SkipComment(out _);
                         }
                         else if (TryReadComment(
                                      out comment,
-                                     _position.Line == thisObjRange.Start.Line
+                                     !isRoot && _position.Line == thisObjRange.Start.Line
                                          ? CommentPosition.AfterOpeningBracket
                                          : CommentPosition.NewLine,
                                      ref thisObjRange)
@@ -565,10 +581,18 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                                 beginComment = comment;
                             else
                             {
-                                props.Range = new FileRange(st, thisObjRange.End);
-                                TransformRange(ref props.Range);
-                                props.LastCharacterIndex = _readLastCharacterIndex + _indexOffset;
-                                AddToNodeList(CommentOnlyNode.Create(comment, in props));
+                                if (couldBeAdditionalProp && comment.TryParseAsAdditionalProperty(out KeyValuePair<string, object?> prop))
+                                {
+                                    additionalProperties = additionalProperties.Add(prop);
+                                }
+
+                                if ((_options & SourceNodeTokenizerOptions.Metadata) != 0)
+                                {
+                                    props.Range = new FileRange(st, thisObjRange.End);
+                                    TransformRange(ref props.Range);
+                                    props.LastCharacterIndex = _readLastCharacterIndex + _indexOffset;
+                                    AddToNodeList(CommentOnlyNode.Create(comment, in props));
+                                }
                             }
                         }
                         break;
@@ -746,9 +770,11 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 
         IAnyChildrenSourceNode node = rootType.Type switch
         {
-            RootType.Asset => RootAssetNode.Create(rootType.File, rootType.Database, nonMetaDataNodeCount, array, in props),
-            RootType.Localization => RootLocalizationNode.Create(rootType.File, rootType.LocalAsset, rootType.Database, nonMetaDataNodeCount, array, in props),
-            RootType.Other => RootDictionaryNode.Create(rootType.File, rootType.Database, nonMetaDataNodeCount, array, in props),
+            RootType.Asset => (_options & SourceNodeTokenizerOptions.SkipLocalizationInAssets) != 0
+                ? RootAssetNodeSkippedLocalization.Create(rootType.File, rootType.Database, nonMetaDataNodeCount, array, in props, additionalProperties)
+                : RootAssetNode.Create(rootType.File, rootType.Database, nonMetaDataNodeCount, array, in props, additionalProperties),
+            RootType.Localization => RootLocalizationNode.Create(rootType.File, rootType.LocalAsset, rootType.Database, nonMetaDataNodeCount, array, in props, additionalProperties),
+            RootType.Other => RootDictionaryNode.Create(rootType.File, rootType.Database, nonMetaDataNodeCount, array, in props, additionalProperties),
             _ => isList ? ListNode.Create(nonMetaDataNodeCount, array, comments, in props)
                         : DictionaryNode.Create(nonMetaDataNodeCount, array, comments, in props)
         };
@@ -1308,7 +1334,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
         if (_skipRead)
         {
             _skipRead = false;
-            return true;
+            return _index < _file.Length;
         }
 
         if (_char == '\n')

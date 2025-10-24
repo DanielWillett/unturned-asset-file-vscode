@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
@@ -192,6 +193,21 @@ public static class SourceNodeExtensions
             }
 
             return property.Value as IDictionarySourceNode;
+        }
+
+        /// <summary>
+        /// Attempts to add localization to the node later on. Used with the 
+        /// </summary>
+        public bool TryAddLocalization(ImmutableArray<ILocalizationSourceFile> localization, [MaybeNullWhen(false)] out IAssetSourceFile sourceFile)
+        {
+            if (root is not RootAssetNodeSkippedLocalization rootAssetNode)
+            {
+                sourceFile = null;
+                return false;
+            }
+
+            sourceFile = rootAssetNode.CreateWithLocalization(localization);
+            return true;
         }
     }
 

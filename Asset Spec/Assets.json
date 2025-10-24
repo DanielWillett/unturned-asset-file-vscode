@@ -40,6 +40,15 @@
         "#332c25",
         "#231f1c"
     ],
+    "KnownFileNames":
+    {
+        "Config.txt": "SDG.Unturned.ServerConfigData, Assembly-CSharp",
+        "Config_EasyDifficulty.txt": "SDG.Unturned.ServerConfigData, Assembly-CSharp",
+        "Config_NormalDifficulty.txt": "SDG.Unturned.ServerConfigData, Assembly-CSharp",
+        "Config_HardDifficulty.txt": "SDG.Unturned.ServerConfigData, Assembly-CSharp",
+        "Level.hierarchy": "SDG.Framework.Devkit.LevelHierarchy, Assembly-CSharp",
+        "MasterBundle.dat": "SDG.Unturned.MasterBundleConfig, Assembly-CSharp"
+    },
     "FaceCount": 32,
     "BeardCount": 16,
     "HairCount": 23,
@@ -312,6 +321,10 @@
     "Types":
     {   
         "SDG.Unturned.MasterBundleConfig, Assembly-CSharp":
+        {
+            "HasDataFiles": true
+        },
+        "SDG.Unturned.ServerConfigData, Assembly-CSharp":
         {
             "HasDataFiles": true
         },

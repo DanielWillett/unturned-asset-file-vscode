@@ -19,7 +19,7 @@ public static class OmniSharpAssetSpecExtensionsExtensions
 
     public static FileRange ToFileRange(this Range range)
     {
-        return new FileRange(range.Start.Line + 1, range.Start.Character + 1, range.End.Line + 1, range.End.Character);
+        return new FileRange(range.Start.Line + 1, range.Start.Character + 1, range.End.Line + 1, range.End.Character + 1);
     }
 
     public static Range ToRange(this FileRange range)

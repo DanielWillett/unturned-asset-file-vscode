@@ -14,9 +14,6 @@ public sealed class TypeOrEnumSpecPropertyType :
     IStringParseableSpecPropertyType,
     ISpecialTypesSpecPropertyType
 {
-    private IAssetSpecDatabase? _cachedSpecDb;
-    private ISpecType? _cachedEnum;
-
     public QualifiedType ElementType { get; }
     public QualifiedType EnumType { get; }
 
@@ -91,25 +88,7 @@ public sealed class TypeOrEnumSpecPropertyType :
     /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
     {
-        ISpecType? enumType = null;
-
-        if (_cachedSpecDb == parse.Database)
-        {
-            lock (this)
-            {
-                if (_cachedSpecDb == parse.Database)
-                {
-                    enumType = _cachedEnum;
-                }
-            }
-        }
-
-        enumType ??= EnumType.IsNull ? null : parse.Database.FindType(EnumType.Type, parse.FileType);
-        lock (this)
-        {
-            _cachedSpecDb = parse.Database;
-            _cachedEnum = enumType;
-        }
+        ISpecType? enumType = parse.Database.FindType(EnumType.Type, parse.FileType);
 
         if (enumType is not IStringParseableSpecPropertyType fullEnumType)
         {

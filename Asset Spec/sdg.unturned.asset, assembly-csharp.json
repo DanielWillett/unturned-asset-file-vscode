@@ -3154,9 +3154,9 @@
                 {
                     "Key": "Asset",
                     "Type": "BcAssetReference",
-                    "ElementType": "ITEM",
+                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
                     "SpecialTypes": [ "SDG.Unturned.SpawnAsset, Assembly-CSharp" ],
-                    "DefaultValue": "#000000",
+                    "DefaultValue": "00000000000000000000000000000000",
                     "Required": true,
                     "Description": "The item or spawn table to spawn in. Legacy IDs will be interpreted as items.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",

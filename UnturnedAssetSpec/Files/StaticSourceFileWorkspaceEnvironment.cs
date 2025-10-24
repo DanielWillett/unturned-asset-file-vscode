@@ -25,7 +25,7 @@ public class StaticSourceFileWorkspaceEnvironment : IWorkspaceEnvironment, IDisp
     {
         _database = database;
         _defaultSourceOptions = defaultSourceOptions;
-        _cache = useCache ? new ConcurrentDictionary<string, StaticSourceFile>(PathHelper.PathComparer) : null;
+        _cache = useCache ? new ConcurrentDictionary<string, StaticSourceFile>(OSPathHelper.PathComparer) : null;
 
         if (useCache && installationEnvironment != null)
         {

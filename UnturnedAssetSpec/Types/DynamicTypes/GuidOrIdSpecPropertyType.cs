@@ -15,9 +15,6 @@ public sealed class GuidOrIdSpecPropertyType :
     IEquatable<GuidOrIdSpecPropertyType>,
     IStringParseableSpecPropertyType
 {
-    private IAssetSpecDatabase? _cachedSpecDb;
-    private ISpecType? _cachedType;
-
     public OneOrMore<QualifiedType> OtherElementTypes { get; }
     public QualifiedType ElementType { get; }
 
@@ -91,31 +88,10 @@ public sealed class GuidOrIdSpecPropertyType :
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out GuidOrId value)
     {
         // todo: remember that [vehicle ]redirect assets need to work properly
-        ISpecType? specType = null;
+        
+        ISpecType? specType = parse.Database.FindType(ElementType.Type, parse.FileType);
 
-        // todo wtf is this for
-        if (_cachedSpecDb == parse.Database)
-        {
-            lock (this)
-            {
-                if (_cachedSpecDb == parse.Database)
-                {
-                    specType = _cachedType;
-                }
-            }
-        }
-
-        if (specType == null)
-        {
-            specType = parse.Database.FindType(ElementType.Type, parse.FileType);
-            lock (this)
-            {
-                _cachedSpecDb = parse.Database;
-                _cachedType = specType;
-            }
-        }
-
-        if (specType is not EnumSpecType enumType)
+        if (!ElementType.IsNull && specType is not AssetSpecType)
         {
             if (parse.HasDiagnostics)
             {
@@ -142,31 +118,6 @@ public sealed class GuidOrIdSpecPropertyType :
         }
 
         string val = stringNode.Value;
-
-        if (val.IndexOf('.') >= 0)
-        {
-            EnumSpecTypeValue[] values = enumType.Values;
-            bool found = false;
-            for (int i = 0; i < values.Length; ++i)
-            {
-                ref EnumSpecTypeValue enumVal = ref values[i];
-                if (enumVal.CorrespondingType.IsNull || !string.Equals(enumVal.Value, val, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                val = enumVal.CorrespondingType.Type;
-                found = true;
-                break;
-            }
-
-            if (!found && int.TryParse(val, NumberStyles.Any, CultureInfo.InvariantCulture, out int index) && index >= 0 && index < values.Length)
-            {
-                string? type = values[index].CorrespondingType.Type;
-                if (type != null)
-                    val = type;
-            }
-        }
 
         if (!GuidOrId.TryParse(val, out value))
         {

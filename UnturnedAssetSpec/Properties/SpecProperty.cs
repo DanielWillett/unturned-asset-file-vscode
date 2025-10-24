@@ -441,7 +441,11 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
         MaximumValue = MaximumValue,
         MinimumValue = MinimumValue,
         Parent = Parent,
-        Variable = Variable
+        Variable = Variable,
+        _keyTemplateProcessor = _keyTemplateProcessor,
+        _aliasTemplateProcessors = _aliasTemplateProcessors,
+        AdditionalProperties = AdditionalProperties,
+        Context = Context
     };
 }
 

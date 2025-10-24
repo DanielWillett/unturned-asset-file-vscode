@@ -362,7 +362,7 @@
         {
             "Key": "Color_Skin",
             "Type": "ColorRGBStrictHex",
-            "DefaultValue": "#ffffff",
+            "DefaultValue": "ffffff",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The NPC's skin color.",
             "Variable": "skin",
@@ -371,7 +371,7 @@
         {
             "Key": "Color_Hair",
             "Type": "ColorRGBStrictHex",
-            "DefaultValue": "#ffffff",
+            "DefaultValue": "ffffff",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The NPC's hair color.",
             "Variable": "color",

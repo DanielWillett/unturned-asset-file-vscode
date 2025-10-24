@@ -1,5 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Immutable;
 
@@ -8,7 +9,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 /// <summary>
 /// The root dictionary of a file.
 /// </summary>
-public interface ISourceFile : IDictionarySourceNode
+public interface ISourceFile : IDictionarySourceNode, IAdditionalPropertyProvider
 {
     /// <summary>
     /// The file this root source node is from.

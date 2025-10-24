@@ -190,12 +190,17 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 
         dictionary.TryGetPropertyValue(nameProperty, out IValueSourceNode? nameNode);
 
-        if (!dictionary.TryGetPropertyValue(pathProperty, out IValueSourceNode? pathNode))
+        if (!dictionary.TryGetProperty(pathProperty, out IPropertySourceNode? pathNode))
         {
             return MissingProperty(in parse, pathProperty, out value);
         }
 
-        value = new BundleReference(nameNode?.Value ?? string.Empty, pathNode.Value, rType);
+        if (!pathNode.HasValue || pathNode.ValueKind != ValueTypeDataRefType.Value)
+        {
+            value = new BundleReference(string.Empty, string.Empty, rType);
+        }
+
+        value = new BundleReference(nameNode?.Value ?? string.Empty, pathNode.GetValueString(out _)!, rType);
         return true;
     }
 

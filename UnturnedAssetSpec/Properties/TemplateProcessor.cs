@@ -27,7 +27,7 @@ public sealed class TemplateProcessor
         if (_segments.IsNull)
             return true;
 
-        if (TemplateCount < output.Length)
+        if (TemplateCount > output.Length)
             throw new ArgumentException($"Span not large enough: output. Expected at least {TemplateCount} template spots.");
 
         if (key.Length < _totalSegmentLength)

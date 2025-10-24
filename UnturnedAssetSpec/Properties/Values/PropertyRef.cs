@@ -354,7 +354,7 @@ public readonly struct PropertyRefInfo
             return prop.DefaultValue;
         }
 
-        SpecPropertyTypeParseContext parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(ctx, prop, node, node.Value);
+        SpecPropertyTypeParseContext parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(ctx, PropertyBreadcrumbs.Root, prop, node, node.Value);
 
         if (prop.Type.TryParseValue(in parse, out ISpecDynamicValue? value))
         {

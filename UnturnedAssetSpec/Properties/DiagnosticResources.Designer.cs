@@ -187,7 +187,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &quot;This&quot; keyword can be used to reference the current asset instead of using an ID or GUID..
+        ///   Looks up a localized string similar to The &quot;this&quot; keyword can be used to reference the current asset instead of using an ID or GUID..
         /// </summary>
         internal static string UNT101_CodeFix_Annotation_Desc {
             get {
@@ -196,7 +196,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use &quot;This&quot; Keyword.
+        ///   Looks up a localized string similar to Use &quot;this&quot; Keyword.
         /// </summary>
         internal static string UNT101_CodeFix_Annotation_Label {
             get {

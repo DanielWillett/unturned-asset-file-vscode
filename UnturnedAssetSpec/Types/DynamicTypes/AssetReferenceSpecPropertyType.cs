@@ -251,14 +251,7 @@ public sealed class AssetReferenceSpecPropertyType :
 
             CheckInappropriateAmount(in parse, stringValue);
 
-            if (!KnownTypeValueHelper.TryParseGuid(stringValue.Value, out value))
-            {
-                return FailedToParse(in parse, out value);
-            }
-
-            CheckSelfRef(in parse, value, stringValue);
-
-            return true;
+            return ParseGuidFromStringValue(stringValue, in parse, out value);
         }
 
         if (!CanParseDictionary || parse.Node is not IDictionarySourceNode dictionary)
@@ -271,12 +264,38 @@ public sealed class AssetReferenceSpecPropertyType :
             return MissingProperty(in parse, "GUID", out value);
         }
 
-        if (node is not IValueSourceNode stringValue2 || !KnownTypeValueHelper.TryParseGuid(stringValue2.Value, out value))
+        if (node is not IValueSourceNode stringValue2)
         {
             return FailedToParse(in parse, out value);
         }
 
-        CheckSelfRef(in parse, value, stringValue2);
+        return ParseGuidFromStringValue(stringValue2, in parse, out value);
+    }
+
+    private bool ParseGuidFromStringValue(IValueSourceNode stringValue, in SpecPropertyTypeParseContext parse, out Guid value)
+    {
+        if (!KnownTypeValueHelper.TryParseGuid(stringValue.Value, out value))
+        {
+            if (stringValue.Value.Equals("0", StringComparison.Ordinal))
+            {
+                value = Guid.Empty;
+            }
+            else
+            {
+                return FailedToParse(in parse, out value);
+            }
+        }
+        else if (parse.HasDiagnostics && SupportsThis && parse.File is IAssetSourceFile { Guid: { } guid } && guid == value)
+        {
+            parse.Log(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT101,
+                Message = DiagnosticResources.UNT101,
+                Range = stringValue.Range
+            });
+        }
+
+        CheckSelfRef(in parse, value, stringValue);
 
         return true;
     }

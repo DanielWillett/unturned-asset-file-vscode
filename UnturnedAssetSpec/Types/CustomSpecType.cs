@@ -149,8 +149,10 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
                 }
                 else
                 {
+                    PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(kvp);
                     SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(
                         new FileEvaluationContext(in parse.EvaluationContext, property, PropertyResolutionContext.Legacy),
+                        breadcrumbs,
                         parse.Diagnostics)
                     {
                         Node = kvp.Value,
@@ -175,8 +177,10 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
                     continue;
                 }
 
+                PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(kvp);
                 SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(
                     new FileEvaluationContext(in parse.EvaluationContext, property, PropertyResolutionContext.Modern),
+                    breadcrumbs,
                     parse.Diagnostics)
                 {
                     Node = kvp.Value,

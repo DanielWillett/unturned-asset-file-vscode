@@ -173,7 +173,7 @@ public sealed class LegacyCompatibleListSpecPropertyType :
 
         baseKey = $"{baseKey}_{index.ToString(CultureInfo.InvariantCulture)}";
 
-        SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(parse.EvaluationContext, parse.Diagnostics)
+        SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(parse.EvaluationContext, parse.Breadcrumbs, parse.Diagnostics)
         {
             Node = dictionary,
             BaseKey = baseKey,
@@ -208,7 +208,7 @@ public sealed class LegacyCompatibleListSpecPropertyType :
             return MissingNode(in parse, out _);
         }
 
-        SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(parse.EvaluationContext, parse.Diagnostics)
+        SpecPropertyTypeParseContext context = new SpecPropertyTypeParseContext(parse.EvaluationContext, parse.Breadcrumbs, parse.Diagnostics)
         {
             Node = dictionary,
             BaseKey = string.Empty,

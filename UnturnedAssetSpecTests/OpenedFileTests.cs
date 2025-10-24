@@ -875,5 +875,50 @@ public class OpenedFileTests
         Console.WriteLine(runner.GetFullText());
     }
 
+    [Test]
+    public void ReplaceValue([Values("\n", "\r\n")] string newLine)
+    {
+        string file = """
+                      GUID cb4352c6fcb044c2b58e6edfa5644904
+                      Type Arrest_End
+                      Rarity Uncommon
+                      Useable Arrest_End
+                      ID 1196
+                      
+                      Size_X test
+                      Size_Y 1
+                      Size_Z 0.3
+                      
+                      Should_Drop_On_Death
+                      
+                      Blueprints
+                      [
+                          {
+                              OutputItems
+                              [
+                                  101
+                                  1196
+                              ]
+                          }
+                      ]
+                      """;
+
+        file = file.Replace("\r", string.Empty).Replace("\n", newLine);
+
+        using OpenedFile runner = new OpenedFile(DocumentUri.File("C:\\test.dat"), file, _logger, _database, obsessivelyValidate: true);
+
+        runner.UpdateText(file =>
+        {
+            // "Size_X test" -> "Size_X 1"
+            file.ReplaceText(((7, 8), (7, 12)), "1");
+        });
+
+        Console.WriteLine(runner.GetFullText());
+
+        Assert.That(runner.GetFullText().Contains("Size_X 1" + newLine));
+
+        runner.AssertFileHasValidIndex();
+    }
+
 }
 #endif

@@ -11,6 +11,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Diagnostics;
+using DanielWillett.UnturnedDataFileLspServer.Diagnostics;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
@@ -19,17 +20,19 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
 {
     private readonly OpenedFileTracker _fileTracker;
     private readonly IAssetSpecDatabase _specDatabase;
-    private readonly ILogger<DocumentSymbolHandler> _logger;
+    private readonly ILogger<DocumentDiagnosticHandler> _logger;
     private readonly IWorkspaceEnvironment _workspace;
     private readonly IFilePropertyVirtualizer _virtualizer;
     private readonly InstallationEnvironment _installationEnvironment;
+    private readonly DiagnosticsManager _diagnosticsManager;
 
     public DocumentDiagnosticHandler(
         OpenedFileTracker fileTracker,
         IAssetSpecDatabase specDatabase,
-        ILogger<DocumentSymbolHandler> logger,
+        ILogger<DocumentDiagnosticHandler> logger,
         IWorkspaceEnvironment workspace,
         InstallationEnvironment installationEnvironment,
+        DiagnosticsManager diagnosticsManager,
         IFilePropertyVirtualizer virtualizer)
     {
         _fileTracker = fileTracker;
@@ -37,6 +40,7 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
         _logger = logger;
         _workspace = workspace;
         _installationEnvironment = installationEnvironment;
+        _diagnosticsManager = diagnosticsManager;
         _virtualizer = virtualizer;
     }
 
@@ -55,6 +59,11 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
     /// <inheritdoc />
     public override async Task<RelatedDocumentDiagnosticReport> Handle(DocumentDiagnosticParams request, CancellationToken cancellationToken)
     {
+        string filePath = Path.GetFullPath(request.TextDocument.Uri.GetFileSystemPath());
+        FileDiagnostics diag = _diagnosticsManager.GetOrAddFile(filePath, request.TextDocument.Uri);
+
+        //Container<Diagnostic> d = diag.Recalculate();
+
         return new RelatedFullDocumentDiagnosticReport
         {
             Items = new Container<Diagnostic>()
@@ -63,42 +72,42 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
         //Debugger.Launch();
         //_logger.LogInformation("Document diagnostic pull request received.");
         //
-        //if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))
-        //{
-        //    return new RelatedFullDocumentDiagnosticReport { Items = new Container<Diagnostic>() };
-        //}
-        //
-        //ISourceFile tree = file.SourceFile;
-        //
-        //DiagnosticsNodeVisitor visitor = new DiagnosticsNodeVisitor(_specDatabase, _virtualizer, _workspace, _installationEnvironment);
-        //
-        //if (tree is IAssetSourceFile asset)
-        //{
-        //    asset.GetMetadataDictionary()?.Visit(ref visitor);
-        //    asset.AssetData.Visit(ref visitor);
-        //}
-        //else
-        //{
-        //    tree.Visit(ref visitor);
-        //}
-        //
-        //List<Diagnostic> diagnostics = new List<Diagnostic>(visitor.Diagnostics.Count);
-        //foreach (DatDiagnosticMessage msg in visitor.Diagnostics)
-        //{
-        //    diagnostics.Add(new Diagnostic
-        //    {
-        //        Code = new DiagnosticCode(msg.Diagnostic.ErrorId),
-        //        Source = UnturnedAssetFileLspServer.DiagnosticSource,
-        //        Message = msg.Message,
-        //        Range = msg.Range.ToRange(),
-        //        Tags = msg.Diagnostic == DatDiagnostics.UNT1018 ? new Container<DiagnosticTag>(DiagnosticTag.Deprecated) : null
-        //    });
-        //}
-        //
-        //return new RelatedFullDocumentDiagnosticReport
-        //{
-        //    Items = diagnostics
-        //};
+        if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))
+        {
+            return new RelatedFullDocumentDiagnosticReport { Items = new Container<Diagnostic>() };
+        }
+        
+        ISourceFile tree = file.SourceFile;
+        
+        DiagnosticsNodeVisitor visitor = new DiagnosticsNodeVisitor(_specDatabase, _virtualizer, _workspace, _installationEnvironment);
+        
+        if (tree is IAssetSourceFile asset)
+        {
+            asset.GetMetadataDictionary()?.Visit(ref visitor);
+            asset.AssetData.Visit(ref visitor);
+        }
+        else
+        {
+            tree.Visit(ref visitor);
+        }
+        
+        List<Diagnostic> diagnostics = new List<Diagnostic>(visitor.Diagnostics.Count);
+        foreach (DatDiagnosticMessage msg in visitor.Diagnostics)
+        {
+            diagnostics.Add(new Diagnostic
+            {
+                Code = new DiagnosticCode(msg.Diagnostic.ErrorId),
+                Source = UnturnedAssetFileLspServer.DiagnosticSource,
+                Message = msg.Message,
+                Range = msg.Range.ToRange(),
+                Tags = msg.Diagnostic == DatDiagnostics.UNT1018 ? new Container<DiagnosticTag>(DiagnosticTag.Deprecated) : null
+            });
+        }
+        
+        return new RelatedFullDocumentDiagnosticReport
+        {
+            Items = diagnostics
+        };
     }
 
     private class DiagnosticsNodeVisitor : ResolvedPropertyNodeVisitor, IDiagnosticSink

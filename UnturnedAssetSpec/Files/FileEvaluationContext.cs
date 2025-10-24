@@ -76,7 +76,7 @@ public readonly struct FileEvaluationContext
             return value != null;
         }
 
-        SpecPropertyTypeParseContext parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(this, Self, property, property.Value, diagnostics);
+        SpecPropertyTypeParseContext parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(this, PropertyBreadcrumbs.Root, Self, property, property.Value, diagnostics);
 
         if (Self.Type.TryParseValue(in parse, out value))
         {

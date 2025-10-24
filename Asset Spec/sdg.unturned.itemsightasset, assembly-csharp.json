@@ -33,7 +33,7 @@
                             "Comparand": "CIVILIAN"
                         }
                     ],
-                    "Value": "#666666"
+                    "Value": "666666"
                 },
                 {
                     "And":
@@ -44,10 +44,10 @@
                             "Comparand": "MILITARY"
                         }
                     ],
-                    "Value": "#147850"
+                    "Value": "147850"
                 },
                 {
-                    "Value": "#000000"
+                    "Value": "000000"
                 }
             ],
             "Description": "Overrides the default color when using night vision.",
@@ -326,7 +326,7 @@
                 {
                     "Key": "Color",
                     "Type": "Color32RGB",
-                    "DefaultValue": "#000000",
+                    "DefaultValue": "000000",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#color-color-black",
                     "Description": "The color of the horizontal line and text.",
                     "Variable": "color"

@@ -21,17 +21,19 @@
   "contributes": {
     "languages": [
       {
-        "id": "unturned-data-file",
-        "aliases": [ "Unturned Data File", "unturned-data-file", "Unturned Asset File" ],
-        "extensions": [ ".dat", ".asset" ],
-        "configuration": "./language-configuration.json"
+        "id": "unturned-dat",
+        "aliases": [ "Unturned Data File", "unturned-dat", "unturned-data-file", "Unturned Asset File" ],
+        "extensions": [ ".dat", ".asset", ".vdf", ".tool" ],
+        "configuration": "./language-configuration.json",
+        "firstLine": "^\\/+\\s*udat-.*:\\s*(?:.*)\\s*$",
+        "filenames": [ "Config_EasyDifficulty.txt", "Config_NormalDifficulty.txt", "Config_HardDifficulty.txt", "Config.txt", "Level.hierarchy", "Visibility.config" ] 
       }
     ],
     "grammars": [
       {
-        "language": "unturned-data-file",
-        "scopeName": "source.unturned-data-file",
-        "path": "./syntaxes/unturned-data-file.tmLanguage.json"
+        "language": "unturned-dat",
+        "scopeName": "source.unturned-dat",
+        "path": "./syntaxes/unturned-dat.tmLanguage.json"
       }
     ],
     "views": {
@@ -71,7 +73,7 @@
       "commandPalette": [
         {
           "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
-          "when": "editorLangId == unturned-data-file"
+          "when": "editorLangId == unturned-dat"
         }
       ]
     }

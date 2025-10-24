@@ -3,11 +3,10 @@
 
 // The 'virtual file system' is used to check that files are being synced properly,
 // and just writes the LSP's version of the file to the desktop every time it updates.
-//#define KEEP_VIRTUAL_FILE_SYSTEM
+#define KEEP_VIRTUAL_FILE_SYSTEM
 
 #endif
 
-using System.Collections.Immutable;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using Microsoft.Extensions.Logging;
@@ -31,7 +30,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 /// Incrementally tracked text file.
 /// </summary>
 [DebuggerDisplay("{Uri} - {LineCount, nq} L, {_contentSegment.Count,nq} C")]
-public class OpenedFile : IMutableWorkspaceFile
+public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
 {
     private const SourceNodeTokenizerOptions ReadFileOptions = SourceNodeTokenizerOptions.Lazy | SourceNodeTokenizerOptions.Metadata;
 
@@ -55,12 +54,16 @@ public class OpenedFile : IMutableWorkspaceFile
     private bool _hasChanged;
     private FileRange _changeRange;
     private FileRange _fullRangeBeforeChange;
+    internal int ChangeVersion;
 
     private char[] _content;
     private LineInfo[] _lines;
     private int _lineCount;
 
     private ArraySegment<char> _contentSegment;
+    internal FileTypeInfo TypeInfo;
+
+    internal List<DatDiagnosticMessage> ParseDiagnostics = new List<DatDiagnosticMessage>();
 
     /// <summary>
     /// The version this file is on, if supported.
@@ -162,9 +165,11 @@ public class OpenedFile : IMutableWorkspaceFile
                 if (file != null)
                     return file;
 
+                ParseDiagnostics.Clear();
                 using SourceNodeTokenizer tokenizer = new SourceNodeTokenizer(
                     new ReadOnlyMemory<char>(_content, _contentSegment.Offset, _contentSegment.Count),
-                    ReadFileOptions
+                    ReadFileOptions,
+                    diagnosticSink: this
                 );
 
                 SourceNodeTokenizer.RootInfo info = SourceNodeTokenizer.RootInfo.Asset(this, _database);
@@ -175,6 +180,11 @@ public class OpenedFile : IMutableWorkspaceFile
 
             return file;
         }
+    }
+
+    void IDiagnosticSink.AcceptDiagnostic(DatDiagnosticMessage diagnostic)
+    {
+        ParseDiagnostics.Add(diagnostic);
     }
 
     [ExcludeFromCodeCoverage]
@@ -204,8 +214,9 @@ public class OpenedFile : IMutableWorkspaceFile
         _obsessivelyValidate = obsessivelyValidate;
         Uri = uri;
 
-        string path = uri.GetFileSystemPath();
+        string path = Path.GetFullPath(uri.GetFileSystemPath());
         File = path;
+        TypeInfo = new FileTypeInfo(File);
 #if KEEP_VIRTUAL_FILE_SYSTEM
         _useVirtualFiles = useVirtualFiles;
         _virtualFile = Path.Combine(UnturnedAssetFileLspServer.DebugPath, Path.GetFileName(path) + ".txt");
@@ -327,6 +338,7 @@ public class OpenedFile : IMutableWorkspaceFile
 
         _content = content;
         _contentSegment = new ArraySegment<char>(content, 0, text.Length);
+        Interlocked.Increment(ref ChangeVersion);
         return true;
     }
 
@@ -403,6 +415,7 @@ public class OpenedFile : IMutableWorkspaceFile
                 fileUpdate(_updater, state);
                 broadcast = _hasChanged;
                 range = _changeRange;
+                Interlocked.Increment(ref ChangeVersion);
                 InvalidateText();
             }
 
@@ -431,6 +444,7 @@ public class OpenedFile : IMutableWorkspaceFile
                 fileUpdate(_updater);
                 broadcast = _hasChanged;
                 range = _changeRange;
+                Interlocked.Increment(ref ChangeVersion);
                 InvalidateText();
             }
 

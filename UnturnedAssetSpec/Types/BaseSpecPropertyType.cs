@@ -16,10 +16,16 @@ public abstract class BaseSpecPropertyType<TValue>
     {
         if (parse.HasDiagnostics && parse.Parent is IPropertySourceNode property)
         {
+            string key = property.Key;
+            if (parse.Node != null && parse.Node.Index >= 0)
+            {
+                key += $"[{parse.Node.Index}]";
+            }
+
             DatDiagnosticMessage message = new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT1005,
-                Message = string.Format(DiagnosticResources.UNT1005, property.Key),
+                Message = string.Format(DiagnosticResources.UNT1005, key),
                 Range = parse.Parent.Range
             };
 

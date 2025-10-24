@@ -8,7 +8,15 @@ public class LspAssetSpecDatabase : AssetSpecDatabase
 {
     private readonly ILogger<LspAssetSpecDatabase> _logger;
 
-    public LspAssetSpecDatabase(ILogger<LspAssetSpecDatabase> logger, JsonSerializerOptions options, ISpecDatabaseCache cache) : base(cache)
+    public LspAssetSpecDatabase(ILogger<LspAssetSpecDatabase> logger, JsonSerializerOptions options
+#if !DEBUG
+        , ISpecDatabaseCache cache
+#endif
+        ) : base(
+#if !DEBUG
+        cache
+#endif
+    )
     {
         _logger = logger;
         Options = options;

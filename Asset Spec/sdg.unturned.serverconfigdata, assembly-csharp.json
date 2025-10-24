@@ -1,0 +1,58 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ServerConfigData, Assembly-CSharp",
+    "DisplayName": "Master Bundle Definition",
+    "Parent": null,
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-configuration.html",
+    "Category": "NONE",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Asset_Bundle_Name",
+            "Type": "String",
+            "Maximum": ".masterbundle",
+            "Required": true,
+            "Description": "Defines the name of this master bundle. Must end in .masterbundle.",
+            "Variable": "assetBundleName"
+        },
+        {
+            "Key": "Asset_Prefix",
+            "Type": "String",
+            "Required": true,
+            "Description": "Defines the path in Unity to the master bundle's folder.",
+            "Variable": "assetPrefix",
+            "Priority": 1
+        },
+        {
+            "Key": "Master_Bundle_Version",
+            "Aliases": [ "Asset_Bundle_Version" ],
+            "Type": "AssetBundleVersion",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "#Self.Included",
+                            "Operation": "eq",
+                            "Comparand": true
+                        },
+                        {
+                            "Variable": "#Self.Key",
+                            "Operation": "eq-i",
+                            "Comparand": "Master_Bundle_Version"
+                        }
+                    ],
+                    "Value": 0
+                },
+                {
+                    "Value": 2
+                }
+            ],
+            "Minimum": 2,
+            "Description": "Defines which version of Unity the bundle was built for.",
+            "Variable": "version"
+        }
+    ]
+}

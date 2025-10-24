@@ -22,6 +22,8 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
     private readonly TextDocumentSaveRegistrationOptions _saveRegistrationOptions;
 
     public event Action<OpenedFile>? ContentUpdated;
+    public event Action<OpenedFile>? FileAdded;
+    public event Action<OpenedFile>? FileRemoved;
 
     public UnturnedAssetFileSyncHandler(OpenedFileTracker fileTracker, ILanguageServerFacade langServer, ILogger<UnturnedAssetFileSyncHandler> logger)
     {
@@ -103,7 +105,7 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
             }
         );
 
-        ContentUpdated?.Invoke(file);
+        FileAdded?.Invoke(file);
         return Unit.Task;
     }
 
@@ -174,6 +176,7 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
             {
                 file.SetFullText(response.Text);
                 file.Version = response.Version;
+                ContentUpdated?.Invoke(file);
                 _logger.LogWarning("File text updated.");
             }
             else
@@ -190,6 +193,7 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
         if (_fileTracker.Files.Remove(request.TextDocument.Uri, out OpenedFile? file))
         {
             file.Dispose();
+            FileRemoved?.Invoke(file);
         }
         return Unit.Task;
     }
@@ -200,6 +204,7 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
         if (request.Text == null)
             return Unit.Task;
 
+        bool added = false;
         //_logger.LogInformation("Received didSaveTextDocument: {0}", request.TextDocument.Uri);
         OpenedFile file = _fileTracker.Files.AddOrUpdate(request.TextDocument.Uri,
             u =>
@@ -209,6 +214,7 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
                     v.Version = o.Version;
                 else if (request.TextDocument is VersionedTextDocumentIdentifier t)
                     v.Version = t.Version;
+                added = true;
                 return v;
             },
             (_, v) =>
@@ -218,11 +224,15 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
                     v.Version = o.Version;
                 else if (request.TextDocument is VersionedTextDocumentIdentifier t)
                     v.Version = t.Version;
+                added = false;
                 return v;
             }
         );
-
-        ContentUpdated?.Invoke(file);
+        
+        if (added)
+            FileAdded?.Invoke(file);
+        else
+            ContentUpdated?.Invoke(file);
         return Unit.Task;
     }
 }

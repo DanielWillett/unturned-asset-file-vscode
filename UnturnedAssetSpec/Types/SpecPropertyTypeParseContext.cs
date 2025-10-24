@@ -9,6 +9,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public readonly ref struct SpecPropertyTypeParseContext
 {
     public readonly FileEvaluationContext EvaluationContext;
+    public readonly PropertyBreadcrumbs Breadcrumbs;
 
     public required IAnyValueSourceNode? Node { get; init; }
     public required ISourceNode? Parent { get; init; }
@@ -27,7 +28,7 @@ public readonly ref struct SpecPropertyTypeParseContext
         if (!HasDiagnostics)
             return this;
 
-        return new SpecPropertyTypeParseContext(EvaluationContext, null)
+        return new SpecPropertyTypeParseContext(EvaluationContext, Breadcrumbs, null)
         {
             BaseKey = BaseKey,
             Node = Node,
@@ -37,7 +38,7 @@ public readonly ref struct SpecPropertyTypeParseContext
 
     public SpecPropertyTypeParseContext WithDiagnostics(ICollection<DatDiagnosticMessage> diagnostics)
     {
-        return new SpecPropertyTypeParseContext(EvaluationContext, diagnostics)
+        return new SpecPropertyTypeParseContext(EvaluationContext, Breadcrumbs, diagnostics)
         {
             BaseKey = BaseKey,
             Node = Node,
@@ -45,12 +46,12 @@ public readonly ref struct SpecPropertyTypeParseContext
         };
     }
 
-    public SpecPropertyTypeParseContext(ICollection<DatDiagnosticMessage> diagnostics) : this(default, diagnostics)
+    public SpecPropertyTypeParseContext(PropertyBreadcrumbs breadcrumbs, ICollection<DatDiagnosticMessage> diagnostics) : this(default, breadcrumbs, diagnostics)
     {
 
     }
 
-    public SpecPropertyTypeParseContext(FileEvaluationContext evalContext, ICollection<DatDiagnosticMessage>? diagnostics)
+    public SpecPropertyTypeParseContext(FileEvaluationContext evalContext, PropertyBreadcrumbs breadcrumbs, ICollection<DatDiagnosticMessage>? diagnostics)
     {
         if (diagnostics is { IsReadOnly: true })
             throw new ArgumentException("Diagnostics collection is readonly.", nameof(diagnostics));
@@ -58,11 +59,12 @@ public readonly ref struct SpecPropertyTypeParseContext
         Diagnostics = diagnostics;
         HasDiagnostics = diagnostics != null;
         EvaluationContext = evalContext;
+        Breadcrumbs = breadcrumbs;
     }
 
-    public static SpecPropertyTypeParseContext FromFileEvaluationContext(FileEvaluationContext evalContext, SpecProperty? property, ISourceNode? parentNode, IAnyValueSourceNode? valueNode, ICollection<DatDiagnosticMessage>? diagnostics = null)
+    public static SpecPropertyTypeParseContext FromFileEvaluationContext(FileEvaluationContext evalContext, PropertyBreadcrumbs breadcrumbs, SpecProperty? property, ISourceNode? parentNode, IAnyValueSourceNode? valueNode, ICollection<DatDiagnosticMessage>? diagnostics = null)
     {
-        return new SpecPropertyTypeParseContext(evalContext, diagnostics)
+        return new SpecPropertyTypeParseContext(evalContext, breadcrumbs, diagnostics)
         {
             Parent = parentNode,
             Node = valueNode,

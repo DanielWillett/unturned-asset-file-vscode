@@ -73,7 +73,7 @@
         {
             "Key": "SpotLight_Color",
             "Type": "ColorRGBLegacy",
-            "DefaultValue": "#f5df93",
+            "DefaultValue": "f5df93",
             "Description": "Color of the tactical light's beam.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-color-color-f5df93",
             "Priority": 8,
@@ -293,7 +293,7 @@
         {
             "Key": "Laser_Color",
             "Type": "ColorRGBLegacy",
-            "DefaultValue": "#ff0000",
+            "DefaultValue": "ff0000",
             "Description": "The color of the tactical laser.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#laser-color-color-ff0000",
             "Variable": "laserColor",

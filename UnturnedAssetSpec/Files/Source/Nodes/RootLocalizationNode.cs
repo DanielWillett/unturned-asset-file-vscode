@@ -1,7 +1,9 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -13,23 +15,25 @@ internal class RootLocalizationNode : RootDictionaryNode, ILocalizationSourceFil
     /// <inheritdoc />
     public IAssetSourceFile Asset { get; }
 
-    /// <inheritdoc />
-    public override QualifiedType ActualType
+    public static RootLocalizationNode Create(
+        IWorkspaceFile file,
+        IAssetSourceFile asset,
+        IAssetSpecDatabase database,
+        int count,
+        ISourceNode[] nodes,
+        in AnySourceNodeProperties properties,
+        OneOrMore<KeyValuePair<string, object?>> additionalProperties)
     {
-        get => Asset.ActualType;
-        protected set => throw new NotSupportedException();
+        return new RootLocalizationNode(file, asset, database, count, nodes, in properties, additionalProperties);
     }
 
-    public static RootLocalizationNode Create(IWorkspaceFile file, IAssetSourceFile asset, IAssetSpecDatabase database, int count, ISourceNode[] nodes, in AnySourceNodeProperties properties)
-    {
-        return new RootLocalizationNode(file, asset, database, count, nodes, in properties);
-    }
-
     /// <inheritdoc />
-    private protected RootLocalizationNode(IWorkspaceFile file, IAssetSourceFile asset, IAssetSpecDatabase database, int count, ISourceNode[] nodes, in AnySourceNodeProperties properties)
-        : base(file, database, count, nodes, in properties)
+    private protected RootLocalizationNode(IWorkspaceFile file, IAssetSourceFile asset, IAssetSpecDatabase database, int count, ISourceNode[] nodes, in AnySourceNodeProperties properties,
+        OneOrMore<KeyValuePair<string, object?>> additionalProperties)
+        : base(file, database, count, nodes, in properties, additionalProperties)
     {
         Asset = asset;
+        ActualType = asset.ActualType;
         LanguageName = GetInternedLanguageName(file.File);
     }
 

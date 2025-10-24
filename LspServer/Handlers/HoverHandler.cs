@@ -1,3 +1,5 @@
+using System.Text;
+using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -6,7 +8,6 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 
@@ -37,61 +38,18 @@ internal class HoverHandler : IHoverHandler
             return Task.FromResult<Hover?>(null);
         }
 
+        HoverMarkdownBuilder builder = new HoverMarkdownBuilder(new StringBuilder(128));
+
         FileRange range = hoverNode!.Range;
 
-        string? desc;
         SpecProperty? prop = ctx.EvaluationContext.Self;
         if (prop == null)
         {
-            if (ctx.Node?.Parent is IListSourceNode list)
-            {
-                desc = list.Parent is IPropertySourceNode p ? $"{p.Key}[{ctx.Node.Index}]" : $"#{ctx.Node.Index}";
-                return Task.FromResult<Hover?>(new Hover
-                {
-                    Range = range.ToRange(),
-                    Contents = new MarkedStringsOrMarkupContent(new MarkedString(desc))
-                });
-            }
-
-            desc = "Unknown property";
+            builder.UnknownProperty(ctx.BaseKey, ctx.Breadcrumbs);
         }
-        else if (prop.Description == null
-                 || !prop.Description.TryEvaluateValue(in ctx.EvaluationContext, out desc, out bool isNull)
-                 || isNull
-                 || string.IsNullOrEmpty(desc)
-                )
+        else
         {
-            desc = prop.Key;
-        }
-
-        if (prop != null)
-        {
-            if (ctx.EvaluationContext.TryGetValue(out ISpecDynamicValue? value))
-            {
-                if (value == null)
-                {
-                    desc += Environment.NewLine + "Value: **null**";
-                }
-                else if (value.ValueType is IStringParseableSpecPropertyType sp)
-                {
-                    if (sp.ToString(value) is not { Length: > 0 } str)
-                        desc += Environment.NewLine + "Value: **null**";
-                    else
-                        desc += $"{Environment.NewLine}Value: `{str}`";
-                }
-                else
-                {
-                    switch (ctx.Node)
-                    {
-                        case IListSourceNode list:
-                            desc += $"{Environment.NewLine}List [ n = {list.Count} ]";
-                            break;
-                        case IDictionarySourceNode dict:
-                            desc += $"{Environment.NewLine}Dictionary {{ n = {dict.Count} }}";
-                            break;
-                    }
-                }
-            }
+            builder.Property(prop, in ctx);
         }
 
         return Task.FromResult<Hover?>(new Hover
@@ -100,8 +58,115 @@ internal class HoverHandler : IHoverHandler
             Contents = new MarkedStringsOrMarkupContent(new MarkupContent
             {
                 Kind = MarkupKind.Markdown,
-                Value = desc
+                Value = builder.ToString()
             })
         });
+    }
+}
+
+public readonly struct HoverMarkdownBuilder
+{
+    private readonly StringBuilder _hov;
+
+    public HoverMarkdownBuilder(StringBuilder hov)
+    {
+        _hov = hov;
+    }
+
+    public override string ToString()
+    {
+        return _hov.ToString();
+    }
+
+    public void UnknownProperty(string? propertyName, PropertyBreadcrumbs breadcrumbs)
+    {
+        _hov.Append(Properties.Resources.Hover_UnknownProperty)
+            .Append(": '")
+            .Append(breadcrumbs.ToString())
+            .Append(propertyName)
+            .Append('\'');
+    }
+
+    public void Property(SpecProperty prop, in SpecPropertyTypeParseContext ctx)
+    {
+        SpecProperty rootProperty = prop;
+        while (rootProperty.Parent != null)
+            rootProperty = rootProperty.Parent;
+
+        _hov.Append("### ").Append(rootProperty.Owner.DisplayName).Append("/").Append(rootProperty.Key);
+        if (prop.Variable != null
+            && prop.Variable.TryEvaluateValue(in ctx.EvaluationContext, out string? variable, out bool isNull)
+            && !isNull
+            && !string.IsNullOrEmpty(variable))
+        {
+            ReadOnlySpan<char> typeName = QualifiedType.ExtractTypeName(prop.Owner.Type.Type);
+            _hov.AppendLine().Append('`').Append(typeName).Append('.').Append(variable).Append('`');
+        }
+
+        _hov.AppendLine().AppendLine().Append('-', 3).AppendLine().AppendLine();
+
+        ISpecPropertyType? type = prop.Type.GetType(in ctx.EvaluationContext);
+        if (type != null)
+        {
+            _hov.Append("**").Append(type.DisplayName).Append("**").AppendLine().AppendLine()
+                .Append('-', 3).AppendLine().AppendLine();
+        }
+
+        if (prop.Description != null
+            && prop.Description.TryEvaluateValue(in ctx.EvaluationContext, out string? description, out isNull)
+            && !isNull
+            && !string.IsNullOrEmpty(description)
+           )
+        {
+            _hov.Append(description).AppendLine().AppendLine()
+                .Append('-', 3).AppendLine().AppendLine();
+        }
+
+        if (prop.Docs != null
+            && prop.Docs.TryEvaluateValue(in ctx.EvaluationContext, out string? docsLink, out isNull)
+            && !isNull
+            && !string.IsNullOrEmpty(docsLink))
+        {
+            _hov.Append("[").Append(Properties.Resources.Hover_UnturnedDocumentationLinkName).Append("](")
+                .Append(docsLink).Append(')').AppendLine().AppendLine()
+                .Append('-', 3).AppendLine().AppendLine();
+        }
+
+        if (!ctx.EvaluationContext.TryGetValue(out ISpecDynamicValue? value))
+        {
+            _hov.Append("-# ").Append(Properties.Resources.Hover_InvalidValue);
+            return;
+        }
+
+        if (value == null)
+        {
+            _hov.Append(Properties.Resources.Hover_ValueTitle).AppendLine(": **null**");
+        }
+        else if (value.ValueType is IStringParseableSpecPropertyType sp)
+        {
+            try
+            {
+                if (sp.ToString(value) is not { Length: > 0 } str)
+                    _hov.Append(Properties.Resources.Hover_ValueTitle).Append(": **null**");
+                else
+                    _hov.Append(Properties.Resources.Hover_ValueTitle).Append(": `").Append(str).Append('`');
+            }
+            catch (InvalidCastException)
+            {
+
+            }
+        }
+        else
+        {
+            switch (ctx.Node)
+            {
+                case IListSourceNode list:
+                    _hov.Append(Properties.Resources.Hover_ListTitle).Append(": [ n = ").Append(list.Count).Append(" ]");
+                    break;
+                case IDictionarySourceNode dict:
+                    _hov.Append(Properties.Resources.Hover_DictionaryTitle).Append(": { n = ").Append(dict.Count).Append(" }");
+                    break;
+            }
+        }
     }
 }

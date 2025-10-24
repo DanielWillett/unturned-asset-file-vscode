@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Design;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -32,6 +33,19 @@ internal abstract class AnySourceNode : ISourceNode
     {
         Parent = parent;
         File = file!;
+    }
+
+    internal AnySourceNodeProperties GetAnyNodeProperties()
+    {
+        return new AnySourceNodeProperties
+        {
+            Index = Index,
+            Range = Range,
+            Depth = Depth,
+            ChildIndex = ChildIndex,
+            FirstCharacterIndex = FirstCharacterIndex,
+            LastCharacterIndex = LastCharacterIndex
+        };
     }
 
     protected void SetParentInfoOfChildren(ISourceNode[] values)

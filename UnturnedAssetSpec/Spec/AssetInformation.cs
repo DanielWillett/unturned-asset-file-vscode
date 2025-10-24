@@ -28,6 +28,8 @@ public class AssetInformation
     [JsonConverter(typeof(TypeDictionaryConverter<TypeHierarchy>))]
     public Dictionary<QualifiedType, TypeHierarchy> Types { get; set; }
 
+    public Dictionary<string, QualifiedType> KnownFileNames { get; set; }
+
     [JsonIgnore] // generated at runtime from Types
     public Dictionary<QualifiedType, InverseTypeHierarchy> ParentTypes { get; set; }
 

@@ -27,7 +27,7 @@
                     "Key": "Asset",
                     "Required": true,
                     "Type": "AssetReference",
-                    "ElementType": "SDG.Unturned.FoliageInfoAsset, Assembly-CSharp",
+                    "ElementType": "SDG.Framework.Foliage.FoliageInfoAsset, Assembly-CSharp",
                     "Description": "The foliage to spawn.",
                     "Variable": "asset"
                 },

@@ -10,11 +10,10 @@
     [
         {
             "Key": "AudioDefs",
-            "Type": "List",
+            "Type": "Dictionary",
             "ElementType": "MasterBundleReference",
             "SpecialTypes": [ "SDG.Unturned.OneShotAudioDefinition, Assembly-CSharp" ],
             "KeyEnumType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.PhysicsMaterialAudioDef, UnturnedAssetSpec",
-            "KeyAllowExtraValues": true,
             "DefaultValue": null,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
             "Description": "List of clothing items to be worn in the preview image.",

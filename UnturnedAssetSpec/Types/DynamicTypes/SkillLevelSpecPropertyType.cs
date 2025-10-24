@@ -85,6 +85,7 @@ public sealed class SkillLevelSpecPropertyType :
             };
 
             parse.Log(message);
+            return false;
         }
 
         if (value == 0 || value > skill!.MaximumLevel)

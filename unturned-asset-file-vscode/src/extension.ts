@@ -15,7 +15,8 @@ import { GetDocumentText, handleGetDocumentText } from './jsonrpc/get-document-t
 import { getEnvironmentData } from 'worker_threads';
 
 
-export const languageId = "unturned-data-file";
+export const languageId = "unturned-dat";
+export const fileMatcher = "{**/*.dat,**/*.asset,**/Config_*Difficulty.txt}";
 
 let client: LanguageClient | undefined;
 
@@ -44,7 +45,7 @@ export function getAssetPropertiesViewProvider(): AssetPropertiesViewProvider
 
 export async function activate(context: ExtensionContext): Promise<void>
 {
-
+    // todo
     const dllPath = context.asAbsolutePath(join('..', 'LspServer', 'bin', 'Debug', 'net9.0', 'LspServer.dll'));
 
     if (!existsSync(dllPath))
@@ -71,13 +72,13 @@ export async function activate(context: ExtensionContext): Promise<void>
         const clientOptions: LanguageClientOptions = {
             documentSelector: [
                 {
-                    pattern: "**/*.{dat,asset}",
-                    language: "unturned-data-file"
+                    pattern: fileMatcher,
+                    language: languageId
                 }
             ],
             synchronize: {
                 configurationSection: 'unturned-data-file-lsp',
-                fileEvents: workspace.createFileSystemWatcher("**/*.{dat,asset}")
+                fileEvents: workspace.createFileSystemWatcher(fileMatcher)
             }
         };
 

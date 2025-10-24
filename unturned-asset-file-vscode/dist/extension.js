@@ -17970,6 +17970,7 @@ var extension_exports = {};
 __export(extension_exports, {
   activate: () => activate,
   deactivate: () => deactivate,
+  fileMatcher: () => fileMatcher,
   getAssetPropertiesViewProvider: () => getAssetPropertiesViewProvider,
   getClient: () => getClient,
   languageId: () => languageId
@@ -18154,7 +18155,8 @@ async function handleGetDocumentText(e) {
 }
 
 // src/extension.ts
-var languageId = "unturned-data-file";
+var languageId = "unturned-dat";
+var fileMatcher = "{**/*.dat,**/*.asset,**/Config_*Difficulty.txt}";
 var client;
 var registrations = [];
 var assetPropertiesViewProvider;
@@ -18190,13 +18192,13 @@ async function activate(context) {
     const clientOptions = {
       documentSelector: [
         {
-          pattern: "**/*.{dat,asset}",
-          language: "unturned-data-file"
+          pattern: fileMatcher,
+          language: languageId
         }
       ],
       synchronize: {
         configurationSection: "unturned-data-file-lsp",
-        fileEvents: import_vscode5.workspace.createFileSystemWatcher("**/*.{dat,asset}")
+        fileEvents: import_vscode5.workspace.createFileSystemWatcher(fileMatcher)
       }
     };
     client = new import_node.LanguageClient("unturned-data-file-lsp", "Unturned Data File format LSP", serverOptions, clientOptions);
@@ -18241,6 +18243,7 @@ async function deactivate() {
 0 && (module.exports = {
   activate,
   deactivate,
+  fileMatcher,
   getAssetPropertiesViewProvider,
   getClient,
   languageId

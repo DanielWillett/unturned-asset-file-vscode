@@ -63,7 +63,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
             return;
 
         FileEvaluationContext ctx = new FileEvaluationContext(property, node.File, _workspaceEnv, _installEnv, _database, context);
-        SpecPropertyTypeParseContext parseContext = new SpecPropertyTypeParseContext(ctx, null)
+        SpecPropertyTypeParseContext parseContext = new SpecPropertyTypeParseContext(ctx, breadcrumbs, null)
         {
             Node = node.Value,
             Parent = node

@@ -16,7 +16,20 @@
     <RunSettingsFilePath>$(MSBuildProjectDirectory)\..\test.runsettings</RunSettingsFilePath>
     
     <AppDesignerFolder>FileProperties</AppDesignerFolder>
+
+    <StrongNameKeyPath>C:\Strong Name Keys\UnturnedAssetSpec\UnturnedAssetSpec_Tests.dll.snk</StrongNameKeyPath>
   </PropertyGroup>
+
+  <PropertyGroup Condition="exists($(StrongNameKeyPath))">
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(StrongNameKeyPath)</AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="UnturnedAssetSpec_Tests.dll.publickey" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -10,9 +12,41 @@ public readonly record struct Comment(CommentPrefix Prefix, string Content, Comm
     public static readonly Comment None = default;
 
     /// <summary>
+    /// Additional properties can be defined at the top of the file.
+    /// <para>
+    /// They must be formatted as a property starting in this value (case-sensitive), followed by a colon, then an optional value.
+    /// <code>
+    /// // udat-type: SDG.Unturned.ServerConfigData, Assembly-CSharp
+    /// // udat-prop:
+    /// Key Value
+    /// </code>
+    /// </para>
+    /// </summary>
+    public const string AdditionalPropertyPrefix = "udat-";
+
+    /// <summary>
+    /// Case-sensitive <c>udat-type</c> additional property defining a type for the file if it can't be figured out automatically.
+    /// For example, server curation files.
+    /// </summary>
+    /// <remarks>Must go at the top of the file in a comment.</remarks>
+    public const string TypeAdditionalProperty = "type";
+
+    /// <summary>
     /// Total length of this comment's prefix and content.
     /// </summary>
     public int Length => Prefix.Length + Content.Length;
+
+    public static Comment AdditionalProperty(string propertyName, object? value)
+    {
+        if (value == null)
+        {
+            return new Comment(CommentPrefix.Default, AdditionalPropertyPrefix + propertyName + ":", CommentPosition.NewLine);
+        }
+        if (value is not string str)
+            str = value.ToString();
+
+        return new Comment(CommentPrefix.Default, AdditionalPropertyPrefix + propertyName + ": " + str, CommentPosition.NewLine);
+    }
 
     public bool Equals(Comment comment)
     {
@@ -54,6 +88,44 @@ public readonly record struct Comment(CommentPrefix Prefix, string Content, Comm
         TryWrite(chars, out _);
         return chars.ToString();
 #endif
+    }
+
+    public bool TryParseAsAdditionalProperty(out KeyValuePair<string, object?> property)
+    {
+        property = default;
+        if (!Content.StartsWith(AdditionalPropertyPrefix, StringComparison.Ordinal))
+            return false;
+
+        int index = Content.IndexOf(':');
+        if (index <= 5 || index >= Content.Length)
+            return false;
+
+        int endPropIndex = index;
+        while (endPropIndex >= 5 && char.IsWhiteSpace(Content[endPropIndex - 1]))
+        {
+            --endPropIndex;
+        }
+
+        if (endPropIndex <= 5 || endPropIndex >= Content.Length)
+            return false;
+
+        string key = Content.Substring(5, endPropIndex - 5);
+        while (index < Content.Length - 1 && char.IsWhiteSpace(Content[index + 1]))
+            ++index;
+
+        if (index >= Content.Length - 1)
+            property = new KeyValuePair<string, object?>(key, null);
+        else
+        {
+            int lastIndex = Content.Length - 1;
+            while (lastIndex > index && char.IsWhiteSpace(Content[lastIndex]))
+                --lastIndex;
+
+            string? value = lastIndex > index + 1 ? Content.Substring(index + 1, lastIndex - index) : null;
+            property = new KeyValuePair<string, object?>(key, value);
+        }
+
+        return true;
     }
 }
 

@@ -32,7 +32,7 @@
                             "Comparand": "CIVILIAN"
                         }
                     ],
-                    "Value": "#666666"
+                    "Value": "666666"
                 },
                 {
                     "And":
@@ -43,10 +43,10 @@
                             "Comparand": "MILITARY"
                         }
                     ],
-                    "Value": "#147850"
+                    "Value": "147850"
                 },
                 {
-                    "Value": "#000000"
+                    "Value": "000000"
                 }
             ],
             "Description": "Overrides the default color when using night vision. Note that when @Vision is 'Civilian' the color will be grayscaled using the red channel.",

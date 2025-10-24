@@ -52,7 +52,7 @@ internal class FileEvaluationContextFactory
         node = sourceFile.GetNodeFromPosition(position.ToFilePosition());
         GetRelationalNodes(node, out IAnyValueSourceNode? valueNode, out IPropertySourceNode? parentNode);
 
-        if (valueNode == null || parentNode == null)
+        if (parentNode == null)
         {
             ctx = new SpecPropertyTypeParseContext(
                 new FileEvaluationContext(
@@ -63,6 +63,7 @@ internal class FileEvaluationContextFactory
                     _installationEnvironment,
                     _specDatabase,
                     PropertyResolutionContext.Modern),
+                PropertyBreadcrumbs.Root,
                 null)
             {
                 Node = valueNode,
@@ -89,7 +90,7 @@ internal class FileEvaluationContextFactory
             context
         );
 
-        ctx = SpecPropertyTypeParseContext.FromFileEvaluationContext(evalCtx, property, parentNode, valueNode, diagnosticSink);
+        ctx = SpecPropertyTypeParseContext.FromFileEvaluationContext(evalCtx, breadcrumbs, property, parentNode, valueNode, diagnosticSink);
         return property != null;
     }
 
