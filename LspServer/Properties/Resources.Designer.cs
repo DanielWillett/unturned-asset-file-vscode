@@ -61,6 +61,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Added in.
+        /// </summary>
+        internal static string Hover_AddedVersion {
+            get {
+                return ResourceManager.GetString("Hover_AddedVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dictionary.
         /// </summary>
         internal static string Hover_DictionaryTitle {

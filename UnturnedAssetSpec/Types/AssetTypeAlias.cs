@@ -11,7 +11,12 @@ using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
-public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, string>, IStringParseableSpecPropertyType, IEquatable<AssetTypeAlias>, IAutoCompleteSpecPropertyType, ISpecType
+public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, string>,
+    IStringParseableSpecPropertyType,
+    IEquatable<AssetTypeAlias>,
+    IAutoCompleteSpecPropertyType,
+    ISpecType,
+    IValueHoverProviderSpecPropertyType
 {
     QualifiedType ISpecType.Type => Type;
     Version? ISpecType.Version => null;
@@ -29,11 +34,25 @@ public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, strin
 
     public QualifiedType Parent => QualifiedType.None;
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="ISpecPropertyType.Type" />
     public override string Type => "DanielWillett.UnturnedDataFileLspServer.Data.Types.AssetTypeAlias, UnturnedAssetSpec";
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Enum;
+
+    /// <inheritdoc />
+    public ValueHoverProviderResult? GetDescription(in SpecPropertyTypeParseContext ctx, ISpecDynamicValue value)
+    {
+        if (value is not AssetTypeAliasValue assetTypeAlias)
+            return null;
+
+        return new ValueHoverProviderResult(
+            assetTypeAlias.Value,
+            QualifiedType.None, 
+            null, null, null, null, false,
+            assetTypeAlias.GetCorrespondingType(ctx.Database)
+        );
+    }
 
     protected override ISpecDynamicValue CreateValue(string? value) => new AssetTypeAliasValue(value!, this);
 

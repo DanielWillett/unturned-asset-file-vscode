@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -12,7 +13,8 @@ public sealed class TypeOrEnumSpecPropertyType :
     IElementTypeSpecPropertyType,
     IEquatable<TypeOrEnumSpecPropertyType>,
     IStringParseableSpecPropertyType,
-    ISpecialTypesSpecPropertyType
+    ISpecialTypesSpecPropertyType,
+    IValueHoverProviderSpecPropertyType
 {
     public QualifiedType ElementType { get; }
     public QualifiedType EnumType { get; }
@@ -69,7 +71,7 @@ public sealed class TypeOrEnumSpecPropertyType :
     {
         ElementType = elementType;
         EnumType = enumType;
-        DisplayName = elementType.IsNull ? $"Type or {enumType.GetTypeName()}" : $"{elementType.GetTypeName()} or {enumType.GetTypeName()}";
+        DisplayName = elementType.IsNull ? $"Type Reference or {enumType.GetTypeName()}" : $"Type Reference of {elementType.GetTypeName()} or {enumType.GetTypeName()}";
     }
 
     /// <inheritdoc />
@@ -88,24 +90,6 @@ public sealed class TypeOrEnumSpecPropertyType :
     /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
     {
-        ISpecType? enumType = parse.Database.FindType(EnumType.Type, parse.FileType);
-
-        if (enumType is not IStringParseableSpecPropertyType fullEnumType)
-        {
-            if (parse.HasDiagnostics)
-            {
-                parse.Log(new DatDiagnosticMessage
-                {
-                    Diagnostic = DatDiagnostics.UNT2005,
-                    Message = string.Format(DiagnosticResources.UNT2005, ElementType.Type),
-                    Range = parse.Node?.Range ?? parse.Parent?.Range ?? default
-                });
-            }
-
-            value = default;
-            return false;
-        }
-
         if (parse.Node == null)
         {
             return MissingNode(in parse, out value);
@@ -120,11 +104,9 @@ public sealed class TypeOrEnumSpecPropertyType :
 
         if (val.IndexOf('.') < 0)
         {
-            if (fullEnumType.TryParse(val.AsSpan(), val, out ISpecDynamicValue enumVal) && enumVal is ICorrespondingTypeSpecDynamicValue correspondingTypeProvider)
+            if (!TryParseEnum(in parse, ref val, out value, out _))
             {
-                QualifiedType correspondingType = correspondingTypeProvider.GetCorrespondingType(parse.Database);
-                if (!correspondingType.IsNull)
-                    val = correspondingType.Type;
+                return false;
             }
         }
 
@@ -162,6 +144,38 @@ public sealed class TypeOrEnumSpecPropertyType :
         return true;
     }
 
+    private bool TryParseEnum(in SpecPropertyTypeParseContext parse, ref string val, out QualifiedType value, out ISpecDynamicValue? enumValue)
+    {
+        ISpecType? enumType = parse.Database.FindType(EnumType.Type, parse.FileType);
+        enumValue = null;
+        if (enumType is not IStringParseableSpecPropertyType fullEnumType)
+        {
+            if (parse.HasDiagnostics)
+            {
+                parse.Log(new DatDiagnosticMessage
+                {
+                    Diagnostic = DatDiagnostics.UNT2005,
+                    Message = string.Format(DiagnosticResources.UNT2005, ElementType.Type),
+                    Range = parse.Node?.Range ?? parse.Parent?.Range ?? default
+                });
+            }
+
+            value = QualifiedType.None;
+            return false;
+        }
+
+        if (fullEnumType.TryParse(val.AsSpan(), val, out ISpecDynamicValue enumVal) && enumVal is ICorrespondingTypeSpecDynamicValue correspondingTypeProvider)
+        {
+            enumValue = enumVal;
+            QualifiedType correspondingType = correspondingTypeProvider.GetCorrespondingType(parse.Database);
+            if (!correspondingType.IsNull)
+                val = correspondingType.Type;
+        }
+
+        value = QualifiedType.None;
+        return true;
+    }
+
     /// <inheritdoc />
     public bool Equals(TypeOrEnumSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType);
 
@@ -172,4 +186,27 @@ public sealed class TypeOrEnumSpecPropertyType :
     public bool Equals(ISpecPropertyType<QualifiedType>? other) => other is TypeOrEnumSpecPropertyType t && Equals(t);
 
     void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
+
+    public ValueHoverProviderResult? GetDescription(in SpecPropertyTypeParseContext ctx, ISpecDynamicValue value)
+    {
+        if (ctx.Node is not IValueSourceNode valueNode)
+            return null;
+
+        string val = valueNode.Value;
+        if (val.IndexOf('.') >= 0)
+            return null;
+
+        if (!TryParseEnum(in ctx, ref val, out QualifiedType v, out ISpecDynamicValue? enumValue)
+            || enumValue?.ValueType is not IValueHoverProviderSpecPropertyType valueHoverProvider)
+        {
+            return null;
+        }
+
+        ValueHoverProviderResult? result = valueHoverProvider.GetDescription(in ctx, enumValue);
+        if (result == null)
+            return null;
+
+        result.CorrespondingType = v;
+        return result;
+    }
 }

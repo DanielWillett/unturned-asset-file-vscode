@@ -3,7 +3,10 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -13,7 +16,8 @@ public sealed class AssetReferenceSpecPropertyType :
     IElementTypeSpecPropertyType,
     ISpecialTypesSpecPropertyType,
     IEquatable<AssetReferenceSpecPropertyType?>,
-    IStringParseableSpecPropertyType
+    IStringParseableSpecPropertyType,
+    IValueHoverProviderSpecPropertyType
 {
     public OneOrMore<QualifiedType> OtherElementTypes { get; }
     public bool CanParseDictionary { get; }
@@ -356,4 +360,48 @@ public sealed class AssetReferenceSpecPropertyType :
     public bool Equals(ISpecPropertyType<Guid>? other) => other is AssetReferenceSpecPropertyType t && Equals(t);
 
     void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
+
+    /// <inheritdoc />
+    public ValueHoverProviderResult? GetDescription(in SpecPropertyTypeParseContext ctx, ISpecDynamicValue value)
+    {
+        Guid? guid;
+        try
+        {
+            guid = value.AsConcreteNullable<Guid>();
+        }
+        catch (InvalidCastException)
+        {
+            return null;
+        }
+
+        if (!guid.HasValue)
+            return null;
+
+        OneOrMore<DiscoveredDatFile> files = ctx.EvaluationContext.Environment.FindFile(guid.Value);
+        if (files.Length == 1)
+        {
+            DiscoveredDatFile file = files[0];
+            string displayName = file.GetDisplayName();
+
+            string fileUri = new Uri(file.FilePath).AbsoluteUri;
+
+            return new ValueHoverProviderResult(
+                displayName,
+                file.Type,
+                null,
+                ReferenceEquals(displayName, file.AssetName) ? null : file.AssetName,
+                null,
+                fileUri,
+                false,
+                QualifiedType.None
+            )
+            {
+                LinkName = Path.GetFileName(file.FilePath)
+            };
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

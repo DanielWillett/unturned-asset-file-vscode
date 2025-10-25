@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 [DebuggerDisplay("Enum: {Type.GetTypeName()}")]
-public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<EnumSpecType>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
+public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<EnumSpecType>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType, IValueHoverProviderSpecPropertyType
 {
     private AutoCompleteResult[]? _valueResults;
 
@@ -194,6 +194,19 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
     SpecProperty? ISpecType.FindProperty(string propertyName, SpecPropertyContext context) => null;
 
     void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
+
+    public ValueHoverProviderResult? GetDescription(in SpecPropertyTypeParseContext ctx, ISpecDynamicValue value)
+    {
+        if (value is not SpecDynamicConcreteEnumValue enumVal)
+            return null;
+
+        int index = enumVal.Value;
+        if (index < 0)
+            return null;
+
+        ref EnumSpecTypeValue info = ref Values[index];
+        return new ValueHoverProviderResult(info.Casing, info.Type.Type, info.Value, info.Description, info.GetReleaseVersion(), info.GetDocumentationLink(), info.Deprecated, info.CorrespondingType);
+    }
 }
 
 [DebuggerDisplay("{Value,nq}")]
@@ -211,6 +224,34 @@ public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, ICompa
     public bool Deprecated { get; init; }
     public Version? Version { get; init; }
     public long? NumericValue { get; init; }
+
+    public Version? GetReleaseVersion()
+    {
+        if (Version != null)
+            return Version;
+        
+        if (Type.Version != null)
+            return Type.Version;
+
+        if (Type.Owner.Version != null)
+            return Type.Owner.Version;
+
+        return null;
+    }
+
+    public string? GetDocumentationLink()
+    {
+        if (Docs != null)
+            return Docs;
+
+        if (Type.Docs != null)
+            return Type.Docs;
+
+        if (Type.Owner.Docs != null)
+            return Type.Owner.Docs;
+
+        return null;
+    }
 
     /// <summary>
     /// If only <see cref="Value"/> is filled out the JSON can be re-written as just a string.

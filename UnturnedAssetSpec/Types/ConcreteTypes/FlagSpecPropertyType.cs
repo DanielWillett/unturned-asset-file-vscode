@@ -72,9 +72,12 @@ public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropert
     {
         if (parse.Node != null && parse.HasDiagnostics)
         {
+            FileRange range = parse.Node.Range;
+            if (parse.Parent != null)
+                range.Encapsulate(parse.Parent.Range);
             DatDiagnosticMessage diagnostic = new DatDiagnosticMessage
             {
-                Range = parse.Parent?.Range ?? parse.Node.Range
+                Range = range
             };
 
             if (parse.Node is IValueSourceNode stringValue

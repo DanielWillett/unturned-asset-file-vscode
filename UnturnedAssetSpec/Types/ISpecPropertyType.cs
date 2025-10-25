@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -41,6 +42,24 @@ public interface ISpecPropertyTypeVisitor
 public interface IElementTypeSpecPropertyType : ISpecPropertyType
 {
     string? ElementType { get; }
+}
+
+public interface IValueHoverProviderSpecPropertyType : ISpecPropertyType
+{
+    ValueHoverProviderResult? GetDescription(in SpecPropertyTypeParseContext ctx, ISpecDynamicValue value);
+}
+
+public class ValueHoverProviderResult(string displayName, QualifiedType declaringType, string? variable, string? description, Version? version, string? docs, bool isDeprecated, QualifiedType correspondingType)
+{
+    public string DisplayName { get; set; } = displayName;
+    public QualifiedType DeclaringType { get; set; } = declaringType;
+    public string? Variable { get; set; } = variable;
+    public string? Description { get; set; } = description;
+    public Version? Version { get; set; } = version;
+    public string? Docs { get; set; } = docs;
+    public string? LinkName { get; set; }
+    public bool IsDeprecated { get; set; } = isDeprecated;
+    public QualifiedType CorrespondingType { get; set; } = correspondingType;
 }
 
 public interface IListTypeSpecPropertyType : IElementTypeSpecPropertyType
