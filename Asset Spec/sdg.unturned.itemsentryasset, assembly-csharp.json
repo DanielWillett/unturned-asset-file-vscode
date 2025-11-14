@@ -131,6 +131,47 @@
             ]
         },
         {
+            "Key": "Sentry_Bypasses_PvE",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the sentry targets players and vehicles in PvE mode.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "BypassesPvEMode",
+            "Priority": 13,
+            "Version": "3.25.10.0"
+        },
+        {
+            "Key": "React_To_Attacks",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the sentry immediately focuses on an attacking player.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "CanReactToAttacks",
+            "Priority": 13,
+            "Version": "3.25.10.0"
+        },
+        {
+            "Key": "Sweep_Yaw",
+            "Type": "Float32",
+            "DefaultValue": 120.0,
+            "Description": "Yaw range in degrees between far left and far right sweep positions.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "SweepHalfYaw",
+            "Priority": 12,
+            "Version": "3.25.10.0"
+        },
+        {
+            "Key": "Sweep_Period",
+            "Type": "Float32",
+            "DefaultValue": "=TAU",
+            "MinimumExclusive": 0.0,
+            "Description": "Duration in seconds for the sentry to complete a sweep from left to right and back.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
+            "Variable": "SweepPeriod",
+            "Priority": 12,
+            "Version": "3.25.10.0"
+        },
+        {
             "Key": "Target_Acquired_Effect",
             "Type": "AssetReferenceString",
             "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",

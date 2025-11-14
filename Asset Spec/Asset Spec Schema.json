@@ -223,7 +223,19 @@
                 },
                 {
                     "const": "SpawnpointId",
-                    "title": "An string ID referencing a spawnpoint node in a map."
+                    "title": "A string ID referencing a spawnpoint node in a map."
+                },
+                {
+                    "const": "OverlapVolumeId",
+                    "title": "A string ID referencing a NPC overlap volume in a map."
+                },
+                {
+                    "const": "ZombieTableId",
+                    "title": "The index of a zombie table defined in the editor."
+                },
+                {
+                    "const": "ZombieCooldownId",
+                    "title": "The unique name of a cooldown tracking instance."
                 },
                 {
                     "const": "FlagId",
@@ -318,8 +330,16 @@
                     "title": "A string that can be in the asset or localization file."
                 },
                 {
+                    "const": "LocalizableRichString",
+                    "title": "A string that can be in the asset or localization file that supports rich text."
+                },
+                {
                     "const": "LocalizableTargetString",
                     "title": "A string that acts as the key for a localization property."
+                },
+                {
+                    "const": "LocalizableTargetRichString",
+                    "title": "A string that acts as the key for a localization property that supports rich text."
                 },
                 {
                     "const": "SkillLevel",

@@ -6,27 +6,31 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 public sealed class LocalizableStringSpecPropertyType : BasicSpecPropertyType<LocalizableStringSpecPropertyType, string>
 {
-    public static readonly LocalizableStringSpecPropertyType Instance = new LocalizableStringSpecPropertyType(false);
-    public static readonly LocalizableStringSpecPropertyType TargetInstance = new LocalizableStringSpecPropertyType(true);
+    public static readonly LocalizableStringSpecPropertyType Instance = new LocalizableStringSpecPropertyType(false, false);
+    public static readonly LocalizableStringSpecPropertyType TargetInstance = new LocalizableStringSpecPropertyType(true, false);
+    public static readonly LocalizableStringSpecPropertyType RichInstance = new LocalizableStringSpecPropertyType(false, true);
+    public static readonly LocalizableStringSpecPropertyType TargetRichInstance = new LocalizableStringSpecPropertyType(true, true);
 
     public override int GetHashCode() => _isTarget ? 34 : 35;
 
     private readonly bool _isTarget;
+    private readonly bool _isRich;
 
     static LocalizableStringSpecPropertyType() { }
-    private LocalizableStringSpecPropertyType(bool isTarget)
+    private LocalizableStringSpecPropertyType(bool isTarget, bool isRich)
     {
         _isTarget = isTarget;
+        _isRich = isRich;
     }
 
     /// <inheritdoc />
-    public override string Type => _isTarget ? "LocalizableTargetString" : "LocalizableString";
+    public override string Type => _isTarget ? _isRich ? "LocalizableTargetRichString" : "LocalizableTargetString" : _isRich ? "LocalizableRichString" : "LocalizableString";
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.String;
 
     /// <inheritdoc />
-    public override string DisplayName => _isTarget ? "Localization Key" : "Localizable Text";
+    public override string DisplayName => _isTarget ? _isRich ? "Localization Key (Rich)" : "Localization Key" : _isRich ? "Localization Text (Rich)" : "Localization Text";
 
     protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 

@@ -137,8 +137,11 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
 
             foreach (SpecProperty property in Properties)
             {
+                if (property.KeyLegacyExpansionFilter == LegacyExpansionFilter.Modern)
+                    continue;
+
                 string fullKey = property.Key;
-                if (fullKey.Length == 0 || fullKey.Equals("#This.Key", StringComparison.OrdinalIgnoreCase))
+                if (property.KeyIsLegacySelfRef)
                     fullKey = baseKey;
                 else
                     fullKey = baseKey + "_" + fullKey;
@@ -171,6 +174,9 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
         {
             foreach (SpecProperty property in Properties)
             {
+                if (property.KeyLegacyExpansionFilter == LegacyExpansionFilter.Legacy)
+                    continue;
+
                 if (!dictionary.TryGetProperty(property.Key, out IPropertySourceNode? kvp))
                 {
                     properties.Add(new CustomSpecTypeProperty(null, property, property.Key));

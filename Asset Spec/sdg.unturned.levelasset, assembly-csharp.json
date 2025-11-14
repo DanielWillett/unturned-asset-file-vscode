@@ -203,6 +203,15 @@
             "Variable": "UnderwaterFogDensity",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
             "Description": "Overrides fog effect intensity while the camera is underwater."
+        },
+        {
+            "Key": "ZombieDifficultyAssetPrioritization",
+            "Type": "SDG.Unturned.EZombieDifficultyAssetPrioritization, Assembly-CSharp",
+            "DefaultValue": "NavmeshOverridesTable",
+            "Variable": "ZombieDifficultyAssetPrioritization",
+            "Description": "Describes the prioritization of per-navmesh and per-table Zombie Difficulty Assets.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
+            "Version": "3.25.10.0"
         }
     ],
     "Types":
@@ -480,6 +489,23 @@
                     "Description": "When restarting the particle system it is simulated this number of seconds.",
                     "Priority": 2,
                     "Version": "3.25.8.4"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EZombieDifficultyAssetPrioritization, Assembly-CSharp",
+            "DisplayName": "Zombie Difficulty Asset Prioritization",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
+            "Version": "3.25.10.0",
+            "Values":
+            [
+                {
+                    "Value": "NavmeshOverridesTable",
+                    "Description": "Per-navmesh difficulty asset takes priority over per-table/type difficulty asset. If per-navmesh asset is null the per-table asset is the fallback."
+                },
+                {
+                    "Value": "TableOverridesNavmesh",
+                    "Description": "Per-table/type difficulty asset takes priority over per-navmesh difficulty asset. If per-table asset is null the per-navmesh asset is the fallback."
                 }
             ]
         }

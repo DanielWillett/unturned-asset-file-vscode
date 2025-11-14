@@ -52,6 +52,9 @@ public static class KnownTypes
         { "TranslationReference", () => TranslationReference },
         { "NavId", () => NavId },
         { "SpawnpointId", () => SpawnpointId },
+        { "OverlapVolumeId", () => OverlapVolumeId },
+        { "ZombieTableId", () => ZombieTableId },
+        { "ZombieCooldownId", () => ZombieCooldownId },
         { "FlagId", () => FlagId },
         { "BlueprintId", () => BlueprintId },
         { "BlueprintIdString", () => BlueprintIdString },
@@ -73,7 +76,9 @@ public static class KnownTypes
         { "MapName", () => MapName },
         { "ActionKey", () => ActionKey },
         { "LocalizableString", () => LocalizableString },
+        { "LocalizableRichString", () => LocalizableRichString },
         { "LocalizableTargetString", () => LocalizableTargetString },
+        { "LocalizableTargetRichString", () => LocalizableTargetRichString },
         { "Skill", () => Skill() },
         { "BlueprintSkill", () => Skill(true, true) },
         { "SteamItemDef", () => SteamItemDef },
@@ -442,6 +447,9 @@ public static class KnownTypes
 
     public static ISpecPropertyType<byte> NavId => NavIdSpecPropertyType.Instance;
     public static ISpecPropertyType<string> SpawnpointId => SpawnpointIdSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> OverlapVolumeId => OverlapVolumeIdSpecPropertyType.Instance;
+    public static ISpecPropertyType<int> ZombieTableId => ZombieTableIdSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> ZombieCooldownId => ZombieCooldownIdSpecPropertyType.Instance;
 
     public static ISpecPropertyType<ushort> FlagId => FlagIdSpecPropertyType.Instance;
 
@@ -508,7 +516,9 @@ public static class KnownTypes
     public static ISpecPropertyType<string> MapName => MapNameSpecPropertyType.Instance;
     public static ISpecPropertyType<string> ActionKey => ActionKeySpecPropertyType.Instance;
     public static ISpecPropertyType<string> LocalizableString => LocalizableStringSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> LocalizableRichString => LocalizableStringSpecPropertyType.RichInstance;
     public static ISpecPropertyType<string> LocalizableTargetString => LocalizableStringSpecPropertyType.TargetInstance;
+    public static ISpecPropertyType<string> LocalizableTargetRichString => LocalizableStringSpecPropertyType.TargetRichInstance;
 
     public static ISpecPropertyType<byte> SkillLevel(string skillsetOrPropertyName)
         => new SkillLevelSpecPropertyType(skillsetOrPropertyName);

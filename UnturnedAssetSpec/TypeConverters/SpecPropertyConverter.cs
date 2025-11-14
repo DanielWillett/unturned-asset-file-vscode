@@ -465,6 +465,11 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             property.TemplateGroupUniqueValue = false;
             property.TemplateGroups = OneOrMore<TemplateGroup>.Null;
         }
+        else if (property.Key.Equals("#This.Key", StringComparison.OrdinalIgnoreCase))
+        {
+            property.KeyIsLegacySelfRef = true;
+            property.Key = string.Empty;
+        }
         else
         {
             property.CreateTemplateProcessors();
@@ -930,7 +935,9 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         writer.WriteStartObject();
 
         string key = property.Key;
-        if (property.IsTemplate)
+        if (property.KeyIsLegacySelfRef)
+            key = "#This.Key";
+        else if (property.IsTemplate)
             key = TemplateProcessor.EscapeKey(key, property.KeyTemplateProcessor);
 
         writer.WriteString(KeyProperty, key);

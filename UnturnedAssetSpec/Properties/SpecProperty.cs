@@ -37,7 +37,13 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     /// Import properties have an empty key and are used to layer one type into another.
     /// </summary>
     /// <remarks>See ServerListCurationAsset for an example.</remarks>
-    public bool IsImport => Key.Length == 0 && Type.Type is IPropertiesSpecType;
+    public bool IsImport => !KeyIsLegacySelfRef && Key.Length == 0 && Type.Type is IPropertiesSpecType;
+
+    /// <summary>
+    /// Whether or not the key should be equal to the current object's key in legacy filter mode.
+    /// </summary>
+    /// <remarks>This is replaced by '#This.Key' in the JSON document.</remarks>
+    public bool KeyIsLegacySelfRef { get; internal set; }
 
     /// <inheritdoc cref="IsImport"/>
     public bool TryGetImportType(out IPropertiesSpecType type)
@@ -346,6 +352,7 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
 
         if (!string.Equals(Key, other.Key, StringComparison.Ordinal)
               || KeyLegacyExpansionFilter != other.KeyLegacyExpansionFilter
+              || KeyIsLegacySelfRef != other.KeyIsLegacySelfRef
               || IsHidden != other.IsHidden
               || !Type.Equals(other.Type)
               || !string.Equals(SingleKeyOverride, other.SingleKeyOverride, StringComparison.Ordinal)
@@ -445,7 +452,8 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
         _keyTemplateProcessor = _keyTemplateProcessor,
         _aliasTemplateProcessors = _aliasTemplateProcessors,
         AdditionalProperties = AdditionalProperties,
-        Context = Context
+        Context = Context,
+        KeyIsLegacySelfRef = KeyIsLegacySelfRef
     };
 }
 

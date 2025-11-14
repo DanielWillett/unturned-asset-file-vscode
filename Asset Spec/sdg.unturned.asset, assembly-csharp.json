@@ -155,6 +155,15 @@
                 }
             ],
             "Priority": -2
+        },
+        {
+            "Key": "Keep_Localization_Loaded",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not to keep localization data loaded for this asset. This is used to make sure NPC hints are translated on the client and not shown in the server's language.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#hint",
+            "Priority": -3,
+            "Version": "3.25.10.0"
         }
     ],
     "Types":
@@ -346,6 +355,13 @@
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#player-life-stamina",
                     "Description": "Applies conditional logic to the player's current stamina stat.",
                     "ConditionType": "SDG.Unturned.NPCPlayerLifeStaminaCondition, Assembly-CSharp"
+                },
+                {
+                    "Value": "VOLUME_OVERLAP",
+                    "Casing": "Volume_Overlap",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#volume-overlap",
+                    "Description": "Applies conditional logic to the number of players in an NPC overlap volume.",
+                    "ConditionType": "SDG.Unturned.NPCVolumeOverlapCondition, Assembly-CSharp"
                 }
             ]
         },
@@ -836,6 +852,16 @@
                     "Variable": "logicType"
                 },
                 {
+                    "Key": "TextId",
+                    "Type": "LocalizableTargetRichString",
+                    "DefaultValue": null,
+                    "SupportsNewLines": true,
+                    "Description": "The localization key for the 'Text' property for this condition in the localization file for this asset.",
+                    "Variable": "text",
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Version": "3.25.4.0"
+                },
+                {
                     "Key": "UI_Requirements",
                     "Type": "CommaDelimitedString",
                     "ElementType": "Int32",
@@ -850,8 +876,11 @@
             [
                 {
                     "Key": "#This.Key",
-                    "Type": "String",
+                    "KeyLegacyExpansionFilter": "Legacy",
+                    "Type": "RichTextString",
                     "DefaultValue": "#Self.Key",
+                    "SupportsNewLines": true,
+                    "Description": "Text used for this condition.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "text"
                 }
@@ -1802,6 +1831,38 @@
             ]
         },
         {
+            "Type": "SDG.Unturned.NPCVolumeOverlapCondition, Assembly-CSharp",
+            "DisplayName": "Volume Overlap Condition",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#volume-overlap",
+            "Parent": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Version": "3.25.10.0",
+            "Properties":
+            [
+                {
+                    "Key": "VolumeID",
+                    "Type": "OverlapVolumeId",
+                    "DefaultValue": null,
+                    "Description": "The unique ID of the overlap volume (`NPCOverlapVolume`) to count players in.",
+                    "Required": true,
+                    "Variable": "VolumeId"
+                },
+                {
+                    "Key": "PlayerCount",
+                    "Type": "Int32",
+                    "Minimum": 0,
+                    "Maximum": 255,
+                    "DefaultValue": 0,
+                    "Description": "The target number of players overlapping the volume referenced by @VolumeID.",
+                    "Required": true,
+                    "Variable": "PlayerCount"
+                },
+                {
+                    "Key": "Reset",
+                    "HideInherited": true
+                }
+            ]
+        },
+        {
             "Type": "SDG.Unturned.ENPCRewardType, Assembly-CSharp",
             "DisplayName": "Reward Type",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
@@ -1974,6 +2035,27 @@
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
                     "Description": "Spawns an effect.",
                     "RewardType": "SDG.Unturned.NPCEffectReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "AIRDROP",
+                    "Casing": "Airdrop",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#airdrop",
+                    "Description": "Spawns an airdrop at a random node or NPC spawnpoint.",
+                    "RewardType": "SDG.Unturned.NPCAirdropReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "ZOMBIE",
+                    "Casing": "Zombie",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#zombie",
+                    "Description": "Respawns zombies at NPC spawnpoint nodes.",
+                    "RewardType": "SDG.Unturned.NPCZombieReward, Assembly-CSharp"
+                },
+                {
+                    "Value": "REMOVE_ZOMBIES",
+                    "Casing": "Remove_Zombies",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#remove-zombies",
+                    "Description": "Kills all zombies in a specified region, with an optional type filter.",
+                    "RewardType": "SDG.Unturned.NPCRemoveZombieReward, Assembly-CSharp"
                 }
             ]
         },
@@ -1987,9 +2069,18 @@
                 {
                     "Key": "Type",
                     "Type": "SDG.Unturned.ENPCRewardType, Assembly-CSharp",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Required": true,
                     "SubtypeSwitch": "RewardType"
+                },
+                {
+                    "Key": "TextId",
+                    "Type": "LocalizableTargetString",
+                    "DefaultValue": null,
+                    "SupportsNewLines": true,
+                    "Description": "The localization key for the 'Text' property for this reward in the localization file for this asset.",
+                    "Variable": "text",
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Version": "3.25.4.0"
                 },
                 {
                     "Key": "GrantDelaySeconds",
@@ -1997,7 +2088,6 @@
                     "Description": "Adds a delay to when the reward will be granted.",
                     "MinimumExclusive": 0,
                     "Except": [ -1 ],
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "DefaultValue": -1,
                     "Variable": "grantDelaySeconds"
                 },
@@ -2005,7 +2095,6 @@
                     "Key": "GrantDelayApplyWhenInterrupted",
                     "Type": "Boolean",
                     "Description": "Indicates that the delay will be skipped and applied immediately when the player dies or disconnects.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "DefaultValue": false,
                     "Variable": "grantDelayApplyWhenInterrupted"
                 }
@@ -2014,8 +2103,11 @@
             [
                 {
                     "Key": "#This.Key",
+                    "KeyLegacyExpansionFilter": "Legacy",
                     "Type": "String",
+                    "SupportsNewLines": true,
                     "DefaultValue": "#Self.Key",
+                    "Description": "Text used for this reward.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "text"
                 }
@@ -2680,12 +2772,13 @@
                 {
                     "Key": "Text",
                     "Type": "RichTextString",
-                    "DefaultValue": "@$local$::Text",
+                    "DefaultValue": "@$local$::",
                     "IncludedDefaultValue": null,
                     "SupportsNewLines": true,
                     "Description": "Message to display on the hint popup. Better to store this value in localization instead.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#hint",
-                    "Variable": "text"
+                    "Variable": "text",
+                    "ExclusiveWith": [ "TextId" ]
                 },
                 {
                     "Key": "Duration",
@@ -2916,6 +3009,165 @@
                     "Description": "Overrides the default relevant distance of 128m when in multiplayer.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
                     "Variable": "OverrideRelevantDistance"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCAirdropReward, Assembly-CSharp",
+            "DisplayName": "Airdrop Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#airdrop",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Version": "3.25.7.0",
+            "Properties":
+            [
+                {
+                    "Key": "Use_Random_Airdrop_Node",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Description": "Whether or not to call in the airdrop at a random airdrop node placed in the editor.",
+                    "Variable": "ShouldUseRandomAirdropNode",
+                    "Required":
+                    {
+                        "Variable": "Spawnpoint",
+                        "Operation": "excluded",
+                        "Comparand": null
+                    },
+                    "ExclusiveWith": [ "Spawnpoint" ]
+                },
+                {
+                    "Key": "Cargo",
+                    "Type": "BcAssetReference",
+                    "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+                    "DefaultValue": "00000000000000000000000000000000",
+                    "Description": "Spawn table ID overriding which items to drop.",
+                    "Variable": "CargoSpawnTableRef",
+                    "Required":
+                    {
+                        "Variable": "Use_Random_Airdrop_Node",
+                        "Operation": "neq",
+                        "Comparand": true
+                    }
+                },
+                {
+                    "Key": "Spawnpoint",
+                    "Type": "SpawnpointId",
+                    "DefaultValue": null,
+                    "Description": "ID of a spawnpoint node to spawn the airdrop at.",
+                    "Variable": "spawnpoint",
+                    "Required":
+                    {
+                        "Variable": "Use_Random_Airdrop_Node",
+                        "Operation": "neq",
+                        "Comparand": true
+                    },
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Use_Random_Airdrop_Node",
+                            "Value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCZombieReward, Assembly-CSharp",
+            "DisplayName": "Zombie Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#zombie",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Version": "3.25.10.0",
+            "Properties":
+            [
+                {
+                    "Key": "Zombie",
+                    "Type": "SDG.Unturned.EZombieSpeciality, Assembly-CSharp",
+                    "DefaultValue": "NONE",
+                    "Description": "Type of zombie to spawn.",
+                    "Variable": "ZombieSpeciality",
+                    "Required": true
+                },
+                {
+                    "Key": "Spawnpoint",
+                    "Type": "SpawnpointId",
+                    "DefaultValue": null,
+                    "Description": "ID corresponding one or more spawnpoint nodes placed in the editor to randomly spawn the zombies at.",
+                    "Variable": "SpawnpointId",
+                    "Required": true
+                },
+                {
+                    "Key": "LevelTableOverride",
+                    "Type": "ZombieTableId",
+                    "DefaultValue": -1,
+                    "Description": "Unique ID of a zombie type shown in the level editor. If set, the zombie spawned will use that type.",
+                    "Variable": "LevelTableUniqueId"
+                },
+                {
+                    "Key": "SpawnQuantity",
+                    "Type": "ZombieTableId",
+                    "DefaultValue": 1,
+                    "Minimum": 1,
+                    "Description": "Total number of zombies to spawn.",
+                    "Variable": "SpawnQuantity"
+                },
+                {
+                    "Key": "CooldownId",
+                    "Type": "ZombieCooldownId",
+                    "DefaultValue": null,
+                    "Description": "If set, zombies will not spawn unless @CooldownDuration seconds have passed since last run. If @CooldownDuration is not set the cooldown will apply until the next restart.",
+                    "Variable": "CooldownId"
+                },
+                {
+                    "Key": "CooldownDuration",
+                    "Type": "Float32",
+                    "DefaultValue": -1.0,
+                    "MinimumExclusive": 0.0,
+                    "Except": [ -1.0 ],
+                    "Description": "When @CooldownId is set, the number of seconds that have to pass before this reward can be activated again.",
+                    "Variable": "CooldownId",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "CooldownId",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "CooldownId",
+                                "Operation": "value-included",
+                                "Comparand": null
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.NPCRemoveZombieReward, Assembly-CSharp",
+            "DisplayName": "Remove Zombies Reward",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#remove-zombies",
+            "Parent": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Version": "3.25.10.0",
+            "Properties":
+            [
+                {
+                    "Key": "Zombie",
+                    "Type": "SDG.Unturned.EZombieSpeciality, Assembly-CSharp",
+                    "DefaultValue": "NONE",
+                    "Description": "Type of zombie to remove, or @NONE to remove all zombie types.",
+                    "Variable": "ZombieSpeciality"
+                },
+                {
+                    "Key": "LevelTable",
+                    "Type": "ZombieTableId",
+                    "DefaultValue": -1,
+                    "Description": "Unique ID of a zombie type shown in the level editor. If set, only zombies using this table will be removed.",
+                    "Variable": "LevelTableUniqueId"
+                },
+                {
+                    "Key": "Nav",
+                    "Type": "NavId",
+                    "DefaultValue": 255,
+                    "Description": "A reference to a navmesh placed in the map editor where zombies will be removed from. If not set, zombies will be removed from all regions.",
+                    "Variable": "NavmeshIndex"
                 }
             ]
         },
