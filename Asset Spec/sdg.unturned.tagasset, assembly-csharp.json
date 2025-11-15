@@ -1,0 +1,84 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.TagAsset, Assembly-CSharp",
+    "DisplayName": "Tag",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html",
+    "RequireId": false,
+    "Version": "3.25.4.0",
+    "Properties":
+    [
+        {
+            "Key": "NameColor",
+            "Type": "Color32RGB",
+            "DefaultValue": "#ffffff",
+            "Description": "The preferred text color of the name when displayed in the UI.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html#tag-properties",
+            "Priority": 5,
+            "Variable": "NameColor"
+        },
+        {
+            "Key": "HasIcon",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not the game should look for an icon in the asset bundle for this asset.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html#tag-properties",
+            "Priority": 4,
+            "Variable": "Icon"
+        },
+        {
+            "Key": "IconPath",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "DefaultValue": true,
+            "Description": "Whether or not the game should look for an icon in the asset bundle for this asset.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html#tag-properties",
+            "Priority": 2,
+            "Variable": "Icon",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "HasIcon",
+                    "Value": false
+                }
+            ]
+        },
+        {
+            "Key": "ShouldTintIcon",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not the game should tint the icon with the user's UI color preference.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html#tag-properties",
+            "Priority": 3,
+            "Variable": "Icon",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "HasIcon",
+                    "Value": false
+                }
+            ]
+        }
+    ],
+    "Localization":
+    [
+        {
+            "Key": "Name",
+            "Type": "String",
+            "DefaultValue": "Name",
+            "Description": "Display name in user interfaces.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html#localization",
+            "Variable": "PlainTextName"
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Icon",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "RedirectableAssetKey": "IconPath",
+            "Variable": "Icon",
+            "Required": "@HasIcon"
+        }
+    ]
+}

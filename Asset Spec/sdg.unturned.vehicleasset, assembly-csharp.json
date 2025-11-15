@@ -1,0 +1,927 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.VehicleAsset, Assembly-CSharp",
+    "DisplayName": "Vehicle",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html",
+    "RequireId": false,
+    "VanillaIdLimit": 2000,
+    "Properties":
+    [
+        {
+            "Key": "Pitch_Idle",
+            "Type": "Float32",
+            "DefaultValue": 0.5,
+            "Description": "Multiplier on the pitch of the engine audio while idle. The default value for this property depends on the audio clip name and may not be shown accurately in the editor.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#pitch-idle-float32",
+            "Variable": "pitchIdle"
+        },
+        {
+            "Key": "Pitch_Drive",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "HELICOPTER"
+                        }
+                    ],
+                    "Value": 0.03
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "BLIMP"
+                        }
+                    ],
+                    "Value": 0.1
+                },
+                {
+                    "Value": 0.05
+                }
+            ],
+            "Description":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "HELICOPTER"
+                        },
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "BLIMP"
+                        }
+                    ],
+                    "Value": "Multiplier on the pitch of the engine audio while driving."
+                },
+                {
+                    "Value": "Multiplier on the pitch of the engine audio while driving. The default value for this property depends on the audio clip name and may not be shown accurately in the editor."
+                }
+            ],
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#pitch-drive-float32",
+            "Variable": "pitchDrive"
+        },
+        {
+            "Key": "Engine",
+            "Type": "SDG.Unturned.EEngine, Assembly-CSharp",
+            "DefaultValue": "CAR",
+            "Description": "Determines the type of vehicle, specifically the movement physics of the vehicle.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#engine-eengine-car",
+            "Variable": "engine"
+        },
+        {
+            "Key": "Physics_Profile",
+            "Type": "AssetReferenceString",
+            "ElementType": "SDG.Unturned.VehiclePhysicsProfileAsset, Assembly-CSharp",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "CAR"
+                        }
+                    ],
+                    "Value": "6b91a94f01b6472eaca31d9420ec2367"
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "PLANE"
+                        }
+                    ],
+                    "Value": "93a47d6d40454335b4784e803628ac54"
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "HELICOPTER"
+                        }
+                    ],
+                    "Value": "bb9f9f0204c4462ca7d976b87d1336d4"
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "BOAT"
+                        }
+                    ],
+                    "Value": "47258d0dcad14cb8be26e24c1ef3449e"
+                },
+                {
+                    "Value": "00000000000000000000000000000000"
+                }
+            ],
+            "Description": "References a physics profile asset Allows for increased control over vehicle settings in bulk.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#physics-profile-guid",
+            "Variable": "physicsProfileRef"
+        },
+        {
+            "Key": "Crawler",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Disables the wheel object from turning when steering by setting the default value of @Num_Steering_Tires to 0. Replaced by the @WheelConfigurations property.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#crawler-flag",
+            "Deprecated": true,
+            "Variable": "hasCrawler"
+        },
+        {
+            "Key": "Num_Steering_Tires",
+            "Type": "Int32",
+            "Minimum": 0,
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Crawler",
+                            "Operation": "eq",
+                            "Comparand": true
+                        }
+                    ],
+                    "Value": 0
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "CAR"
+                        }
+                    ],
+                    "Value": 2
+                },
+                {
+                    "Value": 1
+                }
+            ],
+            "Description": "Total number of tires that should turn when steering. Replaced by the @WheelConfigurations property.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#num-steering-tires-int32",
+            "Deprecated": true,
+            "Variable": "numSteeringTires",
+            "CountForTemplateGroup": "vehicle-steering-tires"
+        },
+        {
+            "Key": "Steering_Tire_*",
+            "Template": true,
+            "TemplateGroups": [ "vehicle-steering-tires" ],
+            "Type": "Int32",
+            "Minimum": 0,
+            "DefaultValue": "#Self.TemplateGroups[0]",
+            "Description": "Set a wheel object as a steering tire, which will visibly turn when steering. Replaced by the @WheelConfigurations property.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steering-tire-int32",
+            "Deprecated": true,
+            "Variable": "steeringTireIndices"
+        },
+        {
+            "Key": "Has_Clip_Prefab",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not the vehicle defines a Clip.prefab. New vehicles should usually set this to false and use the client prefab for both client and server.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#has-clip-prefab-bool-true",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "$bndl$::Clip",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Has_Clip_Prefab",
+                        "Operation": "eq",
+                        "Comparand": false
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Size2_Z",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Orthogonal camera size for economy icons.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#size2-z-float32-0",
+            "Variable": "size2_z"
+        },
+        {
+            "Key": "Shared_Skin_Name",
+            "Type": "String",
+            "DefaultValue": null,
+            "Description": "When generating images, the image name will contain the value of this string instead of the vehicle's file name.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#shared-skin-name-string",
+            "Variable": "sharedSkinName"
+        },
+        {
+            "Key": "Shared_Skin_Lookup_ID",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.VehicleAsset, Assembly-CSharp",
+            "DefaultValue": "@GUID",
+            "Description": "GUID or legacy ID of another vehicle, which this vehicle should share skins with.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#shared-skin-lookup-id-doc-data-guid-or-uint16",
+            "Variable": "SharedSkinLookupGuid"
+        },
+        {
+            "Key": "Rarity",
+            "Type": "SDG.Unturned.EItemRarity, Assembly-CSharp",
+            "DefaultValue": "COMMON",
+            "Description": "Rarity of the vehicle. Used to color text shown in menus.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#rarity-doc-data-eitemrarity-common",
+            "Variable": "rarity"
+        },
+        {
+            "Key": "Zip",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Player character should use a handlebar idle animation.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#zip-flag",
+            "Variable": "hasZip",
+            "ExclusiveWith": [ "Bicycle", "Reclined" ]
+        },
+        {
+            "Key": "Bicycle",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Player character should use a bicycling animation.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bicycle-flag",
+            "Variable": "hasZip",
+            "ExclusiveWith": [ "Zip", "Reclined" ]
+        },
+        {
+            "Key": "Reclined",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Player character should use a reclined idle animation.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bicycle-flag",
+            "Variable": "isReclined",
+            "ExclusiveWith": [ "Zip", "Bicycle" ]
+        },
+        {
+            "Key": "LockMouse",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "First-person camera movement is locked while driving.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#lockmouse-flag",
+            "Variable": "hasLockMouse"
+        },
+        {
+            "Key": "Traction",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Tires should have traction in snowy positions.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#traction-flag",
+            "Variable": "hasTraction"
+        },
+        {
+            "Key": "Sleds",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Tires should easily roll. For example, most planes will want to use this property.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#sleds-flag",
+            "Variable": "hasSleds"
+        },
+        {
+            "Key": "Cannot_Spawn_With_Battery",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "The vehicle does not spawn with a vehicle battery.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#cannot-spawn-with-battery-flag",
+            "Variable": "canSpawnWithBattery"
+        },
+        {
+            "Key": "Battery_Spawn_Charge_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "IncludedDefaultValue": 0.0,
+            "Minimum": 0.0,
+            "Maximum": 1.0,
+            "Description": "Multiplier for the battery charge for newly-spawned vehicles.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#battery-spawn-charge-multiplier-float32-1",
+            "Variable": "batterySpawnChargeMultiplier"
+        },
+        {
+            "Key": "Battery_Burn_Rate",
+            "Type": "Float32",
+            "DefaultValue": 20.0,
+            "IncludedDefaultValue": 0.0,
+            "Minimum": 0.0,
+            "Description": "The rate at which battery charge decreases per second.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#battery-burn-rate-float32-20",
+            "Variable": "batteryBurnRate"
+        },
+        {
+            "Key": "Battery_Charge_Rate",
+            "Type": "Float32",
+            "DefaultValue": 20.0,
+            "IncludedDefaultValue": 0.0,
+            "Minimum": 0.0,
+            "Description": "The rate at which battery charge increases per second.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#battery-charge-rate-float32-20",
+            "Variable": "batteryChargeRate"
+        },
+        {
+            "Key": "BatteryMode_Driving",
+            "Type": "SDG.Unturned.EBatteryMode, Assembly-CSharp",
+            "DefaultValue": "Charge",
+            "Description": "How the vehicle battery should behave when a player is driving it.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#batterymode-driving-doc-data-ebatterymode-charge",
+            "Variable": "batteryDriving"
+        },
+        {
+            "Key": "BatteryMode_Empty",
+            "Type": "SDG.Unturned.EBatteryMode, Assembly-CSharp",
+            "DefaultValue": "None",
+            "Description": "How the vehicle battery should behave when the vehicle is empty.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#batterymode-empty-doc-data-ebatterymode-none",
+            "Variable": "batteryEmpty"
+        },
+        {
+            "Key": "BatteryMode_Headlights",
+            "Type": "SDG.Unturned.EBatteryMode, Assembly-CSharp",
+            "DefaultValue": "Burn",
+            "Description": "How the vehicle battery should behave when the headlights are on.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#batterymode-headlights-doc-data-ebatterymode-burn",
+            "Variable": "batteryHeadlights"
+        },
+        {
+            "Key": "BatteryMode_Sirens",
+            "Type": "SDG.Unturned.EBatteryMode, Assembly-CSharp",
+            "DefaultValue": "Burn",
+            "Description": "How the vehicle battery should behave when the siren is on.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#batterymode-sirens-doc-data-ebatterymode-burn",
+            "Variable": "batterySirens"
+        },
+        {
+            "Key": "Default_Battery",
+            "Type": "AssetReferenceString",
+            "ElementType": "SDG.Unturned.ItemVehicleRepairToolAsset, Assembly-CSharp",
+            "DefaultValue": "098b13be34a7411db7736b7f866ada69",
+            "Description": "Battery item given to the player when a specific battery hasn't been manually installed yet.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#default-battery-doc-data-guid-098b13be34a7411db7736b7f866ada69",
+            "Variable": "defaultBatteryGuid"
+        },
+        {
+            "Key": "Fuel_Burn_Rate",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "CAR"
+                        }
+                    ],
+                    "Value": 2.05
+                },
+                {
+                    "Value": 4.2
+                }
+            ],
+            "Description": "The rate at which fuel decreases per second.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#fuel-burn-rate-float32",
+            "Variable": "fuelBurnRate"
+        },
+        {
+            "Key": "IgnitionAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Description": "Audio clip to play after entering the driver's seat.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#ignitionaudioclip-master-bundle-pointer",
+            "Variable": "ignition"
+        },
+        {
+            "Key": "HornAudioClip",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Description": "Audio clip to play when using the horn.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#hornaudioclip-master-bundle-pointer",
+            "Variable": "horn"
+        },
+        {
+            "Key": "Has_Horn",
+            "Type": "MasterBundleReferenceString",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "$bndl$::Horn",
+                            "Operation": "value-included",
+                            "Comparand": null
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Audio clip to play when using the horn.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#hornaudioclip-master-bundle-pointer",
+            "Variable": "hasHorn"
+        },
+        {
+            "Key": "Speed_Min",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The vehicle's maximum velocity to aim for while accelerating in reverse, in m/s. Usually will be negative.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#speed-min-float32-0",
+            "Variable": "TargetReverseVelocity"
+        },
+        {
+            "Key": "Speed_Max",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The vehicle's maximum velocity to aim for while accelerating forward, in m/s.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#speed-max-float32-0",
+            "Variable": "TargetForwardVelocity"
+        },
+        {
+            "Key": "Steering_Angle_Max",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Steer_Max",
+                            "Operation": "value-included",
+                            "Comparand": null
+                        }
+                    ],
+                    "Value": "=MUL(@Steer_Max 0.75)"
+                },
+                {
+                    "Value": 0
+                }
+            ],
+            "Description": "Steering angle range at target maximum speed (for the current forward/backward direction). Alternative for @Steer_Max that doesn't multiply by 0.75.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steer-max-float32-0",
+            "Variable": "MaxSteeringAngle",
+            "ExclusiveWith": [ "Steer_Max" ]
+        },
+        {
+            "Key": "Steer_Max",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Steering_Angle_Max",
+                            "Operation": "value-included",
+                            "Comparand": null
+                        }
+                    ],
+                    "Value": "=DIV(@Steer_Max 0.75)"
+                },
+                {
+                    "Value": 0
+                }
+            ],
+            "Description": "The vehicle's maximum velocity to aim for while accelerating forward, in m/s. This value ends up getting multiplied by 0.75.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steer-max-float32-0",
+            "Variable": "MaxSteeringAngle",
+            "ExclusiveWith": [ "Steering_Angle_Max" ]
+        },
+        {
+            "Key": "Steering_Angle_FullSpeed_Factor",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Steer_Min",
+                            "Operation": "value-included",
+                            "Comparand": null
+                        }
+                    ],
+                    "Value": "=DIV(@Steer_Min @Steering_Angle_Max)"
+                },
+                {
+                    "Value": 0
+                }
+            ],
+            "Description": "Multiplier for @Steering_Angle_Max used to determine the steering angle range at zero speed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steer-max-float32-0",
+            "Variable": "MaxSteeringAngleAtFullSpeed",
+            "ExclusiveWith": [ "Steer_Min" ]
+        },
+        {
+            "Key": "Steer_Min",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Steering_Angle_FullSpeed_Factor",
+                            "Operation": "value-included",
+                            "Comparand": null
+                        }
+                    ],
+                    "Value": "=MUL(@Steering_Angle_Max @Steering_Angle_FullSpeed_Factor)"
+                },
+                {
+                    "Value": 0
+                }
+            ],
+            "Description": "Steering angle range at zero speed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steer-max-float32-0",
+            "Variable": "MaxSteeringAngleAtFullSpeed",
+            "ExclusiveWith": [ "Steering_Angle_FullSpeed_Factor" ]
+        },
+        {
+            "Key": "CrawlerTrackSteering_Torque",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "A torque value that's added to or subtracted from the wheel motor torque in CrawlerTrack mode.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#crawlertracksteering-torque-float32-1-0",
+            "Variable": "CrawlerTrackSteeringTorque"
+        },
+        {
+            "Key": "CrawlerTrackSteering_SidewaysFrictionMultiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "For a wheel in CrawlerTrack mode, the wheel collider's sideways friction stiffness is multiplied by this value while a steering input is applied.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#crawlertracksteering-sidewaysfrictionmultiplier-float32-1-0",
+            "Variable": "CrawlerTrackSteeringSidewaysFrictionMultiplier"
+        },
+        {
+            "Key": "CrawlerTrackSteering_MaxSpeedScale",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier for crawler track steering torque and sideways friction multiplier while driving at maximum speed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#crawlertracksteering-maxspeedscale-float32-1-0",
+            "Variable": "CrawlerTrackSteeringMaxSpeedScale"
+        },
+        {
+            "Key": "Steering_Angle_Turn_Speed",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Steering_Angle_Max 5)",
+            "Description": "How quickly wheels can turn to meet player input, measured in degrees per second.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steering-angle-turn-speed-float32",
+            "Variable": "SteeringAngleTurnSpeed"
+        },
+        {
+            "Key": "Steering_LeaningForceMultiplier",
+            "Type": "Float32",
+            "DefaultValue": -1.0,
+            "Description": "If greater than zero, torque is applied on the forward axis according to steering input for bikes and motorcycles.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steering-leaningforcemultiplier-float32-1-0",
+            "Variable": "steeringLeaningForceMultiplier"
+        },
+        {
+            "Key": "Steering_LeaningForce_ScaleWithSpeed",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not leaning force is multiplied by normalized speed to the power of @Steering_LeaningForce_SpeedExponent.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steering-leaningforce-scalewithspeed-bool-false",
+            "Variable": "steeringLeaningForceShouldScaleWithSpeed"
+        },
+        {
+            "Key": "Steering_LeaningForce_SpeedExponent",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Leaning force is multiplied by normalized speed to the power of this value if @Steering_LeaningForce_ScaleWithSpeed is enabled.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steering-leaningforce-speedexponent-float32-1-0",
+            "Variable": "steeringLeaningForceShouldScaleWithSpeed",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Steering_LeaningForce_ScaleWithSpeed",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Brake",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The amount of braking force to apply. This value is 4 times the breaking torque for each wheel.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#brake-float32",
+            "Variable": "brake"
+        },
+        {
+            "Key": "Lift",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The amount of upwards lift force to apply on planes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#brake-float32",
+            "Variable": "lift",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Engine",
+                    "Value": "PLANE"
+                }
+            ]
+        },
+        {
+            "Key": "Fuel_Min",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Maximum": "@Fuel_Max",
+            "Description": "Minimum possible fuel to spawn with.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#fuel-min-uint16-0",
+            "Variable": "fuelMin"
+        },
+        {
+            "Key": "Fuel_Max",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Minimum": "@Fuel_Min",
+            "Maximum": "@Fuel",
+            "Description": "Maximum possible fuel to spawn with.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#fuel-max-uint16-0",
+            "Variable": "fuelMax"
+        },
+        {
+            "Key": "Fuel",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Description": "Total fuel capacity.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#fuel-uint16-0",
+            "Variable": "fuel"
+        },
+        {
+            "Key": "Health_Min",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Maximum": "@Health_Max",
+            "Description": "Minimum possible health to spawn with.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#health-min-uint16-0",
+            "Variable": "healthMin"
+        },
+        {
+            "Key": "Health_Max",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Minimum": "@Health_Min",
+            "Maximum": "@Health",
+            "Description": "Maximum possible health to spawn with.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#health-max-uint16-0",
+            "Variable": "healthMax"
+        },
+        {
+            "Key": "Health",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Description": "Total health value.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#health-uint16-0",
+            "Variable": "health"
+        },
+        {
+            "Key": "Explosion",
+            "Type": "GuidOrId",
+            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Description": "Effect to play when the vehicle is destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-doc-data-guid-or-uint16",
+            "Variable": "ExplosionEffectGuid"
+        },
+        {
+            "Key": "ShouldExplosionCauseDamage",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Explosion",
+                            "Operation": "neq",
+                            "Comparand": 0
+                        },
+                        {
+                            "Variable": "Explosion",
+                            "Operation": "neq",
+                            "Comparand": "00000000000000000000000000000000"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Whether or not the explosion caused by the vehicle being destroyed will deal damage to nearby entities and kill any passengers.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#shouldexplosioncausedamage-bool",
+            "Variable": "ShouldExplosionCauseDamage"
+        },
+        {
+            "Key": "ShouldExplosionBurnMaterials",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Explosion",
+                            "Operation": "neq",
+                            "Comparand": 0
+                        },
+                        {
+                            "Variable": "Explosion",
+                            "Operation": "neq",
+                            "Comparand": "00000000000000000000000000000000"
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Whether or not the materials of the vehicle's model will be tinted black when the vehicle is destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#shouldexplosionburnmaterials-bool",
+            "Variable": "ShouldExplosionBurnMaterials"
+        },
+        {
+            "Key": "ExplosionBurnMaterialSections",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Optionally specifies which materials should be darkened after an explosion.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosionburnmaterialsections-list-of-paintablevehiclesection",
+            "Variable": "explosionBurnMaterialSections",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "ShouldExplosionBurnMaterials",
+                    "Value": true
+                }
+            ]
+        },
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EEngine, Assembly-CSharp",
+            "DisplayName": "Engine Type",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-eengine",
+            "Values":
+            [
+                {
+                    "Value": "CAR",
+                    "Casing": "Car",
+                    "Description": "Standard drivable ground vehicle."
+                },
+                {
+                    "Value": "PLANE",
+                    "Casing": "Plane",
+                    "Description": "A gliding air vehicle."
+                },
+                {
+                    "Value": "HELICOPTER",
+                    "Casing": "Helicopter",
+                    "Description": "An air vehicle with vertical lift."
+                },
+                {
+                    "Value": "BLIMP",
+                    "Casing": "Blimp",
+                    "Description": "An air vehicle with buoyancy."
+                },
+                {
+                    "Value": "BOAT",
+                    "Casing": "Boat",
+                    "Description": "A vehicle that floats on the water."
+                },
+                {
+                    "Value": "TRAIN",
+                    "Casing": "Train",
+                    "Description": "A vehicle that is snapped to a track/road placed in the editor."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EBatteryMode, Assembly-CSharp",
+            "DisplayName": "Battery Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/ebatterymode.html",
+            "Values":
+            [
+                {
+                    "Value": "None",
+                    "Description": "Battery charge remains unchanged."
+                },
+                {
+                    "Value": "Burn",
+                    "Description": "Battery charge will deplete over time."
+                },
+                {
+                    "Value": "Charge",
+                    "Description": "Battery charge will replenish over time."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp",
+            "DisplayName": "Paintable Vehicle Section",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-paintablevehiclesection-dictionary",
+            "StringParsableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.PaintableVehicleSectionStringParseableSpecPropertyType, UnturnedAssetSpec",
+            "Properties":
+            [
+                {
+                    "Key": "Path",
+                    "Type": "String",
+                    "DefaultValue": null,
+                    "Required": true,
+                    "Description": "Scene hierarchy path to a Renderer component relative to the vehicle’s root transform.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-paintablevehiclesection-path",
+                    "Variable": "path"
+                },
+                {
+                    "Key": "MaterialIndex",
+                    "Type": "Int32",
+                    "DefaultValue": 0,
+                    "Description": "Zero-based index in the Renderer's material list.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#materialindex-int32-0",
+                    "Variable": "materialIndex"
+                },
+                {
+                    "Key": "AllMaterials",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Description": "Whether or not all materials should be painted instead of just @MaterialIndex.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#allmaterials-bool-false",
+                    "Variable": "allMaterials"
+                }
+            ]
+        }
+    ],
+    "Localization":
+    [
+        {
+            "Key": "Name",
+            "Type": "String",
+            "DefaultValue": "Name",
+            "Description": "Localized vehicle name.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#localization",
+            "Variable": "vehicleName"
+        }
+    ],
+    "BundleAssets":
+    [
+        {
+            "AssetName": "Vehicle",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "clientModel",
+            "Description": "The prefab of the vehicle loaded on clients and sometimes servers.",
+            "Required": true
+        },
+        {
+            "AssetName": "Clip",
+            "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Variable": "legacyServerModel",
+            "Description": "The prefab of the vehicle loaded on the dedicated server. Usually new vehicles should only include a @Vehicle prefab.",
+            "Deprecated": true,
+            "Required":
+            {
+                "Variable": "Has_Clip_Prefab",
+                "Operation": "eq",
+                "Comparand": true
+            }
+        },
+        {
+            "AssetName": "Ignition",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#ignitionaudioclip-master-bundle-pointer",
+            "RedirectableAssetKey": "IgnitionAudioClip",
+            "Variable": "ignition"
+        }
+    ]
+}

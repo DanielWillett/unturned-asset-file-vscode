@@ -3435,6 +3435,50 @@
                     "Priority": 1
                 }
             ]
-        }
+        },
+        {
+            "Type": "SDG.Unturned.EItemRarity, Assembly-CSharp",
+            "DisplayName": "Asset Rarity",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eitemrarity.html",
+            "Values":
+            [
+                {
+                    "Value": "COMMON",
+                    "Casing": "Common",
+                    "Description": "Corresponds to the 'Common' (white-colored) rarity.",
+                    "Color": "#ffffff"
+                },
+                {
+                    "Value": "UNCOMMON",
+                    "Casing": "Uncommon",
+                    "Description": "Corresponds to the 'Uncommon' (green-colored) rarity.",
+                    "Color": "#1f871f"
+                },
+                {
+                    "Value": "RARE",
+                    "Casing": "Rare",
+                    "Description": "Corresponds to the 'Rare' (blue-colored) rarity.",
+                    "Color": "#4b64fa"
+                },
+                {
+                    "Value": "EPIC",
+                    "Casing": "Epic",
+                    "Description": "Corresponds to the 'Epic' (purple-colored) rarity.",
+                    "Color": "#964bfa"
+                },
+                {
+                    "Value": "LEGENDARY",
+                    "Casing": "Legendary",
+                    "Description": "Corresponds to the 'Legendary' (pink-colored) rarity.",
+                    "Color": "#c832fa"
+                },
+                {
+                    "Value": "MYTHICAL",
+                    "Casing": "Mythical",
+                    "Description": "Corresponds to the 'Mythical' (red-colored) rarity.",
+                    "Color": "#fa3219"
+                }
+            ]
+        },
     ]
 }

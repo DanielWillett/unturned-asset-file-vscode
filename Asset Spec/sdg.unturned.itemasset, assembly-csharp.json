@@ -2235,44 +2235,6 @@
             ]
         },
         {
-            "Type": "SDG.Unturned.EItemRarity, Assembly-CSharp",
-            "DisplayName": "Item Rarity",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/eitemrarity.html",
-            "Values":
-            [
-                {
-                    "Value": "COMMON",
-                    "Casing": "Common",
-                    "Description": "Corresponds to the 'Common' (white-colored) rarity."
-                },
-                {
-                    "Value": "UNCOMMON",
-                    "Casing": "Uncommon",
-                    "Description": "Corresponds to the 'Uncommon' (green-colored) rarity."
-                },
-                {
-                    "Value": "RARE",
-                    "Casing": "Rare",
-                    "Description": "Corresponds to the 'Rare' (blue-colored) rarity."
-                },
-                {
-                    "Value": "EPIC",
-                    "Casing": "Epic",
-                    "Description": "Corresponds to the 'Epic' (purple-colored) rarity."
-                },
-                {
-                    "Value": "LEGENDARY",
-                    "Casing": "Legendary",
-                    "Description": "Corresponds to the 'Legendary' (pink-colored) rarity."
-                },
-                {
-                    "Value": "MYTHICAL",
-                    "Casing": "Mythical",
-                    "Description": "Corresponds to the 'Mythical' (red-colored) rarity."
-                }
-            ]
-        },
-        {
             "Type": "SDG.Unturned.ELightingVision, Assembly-CSharp",
             "DisplayName": "Lighting Vision Effect",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/data/enum/elightingvision.html",
