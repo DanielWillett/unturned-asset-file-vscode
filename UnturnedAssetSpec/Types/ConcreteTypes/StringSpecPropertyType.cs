@@ -1,9 +1,19 @@
-using System;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A string that doesn't support rich text tags.
+/// <para>Example: <c>$local$::ItemAsset.Name</c></para>
+/// <code>
+/// Prop Plain Text
+/// </code>
+/// <para>
+/// Supports the <c>SupportsNewLines</c> additional property which indicates whether or not &lt;br&gt; tags can be used.
+/// </para>
+/// </summary>
 public sealed class StringSpecPropertyType : BasicSpecPropertyType<StringSpecPropertyType, string>, IStringParseableSpecPropertyType
 {
     public static readonly StringSpecPropertyType Instance = new StringSpecPropertyType();
@@ -42,14 +52,19 @@ public sealed class StringSpecPropertyType : BasicSpecPropertyType<StringSpecPro
             return FailedToParse(in parse, out value);
         }
 
-        if (parse.HasDiagnostics && KnownTypeValueHelper.ContainsRichText(strValNode.Value))
+        if (parse.HasDiagnostics)
         {
-            parse.Log(new DatDiagnosticMessage
+            KnownTypeValueHelper.CheckValidLineBreakOptions(strValNode, in parse);
+
+            if (KnownTypeValueHelper.ContainsRichText(strValNode.Value))
             {
-                Range = strValNode.Range,
-                Diagnostic = DatDiagnostics.UNT1006,
-                Message = DiagnosticResources.UNT1006
-            });
+                parse.Log(new DatDiagnosticMessage
+                {
+                    Range = strValNode.Range,
+                    Diagnostic = DatDiagnostics.UNT1006,
+                    Message = DiagnosticResources.UNT1006
+                });
+            }
         }
 
         value = strValNode.Value;

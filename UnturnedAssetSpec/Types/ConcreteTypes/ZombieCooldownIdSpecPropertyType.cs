@@ -3,6 +3,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// Unique ID of a cooldown registration for zombie NPC rewards.
+/// <para>Example: <c>Asset.NPCZombieReward.CooldownId</c></para>
+/// <code>
+/// Prop mega_zombie_spawn
+/// </code>
+/// </summary>
 public sealed class ZombieCooldownIdSpecPropertyType : BasicSpecPropertyType<ZombieCooldownIdSpecPropertyType, string>
 {
     public static readonly ZombieCooldownIdSpecPropertyType Instance = new ZombieCooldownIdSpecPropertyType();

@@ -1,10 +1,26 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A floating-point color with only RGB components formatted either as an object or as a hex string.
+/// <para>Component values range between 0 and 1 inclusively.</para>
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffff
+/// 
+/// // or
+/// 
+/// Prop
+/// {
+///     R 1.0
+///     G 1.0
+///     B 1.0
+/// }
+/// </code>
+/// </summary>
 public sealed class ColorRGBSpecPropertyType : ColorSpecPropertyType
 {
     public static readonly ColorRGBSpecPropertyType Instance = new ColorRGBSpecPropertyType();
@@ -26,6 +42,24 @@ public sealed class ColorRGBSpecPropertyType : ColorSpecPropertyType
     private protected override bool HasAlpha => false;
 }
 
+/// <summary>
+/// A floating-point color with RGBA components formatted either as an object or as a hex string.
+/// <para>Component values range between 0 and 1 inclusively.</para>
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffffff
+/// 
+/// // or
+/// 
+/// Prop
+/// {
+///     R 1.0
+///     G 1.0
+///     B 1.0
+///     A 1.0
+/// }
+/// </code>
+/// </summary>
 public sealed class ColorRGBASpecPropertyType : ColorSpecPropertyType
 {
     public static readonly ColorRGBASpecPropertyType Instance = new ColorRGBASpecPropertyType();
@@ -47,6 +81,29 @@ public sealed class ColorRGBASpecPropertyType : ColorSpecPropertyType
     private protected override bool HasAlpha => true;
 }
 
+/// <summary>
+/// A floating-point color with only RGB components formatted either as an object, hex string, or legacy composite object.
+/// <para>Component values range between 0 and 1 inclusively.</para>
+/// <para>Example: <c>ItemTacticalAsset.SpotLight_Color</c></para>
+/// <code>
+/// Prop #ffffff
+/// 
+/// // or
+/// 
+/// Prop
+/// {
+///     R 1.0
+///     G 1.0
+///     B 1.0
+/// }
+///
+/// // or (deprecated)
+///
+/// Prop_R 1.0
+/// Prop_G 1.0
+/// Prop_B 1.0
+/// </code>
+/// </summary>
 public sealed class ColorRGBLegacySpecPropertyType : ColorSpecPropertyType
 {
     public static readonly ColorRGBLegacySpecPropertyType Instance = new ColorRGBLegacySpecPropertyType();
@@ -68,6 +125,31 @@ public sealed class ColorRGBLegacySpecPropertyType : ColorSpecPropertyType
     private protected override bool HasAlpha => false;
 }
 
+/// <summary>
+/// A floating-point color with RGBA components formatted either as an object, hex string, or legacy composite object.
+/// <para>Component values range between 0 and 1 inclusively.</para>
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffffff
+/// 
+/// // or
+/// 
+/// Prop
+/// {
+///     R 1.0
+///     G 1.0
+///     B 1.0
+///     A 1.0
+/// }
+///
+/// // or (deprecated)
+///
+/// Prop_R 1.0
+/// Prop_G 1.0
+/// Prop_B 1.0
+/// Prop_A 1.0
+/// </code>
+/// </summary>
 public sealed class ColorRGBALegacySpecPropertyType : ColorSpecPropertyType
 {
     public static readonly ColorRGBALegacySpecPropertyType Instance = new ColorRGBALegacySpecPropertyType();
@@ -89,6 +171,13 @@ public sealed class ColorRGBALegacySpecPropertyType : ColorSpecPropertyType
     private protected override bool HasAlpha => true;
 }
 
+/// <summary>
+/// A floating-point color with only RGB components formatted as a strict 7-length hex string.
+/// <para>Example: <c>ObjectNPCAsset.Color_Skin</c></para>
+/// <code>
+/// Prop #ffffff
+/// </code>
+/// </summary>
 public sealed class ColorRGBStrictHexSpecPropertyType : ColorStrictHexSpecPropertyType
 {
     public static readonly ColorRGBStrictHexSpecPropertyType Instance = new ColorRGBStrictHexSpecPropertyType();
@@ -107,6 +196,13 @@ public sealed class ColorRGBStrictHexSpecPropertyType : ColorStrictHexSpecProper
     private protected override bool HasAlpha => true;
 }
 
+/// <summary>
+/// A floating-point color with RGBA components formatted as a strict 9-length hex string.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffffff
+/// </code>
+/// </summary>
 public sealed class ColorRGBAStrictHexSpecPropertyType : ColorStrictHexSpecPropertyType
 {
     public static readonly ColorRGBAStrictHexSpecPropertyType Instance = new ColorRGBAStrictHexSpecPropertyType();
@@ -125,6 +221,10 @@ public sealed class ColorRGBAStrictHexSpecPropertyType : ColorStrictHexSpecPrope
     private protected override bool HasAlpha => true;
 }
 
+/// <summary>
+/// Base class for all floating-point colors.
+/// <para>Component values range between 0 and 1 inclusively.</para>
+/// </summary>
 public abstract class ColorSpecPropertyType :
     BaseColorSpecPropertyType<ColorSpecPropertyType, Color>,
     IStringParseableSpecPropertyType
@@ -426,6 +526,9 @@ public abstract class ColorSpecPropertyType :
     }
 }
 
+/// <summary>
+/// Base class for all strict floating-point colors. See <see cref="M:SDG.Unturned.Palette.hex(string)"/> for more info.
+/// </summary>
 public abstract class ColorStrictHexSpecPropertyType :
     BaseColorSpecPropertyType<ColorStrictHexSpecPropertyType, Color>,
     IStringParseableSpecPropertyType
@@ -479,6 +582,11 @@ public abstract class ColorStrictHexSpecPropertyType :
     }
 }
 
+/// <summary>
+/// Base class for all color properties.
+/// </summary>
+/// <typeparam name="TSelf">Property type.</typeparam>
+/// <typeparam name="T">Color type.</typeparam>
 public abstract class BaseColorSpecPropertyType<TSelf, T>
     : BasicSpecPropertyType<TSelf, T>,
         IVectorSpecPropertyType<Color>,
@@ -714,8 +822,12 @@ public abstract class BaseColorSpecPropertyType<TSelf, T>
         if (property.IsTemplate)
         {
             // Color_(\d+)
-
+            // todo
         }
+
+        if ((Options & VectorTypeParseOptions.Legacy) == 0)
+            return;
+
         if (propertyRoot.TryGetProperty(property.Key + "_R", out IPropertySourceNode? node))
         {
             propertyVisitor.AcceptProperty(node);

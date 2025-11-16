@@ -5,6 +5,13 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// An unsigned 16-bit integer.
+/// <para>Example: <c>AnimalAsset.Health</c></para>
+/// <code>
+/// Prop 123
+/// </code>
+/// </summary>
 public sealed class UInt16SpecPropertyType : BasicSpecPropertyType<UInt16SpecPropertyType, ushort>, IStringParseableSpecPropertyType
 {
     public static readonly UInt16SpecPropertyType Instance = new UInt16SpecPropertyType();

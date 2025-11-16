@@ -9,15 +9,29 @@ using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A skill name or blueprint skill name.
+/// <para>Example: <c>LevelAsset.SkillRule.Id</c></para>
+/// <code>
+/// // normal skill
+/// Prop Engineer
+///
+/// // blueprint skill
+/// Prop Craft
+/// </code>
+/// <remarks>
+/// Blueprint skills are disabled by default unless using the 'BlueprintSkill' type.
+/// </remarks>
+/// </summary>
 public sealed class SkillSpecPropertyType :
     BasicSpecPropertyType<SkillSpecPropertyType, string>,
     IStringParseableSpecPropertyType,
     IAutoCompleteSpecPropertyType
 {
+    private readonly IAssetSpecDatabase _database;
     private ISpecType? _blueprintSkillType;
-    private IAssetSpecDatabase? _cacheDb;
 
-    private const string BlueprintSkill = "SDG.Unturned.EBlueprintSkill, Assembly-CSharp";
+    internal const string BlueprintSkillEnumType = "SDG.Unturned.EBlueprintSkill, Assembly-CSharp";
 
     public bool AllowBlueprintSkills { get; }
     public bool AllowStandardSkills { get; }
@@ -36,8 +50,9 @@ public sealed class SkillSpecPropertyType :
         return 78 + (AllowBlueprintSkills ? 1 : 0) + (AllowStandardSkills ? 1 : 0) * 2;
     }
 
-    public SkillSpecPropertyType(bool allowStandardSkills = true, bool allowBlueprintSkills = false)
+    public SkillSpecPropertyType(IAssetSpecDatabase database, bool allowStandardSkills = true, bool allowBlueprintSkills = false)
     {
+        _database = database.ResolveFacade();
         AllowStandardSkills = allowStandardSkills;
         AllowBlueprintSkills = allowBlueprintSkills;
         if (allowBlueprintSkills)
@@ -49,7 +64,7 @@ public sealed class SkillSpecPropertyType :
             }
             else
             {
-                Type = "SDG.Unturned.EBlueprintSkill, Assembly-CSharp";
+                Type = BlueprintSkillEnumType;
                 DisplayName = "Blueprint Skill";
             }
         }
@@ -95,19 +110,7 @@ public sealed class SkillSpecPropertyType :
         if (AllowBlueprintSkills)
         {
             ISpecType? blueprintSkillType = null;
-            lock (this)
-            {
-                if (_cacheDb == parse.Database)
-                {
-                    blueprintSkillType = _blueprintSkillType;
-                }
-
-                if (blueprintSkillType == null)
-                {
-                    _blueprintSkillType = blueprintSkillType = parse.Database.FindType(BlueprintSkill, AssetFileType.AssetBaseType(parse.Database));
-                    _cacheDb = parse.Database;
-                }
-            }
+            _blueprintSkillType ??= _database.FindType(BlueprintSkillEnumType, AssetFileType.AssetBaseType(parse.Database));
 
             if (blueprintSkillType is not EnumSpecType enumType)
             {
@@ -116,7 +119,7 @@ public sealed class SkillSpecPropertyType :
                     parse.Log(new DatDiagnosticMessage
                     {
                         Diagnostic = DatDiagnostics.UNT2005,
-                        Message = string.Format(DiagnosticResources.UNT2005, BlueprintSkill),
+                        Message = string.Format(DiagnosticResources.UNT2005, BlueprintSkillEnumType),
                         Range = parse.Node.Range
                     });
                 }

@@ -1,12 +1,26 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using System;
-using System.Diagnostics.CodeAnalysis;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// An assembly-qualified type name or enum value.
+/// Enums should define a <see cref="EnumSpecTypeValue.CorrespondingType"/> that is used to determine the corresponding type for each enum value.
+/// <para>
+/// The enum type is specified by the <c>ElementType</c> property and the base type of the Type is specified by the <c>SpecialType[0]</c> property.
+/// </para>
+/// <para>Example: <c>ItemAsset.Useable</c></para>
+/// <code>
+/// // type
+/// Prop SDG.Unturned.UseableGun, Assembly-CSharp
+///
+/// // enum
+/// Prop Gun
+/// </code>
+/// </summary>
 public sealed class TypeOrEnumSpecPropertyType :
     BaseSpecPropertyType<QualifiedType>,
     ISpecPropertyType<QualifiedType>,
@@ -16,6 +30,9 @@ public sealed class TypeOrEnumSpecPropertyType :
     ISpecialTypesSpecPropertyType,
     IValueHoverProviderSpecPropertyType
 {
+    private readonly IAssetSpecDatabase _database;
+    private ISpecType? _enumType;
+
     public QualifiedType ElementType { get; }
     public QualifiedType EnumType { get; }
 
@@ -67,8 +84,9 @@ public sealed class TypeOrEnumSpecPropertyType :
         return 82 ^ HashCode.Combine(ElementType, EnumType);
     }
 
-    public TypeOrEnumSpecPropertyType(QualifiedType elementType, QualifiedType enumType)
+    public TypeOrEnumSpecPropertyType(IAssetSpecDatabase database, QualifiedType elementType, QualifiedType enumType)
     {
+        _database = database.ResolveFacade();
         ElementType = elementType;
         EnumType = enumType;
         DisplayName = elementType.IsNull ? $"Type Reference or {enumType.GetTypeName()}" : $"Type Reference of {elementType.GetTypeName()} or {enumType.GetTypeName()}";
@@ -146,9 +164,9 @@ public sealed class TypeOrEnumSpecPropertyType :
 
     private bool TryParseEnum(in SpecPropertyTypeParseContext parse, ref string val, out QualifiedType value, out ISpecDynamicValue? enumValue)
     {
-        ISpecType? enumType = parse.Database.FindType(EnumType.Type, parse.FileType);
+        _enumType ??= _database.FindType(EnumType.Type, parse.FileType);
         enumValue = null;
-        if (enumType is not IStringParseableSpecPropertyType fullEnumType)
+        if (_enumType is not IStringParseableSpecPropertyType fullEnumType)
         {
             if (parse.HasDiagnostics)
             {

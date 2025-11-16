@@ -1308,7 +1308,7 @@
                 {
                     "Key": "Skill",
                     "Type": "BlueprintSkill",
-                    "DefaultValue": "BP:0",
+                    "DefaultValue": null,
                     "Required":
                     {
                         "Variable": "Skill_Level",
@@ -1626,7 +1626,6 @@
             "Type": "SDG.Unturned.Action, Assembly-CSharp",
             "DisplayName": "Action",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html",
-            "IsLegacyExpandedType": true,
             "Properties":
             [
                 {

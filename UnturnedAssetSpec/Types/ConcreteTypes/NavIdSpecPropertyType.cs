@@ -5,6 +5,15 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A reference to a navmesh placed in the map editor.
+/// <para>A value of 255 means no navmesh (or all regions) in most cases.</para>
+/// <para>Example: <c>Asset.NPCZombieKillsCondition.Nav</c></para>
+/// <code>
+/// Prop 14
+/// Prop 255
+/// </code>
+/// </summary>
 public sealed class NavIdSpecPropertyType : BasicSpecPropertyType<NavIdSpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly NavIdSpecPropertyType Instance = new NavIdSpecPropertyType();

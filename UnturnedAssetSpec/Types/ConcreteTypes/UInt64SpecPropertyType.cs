@@ -5,6 +5,13 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// An unsigned 64-bit integer.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop 123
+/// </code>
+/// </summary>
 public sealed class UInt64SpecPropertyType : BasicSpecPropertyType<UInt64SpecPropertyType, ulong>, IStringParseableSpecPropertyType
 {
     public static readonly UInt64SpecPropertyType Instance = new UInt64SpecPropertyType();

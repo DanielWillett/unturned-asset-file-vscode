@@ -9,6 +9,36 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A list of objects than can be formatted in either the modern format or the legacy format.
+/// Individual properties can specify the <see cref="SpecProperty.KeyLegacyExpansionFilter"/> for different keys depending on the format.
+/// <para>Example: <c>DialogueAsset.Conditions</c></para>
+/// <code>
+/// // Modern
+/// Props
+/// [
+///     {
+///         Value 3
+///         Mode Add
+///     }
+///     {
+///         Value 4
+///         Mode Subtract
+///     }
+/// ]
+///
+/// // Legacy
+/// Props 2
+/// Prop_0_Value 3
+/// Prop_0_Mode Add
+/// Prop_1_Value 4
+/// Prop_1_Mode Subtract
+/// 
+/// </code>
+/// <para>
+/// Supports the <c>PluralBaseKey</c> additional property to override the singular property name. By default it just removes the 's' from the end of the property name.
+/// </para>
+/// </summary>
 public sealed class LegacyCompatibleListSpecPropertyType :
     BaseSpecPropertyType<EquatableArray<CustomSpecTypeInstance>>,
     ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>>,
@@ -162,7 +192,7 @@ public sealed class LegacyCompatibleListSpecPropertyType :
         {
             baseKey = value?.ToString() ?? string.Empty;
         }
-        else if (parse.BaseKey.Length > 1)
+        else if (parse.BaseKey.Length > 1 && parse.BaseKey[^1] == 's')
         {
             baseKey = parse.BaseKey.Substring(0, parse.BaseKey.Length - 1);
         }

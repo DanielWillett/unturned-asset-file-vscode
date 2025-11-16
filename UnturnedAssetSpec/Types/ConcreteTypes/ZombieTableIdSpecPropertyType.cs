@@ -3,6 +3,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// Unique ID of a zombie table as set in the level editor. Values less than zero are usually interpreted as all zombie tables.
+/// <para>Example: <c>Asset.NPCZombieReward.LevelTableOverride</c></para>
+/// <code>
+/// Prop 1
+/// </code>
+/// </summary>
 public sealed class ZombieTableIdSpecPropertyType : BasicSpecPropertyType<ZombieTableIdSpecPropertyType, int>
 {
     public static readonly ZombieTableIdSpecPropertyType Instance = new ZombieTableIdSpecPropertyType();

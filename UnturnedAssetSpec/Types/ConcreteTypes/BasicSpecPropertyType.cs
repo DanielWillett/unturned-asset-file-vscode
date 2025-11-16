@@ -4,6 +4,11 @@ using System.ComponentModel;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A base type for property types that produce concrete values.
+/// </summary>
+/// <typeparam name="TValue">Type of value being parsed.</typeparam>
+/// <typeparam name="TSpecPropertyType">The property type being defined (self).</typeparam>
 [EditorBrowsable(EditorBrowsableState.Never)]
 public abstract class BasicSpecPropertyType<TSpecPropertyType, TValue> :
     BaseSpecPropertyType<TValue>,

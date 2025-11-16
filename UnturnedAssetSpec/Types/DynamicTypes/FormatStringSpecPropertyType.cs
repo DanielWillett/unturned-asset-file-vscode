@@ -5,6 +5,20 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A string which takes formatting arguments ({n}) and optionally rich text.
+/// <para>Example: <c>ObjectAsset.Interact</c></para>
+/// <code>
+/// Prop [{0}] Claim
+/// </code>
+/// <para>
+/// ElementType is parsed as <c>N|B</c> where <c>N</c> is the number of arguments and <c>B</c> is a <c>T</c> or <c>F</c> value representing whether or not rich text is allowed.
+/// <para>For example, <c>"ElementType": "1|T"</c> describes a rich-text compatible string with one formatting argument.</para>
+/// </para>
+/// <para>
+/// Supports the <c>SupportsNewLines</c> additional property which indicates whether or not &lt;br&gt; tags can be used.
+/// </para>
+/// </summary>
 public sealed class FormatStringSpecPropertyType : BasicSpecPropertyType<FormatStringSpecPropertyType, string>, IStringParseableSpecPropertyType
 {
     public static readonly FormatStringSpecPropertyType OneNoRichText = new FormatStringSpecPropertyType(1, false);
@@ -72,6 +86,8 @@ public sealed class FormatStringSpecPropertyType : BasicSpecPropertyType<FormatS
 
         if (parse.HasDiagnostics)
         {
+            KnownTypeValueHelper.CheckValidLineBreakOptions(strValNode, in parse);
+
             if (!AllowRichText && KnownTypeValueHelper.ContainsRichText(strValNode.Value))
             {
                 parse.Log(new DatDiagnosticMessage

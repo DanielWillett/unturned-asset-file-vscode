@@ -431,7 +431,7 @@ public class PropertyBreadcrumbsTests
         SpecProperty nestedProperty2 = new SpecProperty
         {
             Key = "List",
-            Type = new PropertyTypeOrSwitch(KnownTypes.List(KnownTypes.Dictionary(CreateCustomTestType(supplyType, nestedProperty3)), false))
+            Type = new PropertyTypeOrSwitch(KnownTypes.List(KnownTypes.Dictionary(_database, CreateCustomTestType(supplyType, nestedProperty3)), false))
         };
         SpecProperty nestedProperty1 = new SpecProperty
         {

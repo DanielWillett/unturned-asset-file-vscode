@@ -11,6 +11,13 @@ using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// 'Enum' type for the <c>Asset.Type</c> property.
+/// There isn't actually an enum for asset aliases so this type is defined to act as a substitute.
+/// <code>
+/// Prop Vehicle_Paint_Tool
+/// </code>
+/// </summary>
 public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, string>,
     IStringParseableSpecPropertyType,
     IEquatable<AssetTypeAlias>,

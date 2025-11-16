@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// Information needed to parse values from properties.
+/// </summary>
 public readonly ref struct SpecPropertyTypeParseContext
 {
     public readonly FileEvaluationContext EvaluationContext;

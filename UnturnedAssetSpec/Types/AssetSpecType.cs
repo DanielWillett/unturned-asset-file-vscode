@@ -8,6 +8,10 @@ using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// An object type used to represent file types.
+/// </summary>
+/// <remarks>While these are usually asset types, some other types are defined in this way such as <c>MasterBundleConfig</c>.</remarks>
 [JsonConverter(typeof(AssetSpecTypeConverter))]
 [DebuggerDisplay("Type: {Type.GetTypeName()}")]
 public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecType?>, ISpecPropertyType<CustomSpecTypeInstance>
@@ -17,6 +21,9 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
     /// </summary>
     public string? Commit { get; set; }
 
+    /// <summary>
+    /// Assembly-qualified type name of this type.
+    /// </summary>
     public QualifiedType Type { get; internal set; }
 
     /// <inheritdoc />
@@ -46,27 +53,64 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
 
     public EnumSpecTypeValue Category { get; set; } = AssetCategory.None;
 
+    /// <summary>
+    /// Link to the U3 modding documentation for this file type.
+    /// </summary>
     public string? Docs { get; set; }
 
+    /// <summary>
+    /// Parent type from which this type inherits all properties.
+    /// </summary>
     public QualifiedType Parent { get; set; }
 
+    /// <summary>
+    /// Minimum ID for modded items.
+    /// </summary>
     public ushort VanillaIdLimit { get; set; }
 
+    /// <summary>
+    /// Whether or not this type of asset must have an ID to function correctly.
+    /// </summary>
     public bool RequireId { get; set; }
 
+    /// <summary>
+    /// Human-readable name of this type.
+    /// </summary>
     public string DisplayName { get; set; } = string.Empty;
 
     /// <inheritdoc />
     string ISpecPropertyType.Type => Type.Type;
 
+    /// <summary>
+    /// Game version that this type was added in.
+    /// </summary>
     public Version? Version { get; set; }
 
+    /// <summary>
+    /// Any additional JSON properties that don't have their own property.
+    /// </summary>
     public OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; set; } = OneOrMore<KeyValuePair<string, object?>>.Null;
 
 #nullable disable
+    /// <summary>
+    /// All properties that should be present in the asset (or main) file.
+    /// </summary>
     public SpecProperty[] Properties { get; set; }
+
+    /// <summary>
+    /// All properties that should be present in the localization file, if any.
+    /// </summary>
     public SpecProperty[] LocalizationProperties { get; set; }
+
+    /// <summary>
+    /// All assets that should be present in the masterbundle folder for this asset, if any.
+    /// </summary>
     public SpecBundleAsset[] BundleAssets { get; set; }
+
+    /// <summary>
+    /// Any other types defined in the file relevant to either this type or the types that inherit this type.
+    /// </summary>
+    /// <remarks>This could include enums used by properties, object types like Blueprints, etc.</remarks>
     public ISpecType[] Types { get; set; }
 #nullable restore
 
@@ -103,6 +147,7 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
         }
     }
 
+    /// <inheritdoc />
     public bool Equals(AssetSpecType? other)
     {
         if (other == null)
@@ -121,6 +166,7 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
             || !EquatableArray.EqualsEquatable(Types, other.Types);
     }
 
+    /// <inheritdoc />
     public bool Equals(ISpecType? other) => other is AssetSpecType t && Type.Equals(t.Type);
 
     /// <inheritdoc />
@@ -142,6 +188,9 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
     /// <inheritdoc />
     public override string ToString() => Type.ToString();
 
+    /// <summary>
+    /// Perform a naïve search for a property by it's key. Doesn't support template properties or aliases.
+    /// </summary>
     public SpecProperty? FindProperty(string propertyName, SpecPropertyContext context)
     {
         if (Properties != null && context is SpecPropertyContext.Property or SpecPropertyContext.Unspecified)

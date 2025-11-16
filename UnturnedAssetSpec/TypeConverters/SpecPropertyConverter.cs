@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
@@ -92,11 +93,11 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
     /// <inheritdoc />
     public override SpecProperty? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return ReadProperty(ref reader, options);
+        return ReadProperty(AssetSpecDatabase.TryGetDatabaseFromOptions(options), ref reader, options);
     }
 
     [SkipLocalsInit]
-    public static SpecProperty? ReadProperty(ref Utf8JsonReader reader, JsonSerializerOptions? options)
+    public static SpecProperty? ReadProperty(IAssetSpecDatabase? database, ref Utf8JsonReader reader, JsonSerializerOptions? options)
     {
         if (reader.TokenType == JsonTokenType.Null)
         {
@@ -498,7 +499,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         }
         else
         {
-            ISpecPropertyType? pt = KnownTypes.GetType(typeStr!, elementTypeStr, specialTypes);
+            ISpecPropertyType? pt = KnownTypes.GetType(database, typeStr!, elementTypeStr, specialTypes);
             pt ??= new UnresolvedSpecPropertyType(typeStr!);
 
             propertyType = new PropertyTypeOrSwitch(pt);
@@ -1260,7 +1261,7 @@ internal sealed class SpecPropertyTypeType : ISpecPropertyType<ISpecPropertyType
     {
         stringValue ??= span.ToString();
 
-        ISpecPropertyType? t = KnownTypes.GetType(stringValue);
+        ISpecPropertyType? t = KnownTypes.GetType(null, stringValue);
         if (t != null)
         {
             dynamicValue = new SpecDynamicConcreteValue<ISpecPropertyType>(t, this);

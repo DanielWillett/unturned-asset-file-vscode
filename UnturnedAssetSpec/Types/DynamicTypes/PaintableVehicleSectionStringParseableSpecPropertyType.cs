@@ -6,6 +6,13 @@ using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// Parses PaintableVehicleSection objects in their string representation.
+/// <para>Example: <c>VehicleAsset.ExplosionBurnMaterialSections</c></para>
+/// <code>
+/// Prop "Path/To/Model"
+/// </code>
+/// </summary>
 public sealed class PaintableVehicleSectionStringParseableSpecPropertyType :
     BaseSpecPropertyType<CustomSpecTypeInstance>,
     ISpecPropertyType<CustomSpecTypeInstance>,

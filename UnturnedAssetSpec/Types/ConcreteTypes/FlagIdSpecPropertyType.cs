@@ -5,6 +5,13 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// Unique flag ID used for quest conditions and rewards.
+/// <para>Example: <c>ObjectNPCAsset.PlayerKnowsNameFlagID</c></para>
+/// <code>
+/// Prop 123
+/// </code>
+/// </summary>
 public sealed class FlagIdSpecPropertyType :
     BaseSpecPropertyType<ushort>,
     ISpecPropertyType<ushort>,

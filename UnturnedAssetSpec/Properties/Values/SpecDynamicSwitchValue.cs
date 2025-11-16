@@ -16,7 +16,7 @@ public class SpecDynamicSwitchValue :
     IEquatable<ISpecDynamicValue>,
     IEquatable<SpecDynamicSwitchValue>
 {
-    public OneOrMore<SpecDynamicSwitchCaseValue> Cases { get; }
+    public OneOrMore<SpecDynamicSwitchCaseValue> Cases { get; private set; }
 
     public ISpecPropertyType? ValueType { get; }
 
@@ -26,6 +26,45 @@ public class SpecDynamicSwitchValue :
     {
         ValueType = valueType;
         Cases = valueCase;
+    }
+
+    /// <returns><see langword="true"/> if any values were updated.</returns>
+    internal bool UpdateValues(Func<ISpecDynamicValue, ISpecDynamicValue> valueTransformation)
+    {
+        Queue<SpecDynamicSwitchCaseValue> queue = new Queue<SpecDynamicSwitchCaseValue>(4);
+        bool anyUpdates = false;
+        foreach (SpecDynamicSwitchCaseValue c in Cases)
+        {
+            queue.Enqueue(c);
+            anyUpdates |= Visit(c, valueTransformation);
+        }
+
+        while (queue.Count > 0)
+        {
+            SpecDynamicSwitchCaseValue c = queue.Dequeue();
+            anyUpdates |= Visit(c, valueTransformation);
+            foreach (SpecDynamicSwitchCaseOrCondition c2 in c.Conditions)
+            {
+                if (c2.Case == null)
+                    continue;
+
+                queue.Enqueue(c2.Case);
+            }
+        }
+
+        return anyUpdates;
+
+        static bool Visit(SpecDynamicSwitchCaseValue c, Func<ISpecDynamicValue, ISpecDynamicValue> valueTransformation)
+        {
+            ISpecDynamicValue newValue = valueTransformation(c);
+            if (ReferenceEquals(newValue, c.Value))
+            {
+                return false;
+            }
+
+            c.Value = newValue;
+            return true;
+        }
     }
 
     public bool TryEvaluateMatchingSwitchCase(
@@ -526,7 +565,7 @@ public sealed class SpecDynamicSwitchCaseValue : ISpecDynamicValue, IEquatable<I
     public OneOrMore<SpecDynamicSwitchCaseOrCondition> Conditions { get; }
     public SpecCondition WhenCondition { get; }
     public SpecDynamicSwitchCaseOperation Operation { get; }
-    public ISpecDynamicValue Value { get; }
+    public ISpecDynamicValue Value { get; internal set; }
 
     public bool HasConditions => !Conditions.IsNull;
 

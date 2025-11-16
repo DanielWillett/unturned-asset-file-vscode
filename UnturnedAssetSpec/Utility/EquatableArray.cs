@@ -5,6 +5,10 @@ using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
+/// <summary>
+/// An array that implements <see cref="IEquatable{T}"/>.
+/// </summary>
+/// <typeparam name="T">The element type.</typeparam>
 [JsonConverter(typeof(EquatableArrayConverterFactory))]
 public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>> where T : IEquatable<T>
 {

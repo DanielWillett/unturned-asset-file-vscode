@@ -8,6 +8,14 @@ using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A master bundle/asset bundle version number.
+/// See <seealso href="https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#unity-asset-bundles"/> for more info.
+/// <para>Example: <c>MasterBundleConfig.Master_Bundle_Version</c></para>
+/// <code>
+/// Prop 6
+/// </code>
+/// </summary>
 public sealed class AssetBundleVersionSpecPropertyType : BasicSpecPropertyType<AssetBundleVersionSpecPropertyType, int>, IAutoCompleteSpecPropertyType, IStringParseableSpecPropertyType
 {
     public static readonly AssetBundleVersionSpecPropertyType Instance = new AssetBundleVersionSpecPropertyType();

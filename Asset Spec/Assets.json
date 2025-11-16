@@ -171,7 +171,8 @@
                     "Skill": "OVERKILL",
                     "Cost": 10,
                     "Difficulty": 1,
-                    "Index": 0
+                    "Index": 0,
+                    "MaximumLevel": 7
                 },
                 {
                     "Skill": "SHARPSHOOTER",
@@ -179,37 +180,43 @@
                     "Difficulty": 1,
                     "Index": 1,
                     "LevelMultiplier": 0.4,
-                    "LevelMultiplierInverse": true
+                    "LevelMultiplierInverse": true,
+                    "MaximumLevel": 7
                 },
                 {
                     "Skill": "DEXTERITY",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 2
+                    "Index": 2,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "CARDIO",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 3
+                    "Index": 3,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "EXERCISE",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 4
+                    "Index": 4,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "DIVING",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 5
+                    "Index": 5,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "PARKOUR",
                     "Cost": 20,
                     "Difficulty": 0.5,
-                    "Index": 6
+                    "Index": 6,
+                    "MaximumLevel": 5
                 }
             ]
         },
@@ -222,43 +229,50 @@
                     "Skill": "SNEAKYBEAKY",
                     "Cost": 10,
                     "Difficulty": 1,
-                    "Index": 0
+                    "Index": 0,
+                    "MaximumLevel": 7
                 },
                 {
                     "Skill": "VITALITY",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 1
+                    "Index": 1,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "IMMUNITY",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 2
+                    "Index": 2,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "TOUGHNESS",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 3
+                    "Index": 3,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "STRENGTH",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 4
+                    "Index": 4,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "WARMBLOODED",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 5
+                    "Index": 5,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "SURVIVAL",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 6
+                    "Index": 6,
+                    "MaximumLevel": 5
                 }
             ]
         },
@@ -271,49 +285,57 @@
                     "Skill": "HEALING",
                     "Cost": 10,
                     "Difficulty": 1,
-                    "Index": 0
+                    "Index": 0,
+                    "MaximumLevel": 7
                 },
                 {
                     "Skill": "CRAFTING",
                     "Cost": 20,
                     "Difficulty": 1.5,
-                    "Index": 1
+                    "Index": 1,
+                    "MaximumLevel": 3
                 },
                 {
                     "Skill": "OUTDOORS",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 2
+                    "Index": 2,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "COOKING",
                     "Cost": 20,
                     "Difficulty": 1.5,
-                    "Index": 3
+                    "Index": 3,
+                    "MaximumLevel": 3
                 },
                 {
                     "Skill": "FISHING",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 4
+                    "Index": 4,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "AGRICULTURE",
                     "Cost": 10,
                     "Difficulty": 1,
-                    "Index": 5
+                    "Index": 5,
+                    "MaximumLevel": 7
                 },
                 {
                     "Skill": "MECHANIC",
                     "Cost": 10,
                     "Difficulty": 0.5,
-                    "Index": 6
+                    "Index": 6,
+                    "MaximumLevel": 5
                 },
                 {
                     "Skill": "ENGINEER",
                     "Cost": 10,
                     "Difficulty": 1.5,
-                    "Index": 7
+                    "Index": 7,
+                    "MaximumLevel": 3
                 }
             ]
         }

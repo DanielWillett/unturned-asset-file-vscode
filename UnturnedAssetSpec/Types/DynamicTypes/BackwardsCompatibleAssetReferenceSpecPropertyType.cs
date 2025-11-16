@@ -7,6 +7,48 @@ using System.Text;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A backwards-compatable reference to one or more types of assets formatted as either a string or sometimes as an object (see <see cref="CanParseDictionary"/>).
+/// Accepts both <see cref="Guid"/> and <see cref="ushort"/> IDs, although in some cases the ID can't be assumed and a <see cref="AssetCategory"/> also has to be specified ('Type').
+/// <para>Example: <c>AirdropAsset.Landed_Barricade</c></para>
+/// <code>
+/// // string
+/// Prop fe71781c60314468b22c6b0642a51cd9
+/// // if category can be assumed
+/// Prop 1374
+/// // if category can't be assumed
+/// Prop ITEM:1374
+///
+/// // object
+/// Prop
+/// {
+///     GUID fe71781c60314468b22c6b0642a51cd9
+/// }
+/// // if category can be assumed
+/// Prop
+/// {
+///     ID 1374
+/// }
+/// // if category can't be assumed
+/// Prop
+/// {
+///     Type Item
+///     ID 1374
+/// }
+///
+/// // this
+/// Prop this
+/// </code>
+/// <para>
+/// Also supports the <c>PreventSelfReference</c> additional property to log a warning if the current asset is referenced.
+/// </para>
+/// <para>
+/// If "this" is one of the element types, the word 'this' will be resolved to the current asset.
+/// </para>
+/// <para>
+/// If an amount is supppled (i.e. "102 x 3") a warning will be logged.
+/// </para>
+/// </summary>
 public class BackwardsCompatibleAssetReferenceSpecPropertyType :
     BaseSpecPropertyType<GuidOrId>,
     ISpecPropertyType<GuidOrId>,
@@ -15,6 +57,7 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
     IEquatable<BackwardsCompatibleAssetReferenceSpecPropertyType?>,
     IStringParseableSpecPropertyType
 {
+    private readonly IAssetSpecDatabase _database;
     public OneOrMore<QualifiedType> OtherElementTypes { get; }
     public bool CanParseDictionary { get; }
     public bool SupportsThis { get; }
@@ -47,8 +90,9 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
                ^ HashCode.Combine(ElementType, OtherElementTypes);
     }
 
-    public BackwardsCompatibleAssetReferenceSpecPropertyType(QualifiedType elementType, bool canParseDictionary, OneOrMore<string> specialTypes)
+    public BackwardsCompatibleAssetReferenceSpecPropertyType(IAssetSpecDatabase database, QualifiedType elementType, bool canParseDictionary, OneOrMore<string> specialTypes)
     {
+        _database = database.ResolveFacade();
         CanParseDictionary = canParseDictionary;
 
         SupportsThis = AssetReferenceSpecPropertyType.ExtractThisElementType(ref elementType, ref specialTypes);
@@ -76,7 +120,8 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
 
         OtherElementTypes = specialTypes
             .Where(x => !string.IsNullOrEmpty(x))
-            .Select(x => new QualifiedType(x));
+            .Select(x => new QualifiedType(x))
+            .Remove(ElementType);
 
         if (DisplayName != null)
             return;
@@ -84,7 +129,7 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
         switch (OtherElementTypes.Length)
         {
             case 0:
-                DisplayName = "Asset Reference (Backwards-Compatible)";
+                DisplayName = "Asset Reference";
                 break;
 
             case 1:
@@ -141,11 +186,18 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
         return true;
     }
 
+    private bool? _isTypeValid;
+
     /// <inheritdoc />
     public virtual bool TryParseValue(in SpecPropertyTypeParseContext parse, out GuidOrId value)
     {
-        InverseTypeHierarchy parents = parse.Database.Information.GetParentTypes(ElementType);
-        if (!parents.IsValid)
+        if (!_isTypeValid.HasValue)
+        {
+            InverseTypeHierarchy parents = _database.Information.GetParentTypes(ElementType);
+            _isTypeValid = parents.IsValid;
+        }
+
+        if (!_isTypeValid.Value)
         {
             parse.Log(new DatDiagnosticMessage
             {

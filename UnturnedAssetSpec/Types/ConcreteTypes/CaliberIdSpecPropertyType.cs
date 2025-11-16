@@ -9,6 +9,13 @@ using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A unique ID used to indicate which attachments can be used with which weapons.
+/// <para>Example: <c>ItemCaliberAsset.Caliber_#</c></para>
+/// <code>
+/// Prop 123
+/// </code>
+/// </summary>
 public sealed class CaliberIdSpecPropertyType : BasicSpecPropertyType<CaliberIdSpecPropertyType, ushort>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
     public static readonly CaliberIdSpecPropertyType Instance = new CaliberIdSpecPropertyType();

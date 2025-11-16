@@ -5,6 +5,13 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// An unsigned 32-bit integer.
+/// <para>Example: <c>AnimalAsset.Reward_XP</c></para>
+/// <code>
+/// Prop 123
+/// </code>
+/// </summary>
 public sealed class UInt32SpecPropertyType : BasicSpecPropertyType<UInt32SpecPropertyType, uint>, IStringParseableSpecPropertyType
 {
     public static readonly UInt32SpecPropertyType Instance = new UInt32SpecPropertyType();

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
@@ -42,10 +43,10 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
     /// <inheritdoc />
     public override AssetSpecType? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return ReadFile(ref reader, options);
+        return ReadFile(AssetSpecDatabase.TryGetDatabaseFromOptions(options), ref reader, options);
     }
 
-    public static AssetSpecType? ReadFile(ref Utf8JsonReader reader, JsonSerializerOptions? options)
+    public static AssetSpecType? ReadFile(IAssetSpecDatabase? database, ref Utf8JsonReader reader, JsonSerializerOptions? options)
     {
         if (reader.TokenType == JsonTokenType.Null)
         {
@@ -165,11 +166,11 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
                     break;
 
                 case 7: // Properties
-                    type.Properties = ReadPropertyList(ref reader, options, type, in PropertiesProperty, SpecPropertyContext.Property);
+                    type.Properties = ReadPropertyList(database, ref reader, options, type, in PropertiesProperty, SpecPropertyContext.Property);
                     break;
 
                 case 8: // Localization
-                    type.LocalizationProperties = ReadPropertyList(ref reader, options, type, in LocalizationProperty, SpecPropertyContext.Localization);
+                    type.LocalizationProperties = ReadPropertyList(database, ref reader, options, type, in LocalizationProperty, SpecPropertyContext.Localization);
                     break;
 
                 case 9: // BundleAssets
@@ -178,7 +179,7 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
                     break;
 
                 case 10: // Types
-                    type.Types = ReadTypeList(ref reader, options, type);
+                    type.Types = ReadTypeList(database, ref reader, options, type);
                     break;
 
                 case 11: // Version
@@ -216,7 +217,7 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
         throw new JsonException($"Unexpected token {tokenType} reading AssetSpecType.\"{property}\".");
     }
 
-    private static ISpecType[] ReadTypeList(ref Utf8JsonReader reader, JsonSerializerOptions? options, AssetSpecType type)
+    private static ISpecType[] ReadTypeList(IAssetSpecDatabase? database, ref Utf8JsonReader reader, JsonSerializerOptions? options, AssetSpecType type)
     {
         List<ISpecType> list = new List<ISpecType>(4);
         int index = 0;
@@ -224,7 +225,7 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
         {
             try
             {
-                ISpecType? t = SpecTypeConverter.ReadType(ref reader, options);
+                ISpecType? t = SpecTypeConverter.ReadType(database, ref reader, options);
                 if (t != null)
                 {
                     t.Owner = type;
@@ -242,7 +243,7 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
         return list.ToArray();
     }
 
-    private static SpecProperty[] ReadPropertyList(ref Utf8JsonReader reader, JsonSerializerOptions? options, AssetSpecType type, in JsonEncodedText propertyName, SpecPropertyContext context)
+    private static SpecProperty[] ReadPropertyList(IAssetSpecDatabase? database, ref Utf8JsonReader reader, JsonSerializerOptions? options, AssetSpecType type, in JsonEncodedText propertyName, SpecPropertyContext context)
     {
         List<SpecProperty> list = new List<SpecProperty>(32);
         int index = 0;
@@ -250,7 +251,7 @@ public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
         {
             try
             {
-                SpecProperty? prop = SpecPropertyConverter.ReadProperty(ref reader, options);
+                SpecProperty? prop = SpecPropertyConverter.ReadProperty(database, ref reader, options);
                 if (prop != null)
                 {
                     prop.Context = context;

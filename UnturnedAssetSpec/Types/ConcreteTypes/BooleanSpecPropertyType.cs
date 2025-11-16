@@ -7,6 +7,14 @@ using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A true or false value.
+/// <para>Example: <c>ItemBarricadeAsset.Can_Be_Damaged</c></para>
+/// <code>
+/// Prop True
+/// Prop False
+/// </code>
+/// </summary>
 public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecPropertyType, bool>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
     public static readonly BooleanSpecPropertyType Instance = new BooleanSpecPropertyType();

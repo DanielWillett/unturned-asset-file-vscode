@@ -7,6 +7,21 @@ using System.Diagnostics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A dictionary with strings as the keys and <typeparamref name="TElementType"/> as the values.
+/// <para>Example: <c>LevelAsset.Skillset_Loadouts</c></para>
+/// <code>
+/// Prop
+/// {
+///     Key1 1
+///     Key2 -4
+/// }
+/// </code>
+/// <para>
+/// Has support for the <c>KeyEnumType</c> property which enables enum auto-completion for keys.
+/// When using that property, <c>KeyAllowExtraValues</c> can be used to indicate that invalid enum values shouldn't raise warnings.
+/// </para>
+/// </summary>
 // todo: support for KeyEnumType, KeyAllowExtraValues
 public sealed class DictionarySpecPropertyType<TElementType> :
     BaseSpecPropertyType<EquatableArray<DictionaryPair<TElementType>>>,
@@ -15,6 +30,8 @@ public sealed class DictionarySpecPropertyType<TElementType> :
     IDictionaryTypeSpecPropertyType
     where TElementType : IEquatable<TElementType>
 {
+    private readonly IAssetSpecDatabase _database;
+
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName { get; }
 
@@ -37,8 +54,9 @@ public sealed class DictionarySpecPropertyType<TElementType> :
         return 68 ^ InnerType.GetHashCode();
     }
 
-    public DictionarySpecPropertyType(ISpecPropertyType<TElementType> innerType)
+    public DictionarySpecPropertyType(IAssetSpecDatabase database, ISpecPropertyType<TElementType> innerType)
     {
+        _database = database.ResolveFacade();
         InnerType = innerType;
         DisplayName = "Dictionary of " + innerType.DisplayName;
     }
@@ -192,6 +210,7 @@ internal sealed class UnresolvedDictionarySpecPropertyType :
     IDictionaryTypeSpecPropertyType,
     IDisposable
 {
+    private readonly IAssetSpecDatabase _database;
     public ISecondPassSpecPropertyType InnerType { get; }
     ISpecPropertyType IDictionaryTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
     string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
@@ -201,8 +220,9 @@ internal sealed class UnresolvedDictionarySpecPropertyType :
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
     public Type ValueType => throw new NotSupportedException();
 
-    public UnresolvedDictionarySpecPropertyType(ISecondPassSpecPropertyType innerType)
+    public UnresolvedDictionarySpecPropertyType(IAssetSpecDatabase database, ISecondPassSpecPropertyType innerType)
     {
+        _database = database;
         InnerType = innerType ?? throw new ArgumentNullException(nameof(innerType));
     }
 
@@ -225,7 +245,7 @@ internal sealed class UnresolvedDictionarySpecPropertyType :
 
     public ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile)
     {
-        return KnownTypes.Dictionary(InnerType.Transform(property, database, assetFile));
+        return KnownTypes.Dictionary(_database, InnerType.Transform(property, database, assetFile));
     }
 
     void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) { }

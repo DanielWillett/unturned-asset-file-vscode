@@ -343,7 +343,7 @@
         },
         {
             "Key": "Hair",
-            "Type": "FaceIndex",
+            "Type": "HairIndex",
             "DefaultValue": 0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The default hair the NPC displays.",
@@ -352,7 +352,7 @@
         },
         {
             "Key": "Beard",
-            "Type": "FaceIndex",
+            "Type": "BeardIndex",
             "DefaultValue": 0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The default beard the NPC displays.",

@@ -4,6 +4,14 @@ using System.Linq;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// References a valid action key for blueprint actions which are loaded from the <c>Localization\English\Player\PlayerDashboardInventory.dat</c> file.
+/// <para>Example: <c>ItemAsset.Action.CommonTextId</c></para>
+/// <code>
+/// Prop Store
+/// </code>
+/// </summary>
+/// <remarks>Any lines ending in <c>_Button</c> and <c>_Button_Tooltip</c> are valid.</remarks>
 public sealed class ActionKeySpecPropertyType : BasicSpecPropertyType<ActionKeySpecPropertyType, string>
 {
     public static readonly ActionKeySpecPropertyType Instance = new ActionKeySpecPropertyType();

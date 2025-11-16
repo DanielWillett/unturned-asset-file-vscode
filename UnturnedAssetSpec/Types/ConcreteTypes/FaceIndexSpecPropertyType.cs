@@ -5,6 +5,14 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A face type number or index.
+/// See <seealso href="https://github.com/DanielWillett/UnturnedUIAssets/tree/main/Customization/Faces"/> for a list of face indices.
+/// <para>Example: <c>ObjectNPCAsset.Face</c></para>
+/// <code>
+/// Prop 31
+/// </code>
+/// </summary>
 public sealed class FaceIndexSpecPropertyType : BasicSpecPropertyType<FaceIndexSpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly FaceIndexSpecPropertyType Instance = new FaceIndexSpecPropertyType();

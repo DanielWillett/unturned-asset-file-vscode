@@ -3,6 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -103,7 +106,7 @@ public static class KnownTypeValueHelper
         return true;
     }
 
-    private static readonly char[] InvalidTypeChars =
+    internal static readonly char[] InvalidTypeChars =
     [
         '\\',
         ':',
@@ -274,7 +277,25 @@ public static class KnownTypeValueHelper
             value = default;
             return false;
         }
+#if NETSTANDARD2_1_OR_GREATER
+        if (!float.TryParse(str.Slice(startIndex, comma1 - startIndex), out float x))
+        {
+            value = default;
+            return false;
+        }
 
+        if (!float.TryParse(str.Slice(comma1 + 1, comma2 - comma1 - 1), out float y))
+        {
+            value = default;
+            return false;
+        }
+
+        if (!float.TryParse(str.Slice(comma2 + 1, endIndex - comma2), out float z))
+        {
+            value = default;
+            return false;
+        }
+#else
         if (!float.TryParse(str.Slice(startIndex, comma1 - startIndex).ToString(), out float x))
         {
             value = default;
@@ -292,6 +313,7 @@ public static class KnownTypeValueHelper
             value = default;
             return false;
         }
+#endif
 
         value = new Vector3(x, y, z);
         return true;
@@ -368,7 +390,31 @@ public static class KnownTypeValueHelper
             value = default;
             return false;
         }
+#if NETSTANDARD2_1_OR_GREATER
+        if (!float.TryParse(str.Slice(startIndex, comma1 - startIndex), out float x))
+        {
+            value = default;
+            return false;
+        }
 
+        if (!float.TryParse(str.Slice(comma1 + 1, comma2 - comma1 - 1), out float y))
+        {
+            value = default;
+            return false;
+        }
+
+        if (!float.TryParse(str.Slice(comma2 + 1, comma3 - comma2 - 1), out float z))
+        {
+            value = default;
+            return false;
+        }
+
+        if (!float.TryParse(str.Slice(comma3 + 1, endIndex - comma3), out float w))
+        {
+            value = default;
+            return false;
+        }
+#else
         if (!float.TryParse(str.Slice(startIndex, comma1 - startIndex).ToString(), out float x))
         {
             value = default;
@@ -392,6 +438,7 @@ public static class KnownTypeValueHelper
             value = default;
             return false;
         }
+#endif
 
         value = new Vector4(x, y, z, w);
         return true;
@@ -440,7 +487,19 @@ public static class KnownTypeValueHelper
             value = default;
             return false;
         }
+#if NETSTANDARD2_1_OR_GREATER
+        if (!float.TryParse(str.Slice(startIndex, comma - startIndex), out float x))
+        {
+            value = default;
+            return false;
+        }
 
+        if (!float.TryParse(str.Slice(comma + 1, num2 - comma), out float y))
+        {
+            value = default;
+            return false;
+        }
+#else
         if (!float.TryParse(str.Slice(startIndex, comma - startIndex).ToString(), out float x))
         {
             value = default;
@@ -452,6 +511,7 @@ public static class KnownTypeValueHelper
             value = default;
             return false;
         }
+#endif
 
         value = new Vector2(x, y);
         return true;
@@ -650,13 +710,21 @@ public static class KnownTypeValueHelper
         {
             if (AssetCategory.TryParse(assetCategory, out EnumSpecTypeValue category)
                 && category != AssetCategory.None
-                && ushort.TryParse(stringValue ?? span.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort id))
+#if NETSTANDARD2_1_OR_GREATER
+                && ushort.TryParse(span, NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort id)
+#else
+                && ushort.TryParse(stringValue ?? span.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort id)
+#endif
+                )
             {
                 guidOrId = id == 0 ? GuidOrId.Empty : new GuidOrId(id, category);
                 return true;
             }
-
+#if NETSTANDARD2_1_OR_GREATER
+            if (Guid.TryParse(span, out Guid guid))
+#else
             if (Guid.TryParse(stringValue ?? span.ToString(), out Guid guid))
+#endif
             {
                 guidOrId = new GuidOrId(guid);
                 return true;
@@ -685,8 +753,12 @@ public static class KnownTypeValueHelper
                 return false;
             }
 
-            string number = input.Slice(index + 1).ToString();
+            ReadOnlySpan<char> number = input.Slice(index + 1);
+#if NETSTANDARD2_1_OR_GREATER
             if (!int.TryParse(number, NumberStyles.Integer, CultureInfo.InvariantCulture, out amount))
+#else
+            if (!int.TryParse(number.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out amount))
+#endif
             {
                 return false;
             }
@@ -720,7 +792,12 @@ public static class KnownTypeValueHelper
     {
         if (!value.IsEmpty
             && value.Length == (alpha ? 9 : 7)
-            && uint.TryParse(value.Slice(1, value.Length - 1).ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint result))
+#if NETSTANDARD2_1_OR_GREATER
+            && uint.TryParse(value.Slice(1, value.Length - 1), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint result)
+#else
+            && uint.TryParse(value.Slice(1, value.Length - 1).ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint result)
+#endif
+            )
         {
             color = new Color32(
                 alpha ? (byte)((result >> 24) & byte.MaxValue) : byte.MaxValue,
@@ -732,5 +809,83 @@ public static class KnownTypeValueHelper
 
         color = Color32.White;
         return false;
+    }
+
+    public static bool CheckValidLineBreakOptions(IValueSourceNode node, in SpecPropertyTypeParseContext parse)
+    {
+        return !parse.EvaluationContext.Self.TryGetAdditionalProperty("SupportsNewLines", out bool prop) || !prop
+            ? TryGetLineBreakTagLocationForUnexpectedTagWarning(node, in parse)
+            : TryGetLineBreakTagLocationForIncorrectTagWarning(node, in parse);
+    }
+
+    // match any <[ ]br[ ][/][ ]>
+    private static readonly Regex AnyLineBreakTagsMatcher =
+        new Regex(@"\<\s*br\s*\/{0,1}\s*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    public static bool TryGetLineBreakTagLocationForUnexpectedTagWarning(IValueSourceNode node, in SpecPropertyTypeParseContext parse)
+    {
+        foreach (Match match in AnyLineBreakTagsMatcher.Matches(node.Value))
+        {
+            FileRange range = node.Range;
+            range.Start.Character += match.Index;
+            if (node.IsQuoted)
+                ++range.Start.Character;
+            range.End.Character = range.Start.Character + (match.Length - 1);
+            parse.Log(new DatDiagnosticMessage
+            {
+                Range = range,
+                Diagnostic = DatDiagnostics.UNT1021,
+                Message = DiagnosticResources.UNT1021
+            });
+        }
+        return true;
+    }
+
+    // match any <[ ]br[ ]/[ ]>
+    private static readonly Regex InvalidLineBreakTagsMatcher =
+        new Regex(@"\<\s*br\s*\/\s*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    public static bool TryGetLineBreakTagLocationForIncorrectTagWarning(IValueSourceNode node, in SpecPropertyTypeParseContext parse)
+    {
+        string str = node.Value;
+
+        int crlfInd = -1;
+        while (crlfInd + 1 < str.Length)
+        {
+            crlfInd = str.IndexOf('\n', crlfInd + 1);
+            if (crlfInd >= 0)
+            {
+                int startIndex = crlfInd > 0 && str[crlfInd - 1] == '\r' ? crlfInd - 1 : crlfInd;
+                int len = crlfInd - startIndex + 1;
+
+                FileRange range = node.Range;
+                range.Start.Character += startIndex;
+                if (node.IsQuoted)
+                    ++range.Start.Character;
+                range.End.Character = range.Start.Character + (len - 1);
+                parse.Log(new DatDiagnosticMessage
+                {
+                    Range = range,
+                    Diagnostic = DatDiagnostics.UNT106,
+                    Message = DiagnosticResources.UNT106
+                });
+            }
+        }
+
+        foreach (Match match in InvalidLineBreakTagsMatcher.Matches(str))
+        {
+            FileRange range = node.Range;
+            range.Start.Character += match.Index;
+            if (node.IsQuoted)
+                ++range.Start.Character;
+            range.End.Character = range.Start.Character + (match.Length - 1);
+            parse.Log(new DatDiagnosticMessage
+            {
+                Range = range,
+                Diagnostic = DatDiagnostics.UNT1022,
+                Message = DiagnosticResources.UNT1022
+            });
+        }
+        return true;
     }
 }

@@ -4,21 +4,29 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// The skill level of another property's skill.
+/// <para>Example: <c>ItemAsset.Blueprint.Skill_Level</c></para>
+/// <code>
+/// Skill Sharpshooter
+/// Prop 6
+/// </code>
+/// </summary>
 public sealed class SkillLevelSpecPropertyType :
     BasicSpecPropertyType<SkillLevelSpecPropertyType, byte>,
     IStringParseableSpecPropertyType,
     IElementTypeSpecPropertyType,
     IAutoCompleteSpecPropertyType
 {
-    private ISpecDynamicValue? _skillValue;
-    private ISpecDynamicValue? _specialityIndexValue;
-    private ISpecDynamicValue? _skillIndexValue;
-    private IAssetSpecDatabase? _cacheDb;
+    private readonly IAssetSpecDatabase _database;
+    private PropertyRef? _skillValue;
+    private PropertyRef? _specialityIndexValue;
+    private PropertyRef? _skillIndexValue;
+    private EnumSpecType? _blueprintSkillEnumType;
 
     public string SkillsetOrProperty { get; }
 
@@ -29,8 +37,9 @@ public sealed class SkillLevelSpecPropertyType :
         return 77 ^ (SkillsetOrProperty?.GetHashCode() ?? 0);
     }
 
-    public SkillLevelSpecPropertyType(string skillsetOrProperty)
+    public SkillLevelSpecPropertyType(IAssetSpecDatabase database, string skillsetOrProperty)
     {
+        _database = database.ResolveFacade();
         SkillsetOrProperty = skillsetOrProperty;
     }
 
@@ -107,83 +116,73 @@ public sealed class SkillLevelSpecPropertyType :
     {
         IAssetSpecDatabase db = ctx.Information;
 
-        ISpecDynamicValue? skillValue;
-        ISpecDynamicValue? specialityIndexValue;
-        ISpecDynamicValue? skillIndexValue;
-        lock (this)
-        {
-            if (_cacheDb == null || _cacheDb != db)
-            {
-                _skillIndexValue = null;
-                _specialityIndexValue = null;
-                _skillValue = null;
-                skillValue = null;
-                specialityIndexValue = null;
-                skillIndexValue = null;
-            }
-            else
-            {
-                skillValue = _skillValue;
-                specialityIndexValue = _specialityIndexValue;
-                skillIndexValue = _skillIndexValue;
-            }
-        }
-
-        skill = db.Information.Specialities
-            ?.SelectMany(x => x?.Skills ?? Array.Empty<SkillInfo>())
-            ?.FirstOrDefault(x => string.Equals(x.Skill, SkillsetOrProperty));
+        skill = db.FindSkillByName(SkillsetOrProperty);
 
         if (skill != null)
         {
             return true;
         }
 
-        if (skillValue == null && (specialityIndexValue == null || skillIndexValue == null))
+        if (_skillValue == null && (_specialityIndexValue == null || _skillIndexValue == null))
         {
             int index = SkillsetOrProperty.IndexOf(':');
 
-            lock (this)
+            if (index <= 0 || index >= SkillsetOrProperty.Length - 1)
             {
-                if (index <= 0 || index >= SkillsetOrProperty.Length - 1)
+                _skillValue = new PropertyRef(SkillsetOrProperty.AsSpan(), SkillsetOrProperty);
+            }
+            else
+            {
+                ReadOnlySpan<char> prop1 = SkillsetOrProperty.AsSpan(0, index).Trim();
+                ReadOnlySpan<char> prop2 = SkillsetOrProperty.AsSpan(index + 1).Trim();
+                if (!prop1.IsEmpty && !prop2.IsEmpty)
                 {
-                    _skillValue = skillValue = new PropertyRef(SkillsetOrProperty.AsSpan(), SkillsetOrProperty);
+                    _specialityIndexValue = new PropertyRef(prop1, null);
+                    _skillIndexValue = new PropertyRef(prop2, null);
                 }
                 else
                 {
-                    ReadOnlySpan<char> prop1 = SkillsetOrProperty.AsSpan(0, index).Trim();
-                    ReadOnlySpan<char> prop2 = SkillsetOrProperty.AsSpan(index + 1).Trim();
-                    if (!prop1.IsEmpty && !prop2.IsEmpty)
-                    {
-                        _specialityIndexValue = specialityIndexValue = new PropertyRef(prop1, null);
-                        _skillIndexValue = skillIndexValue = new PropertyRef(prop2, null);
-                    }
-                    else
-                    {
-                        _specialityIndexValue = specialityIndexValue = null;
-                        _skillIndexValue = skillIndexValue = null;
-                    }
+                    _specialityIndexValue = null;
+                    _skillIndexValue = null;
                 }
-                _cacheDb = db;
             }
         }
 
-        if (skillValue != null)
+        if (_skillValue != null)
         {
-            if (!skillValue.TryEvaluateValue(in ctx, out string? value, out bool isNull) || value == null || isNull)
+            if (!_skillValue.TryEvaluateValue(in ctx, out string? value, out bool isNull) || value == null || isNull)
             {
                 return false;
             }
 
-            skill = db.Information.Specialities
-                ?.SelectMany(x => x?.Skills ?? Array.Empty<SkillInfo>())
-                ?.FirstOrDefault(x => string.Equals(x.Skill, value));
+            skill = db.FindSkillByName(value);
+
+            if (skill != null)
+                return true;
+
+            SpecProperty? prop = _skillValue.ResolveProperty(in ctx);
+            if (prop?.Type.GetType(in ctx) is not SkillSpecPropertyType { AllowBlueprintSkills: true }
+                || _database.FindType(SkillSpecPropertyType.BlueprintSkillEnumType, ctx.FileType) is not EnumSpecType enumType)
+            {
+                return false;
+            }
+
+            _blueprintSkillEnumType = enumType;
+            if (!enumType.TryParse(value, out int index)
+                || !enumType.Values[index].TryGetAdditionalProperty("Skill", out string? skillName)
+                || skillName == null)
+            {
+                return false;
+            }
+
+            skill = db.FindSkillByName(skillName);
             return skill != null;
         }
 
-        if (specialityIndexValue != null && skillIndexValue != null)
+        if (_specialityIndexValue != null && _skillIndexValue != null)
         {
-            if (!specialityIndexValue.TryEvaluateValue(in ctx, out byte specialityIndex, out bool isNull) || isNull
-                || !specialityIndexValue.TryEvaluateValue(in ctx, out byte skillIndex, out isNull) || isNull)
+            if (!_specialityIndexValue.TryEvaluateValue(in ctx, out byte specialityIndex, out bool isNull) || isNull
+                || !_specialityIndexValue.TryEvaluateValue(in ctx, out byte skillIndex, out isNull) || isNull)
             {
                 return false;
             }

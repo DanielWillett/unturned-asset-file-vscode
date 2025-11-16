@@ -1,11 +1,13 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using System;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
-using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A 32-bit color with values ranged 0 to 255.
+/// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 4)]
 [JsonConverter(typeof(Color32Converter))]
 public readonly struct Color32 : IEquatable<Color32>, IComparable<Color32>

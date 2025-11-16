@@ -4,24 +4,77 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// Any defined type, such as assets, objects, and enums.
+/// <para>
+/// Primary implementations:
+/// <list type="bullet">
+///    <item><see cref="AssetSpecType"/></item>
+///    <item><see cref="EnumSpecType"/></item>
+///    <item><see cref="CustomSpecType"/></item>
+/// </list>
+/// </para>
+/// </summary>
 public interface ISpecType : IEquatable<ISpecType?>, IAdditionalPropertyProvider
 {
+    /// <summary>
+    /// Parent type from which this type inherits all properties.
+    /// </summary>
     QualifiedType Parent { get; }
+
+    /// <summary>
+    /// Assembly-qualified type name of this type.
+    /// </summary>
     QualifiedType Type { get; }
+
+    /// <summary>
+    /// Human-readable name of this type.
+    /// </summary>
     string DisplayName { get; }
+
+    /// <summary>
+    /// Link to the U3 modding documentation for this file type.
+    /// </summary>
     string? Docs { get; }
 
+    /// <summary>
+    /// Game version that this type was added in.
+    /// </summary>
     Version? Version { get; }
 
     AssetSpecType Owner { get; set; }
 
+    /// <summary>
+    /// Perform a naïve search for a property by it's key. Doesn't support template properties or aliases.
+    /// </summary>
     SpecProperty? FindProperty(string propertyName, SpecPropertyContext context);
 }
 
+/// <summary>
+/// Any defined type with properties, such as objects and assets.
+/// <para>
+/// Primary implementations:
+/// <list type="bullet">
+///    <item><see cref="AssetSpecType"/></item>
+///    <item><see cref="CustomSpecType"/></item>
+/// </list>
+/// </para>
+/// </summary>
 public interface IPropertiesSpecType : ISpecType
 {
+    /// <summary>
+    /// Properties that should be present in the asset (or main) file.
+    /// </summary>
     SpecProperty[] Properties { get; set; }
+
+    /// <summary>
+    /// Properties that should be present in the localization file, if any.
+    /// </summary>
     SpecProperty[] LocalizationProperties { get; set; }
+
+    /// <summary>
+    /// Assets that should be present in the masterbundle folder for this asset, if any.
+    /// </summary>
     SpecBundleAsset[] BundleAssets { get; set; }
 }
 

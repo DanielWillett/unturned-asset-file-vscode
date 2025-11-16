@@ -5,6 +5,14 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A beard type number or index.
+/// See <seealso href="https://github.com/DanielWillett/UnturnedUIAssets/tree/main/Customization/Beards"/> for a list of beard indices.
+/// <para>Example: <c>ObjectNPCAsset.Beard</c></para>
+/// <code>
+/// Prop 15
+/// </code>
+/// </summary>
 public sealed class BeardIndexSpecPropertyType : BasicSpecPropertyType<BeardIndexSpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly BeardIndexSpecPropertyType Instance = new BeardIndexSpecPropertyType();

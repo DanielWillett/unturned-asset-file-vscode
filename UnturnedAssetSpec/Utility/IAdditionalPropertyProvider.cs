@@ -30,6 +30,22 @@ public static class AdditionalPropertyProviderExtensions
             return false;
         }
 
+        return TryCastValue(valBox, out val);
+    }
+
+    internal static bool TryGetAdditionalPropertyFromStruct<TStruct, T>(ref TStruct provider, string name, out T? val) where TStruct : struct, IAdditionalPropertyProvider
+    {
+        if (name == null || !provider.AdditionalProperties.TryGetValue(name, out object? valBox, StringComparison.OrdinalIgnoreCase))
+        {
+            val = default;
+            return false;
+        }
+
+        return TryCastValue(valBox, out val);
+    }
+
+    private static bool TryCastValue<T>(object? valBox, out T? val)
+    {
         if (valBox is T t)
         {
             val = t;

@@ -50,7 +50,7 @@
         },
         {
             "Key": "Grow_SpawnTable",
-            "Type": "Guid",
+            "Type": "AssetReferenceString",
             "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
             "DefaultValue": 0,
             "ExclusiveWith": 

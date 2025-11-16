@@ -5,6 +5,14 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A signed 8-bit integer.
+/// <para>Example: <c>ItemConsumableAsset.Oxygen</c></para>
+/// <code>
+/// Prop 123
+/// Prop -123
+/// </code>
+/// </summary>
 public sealed class Int8SpecPropertyType : BasicSpecPropertyType<Int8SpecPropertyType, sbyte>, IStringParseableSpecPropertyType
 {
     public static readonly Int8SpecPropertyType Instance = new Int8SpecPropertyType();

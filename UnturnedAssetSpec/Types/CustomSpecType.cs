@@ -9,6 +9,9 @@ using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// An object type with it's own properties.
+/// </summary>
 [DebuggerDisplay("Type: {Type.GetTypeName()}")]
 public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<CustomSpecTypeInstance>, IEquatable<CustomSpecType>
 {
@@ -22,6 +25,10 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
     public required SpecProperty[] LocalizationProperties { get; set; }
     public required string? Docs { get; init; }
     public Version? Version { get; init; }
+    
+    /// <summary>
+    /// Whether or not this type is only represented in the legacy format.
+    /// </summary>
     public bool IsLegacyExpandedType { get; init; }
 
     /// <summary>
@@ -78,7 +85,7 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
         {
             if (!string.IsNullOrEmpty(StringParsableType) && parse.Node is IValueSourceNode stringValue)
             {
-                ISpecPropertyType? type = KnownTypes.GetType(StringParsableType!, null, OneOrMore<string>.Null, resolvedOnly: true);
+                ISpecPropertyType? type = KnownTypes.GetType(parse.Database, StringParsableType!, null, OneOrMore<string>.Null, resolvedOnly: true);
                 if (type == null)
                 {
                     if (parse.HasDiagnostics)

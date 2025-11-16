@@ -5,11 +5,26 @@ using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;
 
+/// <summary>
+/// A data structure containg a bundle name and file path within the bundle.
+/// This is a common format shared between master bundle references, content references, audio references, and more.
+/// </summary>
 [JsonConverter(typeof(BundleReferenceConverter))]
 public readonly struct BundleReference : IEquatable<BundleReference>, IComparable<BundleReference>
 {
+    /// <summary>
+    /// The name of a bundle.
+    /// </summary>
     public readonly string Name;
+    
+    /// <summary>
+    /// The path of content within the bundle.
+    /// </summary>
     public readonly string Path;
+
+    /// <summary>
+    /// The type of reference this reference was created for.
+    /// </summary>
     public readonly MasterBundleReferenceType Type;
 
     public BundleReference(string name, string path, MasterBundleReferenceType type)

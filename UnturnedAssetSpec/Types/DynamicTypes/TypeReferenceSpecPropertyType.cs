@@ -5,6 +5,21 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// An assembly-qualified CLR type name represented by the <see cref="T:SDG.Unturned.TypeReference{T}"/> type in-game.
+/// It can either be formatted as a string or an object.
+/// <para>Example: <c>LevelAsset.Default_Game_Mode</c></para>
+/// <code>
+/// // string
+/// Prop SDG.Unturned.SurvivalGameMode, Assembly-CSharp
+///
+/// // object
+/// Prop
+/// {
+///     Type SDG.Unturned.SurvivalGameMode, Assembly-CSharp
+/// }
+/// </code>
+/// </summary>
 public sealed class TypeReferenceSpecPropertyType :
     BaseSpecPropertyType<QualifiedType>,
     ISpecPropertyType<QualifiedType>,
@@ -82,6 +97,7 @@ public sealed class TypeReferenceSpecPropertyType :
         return false;
     }
 
+#pragma warning disable CS8500
     /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
     {
@@ -118,19 +134,58 @@ public sealed class TypeReferenceSpecPropertyType :
             return FailedToParse(in parse, out value);
         }
 
-        if (!QualifiedType.ExtractParts(asmQualifiedType.AsSpan(), out _, out _))
+        if (asmQualifiedType.Length == 0 || asmQualifiedType.IndexOfAny(KnownTypeValueHelper.InvalidTypeChars) >= 0)
         {
-            parse.Log(new DatDiagnosticMessage
-            {
-                Range = range,
-                Diagnostic = DatDiagnostics.UNT2013,
-                Message = DiagnosticResources.UNT2013
-            });
-            value = QualifiedType.None;
-            return false;
+            return FailedToParse(in parse, out value);
         }
 
-        value = new QualifiedType(asmQualifiedType, false);
+        QualifiedType.ExtractParts(asmQualifiedType.AsSpan(), out ReadOnlySpan<char> typeName, out ReadOnlySpan<char> asmName);
+        if (asmName.IsEmpty)
+        {
+            if (parse.HasDiagnostics && !typeName.StartsWith("SDG", StringComparison.Ordinal))
+            {
+                parse.Log(new DatDiagnosticMessage
+                {
+                    Range = range,
+                    Diagnostic = DatDiagnostics.UNT1023,
+                    Message = DiagnosticResources.UNT1023
+                });
+            }
+
+            const int defaultAssemblyNameLen = 15;
+#if NETSTANDARD2_1_OR_GREATER
+            unsafe
+            {
+                ConcatAssemblyNameState state;
+                state.Ptr = &typeName;
+                value = new QualifiedType(
+                    string.Create(typeName.Length + defaultAssemblyNameLen + 2,
+                        state,
+                        (span, state) =>
+                        {
+                            state.Ptr->CopyTo(span);
+                            int l = state.Ptr->Length;
+                            span[l] = ',';
+                            span[l + 1] = ' ';
+                            ReadOnlySpan<char> defaultAssemblyName = "Assembly-CSharp";
+                            defaultAssemblyName.CopyTo(span.Slice(l + 2));
+                        })
+                    );
+            }
+#else
+            ReadOnlySpan<char> defaultAssemblyName = "Assembly-CSharp";
+            Span<char> newTypeName = stackalloc char[typeName.Length + defaultAssemblyNameLen + 2];
+            typeName.CopyTo(newTypeName);
+            newTypeName[typeName.Length] = ',';
+            newTypeName[typeName.Length + 1] = ' ';
+            defaultAssemblyName.CopyTo(newTypeName.Slice(typeName.Length + 2));
+            value = new QualifiedType(newTypeName.ToString());
+#endif
+        }
+        else
+        {
+            value = new QualifiedType(asmQualifiedType, false);
+        }
 
         if (parse.HasDiagnostics && ElementType.Type != null)
         {
@@ -148,6 +203,13 @@ public sealed class TypeReferenceSpecPropertyType :
 
         return true;
     }
+#if NETSTANDARD2_1_OR_GREATER
+    private unsafe struct ConcatAssemblyNameState
+    {
+        public ReadOnlySpan<char>* Ptr;
+    }
+#endif
+#pragma warning restore CS8500
 
     /// <inheritdoc />
     public bool Equals(TypeReferenceSpecPropertyType? other) => other != null && ElementType.Equals(other.ElementType);

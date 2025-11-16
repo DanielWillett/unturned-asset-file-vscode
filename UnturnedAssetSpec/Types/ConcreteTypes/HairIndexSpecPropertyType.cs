@@ -5,6 +5,14 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A hair type number or index.
+/// See <seealso href="https://github.com/DanielWillett/UnturnedUIAssets/tree/main/Customization/Hair"/> for a list of hair indices.
+/// <para>Example: <c>ObjectNPCAsset.Hair</c></para>
+/// <code>
+/// Prop 22
+/// </code>
+/// </summary>
 public sealed class HairIndexSpecPropertyType : BasicSpecPropertyType<HairIndexSpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly HairIndexSpecPropertyType Instance = new HairIndexSpecPropertyType();

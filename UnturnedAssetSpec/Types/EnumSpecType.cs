@@ -5,6 +5,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -109,7 +110,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
             return false;
         }
 
-        if (!TryParse(strValNode.Value.AsSpan(), out EnumSpecTypeValue v, ignoreCase: true))
+        if (!TryParse(strValNode.Value.AsSpan(), out int v, ignoreCase: true))
         {
             if (parse.HasDiagnostics)
             {
@@ -127,7 +128,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
             return false;
         }
 
-        index = v.Index;
+        index = v;
         return true;
     }
 
@@ -153,6 +154,23 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
         return value.AsConcrete<string>();
     }
 
+    public bool TryParse(ReadOnlySpan<char> span, out int index, bool ignoreCase = true)
+    {
+        span = span.Trim();
+        StringComparison comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        for (int i = 0; i < Values.Length; i++)
+        {
+            ref EnumSpecTypeValue value = ref Values[i];
+            if (!span.Equals(value.Value.AsSpan(), comparison))
+                continue;
+
+            index = i;
+            return true;
+        }
+
+        index = -1;
+        return false;
+    }
     public bool TryParse(ReadOnlySpan<char> span, out EnumSpecTypeValue v, bool ignoreCase = true)
     {
         span = span.Trim();
@@ -291,4 +309,9 @@ public readonly struct EnumSpecTypeValue : IEquatable<EnumSpecTypeValue>, ICompa
     public static bool operator >(EnumSpecTypeValue left, EnumSpecTypeValue right) => left.Index > right.Index;
     public static bool operator <=(EnumSpecTypeValue left, EnumSpecTypeValue right) => left.Index <= right.Index;
     public static bool operator >=(EnumSpecTypeValue left, EnumSpecTypeValue right) => left.Index >= right.Index;
+
+    public bool TryGetAdditionalProperty<T>(string name, out T? val)
+    {
+        return AdditionalPropertyProviderExtensions.TryGetAdditionalPropertyFromStruct(ref Unsafe.AsRef(in this), name, out val);
+    }
 }

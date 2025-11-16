@@ -4,6 +4,40 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A reference to content in a masterbundle. Supports various different formats used around the game.
+/// <para>Example: <c>LevelAsset.Death_Music</c></para>
+/// <code>
+/// // audio reference
+/// core.masterbundle::Sounds/Inventory/Equip.ogg
+/// 
+/// // masterbundle reference
+/// core.masterbundle::Bundles/Ace/Item.prefab
+/// // - or -
+/// {
+///     MasterBundle "core.masterbundle"
+///     AssetPath "Bundles/Ace/Item.prefab"
+/// }
+/// 
+/// // content reference
+/// core.masterbundle::Bundles/Ace/Item.prefab
+/// // - or -
+/// {
+///     Name "core.masterbundle"
+///     Path "Bundles/Ace/Item.prefab"
+/// }
+/// 
+/// // translation reference
+/// SDG::Stereo_Songs.Unturned_Theme.Title
+/// // - or -
+/// SDG#Stereo_Songs.Unturned_Theme.Title
+/// // - or -
+/// {
+///     Namespace SDG
+///     Token Stereo_Songs.Unturned_Theme.Title
+/// }
+/// </code>
+/// </summary>
 public sealed class MasterBundleReferenceSpecPropertyType :
     BaseSpecPropertyType<BundleReference>,
     ISpecPropertyType<BundleReference>,
@@ -125,6 +159,16 @@ public sealed class MasterBundleReferenceSpecPropertyType :
                 {
                     return FailedToParse(in parse, out value);
                 }
+
+                if (parse.HasDiagnostics)
+                {
+                    parse.Log(new DatDiagnosticMessage
+                    {
+                        Range = stringValue.Range,
+                        Diagnostic = DatDiagnostics.UNT1018,
+                        Message = DiagnosticResources.UNT1018_TranslationReference
+                    });
+                }
             }
             else
             {
@@ -146,6 +190,17 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 
             value = new BundleReference(name, path, rType);
             return true;
+        }
+
+        // todo: AudioReference can also reference OneShotAudioDefs (*.asset)
+        if (ReferenceType == MasterBundleReferenceType.TranslationReference && parse.HasDiagnostics)
+        {
+            parse.Log(new DatDiagnosticMessage
+            {
+                Range = parse.Node.Range,
+                Diagnostic = DatDiagnostics.UNT1018,
+                Message = DiagnosticResources.UNT1018_TranslationReference
+            });
         }
 
         if (parse.Node is not IDictionarySourceNode dictionary
@@ -216,13 +271,89 @@ public sealed class MasterBundleReferenceSpecPropertyType :
     void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }
 
+/// <summary>
+/// Various different variations of a masterbundle name and path structure.
+/// </summary>
 public enum MasterBundleReferenceType
 {
     Unspecified,
+
+    /// <summary>
+    /// Supports the string representation or object representation of a master bundle reference.
+    /// Represented in-game by the <see cref="T:SDG.Unturned.MasterBundleReference{T}"/> type.
+    /// <code>
+    /// Path (current masterbundle)
+    /// Name:Path
+    /// 
+    /// // or
+    /// 
+    /// {
+    ///     MasterBundle "Name"
+    ///     AssetPath "Path"
+    /// }
+    /// </code>
+    /// </summary>
     MasterBundleReference,
+
+    /// <summary>
+    /// Only supports the string representation of a master bundle reference.
+    /// Represented in-game by the <see cref="T:SDG.Unturned.MasterBundleReference{T}"/> type.
+    /// <code>
+    /// Path (current masterbundle)
+    /// Name:Path
+    /// </code>
+    /// </summary>
     MasterBundleReferenceString,
+
+    /// <summary>
+    /// Supports the string representation or object representation of a master bundle reference.
+    /// Represented in-game by the <see cref="T:SDG.Unturned.ContentReference{T}"/> type.
+    /// <code>
+    /// Path (current masterbundle)
+    /// Name:Path
+    /// 
+    /// // or
+    /// 
+    /// {
+    ///     Name "Name"
+    ///     Path "Path"
+    /// }
+    /// </code>
+    /// </summary>
     ContentReference,
+
+    /// <summary>
+    /// Only supports the string representation of a master bundle reference, specifically for Audio Clips or One Shot Audio definitions.
+    /// Represented in-game by the <see cref="T:SDG.Unturned.AudioReference"/> type.
+    /// <code>
+    /// Path (current masterbundle)
+    /// Name:Path
+    /// </code>
+    /// </summary>
     AudioReference,
+
+    /// <summary>
+    /// Supports the string representation or object representation of a master bundle reference.
+    /// Either <see cref="MasterBundleReference"/> or <see cref="ContentReference"/>, preferring <see cref="MasterBundleReference"/>.
+    /// <code>
+    /// Path (current masterbundle)
+    /// Name:Path
+    /// 
+    /// // or
+    /// 
+    /// {
+    ///     Name "Name"
+    ///     Path "Path"
+    /// }
+    ///
+    /// // or
+    /// 
+    /// {
+    ///     MasterBundle "Name"
+    ///     AssetPath "Path"
+    /// }
+    /// </code>
+    /// </summary>
     MasterBundleOrContentReference,
 
     /// <summary>

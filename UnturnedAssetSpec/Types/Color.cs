@@ -5,6 +5,9 @@ using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A floating-point color with components ranged 0 to 1.
+/// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 16)]
 [JsonConverter(typeof(ColorConverter))]
 public readonly struct Color : IEquatable<Color>, IComparable<Color>

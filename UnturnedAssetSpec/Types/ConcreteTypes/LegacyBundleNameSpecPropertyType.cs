@@ -3,6 +3,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A path to a legacy (.unity3d) bundle.
+/// <para>Example: <c>Asset.Bundle_Override_Path</c></para>
+/// <code>
+/// Prop Asset/bndl.unity3d
+/// </code>
+/// </summary>
 public sealed class LegacyBundleNameSpecPropertyType : BasicSpecPropertyType<LegacyBundleNameSpecPropertyType, string>
 {
     public static readonly LegacyBundleNameSpecPropertyType Instance = new LegacyBundleNameSpecPropertyType();

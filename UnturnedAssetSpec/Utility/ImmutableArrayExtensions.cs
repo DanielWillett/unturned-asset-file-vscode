@@ -6,8 +6,15 @@ using System.Runtime.CompilerServices;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
+/// <summary>
+/// Back-ported utilities for <see cref="ImmutableArray{T}"/>.
+/// </summary>
 public static class ImmutableArrayExtensions
 {
+    /// <summary>
+    /// Extracts the underlying array from an <see cref="ImmutableArray{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The array's element type.</typeparam>
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] UnsafeThaw<T>(this ImmutableArray<T> array)
@@ -15,6 +22,10 @@ public static class ImmutableArrayExtensions
         return array.IsDefaultOrEmpty ? Array.Empty<T>() : Unsafe.As<ImmutableArray<T>, T[]>(ref array);
     }
 
+    /// <summary>
+    /// Creates an <see cref="ImmutableArray{T}"/> from an array without copying.
+    /// </summary>
+    /// <typeparam name="T">The array's element type.</typeparam>
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ImmutableArray<T> UnsafeFreeze<T>(this T[]? array)
@@ -22,6 +33,10 @@ public static class ImmutableArrayExtensions
         return array is not { Length: > 0 } ? ImmutableArray<T>.Empty : Unsafe.As<T[], ImmutableArray<T>>(ref array);
     }
 
+    /// <summary>
+    /// Effeciently creates an <see cref="ImmutableArray{T}"/> from a <see cref="ImmutableArray{T}.Builder"/>.
+    /// </summary>
+    /// <typeparam name="T">The array's element type.</typeparam>
     public static ImmutableArray<T> MoveToImmutableOrCopy<T>(this ImmutableArray<T>.Builder builder)
     {
         return builder.Capacity == builder.Count ? builder.MoveToImmutable() : builder.ToImmutable();

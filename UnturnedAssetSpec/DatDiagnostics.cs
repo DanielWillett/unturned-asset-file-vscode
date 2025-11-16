@@ -4,8 +4,18 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;
 
+/// <summary>
+/// Common diagnostics.
+/// </summary>
 public static class DatDiagnostics
 {
+    /* External (not used by this library) */
+
+    /// <summary>
+    /// Emitted by the <c>Unturned.MSBuild</c> NuGet package when referencing Newtonsoft.Json using &lt;UnturnedReference&gt; instead of &lt;PackageReference&gt;.
+    /// </summary>
+    public static readonly DatDiagnostic UNT003 = new DatDiagnostic("UNT003", DatDiagnosticSeverity.Error);
+
     /* Suggestions */
 
     /// <summary>
@@ -32,6 +42,11 @@ public static class DatDiagnostics
     /// Displayed when a quoted string has an unnecssary comma after it.
     /// </summary>
     public static readonly DatDiagnostic UNT105 = new DatDiagnostic("UNT105", DatDiagnosticSeverity.Hint);
+
+    /// <summary>
+    /// Use &lt;br&gt; instead of \n or \r\n.
+    /// </summary>
+    public static readonly DatDiagnostic UNT106 = new DatDiagnostic("UNT106", DatDiagnosticSeverity.Hint);
 
     /* Warnings */
 
@@ -135,6 +150,21 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT1020 = new DatDiagnostic("UNT1020", DatDiagnosticSeverity.Warning);
 
+    /// <summary>
+    /// New-lines not supported for this string.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1021 = new DatDiagnostic("UNT1021", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// An invalid new-line tag is used, such as &lt;br/&gt;.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1022 = new DatDiagnostic("UNT1022", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// TypeReference missing assembly-qualified name.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1023 = new DatDiagnostic("UNT1023", DatDiagnosticSeverity.Warning);
+
     /* Errors */
 
     /// <summary>
@@ -181,10 +211,4 @@ public static class DatDiagnostics
     /// Malformed format string.
     /// </summary>
     public static readonly DatDiagnostic UNT2012 = new DatDiagnostic("UNT2012", DatDiagnosticSeverity.Error);
-
-    /// <summary>
-    /// TypeReference missing assembly-qualified name.
-    /// </summary>
-    public static readonly DatDiagnostic UNT2013 = new DatDiagnostic("UNT2013", DatDiagnosticSeverity.Error);
-
 }

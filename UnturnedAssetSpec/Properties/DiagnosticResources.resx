@@ -219,8 +219,8 @@
   <data name="UNT1019" xml:space="preserve">
     <value>This property shouldn't reference the asset it's defined in.</value>
   </data>
-  <data name="UNT2013" xml:space="preserve">
-    <value>Type references must use assembly-qualified type names. These are formatted as the full type and the assembly name separated by a comma. For example: 'SDG.Unturned.Asset, Assembly-CSharp'.</value>
+  <data name="UNT1023" xml:space="preserve">
+    <value>Type references should use assembly-qualified type names. These are formatted as the full type and the assembly name separated by a comma. For example: 'SDG.Unturned.Asset, Assembly-CSharp'.</value>
   </data>
   <data name="UNT103" xml:space="preserve">
     <value>Type {0} is unknown and may not be assignable to '{1}'.</value>
@@ -245,5 +245,17 @@
   </data>
   <data name="UNT101_CodeFix_Annotation_Desc" xml:space="preserve">
     <value>The "this" keyword can be used to reference the current asset instead of using an ID or GUID.</value>
+  </data>
+  <data name="UNT1021" xml:space="preserve">
+    <value>New-line formatting is not supported for this string.</value>
+  </data>
+  <data name="UNT1022" xml:space="preserve">
+    <value>The correct new-line tag is "&lt;br&gt;". No other variations are accepted.</value>
+  </data>
+  <data name="UNT106" xml:space="preserve">
+    <value>Use "&lt;br&gt;" instead of an explicit new-line.</value>
+  </data>
+  <data name="UNT1018_TranslationReference" xml:space="preserve">
+    <value>The Translation Reference format is no longer supported by Unturned.</value>
   </data>
 </root>

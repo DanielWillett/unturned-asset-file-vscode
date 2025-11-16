@@ -10,6 +10,13 @@ using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A unique ID used to indicate which weapons can damage which entities.
+/// <para>Example: <c>ObjectAsset.Rubble_Blade_ID</c></para>
+/// <code>
+/// Prop 123
+/// </code>
+/// </summary>
 public sealed class BladeIdSpecPropertyType : BasicSpecPropertyType<BladeIdSpecPropertyType, byte>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
     public static readonly BladeIdSpecPropertyType Instance = new BladeIdSpecPropertyType();

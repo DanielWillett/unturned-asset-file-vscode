@@ -7,6 +7,13 @@ using System.Text;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A URL to content hosted on the internet. Can optionally filter by MIME types by passing them as element types.
+/// <para>Example: <c>ServerListCurationAsset.IconURL</c></para>
+/// <code>
+/// Prop https://smartlydressedgames.com/favicon.png
+/// </code>
+/// </summary>
 public sealed class UrlSpecPropertyType :
     BaseSpecPropertyType<string>,
     ISpecPropertyType<string>,

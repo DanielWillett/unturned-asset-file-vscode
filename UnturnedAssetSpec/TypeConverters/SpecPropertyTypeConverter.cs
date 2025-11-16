@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
@@ -16,8 +17,8 @@ public class SpecPropertyTypeConverter : JsonConverter<ISpecPropertyType>
         string type = reader.GetString();
         if (string.IsNullOrWhiteSpace(type))
             throw new JsonException("Empty type while reading ISpecPropertyType.");
-        
-        return KnownTypes.GetType(type) ?? new UnresolvedSpecPropertyType(type);
+
+        return KnownTypes.GetType(AssetSpecDatabase.TryGetDatabaseFromOptions(options), type) ?? new UnresolvedSpecPropertyType(type);
     }
 
     /// <inheritdoc />

@@ -5,6 +5,13 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A 128-bit high precision decimal value.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop 123.456
+/// </code>
+/// </summary>
 public sealed class Float128SpecPropertyType : BasicSpecPropertyType<Float128SpecPropertyType, decimal>, IStringParseableSpecPropertyType
 {
     public static readonly Float128SpecPropertyType Instance = new Float128SpecPropertyType();

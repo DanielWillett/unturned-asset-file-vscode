@@ -6,18 +6,40 @@ using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// Base class for string-parsable type implementations for <see cref="BlueprintSupplyStringParseableSpecPropertyType"/> and <see cref="BlueprintOutputStringParseableSpecPropertyType"/> string value parsers.
+/// <para>
+/// Parses a blueprint item expression from it's string value.
+/// <para>Example: <c>ItemAsset.Blueprint.InputItems</c></para>
+/// <code>
+/// Prop fe71781c60314468b22c6b0642a51cd9
+/// Prop 1374
+/// Prop this
+/// 
+/// Prop fe71781c60314468b22c6b0642a51cd9 x 5
+/// Prop 1374 x 5
+/// Prop this x 5
+/// </code>
+/// </para>
+/// </summary>
 public abstract class BlueprintItemStringParseableSpecPropertyType :
     BaseSpecPropertyType<CustomSpecTypeInstance>,
     ISpecPropertyType<CustomSpecTypeInstance>
 {
+    private readonly IAssetSpecDatabase _database;
     private ISpecType? _cachedType;
-    private IAssetSpecDatabase? _cachedDatabase;
+    private BlueprintIdSpecPropertyType? _bpIdType;
 
     public abstract string BackingType { get; }
 
     public Type ValueType => typeof(CustomSpecTypeInstance);
 
     public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+
+    protected BlueprintItemStringParseableSpecPropertyType(IAssetSpecDatabase database)
+    {
+        _database = database.ResolveFacade();
+    }
 
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
@@ -52,17 +74,13 @@ public abstract class BlueprintItemStringParseableSpecPropertyType :
 
         ISpecType? type;
 
-        lock (this)
+        if (_cachedType == null)
         {
-            if (_cachedDatabase == parse.Database)
-            {
-                type = _cachedType;
-            }
-            else
-            {
-                _cachedDatabase = parse.Database;
-                _cachedType = type = parse.Database.FindType(BackingType, parse.FileType);
-            }
+            _cachedType = type = _database.FindType(BackingType, parse.FileType);
+        }
+        else
+        {
+            type = _cachedType;
         }
 
         if (type is not CustomSpecType backingType)
@@ -80,7 +98,8 @@ public abstract class BlueprintItemStringParseableSpecPropertyType :
             }
             else if (property.Key.Equals("ID", StringComparison.Ordinal))
             {
-                val = new SpecDynamicConcreteValue<GuidOrId>(assetRef, BlueprintIdSpecPropertyType.Instance);
+                _bpIdType ??= new BlueprintIdSpecPropertyType(_database, true);
+                val = new SpecDynamicConcreteValue<GuidOrId>(assetRef, _bpIdType);
             }
             else
             {

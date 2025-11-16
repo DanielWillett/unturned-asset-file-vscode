@@ -5,6 +5,14 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A date-time parsed as a <see cref="DateTimeOffset"/> with an optional time-zone (assumed UTC).
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop 2025-11-15T21:30:35
+/// Prop 2025-11-16T02:30:35-05:00
+/// </code>
+/// </summary>
 public sealed class DateTimeOffsetSpecPropertyType : BasicSpecPropertyType<DateTimeOffsetSpecPropertyType, DateTimeOffset>, IStringParseableSpecPropertyType
 {
     public static readonly DateTimeOffsetSpecPropertyType Instance = new DateTimeOffsetSpecPropertyType();

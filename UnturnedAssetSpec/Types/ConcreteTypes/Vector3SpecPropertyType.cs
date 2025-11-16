@@ -6,6 +6,9 @@ using System.Numerics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// Base class for all 3-component vector types.
+/// </summary>
 public abstract class Vector3SpecPropertyType : BasicSpecPropertyType<Vector3SpecPropertyType, Vector3>,
     IStringParseableSpecPropertyType,
     IVectorSpecPropertyType<Vector3>

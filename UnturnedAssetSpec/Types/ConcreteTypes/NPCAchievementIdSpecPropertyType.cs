@@ -4,6 +4,13 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// The name of an NPC achievement. Valid NPC achievements are listed in the Status.json file under "Achievements"."NPC_Achievement_IDs".
+/// <para>Example: <c>Asset.NPCAchievementReward.ID</c></para>
+/// <code>
+/// Prop Soulcrystal
+/// </code>
+/// </summary>
 public sealed class NPCAchievementIdSpecPropertyType :
     BasicSpecPropertyType<NPCAchievementIdSpecPropertyType, string>
 {

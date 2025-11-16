@@ -4,6 +4,13 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// The assembly-qualified name of a CLR type.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop SDG.Unturned.ItemCaliberAsset, Assembly-CSharp
+/// </code>
+/// </summary>
 public sealed class TypeSpecPropertyType : BasicSpecPropertyType<TypeSpecPropertyType, QualifiedType>, IStringParseableSpecPropertyType
 {
     public static readonly TypeSpecPropertyType Instance = new TypeSpecPropertyType();

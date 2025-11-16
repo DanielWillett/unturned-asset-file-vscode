@@ -1,28 +1,53 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A backwards-compatable reference to one or more types of assets formatted as either a string or sometimes as an object (see <see cref="CanParseDictionary"/>).
+/// Accepts both <see cref="Guid"/> and <see cref="ushort"/> IDs, although in some cases the ID can't be assumed and a <see cref="AssetCategory"/> also has to be specified ('Type').
+/// <para>Used for blueprint supply item references.</para>
+/// <para>Assumes the category is ITEM for <see cref="ushort"/> IDs.</para>
+/// <para>Example: <c>ItemAsset.BlueprintSupply.ID</c></para>
+/// <code>
+/// // string
+/// Prop fe71781c60314468b22c6b0642a51cd9
+/// Prop 1374
+///
+/// // object
+/// Prop
+/// {
+///     GUID fe71781c60314468b22c6b0642a51cd9
+/// }
+/// Prop
+/// {
+///     ID 1374
+/// }
+///
+/// // this
+/// Prop this
+/// </code>
+/// <para>
+/// If an amount is supppled (i.e. "102 x 3") a warning will be logged.
+/// </para>
+/// </summary>
 public sealed class BlueprintIdSpecPropertyType :
     BackwardsCompatibleAssetReferenceSpecPropertyType,
     IEquatable<BlueprintIdSpecPropertyType>
 {
-    public static readonly BlueprintIdSpecPropertyType Instance = new BlueprintIdSpecPropertyType(true);
-    public static readonly BlueprintIdSpecPropertyType StringInstance = new BlueprintIdSpecPropertyType(false);
-
     public override int GetHashCode()
     {
         return 64;
     }
 
-    static BlueprintIdSpecPropertyType() { }
-
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string Type => "BlueprintId";
 
-    private BlueprintIdSpecPropertyType(bool canParseDictionary) : base(AssetCategory.Item.Value, canParseDictionary, OneOrMore<string>.Null) { }
+    public BlueprintIdSpecPropertyType(IAssetSpecDatabase database, bool canParseDictionary)
+        : base(database, AssetCategory.Item.Value, canParseDictionary, OneOrMore<string>.Null) { }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out GuidOrId value)

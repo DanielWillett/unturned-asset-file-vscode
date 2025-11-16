@@ -3,6 +3,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// The file name of a registered masterbundle, including the extension.
+/// <para>Example: <c>Asset.Master_Bundle_Override</c></para>
+/// <code>
+/// Prop core.masterbundle
+/// </code>
+/// </summary>
 public sealed class MasterBundleNameSpecPropertyType : BasicSpecPropertyType<MasterBundleNameSpecPropertyType, string>
 {
     public static readonly MasterBundleNameSpecPropertyType Instance = new MasterBundleNameSpecPropertyType();
@@ -36,6 +43,7 @@ public sealed class MasterBundleNameSpecPropertyType : BasicSpecPropertyType<Mas
             return FailedToParse(in parse, out value);
         }
 
+        // todo: check ends with .masterbundle
         // todo: file checking
 
         value = strValNode.Value;

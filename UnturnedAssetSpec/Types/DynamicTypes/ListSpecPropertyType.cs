@@ -7,6 +7,31 @@ using System.Collections.Immutable;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A list of objects than can be only be formatted in the modern format.
+/// If <see cref="AllowSingle"/> is <see langword="true"/>, also can parse one value as a list of length 1.
+/// <para>Example: <c>LevelAsset.Crafting_Blacklists</c></para>
+/// <code>
+/// // list
+/// Props
+/// [
+///     {
+///         Value 3
+///         Mode Add
+///     }
+///     {
+///         Value 4
+///         Mode Subtract
+///     }
+/// ]
+///
+/// // single
+/// {
+///     Value 3
+///     Mode Add
+/// }
+/// </code>
+/// </summary>
 public sealed class ListSpecPropertyType<TElementType> :
     BaseSpecPropertyType<EquatableArray<TElementType>>,
     ISpecPropertyType<EquatableArray<TElementType>>,

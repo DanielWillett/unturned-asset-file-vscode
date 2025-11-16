@@ -7,6 +7,21 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A backwards-compatable reference to one or more types of assets formatted as a string.
+/// Accepts both <see cref="Guid"/> and <see cref="ushort"/> IDs.
+/// <para>Example: <c>ItemBarricadeAsset.Explosion</c></para>
+/// <code>
+/// Prop fcfe74fe2e8748a69813539f7dbc5738
+/// Prop 21
+/// </code>
+/// <para>
+/// Also supports the <c>PreventSelfReference</c> additional property to log a warning if the current asset is referenced.
+/// </para>
+/// <para>
+/// If an amount is supppled (i.e. "21 x 2") a warning will be logged.
+/// </para>
+/// </summary>
 public sealed class GuidOrIdSpecPropertyType :
     BaseSpecPropertyType<GuidOrId>,
     ISpecPropertyType<GuidOrId>,
@@ -64,11 +79,17 @@ public sealed class GuidOrIdSpecPropertyType :
 
     public GuidOrIdSpecPropertyType(QualifiedType elementType, OneOrMore<string> specialTypes = default)
     {
+        OtherElementTypes = AssetReferenceSpecPropertyType.NormalizeAssetTypes(ref elementType, specialTypes, out _);
+        ElementType = elementType;
+
         ElementType = elementType;
         DisplayName = elementType.IsNull ? "GUID or ID" : $"GUID or ID ({elementType.GetTypeName()})";
         OtherElementTypes = specialTypes
             .Where(x => !string.IsNullOrEmpty(x))
-            .Select(x => new QualifiedType(x));
+            .Select(x => new QualifiedType(x))
+            .Remove(elementType);
+
+        DisplayName = AssetReferenceSpecPropertyType.CreateDisplayName("ID or Asset Reference", elementType, OtherElementTypes);
     }
 
     /// <inheritdoc />
@@ -119,11 +140,16 @@ public sealed class GuidOrIdSpecPropertyType :
 
         string val = stringNode.Value;
 
+        AssetReferenceSpecPropertyType.CheckInappropriateAmount(in parse, stringNode);
+
         if (!GuidOrId.TryParse(val, out value))
         {
             return FailedToParse(in parse, out value);
         }
 
+        if (!parse.HasDiagnostics)
+            return true;
+        
         if (!AssetReferenceSpecPropertyType.GetPreventSelfRef(in parse))
             return true;
 

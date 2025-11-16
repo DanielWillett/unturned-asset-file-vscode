@@ -4,6 +4,13 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A string that supports Unity rich text tags.
+/// <para>Example: <c>$local$::ItemAsset.Description</c></para>
+/// <code>
+/// Prop &lt;b&gt;Bold&lt;/b&gt; Text
+/// </code>
+/// </summary>
 public sealed class RichTextStringSpecPropertyType : BasicSpecPropertyType<RichTextStringSpecPropertyType, string>, IStringParseableSpecPropertyType
 {
     public static readonly RichTextStringSpecPropertyType Instance = new RichTextStringSpecPropertyType();

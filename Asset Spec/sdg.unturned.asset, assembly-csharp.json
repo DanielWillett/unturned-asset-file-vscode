@@ -825,7 +825,6 @@
             "Type": "SDG.Unturned.INPCCondition, Assembly-CSharp",
             "DisplayName": "Condition",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
-            "IsLegacyExpandedType": true,
             "Properties":
             [
                 {
@@ -2063,7 +2062,6 @@
             "Type": "SDG.Unturned.INPCReward, Assembly-CSharp",
             "DisplayName": "Reward",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
-            "IsLegacyExpandedType": true,
             "Properties":
             [
                 {

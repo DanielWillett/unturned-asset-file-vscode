@@ -4,6 +4,14 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A 128-bit globally unique identifier (<see cref="Guid"/>).
+/// <para>Example: <c>Asset.GUID</c></para>
+/// <code>
+/// Prop 7a85ae60118140a7a9289eeba5ac5772
+/// </code>
+/// </summary>
+/// <remarks>This type should not be used for asset references, instead <see cref="AssetReferenceSpecPropertyType"/> should be used instead ('AssetReferenceString').</remarks>
 public sealed class GuidSpecPropertyType : BasicSpecPropertyType<GuidSpecPropertyType, Guid>, IStringParseableSpecPropertyType
 {
     public static readonly GuidSpecPropertyType Instance = new GuidSpecPropertyType();

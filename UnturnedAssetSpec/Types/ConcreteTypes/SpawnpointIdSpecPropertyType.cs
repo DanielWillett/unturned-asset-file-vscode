@@ -3,6 +3,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// The unique ID of an NPC spawnpoint node as set in the level editor.
+/// <para>Example: <c>Asset.NPCVehicleReward.Spawnpoint</c></para>
+/// <code>
+/// Prop liberator_spawn_jet
+/// </code>
+/// </summary>
 public sealed class SpawnpointIdSpecPropertyType : BasicSpecPropertyType<SpawnpointIdSpecPropertyType, string>
 {
     public static readonly SpawnpointIdSpecPropertyType Instance = new SpawnpointIdSpecPropertyType();

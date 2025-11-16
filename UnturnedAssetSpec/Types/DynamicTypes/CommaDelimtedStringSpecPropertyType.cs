@@ -5,6 +5,14 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A string containing multiple values separated by a comma.
+/// <para>Example: <c>Asset.INPCCondition.UI_Requirements</c></para>
+/// <code>
+/// Prop 1,2,3,4,5
+/// </code>
+/// </summary>
+/// <remarks>A primitive element type such as Int32 can be defined for diagnostics.</remarks>
 public sealed class CommaDelimitedStringSpecPropertyType :
     BaseSpecPropertyType<string>,
     ISpecPropertyType<string>,

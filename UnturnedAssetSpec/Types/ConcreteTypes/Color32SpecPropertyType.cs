@@ -4,6 +4,23 @@ using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A 32-bit color with only RGB components formatted either as an object or as a hex string.
+/// <para>Component values range between 0 and 255 inclusively.</para>
+/// <para>Example: <c>ItemVehiclePaintToolAsset.PaintColor</c></para>
+/// <code>
+/// Prop #ffffff
+/// 
+/// // or
+/// 
+/// Prop
+/// {
+///     R 255
+///     G 255
+///     B 255
+/// }
+/// </code>
+/// </summary>
 public sealed class Color32RGBSpecPropertyType : Color32SpecPropertyType
 {
     public static readonly Color32RGBSpecPropertyType Instance = new Color32RGBSpecPropertyType();
@@ -25,6 +42,24 @@ public sealed class Color32RGBSpecPropertyType : Color32SpecPropertyType
     private protected override bool HasAlpha => false;
 }
 
+/// <summary>
+/// A 32-bit color with RGBA components formatted either as an object or as a hex string.
+/// <para>Component values range between 0 and 255 inclusively.</para>
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffffff
+/// 
+/// // or
+/// 
+/// Prop
+/// {
+///     R 255
+///     G 255
+///     B 255
+///     A 255
+/// }
+/// </code>
+/// </summary>
 public sealed class Color32RGBASpecPropertyType : Color32SpecPropertyType
 {
     public static readonly Color32RGBASpecPropertyType Instance = new Color32RGBASpecPropertyType();
@@ -44,6 +79,29 @@ public sealed class Color32RGBASpecPropertyType : Color32SpecPropertyType
     private protected override bool HasAlpha => true;
 }
 
+/// <summary>
+/// A 32-bit color with only RGB components formatted either as an object, hex string, or legacy composite object.
+/// <para>Component values range between 0 and 255 inclusively.</para>
+/// <para>Example: <c>ItemGlassesAsset.Nightvision_Color</c></para>
+/// <code>
+/// Prop #ffffff
+/// 
+/// // or
+/// 
+/// Prop
+/// {
+///     R 255
+///     G 255
+///     B 255
+/// }
+///
+/// // or (deprecated)
+///
+/// Prop_R 255
+/// Prop_G 255
+/// Prop_B 255
+/// </code>
+/// </summary>
 public sealed class Color32RGBLegacySpecPropertyType : Color32SpecPropertyType
 {
     public static readonly Color32RGBLegacySpecPropertyType Instance = new Color32RGBLegacySpecPropertyType();
@@ -63,6 +121,31 @@ public sealed class Color32RGBLegacySpecPropertyType : Color32SpecPropertyType
     private protected override bool HasAlpha => false;
 }
 
+/// <summary>
+/// A 32-bit color with RGBA components formatted either as an object, hex string, or legacy composite object.
+/// <para>Component values range between 0 and 255 inclusively.</para>
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffffff
+/// 
+/// // or
+/// 
+/// Prop
+/// {
+///     R 255
+///     G 255
+///     B 255
+///     A 255
+/// }
+///
+/// // or (deprecated)
+///
+/// Prop_R 255
+/// Prop_G 255
+/// Prop_B 255
+/// Prop_A 255
+/// </code>
+/// </summary>
 public sealed class Color32RGBALegacySpecPropertyType : Color32SpecPropertyType
 {
     public static readonly Color32RGBALegacySpecPropertyType Instance = new Color32RGBALegacySpecPropertyType();
@@ -82,6 +165,13 @@ public sealed class Color32RGBALegacySpecPropertyType : Color32SpecPropertyType
     private protected override bool HasAlpha => true;
 }
 
+/// <summary>
+/// A 32-bit color with only RGB components formatted as a strict 7-length hex string.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffff
+/// </code>
+/// </summary>
 public sealed class Color32RGBStrictHexSpecPropertyType : Color32StrictHexSpecPropertyType
 {
     public static readonly Color32RGBStrictHexSpecPropertyType Instance = new Color32RGBStrictHexSpecPropertyType();
@@ -98,6 +188,13 @@ public sealed class Color32RGBStrictHexSpecPropertyType : Color32StrictHexSpecPr
     private protected override bool HasAlpha => true;
 }
 
+/// <summary>
+/// A 32-bit color with RGBA components formatted as a strict 9-length hex string.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffffff
+/// </code>
+/// </summary>
 public sealed class Color32RGBAStrictHexSpecPropertyType : Color32StrictHexSpecPropertyType
 {
     public static readonly Color32RGBAStrictHexSpecPropertyType Instance = new Color32RGBAStrictHexSpecPropertyType();
@@ -114,6 +211,10 @@ public sealed class Color32RGBAStrictHexSpecPropertyType : Color32StrictHexSpecP
     private protected override bool HasAlpha => true;
 }
 
+/// <summary>
+/// Base class for all 32-bit colors.
+/// <para>Component values range between 0 and 255 inclusively.</para>
+/// </summary>
 public abstract class Color32SpecPropertyType : BaseColorSpecPropertyType<Color32SpecPropertyType, Color32>, IStringParseableSpecPropertyType
 {
     /// <inheritdoc />
@@ -317,6 +418,9 @@ public abstract class Color32SpecPropertyType : BaseColorSpecPropertyType<Color3
     }
 }
 
+/// <summary>
+/// Base class for all strict 32-bit colors. See <see cref="M:SDG.Unturned.Palette.hex(string)"/> for more info.
+/// </summary>
 public abstract class Color32StrictHexSpecPropertyType :
     BaseColorSpecPropertyType<Color32StrictHexSpecPropertyType, Color32>,
     IStringParseableSpecPropertyType

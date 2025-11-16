@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
@@ -63,10 +64,10 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
     /// <inheritdoc />
     public override ISpecType? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return ReadType(ref reader, options);
+        return ReadType(AssetSpecDatabase.TryGetDatabaseFromOptions(options), ref reader, options);
     }
 
-    public static ISpecType? ReadType(ref Utf8JsonReader reader, JsonSerializerOptions? options)
+    public static ISpecType? ReadType(IAssetSpecDatabase? database, ref Utf8JsonReader reader, JsonSerializerOptions? options)
     {
         if (reader.TokenType == JsonTokenType.Null)
         {
@@ -180,7 +181,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                     if (reader.TokenType is not JsonTokenType.StartArray)
                         ThrowUnexpectedToken(reader.TokenType, propType);
 
-                    properties = ReadPropertyList(ref reader, options, type, PropertiesProperty, SpecPropertyContext.Property);
+                    properties = ReadPropertyList(database, ref reader, options, type, PropertiesProperty, SpecPropertyContext.Property);
                     break;
 
                 case 7: // Localization
@@ -192,7 +193,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
                     if (reader.TokenType is not JsonTokenType.StartArray)
                         ThrowUnexpectedToken(reader.TokenType, propType);
 
-                    localProperties = ReadPropertyList(ref reader, options, type, LocalizationProperty, SpecPropertyContext.Localization);
+                    localProperties = ReadPropertyList(database, ref reader, options, type, LocalizationProperty, SpecPropertyContext.Localization);
                     break;
 
                 case 8: // StringParseableType
@@ -471,7 +472,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         return list;
     }
 
-    private static SpecProperty[] ReadPropertyList(ref Utf8JsonReader reader, JsonSerializerOptions? options, string? typeName, in JsonEncodedText propertyName, SpecPropertyContext context)
+    private static SpecProperty[] ReadPropertyList(IAssetSpecDatabase? database, ref Utf8JsonReader reader, JsonSerializerOptions? options, string? typeName, in JsonEncodedText propertyName, SpecPropertyContext context)
     {
         List<SpecProperty> list = new List<SpecProperty>(16);
         int index = 0;
@@ -479,7 +480,7 @@ public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
         {
             try
             {
-                SpecProperty? prop = SpecPropertyConverter.ReadProperty(ref reader, options);
+                SpecProperty? prop = SpecPropertyConverter.ReadProperty(database, ref reader, options);
                 if (prop != null)
                 {
                     prop.Context = context;

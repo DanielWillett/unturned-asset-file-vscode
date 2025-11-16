@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
+/// <summary>
+/// Case-sensitivity tools for file paths depending on the operating system.
+/// </summary>
 public static class OSPathHelper
 {
     public static bool IsCaseInsensitive { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ||

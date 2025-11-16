@@ -3,6 +3,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// The unique ID of an NPCOverlapVolume as set in the level editor.
+/// <para>Example: <c>Asset.NPCVolumeOverlapCondition.VolumeID</c></para>
+/// <code>
+/// Prop overlap_give_gun
+/// </code>
+/// </summary>
 public sealed class OverlapVolumeIdSpecPropertyType : BasicSpecPropertyType<OverlapVolumeIdSpecPropertyType, string>
 {
     public static readonly OverlapVolumeIdSpecPropertyType Instance = new OverlapVolumeIdSpecPropertyType();

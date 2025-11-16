@@ -86,6 +86,11 @@ public interface IAssetSpecDatabase
     Task OnInitialize(Func<IAssetSpecDatabase, Task> action);
 }
 
+public interface IAssetSpecDatabaseFacade : IAssetSpecDatabase
+{
+    IAssetSpecDatabase Reference { get; }
+}
+
 public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 {
     public const string Repository = "DanielWillett/unturned-asset-file-vscode";
@@ -152,6 +157,9 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     {
         if (disposing)
         {
+            if (Options != null)
+                OptionsDatabaseLink.Remove(Options);
+
             Interlocked.Exchange(ref _statusJson, null)?.Dispose();
         }
     }
@@ -183,6 +191,15 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         public TaskCompletionSource<int> Task;
     }
 
+    internal static Dictionary<JsonSerializerOptions, IAssetSpecDatabase> OptionsDatabaseLink =
+        new Dictionary<JsonSerializerOptions, IAssetSpecDatabase>(1);
+
+    public static IAssetSpecDatabase? TryGetDatabaseFromOptions(JsonSerializerOptions options)
+    {
+        OptionsDatabaseLink.TryGetValue(options, out IAssetSpecDatabase db);
+        return db;
+    }
+
     public async Task InitializeAsync(CancellationToken token = default)
     {
         IsCacheUpToDate = false;
@@ -196,6 +213,8 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             MaxDepth = 14,
             AllowTrailingCommas = true
         };
+
+        OptionsDatabaseLink[Options] = this;
 
         Options.Converters.Add(new SpecPropertyTypeConverter());
         Options.Converters.Add(new ColorConverter());
@@ -675,6 +694,24 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
             ForEachPropertyWhile(info, prop =>
             {
+                if (prop.Type.IsSwitch)
+                {
+                    SpecDynamicSwitchValue sw = prop.Type.TypeSwitch;
+                    sw.UpdateValues(val =>
+                    {
+                        if (val is not SpecDynamicConcreteValue<ISpecPropertyType>
+                            {
+                                Value: ISecondPassSpecPropertyType sp
+                            }) return val;
+
+                        ISpecPropertyType newType = sp.Transform(prop, wrapper, info.Owner);
+                        return ReferenceEquals(newType, sp)
+                            ? val
+                            : new SpecDynamicConcreteValue<ISpecPropertyType>(newType, SpecPropertyTypeType.Instance);
+                    });
+                    return true;
+                }
+
                 if (prop.Type.Type is not ISecondPassSpecPropertyType s)
                     return true;
 
@@ -1403,7 +1440,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         Dispose(false);
     }
 
-    private class AssetSpecDatabaseWrapper : IAssetSpecDatabase
+    private class AssetSpecDatabaseWrapper : IAssetSpecDatabaseFacade
     {
         private readonly AssetSpecDatabase _db;
 
@@ -1437,11 +1474,20 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         public Task InitializeAsync(CancellationToken token = default) => _db.InitializeAsync(token);
         public void LogMessage(string message) => _db.Log(message);
         public Task OnInitialize(Func<IAssetSpecDatabase, Task> action) => _db.OnInitialize(action);
+        public IAssetSpecDatabase Reference => _db;
     }
 }
 
 public static class AssetSpecDatabaseExtensions
 {
+    /// <summary>
+    /// Gets the original reference if this <paramref name="database"/> is a <see cref="IAssetSpecDatabaseFacade"/>, otherwise just returns the original <paramref name="database"/>.
+    /// </summary>
+    public static IAssetSpecDatabase ResolveFacade(this IAssetSpecDatabase database)
+    {
+        return database is IAssetSpecDatabaseFacade f ? f.Reference : database;
+    }
+
     public static ISpecType? FindType(this IAssetSpecDatabase db, string type, AssetFileType fileType)
     {
         if (db.Types.TryGetValue(new QualifiedType(type, isCaseInsensitive: true), out AssetSpecType? otherAssetType))
@@ -1500,6 +1546,26 @@ public static class AssetSpecDatabaseExtensions
             if (t != null)
             {
                 return t;
+            }
+        }
+
+        return null;
+    }
+
+    public static SkillInfo? FindSkillByName(this IAssetSpecDatabase db, string name)
+    {
+        if (db.Information.Specialities == null)
+            return null;
+
+        foreach (SpecialityInfo? spec in db.Information.Specialities)
+        {
+            if (spec == null)
+                continue;
+
+            foreach (SkillInfo skill in spec.Skills)
+            {
+                if (string.Equals(skill.Skill, name))
+                    return skill;
             }
         }
 

@@ -5,6 +5,14 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A 32 bit integer representing a SteamItemDef_t value (Steam inventory item ID).
+/// <para>Valid values fall between 1 and 999,999,999 inclusively.</para>
+/// <para>Example: <c>ItemBoxAsset.Generate</c></para>
+/// <code>
+/// Prop 52400
+/// </code>
+/// </summary>
 public sealed class SteamItemDefSpecPropertyType : BasicSpecPropertyType<SteamItemDefSpecPropertyType, int>, IStringParseableSpecPropertyType
 {
     public static readonly SteamItemDefSpecPropertyType Instance = new SteamItemDefSpecPropertyType();

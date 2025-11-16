@@ -62,10 +62,6 @@
                     "title": "A regular expression."
                 },
                 {
-                    "const": "FilePathString",
-                    "title": "Zero or more characters of UTF-16 text that represents a file path."
-                },
-                {
                     "const": "RichTextString",
                     "title": "Zero or more characters of UTF-16 text with rich-text tags supported."
                 },
@@ -254,6 +250,10 @@
                     "title": "A UTC date and time."
                 },
                 {
+                    "const": "DateTimeOffset",
+                    "title": "A UTC date and time (parsed as a DateTimeOffset)."
+                },
+                {
                     "const": "Position",
                     "title": "A Vector3 position (X, Y, Z) or object."
                 },
@@ -352,6 +352,10 @@
                 {
                     "const": "Skill",
                     "title": "The name of a skill."
+                },
+                {
+                    "const": "BlueprintSkill",
+                    "title": "The name of a blueprint skill."
                 },
                 {
                     "const": "SkillLevel",
@@ -1585,6 +1589,11 @@
                             "boolean",
                             "null"
                         ]
+                    },
+                    "StringParsableType":
+                    {
+                        "description": "Custom parser type for string value nodes.",
+                        "$ref": "#/$defs/datPropertyType"
                     },
                     "Docs":
                     {

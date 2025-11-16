@@ -5,6 +5,10 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// An included or excluded value. Just the presence of the property counts as a <see langword="true"/> value, even if the value is set to 'False'.
+/// <para>Example: <c>ItemBarricadeAsset.Vulnerable</c></para>
+/// </summary>
 public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropertyType, bool>, IStringParseableSpecPropertyType
 {
     public static readonly FlagSpecPropertyType Instance = new FlagSpecPropertyType();

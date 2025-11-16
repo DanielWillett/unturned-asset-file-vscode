@@ -1,18 +1,44 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A type which couldn't be resolved during the initial deserialization and must be revisited during a second pass.
+/// </summary>
 internal sealed class UnresolvedSpecPropertyType :
     IEquatable<UnresolvedSpecPropertyType>,
     ISecondPassSpecPropertyType
 {
     public string Value { get; }
+    public bool IsKnownType { get; }
+    public string? ElementType { get; }
+    public OneOrMore<string> SpecialTypes { get; }
 
-    public UnresolvedSpecPropertyType(string value)
+    public UnresolvedSpecPropertyType(string value, bool isKnownType = false)
     {
         Value = value;
+        IsKnownType = isKnownType;
+        ElementType = null;
+        SpecialTypes = OneOrMore<string>.Null;
+    }
+
+    public UnresolvedSpecPropertyType(string value, string? elementType)
+    {
+        Value = value;
+        ElementType = elementType;
+        SpecialTypes = OneOrMore<string>.Null;
+        IsKnownType = true;
+    }
+
+    public UnresolvedSpecPropertyType(string value, string? elementType, OneOrMore<string> specialTypes)
+    {
+        Value = value;
+        ElementType = elementType;
+        SpecialTypes = specialTypes;
+        IsKnownType = true;
     }
 
     /// <inheritdoc />
@@ -20,7 +46,9 @@ internal sealed class UnresolvedSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(UnresolvedSpecPropertyType other) =>
-        other != null && string.Equals(Value, other.Value, StringComparison.Ordinal);
+        other != null && string.Equals(Value, other.Value, StringComparison.Ordinal)
+                      && string.Equals(ElementType, other.ElementType, StringComparison.Ordinal)
+                      && SpecialTypes.Equals(other.SpecialTypes, StringComparison.Ordinal);
 
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is UnresolvedSpecPropertyType t && Equals(t);
@@ -49,6 +77,15 @@ internal sealed class UnresolvedSpecPropertyType :
 
     public ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile)
     {
+        if (IsKnownType)
+        {
+            ISpecPropertyType? knownType = KnownTypes.GetType(database, Value, ElementType, SpecialTypes);
+            if (knownType != null)
+                return knownType;
+
+            throw new SpecTypeResolveException($"Failed to resolve type: \"{Value}\".");
+        }
+
         if (property.Owner is ISpecPropertyType specPropertyType && Value.Equals(specPropertyType.Type, StringComparison.Ordinal))
         {
             return specPropertyType;

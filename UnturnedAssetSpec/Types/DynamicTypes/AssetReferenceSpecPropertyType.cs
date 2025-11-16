@@ -1,15 +1,42 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Diagnostics.Contracts;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A reference to one or more types of assets formatted as either a string or sometimes as an object (see <see cref="CanParseDictionary"/>).
+/// Only accepts <see cref="Guid"/> IDs, not <see cref="ushort"/> IDs.
+/// <para>Example: <c>AirdropAsset.Landed_Barricade</c></para>
+/// <code>
+/// // string
+/// Prop fe71781c60314468b22c6b0642a51cd9
+///
+/// // object
+/// Prop
+/// {
+///     GUID fe71781c60314468b22c6b0642a51cd9
+/// }
+///
+/// // this
+/// Prop this
+/// </code>
+/// <para>
+/// Also supports the <c>PreventSelfReference</c> additional property to log a warning if the current asset is referenced.
+/// </para>
+/// <para>
+/// If "this" is one of the element types, the word 'this' will be resolved to the current asset.
+/// </para>
+/// <para>
+/// If an amount is supppled (i.e. "102 x 3") a warning will be logged.
+/// </para>
+/// </summary>
 public sealed class AssetReferenceSpecPropertyType :
     BaseSpecPropertyType<Guid>,
     ISpecPropertyType<Guid>,
@@ -19,9 +46,26 @@ public sealed class AssetReferenceSpecPropertyType :
     IStringParseableSpecPropertyType,
     IValueHoverProviderSpecPropertyType
 {
+    private readonly IAssetSpecDatabase _database;
+
+    /// <summary>
+    /// Other valid asset types.
+    /// </summary>
     public OneOrMore<QualifiedType> OtherElementTypes { get; }
+
+    /// <summary>
+    /// Whether or not objects can be parsed.
+    /// </summary>
     public bool CanParseDictionary { get; }
+
+    /// <summary>
+    /// If the word 'this' can be used to refer to the current asset.
+    /// </summary>
     public bool SupportsThis { get; }
+
+    /// <summary>
+    /// Primary asset type.
+    /// </summary>
     public QualifiedType ElementType { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -64,11 +108,21 @@ public sealed class AssetReferenceSpecPropertyType :
                ^ HashCode.Combine(ElementType, OtherElementTypes);
     }
 
-    public AssetReferenceSpecPropertyType(QualifiedType elementType, bool canParseDictionary, OneOrMore<string> specialTypes)
+    public AssetReferenceSpecPropertyType(IAssetSpecDatabase database, QualifiedType elementType, bool canParseDictionary, OneOrMore<string> specialTypes)
     {
+        _database = database.ResolveFacade();
         CanParseDictionary = canParseDictionary;
 
-        SupportsThis = ExtractThisElementType(ref elementType, ref specialTypes);
+        OtherElementTypes = NormalizeAssetTypes(ref elementType, specialTypes, out bool supportsThis);
+        SupportsThis = supportsThis;
+        ElementType = elementType;
+
+        DisplayName = CreateDisplayName("Asset Reference", ElementType, OtherElementTypes);
+    }
+
+    internal static OneOrMore<QualifiedType> NormalizeAssetTypes(ref QualifiedType elementType, OneOrMore<string> specialTypes, out bool supportsThis)
+    {
+        supportsThis = ExtractThisElementType(ref elementType, ref specialTypes);
 
         if (specialTypes.Contains(QualifiedType.AssetBaseType.Type) || elementType == QualifiedType.AssetBaseType)
         {
@@ -78,58 +132,44 @@ public sealed class AssetReferenceSpecPropertyType :
 
         if (elementType.Type == null || elementType.Equals(QualifiedType.AssetBaseType))
         {
-            ElementType = QualifiedType.AssetBaseType;
-        }
-        else
-        {
-            ElementType = elementType;
+            elementType = QualifiedType.AssetBaseType;
         }
 
-        OtherElementTypes = specialTypes
+        return specialTypes
             .Where(x => !string.IsNullOrEmpty(x))
-            .Select(x => new QualifiedType(x));
+            .Select(x => new QualifiedType(x))
+            .Remove(elementType);
+    }
 
-        if (DisplayName != null)
-            return;
-
-        switch (OtherElementTypes.Length)
+    [Pure]
+    internal static string CreateDisplayName(string typeName, QualifiedType elementType, OneOrMore<QualifiedType> otherElementTypes, string joinWord = "to")
+    {
+        switch (otherElementTypes.Length)
         {
             case 0:
-                if (ElementType == QualifiedType.AssetBaseType)
-                {
-                    DisplayName = "Asset Reference";
-                }
-                else
-                {
-                    DisplayName = $"Asset Reference to {ElementType.GetTypeName()}";
-                }
-                break;
+                return elementType == QualifiedType.AssetBaseType
+                    ? typeName
+                    : $"{typeName} {joinWord} {elementType.GetTypeName()}";
 
             case 1:
-                if (ElementType == QualifiedType.AssetBaseType)
-                {
-                    DisplayName = $"Asset Reference to {OtherElementTypes[0].GetTypeName()}";
-                }
-                else
-                {
-                    DisplayName = $"Asset Reference to {ElementType.GetTypeName()} or {OtherElementTypes[0].GetTypeName()}";
-                }
-                break;
+                return elementType == QualifiedType.AssetBaseType
+                    ? $"{typeName} {joinWord} {otherElementTypes[0].GetTypeName()}"
+                    : $"{typeName} {joinWord} {elementType.GetTypeName()} or {otherElementTypes[0].GetTypeName()}";
 
             default:
-                StringBuilder sb = new StringBuilder("Asset Reference to ");
+                StringBuilder sb = new StringBuilder(typeName).Append(' ').Append(joinWord).Append(' ');
 
                 int ct;
-                if (ElementType != QualifiedType.AssetBaseType)
+                if (elementType != QualifiedType.AssetBaseType)
                 {
-                    sb.Append(ElementType.GetTypeName());
+                    sb.Append(elementType.GetTypeName());
                     ct = 1;
                 }
                 else ct = 0;
-                for (int i = 0; i < OtherElementTypes.Length; i++)
+                for (int i = 0; i < otherElementTypes.Length; i++)
                 {
-                    QualifiedType t = OtherElementTypes[i];
-                    if (ct == OtherElementTypes.Length - 1)
+                    QualifiedType t = otherElementTypes[i];
+                    if (ct == otherElementTypes.Length - 1)
                         sb.Append(ct == 1 ? " or " : ", or ");
                     else if (ct != 0)
                         sb.Append(", ");
@@ -138,8 +178,7 @@ public sealed class AssetReferenceSpecPropertyType :
                     ++ct;
                 }
 
-                DisplayName = sb.ToString();
-                break;
+                return sb.ToString();
         }
     }
 
@@ -205,11 +244,18 @@ public sealed class AssetReferenceSpecPropertyType :
         }
     }
 
+    private bool? _isTypeValid;
+
     /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out Guid value)
     {
-        InverseTypeHierarchy parents = parse.Database.Information.GetParentTypes(ElementType);
-        if (!parents.IsValid)
+        if (!_isTypeValid.HasValue)
+        {
+            InverseTypeHierarchy parents = _database.Information.GetParentTypes(ElementType);
+            _isTypeValid = parents.IsValid;
+        }
+
+        if (!_isTypeValid.Value)
         {
             parse.Log(new DatDiagnosticMessage
             {

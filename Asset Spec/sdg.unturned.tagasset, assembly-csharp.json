@@ -11,7 +11,7 @@
         {
             "Key": "NameColor",
             "Type": "Color32RGB",
-            "DefaultValue": "#ffffff",
+            "DefaultValue": "ffffff",
             "Description": "The preferred text color of the name when displayed in the UI.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html#tag-properties",
             "Priority": 5,

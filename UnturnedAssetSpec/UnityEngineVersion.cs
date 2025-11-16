@@ -6,6 +6,9 @@ using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;
 
+/// <summary>
+/// A comparable data structure storing information about a UnityEngine version number.
+/// </summary>
 [DebuggerDisplay("{Major,nq}.{Minor,nq}.{Build,nq}{Status,nq}{Revision,nq}")]
 [JsonConverter(typeof(UnityEngineVersionConverter))]
 public readonly struct UnityEngineVersion : IEquatable<UnityEngineVersion>, IComparable, IComparable<UnityEngineVersion>, IFormattable

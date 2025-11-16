@@ -6,6 +6,15 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A <see cref="ushort"/> ID that can be left as a negative number to indicate the default value.
+/// Doesn't accept <see cref="Guid"/> IDs.
+/// <para>Example: <c>Asset.NPCItemReward.Sight</c></para>
+/// <code>
+/// Prop -1
+/// Prop 296
+/// </code>
+/// </summary>
 public class DefaultableIdSpecPropertyType :
     BaseSpecPropertyType<int>,
     ISpecPropertyType<int>,

@@ -5,6 +5,14 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A signed 64-bit integer.
+/// <para>Example: <c>Asset.NPCDateCounterCondition.Value</c></para>
+/// <code>
+/// Prop 123
+/// Prop -123
+/// </code>
+/// </summary>
 public sealed class Int64SpecPropertyType : BasicSpecPropertyType<Int64SpecPropertyType, long>, IStringParseableSpecPropertyType
 {
     public static readonly Int64SpecPropertyType Instance = new Int64SpecPropertyType();

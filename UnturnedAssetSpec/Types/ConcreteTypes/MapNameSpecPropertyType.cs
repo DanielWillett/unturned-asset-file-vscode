@@ -3,6 +3,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// The directory name of a map, either installed locally or in workshop.
+/// <para>Example: <c>ItemGunAsset.Magazine_Replacement_#_Map</c></para>
+/// <code>
+/// Prop Washington
+/// </code>
+/// </summary>
 public sealed class MapNameSpecPropertyType : BasicSpecPropertyType<MapNameSpecPropertyType, string>
 {
     public static readonly MapNameSpecPropertyType Instance = new MapNameSpecPropertyType();

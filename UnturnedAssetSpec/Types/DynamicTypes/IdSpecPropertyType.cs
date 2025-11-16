@@ -6,6 +6,20 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A legacy reference to one or more types of assets formatted as a string.
+/// Accepts only <see cref="ushort"/> IDs, not <see cref="Guid"/> IDs.
+/// <para>Example: <c>AnimalAsset.Meat</c></para>
+/// <code>
+/// Prop 1120
+/// </code>
+/// <para>
+/// Also supports the <c>PreventSelfReference</c> additional property to log a warning if the current asset is referenced.
+/// </para>
+/// <para>
+/// If an amount is supppled (i.e. "1120 x 3") a warning will be logged.
+/// </para>
+/// </summary>
 public class IdSpecPropertyType :
     BaseSpecPropertyType<ushort>,
     ISpecPropertyType<ushort>,
@@ -119,6 +133,17 @@ public class IdSpecPropertyType :
             return FailedToParse(in parse, out value);
         }
 
+        if (!parse.HasDiagnostics)
+            return true;
+
+        if (!AssetReferenceSpecPropertyType.GetPreventSelfRef(in parse))
+            return true;
+
+        int category = parse.Database.Information.GetAssetCategory(ElementType, OtherElementTypes);
+        if (category > 0)
+        {
+            AssetReferenceSpecPropertyType.CheckSelfRef(in parse, value, category, strValNode, true);
+        }
         // todo: ID resolution
 
         return true;

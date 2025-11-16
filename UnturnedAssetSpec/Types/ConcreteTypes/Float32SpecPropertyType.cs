@@ -5,6 +5,13 @@ using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
+/// <summary>
+/// A 32-bit single-precision decimal value.
+/// <para>Example: <c>EffectAsset.Lifetime</c></para>
+/// <code>
+/// Prop 123.456
+/// </code>
+/// </summary>
 public sealed class Float32SpecPropertyType : BasicSpecPropertyType<Float32SpecPropertyType, float>, IStringParseableSpecPropertyType
 {
     public static readonly Float32SpecPropertyType Instance = new Float32SpecPropertyType();
