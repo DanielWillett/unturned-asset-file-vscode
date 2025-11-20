@@ -14,7 +14,7 @@
             "Type": "Float32",
             "Minimum": 0.0,
             "DefaultValue": 1.0,
-            "Description": "Multiplier for how quickly deadzones deplete a gasmask’s filter quality. Higher is faster.",
+            "Description": "Multiplier for how quickly deadzones deplete a gasmask's filter quality. Higher is faster.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/mask-asset.html#mask-asset-properties",
             "Variable": "FilterDegradationRateMultiplier",
             "Priority": 3

@@ -12,29 +12,26 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 123
 /// </code>
 /// </summary>
-public sealed class FlagIdSpecPropertyType :
-    BaseSpecPropertyType<ushort>,
-    ISpecPropertyType<ushort>,
-    IEquatable<FlagIdSpecPropertyType?>,
-    IStringParseableSpecPropertyType
+public sealed class FlagIdSpecPropertyType : BasicSpecPropertyType<FlagIdSpecPropertyType, ushort>, IStringParseableSpecPropertyType
 {
+
     public static readonly FlagIdSpecPropertyType Instance = new FlagIdSpecPropertyType();
 
     public override int GetHashCode() => 22;
 
     static FlagIdSpecPropertyType() { }
+    private FlagIdSpecPropertyType() { }
 
-    /// <inheritdoc cref="ISpecPropertyType" />
-    public override string DisplayName => "Flag ID";
-
-    /// <inheritdoc cref="ISpecPropertyType" />
+    /// <inheritdoc />
     public override string Type => "FlagId";
 
     /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
 
     /// <inheritdoc />
-    public Type ValueType => typeof(ushort);
+    public override string DisplayName => "Flag ID";
+
+    protected override ISpecDynamicValue CreateValue(ushort value) => new SpecDynamicConcreteConvertibleValue<ushort>(value, this);
 
     public string? ToString(ISpecDynamicValue value)
     {
@@ -54,41 +51,19 @@ public sealed class FlagIdSpecPropertyType :
         return false;
     }
 
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out ushort val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteConvertibleValue<ushort>(val, this);
-        return true;
-    }
-
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ushort value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out ushort value)
     {
         if (parse.Node == null)
+        {
             return MissingNode(in parse, out value);
+        }
 
-        if (parse.Node is not IValueSourceNode strValNode
-            || !KnownTypeValueHelper.TryParseUInt16(strValNode.Value, out value))
+        if (parse.Node is not IValueSourceNode strValNode || !KnownTypeValueHelper.TryParseUInt16(strValNode.Value, out value))
         {
             return FailedToParse(in parse, out value);
         }
 
         return true;
     }
-
-    /// <inheritdoc />
-    public bool Equals(FlagIdSpecPropertyType? other) => other != null;
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is FlagIdSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<ushort>? other) => other is FlagIdSpecPropertyType t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

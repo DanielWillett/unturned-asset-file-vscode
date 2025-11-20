@@ -204,6 +204,11 @@ public static class KnownTypeValueHelper
         return DateTimeOffset.TryParse(key, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out value);
     }
 
+    public static bool TryParseTimeSpan(string key, out TimeSpan value)
+    {
+        return TimeSpan.TryParse(key, CultureInfo.InvariantCulture, out value);
+    }
+
 
     /// <summary>
     /// Regular expression to check for basic rich text.
@@ -811,7 +816,7 @@ public static class KnownTypeValueHelper
         return false;
     }
 
-    public static bool CheckValidLineBreakOptions(IValueSourceNode node, in SpecPropertyTypeParseContext parse)
+    internal static bool CheckValidLineBreakOptions(IValueSourceNode node, in SpecPropertyTypeParseContext parse)
     {
         return !parse.EvaluationContext.Self.TryGetAdditionalProperty("SupportsNewLines", out bool prop) || !prop
             ? TryGetLineBreakTagLocationForUnexpectedTagWarning(node, in parse)
@@ -822,7 +827,7 @@ public static class KnownTypeValueHelper
     private static readonly Regex AnyLineBreakTagsMatcher =
         new Regex(@"\<\s*br\s*\/{0,1}\s*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    public static bool TryGetLineBreakTagLocationForUnexpectedTagWarning(IValueSourceNode node, in SpecPropertyTypeParseContext parse)
+    internal static bool TryGetLineBreakTagLocationForUnexpectedTagWarning(IValueSourceNode node, in SpecPropertyTypeParseContext parse)
     {
         foreach (Match match in AnyLineBreakTagsMatcher.Matches(node.Value))
         {
@@ -845,7 +850,7 @@ public static class KnownTypeValueHelper
     private static readonly Regex InvalidLineBreakTagsMatcher =
         new Regex(@"\<\s*br\s*\/\s*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    public static bool TryGetLineBreakTagLocationForIncorrectTagWarning(IValueSourceNode node, in SpecPropertyTypeParseContext parse)
+    internal static bool TryGetLineBreakTagLocationForIncorrectTagWarning(IValueSourceNode node, in SpecPropertyTypeParseContext parse)
     {
         string str = node.Value;
 
@@ -887,5 +892,60 @@ public static class KnownTypeValueHelper
             });
         }
         return true;
+    }
+
+    internal static bool TryGetMinimaxCountWarning(int actualCount, in SpecPropertyTypeParseContext parse)
+    {
+        if (!parse.HasDiagnostics)
+            return false;
+
+        ref readonly FileEvaluationContext evalCtx = ref parse.EvaluationContext;
+        if (evalCtx.Self.MinimumCount != null
+            && evalCtx.Self.MinimumCount.TryEvaluateValue(in evalCtx, out int minCount, out bool isNull)
+            && !isNull
+            && actualCount < minCount)
+        {
+            parse.Log(new DatDiagnosticMessage
+            {
+                Range = parse.Node?.Range ?? default,
+                Diagnostic = DatDiagnostics.UNT1024,
+                Message = string.Format(DiagnosticResources.UNT1024_Less, parse.GetParseTargetDisplayName(), minCount)
+            });
+            return true;
+        }
+
+        if (evalCtx.Self.MaximumCount != null
+                 && evalCtx.Self.MaximumCount.TryEvaluateValue(in evalCtx, out int maxCount, out isNull)
+                 && !isNull
+                 && actualCount > maxCount)
+        {
+            parse.Log(new DatDiagnosticMessage
+            {
+                Range = parse.Node?.Range ?? default,
+                Diagnostic = DatDiagnostics.UNT1024,
+                Message = string.Format(DiagnosticResources.UNT1024_More, parse.GetParseTargetDisplayName(), maxCount)
+            });
+            return true;
+        }
+
+        return false;
+    }
+
+    internal static bool TryGetBackslashWarning(string val, in SpecPropertyTypeParseContext parse)
+    {
+        if (!parse.HasDiagnostics)
+            return false;
+
+        if (val.IndexOf('\\') < 0)
+            return false;
+
+        parse.Log(new DatDiagnosticMessage
+        {
+            Range = parse.Node?.Range ?? default,
+            Diagnostic = DatDiagnostics.UNT1010,
+            Message = DiagnosticResources.UNT1010
+        });
+        return true;
+
     }
 }

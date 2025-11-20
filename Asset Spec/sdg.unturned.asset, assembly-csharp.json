@@ -86,7 +86,8 @@
             "Description": "Includes the file name in the bundle path, so if you have an asset that isn't in it's own folder, use this property for the correct bundle path.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
             "DefaultValue": false,
-            "Priority": -2
+            "Priority": -2,
+            "ExclusiveWith": [ "Bundle_Override_Path" ]
         },
         {
             "Key": "Asset_Bundle_Version",

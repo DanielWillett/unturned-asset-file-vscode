@@ -5,35 +5,32 @@ using System;
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 /// <summary>
-/// A string that doesn't support rich text tags.
-/// <para>Example: <c>$local$::ItemAsset.Name</c></para>
+/// A path string such as a Unity asset path.
+/// <para>Example: <c>ItemSightAsset.AimAlignment_Path</c></para>
 /// <code>
-/// Prop Plain Text
+/// Prop Model_0/Aim
 /// </code>
-/// <para>
-/// Supports the <c>SupportsNewLines</c> additional property which indicates whether or not &lt;br&gt; tags can be used.
-/// </para>
 /// <para>
 /// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for character count limits.
 /// </para>
 /// </summary>
-public sealed class StringSpecPropertyType : BasicSpecPropertyType<StringSpecPropertyType, string>, IStringParseableSpecPropertyType
+public sealed class PathSpecPropertyType : BasicSpecPropertyType<PathSpecPropertyType, string>, IStringParseableSpecPropertyType
 {
-    public static readonly StringSpecPropertyType Instance = new StringSpecPropertyType();
+    public static readonly PathSpecPropertyType Instance = new PathSpecPropertyType();
 
-    public override int GetHashCode() => 49;
+    public override int GetHashCode() => 90;
 
-    static StringSpecPropertyType() { }
-    private StringSpecPropertyType() { }
+    static PathSpecPropertyType() { }
+    private PathSpecPropertyType() { }
 
     /// <inheritdoc />
-    public override string Type => "String";
+    public override string Type => "Path";
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.String;
 
     /// <inheritdoc />
-    public override string DisplayName => "Text";
+    public override string DisplayName => "Path";
 
     protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
@@ -55,23 +52,15 @@ public sealed class StringSpecPropertyType : BasicSpecPropertyType<StringSpecPro
             return FailedToParse(in parse, out value);
         }
 
+        string val = strValNode.Value;
+
         if (parse.HasDiagnostics)
         {
-            KnownTypeValueHelper.TryGetMinimaxCountWarning(strValNode.Value.Length, in parse);
-            KnownTypeValueHelper.CheckValidLineBreakOptions(strValNode, in parse);
-
-            if (KnownTypeValueHelper.ContainsRichText(strValNode.Value))
-            {
-                parse.Log(new DatDiagnosticMessage
-                {
-                    Range = strValNode.Range,
-                    Diagnostic = DatDiagnostics.UNT1006,
-                    Message = DiagnosticResources.UNT1006
-                });
-            }
+            KnownTypeValueHelper.TryGetMinimaxCountWarning(val.Length, in parse);
+            KnownTypeValueHelper.TryGetBackslashWarning(val, in parse);
         }
 
-        value = strValNode.Value;
+        value = val;
         return true;
     }
 

@@ -310,7 +310,7 @@
             "Key": "Skin_Override",
             "Type": "String",
             "Variable": "skinOverride",
-            "Description": "Optional name of a renderer that should use the player’s skin material.",
+            "Description": "Optional name of a renderer that should use the player's skin material.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/clothing-asset.html#skin-override-string",
             "DefaultValue": null
         }

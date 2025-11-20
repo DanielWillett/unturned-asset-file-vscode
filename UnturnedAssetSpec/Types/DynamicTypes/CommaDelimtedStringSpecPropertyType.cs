@@ -11,6 +11,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <code>
 /// Prop 1,2,3,4,5
 /// </code>
+/// <para>
+/// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for list element count limits.
+/// </para>
 /// </summary>
 /// <remarks>A primitive element type such as Int32 can be defined for diagnostics.</remarks>
 public sealed class CommaDelimitedStringSpecPropertyType :
@@ -142,6 +145,7 @@ public sealed class CommaDelimitedStringSpecPropertyType :
             int lastIndex = -1;
             FilePosition start = stringNode.Range.Start, end = stringNode.Range.End;
             int index = 0;
+
             while (lastIndex + 1 < values.Length)
             {
                 int commaIndex = values.IndexOf(',', lastIndex + 1);
@@ -190,6 +194,8 @@ public sealed class CommaDelimitedStringSpecPropertyType :
 
                 lastIndex = commaIndex;
             }
+
+            KnownTypeValueHelper.TryGetMinimaxCountWarning(index, in parse);
         }
     }
 

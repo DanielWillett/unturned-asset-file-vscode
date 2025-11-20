@@ -390,14 +390,21 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     }
 
     /// <inheritdoc />
-    public override string ToString()
+    public override string ToString() => ToString(true);
+    public string ToString(bool rootSlash, string? property = null)
     {
         if (_sections == null || _sections.Length == 0)
-            return "/";
+        {
+            if (property != null)
+                return rootSlash ? "/" + property : property;
+            return rootSlash ? "/" : string.Empty;
+        }
 
         if (_sections.Length == 1)
         {
-            return "/" + _sections[0] + "/";
+            if (property != null)
+                return rootSlash ? ("/" + _sections[0] + "/" + property) : (_sections[0] + "/" + property);
+            return rootSlash ? ("/" + _sections[0] + "/") : (_sections[0] + "/");
         }
 
         StringBuilder sb = new StringBuilder(_sections.Length * 16);
@@ -408,7 +415,9 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
         }
 
         sb.Append('/');
-        return sb.ToString();
+        if (property != null)
+            sb.Append(property);
+        return rootSlash ? sb.ToString() : sb.ToString(1, sb.Length - 1);
     }
 }
 

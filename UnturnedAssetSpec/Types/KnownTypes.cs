@@ -31,6 +31,7 @@ public static class KnownTypes
         { "Int32", () => Int32 },
         { "Int64", () => Int64 },
         { "String", () => String },
+        { "Path", () => Path },
         { "RegEx", () => RegEx },
         { "RichTextString", () => RichTextString },
         { "Character", () => Character },
@@ -61,6 +62,7 @@ public static class KnownTypes
         { "FlagId", () => FlagId },
         { "NPCAchievementId", () => NPCAchievementId },
         { "DateTime", () => DateTime },
+        { "TimeSpan", () => TimeSpan },
         { "DateTimeOffset", () => DateTimeOffset },
         { "Position", () => Position },
         { "PositionOrLegacy", () => PositionOrLegacy },
@@ -71,6 +73,7 @@ public static class KnownTypes
         { "EulerRotation", () => EulerRotation },
         { "EulerRotationOrLegacy", () => EulerRotationOrLegacy },
         { "LegacyEulerRotation", () => LegacyEulerRotation },
+        { "Vector2", () => Vector2 },
         { "MasterBundleName", () => MasterBundleName },
         { "LegacyBundleName", () => LegacyBundleName },
         { "AssetBundleVersion", () => AssetBundleVersion },
@@ -450,6 +453,7 @@ public static class KnownTypes
     public static ISpecPropertyType<long> Int64 => Int64SpecPropertyType.Instance;
 
     public static ISpecPropertyType<string> String => StringSpecPropertyType.Instance;
+    public static ISpecPropertyType<string> Path => PathSpecPropertyType.Instance;
     public static ISpecPropertyType<string> RegEx => StringSpecPropertyType.Instance; // todo
 
     //public static ISpecPropertyType<string> FilePathString(string? globPattern = null) =>
@@ -532,6 +536,7 @@ public static class KnownTypes
     public static ISpecPropertyType<string> NPCAchievementId => NPCAchievementIdSpecPropertyType.Instance;
 
     public static ISpecPropertyType<DateTime> DateTime => DateTimeSpecPropertyType.Instance;
+    public static ISpecPropertyType<TimeSpan> TimeSpan => TimeSpanSpecPropertyType.Instance;
     public static ISpecPropertyType<DateTimeOffset> DateTimeOffset => DateTimeOffsetSpecPropertyType.Instance;
 
     public static ISpecPropertyType<Vector3> Position => PositionSpecPropertyType.Instance;
@@ -545,6 +550,7 @@ public static class KnownTypes
     public static ISpecPropertyType<Vector3> EulerRotation => EulerRotationSpecPropertyType.Instance;
     public static ISpecPropertyType<Vector3> EulerRotationOrLegacy => EulerRotationOrLegacySpecPropertyType.Instance;
     public static ISpecPropertyType<Vector3> LegacyEulerRotation => LegacyEulerRotationSpecPropertyType.Instance;
+    public static ISpecPropertyType<Vector2> Vector2 => Vector2SpecPropertyType.Instance;
 
     public static ISpecPropertyType<string> CommaDelimitedString(ISpecPropertyType innerType)
         => new CommaDelimitedStringSpecPropertyType(innerType ?? throw new ArgumentNullException(nameof(innerType)));

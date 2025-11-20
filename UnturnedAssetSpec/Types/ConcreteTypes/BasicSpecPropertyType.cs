@@ -22,6 +22,12 @@ public abstract class BasicSpecPropertyType<TSpecPropertyType, TValue> :
 
     public virtual bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
+        if (parse.EvaluationContext.Self?.Owner is { OverridableProperties: true } && parse.Node == null)
+        {
+            value = parse.EvaluationContext.Self.DefaultValue!;
+            return value != null;
+        }
+
         if (!TryParseValue(in parse, out TValue? val))
         {
             value = null!;
@@ -42,15 +48,23 @@ public abstract class BasicSpecPropertyType<TSpecPropertyType, TValue> :
 
     private protected BasicSpecPropertyType() { }
 
-    public bool Equals(ISpecPropertyType? other) => other is BasicSpecPropertyType<TSpecPropertyType, TValue>;
-    public bool Equals(ISpecPropertyType<TValue>? other) => other is BasicSpecPropertyType<TSpecPropertyType, TValue>;
+    public bool Equals(ISpecPropertyType? other) => other is BasicSpecPropertyType<TSpecPropertyType, TValue> bs && Equals(bs);
+    public bool Equals(ISpecPropertyType<TValue>? other) => other is BasicSpecPropertyType<TSpecPropertyType, TValue> bs && Equals(bs);
     
-    public bool Equals(BasicSpecPropertyType<TSpecPropertyType, TValue>? other) => other != null;
+    public bool Equals(BasicSpecPropertyType<TSpecPropertyType, TValue>? other)
+    {
+        if (this is IEquatable<TSpecPropertyType> equatable)
+        {
+            return other is TSpecPropertyType ts && equatable.Equals(ts);
+        }
+
+        return other != null;
+    }
 
     /// <inheritdoc />
     public abstract bool TryParseValue(in SpecPropertyTypeParseContext parse, out TValue? value);
 
-    public override bool Equals(object? obj) => obj is BasicSpecPropertyType<TSpecPropertyType, TValue>;
+    public override bool Equals(object? obj) => obj is BasicSpecPropertyType<TSpecPropertyType, TValue> bs && Equals(bs);
     public override int GetHashCode() => Type.GetHashCode();
     public override string ToString() => Type;
 

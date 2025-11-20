@@ -258,4 +258,10 @@
   <data name="UNT1018_TranslationReference" xml:space="preserve">
     <value>The Translation Reference format is no longer supported by Unturned.</value>
   </data>
+  <data name="UNT1024_More" xml:space="preserve">
+    <value>Property "{0}" should not contain more than {1} element(s).</value>
+  </data>
+  <data name="UNT1024_Less" xml:space="preserve">
+    <value>Property "{0}" should must contain at least {1} element(s).</value>
+  </data>
 </root>

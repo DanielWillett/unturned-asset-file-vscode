@@ -18,6 +18,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <para>
 /// Supports the <c>SupportsNewLines</c> additional property which indicates whether or not &lt;br&gt; tags can be used.
 /// </para>
+/// <para>
+/// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for character count limits.
+/// </para>
 /// </summary>
 public sealed class FormatStringSpecPropertyType : BasicSpecPropertyType<FormatStringSpecPropertyType, string>, IStringParseableSpecPropertyType
 {
@@ -86,6 +89,7 @@ public sealed class FormatStringSpecPropertyType : BasicSpecPropertyType<FormatS
 
         if (parse.HasDiagnostics)
         {
+            KnownTypeValueHelper.TryGetMinimaxCountWarning(strValNode.Value.Length, in parse);
             KnownTypeValueHelper.CheckValidLineBreakOptions(strValNode, in parse);
 
             if (!AllowRichText && KnownTypeValueHelper.ContainsRichText(strValNode.Value))

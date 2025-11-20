@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -1631,6 +1632,7 @@ public static class AssetSpecDatabaseExtensions
     /// <summary>
     /// Searches for a property by the key entered into a document and it's type.
     /// </summary>
+    /// <returns>Information about the property key match, or <see langword="default"/> if the key didn't match.</returns>
     public static PropertyFindResult FindPropertyInfoByKey(this IAssetSpecDatabase db, string key, ISpecType fileType, PropertyResolutionContext resolutionContext, bool requireCanBeInMetadata = false, SpecPropertyContext context = SpecPropertyContext.Property)
     {
         if (context is not SpecPropertyContext.Localization and not SpecPropertyContext.Property and not SpecPropertyContext.BundleAsset)
@@ -1656,117 +1658,158 @@ public static class AssetSpecDatabaseExtensions
             Property = null
         };
 
-        static PropertyFindResult SearchForProperty(ISpecType type, ISpecType originalType, string key, Span<int> templateParse, SpecPropertyContext context, PropertyResolutionContext resolutionContext, bool requireMetadata)
+    }
+
+    /// <summary>
+    /// Figures out how the given key matches a property, if it does at all. I.e. which alias it matches, etc. Useful for normalizing property names.
+    /// </summary>
+    /// <param name="prop">The property.</param>
+    /// <param name="key">The user-entered key.</param>
+    /// <param name="context">The context from which the property was defined.</param>
+    /// <returns>Information about the property key match, or <see langword="default"/> if the key didn't match.</returns>
+    public static PropertyFindResult GetPropertyKeyInfo(SpecProperty prop, string key, PropertyResolutionContext context)
+    {
+        Span<int> output = stackalloc int[_maxTemplateProcessorCount];
+        PropertyFindResult result = default;
+
+        if (TryMatchProperty(prop, ref result, output, null, null, key, SpecPropertyContext.Unspecified, context, false))
         {
-            SpecProperty[] properties = type.GetProperties(context);
-            scoped Span<int> output = templateParse;
-            for (int i = 0; i < properties.Length; ++i)
+            return result;
+        }
+
+        return default;
+    }
+
+    private static bool TryMatchProperty(SpecProperty prop, ref PropertyFindResult result, scoped Span<int> output, ISpecType? type, ISpecType? originalType, string key, SpecPropertyContext context, PropertyResolutionContext resolutionContext, bool requireMetadata)
+    {
+        if (prop.IsHidden)
+            return false;
+
+        if (requireMetadata && !prop.CanBeInMetadata)
+            return false;
+
+        if (type != null && originalType != null && prop.TryGetImportType(out IPropertiesSpecType importType) && !ReferenceEquals(originalType, importType))
+        {
+            PropertyFindResult importedProperty = SearchForProperty(type, originalType, key, output, context, resolutionContext, requireMetadata);
+            if (importedProperty.Property != null)
             {
-                SpecProperty prop = properties[i];
-                if (prop.IsHidden)
-                    continue;
-
-                if (requireMetadata && !prop.CanBeInMetadata)
-                    continue;
-             
-                if (prop.TryGetImportType(out IPropertiesSpecType importType) && !ReferenceEquals(originalType, importType))
-                {
-                    PropertyFindResult importedProperty = SearchForProperty(type, originalType, key, templateParse, context, resolutionContext, requireMetadata);
-                    if (importedProperty.Property != null)
-                        return importedProperty;
-                    
-                    continue;
-                }
-
-                if (!prop.IsTemplate)
-                {
-                    if (SourceNodeExtensions.FilterMatches(prop.KeyLegacyExpansionFilter, resolutionContext) && prop.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return new PropertyFindResult
-                        {
-                            Indices = OneOrMore<int>.Null,
-                            Key = prop.Key,
-                            Property = prop,
-                            Alias = -1
-                        };
-                    }
-
-                    for (int aliasIndex = 0; aliasIndex < prop.Aliases.Length; ++aliasIndex)
-                    {
-                        Alias alias = prop.Aliases[aliasIndex];
-
-                        if (!SourceNodeExtensions.FilterMatches(alias.Filter, resolutionContext)
-                            || !alias.Value.Equals(key, StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
-                        return new PropertyFindResult
-                        {
-                            Indices = OneOrMore<int>.Null,
-                            Key = alias.Value,
-                            Alias = aliasIndex,
-                            Property = prop
-                        };
-                    }
-
-                    continue;
-                }
-
-                int expectedCount;
-                if (SourceNodeExtensions.FilterMatches(prop.KeyLegacyExpansionFilter, resolutionContext))
-                {
-                    expectedCount = prop.KeyTemplateProcessor.TemplateCount;
-                    if (output.Length < expectedCount)
-                    {
-                        _maxTemplateProcessorCount = expectedCount;
-                        // ReSharper disable once StackAllocInsideLoop
-                        output = stackalloc int[expectedCount];
-                    }
-
-                    if (prop.KeyTemplateProcessor.TryParseKeyValues(key.AsSpan(), output, StringComparison.OrdinalIgnoreCase))
-                    {
-                        ReadOnlySpan<int> indicies = output.Slice(0, expectedCount);
-                        return new PropertyFindResult
-                        {
-                            Indices = [.. indicies],
-                            Key = prop.KeyTemplateProcessor.CreateKey(key, indicies),
-                            Property = prop,
-                            Alias = -1
-                        };
-                    }
-                }
-
-                for (int aliasIndex = 0; aliasIndex < prop.Aliases.Length; ++aliasIndex)
-                {
-                    if (!SourceNodeExtensions.FilterMatches(prop.Aliases[aliasIndex].Filter, resolutionContext))
-                        continue;
-
-                    TemplateProcessor p = prop.GetAliasTemplateProcessor(aliasIndex);
-                    expectedCount = p.TemplateCount;
-                    if (output.Length < expectedCount)
-                    {
-                        _maxTemplateProcessorCount = expectedCount;
-                        // ReSharper disable once StackAllocInsideLoop
-                        output = stackalloc int[expectedCount];
-                    }
-
-                    if (!p.TryParseKeyValues(key.AsSpan(), output, StringComparison.OrdinalIgnoreCase))
-                        continue;
-
-                    ReadOnlySpan<int> indicies = output.Slice(0, expectedCount);
-                    return new PropertyFindResult
-                    {
-                        Indices = [ ..indicies ],
-                        Key = p.CreateKey(key, indicies),
-                        Property = prop,
-                        Alias = aliasIndex
-                    };
-                }
+                result = importedProperty;
+                return true;
             }
 
-            return default;
+            return false;
         }
+        
+        if (prop.IsImport)
+            return false;
+        
+        if (!prop.IsTemplate)
+        {
+            if (SourceNodeExtensions.FilterMatches(prop.KeyLegacyExpansionFilter, resolutionContext) && prop.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
+            {
+                result = new PropertyFindResult
+                {
+                    Indices = OneOrMore<int>.Null,
+                    Key = prop.Key,
+                    Property = prop,
+                    Alias = -1
+                };
+                return true;
+            }
+
+            for (int aliasIndex = 0; aliasIndex < prop.Aliases.Length; ++aliasIndex)
+            {
+                Alias alias = prop.Aliases[aliasIndex];
+
+                if (!SourceNodeExtensions.FilterMatches(alias.Filter, resolutionContext)
+                    || !alias.Value.Equals(key, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                result = new PropertyFindResult
+                {
+                    Indices = OneOrMore<int>.Null,
+                    Key = alias.Value,
+                    Alias = aliasIndex,
+                    Property = prop
+                };
+                return true;
+            }
+
+            return false;
+        }
+
+        int expectedCount;
+        if (SourceNodeExtensions.FilterMatches(prop.KeyLegacyExpansionFilter, resolutionContext))
+        {
+            expectedCount = prop.KeyTemplateProcessor.TemplateCount;
+            if (output.Length < expectedCount)
+            {
+                _maxTemplateProcessorCount = expectedCount;
+                // ReSharper disable once StackAllocInsideLoop
+                output = stackalloc int[expectedCount];
+            }
+
+            if (prop.KeyTemplateProcessor.TryParseKeyValues(key.AsSpan(), output, StringComparison.OrdinalIgnoreCase))
+            {
+                ReadOnlySpan<int> indicies = output.Slice(0, expectedCount);
+                result = new PropertyFindResult
+                {
+                    Indices = [.. indicies],
+                    Key = prop.KeyTemplateProcessor.CreateKey(key, indicies),
+                    Property = prop,
+                    Alias = -1
+                };
+                return true;
+            }
+        }
+
+        for (int aliasIndex = 0; aliasIndex < prop.Aliases.Length; ++aliasIndex)
+        {
+            if (!SourceNodeExtensions.FilterMatches(prop.Aliases[aliasIndex].Filter, resolutionContext))
+                continue;
+
+            TemplateProcessor p = prop.GetAliasTemplateProcessor(aliasIndex);
+            expectedCount = p.TemplateCount;
+            if (output.Length < expectedCount)
+            {
+                _maxTemplateProcessorCount = expectedCount;
+                // ReSharper disable once StackAllocInsideLoop
+                output = stackalloc int[expectedCount];
+            }
+
+            if (!p.TryParseKeyValues(key.AsSpan(), output, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            ReadOnlySpan<int> indicies = output.Slice(0, expectedCount);
+            result = new PropertyFindResult
+            {
+                Indices = [.. indicies],
+                Key = p.CreateKey(key, indicies),
+                Property = prop,
+                Alias = aliasIndex
+            };
+            return true;
+        }
+
+        return false;
+    }
+
+    private static PropertyFindResult SearchForProperty(ISpecType type, ISpecType originalType, string key, Span<int> templateParse, SpecPropertyContext context, PropertyResolutionContext resolutionContext, bool requireMetadata)
+    {
+        SpecProperty[] properties = type.GetProperties(context);
+        PropertyFindResult result = default;
+        for (int i = 0; i < properties.Length; ++i)
+        {
+            SpecProperty prop = properties[i];
+            if (!TryMatchProperty(prop, ref result, templateParse, type, originalType, key, context, resolutionContext, requireMetadata))
+                continue;
+
+            return result;
+        }
+
+        return default;
     }
 
     /// <summary>

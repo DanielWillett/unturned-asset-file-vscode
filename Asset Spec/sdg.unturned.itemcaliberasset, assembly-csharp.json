@@ -99,7 +99,7 @@
             "Key": "Firerate",
             "Type": "Int32",
             "DefaultValue": 0,
-            "Description": "The value of the attached ranged weapon’s @(SDG.Unturned.ItemGunAsset, Assembly-CSharp::Firerate) property is reduced by the value of this property. A larger decrease will allow for the ranged weapon to fire more often.",
+            "Description": "The value of the attached ranged weapon's @(SDG.Unturned.ItemGunAsset, Assembly-CSharp::Firerate) property is reduced by the value of this property. A larger decrease will allow for the ranged weapon to fire more often.",
             "Variable": "FirerateOffset",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#firerate-uint8-0",
             "Priority": 2
@@ -172,7 +172,7 @@
             "Key": "Destroy_Attachment_Colliders",
             "Type": "Boolean",
             "DefaultValue": true,
-            "Description": "When false, colliders are not destroyed when the attached ranged weapon’s colliders are destroyed.",
+            "Description": "When false, colliders are not destroyed when the attached ranged weapon's colliders are destroyed.",
             "Variable": "shouldDestroyAttachmentColliders",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#destroy-attachment-colliders-bool-true",
             "Priority": 1

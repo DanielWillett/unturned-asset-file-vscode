@@ -31,6 +31,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 ///     Mode Add
 /// }
 /// </code>
+/// <para>
+/// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for list element count limits.
+/// </para>
 /// </summary>
 public sealed class ListSpecPropertyType<TElementType> :
     BaseSpecPropertyType<EquatableArray<TElementType>>,
@@ -39,7 +42,6 @@ public sealed class ListSpecPropertyType<TElementType> :
     IListTypeSpecPropertyType
     where TElementType : IEquatable<TElementType>
 {
-
     public bool AllowSingle { get; }
 
     /// <inheritdoc cref="ISpecPropertyType" />
@@ -93,50 +95,60 @@ public sealed class ListSpecPropertyType<TElementType> :
             return MissingNode(in parse, out value);
         }
 
+        int suppliedCount;
+        bool parsedAll = true;
         if (parse.Node is not IListSourceNode listNode)
         {
             if (!AllowSingle)
                 return FailedToParse(in parse, out value);
 
+            suppliedCount = 1;
             if (!TryParseElement(parse.Node, parse.Parent, in parse, out TElementType element))
             {
                 value = EquatableArray<TElementType>.Empty;
-                return false;
-            }
-
-            value = new EquatableArray<TElementType>(new TElementType[] { element });
-            return true;
-        }
-
-        ImmutableArray<ISourceNode> children = listNode.Children;
-        EquatableArray<TElementType> eqArray = new EquatableArray<TElementType>(children.Length);
-
-        bool parsedAll = true;
-        int index = 0;
-        foreach (ISourceNode node in children)
-        {
-            if (node is not IAnyValueSourceNode anyVal)
-                continue;
-
-            if (!TryParseElement(anyVal, listNode, in parse, out TElementType element))
-            {
-                value = eqArray;
                 parsedAll = false;
             }
             else
             {
-                eqArray.Array[index] = element;
+                value = new EquatableArray<TElementType>(new TElementType[] { element });
+            }
+        }
+        else
+        {
+            ImmutableArray<ISourceNode> children = listNode.Children;
+            EquatableArray<TElementType> eqArray = new EquatableArray<TElementType>(children.Length);
+            
+            suppliedCount = children.Length;
+
+            int index = 0;
+            foreach (ISourceNode node in children)
+            {
+                if (node is not IAnyValueSourceNode anyVal)
+                    continue;
+
+                if (!TryParseElement(anyVal, listNode, in parse, out TElementType element))
+                {
+                    value = eqArray;
+                    parsedAll = false;
+                }
+                else
+                {
+                    eqArray.Array[index] = element;
+                }
+
+                ++index;
             }
 
-            ++index;
+            if (index < eqArray.Array.Length)
+            {
+                eqArray = new EquatableArray<TElementType>(eqArray.Array, index);
+            }
+
+            value = eqArray;
         }
 
-        if (index < eqArray.Array.Length)
-        {
-            eqArray = new EquatableArray<TElementType>(eqArray.Array, index);
-        }
+        KnownTypeValueHelper.TryGetMinimaxCountWarning(suppliedCount, in parse);
 
-        value = eqArray;
         return parsedAll;
     }
 

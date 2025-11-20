@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -20,6 +21,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <para>
 /// Has support for the <c>KeyEnumType</c> property which enables enum auto-completion for keys.
 /// When using that property, <c>KeyAllowExtraValues</c> can be used to indicate that invalid enum values shouldn't raise warnings.
+/// </para>
+/// <para>
+/// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for property count limits.
 /// </para>
 /// </summary>
 // todo: support for KeyEnumType, KeyAllowExtraValues
@@ -87,11 +91,12 @@ public sealed class DictionarySpecPropertyType<TElementType> :
             return FailedToParse(in parse, out value);
         }
 
-        EquatableArray<DictionaryPair<TElementType>> eqArray = new EquatableArray<DictionaryPair<TElementType>>(dictNode.Children.Length);
+        ImmutableArray<ISourceNode> children = dictNode.Children;
+        EquatableArray<DictionaryPair<TElementType>> eqArray = new EquatableArray<DictionaryPair<TElementType>>(children.Length);
 
         bool parsedAll = true;
         int index = 0;
-        foreach (ISourceNode node in dictNode.Children)
+        foreach (ISourceNode node in children)
         {
             if (node is not IPropertySourceNode property)
                 continue;
@@ -127,6 +132,8 @@ public sealed class DictionarySpecPropertyType<TElementType> :
 
             ++index;
         }
+
+        KnownTypeValueHelper.TryGetMinimaxCountWarning(children.Length, in parse);
 
         if (index < eqArray.Array.Length)
         {

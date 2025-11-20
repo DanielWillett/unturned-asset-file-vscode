@@ -34,6 +34,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Supports the <c>LocalizationKeyOverride</c> additional property which
 /// overrides the localization key when used on a non-target asset property.
 /// </para>
+/// <para>
+/// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for character count limits.
+/// </para>
 /// </summary>
 public sealed class LocalizableStringSpecPropertyType : BasicSpecPropertyType<LocalizableStringSpecPropertyType, string>
 {
@@ -119,6 +122,7 @@ public sealed class LocalizableStringSpecPropertyType : BasicSpecPropertyType<Lo
 
             if (parse.HasDiagnostics)
             {
+                KnownTypeValueHelper.TryGetMinimaxCountWarning(strValNode.Value.Length, in parse);
                 KnownTypeValueHelper.CheckValidLineBreakOptions(strValNode, in parse);
             }
         }

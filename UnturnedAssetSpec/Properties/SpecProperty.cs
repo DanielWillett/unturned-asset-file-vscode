@@ -178,6 +178,16 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     public ISpecDynamicValue? MinimumValue { get; set; }
 
     /// <summary>
+    /// The minimum number of values in this property if it's a list or dictionary.
+    /// </summary>
+    public ISpecDynamicValue? MinimumCount { get; set; }
+
+    /// <summary>
+    /// The maximum number of values in this property if it's a list or dictionary.
+    /// </summary>
+    public ISpecDynamicValue? MaximumCount { get; set; }
+
+    /// <summary>
     /// If <see cref="MinimumValue"/> is an exclusive minimum.
     /// </summary>
     public bool IsMinimumValueExclusive { get; set; }
@@ -221,7 +231,7 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     /// <summary>
     /// The type that this property is a part of.
     /// </summary>
-    public ISpecType Owner { get; set; }
+    public IPropertiesSpecType Owner { get; set; }
 
 #nullable restore
 
@@ -252,6 +262,10 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
             MinimumValue = process(MinimumValue);
         if (MaximumValue != null)
             MaximumValue = process(MaximumValue);
+        if (MinimumCount != null)
+            MinimumCount = process(MinimumCount);
+        if (MaximumCount != null)
+            MaximumCount = process(MaximumCount);
 
         foreach (ISpecDynamicValue value in Exceptions)
         {
@@ -373,6 +387,8 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(RequiredCondition, other.RequiredCondition)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(DefaultValue, other.DefaultValue)
               || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(IncludedDefaultValue, other.IncludedDefaultValue)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(MinimumCount, other.MinimumCount)
+              || !EqualityComparer<ISpecDynamicValue?>.Default.Equals(MaximumCount, other.MaximumCount)
               || !TemplateGroups.Equals(other.TemplateGroups)
               || !EqualityComparer<ISpecType?>.Default.Equals(Owner, other.Owner)
               || Priority != other.Priority
@@ -447,6 +463,8 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
         IsMinimumValueExclusive = IsMinimumValueExclusive,
         MaximumValue = MaximumValue,
         MinimumValue = MinimumValue,
+        MaximumCount = MaximumCount,
+        MinimumCount = MinimumCount,
         Parent = Parent,
         Variable = Variable,
         _keyTemplateProcessor = _keyTemplateProcessor,

@@ -105,4 +105,16 @@ public readonly ref struct SpecPropertyTypeParseContext
 
         return new GuidOrId(id.Value, assetSourceFile.Category);
     }
+
+    public string GetParseTargetDisplayName()
+    {
+        if (EvaluationContext.Self != null && Parent is IPropertySourceNode prop)
+        {
+            AssetSpecDatabaseExtensions.PropertyFindResult result
+                = AssetSpecDatabaseExtensions.GetPropertyKeyInfo(EvaluationContext.Self, prop.Key, EvaluationContext.PropertyContext);
+            return Breadcrumbs.ToString(false, result.Key ?? EvaluationContext.Self.Key);
+        }
+
+        return Breadcrumbs.ToString(false);
+    }
 }

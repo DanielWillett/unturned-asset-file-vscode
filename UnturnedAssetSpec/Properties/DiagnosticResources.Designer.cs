@@ -358,6 +358,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; should must contain at least {1} element(s)..
+        /// </summary>
+        internal static string UNT1024_Less {
+            get {
+                return ResourceManager.GetString("UNT1024_Less", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; should not contain more than {1} element(s)..
+        /// </summary>
+        internal static string UNT1024_More {
+            get {
+                return ResourceManager.GetString("UNT1024_More", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type {0} is unknown and may not be assignable to &apos;{1}&apos;..
         /// </summary>
         internal static string UNT103 {

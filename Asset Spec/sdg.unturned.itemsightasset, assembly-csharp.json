@@ -201,9 +201,9 @@
         },
         {
             "Key": "AimAlignment_Path",
-            "Type": "String",
+            "Type": "Path",
             "DefaultValue": "Model_0/Aim",
-            "Description": "While aiming down sights, the camera’s position is aligned with this transform. Relative to @AimAlignment_Owner.",
+            "Description": "While aiming down sights, the camera's position is aligned with this transform. Relative to @AimAlignment_Owner.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#aimalignment-owner-eaimalignmenttransformowner-sight",
             "Variable": "AimAlignmentTransformOwner",
             "Priority": 5

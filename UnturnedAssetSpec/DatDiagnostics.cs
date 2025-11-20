@@ -1,6 +1,7 @@
 // ReSharper disable InconsistentNaming
 
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;
 
@@ -164,6 +165,11 @@ public static class DatDiagnostics
     /// TypeReference missing assembly-qualified name.
     /// </summary>
     public static readonly DatDiagnostic UNT1023 = new DatDiagnostic("UNT1023", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// A list or dictionary has too many or too few elements. <see cref="SpecProperty.MinimumCount"/> and <see cref="SpecProperty.MaximumCount"/> trigger this warning.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1024 = new DatDiagnostic("UNT1023", DatDiagnosticSeverity.Warning);
 
     /* Errors */
 

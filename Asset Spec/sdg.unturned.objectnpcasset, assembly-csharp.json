@@ -462,7 +462,7 @@
             "Maximum": 1.0,
             "DefaultValue": 0.0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
-            "Description": "How far the NPC leans left or right, as a number from -1 to 1. Positive numbers learn to the NPC’s left, while negative numbers lean to the NPC’s right.",
+            "Description": "How far the NPC leans left or right, as a number from -1 to 1. Positive numbers learn to the NPC's left, while negative numbers lean to the NPC's right.",
             "Variable": "poseLean",
             "Priority": 22
         },
@@ -499,7 +499,7 @@
             ],
             "IncludedDefaultValue": 0.0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
-            "Description": "Offset of the NPC’s head from their body, in meters. Positive numbers offset it forward, while negative numbers offset it backward.",
+            "Description": "Offset of the NPC's head from their body, in meters. Positive numbers offset it forward, while negative numbers offset it backward.",
             "Variable": "poseHeadOffset",
             "Priority": 22
         },

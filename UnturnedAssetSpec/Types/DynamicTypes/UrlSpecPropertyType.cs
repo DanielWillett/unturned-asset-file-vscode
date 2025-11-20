@@ -13,6 +13,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <code>
 /// Prop https://smartlydressedgames.com/favicon.png
 /// </code>
+/// <para>
+/// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for character count limits.
+/// </para>
 /// </summary>
 public sealed class UrlSpecPropertyType :
     BaseSpecPropertyType<string>,
@@ -143,14 +146,19 @@ public sealed class UrlSpecPropertyType :
             return FailedToParse(in parse, out value);
 
         string val = stringNode.Value;
-        if (parse.HasDiagnostics && val.IndexOf('\\') >= 0)
+        if (parse.HasDiagnostics)
         {
-            parse.Log(new DatDiagnosticMessage
+            KnownTypeValueHelper.TryGetMinimaxCountWarning(val.Length, in parse);
+
+            if (val.IndexOf('\\') >= 0)
             {
-                Range = stringNode.Range,
-                Diagnostic = DatDiagnostics.UNT1010,
-                Message = DiagnosticResources.UNT1010
-            });
+                parse.Log(new DatDiagnosticMessage
+                {
+                    Range = stringNode.Range,
+                    Diagnostic = DatDiagnostics.UNT1010,
+                    Message = DiagnosticResources.UNT1010
+                });
+            }
         }
         
         if (!IsValidWebUrl(val))

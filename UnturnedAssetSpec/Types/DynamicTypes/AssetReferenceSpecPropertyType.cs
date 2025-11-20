@@ -38,7 +38,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </para>
 /// </summary>
 public sealed class AssetReferenceSpecPropertyType :
-    BaseSpecPropertyType<Guid>,
+    BasicSpecPropertyType<AssetReferenceSpecPropertyType, Guid>,
     ISpecPropertyType<Guid>,
     IElementTypeSpecPropertyType,
     ISpecialTypesSpecPropertyType,
@@ -75,10 +75,7 @@ public sealed class AssetReferenceSpecPropertyType :
     public override string Type => "AssetReference";
 
     /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
-
-    /// <inheritdoc />
-    public Type ValueType => typeof(Guid);
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
     OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
@@ -211,19 +208,6 @@ public sealed class AssetReferenceSpecPropertyType :
         return true;
     }
 
-    /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out Guid val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteValue<Guid>(val, this);
-        return true;
-    }
-
     internal static void CheckInappropriateAmount(in SpecPropertyTypeParseContext parse, IValueSourceNode stringValue)
     {
         if (!parse.HasDiagnostics)
@@ -247,7 +231,7 @@ public sealed class AssetReferenceSpecPropertyType :
     private bool? _isTypeValid;
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out Guid value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out Guid value)
     {
         if (!_isTypeValid.HasValue)
         {
@@ -398,14 +382,6 @@ public sealed class AssetReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(AssetReferenceSpecPropertyType? other) => other != null && ElementType.Equals(other.ElementType) && OtherElementTypes.Equals(other.OtherElementTypes);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is AssetReferenceSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<Guid>? other) => other is AssetReferenceSpecPropertyType t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 
     /// <inheritdoc />
     public ValueHoverProviderResult? GetDescription(in SpecPropertyTypeParseContext ctx, ISpecDynamicValue value)

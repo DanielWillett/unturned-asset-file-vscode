@@ -38,6 +38,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <para>
 /// Supports the <c>PluralBaseKey</c> additional property to override the singular property name. By default it just removes the 's' from the end of the property name.
 /// </para>
+/// <para>
+/// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for list element count limits.
+/// </para>
 /// </summary>
 public sealed class LegacyCompatibleListSpecPropertyType :
     BaseSpecPropertyType<EquatableArray<CustomSpecTypeInstance>>,
@@ -131,6 +134,8 @@ public sealed class LegacyCompatibleListSpecPropertyType :
                 }
             }
 
+            KnownTypeValueHelper.TryGetMinimaxCountWarning(conditions.Length, in parse);
+
             if (!passed)
             {
                 return FailedToParse(in parse, out value, stringNode);
@@ -146,6 +151,9 @@ public sealed class LegacyCompatibleListSpecPropertyType :
         }
 
         ImmutableArray<ISourceNode> children = list.Children;
+
+        KnownTypeValueHelper.TryGetMinimaxCountWarning(children.Length, in parse);
+
         if (children.Length == 0)
         {
             value = EquatableArray<CustomSpecTypeInstance>.Empty;

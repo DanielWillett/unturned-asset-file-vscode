@@ -76,7 +76,7 @@
             "Key": "Engine",
             "Type": "SDG.Unturned.EEngine, Assembly-CSharp",
             "DefaultValue": "CAR",
-            "Description": "Determines the type of vehicle, specifically the movement physics of the vehicle.",
+            "Description": "Determines the vehicle type, specifically the movement physics, of this vehicle.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#engine-eengine-car",
             "Variable": "engine"
         },
@@ -201,7 +201,7 @@
             "Key": "Has_Clip_Prefab",
             "Type": "Boolean",
             "DefaultValue": true,
-            "Description": "Whether or not the vehicle defines a Clip.prefab. New vehicles should usually set this to false and use the client prefab for both client and server.",
+            "Description": "Whether or not this vehicle defines a Clip.prefab. New vehicles should usually set this to false and use the client prefab for both client and server.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#has-clip-prefab-bool-true",
             "ExclusiveWith":
             [
@@ -229,7 +229,7 @@
             "Key": "Shared_Skin_Name",
             "Type": "String",
             "DefaultValue": null,
-            "Description": "When generating images, the image name will contain the value of this string instead of the vehicle's file name.",
+            "Description": "When generating images, the image name will contain the value of this string instead of this asset's file name.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#shared-skin-name-string",
             "Variable": "sharedSkinName"
         },
@@ -246,7 +246,7 @@
             "Key": "Rarity",
             "Type": "SDG.Unturned.EItemRarity, Assembly-CSharp",
             "DefaultValue": "COMMON",
-            "Description": "Rarity of the vehicle. Used to color text shown in menus.",
+            "Description": "Rarity of this vehicle. Used to color text shown in menus.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#rarity-doc-data-eitemrarity-common",
             "Variable": "rarity"
         },
@@ -266,7 +266,8 @@
             "Description": "Player character should use a bicycling animation.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bicycle-flag",
             "Variable": "hasZip",
-            "ExclusiveWith": [ "Zip", "Reclined" ]
+            "ExclusiveWith": [ "Zip", "Reclined" ],
+            "InclusiveWith": [ "Bicycle_Anim_Speed" ]
         },
         {
             "Key": "Reclined",
@@ -305,7 +306,7 @@
             "Key": "Cannot_Spawn_With_Battery",
             "Type": "Flag",
             "DefaultValue": false,
-            "Description": "The vehicle does not spawn with a vehicle battery.",
+            "Description": "Indicates that this vehicle does not spawn with a battery.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#cannot-spawn-with-battery-flag",
             "Variable": "canSpawnWithBattery"
         },
@@ -344,7 +345,7 @@
             "Key": "BatteryMode_Driving",
             "Type": "SDG.Unturned.EBatteryMode, Assembly-CSharp",
             "DefaultValue": "Charge",
-            "Description": "How the vehicle battery should behave when a player is driving it.",
+            "Description": "How this vehicle's battery should behave when a player is driving it.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#batterymode-driving-doc-data-ebatterymode-charge",
             "Variable": "batteryDriving"
         },
@@ -352,7 +353,7 @@
             "Key": "BatteryMode_Empty",
             "Type": "SDG.Unturned.EBatteryMode, Assembly-CSharp",
             "DefaultValue": "None",
-            "Description": "How the vehicle battery should behave when the vehicle is empty.",
+            "Description": "How this vehicle's battery should behave with no players.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#batterymode-empty-doc-data-ebatterymode-none",
             "Variable": "batteryEmpty"
         },
@@ -360,7 +361,7 @@
             "Key": "BatteryMode_Headlights",
             "Type": "SDG.Unturned.EBatteryMode, Assembly-CSharp",
             "DefaultValue": "Burn",
-            "Description": "How the vehicle battery should behave when the headlights are on.",
+            "Description": "How this vehicle's battery should behave when the headlights are on.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#batterymode-headlights-doc-data-ebatterymode-burn",
             "Variable": "batteryHeadlights"
         },
@@ -368,7 +369,7 @@
             "Key": "BatteryMode_Sirens",
             "Type": "SDG.Unturned.EBatteryMode, Assembly-CSharp",
             "DefaultValue": "Burn",
-            "Description": "How the vehicle battery should behave when the siren is on.",
+            "Description": "How this vehicle's battery should behave when the siren is on.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#batterymode-sirens-doc-data-ebatterymode-burn",
             "Variable": "batterySirens"
         },
@@ -452,7 +453,7 @@
             "Key": "Speed_Min",
             "Type": "Float32",
             "DefaultValue": 0.0,
-            "Description": "The vehicle's maximum velocity to aim for while accelerating in reverse, in m/s. Usually will be negative.",
+            "Description": "This vehicle's maximum velocity to aim for while accelerating in reverse, in m/s. Usually will be negative.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#speed-min-float32-0",
             "Variable": "TargetReverseVelocity"
         },
@@ -460,7 +461,7 @@
             "Key": "Speed_Max",
             "Type": "Float32",
             "DefaultValue": 0.0,
-            "Description": "The vehicle's maximum velocity to aim for while accelerating forward, in m/s.",
+            "Description": "This vehicle's maximum velocity to aim for while accelerating forward, in m/s.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#speed-max-float32-0",
             "Variable": "TargetForwardVelocity"
         },
@@ -509,7 +510,7 @@
                     "Value": 0
                 }
             ],
-            "Description": "The vehicle's maximum velocity to aim for while accelerating forward, in m/s. This value ends up getting multiplied by 0.75.",
+            "Description": "This vehicle's maximum velocity (in m/s) to aim for while accelerating forward. This value ends up getting multiplied by 0.75.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steer-max-float32-0",
             "Variable": "MaxSteeringAngle",
             "ExclusiveWith": [ "Steering_Angle_Max" ]
@@ -709,7 +710,7 @@
             "Type": "GuidOrId",
             "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
             "DefaultValue": "00000000000000000000000000000000",
-            "Description": "Effect to play when the vehicle is destroyed.",
+            "Description": "Effect to play when this vehicle is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-doc-data-guid-or-uint16",
             "Variable": "ExplosionEffectGuid"
         },
@@ -738,7 +739,7 @@
                     "Value": false
                 }
             ],
-            "Description": "Whether or not the explosion caused by the vehicle being destroyed will deal damage to nearby entities and kill any passengers.",
+            "Description": "Whether or not the explosion caused by this vehicle being destroyed will deal damage to nearby entities and kill any passengers.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#shouldexplosioncausedamage-bool",
             "Variable": "ShouldExplosionCauseDamage"
         },
@@ -767,7 +768,7 @@
                     "Value": false
                 }
             ],
-            "Description": "Whether or not the materials of the vehicle's model will be tinted black when the vehicle is destroyed.",
+            "Description": "Whether or not the materials of this vehicle's model will be tinted black when it's destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#shouldexplosionburnmaterials-bool",
             "Variable": "ShouldExplosionBurnMaterials"
         },
@@ -786,6 +787,770 @@
                     "Value": true
                 }
             ]
+        },
+        {
+            "Key": "Explosion_Force_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "A multiplier on the force applied when this vehicle explodes. Should scale with your vehicle's mass.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-force-multiplier-float32-1-0"
+        },
+        {
+            "Key": "Explosion_Min_Force",
+            "Type": "ScaleOrLegacy",
+            "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) ((0 1 0)))",
+            "Description": "Minimum amount of force applied to this vehicle when it explodes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-min-force-vector3-0-1024-0",
+            "Variable": "minExplosionForce"
+        },
+        {
+            "Key": "Explosion_Max_Force",
+            "Type": "ScaleOrLegacy",
+            "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) ((0 1 0)))",
+            "Description": "Maximum amount of force applied to this vehicle when it explodes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-max-force-vector3-0-1024-0",
+            "Variable": "maxExplosionForce"
+        },
+        {
+            "Key": "Exit",
+            "Type": "Float32",
+            "DefaultValue": 2.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "Distance away from this vehicle to teleport when exiting.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#exit-float-2",
+            "Variable": "exit"
+        },
+        {
+            "Key": "Cam_Follow_Distance",
+            "Type": "Float32",
+            "DefaultValue": 5.5,
+            "IncludedDefaultValue": 0.0,
+            "Description": "Distance of the third-person camera from the player when inside this vehicle.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#cam-follow-distance-float32-5-5",
+            "Variable": "camFollowDistance"
+        },
+        {
+            "Key": "Cam_Driver_Offset",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The extra vertical offset (in meters) from @Cam_Passenger_Offset for the driver's first-person camera.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#cam-driver-offset-float32-0",
+            "Variable": "camDriverOffset"
+        },
+        {
+            "Key": "Cam_Passenger_Offset",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The vertical offset (in meters) for any passenger's and driver's first-person cameras.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#cam-passenger-offset-float32-0",
+            "Variable": "camPassengerOffset"
+        },
+        {
+            "Key": "Bumper_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "Multiplied by this vehicle's speed (in m/s) when calculating roadkill damage, the result of which is multiplied by the @Bumper_PlayerDamage property (or the corresponding entity's property).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bumper-multiplier-float32-1-0",
+            "Variable": "bumperMultiplier"
+        },
+        {
+            "Key": "Bumper_SpeedDamageThreshold",
+            "Type": "Float32",
+            "DefaultValue": 3.0,
+            "Description": "After multiplying this vehicle's speed (in m/s) by @Bumper_Multiplier, if the value is less than this value, no roadkill damage is applied.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bumper-speeddamagethreshold-float32-3-0",
+            "Variable": "BumperSpeedDamageThreshold"
+        },
+        {
+            "Key": "Bumper_PlayerDamage",
+            "Type": "Float32",
+            "DefaultValue": 10.0,
+            "Description": "Roadkill damage multiplier for players, which is multiplied by this vehicle's speed (in m/s) and @Bumper_Multiplier. This value is the damage done when this vehicle is traveling at 1 m/s with a @Bumper_Multiplier of 1.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bumper-playerdamage-float32-10",
+            "Variable": "BumperPlayerDamage"
+        },
+        {
+            "Key": "Bumper_ZombieDamage",
+            "Type": "Float32",
+            "DefaultValue": 15.0,
+            "Description": "Roadkill damage multiplier for zombies, which is multiplied by this vehicle's speed (in m/s) and @Bumper_Multiplier. This value is the damage done when this vehicle is traveling at 1 m/s with a @Bumper_Multiplier of 1.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bumper-zombiedamage-float32-15",
+            "Variable": "BumperZombieDamage"
+        },
+        {
+            "Key": "Bumper_AnimalDamage",
+            "Type": "Float32",
+            "DefaultValue": 15.0,
+            "Description": "Roadkill damage multiplier for animals, which is multiplied by this vehicle's speed (in m/s) and @Bumper_Multiplier. This value is the damage done when this vehicle is traveling at 1 m/s with a @Bumper_Multiplier of 1.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bumper-animaldamage-float32-15",
+            "Variable": "BumperAnimalDamage"
+        },
+        {
+            "Key": "Bumper_ObjectDamage",
+            "Type": "Float32",
+            "DefaultValue": 30.0,
+            "Description": "Roadkill damage multiplier for objects, which is multiplied by this vehicle's speed (in m/s) and @Bumper_Multiplier. This value is the damage done when this vehicle is traveling at 1 m/s with a @Bumper_Multiplier of 1.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bumper-objectdamage-float32-30",
+            "Variable": "BumperObjectDamage"
+        },
+        {
+            "Key": "Bumper_ResourceDamage",
+            "Type": "Float32",
+            "DefaultValue": 85.0,
+            "Description": "Roadkill damage multiplier for resources, which is multiplied by this vehicle's speed (in m/s) and @Bumper_Multiplier. This value is the damage done when this vehicle is traveling at 1 m/s with a @Bumper_Multiplier of 1.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bumper-resourcedamage-float32-85",
+            "Variable": "BumperResourceDamage"
+        },
+        {
+            "Key": "Bumper_SelfDamageMultiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Roadkill damage multiplier for damage done to this vehicle when it hits another entity, which is multiplied by this vehicle's speed (in m/s) and @Bumper_Multiplier.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bumper-selfdamagemultiplier-float32-1-0",
+            "Variable": "BumperSelfDamageMultiplier",
+            "ExclusiveWith": [ "Bumper_Invulnerable" ]
+        },
+        {
+            "Key": "Passenger_Explosion_Armor",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Damage multiplier for passengers and the driver from explosions.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#passenger-explosion-armor-float32-1",
+            "Variable": "passengerExplosionArmor"
+        },
+        {
+            "Key": "Valid_Speed_Horizontal",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "HELICOPTER"
+                        },
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "BLIMP"
+                        }
+                    ],
+                    "Value": "=MUL(@Speed_Max 1.953125)"
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "TRAIN"
+                        }
+                    ],
+                    "Value": "=MUL(@Speed_Max 1.25)"
+                },
+                {
+                    "Value": "=MUL(@Speed_Max 1.5625)"
+                }
+            ],
+            "Description": "Maximum distance (in m) this vehicle can move horizontally in a second without being rubber-banded.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#valid-speed-horizontal-float32",
+            "Variable": "sqrDelta"
+        },
+        {
+            "Key": "Valid_Speed_Up",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "CAR"
+                        }
+                    ],
+                    "Value": 12.5
+                },
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "BOAT"
+                        }
+                    ],
+                    "Value": 3.25
+                },
+                {
+                    "Value": 100
+                }
+            ],
+            "Description": "Maximum distance (in m) this vehicle can move forward in a single tick without being rubber-banded. Vehicles are simulated at 12.5 ticks per second.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#valid-speed-up-float32",
+            "Variable": "validSpeedUp"
+        },
+        {
+            "Key": "Valid_Speed_Up",
+            "Type": "Float32",
+            "DefaultValue":
+            [
+                {
+                    "Or":
+                    [
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "CAR"
+                        },
+                        {
+                            "Variable": "Engine",
+                            "Operation": "eq",
+                            "Comparand": "BOAT"
+                        }
+                    ],
+                    "Value": 25
+                },
+                {
+                    "Value": 100
+                }
+            ],
+            "Description": "Maximum distance (in m) this vehicle can move backwards in a single tick without being rubber-banded. Vehicles are simulated at 12.5 ticks per second.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#valid-speed-down-float32",
+            "Variable": "validSpeedDown"
+        },
+        {
+            "Key": "Valid_Hit_Distance_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "A multiplier for the maximum distance between the client's reported position and the server's expected position of a gunshot hit from a turret on this vehicle. This value is multiplied by 64 to calculate the threshold.",
+            "Variable": "ValidHitDistanceMultiplier"
+        },
+        {
+            "Key": "Turrets",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "The number of seats designated as turrets.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turrets-uint8-0",
+            "Variable": "turrets",
+            "CountForTemplateGroup": "vehicle-turrets"
+        },
+        {
+            "Key": "Turret_*_Seat_Index",
+            "Type": "UInt8",
+            "Template": true,
+            "TemplateGroupUniqueValue": true,
+            "TemplateGroups": [ "vehicle-turrets" ],
+            "DefaultValue": 0,
+            "Required": true,
+            "Description": "The zero-based index of the seat to mount turret #(Self.KeyGroups[0]) to.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-seat-index-uint8-0",
+            "Variable": "TurretInfo.seatIndex"
+        },
+        {
+            "Key": "Turret_*_Item_ID",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.ItemGunAsset, Assembly-CSharp",
+            "Template": true,
+            "TemplateGroups": [ "vehicle-turrets" ],
+            "DefaultValue": 0,
+            "Required": true,
+            "Description": "The gun asset to use for turret #(Self.KeyGroups[0]).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-item-id-uint16-0",
+            "Variable": "TurretInfo.itemID"
+        },
+        {
+            "Key": "Turret_*_Yaw_Min",
+            "Type": "Float32",
+            "MinimumExclusive": -360,
+            "Maximum": 360,
+            "Template": true,
+            "TemplateGroups": [ "vehicle-turrets" ],
+            "DefaultValue": 0.0,
+            "Required": true,
+            "Description": "Maximum allowed rotation of the turret through the azimuth, in degrees. If this is set to 360, it can rotate rightward forever.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-yaw-min-float32-0",
+            "Variable": "TurretInfo.yawMin"
+        },
+        {
+            "Key": "Turret_*_Yaw_Max",
+            "Type": "Float32",
+            "Minimum": -360,
+            "MaximumExclusive": 360,
+            "Template": true,
+            "TemplateGroups": [ "vehicle-turrets" ],
+            "DefaultValue": 0.0,
+            "Required": true,
+            "Description": "Minimum allowed rotation of turret #(Self.KeyGroups[0]) through the azimuth, in degrees. If this is set to -360, it can rotate leftward forever.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-yaw-max-float32-0",
+            "Variable": "TurretInfo.yawMax"
+        },
+        {
+            "Key": "Turret_*_Pitch_Min",
+            "Type": "Float32",
+            "Minimum": 0,
+            "Maximum": 180,
+            "Template": true,
+            "TemplateGroups": [ "vehicle-turrets" ],
+            "DefaultValue": 0.0,
+            "Required": true,
+            "Description": "Minimum allowed rotation of the turret through the elevation, in degrees.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-pitch-min-float32-0",
+            "Variable": "TurretInfo.pitchMin"
+        },
+        {
+            "Key": "Turret_*_Pitch_Max",
+            "Type": "Float32",
+            "Minimum": 0,
+            "Maximum": 180,
+            "Template": true,
+            "TemplateGroups": [ "vehicle-turrets" ],
+            "DefaultValue": 0.0,
+            "Required": true,
+            "Description": "Maximum allowed rotation of the turret through the elevation, in degrees.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-pitch-max-float32-0",
+            "Variable": "TurretInfo.pitchMax"
+        },
+        {
+            "Key": "Turret_*_Ignore_Aim_Camera",
+            "Type": "Flag",
+            "Template": true,
+            "TemplateGroups": [ "vehicle-turrets" ],
+            "DefaultValue": false,
+            "Description": "Normally, the player's camera is positioned at the \"Aim\" GameObject. Including this flag will disable this feature.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-ignore-aim-camera-flag",
+            "Variable": "TurretInfo.useAimCamera"
+        },
+        {
+            "Key": "Invulnerable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this vehicle can only be damaged by weapons that have the @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Invulnerable) flag.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#invulnerable-flag",
+            "Variable": "isVulnerable"
+        },
+        {
+            "Key": "Explosions_Invulnerable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This vehicle cannot be damaged by explosions.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosions-invulnerable-flag",
+            "Variable": "isVulnerableToExplosions"
+        },
+        {
+            "Key": "Environment_Invulnerable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This vehicle cannot be damaged by animals, zombie melee attacks, or boulders thrown by mega zombies.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#environment-invulnerable-flag",
+            "Variable": "isVulnerableToEnvironment"
+        },
+        {
+            "Key": "Bumper_Invulnerable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This vehicle cannot be damaged by collisions.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bumper-invulnerable-flag",
+            "Variable": "isVulnerableToBumper"
+        },
+        {
+            "Key": "Tires_Invulnerable",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "This vehicle's tires cannot be damaged.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#tires-invulnerable-flag",
+            "Variable": "canTiresBeDamaged"
+        },
+        {
+            "Key": "Can_Repair_While_Seated",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not this vehicle can be repaired by seated players.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#can-repair-while-seated-bool-false",
+            "Variable": "canRepairWhileSeated"
+        },
+        {
+            "Key": "Child_Explosion_Armor_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 0.2,
+            "Description": "Multiplier on the damage that barricades placed on this vehicle receive when damaged by explosions.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#child-explosion-armor-multiplier-float32-0-2",
+            "Variable": "childExplosionArmorMultiplier"
+        },
+        {
+            "Key": "Air_Turn_Responsiveness",
+            "Type": "Float32",
+            "DefaultValue": 2.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "Sensitivity on steering while airborne.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#air-turn-responsiveness-float32-2",
+            "Variable": "airTurnResponsiveness",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Engine",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Engine",
+                                "Operation": "eq",
+                                "Comparand": "PLANE"
+                            },
+                            {
+                                "Variable": "Engine",
+                                "Operation": "eq",
+                                "Comparand": "BLIMP"
+                            }
+                        ],
+                        "Value": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Air_Steer_Min",
+            "Type": "Float32",
+            "DefaultValue": "@Steer_Min",
+            "IncludedDefaultValue": 0.0,
+            "Description": "The angle to turn when moving slowly in planes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#air-steer-min-float32",
+            "Variable": "airSteerMin",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Engine",
+                    "Value": "PLANE"
+                }
+            ]
+        },
+        {
+            "Key": "Air_Steer_Max",
+            "Type": "Float32",
+            "DefaultValue": "=MUL(@Steer_Max 0.75)",
+            "IncludedDefaultValue": 0.0,
+            "Description": "The angle to turn when moving quickly in planes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#air-steer-max-float32",
+            "Variable": "airSteerMax",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Engine",
+                    "Value": "PLANE"
+                }
+            ]
+        },
+        {
+            "Key": "Bicycle_Anim_Speed",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The angle to turn when moving quickly in planes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#bicycle-anim-speed-float32-0",
+            "Variable": "bicycleAnimSpeed",
+            "InclusiveWith": [ "Bicycle" ]
+        },
+        {
+            "Key": "Stamina_Boost",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Indicates that this vehicle should use the stamina boosting feature found in bicycles, where the value of this property is a multiplier for the maximum vehicle speed applied when not boosting. Usually this would be less than 1.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#stamina-boost-float32",
+            "Variable": "staminaBoost"
+        },
+        {
+            "Key": "Stamina_Powered",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this vehicle doesn't use fuel or a battery. Usually used with @Stamina_Boost.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#stamina-powered-flag",
+            "Variable": "isStaminaPowered",
+            "ExclusiveWith": [ "Battery_Powered" ]
+        },
+        {
+            "Key": "Battery_Powered",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Indicates that this vehicle doesn't use fuel and relies on battery power instead.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#battery-powered-flag",
+            "Variable": "isBatteryPowered",
+            "ExclusiveWith": [ "Stamina_Powered" ]
+        },
+        {
+            "Key": "Supports_Mobile_Buildables",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Deprecated": true,
+            "Description": "Indicates that all barricades can be placed on this vehicle, even if they have @(SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp::Allow_Placement_On_Vehicle) set to false. Set @Buildable_Placement_Rule to @(SDG.Unturned.EVehicleBuildablePlacementRule, Assembly-CSharp::AlwaysAllow) instead.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#buildable-placement-rule-evehiclebuildableplacementrule-none",
+            "Variable": "BuildablePlacementRule",
+            "ExclusiveWith": [ "Buildable_Placement_Rule" ]
+        },
+        {
+            "Key": "Buildable_Placement_Rule",
+            "Type": "SDG.Unturned.EVehicleBuildablePlacementRule, Assembly-CSharp",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "Supports_Mobile_Buildables",
+                            "Operation": "eq",
+                            "Comparand": true
+                        }
+                    ],
+                    "Value": "AlwaysAllow"
+                },
+                {
+                    "Value": "None"
+                }
+            ],
+            "Description": "Indicates which barricades are allowed to be placed on this vehicle.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#buildable-placement-rule-evehiclebuildableplacementrule-none",
+            "Variable": "BuildablePlacementRule"
+        },
+        {
+            "Key": "Should_Spawn_Seat_Capsules",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not capsule colliders will be attached to the \"Seat\" GameObject in order to prevent players from clipping into the ground.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#should-spawn-seat-capsules-bool-false",
+            "Variable": "shouldSpawnSeatCapsules"
+        },
+        {
+            "Key": "Can_Be_Locked",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not this vehicle can be locked by a player.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#can-be-locked-bool-true",
+            "Variable": "canBeLocked"
+        },
+        {
+            "Key": "Can_Steal_Battery",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not this vehicle's battery can be removed by a player.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#can-steal-battery-bool-true",
+            "Variable": "canStealBattery"
+        },
+        {
+            "Key": "Trunk_Storage_X",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "Number of columns of inventory space in this vehicle's trunk.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#trunk-storage-x-uint8-0",
+            "Variable": "trunkStorage_X"
+        },
+        {
+            "Key": "Trunk_Storage_Y",
+            "Type": "UInt8",
+            "DefaultValue": 0,
+            "Description": "Number of rows of inventory space in this vehicle's trunk.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#trunk-storage-y-uint8-0",
+            "Variable": "trunkStorage_Y"
+        },
+        {
+            "Key": "Drops_Table_ID",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "DefaultValue": 962,
+            "Description": "Spawn table ID to use to drop scrap items when this vehicle explodes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#drops-table-id-uint16-962",
+            "Variable": "dropsTableId"
+        },
+        {
+            "Key": "Drops_Min",
+            "Type": "UInt8",
+            "DefaultValue": 3,
+            "Description": "Minimum amount of item drops to spawn from @Drops_Table_ID when this vehicle explodes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#drops-min-uint8-3",
+            "Variable": "dropsMin"
+        },
+        {
+            "Key": "Drops_Max",
+            "Type": "UInt8",
+            "DefaultValue": 7,
+            "Description": "Maximum amount of item drops to spawn from @Drops_Table_ID when this vehicle explodes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#drops-max-uint8-7",
+            "Variable": "dropsMax"
+        },
+        {
+            "Key": "Tire_ID",
+            "Type": "Id",
+            "ElementType": "SDG.Unturned.ItemTireAsset, Assembly-CSharp",
+            "DefaultValue": 1451,
+            "Description": "ID of the item that acts as the tire for this vehicle, meaning it can be added to and removed from the wheels.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#tire-id-uint16-1451",
+            "Variable": "tireID"
+        },
+        {
+            "Key": "Override_Center_Of_Mass",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not to override this vehicle's center of mass using the @Center_Of_Mass property.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#override-center-of-mass-bool-false",
+            "Variable": "hasCenterOfMassOverride",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Center_Of_Mass",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "Override_Center_Of_Mass",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Center_Of_Mass",
+            "Type": "PositionOrLegacy",
+            "DefaultValue": "(0,0,0)",
+            "Description": "Overrides this vehicle's center of mass.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#center-of-mass-vector3",
+            "Variable": "centerOfMass",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Override_Center_Of_Mass",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Carjack_Force_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier for the force applied when using a Carjack on this vehicle. Should scale with vehicle mass.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#carjack-force-multiplier-float32-1-0",
+            "Variable": "carjackForceMultiplier"
+        },
+        {
+            "Key": "Engine_Force_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Description": "Multiplier for the engine force of planes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#engine-force-multiplier-float32-1-0",
+            "Variable": "engineForceMultiplier",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Engine",
+                    "Value": "PLANE"
+                }
+            ]
+        },
+        {
+            "Key": "Wheel_Collider_Mass_Override",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 1.0,
+            "Description": "Overrides the mass (in kilograms) of wheels.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#wheel-collider-mass-override-float32-null",
+            "Variable": "wheelColliderMassOverride"
+        },
+        {
+            "Key": "Train_Track_Offset",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The offset (in meters) of the train car above the track.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#train-track-offset-float32-0",
+            "Variable": "trainTrackOffset",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Engine",
+                    "Value": "TRAIN"
+                }
+            ]
+        },
+        {
+            "Key": "Train_Wheel_Offset",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The offset (in meters) between the wheels of the train car.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#train-wheel-offset-float32-0",
+            "Variable": "trainWheelOffset",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Engine",
+                    "Value": "TRAIN"
+                }
+            ]
+        },
+        {
+            "Key": "Train_Car_Length",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "The distance (in meters) between each train car.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#train-car-length-float32-0",
+            "Variable": "trainCarLength",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Engine",
+                    "Value": "TRAIN"
+                }
+            ]
+        },
+        {
+            "Key": "Bypass_Hash_Verification",
+            "Type": "Flag",
+            "DefaultValue": false,
+            "Description": "Disable hash verification checks, allowing for mismatched files.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#train-car-length-float32-0",
+            "Variable": "shouldVerifyHash"
+        },
+        {
+            "Key": "PaintableSections",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Each section's material's \"_PaintColor\" property is set to the paint color. This vehicle is not paintable unless this property is defined with at least one section.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosionburnmaterialsections-list-of-paintablevehiclesection",
+            "Variable": "PaintableVehicleSections"
+        },
+        {
+            "Key": "IsPaintable",
+            "Type": "Boolean",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "PaintableSections",
+                            "Operation": "neq",
+                            "Comparand": null
+                        }
+                    ],
+                    "Value": true
+                },
+                {
+                    "Value": false
+                }
+            ],
+            "Description": "Whether or not players can paint this vehicle using vehicle paint tools.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#ispaintable-bool",
+            "Variable": "IsPaintable"
+        },
+        {
+            "Key": "CrawlerTrackTilingMaterials",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.CrawlerTrackTilingMaterial, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "List of materials which offset their UVs in sync with wheels rolling.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#crawlertracktilingmaterials-list-of-crawlertracktilingmaterial",
+            "Variable": "crawlerTrackTilingMaterials"
         },
     ],
     "Types":
@@ -853,14 +1618,15 @@
             "DisplayName": "Paintable Vehicle Section",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-paintablevehiclesection-dictionary",
             "StringParsableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.PaintableVehicleSectionStringParseableSpecPropertyType, UnturnedAssetSpec",
+            "Version": "3.24.4.0",
             "Properties":
             [
                 {
                     "Key": "Path",
-                    "Type": "String",
+                    "Type": "Path",
                     "DefaultValue": null,
                     "Required": true,
-                    "Description": "Scene hierarchy path to a Renderer component relative to the vehicle’s root transform.",
+                    "Description": "Scene hierarchy path to a Renderer component relative to the vehicle's root transform.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-paintablevehiclesection-path",
                     "Variable": "path"
                 },
@@ -869,7 +1635,7 @@
                     "Type": "Int32",
                     "DefaultValue": 0,
                     "Description": "Zero-based index in the Renderer's material list.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#materialindex-int32-0",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-paintablevehiclesection-materialindex",
                     "Variable": "materialIndex"
                 },
                 {
@@ -877,11 +1643,100 @@
                     "Type": "Boolean",
                     "DefaultValue": false,
                     "Description": "Whether or not all materials should be painted instead of just @MaterialIndex.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#allmaterials-bool-false",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-paintablevehiclesection-allmaterials",
                     "Variable": "allMaterials"
                 }
             ]
-        }
+        },
+        {
+            "Type": "SDG.Unturned.EVehicleBuildablePlacementRule, Assembly-CSharp",
+            "DisplayName": "Vehicle Buildable Placement Rule",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-evehiclebuildableplacementrule",
+            "Version": "3.24.3.1",
+            "Values":
+            [
+                {
+                    "Value": "None",
+                    "Description": "Vehicle does not override placement. This means that barricades can be attached unless the barricade sets @(SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp::Allow_Placement_On_Vehicle) to false (ex. beds and sentry guns are often set to false)."
+                },
+                {
+                    "Value": "AlwaysAllow",
+                    "Description": "Vehicle allows any barricade to be placed on it, regardless of the barricade's @(SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp::Allow_Placement_On_Vehicle) setting."
+                },
+                {
+                    "Value": "Block",
+                    "Description": "Vehicle prevents any barricade form being placed on it."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.CrawlerTrackTilingMaterial, Assembly-CSharp",
+            "DisplayName": "Crawler Track Material",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-crawlertracktilingmaterial-dictionary",
+            "Version": "3.24.7.0",
+            "Properties":
+            [
+                {
+                    "Key": "Path",
+                    "Type": "Path",
+                    "DefaultValue": null,
+                    "Required": true,
+                    "Description": "Scene hierarchy path to a Renderer component relative to the vehicle's root transform.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-crawlertracktilingmaterial-path",
+                    "Variable": "path"
+                },
+                {
+                    "Key": "MaterialIndex",
+                    "Type": "Int32",
+                    "DefaultValue": 0,
+                    "Description": "Zero-based index in the Renderer's material list.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-crawlertracktilingmaterial-materialindex",
+                    "Variable": "materialIndex"
+                },
+                {
+                    "Key": "UV_Direction",
+                    "Type": "Vector2",
+                    "DefaultValue": "(0,0)",
+                    "Required": true,
+                    "Description": "Forward vector applied to the UV offset as the vehicle moves.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-crawlertracktilingmaterial-uv-direction",
+                    "Variable": "uvDirection"
+                },
+                {
+                    "Key": "RepeatDistance",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Required": true,
+                    "Description": "How far to travel to offset UV by 1 track. See docs for more information.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-crawlertracktilingmaterial-repeatdistance",
+                    "Variable": "repeatDistance"
+                },
+                {
+                    "Key": "WheelIndices",
+                    "Type": "List",
+                    "ElementType": "Int32",
+                    "Minimum": 0,
+                    "DefaultValue": null,
+                    "Required": true,
+                    "Description": "List of wheels which are averaged to calculate how fast crawler track is moving.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-crawlertracktilingmaterial-wheelindices",
+                    "Variable": "repeatDistance",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "WheelIndices",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "WheelIndices",
+                                "Operation": "neq",
+                                "Comparand": null
+                            }
+                        }
+                    ]
+                },
+            ]
+        },
     ],
     "Localization":
     [
@@ -921,7 +1776,65 @@
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#ignitionaudioclip-master-bundle-pointer",
             "RedirectableAssetKey": "IgnitionAudioClip",
+            "Description": "Audio clip to play after entering the driver's seat.",
             "Variable": "ignition"
+        },
+        {
+            "AssetName": "Albedo_Base",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Description": "Skin albedo base texture.",
+            "Variable": "albedoBase",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "ID",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "ID",
+                        "Operation": "gte",
+                        "Comparand": 2000
+                    }
+                }
+            ]
+        },
+        {
+            "AssetName": "Metallic_Base",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Description": "Skin metallic base texture.",
+            "Variable": "metallicBase",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "ID",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "ID",
+                        "Operation": "gte",
+                        "Comparand": 2000
+                    }
+                }
+            ]
+        },
+        {
+            "AssetName": "Emission_Base",
+            "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Description": "Skin emission base texture.",
+            "Variable": "emissionBase",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "ID",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "ID",
+                        "Operation": "gte",
+                        "Comparand": 2000
+                    }
+                }
+            ]
         }
     ]
 }

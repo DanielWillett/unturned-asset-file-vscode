@@ -11,7 +11,7 @@
         {
             "Key": "UnityNames",
             "Type": "List",
-            "Minimum": 1,
+            "MinimumCount": 1,
             "ElementType": "PhysicsMaterial",
             "DefaultValue": "@UnityName",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",

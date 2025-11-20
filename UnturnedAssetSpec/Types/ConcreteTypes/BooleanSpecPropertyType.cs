@@ -65,19 +65,6 @@ public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecP
     }
 
     /// <inheritdoc />
-    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out bool val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = val ? SpecDynamicValue.True : SpecDynamicValue.False;
-        return true;
-    }
-
-    /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out bool value)
     {
         if (parse.Node == null)

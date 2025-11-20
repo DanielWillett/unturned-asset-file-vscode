@@ -451,7 +451,7 @@
             [
                 {
                     "Key": "Path",
-                    "Type": "String",
+                    "Type": "Path",
                     "DefaultValue": null,
                     "Required": true,
                     "Description": "Path to a Particle System component relative to @CloudOverride_Prefab. This renderer should likely use the Unturned \"Particles/Standard Surface (ZClip False)\" shader to prevent a harsh transition with low max draw distance.",

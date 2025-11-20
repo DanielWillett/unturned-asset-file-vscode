@@ -710,7 +710,7 @@
         },
         {
             "Key": "Interactability_Animation_Component_Path",
-            "Type": "String",
+            "Type": "Path",
             "DefaultValue": "Root",
             "Description": "Transform path relative to object root with Animation component.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
@@ -739,7 +739,7 @@
             "Key": "Interactability_Emissive_Material_Mode",
             "Type": "SDG.Unturned.EInteractableObjectBinaryStateEmissiveMaterialMode, Assembly-CSharp",
             "DefaultValue": "Auto",
-            "Description": "Transform path relative to object root with Animation component.",
+            "Description": "Whether or not to create a material instance for the \"Toggle\" object, which prevents emission state from being shared between all instances of this object but excludes the material from level batching.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 10,
             "Variable": "iobsEmissiveMaterialMode",

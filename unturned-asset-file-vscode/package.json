@@ -25,7 +25,7 @@
         "aliases": [ "Unturned Data File", "unturned-dat", "unturned-data-file", "Unturned Asset File" ],
         "extensions": [ ".dat", ".asset", ".vdf", ".tool" ],
         "configuration": "./language-configuration.json",
-        "firstLine": "^\\/+\\s*udat-.*:\\s*(?:.*)\\s*$",
+        "firstLine": "^(?:\\/+\\s*udat-.*:\\s*(?:.*)\\s*|\\/\\/\\s\\>\\sUnturned\\sServer\\sConfiguration\\sFile)$",
         "filenames": [ "Config_EasyDifficulty.txt", "Config_NormalDifficulty.txt", "Config_HardDifficulty.txt", "Config.txt", "Level.hierarchy", "Visibility.config" ] 
       }
     ],
