@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -16,7 +15,7 @@ public readonly record struct Comment(CommentPrefix Prefix, string Content, Comm
     /// <para>
     /// They must be formatted as a property starting in this value (case-sensitive), followed by a colon, then an optional value.
     /// <code>
-    /// // udat-type: SDG.Unturned.ServerConfigData, Assembly-CSharp
+    /// // udat-type: SDG.Unturned.ConfigData, Assembly-CSharp
     /// // udat-prop:
     /// Key Value
     /// </code>

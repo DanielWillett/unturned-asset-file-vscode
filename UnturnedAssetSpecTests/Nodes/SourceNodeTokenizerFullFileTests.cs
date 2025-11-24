@@ -493,7 +493,7 @@ Key "Value" // inline comment
     {
         string file =
 """
-// udat-type: SDG.Unturned.ServerConfigData, Assembly-CSharp
+// udat-type: SDG.Unturned.ConfigData, Assembly-CSharp
 // udat-prop:
 //  udat-prop2  :  value  
 // not-udat-prop: test
@@ -523,7 +523,7 @@ Key Value // not inline comment
         int charIndex = 0;
 
         Assert.That(sourceFile.TryGetAdditionalProperty("type", out string? propVal));
-        Assert.That(propVal, Is.EqualTo("SDG.Unturned.ServerConfigData, Assembly-CSharp"));
+        Assert.That(propVal, Is.EqualTo("SDG.Unturned.ConfigData, Assembly-CSharp"));
 
         Assert.That(sourceFile.TryGetAdditionalProperty("prop", out propVal));
         Assert.That(propVal, Is.Null);
@@ -536,7 +536,7 @@ Key Value // not inline comment
         Assert.That(sourceFile.TryGetAdditionalProperty("Comment", out propVal), Is.False);
         Assert.That(sourceFile.TryGetAdditionalProperty(string.Empty, out propVal), Is.False);
 
-        // // udat-type: SDG.Unturned.ServerConfigData, Assembly-CSharp
+        // // udat-type: SDG.Unturned.ConfigData, Assembly-CSharp
         AssertNode<ICommentSourceNode>(
             sourceFile,
             ref index,
@@ -547,7 +547,7 @@ Key Value // not inline comment
             ref charIndex,
             node =>
             {
-                Assert.That(node.Comments, Is.EquivalentTo([ Comment.AdditionalProperty("type", "SDG.Unturned.ServerConfigData, Assembly-CSharp") ]));
+                Assert.That(node.Comments, Is.EquivalentTo([ Comment.AdditionalProperty("type", "SDG.Unturned.ConfigData, Assembly-CSharp") ]));
             }
         );
 
