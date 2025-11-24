@@ -607,11 +607,21 @@
                                     [
                                         "string",
                                         "number",
-                                        "integer",
                                         "boolean",
-                                        "null",
-                                        "array"
+                                        "null"
                                     ]
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type":
+                                        [
+                                            "string",
+                                            "number",
+                                            "boolean",
+                                            "null"
+                                        ]
+                                    }
                                 }
                             ]
                         },
@@ -628,11 +638,21 @@
                                     [
                                         "string",
                                         "number",
-                                        "integer",
                                         "boolean",
-                                        "null",
-                                        "array"
+                                        "null"
                                     ]
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type":
+                                        [
+                                            "string",
+                                            "number",
+                                            "boolean",
+                                            "null"
+                                        ]
+                                    }
                                 }
                             ]
                         },
