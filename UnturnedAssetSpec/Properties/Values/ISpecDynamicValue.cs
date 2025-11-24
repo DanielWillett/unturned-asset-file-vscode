@@ -1255,6 +1255,7 @@ public static class SpecDynamicValue
         throw new JsonException($"Unexpected token type {reader.TokenType} when parsing ISpecDynamicValue.");
     }
 
+#nullable disable
     private struct ReadEquatableArrayVisitor(Array array) : ISpecPropertyTypeVisitor
     {
         public ISpecDynamicValue Result;
@@ -1264,6 +1265,7 @@ public static class SpecDynamicValue
             Result = new SpecDynamicConcreteValue<T>((T)Activator.CreateInstance(typeof(T), array), type);
         }
     }
+#nullable restore
 
     public static ISpecDynamicValue ReadValue(ref Utf8JsonReader reader, ISpecPropertyType? expectedType, Func<Type?, ISpecPropertyType, ISpecDynamicValue> invalidTypeThrowHandler)
     {

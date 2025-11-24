@@ -277,7 +277,7 @@ public class SpecDynamicConcreteConvertibleValue<T> : SpecDynamicConcreteValue<T
             return true;
         }
 
-        if (SpecDynamicEquationTreeValueHelpers.TryConvert(ValueIntl, IsNull, out value, out isNull))
+        if (SpecDynamicEquationTreeValueHelpers.TryConvert(ValueIntl, IsNull, out value!, out isNull))
         {
             return true;
         }

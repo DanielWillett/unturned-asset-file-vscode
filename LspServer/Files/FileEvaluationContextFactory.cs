@@ -67,7 +67,8 @@ internal class FileEvaluationContextFactory
                 null)
             {
                 Node = valueNode,
-                Parent = null
+                Parent = null,
+                BaseKey = parentNode?.Key
             };
             return false;
         }

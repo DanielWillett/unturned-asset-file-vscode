@@ -21,7 +21,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// </summary>
 public sealed class TypeReferenceSpecPropertyType :
-    BaseSpecPropertyType<QualifiedType>,
+    BaseSpecPropertyType<TypeReferenceSpecPropertyType, QualifiedType>,
     ISpecPropertyType<QualifiedType>,
     IElementTypeSpecPropertyType,
     IEquatable<TypeReferenceSpecPropertyType?>,
@@ -39,10 +39,7 @@ public sealed class TypeReferenceSpecPropertyType :
     public override string Type => "TypeReference";
 
     /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
-
-    /// <inheritdoc />
-    public Type ValueType => typeof(QualifiedType);
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
 
@@ -85,21 +82,7 @@ public sealed class TypeReferenceSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out QualifiedType type))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteValue<QualifiedType>(type, this);
-        return false;
-    }
-
-#pragma warning disable CS8500
-    /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
     {
         if (parse.Node == null)
         {
@@ -213,12 +196,4 @@ public sealed class TypeReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(TypeReferenceSpecPropertyType? other) => other != null && ElementType.Equals(other.ElementType);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is TypeReferenceSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<QualifiedType>? other) => other is TypeReferenceSpecPropertyType t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop overlap_give_gun
 /// </code>
 /// </summary>
-public sealed class OverlapVolumeIdSpecPropertyType : BasicSpecPropertyType<OverlapVolumeIdSpecPropertyType, string>
+public sealed class OverlapVolumeIdSpecPropertyType : BaseSpecPropertyType<OverlapVolumeIdSpecPropertyType, string>
 {
     public static readonly OverlapVolumeIdSpecPropertyType Instance = new OverlapVolumeIdSpecPropertyType();
 
@@ -28,7 +28,7 @@ public sealed class OverlapVolumeIdSpecPropertyType : BasicSpecPropertyType<Over
     /// <inheritdoc />
     public override string DisplayName => "NPC Overlap Volume ID";
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)

@@ -21,7 +21,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </para>
 /// </summary>
 public class IdSpecPropertyType :
-    BaseSpecPropertyType<ushort>,
+    BaseSpecPropertyType<IdSpecPropertyType, ushort>,
     ISpecPropertyType<ushort>,
     IElementTypeSpecPropertyType,
     ISpecialTypesSpecPropertyType,
@@ -40,10 +40,7 @@ public class IdSpecPropertyType :
     public override string Type => "Id";
 
     /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
-
-    /// <inheritdoc />
-    public Type ValueType => typeof(ushort);
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
 
     public string? ToString(ISpecDynamicValue value)
     {
@@ -107,20 +104,10 @@ public class IdSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out ushort val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteConvertibleValue<ushort>(val, this);
-        return true;
-    }
+    protected override ISpecDynamicValue CreateValue(ushort value) => new SpecDynamicConcreteConvertibleValue<ushort>(value, this);
 
     /// <inheritdoc />
-    public virtual bool TryParseValue(in SpecPropertyTypeParseContext parse, out ushort value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out ushort value)
     {
         if (parse.Node == null)
         {
@@ -151,12 +138,4 @@ public class IdSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(IdSpecPropertyType? other) => other != null && GetType() == other.GetType() && Category.Equals(other.Category) && OtherElementTypes.Equals(other.OtherElementTypes);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is IdSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<ushort>? other) => other is IdSpecPropertyType t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

@@ -12,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// </summary>
 /// <remarks>Any lines ending in <c>_Button</c> and <c>_Button_Tooltip</c> are valid.</remarks>
-public sealed class ActionKeySpecPropertyType : BasicSpecPropertyType<ActionKeySpecPropertyType, string>
+public sealed class ActionKeySpecPropertyType : BaseSpecPropertyType<ActionKeySpecPropertyType, string>
 {
     public static readonly ActionKeySpecPropertyType Instance = new ActionKeySpecPropertyType();
 
@@ -30,7 +30,7 @@ public sealed class ActionKeySpecPropertyType : BasicSpecPropertyType<ActionKeyS
     /// <inheritdoc />
     public override string DisplayName => "Action Button Label";
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)

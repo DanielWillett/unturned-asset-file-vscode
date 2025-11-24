@@ -41,6 +41,9 @@ public class MutableVirtualFile : IMutableWorkspaceFile, IMutableWorkspaceFileUp
         return _parent.GetFullText();
     }
 
+    /// <inheritdoc />
+    public event Action<IWorkspaceFile, FileRange>? OnUpdated;
+
     public string? GetLine(int lineNum, bool includeNewLine = false)
     {
         return _parent.GetLine(lineNum, includeNewLine);
@@ -69,6 +72,7 @@ public class MutableVirtualFile : IMutableWorkspaceFile, IMutableWorkspaceFileUp
     public void SetFullText(ReadOnlySpan<char> text)
     {
         _listener.RecordFullReplace(text, null);
+        OnUpdated?.Invoke(this, FullRange);
     }
 
     public void UpdateText(Action<IMutableWorkspaceFileUpdater> fileUpdate)
@@ -76,6 +80,7 @@ public class MutableVirtualFile : IMutableWorkspaceFile, IMutableWorkspaceFileUp
         lock (_parent.SyncRoot)
         {
             fileUpdate(this);
+            OnUpdated?.Invoke(this, FullRange);
         }
     }
 
@@ -84,6 +89,7 @@ public class MutableVirtualFile : IMutableWorkspaceFile, IMutableWorkspaceFileUp
         lock (_parent.SyncRoot)
         {
             fileUpdate(this, state);
+            OnUpdated?.Invoke(this, FullRange);
         }
     }
 

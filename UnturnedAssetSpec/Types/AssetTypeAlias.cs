@@ -18,7 +18,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop Vehicle_Paint_Tool
 /// </code>
 /// </summary>
-public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, string>,
+public sealed class AssetTypeAlias : BaseSpecPropertyType<AssetTypeAlias, string>,
     IStringParseableSpecPropertyType,
     IEquatable<AssetTypeAlias>,
     IAutoCompleteSpecPropertyType,
@@ -61,7 +61,7 @@ public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, strin
         );
     }
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new AssetTypeAliasValue(value!, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new AssetTypeAliasValue(value!, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)

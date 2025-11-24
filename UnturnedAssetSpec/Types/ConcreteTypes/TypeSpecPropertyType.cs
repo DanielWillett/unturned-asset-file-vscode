@@ -11,7 +11,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop SDG.Unturned.ItemCaliberAsset, Assembly-CSharp
 /// </code>
 /// </summary>
-public sealed class TypeSpecPropertyType : BasicSpecPropertyType<TypeSpecPropertyType, QualifiedType>, IStringParseableSpecPropertyType
+public sealed class TypeSpecPropertyType : BaseSpecPropertyType<TypeSpecPropertyType, QualifiedType>, IStringParseableSpecPropertyType
 {
     public static readonly TypeSpecPropertyType Instance = new TypeSpecPropertyType();
 

@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop core.masterbundle
 /// </code>
 /// </summary>
-public sealed class MasterBundleNameSpecPropertyType : BasicSpecPropertyType<MasterBundleNameSpecPropertyType, string>
+public sealed class MasterBundleNameSpecPropertyType : BaseSpecPropertyType<MasterBundleNameSpecPropertyType, string>
 {
     public static readonly MasterBundleNameSpecPropertyType Instance = new MasterBundleNameSpecPropertyType();
 
@@ -28,7 +28,7 @@ public sealed class MasterBundleNameSpecPropertyType : BasicSpecPropertyType<Mas
     /// <inheritdoc />
     public override string DisplayName => "Masterbundle Name";
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)

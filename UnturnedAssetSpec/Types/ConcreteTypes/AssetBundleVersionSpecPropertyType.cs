@@ -16,7 +16,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 6
 /// </code>
 /// </summary>
-public sealed class AssetBundleVersionSpecPropertyType : BasicSpecPropertyType<AssetBundleVersionSpecPropertyType, int>, IAutoCompleteSpecPropertyType, IStringParseableSpecPropertyType
+public sealed class AssetBundleVersionSpecPropertyType : BaseSpecPropertyType<AssetBundleVersionSpecPropertyType, int>, IAutoCompleteSpecPropertyType, IStringParseableSpecPropertyType
 {
     public static readonly AssetBundleVersionSpecPropertyType Instance = new AssetBundleVersionSpecPropertyType();
 

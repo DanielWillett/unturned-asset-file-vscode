@@ -43,7 +43,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </para>
 /// </summary>
 public sealed class LegacyCompatibleListSpecPropertyType :
-    BaseSpecPropertyType<EquatableArray<CustomSpecTypeInstance>>,
+    BaseSpecPropertyType<LegacyCompatibleListSpecPropertyType, EquatableArray<CustomSpecTypeInstance>>,
     ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>>,
     IListTypeSpecPropertyType,
     IEquatable<LegacyCompatibleListSpecPropertyType>
@@ -51,8 +51,8 @@ public sealed class LegacyCompatibleListSpecPropertyType :
     private readonly ISpecType _specifiedBaseType;
 
     public override string Type => "LegacyCompatibleList";
-    public Type ValueType => typeof(EquatableArray<CustomSpecTypeInstance>);
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     string IElementTypeSpecPropertyType.ElementType => _specifiedBaseType.Type;
 
@@ -74,25 +74,9 @@ public sealed class LegacyCompatibleListSpecPropertyType :
         DisplayName = $"List of {type.DisplayName} (Legacy Compatible)";
     }
 
-    public bool Equals(ISpecPropertyType? other) => other is LegacyCompatibleListSpecPropertyType;
-    public bool Equals(ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>>? other) => other is LegacyCompatibleListSpecPropertyType;
     public bool Equals(LegacyCompatibleListSpecPropertyType? other) => other != null;
 
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (TryParseValue(in parse, out EquatableArray<CustomSpecTypeInstance> array))
-        {
-            value = array.Array is not { Length: > 0 }
-                ? SpecDynamicValue.Null
-                : new SpecDynamicConcreteValue<EquatableArray<CustomSpecTypeInstance>>(array, this);
-            return true;
-        }
-
-        value = null!;
-        return false;
-    }
-
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out EquatableArray<CustomSpecTypeInstance> value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out EquatableArray<CustomSpecTypeInstance> value)
     {
         bool passed = true;
 
@@ -271,8 +255,6 @@ public sealed class LegacyCompatibleListSpecPropertyType :
         instance = type!;
         return instance != null;
     }
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }
 
 internal sealed class UnresolvedLegacyCompatibleListSpecPropertyType :

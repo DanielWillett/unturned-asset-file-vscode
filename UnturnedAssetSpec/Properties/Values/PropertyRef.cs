@@ -424,7 +424,7 @@ public readonly struct PropertyRefInfo
             return null;
         }
 
-        using IWorkspaceFile? workspaceFile = ctx.Workspace.TemporarilyGetOrLoadFile(file);
+        using IWorkspaceFile? workspaceFile = ctx.Workspace.TemporarilyGetOrLoadFile(file.FilePath);
         if (workspaceFile == null)
         {
             return null;
@@ -507,7 +507,7 @@ public readonly struct PropertyRefInfo
             return false;
         }
 
-        using IWorkspaceFile? workspaceFile = ctx.Workspace.TemporarilyGetOrLoadFile(file);
+        using IWorkspaceFile? workspaceFile = ctx.Workspace.TemporarilyGetOrLoadFile(file.FilePath);
         if (workspaceFile == null)
         {
             return false;

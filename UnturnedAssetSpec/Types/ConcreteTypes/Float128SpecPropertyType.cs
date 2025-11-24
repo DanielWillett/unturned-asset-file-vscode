@@ -12,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 123.456
 /// </code>
 /// </summary>
-public sealed class Float128SpecPropertyType : BasicSpecPropertyType<Float128SpecPropertyType, decimal>, IStringParseableSpecPropertyType
+public sealed class Float128SpecPropertyType : BaseSpecPropertyType<Float128SpecPropertyType, decimal>, IStringParseableSpecPropertyType
 {
     public static readonly Float128SpecPropertyType Instance = new Float128SpecPropertyType();
 

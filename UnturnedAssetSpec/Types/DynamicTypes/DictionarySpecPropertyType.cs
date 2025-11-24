@@ -28,7 +28,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </summary>
 // todo: support for KeyEnumType, KeyAllowExtraValues
 public sealed class DictionarySpecPropertyType<TElementType> :
-    BaseSpecPropertyType<EquatableArray<DictionaryPair<TElementType>>>,
+    BaseSpecPropertyType<DictionarySpecPropertyType<TElementType>, EquatableArray<DictionaryPair<TElementType>>>,
     ISpecPropertyType<EquatableArray<DictionaryPair<TElementType>>>,
     IEquatable<DictionarySpecPropertyType<TElementType>?>,
     IDictionaryTypeSpecPropertyType
@@ -43,10 +43,7 @@ public sealed class DictionarySpecPropertyType<TElementType> :
     public override string Type => "Dictionary";
 
     /// <inheritdoc />
-    public Type ValueType => typeof(EquatableArray<TElementType>);
-
-    /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
 
     public ISpecPropertyType<TElementType> InnerType { get; }
     ISpecPropertyType IDictionaryTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
@@ -66,20 +63,7 @@ public sealed class DictionarySpecPropertyType<TElementType> :
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out EquatableArray<DictionaryPair<TElementType>> val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteValue<EquatableArray<DictionaryPair<TElementType>>>(val, this);
-        return true;
-    }
-
-    /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out EquatableArray<DictionaryPair<TElementType>> value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out EquatableArray<DictionaryPair<TElementType>> value)
     {
         if (parse.Node == null)
         {
@@ -157,14 +141,6 @@ public sealed class DictionarySpecPropertyType<TElementType> :
 
     /// <inheritdoc />
     public bool Equals(DictionarySpecPropertyType<TElementType>? other) => other != null && InnerType.Equals(other.InnerType);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is DictionarySpecPropertyType<TElementType> t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<EquatableArray<DictionaryPair<TElementType>>>? other) => other is DictionarySpecPropertyType<TElementType> t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }
 
 /// <summary>

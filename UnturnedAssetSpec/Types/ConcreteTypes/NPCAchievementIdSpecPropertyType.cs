@@ -12,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// </summary>
 public sealed class NPCAchievementIdSpecPropertyType :
-    BasicSpecPropertyType<NPCAchievementIdSpecPropertyType, string>
+    BaseSpecPropertyType<NPCAchievementIdSpecPropertyType, string>
 {
     public static readonly NPCAchievementIdSpecPropertyType Instance = new NPCAchievementIdSpecPropertyType();
 
@@ -30,7 +30,7 @@ public sealed class NPCAchievementIdSpecPropertyType :
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.String;
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)

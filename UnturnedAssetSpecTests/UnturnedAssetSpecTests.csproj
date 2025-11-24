@@ -21,6 +21,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="exists($(StrongNameKeyPath))">
+    <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$(StrongNameKeyPath)</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>

@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -27,7 +26,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
 
     private List<Diagnostic> _diagnostics;
     private readonly Lock _diagnosticReadLock;
-    private string? _localizationAssetFile;
+    //private string? _localizationAssetFile;
     internal FileTypeInfo TypeInfo;
     private OpenedFile? _openedFile;
     private List<DatDiagnosticMessage> _diagnosticBuffer;
@@ -265,11 +264,16 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
 
     }
 
+    event Action<IWorkspaceFile, FileRange>? IWorkspaceFile.OnUpdated
+    {
+        add { }
+        remove { }
+    }
+
     void IDisposable.Dispose() { }
     string IWorkspaceFile.File => FilePath;
     ISourceFile IWorkspaceFile.SourceFile => SourceFile ?? throw new InvalidOperationException();
     string IWorkspaceFile.GetFullText() => throw new NotSupportedException();
-
 
     private class DiagnosticsNodeVisitor : ResolvedPropertyNodeVisitor, IDiagnosticSink
     {

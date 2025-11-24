@@ -22,7 +22,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for character count limits.
 /// </para>
 /// </summary>
-public sealed class FormatStringSpecPropertyType : BasicSpecPropertyType<FormatStringSpecPropertyType, string>, IStringParseableSpecPropertyType
+public sealed class FormatStringSpecPropertyType : BaseSpecPropertyType<FormatStringSpecPropertyType, string>, IStringParseableSpecPropertyType
 {
     public static readonly FormatStringSpecPropertyType OneNoRichText = new FormatStringSpecPropertyType(1, false);
     public static readonly FormatStringSpecPropertyType TwoNoRichText = new FormatStringSpecPropertyType(2, false);
@@ -43,7 +43,7 @@ public sealed class FormatStringSpecPropertyType : BasicSpecPropertyType<FormatS
     /// </summary>
     public bool AllowRichText { get; }
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     public string? ToString(ISpecDynamicValue value)
     {

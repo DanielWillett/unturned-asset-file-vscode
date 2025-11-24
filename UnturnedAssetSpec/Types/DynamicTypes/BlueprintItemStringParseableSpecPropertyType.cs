@@ -23,7 +23,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </para>
 /// </summary>
 public abstract class BlueprintItemStringParseableSpecPropertyType :
-    BaseSpecPropertyType<CustomSpecTypeInstance>,
+    BaseSpecPropertyType<BlueprintItemStringParseableSpecPropertyType, CustomSpecTypeInstance>,
     ISpecPropertyType<CustomSpecTypeInstance>
 {
     private readonly IAssetSpecDatabase _database;
@@ -32,28 +32,16 @@ public abstract class BlueprintItemStringParseableSpecPropertyType :
 
     public abstract string BackingType { get; }
 
-    public Type ValueType => typeof(CustomSpecTypeInstance);
-
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     protected BlueprintItemStringParseableSpecPropertyType(IAssetSpecDatabase database)
     {
         _database = database.ResolveFacade();
     }
 
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (TryParseValue(in parse, out CustomSpecTypeInstance? instance))
-        {
-            value = (ISpecDynamicValue?)instance ?? SpecDynamicValue.Null;
-            return true;
-        }
+    protected override ISpecDynamicValue CreateValue(CustomSpecTypeInstance value) => (ISpecDynamicValue?)value ?? SpecDynamicValue.Null;
 
-        value = null!;
-        return false;
-    }
-
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out CustomSpecTypeInstance? value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out CustomSpecTypeInstance? value)
     {
         if (parse.Node == null)
         {
@@ -113,9 +101,5 @@ public abstract class BlueprintItemStringParseableSpecPropertyType :
         return true;
     }
     
-    public abstract bool Equals(ISpecPropertyType? other);
-    public abstract bool Equals(ISpecPropertyType<CustomSpecTypeInstance>? other);
     public abstract bool Equals(BlueprintItemStringParseableSpecPropertyType? other);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

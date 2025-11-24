@@ -588,7 +588,7 @@ public abstract class ColorStrictHexSpecPropertyType :
 /// <typeparam name="TSelf">Property type.</typeparam>
 /// <typeparam name="T">Color type.</typeparam>
 public abstract class BaseColorSpecPropertyType<TSelf, T>
-    : BasicSpecPropertyType<TSelf, T>,
+    : BaseSpecPropertyType<TSelf, T>,
         IVectorSpecPropertyType<Color>,
         IVectorSpecPropertyType<Color32>,
         ILegacyCompositeTypeProvider

@@ -824,6 +824,9 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
             ForEachTypeInHierarchyWhile(info, types, t =>
             {
+                if (info is not IPropertiesSpecType prop)
+                    return false;
+
                 SpecProperty[]
                     props0 = info.GetProperties(SpecPropertyContext.Property),
                     local0 = info.GetProperties(SpecPropertyContext.Localization),
@@ -832,12 +835,12 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                     local1 = t.GetProperties(SpecPropertyContext.Localization),
                     asset1 = t.GetProperties(SpecPropertyContext.BundleAsset);
 
-                info.SetProperties(Merge(info, props0, props1), SpecPropertyContext.Property);
-                info.SetProperties(Merge(info, local0, local1), SpecPropertyContext.Localization);
-                info.SetProperties(Merge(info, asset0, asset1), SpecPropertyContext.BundleAsset);
+                info.SetProperties(Merge(prop, props0, props1), SpecPropertyContext.Property);
+                info.SetProperties(Merge(prop, local0, local1), SpecPropertyContext.Localization);
+                info.SetProperties(Merge(prop, asset0, asset1), SpecPropertyContext.BundleAsset);
                 return false;
 
-                SpecProperty[] Merge(ISpecType owner, SpecProperty[] p0, SpecProperty[] p1)
+                SpecProperty[] Merge(IPropertiesSpecType owner, SpecProperty[] p0, SpecProperty[] p1)
                 {
                     if (p1.Length == 0)
                         return p0;
@@ -850,7 +853,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                         foreach (SpecBundleAsset prop in bundles)
                         {
                             int existingIndex = newProperties.FindIndex(x => ReferenceEquals(x.Owner, owner) && string.Equals(x.Key, prop.Key, StringComparison.Ordinal));
-                            if (existingIndex != -1 && !ReferenceEquals(newProperties[existingIndex].Type, HideInheritedPropertyType.Instance))
+                            if (existingIndex != -1 && !ReferenceEquals(newProperties[existingIndex].Type.Type, HideInheritedPropertyType.Instance))
                             {
                                 Log($"Parent bundle asset {prop.Owner.Type.GetTypeName()}.{prop.Key} hidden by a duplicate bundle asset present in {owner.Type.GetTypeName()}.");
                                 continue;
@@ -881,7 +884,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                         foreach (SpecProperty prop in p1)
                         {
                             int existingIndex = newProperties.FindIndex(x => ReferenceEquals(x.Owner, owner) && string.Equals(x.Key, prop.Key, StringComparison.Ordinal));
-                            if (existingIndex != -1 && !ReferenceEquals(newProperties[existingIndex].Type, HideInheritedPropertyType.Instance))
+                            if (existingIndex != -1 && !ReferenceEquals(newProperties[existingIndex].Type.Type, HideInheritedPropertyType.Instance))
                             {
                                 Log($"Parent property {prop.Owner.Type.GetTypeName()}.{prop.Key} hidden by a duplicate property present in {owner.Type.GetTypeName()}.");
                                 continue;
@@ -908,7 +911,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
             ForEachPropertyWhile(info, prop =>
             {
-                if (!ReferenceEquals(prop.Type, HideInheritedPropertyType.Instance))
+                if (!ReferenceEquals(prop.Type.Type, HideInheritedPropertyType.Instance))
                     return true;
 
                 Log(prop.Owner.Parent.IsNull

@@ -38,7 +38,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </para>
 /// </summary>
 public sealed class AssetReferenceSpecPropertyType :
-    BasicSpecPropertyType<AssetReferenceSpecPropertyType, Guid>,
+    BaseSpecPropertyType<AssetReferenceSpecPropertyType, Guid>,
     ISpecPropertyType<Guid>,
     IElementTypeSpecPropertyType,
     ISpecialTypesSpecPropertyType,

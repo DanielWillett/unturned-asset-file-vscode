@@ -45,7 +45,7 @@ internal class HoverHandler : IHoverHandler
         SpecProperty? prop = ctx.EvaluationContext.Self;
         if (prop == null)
         {
-            builder.UnknownProperty(ctx.BaseKey, ctx.Breadcrumbs);
+            builder.UnknownProperty(in ctx);
         }
         else
         {
@@ -91,12 +91,11 @@ public readonly struct HoverMarkdownBuilder
         return _hov.ToString();
     }
 
-    public void UnknownProperty(string? propertyName, PropertyBreadcrumbs breadcrumbs)
+    public void UnknownProperty(in SpecPropertyTypeParseContext ctx)
     {
         _hov.Append(Properties.Resources.Hover_UnknownProperty)
             .Append(": '")
-            .Append(breadcrumbs.ToString())
-            .Append(propertyName)
+            .Append(ctx.GetParseTargetDisplayName())
             .Append('\'');
     }
 

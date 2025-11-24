@@ -15,7 +15,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop False
 /// </code>
 /// </summary>
-public sealed class BooleanSpecPropertyType : BasicSpecPropertyType<BooleanSpecPropertyType, bool>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
+public sealed class BooleanSpecPropertyType : BaseSpecPropertyType<BooleanSpecPropertyType, bool>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
     public static readonly BooleanSpecPropertyType Instance = new BooleanSpecPropertyType();
 

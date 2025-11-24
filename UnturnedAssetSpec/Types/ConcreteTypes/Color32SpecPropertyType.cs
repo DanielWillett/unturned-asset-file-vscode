@@ -66,6 +66,8 @@ public sealed class Color32RGBASpecPropertyType : Color32SpecPropertyType
 
     static Color32RGBASpecPropertyType() { }
 
+    public override int GetHashCode() => 92;
+
     /// <inheritdoc />
     public override string Type => "Color32RGBA";
 
@@ -107,6 +109,8 @@ public sealed class Color32RGBLegacySpecPropertyType : Color32SpecPropertyType
     public static readonly Color32RGBLegacySpecPropertyType Instance = new Color32RGBLegacySpecPropertyType();
 
     static Color32RGBLegacySpecPropertyType() { }
+
+    public override int GetHashCode() => 93;
 
     /// <inheritdoc />
     public override string Type => "Color32RGBLegacy";
@@ -152,6 +156,8 @@ public sealed class Color32RGBALegacySpecPropertyType : Color32SpecPropertyType
 
     static Color32RGBALegacySpecPropertyType() { }
 
+    public override int GetHashCode() => 94;
+
     /// <inheritdoc />
     public override string Type => "Color32RGBALegacy";
 
@@ -178,6 +184,8 @@ public sealed class Color32RGBStrictHexSpecPropertyType : Color32StrictHexSpecPr
 
     static Color32RGBStrictHexSpecPropertyType() { }
 
+    public override int GetHashCode() => 95;
+
     /// <inheritdoc />
     public override string Type => "Color32RGBStrictHex";
 
@@ -200,6 +208,8 @@ public sealed class Color32RGBAStrictHexSpecPropertyType : Color32StrictHexSpecP
     public static readonly Color32RGBAStrictHexSpecPropertyType Instance = new Color32RGBAStrictHexSpecPropertyType();
 
     static Color32RGBAStrictHexSpecPropertyType() { }
+
+    public override int GetHashCode() => 96;
 
     /// <inheritdoc />
     public override string Type => "Color32RGBAStrictHex";

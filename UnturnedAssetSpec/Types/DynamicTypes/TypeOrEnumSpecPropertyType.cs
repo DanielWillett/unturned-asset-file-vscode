@@ -22,7 +22,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// </summary>
 public sealed class TypeOrEnumSpecPropertyType :
-    BaseSpecPropertyType<QualifiedType>,
+    BaseSpecPropertyType<TypeOrEnumSpecPropertyType, QualifiedType>,
     ISpecPropertyType<QualifiedType>,
     IElementTypeSpecPropertyType,
     IEquatable<TypeOrEnumSpecPropertyType>,
@@ -46,10 +46,7 @@ public sealed class TypeOrEnumSpecPropertyType :
     public override string Type => "TypeOrEnum";
 
     /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
-
-    /// <inheritdoc />
-    public Type ValueType => typeof(QualifiedType);
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     public string? ToString(ISpecDynamicValue value)
     {
@@ -93,20 +90,7 @@ public sealed class TypeOrEnumSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out QualifiedType val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteValue<QualifiedType>(val, this);
-        return true;
-    }
-
-    /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
     {
         if (parse.Node == null)
         {
@@ -195,15 +179,7 @@ public sealed class TypeOrEnumSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool Equals(TypeOrEnumSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is TypeOrEnumSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<QualifiedType>? other) => other is TypeOrEnumSpecPropertyType t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
+    public bool Equals(TypeOrEnumSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType) && EnumType.Equals(other.EnumType);
 
     public ValueHoverProviderResult? GetDescription(in SpecPropertyTypeParseContext ctx, ISpecDynamicValue value)
     {

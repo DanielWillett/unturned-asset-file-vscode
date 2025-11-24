@@ -756,9 +756,16 @@ Key Value // not inline comment
         public string File => "./test.asset";
 
         /// <inheritdoc />
-        public ISourceFile SourceFile => null;
+        public ISourceFile SourceFile => null!;
 
         /// <inheritdoc />
-        public string GetFullText() => null;
+        public string GetFullText() => null!;
+
+        /// <inheritdoc />
+        public event Action<IWorkspaceFile, FileRange>? OnUpdated
+        {
+            add { }
+            remove { }
+        }
     }
 }

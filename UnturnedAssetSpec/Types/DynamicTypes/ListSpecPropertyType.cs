@@ -36,7 +36,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </para>
 /// </summary>
 public sealed class ListSpecPropertyType<TElementType> :
-    BaseSpecPropertyType<EquatableArray<TElementType>>,
+    BaseSpecPropertyType<ListSpecPropertyType<TElementType>, EquatableArray<TElementType>>,
     ISpecPropertyType<EquatableArray<TElementType>>,
     IEquatable<ListSpecPropertyType<TElementType>?>,
     IListTypeSpecPropertyType
@@ -51,10 +51,7 @@ public sealed class ListSpecPropertyType<TElementType> :
     public override string Type => AllowSingle ? "ListOrSingle" : "List";
 
     /// <inheritdoc />
-    public Type ValueType => typeof(EquatableArray<TElementType>);
-
-    /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
 
     public ISpecPropertyType<TElementType> InnerType { get; }
     ISpecPropertyType IListTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
@@ -75,20 +72,7 @@ public sealed class ListSpecPropertyType<TElementType> :
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out EquatableArray<TElementType> val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteValue<EquatableArray<TElementType>>(val, this);
-        return true;
-    }
-
-    /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out EquatableArray<TElementType> value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out EquatableArray<TElementType> value)
     {
         if (parse.Node == null)
         {
@@ -165,14 +149,6 @@ public sealed class ListSpecPropertyType<TElementType> :
 
     /// <inheritdoc />
     public bool Equals(ListSpecPropertyType<TElementType>? other) => other != null && InnerType.Equals(other.InnerType) && AllowSingle == other.AllowSingle;
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<EquatableArray<TElementType>>? other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }
 
 internal sealed class UnresolvedListSpecPropertyType :

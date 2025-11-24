@@ -13,7 +13,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop -123
 /// </code>
 /// </summary>
-public sealed class Int64SpecPropertyType : BasicSpecPropertyType<Int64SpecPropertyType, long>, IStringParseableSpecPropertyType
+public sealed class Int64SpecPropertyType : BaseSpecPropertyType<Int64SpecPropertyType, long>, IStringParseableSpecPropertyType
 {
     public static readonly Int64SpecPropertyType Instance = new Int64SpecPropertyType();
 

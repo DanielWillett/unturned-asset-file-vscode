@@ -12,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 123.456
 /// </code>
 /// </summary>
-public sealed class Float64SpecPropertyType : BasicSpecPropertyType<Float64SpecPropertyType, double>, IStringParseableSpecPropertyType
+public sealed class Float64SpecPropertyType : BaseSpecPropertyType<Float64SpecPropertyType, double>, IStringParseableSpecPropertyType
 {
     public static readonly Float64SpecPropertyType Instance = new Float64SpecPropertyType();
 

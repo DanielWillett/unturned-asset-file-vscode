@@ -206,7 +206,11 @@ internal sealed class UnturnedAssetFileLspServer
         });
 
         await server.WaitForExit.ConfigureAwait(false);
-        _closeTimer?.Dispose();
+
+        if (_closeTimer != null)
+        {
+            await _closeTimer.DisposeAsync();
+        }
     }
 
     private static bool CheckClientProcessAlive()

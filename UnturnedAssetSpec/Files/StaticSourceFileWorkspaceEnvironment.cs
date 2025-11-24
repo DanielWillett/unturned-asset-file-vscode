@@ -56,22 +56,22 @@ public class StaticSourceFileWorkspaceEnvironment : IWorkspaceEnvironment, IDisp
     }
 
     /// <inheritdoc />
-    public IWorkspaceFile? TemporarilyGetOrLoadFile(DiscoveredDatFile datFile)
+    public IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath)
     {
         if (_cache == null)
         {
-            return StaticSourceFile.FromAssetFile(datFile.FilePath, _database, _defaultSourceOptions);
+            return StaticSourceFile.FromAssetFile(filePath, _database, _defaultSourceOptions);
         }
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER || NET472_OR_GREATER
         StaticSourceFile file = _cache.GetOrAdd(
-            datFile.FilePath,
+            filePath,
             static (filePath, env) => StaticSourceFile.FromAssetFile(filePath, env._database, env._defaultSourceOptions),
             this
         );
 #else
         StaticSourceFile file = _cache.GetOrAdd(
-            datFile.FilePath,
+            filePath,
             filePath => StaticSourceFile.FromAssetFile(filePath, _database, _defaultSourceOptions)
         );
 #endif

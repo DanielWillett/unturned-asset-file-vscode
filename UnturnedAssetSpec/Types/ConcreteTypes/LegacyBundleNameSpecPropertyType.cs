@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop Asset/bndl.unity3d
 /// </code>
 /// </summary>
-public sealed class LegacyBundleNameSpecPropertyType : BasicSpecPropertyType<LegacyBundleNameSpecPropertyType, string>
+public sealed class LegacyBundleNameSpecPropertyType : BaseSpecPropertyType<LegacyBundleNameSpecPropertyType, string>
 {
     public static readonly LegacyBundleNameSpecPropertyType Instance = new LegacyBundleNameSpecPropertyType();
 
@@ -28,7 +28,7 @@ public sealed class LegacyBundleNameSpecPropertyType : BasicSpecPropertyType<Leg
     /// <inheritdoc />
     public override string DisplayName => "Legacy Bundle Name";
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)

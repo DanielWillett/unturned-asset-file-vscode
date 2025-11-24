@@ -13,7 +13,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 15
 /// </code>
 /// </summary>
-public sealed class BeardIndexSpecPropertyType : BasicSpecPropertyType<BeardIndexSpecPropertyType, byte>, IStringParseableSpecPropertyType
+public sealed class BeardIndexSpecPropertyType : BaseSpecPropertyType<BeardIndexSpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly BeardIndexSpecPropertyType Instance = new BeardIndexSpecPropertyType();
 

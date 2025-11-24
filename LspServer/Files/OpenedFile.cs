@@ -3,7 +3,7 @@
 
 // The 'virtual file system' is used to check that files are being synced properly,
 // and just writes the LSP's version of the file to the desktop every time it updates.
-#define KEEP_VIRTUAL_FILE_SYSTEM
+//#define KEEP_VIRTUAL_FILE_SYSTEM
 
 #endif
 
@@ -17,6 +17,7 @@ using System.Runtime.CompilerServices;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 #if DEBUG
 using System.ComponentModel;
+// ReSharper disable InconsistentOrderOfLocks
 #endif
 #if KEEP_VIRTUAL_FILE_SYSTEM
 using System.Text;
@@ -43,6 +44,7 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
     private readonly IAssetSpecDatabase _database;
 
     private readonly bool _obsessivelyValidate;
+    private readonly IWorkspaceEnvironment? _environment;
 
     private ISourceFile? _sourceFile;
 
@@ -151,6 +153,8 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
     /// </summary>
     public int LineCount => _lineCount;
 
+    private IWorkspaceFile? _assetSourceFile;
+
     public ISourceFile SourceFile
     {
         get
@@ -172,13 +176,45 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
                     diagnosticSink: this
                 );
 
-                SourceNodeTokenizer.RootInfo info = SourceNodeTokenizer.RootInfo.Asset(this, _database);
+                string fsPath = Uri.GetFileSystemPath();
+                FileTypeInfo typeInfo = new FileTypeInfo(fsPath);
+
+                SourceNodeTokenizer.RootInfo info;
+                if (typeInfo.IsAsset)
+                {
+                    info = SourceNodeTokenizer.RootInfo.Asset(this, _database);
+                }
+                else if (typeInfo.IsLocalization)
+                {
+                    if (typeInfo.AssetPath != null && _assetSourceFile == null)
+                    {
+                        _assetSourceFile = _environment?.TemporarilyGetOrLoadFile(typeInfo.AssetPath);
+                        if (_assetSourceFile != null)
+                            _assetSourceFile.OnUpdated += OnAssetFileUpdated;
+                    }
+
+                    info = _assetSourceFile?.SourceFile is not IAssetSourceFile a
+                        ? SourceNodeTokenizer.RootInfo.Other(this, _database)
+                        : SourceNodeTokenizer.RootInfo.Localization(this, _database, a);
+                }
+                else
+                {
+                    info = SourceNodeTokenizer.RootInfo.Other(this, _database);
+                }
 
                 file = tokenizer.ReadRootDictionary(info);
                 _sourceFile = file;
             }
 
             return file;
+        }
+    }
+
+    private void OnAssetFileUpdated(IWorkspaceFile arg1, FileRange arg2)
+    {
+        lock (UpdateLock)
+        {
+            BroadcastUpdate(FullRange);
         }
     }
 
@@ -191,6 +227,12 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
     public DocumentUri Uri { get; }
 
     public event Action<OpenedFile, FileRange>? OnUpdated;
+
+    event Action<IWorkspaceFile, FileRange>? IWorkspaceFile.OnUpdated
+    {
+        add => OnUpdated += value;
+        remove => OnUpdated -= value;
+    }
 
     public FileRange FullRange
     {
@@ -207,11 +249,12 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
 
 #pragma warning disable CS8618, CS9264
     // ReSharper disable once UnusedParameter.Local
-    public OpenedFile(DocumentUri uri, ReadOnlySpan<char> text, ILogger logger, IAssetSpecDatabase database, bool obsessivelyValidate = false, bool useVirtualFiles = false)
+    internal OpenedFile(DocumentUri uri, ReadOnlySpan<char> text, ILogger logger, IAssetSpecDatabase database, bool obsessivelyValidate = false, bool useVirtualFiles = false, IWorkspaceEnvironment? environment = null)
     {
         _logger = logger;
         _database = database;
         _obsessivelyValidate = obsessivelyValidate;
+        _environment = environment;
         Uri = uri;
 
         string path = Path.GetFullPath(uri.GetFileSystemPath());
@@ -775,6 +818,16 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
 
     public void Dispose()
     {
+        lock (EditLock)
+        {
+            if (_assetSourceFile == null)
+                return;
+
+            _assetSourceFile.OnUpdated -= OnAssetFileUpdated;
+            _assetSourceFile.Dispose();
+            _assetSourceFile = null;
+        }
+
 #if KEEP_VIRTUAL_FILE_SYSTEM
         lock (_virtualFile)
         {

@@ -13,7 +13,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 22
 /// </code>
 /// </summary>
-public sealed class HairIndexSpecPropertyType : BasicSpecPropertyType<HairIndexSpecPropertyType, byte>, IStringParseableSpecPropertyType
+public sealed class HairIndexSpecPropertyType : BaseSpecPropertyType<HairIndexSpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly HairIndexSpecPropertyType Instance = new HairIndexSpecPropertyType();
 

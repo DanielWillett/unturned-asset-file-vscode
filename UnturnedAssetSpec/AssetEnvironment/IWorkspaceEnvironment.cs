@@ -5,7 +5,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 
 public interface IWorkspaceEnvironment
 {
-    IWorkspaceFile? TemporarilyGetOrLoadFile(DiscoveredDatFile datFile);
+    IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath);
 }
 
 public interface IWorkspaceFile : IDisposable
@@ -20,6 +20,11 @@ public interface IWorkspaceFile : IDisposable
     /// Gets the entire text of the file as a string in it's current state.
     /// </summary>
     string GetFullText();
+
+    /// <summary>
+    /// Invoked when this file's contents are updated.
+    /// </summary>
+    event Action<IWorkspaceFile, FileRange>? OnUpdated;
 }
 
 public delegate void SpanAction<TState>(ReadOnlySpan<char> span, ref TState state);

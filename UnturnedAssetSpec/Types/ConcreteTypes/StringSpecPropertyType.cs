@@ -17,7 +17,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for character count limits.
 /// </para>
 /// </summary>
-public sealed class StringSpecPropertyType : BasicSpecPropertyType<StringSpecPropertyType, string>, IStringParseableSpecPropertyType
+public sealed class StringSpecPropertyType : BaseSpecPropertyType<StringSpecPropertyType, string>, IStringParseableSpecPropertyType
 {
     public static readonly StringSpecPropertyType Instance = new StringSpecPropertyType();
 
@@ -35,7 +35,7 @@ public sealed class StringSpecPropertyType : BasicSpecPropertyType<StringSpecPro
     /// <inheritdoc />
     public override string DisplayName => "Text";
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     public string? ToString(ISpecDynamicValue value)
     {

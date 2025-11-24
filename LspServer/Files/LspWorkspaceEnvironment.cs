@@ -298,12 +298,12 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         };
     }
 
-    public IWorkspaceFile? TemporarilyGetOrLoadFile(DiscoveredDatFile datFile)
+    public IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath)
     {
-        if (!File.Exists(datFile.FilePath))
+        if (!File.Exists(filePath))
             return null;
 
-        DocumentUri uri = DocumentUri.File(datFile.FilePath);
+        DocumentUri uri = DocumentUri.File(filePath);
         if (_tracker.Files.TryGetValue(uri, out OpenedFile? file))
         {
             return new DontDisposeWorkspaceFile(file);
@@ -311,11 +311,11 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
 
         try
         {
-            return StaticSourceFile.FromAssetFile(datFile.FilePath, _database, SourceNodeTokenizerOptions.Lazy);
+            return StaticSourceFile.FromAssetFile(filePath, _database, SourceNodeTokenizerOptions.Lazy);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to read file {0}.", datFile.FilePath);
+            _logger.LogWarning(ex, "Failed to read file {0}.", filePath);
             return null;
         }
     }
@@ -345,6 +345,13 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
 
         /// <inheritdoc />
         public string GetFullText() => file.GetFullText();
+
+        /// <inheritdoc />
+        public event Action<IWorkspaceFile, FileRange>? OnUpdated
+        {
+            add => file.OnUpdated += value;
+            remove => file.OnUpdated -= value;
+        }
 
         /// <inheritdoc />
         public void Dispose() { }

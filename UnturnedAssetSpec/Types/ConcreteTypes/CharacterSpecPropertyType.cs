@@ -11,7 +11,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop a
 /// </code>
 /// </summary>
-public sealed class CharacterSpecPropertyType : BasicSpecPropertyType<CharacterSpecPropertyType, char>, IStringParseableSpecPropertyType
+public sealed class CharacterSpecPropertyType : BaseSpecPropertyType<CharacterSpecPropertyType, char>, IStringParseableSpecPropertyType
 {
     public static readonly CharacterSpecPropertyType Instance = new CharacterSpecPropertyType();
 

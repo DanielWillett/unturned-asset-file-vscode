@@ -407,6 +407,7 @@ public sealed class TemplateProcessor
             totalDigitCount += StringHelper.CountDigits(num);
         }
 
+#pragma warning disable CS8500
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
         unsafe
         {
@@ -453,6 +454,7 @@ public sealed class TemplateProcessor
                 }
             });
         }
+#pragma warning restore CS8500
 #else
         int len = _totalSegmentLength + totalDigitCount;
         char[]? arr = null;

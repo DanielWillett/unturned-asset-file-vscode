@@ -600,6 +600,9 @@
                             "oneOf":
                             [
                                 {
+                                    "$ref": "#/$defs/switch"
+                                },
+                                {
                                     "type":
                                     [
                                         "string",
@@ -609,9 +612,6 @@
                                         "null",
                                         "array"
                                     ]
-                                },
-                                {
-                                    "$ref": "#/$defs/switch"
                                 }
                             ]
                         },
@@ -621,6 +621,9 @@
                             "oneOf":
                             [
                                 {
+                                    "$ref": "#/$defs/switch"
+                                },
+                                {
                                     "type":
                                     [
                                         "string",
@@ -630,9 +633,6 @@
                                         "null",
                                         "array"
                                     ]
-                                },
-                                {
-                                    "$ref": "#/$defs/switch"
                                 }
                             ]
                         },

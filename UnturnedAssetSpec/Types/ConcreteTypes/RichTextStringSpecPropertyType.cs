@@ -11,7 +11,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop &lt;b&gt;Bold&lt;/b&gt; Text
 /// </code>
 /// </summary>
-public sealed class RichTextStringSpecPropertyType : BasicSpecPropertyType<RichTextStringSpecPropertyType, string>, IStringParseableSpecPropertyType
+public sealed class RichTextStringSpecPropertyType : BaseSpecPropertyType<RichTextStringSpecPropertyType, string>, IStringParseableSpecPropertyType
 {
     public static readonly RichTextStringSpecPropertyType Instance = new RichTextStringSpecPropertyType();
 
@@ -29,7 +29,7 @@ public sealed class RichTextStringSpecPropertyType : BasicSpecPropertyType<RichT
     /// <inheritdoc />
     public override string DisplayName => "Rich Text";
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     public string? ToString(ISpecDynamicValue value)
     {

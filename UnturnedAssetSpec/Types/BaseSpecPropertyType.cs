@@ -1,20 +1,85 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System;
 using System.ComponentModel;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 /// <summary>
-/// A base type for most property types.
+/// A base type for normal property types that parse values.
 /// </summary>
 /// <typeparam name="TValue">Type of value being parsed.</typeparam>
+/// <typeparam name="TSpecPropertyType">The property type being defined (self).</typeparam>
+
+// note: this used to be called BasicSpecPropertyType which derived from BaseSpecPropertyType
+//       but the original base one was pretty much useless so Base was removed and merged with Basic
+
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class BaseSpecPropertyType<TValue>
+public abstract class BaseSpecPropertyType<TSpecPropertyType, TValue> :
+    ISpecPropertyType<TValue>,
+    IEquatable<BaseSpecPropertyType<TSpecPropertyType, TValue>?>
+    where TSpecPropertyType : BaseSpecPropertyType<TSpecPropertyType, TValue>
+    where TValue : IEquatable<TValue>
 {
+    /// <inheritdoc />
+    public abstract SpecPropertyTypeKind Kind { get; }
+
     public abstract string Type { get; }
     public abstract string DisplayName { get; }
-    
+
     public override string ToString() => Type;
+
+    public abstract override int GetHashCode();
+
+    public virtual bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
+    {
+        if (parse.EvaluationContext.Self?.Owner is { OverridableProperties: true } && parse.Node == null)
+        {
+            value = parse.EvaluationContext.Self.DefaultValue!;
+            return value != null;
+        }
+
+        if (!TryParseValue(in parse, out TValue? val))
+        {
+            value = null!;
+            return false;
+        }
+
+        value = val == null ? SpecDynamicValue.Null : CreateValue(val);
+        return true;
+    }
+
+    protected virtual ISpecDynamicValue CreateValue(TValue value)
+    {
+        return new SpecDynamicConcreteValue<TValue>(value, this);
+    }
+
+    /// <inheritdoc />
+    public Type ValueType => typeof(TValue);
+
+    private protected BaseSpecPropertyType() { }
+
+    public bool Equals(ISpecPropertyType? other) => other is BaseSpecPropertyType<TSpecPropertyType, TValue> bs && Equals(bs);
+    public bool Equals(ISpecPropertyType<TValue>? other) => other is BaseSpecPropertyType<TSpecPropertyType, TValue> bs && Equals(bs);
+    
+    public bool Equals(BaseSpecPropertyType<TSpecPropertyType, TValue>? other)
+    {
+        if (this is IEquatable<TSpecPropertyType> equatable)
+        {
+            return other is TSpecPropertyType ts && equatable.Equals(ts);
+        }
+
+        return other != null;
+    }
+
+    /// <inheritdoc />
+    public abstract bool TryParseValue(in SpecPropertyTypeParseContext parse, out TValue? value);
+
+    public override bool Equals(object? obj) => obj is BaseSpecPropertyType<TSpecPropertyType, TValue> bs && Equals(bs);
+
+    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
+
+    #region Diagnostics
 
     protected bool MissingNode(in SpecPropertyTypeParseContext parse, out TValue? value)
     {
@@ -99,5 +164,5 @@ public abstract class BaseSpecPropertyType<TValue>
         return false;
     }
 
-    public abstract override int GetHashCode();
+    #endregion
 }

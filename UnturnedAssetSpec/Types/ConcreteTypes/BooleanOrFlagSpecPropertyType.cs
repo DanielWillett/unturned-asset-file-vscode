@@ -33,7 +33,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// Example: <c>ItemBarricadeAsset.Bypass_Claim</c>
 /// </summary>
-public sealed class BooleanOrFlagSpecPropertyType : BasicSpecPropertyType<BooleanOrFlagSpecPropertyType, bool>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
+public sealed class BooleanOrFlagSpecPropertyType : BaseSpecPropertyType<BooleanOrFlagSpecPropertyType, bool>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
     public static readonly BooleanOrFlagSpecPropertyType Instance = new BooleanOrFlagSpecPropertyType();
 

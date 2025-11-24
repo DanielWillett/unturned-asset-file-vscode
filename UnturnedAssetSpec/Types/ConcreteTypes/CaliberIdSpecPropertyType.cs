@@ -16,7 +16,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 123
 /// </code>
 /// </summary>
-public sealed class CaliberIdSpecPropertyType : BasicSpecPropertyType<CaliberIdSpecPropertyType, ushort>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
+public sealed class CaliberIdSpecPropertyType : BaseSpecPropertyType<CaliberIdSpecPropertyType, ushort>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
     public static readonly CaliberIdSpecPropertyType Instance = new CaliberIdSpecPropertyType();
 

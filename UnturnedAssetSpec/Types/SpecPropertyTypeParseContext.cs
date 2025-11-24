@@ -71,7 +71,7 @@ public readonly ref struct SpecPropertyTypeParseContext
         {
             Parent = parentNode,
             Node = valueNode,
-            BaseKey = property?.Key
+            BaseKey = property?.Key ?? (parentNode as IPropertySourceNode)?.Key
         };
     }
 
@@ -112,9 +112,9 @@ public readonly ref struct SpecPropertyTypeParseContext
         {
             AssetSpecDatabaseExtensions.PropertyFindResult result
                 = AssetSpecDatabaseExtensions.GetPropertyKeyInfo(EvaluationContext.Self, prop.Key, EvaluationContext.PropertyContext);
-            return Breadcrumbs.ToString(false, result.Key ?? EvaluationContext.Self.Key);
+            return Breadcrumbs.ToString(false, result.Key ?? BaseKey);
         }
 
-        return Breadcrumbs.ToString(false);
+        return Breadcrumbs.ToString(false, BaseKey);
     }
 }

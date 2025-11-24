@@ -14,7 +14,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for character count limits.
 /// </para>
 /// </summary>
-public sealed class PathSpecPropertyType : BasicSpecPropertyType<PathSpecPropertyType, string>, IStringParseableSpecPropertyType
+public sealed class PathSpecPropertyType : BaseSpecPropertyType<PathSpecPropertyType, string>, IStringParseableSpecPropertyType
 {
     public static readonly PathSpecPropertyType Instance = new PathSpecPropertyType();
 
@@ -32,7 +32,7 @@ public sealed class PathSpecPropertyType : BasicSpecPropertyType<PathSpecPropert
     /// <inheritdoc />
     public override string DisplayName => "Path";
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     public string? ToString(ISpecDynamicValue value)
     {

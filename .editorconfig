@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# VSTHRD110: Observe result of async calls
+dotnet_diagnostic.VSTHRD110.severity = none

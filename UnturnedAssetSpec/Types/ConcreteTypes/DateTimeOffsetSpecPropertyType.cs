@@ -13,7 +13,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 2025-11-16T02:30:35-05:00
 /// </code>
 /// </summary>
-public sealed class DateTimeOffsetSpecPropertyType : BasicSpecPropertyType<DateTimeOffsetSpecPropertyType, DateTimeOffset>, IStringParseableSpecPropertyType
+public sealed class DateTimeOffsetSpecPropertyType : BaseSpecPropertyType<DateTimeOffsetSpecPropertyType, DateTimeOffset>, IStringParseableSpecPropertyType
 {
     public static readonly DateTimeOffsetSpecPropertyType Instance = new DateTimeOffsetSpecPropertyType();
 

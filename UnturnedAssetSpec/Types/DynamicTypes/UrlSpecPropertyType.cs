@@ -18,7 +18,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </para>
 /// </summary>
 public sealed class UrlSpecPropertyType :
-    BaseSpecPropertyType<string>,
+    BaseSpecPropertyType<UrlSpecPropertyType, string>,
     ISpecPropertyType<string>,
     IEquatable<UrlSpecPropertyType?>,
     ISpecialTypesSpecPropertyType
@@ -34,10 +34,7 @@ public sealed class UrlSpecPropertyType :
     public override string Type => "Url";
 
     /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
-
-    /// <inheritdoc />
-    public Type ValueType => typeof(string);
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => MimeTypes!;
 
@@ -60,6 +57,9 @@ public sealed class UrlSpecPropertyType :
         MimeTypes = specialTypes;
         DisplayName = GetDisplayName();
     }
+
+    /// <inheritdoc />
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     private string GetDisplayName()
     {
@@ -124,20 +124,7 @@ public sealed class UrlSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out string? val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = val == null ? SpecDynamicValue.Null : new SpecDynamicConcreteConvertibleValue<string>(val, this);
-        return true;
-    }
-
-    /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
     {
         if (parse.Node == null)
             return MissingNode(in parse, out value);
@@ -189,12 +176,4 @@ public sealed class UrlSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(UrlSpecPropertyType? other) => other != null && MimeTypes.Equals(other.MimeTypes, StringComparison.OrdinalIgnoreCase);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is UrlSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<string>? other) => other is UrlSpecPropertyType t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

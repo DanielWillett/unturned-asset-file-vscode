@@ -212,5 +212,11 @@ public sealed class StaticSourceFile : IWorkspaceFile
         return _fileContentStr;
     }
 
+    event Action<IWorkspaceFile, FileRange>? IWorkspaceFile.OnUpdated
+    {
+        add { }
+        remove { }
+    }
+
     public void Dispose() { }
 }
