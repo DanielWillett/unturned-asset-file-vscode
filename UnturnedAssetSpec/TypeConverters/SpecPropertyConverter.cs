@@ -551,12 +551,12 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
         if (defaultValueReader.TokenType != JsonTokenType.None)
         {
-            property.DefaultValue = ReadValue(propertyType, ref defaultValueReader, SpecDynamicValueContext.AllowSwitch, options, in DefaultValueProperty);
+            property.DefaultValue = ReadValue(propertyType, ref defaultValueReader, SpecDynamicValueContext.AllowConditionals, options, in DefaultValueProperty);
         }
 
         if (includedDefaultValueReader.TokenType != JsonTokenType.None)
         {
-            property.IncludedDefaultValue = ReadValue(propertyType, ref includedDefaultValueReader, SpecDynamicValueContext.AllowSwitch, options, in IncludedDefaultValueProperty);
+            property.IncludedDefaultValue = ReadValue(propertyType, ref includedDefaultValueReader, SpecDynamicValueContext.AllowConditionals, options, in IncludedDefaultValueProperty);
         }
 
         if (minimumValue.TokenType != JsonTokenType.None)

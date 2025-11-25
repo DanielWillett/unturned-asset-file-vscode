@@ -335,7 +335,7 @@ public class CustomSpecTypeInstance : IEquatable<CustomSpecTypeInstance>, ISpecD
             return false;
         }
 
-        value = SpecDynamicEquationTreeValueHelpers.As<CustomSpecTypeInstance, TValue>(this);
+        value = SpecDynamicExpressionTreeValueHelpers.As<CustomSpecTypeInstance, TValue>(this);
         isNull = false;
         return true;
     }

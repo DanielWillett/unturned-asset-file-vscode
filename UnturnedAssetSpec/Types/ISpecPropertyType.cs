@@ -172,7 +172,7 @@ public interface ISecondPassSpecPropertyType : ISpecPropertyType
     /// <param name="property">The property this type is on.</param>
     /// <param name="database">The database service.</param>
     /// <param name="assetFile">The file this property belongs to.</param>
-    /// <returns></returns>
+    /// <returns>The new type, or the same reference to the old type if a new type didn't need to be created.</returns>
     ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile);
 }
 

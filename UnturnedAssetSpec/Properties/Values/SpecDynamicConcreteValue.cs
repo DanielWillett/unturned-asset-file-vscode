@@ -10,6 +10,9 @@ using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
+/// <summary>
+/// A <see langword="null"/> implementation of <see cref="ISpecDynamicValue"/>.
+/// </summary>
 public sealed class SpecDynamicConcreteNullValue :
     ISpecConcreteValue,
     IEquatable<SpecDynamicConcreteNullValue>,
@@ -72,6 +75,9 @@ public sealed class SpecDynamicConcreteNullValue :
     }
 }
 
+/// <summary>
+/// An enum value as a <see cref="ISpecDynamicValue"/>, or <see langword="null"/> if <see cref="Value"/> is less than 0.
+/// </summary>
 [DebuggerDisplay("{Name,nq}")]
 public sealed class SpecDynamicConcreteEnumValue :
     IEquatable<SpecDynamicConcreteEnumValue>,
@@ -176,35 +182,35 @@ public sealed class SpecDynamicConcreteEnumValue :
         isNull = Value < 0;
 
         if (typeof(TValue) == typeof(int))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<int, TValue>(Value);
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<int, TValue>(Value);
         else if (typeof(TValue) == typeof(EnumSpecTypeValue))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<EnumSpecTypeValue, TValue>(Type.Values[Value]);
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<EnumSpecTypeValue, TValue>(Type.Values[Value]);
         else if (typeof(TValue) == typeof(string))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<string, TValue>(Type.Values[Value].Value);
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<string, TValue>(Type.Values[Value].Value);
         else if (typeof(TValue) == typeof(uint))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<uint, TValue>((uint)Value);
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<uint, TValue>((uint)Value);
         else if (typeof(TValue) == typeof(long))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<long, TValue>(Value);
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<long, TValue>(Value);
         else if (typeof(TValue) == typeof(ulong))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<ulong, TValue>((ulong)Value);
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<ulong, TValue>((ulong)Value);
         else if (typeof(TValue) == typeof(short))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<short, TValue>(checked( (short)Value ));
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<short, TValue>(checked( (short)Value ));
         else if (typeof(TValue) == typeof(ushort))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<ushort, TValue>(checked( (ushort)Value ));
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<ushort, TValue>(checked( (ushort)Value ));
         else if (typeof(TValue) == typeof(sbyte))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<sbyte, TValue>(checked( (sbyte)Value ));
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<sbyte, TValue>(checked( (sbyte)Value ));
         else if (typeof(TValue) == typeof(byte))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<byte, TValue>(checked( (byte)Value ));
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<byte, TValue>(checked( (byte)Value ));
         else if (typeof(TValue) == typeof(float))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<float, TValue>(Value);
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<float, TValue>(Value);
         else if (typeof(TValue) == typeof(double))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<double, TValue>(Value);
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<double, TValue>(Value);
         else if (typeof(TValue) == typeof(decimal))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<decimal, TValue>(Value);
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<decimal, TValue>(Value);
         else if (typeof(TValue) == typeof(char))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<char, TValue>(checked( (char)Value ));
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<char, TValue>(checked( (char)Value ));
         else if (typeof(TValue) == typeof(bool))
-            value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<bool, TValue>(Value != 0);
+            value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<bool, TValue>(Value != 0);
         else
         {
             value = default;
@@ -220,6 +226,10 @@ public sealed class SpecDynamicConcreteEnumValue :
     public static implicit operator string?(SpecDynamicConcreteEnumValue v) => v.Value < 0 ? null : v.Type.Values[v.Value].Value;
 }
 
+/// <summary>
+/// The base type for the concrete value implementation of <see cref="ISpecDynamicValue"/> for any type, supporting null values.
+/// </summary>
+/// <remarks>Any types implementing <see cref="IConvertible"/> should use <see cref="SpecDynamicConcreteConvertibleValue{T}"/> instead.</remarks>
 public abstract class SpecDynamicConcreteValue :
     ISpecConcreteValue,
     IEquatable<SpecDynamicConcreteValue>,
@@ -261,6 +271,10 @@ public abstract class SpecDynamicConcreteValue :
     public abstract void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options);
 }
 
+/// <summary>
+/// A concrete value implementation of <see cref="ISpecDynamicValue"/> for any type implementing <see cref="IConvertible"/>, supporting null values.
+/// </summary>
+/// <remarks>This type allows for faster conversion between types by using generics with the <see cref="IConvertible"/> interface.</remarks>
 public class SpecDynamicConcreteConvertibleValue<T> : SpecDynamicConcreteValue<T> where T : IEquatable<T>, IConvertible
 {
     /// <inheritdoc />
@@ -277,7 +291,7 @@ public class SpecDynamicConcreteConvertibleValue<T> : SpecDynamicConcreteValue<T
             return true;
         }
 
-        if (SpecDynamicEquationTreeValueHelpers.TryConvert(ValueIntl, IsNull, out value!, out isNull))
+        if (SpecDynamicExpressionTreeValueHelpers.TryConvert(ValueIntl, IsNull, out value!, out isNull))
         {
             return true;
         }
@@ -286,6 +300,10 @@ public class SpecDynamicConcreteConvertibleValue<T> : SpecDynamicConcreteValue<T
     }
 }
 
+/// <summary>
+/// A generic concrete value implementation of <see cref="ISpecDynamicValue"/> for any type, supporting null values.
+/// </summary>
+/// <remarks>Any types implementing <see cref="IConvertible"/> should use <see cref="SpecDynamicConcreteConvertibleValue{T}"/> instead.</remarks>
 public class SpecDynamicConcreteValue<T> :
     SpecDynamicConcreteValue,
     IEquatable<SpecDynamicConcreteValue<T>>,
@@ -405,7 +423,7 @@ public class SpecDynamicConcreteValue<T> :
 
             if (typeof(T) == typeof(TVector))
             {
-                Converted = SpecDynamicEquationTreeValueHelpers.TryConvertVector(Unsafe.As<T, TVector>(ref Value.ValueIntl!), false, out OutValue, out ValueIsNull);
+                Converted = SpecDynamicExpressionTreeValueHelpers.TryConvertVector(Unsafe.As<T, TVector>(ref Value.ValueIntl!), false, out OutValue, out ValueIsNull);
             }
         }
     }

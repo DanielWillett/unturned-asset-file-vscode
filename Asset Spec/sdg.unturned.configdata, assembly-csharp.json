@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
-    "Type": "SDG.Unturned.ConfigData, Assembly-CSharp",
+    "Type": " ",
     "DisplayName": "Server Configuration",
     "Parent": null,
     "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-configuration.html",
@@ -43,17 +43,41 @@
             "Description": "Item settings.",
             "DefaultValue": null,
             "Required": true
-        },
-        {
-            "Key": "_Mode",
-            "Type": "SDG.Unturned.EGameMode, Assembly-CSharp",
-            "Deprecated": true,
-            "Description": "Unused",
-            "Variable": null
         }
     ],
     "Types":
     [
+        {
+            "Type": "SDG.Unturned.EGameMode, Assembly-CSharp",
+            "DisplayName": "Difficulty",
+            "Values":
+            [
+                {
+                    "Value": "EASY",
+                    "Casing": "Easy"
+                },
+                {
+                    "Value": "NORMAL",
+                    "Casing": "Normal"
+                },
+                {
+                    "Value": "HARD",
+                    "Casing": "Hard"
+                },
+                {
+                    "Value": "ANY",
+                    "Casing": "Any",
+                    "Deprecated": true,
+                    "Description": "Not a gamemode."
+                },
+                {
+                    "Value": "TUTORIAL",
+                    "Casing": "Tutorial",
+                    "Deprecated": true,
+                    "Description": "Not a difficulty."
+                }
+            ]
+        },
         {
             "Type": "SDG.Unturned.EServerMonetizationTag, Assembly-CSharp",
             "DisplayName": "Server Monetization Tag",
@@ -259,42 +283,50 @@
                 {
                     "Key": "Timeout_Queue_Seconds",
                     "Type": "Float32",
+                    "Minimum": 0.0,
                     "Description": "Players in the pre-join queue we haven't heard from in this past number of seconds are kicked.",
                     "DefaultValue": 15.0
                 },
                 {
                     "Key": "Timeout_Game_Seconds",
                     "Type": "Float32",
+                    "Minimum": 0.0,
                     "Description": "Players in the server we haven't heard from in this past number of seconds are kicked.",
                     "DefaultValue": 30.0
                 },
                 {
                     "Key": "Join_Rate_Limit_Window_Seconds",
                     "Type": "Float32",
+                    "Minimum": 0.0,
                     "Description": "If ready-to-connect messages are received more than twice from the same client in less than this many seconds they will be kicked.",
                     "DefaultValue": 40.0
                 },
                 {
                     "Key": "Bad_Packet_Rate_Limit_Window_Seconds",
                     "Type": "Float32",
+                    "Minimum": 0.0,
                     "Description": "If bad packets (that *may* be legitimate) are received more than threshold times within this many seconds of each other, reject the calling connection.",
                     "DefaultValue": 2.5
                 },
                 {
                     "Key": "Bad_Packet_Rate_Limit_Threshold",
                     "Type": "Int32",
+                    "Minimum": 0,
                     "Description": "If more than this many bad packets (that *may* be legitimate) are received within window seconds of each other, reject the calling connection.",
                     "DefaultValue": 10
                 },
                 {
                     "Key": "Rate_Limit_Kick_Threshold",
                     "Type": "Int32",
+                    "Minimum": 2,
                     "Description": "If a rate-limited method is called this many times within cooldown window the client will be kicked. For example a value of 1 means the client will be kicked the first time they call the method off-cooldown. (not recommended)",
                     "DefaultValue": 10
                 },
                 {
                     "Key": "Max_Clients_With_Same_IP_Address",
                     "Type": "Int32",
+                    "Minimum": 0,
+                    "Maximum": 255,
                     "Description": "Only applicable when Fake IP is off. When a client is connecting, if their connection would push the number of simultaneous connections from the same IP address past this number, they are prevented from joining.",
                     "DefaultValue": 64
                 },
@@ -307,6 +339,7 @@
                 {
                     "Key": "Fake_Lag_Threshold_Seconds",
                     "Type": "Float32",
+                    "Minimum": 0.0,
                     "Description": "Ordinarily the server should be receiving multiple input packets per second from a client. If more than this amount of time passes between input packets we flag the client as potentially using a lag switch, and modify their stats (e.g. reduce player damage) for a corresponding duration.",
                     "DefaultValue": 3.0
                 },
@@ -319,6 +352,8 @@
                 {
                     "Key": "Fake_Lag_Damage_Penalty_Multiplier",
                     "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
                     "Description": "PvP damage multiplier while under fake lag penalty.",
                     "DefaultValue": 0.1
                 },
@@ -408,6 +443,7 @@
                 {
                     "Key": "Reset_Vehicles_Outside_Horizontal_Distance",
                     "Type": "Float32",
+                    "Minimum": 0.0,
                     "Description": "If greater than zero, vehicles with XZ position outside this threshold are saved in the center of the map.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/fake-ip.html",
                     "DefaultValue": 40000.0
@@ -456,32 +492,599 @@
             [
                 {
                     "Key": "Spawn_Chance",
-                    "Type": "Boolean",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
                     "Description": "Percentage [0 to 1] of item spawns to use. For example, if set to 0.2 and level has 100 item spawns, max 20 items will spawn at a time.",
                     "DefaultValue":
                     [
                         {
-                            
+                            "Or":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "EASY"
+                                },
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "NORMAL"
+                                }
+                            ],
+                            "Value": 0.35
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "HARD"
+                                }
+                            ],
+                            "Value": 0.15
+                        },
+                        {
+                            "Value": 1.0
                         }
                     ]
                 },
                 {
-                    "Key": "Allow_Server_Commands",
-                    "Type": "Boolean",
-                    "Description": "Should ServerTextChatMessenger be allowed to execute commands?",
-                    "DefaultValue": false
+                    "Key": "Despawn_Dropped_Time",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Description": "How long (in seconds) before an item dropped by a player is despawned.",
+                    "DefaultValue": 600.0
                 },
                 {
-                    "Key": "Allow_Client_Messages",
-                    "Type": "Boolean",
-                    "Description": "Should ClientTextChatMessenger be allowed to broadcast?",
-                    "DefaultValue": false
+                    "Key": "Despawn_Natural_Time",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Description": "How long (in seconds) before a spawned item is despawned. (For example, an item nobody wants to pick up.)",
+                    "DefaultValue": 900.0
                 },
                 {
-                    "Key": "Allow_Client_Commands",
+                    "Key": "Respawn_Time",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Description": "When less than the target amount of items are dropped (determined by @Spawn_Chance), a new item is spawned approximately this often (in seconds).",
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "EASY"
+                                }
+                            ],
+                            "Value": 50.0
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "NORMAL"
+                                }
+                            ],
+                            "Value": 100.0
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "HARD"
+                                }
+                            ],
+                            "Value": 150.0
+                        },
+                        {
+                            "Value": 1000000.0
+                        }
+                    ]
+                },
+                {
+                    "Key": "Quality_Full_Chance",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Description": "Percentage [0 to 1] probability of item spawning at max quality.",
+                    "DefaultValue":
+                    [
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "EASY"
+                                },
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "NORMAL"
+                                }
+                            ],
+                            "Value": 0.1
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "HARD"
+                                }
+                            ],
+                            "Value": 0.01
+                        },
+                        {
+                            "Value": 1.0
+                        }
+                    ]
+                },
+                {
+                    "Key": "Quality_Multiplier",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Description": "When an item spawns without max quality, the random quality is scaled by this factor.",
+                    "DefaultValue": 1.0
+                },
+                {
+                    "Key": "Gun_Bullets_Full_Chance",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Description": "Percentage [0 to 1] probability of gun spawning with full ammo.",
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "EASY"
+                                }
+                            ],
+                            "Value": 0.1
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "NORMAL"
+                                }
+                            ],
+                            "Value": 0.05
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "HARD"
+                                }
+                            ],
+                            "Value": 0.025
+                        },
+                        {
+                            "Value": 1.0
+                        }
+                    ]
+                },
+                {
+                    "Key": "Gun_Bullets_Multiplier",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Description": "When a gun spawns without full ammo, the random amount is scaled by this factor.",
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "EASY"
+                                }
+                            ],
+                            "Value": 1.0
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "NORMAL"
+                                }
+                            ],
+                            "Value": 0.25
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "HARD"
+                                }
+                            ],
+                            "Value": 0.1
+                        },
+                        {
+                            "Value": 1.0
+                        }
+                    ]
+                },
+                {
+                    "Key": "Magazine_Bullets_Full_Chance",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Description": "Percentage [0 to 1] probability of magazines spawning with full ammo.",
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "EASY"
+                                }
+                            ],
+                            "Value": 0.1
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "NORMAL"
+                                }
+                            ],
+                            "Value": 0.05
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "HARD"
+                                }
+                            ],
+                            "Value": 0.025
+                        },
+                        {
+                            "Value": 1.0
+                        }
+                    ]
+                },
+                {
+                    "Key": "Magazine_Bullets_Multiplier",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Description": "When a magazine spawns without full ammo, the random amount is scaled by this factor.",
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "EASY"
+                                }
+                            ],
+                            "Value": 1.0
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "NORMAL"
+                                }
+                            ],
+                            "Value": 0.5
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "HARD"
+                                }
+                            ],
+                            "Value": 0.25
+                        },
+                        {
+                            "Value": 1.0
+                        }
+                    ]
+                },
+                {
+                    "Key": "Crate_Bullets_Full_Chance",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Description": "Percentage [0 to 1] probability of non-magazines spawning with full amount. (E.g., ammo boxes.)",
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "EASY"
+                                }
+                            ],
+                            "Value": 0.1
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "NORMAL"
+                                }
+                            ],
+                            "Value": 0.05
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "HARD"
+                                }
+                            ],
+                            "Value": 0.025
+                        },
+                        {
+                            "Value": 1.0
+                        }
+                    ]
+                },
+                {
+                    "Key": "Crate_Bullets_Full_Chance",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Description": "When a non-magazine spawns without full amount, the random amount is scaled by this factor. (E.g., ammo boxes.)",
+                    "DefaultValue":
+                    [
+                        {
+                            "Or":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "EASY"
+                                },
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "NORMAL"
+                                }
+                            ],
+                            "Value": 1.0
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#This.Difficulty",
+                                    "Operation": "eq",
+                                    "Comparand": "HARD"
+                                }
+                            ],
+                            "Value": 0.75
+                        },
+                        {
+                            "Value": 1.0
+                        }
+                    ]
+                },
+                {
+                    "Key": "Has_Durability",
                     "Type": "Boolean",
-                    "Description": "Should ClientTextChatMessenger be allowed to execute commands?",
-                    "DefaultValue": false
+                    "Description": "Original option for disabling item quality. If false, items spawn at 100% quality and their quality doesn't decrease. For backwards compatibility, the newer per-item-type durability options are ignored if this is off.",
+                    "DefaultValue":
+                    {
+                        "Variable": "#This.Difficulty",
+                        "Operation": "neq",
+                        "Comparand": "EASY"
+                    }
+                },
+                {
+                    "Key": "Food_Spawns_At_Full_Quality",
+                    "Type": "Boolean",
+                    "Description": "Food-specific replacement for @Has_Durability. If true, food spawns at 100% quality.",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Has_Durability",
+                            "Value": false,
+                            "Condition":
+                            {
+                                "Variable": "Food_Spawns_At_Full_Quality",
+                                "Operation": "eq",
+                                "Comparand": false
+                            }
+                        }
+                    ],
+                    "DefaultValue":
+                    {
+                        "Variable": "#This.Difficulty",
+                        "Operation": "eq",
+                        "Comparand": "EASY"
+                    }
+                },
+                {
+                    "Key": "Water_Spawns_At_Full_Quality",
+                    "Type": "Boolean",
+                    "Description": "Water-specific replacement for @Has_Durability. If true, water spawns at 100% quality.",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Has_Durability",
+                            "Value": false,
+                            "Condition":
+                            {
+                                "Variable": "Water_Spawns_At_Full_Quality",
+                                "Operation": "eq",
+                                "Comparand": false
+                            }
+                        }
+                    ],
+                    "DefaultValue":
+                    {
+                        "Variable": "#This.Difficulty",
+                        "Operation": "eq",
+                        "Comparand": "EASY"
+                    }
+                },
+                {
+                    "Key": "Clothing_Spawns_At_Full_Quality",
+                    "Type": "Boolean",
+                    "Description": "Clothing-specific replacement for @Has_Durability. If true, clothing spawns at 100% quality.",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Has_Durability",
+                            "Value": false,
+                            "Condition":
+                            {
+                                "Variable": "Clothing_Spawns_At_Full_Quality",
+                                "Operation": "eq",
+                                "Comparand": false
+                            }
+                        }
+                    ],
+                    "DefaultValue":
+                    {
+                        "Variable": "#This.Difficulty",
+                        "Operation": "eq",
+                        "Comparand": "EASY"
+                    }
+                },
+                {
+                    "Key": "Weapons_Spawn_At_Full_Quality",
+                    "Type": "Boolean",
+                    "Description": "Weapon-specific replacement for @Has_Durability. If true, weapons spawn at 100% quality.",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Has_Durability",
+                            "Value": false,
+                            "Condition":
+                            {
+                                "Variable": "Weapons_Spawn_At_Full_Quality",
+                                "Operation": "eq",
+                                "Comparand": false
+                            }
+                        }
+                    ],
+                    "DefaultValue":
+                    {
+                        "Variable": "#This.Difficulty",
+                        "Operation": "eq",
+                        "Comparand": "EASY"
+                    }
+                },
+                {
+                    "Key": "Default_Spawns_At_Full_Quality",
+                    "Type": "Boolean",
+                    "Description": "Fallback used when spawning an item that doesn't fit into one of the other quality/durability settings. If true, items spawn at 100% quality.",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Has_Durability",
+                            "Value": false,
+                            "Condition":
+                            {
+                                "Variable": "Default_Spawns_At_Full_Quality",
+                                "Operation": "eq",
+                                "Comparand": false
+                            }
+                        }
+                    ],
+                    "DefaultValue":
+                    {
+                        "Variable": "#This.Difficulty",
+                        "Operation": "eq",
+                        "Comparand": "EASY"
+                    }
+                },
+                {
+                    "Key": "Clothing_Has_Durability",
+                    "Type": "Boolean",
+                    "Description": "Clothing-specific replacement for @Has_Durability. If false, clothing quality doesn't decrease when damaged.",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Has_Durability",
+                            "Value": false,
+                            "Condition":
+                            {
+                                "Variable": "Clothing_Has_Durability",
+                                "Operation": "eq",
+                                "Comparand": true
+                            }
+                        }
+                    ],
+                    "DefaultValue":
+                    {
+                        "Variable": "#This.Difficulty",
+                        "Operation": "neq",
+                        "Comparand": "EASY"
+                    }
+                },
+                {
+                    "Key": "Weapons_Have_Durability",
+                    "Type": "Boolean",
+                    "Description": "Melee and gun replacement for @Has_Durability. If false, weapons quality doesn't decrease when damaged.",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Has_Durability",
+                            "Value": false,
+                            "Condition":
+                            {
+                                "Variable": "Weapons_Have_Durability",
+                                "Operation": "eq",
+                                "Comparand": true
+                            }
+                        }
+                    ],
+                    "DefaultValue":
+                    {
+                        "Variable": "#This.Difficulty",
+                        "Operation": "neq",
+                        "Comparand": "EASY"
+                    }
                 }
             ]
         }

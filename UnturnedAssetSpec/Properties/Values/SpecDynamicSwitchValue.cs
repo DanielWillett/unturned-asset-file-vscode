@@ -6,11 +6,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
+/// <summary>
+/// A switch statement which maps ordered conditions to different values.
+/// </summary>
 public class SpecDynamicSwitchValue :
     ISpecDynamicValue,
     IEquatable<ISpecDynamicValue>,
@@ -558,6 +560,9 @@ public class SpecDynamicSwitchValue :
     }
 }
 
+/// <summary>
+/// A case of a <see cref="SpecDynamicSwitchValue"/>. Can also be used as a standalone value.
+/// </summary>
 public sealed class SpecDynamicSwitchCaseValue : ISpecDynamicValue, IEquatable<ISpecDynamicValue>, IEquatable<SpecDynamicSwitchCaseValue>
 {
     public ISpecPropertyType? ValueType { get; }
@@ -704,13 +709,30 @@ public sealed class SpecDynamicSwitchCaseValue : ISpecDynamicValue, IEquatable<I
     }
 }
 
+/// <summary>
+/// An operation of a <see cref="SpecDynamicSwitchCaseValue"/> condition list.
+/// </summary>
 public enum SpecDynamicSwitchCaseOperation
 {
+    /// <summary>
+    /// All conditions or cases must be <see langword="true"/>.
+    /// </summary>
     And,
+
+    /// <summary>
+    /// At least one condition or case must be <see langword="true"/>.
+    /// </summary>
     Or,
+
+    /// <summary>
+    /// Defines one condition which, when <see langword="true"/>, will be resolved to a nested switch statement.
+    /// </summary>
     When
 }
 
+/// <summary>
+/// A nested case or <see cref="SpecCondition"/> as a condition of a <see cref="SpecDynamicSwitchCaseValue"/>.
+/// </summary>
 public readonly struct SpecDynamicSwitchCaseOrCondition : IEquatable<SpecDynamicSwitchCaseOrCondition>
 {
     public readonly SpecCondition Condition;

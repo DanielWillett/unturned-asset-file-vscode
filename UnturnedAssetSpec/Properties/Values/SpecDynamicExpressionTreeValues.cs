@@ -9,13 +9,13 @@ using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
-internal static class SpecDynamicEquationTreeValueHelpers
+internal static class SpecDynamicExpressionTreeValueHelpers
 {
-    public static ISpecPropertyType GetValueType(ISpecDynamicValue argument, SpecDynamicEquationTreeUnaryOperation operation, ISpecPropertyType? expectedType)
+    public static ISpecPropertyType GetValueType(ISpecDynamicValue argument, SpecDynamicExpressionTreeUnaryOperation operation, ISpecPropertyType? expectedType)
     {
         if (operation
-            is >= SpecDynamicEquationTreeUnaryOperation.SineRad
-            and <= SpecDynamicEquationTreeUnaryOperation.SquareRoot)
+            is >= SpecDynamicExpressionTreeUnaryOperation.SineRad
+            and <= SpecDynamicExpressionTreeUnaryOperation.SquareRoot)
         {
             if (expectedType != null && (expectedType is IVectorSpecPropertyType || expectedType.ValueType == typeof(float) || expectedType.ValueType == typeof(double) || expectedType.ValueType == typeof(decimal)))
             {
@@ -49,9 +49,9 @@ internal static class SpecDynamicEquationTreeValueHelpers
         return argument.ValueType ?? KnownTypes.Float64;
     }
 
-    public static ISpecPropertyType GetValueType(ISpecDynamicValue left, ISpecDynamicValue? right, SpecDynamicEquationTreeBinaryOperation operation, ISpecPropertyType? expectedType)
+    public static ISpecPropertyType GetValueType(ISpecDynamicValue left, ISpecDynamicValue? right, SpecDynamicExpressionTreeBinaryOperation operation, ISpecPropertyType? expectedType)
     {
-        if (operation == SpecDynamicEquationTreeBinaryOperation.Concat)
+        if (operation == SpecDynamicExpressionTreeBinaryOperation.Concat)
         {
             return expectedType != null && (expectedType is EnumSpecType || expectedType.ValueType == typeof(string)) ? expectedType : KnownTypes.String;
         }
@@ -86,9 +86,9 @@ internal static class SpecDynamicEquationTreeValueHelpers
         return KnownTypes.Float64;
     }
 
-    public static ISpecPropertyType GetValueType(ISpecDynamicValue arg1, ISpecDynamicValue arg2, ISpecDynamicValue arg3, SpecDynamicEquationTreeTertiaryOperation operation, ISpecPropertyType? expectedType)
+    public static ISpecPropertyType GetValueType(ISpecDynamicValue arg1, ISpecDynamicValue arg2, ISpecDynamicValue arg3, SpecDynamicExpressionTreeTertiaryOperation operation, ISpecPropertyType? expectedType)
     {
-        if (operation == SpecDynamicEquationTreeTertiaryOperation.BallisticGravityMultiplierCalculation)
+        if (operation == SpecDynamicExpressionTreeTertiaryOperation.BallisticGravityMultiplierCalculation)
         {
             if (expectedType != null && (expectedType.ValueType == typeof(float) || expectedType.ValueType == typeof(double) || expectedType.ValueType == typeof(decimal) || expectedType.ValueType == typeof(string)))
             {
@@ -98,7 +98,7 @@ internal static class SpecDynamicEquationTreeValueHelpers
             return KnownTypes.Float32;
         }
 
-        if (operation == SpecDynamicEquationTreeTertiaryOperation.Replace)
+        if (operation == SpecDynamicExpressionTreeTertiaryOperation.Replace)
         {
             return expectedType != null && (expectedType is EnumSpecType || expectedType.ValueType == typeof(string)) ? expectedType : KnownTypes.String;
         }
@@ -369,12 +369,15 @@ internal static class SpecDynamicEquationTreeValueHelpers
     }
 }
 
-public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
+/// <summary>
+/// Base type for all expression values (=).
+/// </summary>
+public abstract class SpecDynamicExpressionTreeValue : ISpecDynamicValue
 {
     public ISpecPropertyType ValueType { get; }
     public abstract string FunctionName { get; }
 
-    protected SpecDynamicEquationTreeValue(ISpecPropertyType valueType)
+    protected SpecDynamicExpressionTreeValue(ISpecPropertyType valueType)
     {
         ValueType = valueType;
     }
@@ -425,7 +428,7 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
     private struct TryEvaluateBoxedValueVisitor : ISpecPropertyTypeVisitor
     {
         public FileEvaluationContext Context;
-        public SpecDynamicEquationTreeValue Tree;
+        public SpecDynamicExpressionTreeValue Tree;
         public bool HasValue;
         public object? Value;
 
@@ -595,7 +598,10 @@ public abstract class SpecDynamicEquationTreeValue : ISpecDynamicValue
     public abstract void WriteToJsonWriter(Utf8JsonWriter writer, JsonSerializerOptions? options);
 }
 
-public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
+/// <summary>
+/// An expression function with two parameters.
+/// </summary>
+public class SpecDynamicExpressionTreeBinaryValue : SpecDynamicExpressionTreeValue
 {
     private static readonly string[] OperationFunctionNames =
     [
@@ -613,11 +619,11 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
 
     public ISpecDynamicValue Left { get; }
     public ISpecDynamicValue Right { get; }
-    public SpecDynamicEquationTreeBinaryOperation Operation { get; }
+    public SpecDynamicExpressionTreeBinaryOperation Operation { get; }
     public override string FunctionName { get; }
 
-    public SpecDynamicEquationTreeBinaryValue(ISpecDynamicValue left, ISpecDynamicValue right, SpecDynamicEquationTreeBinaryOperation operation, ISpecPropertyType? expectedType)
-        : base(SpecDynamicEquationTreeValueHelpers.GetValueType(left, right, operation, expectedType))
+    public SpecDynamicExpressionTreeBinaryValue(ISpecDynamicValue left, ISpecDynamicValue right, SpecDynamicExpressionTreeBinaryOperation operation, ISpecPropertyType? expectedType)
+        : base(SpecDynamicExpressionTreeValueHelpers.GetValueType(left, right, operation, expectedType))
     {
         Left = left;
         Right = right;
@@ -625,22 +631,28 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
         FunctionName = GetOperationName(operation);
     }
 
-    public static bool TryParseOperation(ReadOnlySpan<char> span, out SpecDynamicEquationTreeBinaryOperation operation)
+    /// <summary>
+    /// Attempt to parse a binary function.
+    /// </summary>
+    public static bool TryParseOperation(ReadOnlySpan<char> span, out SpecDynamicExpressionTreeBinaryOperation operation)
     {
         for (int i = 0; i < OperationFunctionNames.Length; ++i)
         {
             if (!span.Equals(OperationFunctionNames[i].AsSpan(), StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            operation = (SpecDynamicEquationTreeBinaryOperation)i;
+            operation = (SpecDynamicExpressionTreeBinaryOperation)i;
             return true;
         }
 
-        operation = (SpecDynamicEquationTreeBinaryOperation)(-1);
+        operation = (SpecDynamicExpressionTreeBinaryOperation)(-1);
         return false;
     }
 
-    public static string GetOperationName(SpecDynamicEquationTreeBinaryOperation operation)
+    /// <summary>
+    /// Get the name of a binary function.
+    /// </summary>
+    public static string GetOperationName(SpecDynamicExpressionTreeBinaryOperation operation)
     {
         return OperationFunctionNames[(int)operation];
     }
@@ -648,7 +660,7 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull) where TValue : default
     {
         bool leftIsNull, rightIsNull;
-        if (typeof(TValue) == typeof(string) && Operation == SpecDynamicEquationTreeBinaryOperation.Concat)
+        if (typeof(TValue) == typeof(string) && Operation == SpecDynamicExpressionTreeBinaryOperation.Concat)
         {
             if (TryGetArgumentValue(in ctx, 0, out string? leftStr, out leftIsNull)
                 && TryGetArgumentValue(in ctx, 0, out string? rightStr, out rightIsNull))
@@ -659,7 +671,7 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
                     rightStr = string.Empty;
 
                 isNull = leftIsNull && rightIsNull;
-                value = isNull ? default : SpecDynamicEquationTreeValueHelpers.As<string, TValue>(leftStr + rightStr);
+                value = isNull ? default : SpecDynamicExpressionTreeValueHelpers.As<string, TValue>(leftStr + rightStr);
                 return true;
             }
 
@@ -717,21 +729,21 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
                 TValue vector = vectorType.Construct(leftIsVector ? rightNum : leftNum);
                 v = Operation switch
                 {
-                    SpecDynamicEquationTreeBinaryOperation.Add
+                    SpecDynamicExpressionTreeBinaryOperation.Add
                         => leftIsVector ? vectorType.Add(leftVector, vector) : vectorType.Add(vector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Subtract
+                    SpecDynamicExpressionTreeBinaryOperation.Subtract
                         => leftIsVector ? vectorType.Subtract(leftVector, vector) : vectorType.Subtract(vector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Multiply
+                    SpecDynamicExpressionTreeBinaryOperation.Multiply
                         => leftIsVector ? vectorType.Multiply(leftVector, vector) : vectorType.Multiply(vector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Divide
+                    SpecDynamicExpressionTreeBinaryOperation.Divide
                         => leftIsVector ? vectorType.Divide(leftVector, vector) : vectorType.Divide(vector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Minimum
+                    SpecDynamicExpressionTreeBinaryOperation.Minimum
                         => leftIsVector ? vectorType.Min(leftVector, vector) : vectorType.Min(vector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Maximum
+                    SpecDynamicExpressionTreeBinaryOperation.Maximum
                         => leftIsVector ? vectorType.Max(leftVector, vector) : vectorType.Max(vector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Average
+                    SpecDynamicExpressionTreeBinaryOperation.Average
                         => leftIsVector ? vectorType.Avg(leftVector, vector) : vectorType.Avg(vector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Power
+                    SpecDynamicExpressionTreeBinaryOperation.Power
                         => leftIsVector ? vectorType.Power(leftVector, vector) : vectorType.Power(vector, rightVector),
                     _ => leftIsVector ? leftVector : vector
                 };
@@ -746,19 +758,19 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
 
                 v = Operation switch
                 {
-                    SpecDynamicEquationTreeBinaryOperation.Add => vectorType.Add(leftVector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Subtract => vectorType.Subtract(leftVector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Multiply => vectorType.Multiply(leftVector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Divide => vectorType.Divide(leftVector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Minimum => vectorType.Min(leftVector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Maximum => vectorType.Max(leftVector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Average => vectorType.Avg(leftVector, rightVector),
-                    SpecDynamicEquationTreeBinaryOperation.Power => vectorType.Power(leftVector, rightVector),
+                    SpecDynamicExpressionTreeBinaryOperation.Add => vectorType.Add(leftVector, rightVector),
+                    SpecDynamicExpressionTreeBinaryOperation.Subtract => vectorType.Subtract(leftVector, rightVector),
+                    SpecDynamicExpressionTreeBinaryOperation.Multiply => vectorType.Multiply(leftVector, rightVector),
+                    SpecDynamicExpressionTreeBinaryOperation.Divide => vectorType.Divide(leftVector, rightVector),
+                    SpecDynamicExpressionTreeBinaryOperation.Minimum => vectorType.Min(leftVector, rightVector),
+                    SpecDynamicExpressionTreeBinaryOperation.Maximum => vectorType.Max(leftVector, rightVector),
+                    SpecDynamicExpressionTreeBinaryOperation.Average => vectorType.Avg(leftVector, rightVector),
+                    SpecDynamicExpressionTreeBinaryOperation.Power => vectorType.Power(leftVector, rightVector),
                     _ => leftVector
                 };
             }
 
-            return SpecDynamicEquationTreeValueHelpers.TryConvertVector(v, isNull, out value, out isNull);
+            return SpecDynamicExpressionTreeValueHelpers.TryConvertVector(v, isNull, out value, out isNull);
         }
         else
         {
@@ -780,18 +792,18 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
 
             double v = Operation switch
             {
-                SpecDynamicEquationTreeBinaryOperation.Add => leftNum + rightNum,
-                SpecDynamicEquationTreeBinaryOperation.Subtract => leftNum - rightNum,
-                SpecDynamicEquationTreeBinaryOperation.Multiply => leftNum * rightNum,
-                SpecDynamicEquationTreeBinaryOperation.Divide => leftNum / rightNum,
-                SpecDynamicEquationTreeBinaryOperation.Minimum => Math.Min(leftNum, rightNum),
-                SpecDynamicEquationTreeBinaryOperation.Maximum => Math.Max(leftNum, rightNum),
-                SpecDynamicEquationTreeBinaryOperation.Average => (leftNum + rightNum) / 2d,
-                SpecDynamicEquationTreeBinaryOperation.Power => Math.Pow(leftNum, rightNum),
+                SpecDynamicExpressionTreeBinaryOperation.Add => leftNum + rightNum,
+                SpecDynamicExpressionTreeBinaryOperation.Subtract => leftNum - rightNum,
+                SpecDynamicExpressionTreeBinaryOperation.Multiply => leftNum * rightNum,
+                SpecDynamicExpressionTreeBinaryOperation.Divide => leftNum / rightNum,
+                SpecDynamicExpressionTreeBinaryOperation.Minimum => Math.Min(leftNum, rightNum),
+                SpecDynamicExpressionTreeBinaryOperation.Maximum => Math.Max(leftNum, rightNum),
+                SpecDynamicExpressionTreeBinaryOperation.Average => (leftNum + rightNum) / 2d,
+                SpecDynamicExpressionTreeBinaryOperation.Power => Math.Pow(leftNum, rightNum),
                 _ => leftNum
             };
 
-            return SpecDynamicEquationTreeValueHelpers.TryConvert(v, isNull, out value, out isNull);
+            return SpecDynamicExpressionTreeValueHelpers.TryConvert(v, isNull, out value, out isNull);
         }
     }
 
@@ -811,22 +823,37 @@ public class SpecDynamicEquationTreeBinaryValue : SpecDynamicEquationTreeValue
     public override string ToString() => $"={FunctionName}({ArgToString(Left)} {ArgToString(Right)})";
 }
 
-public enum SpecDynamicEquationTreeBinaryOperation
+/// <summary>
+/// Expression functions with two parameters.
+/// </summary>
+public enum SpecDynamicExpressionTreeBinaryOperation
 {
+    /// <summary><c>ADD</c></summary>
     Add,
+    /// <summary><c>SUB</c></summary>
     Subtract,
+    /// <summary><c>MUL</c></summary>
     Multiply,
+    /// <summary><c>DIV</c></summary>
     Divide,
+    /// <summary><c>MOD</c></summary>
     Modulo,
+    /// <summary><c>MIN</c></summary>
     Minimum,
+    /// <summary><c>MAX</c></summary>
     Maximum,
+    /// <summary><c>AVG</c></summary>
     Average,
+    /// <summary><c>CAT</c></summary>
     Concat,
+    /// <summary><c>POW</c></summary>
     Power
 }
 
-
-public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
+/// <summary>
+/// An expression function with one parameter.
+/// </summary>
+public class SpecDynamicExpressionTreeUnaryValue : SpecDynamicExpressionTreeValue
 {
     private static readonly string[] OperationFunctionNames =
     [
@@ -850,33 +877,39 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
     ];
 
     public ISpecDynamicValue Argument { get; }
-    public SpecDynamicEquationTreeUnaryOperation Operation { get; }
+    public SpecDynamicExpressionTreeUnaryOperation Operation { get; }
     public override string FunctionName { get; }
 
-    public SpecDynamicEquationTreeUnaryValue(ISpecDynamicValue argument, SpecDynamicEquationTreeUnaryOperation operation, ISpecPropertyType? expectedType)
-        : base(SpecDynamicEquationTreeValueHelpers.GetValueType(argument, operation, expectedType))
+    public SpecDynamicExpressionTreeUnaryValue(ISpecDynamicValue argument, SpecDynamicExpressionTreeUnaryOperation operation, ISpecPropertyType? expectedType)
+        : base(SpecDynamicExpressionTreeValueHelpers.GetValueType(argument, operation, expectedType))
     {
         Argument = argument;
         Operation = operation;
         FunctionName = GetOperationName(operation);
     }
 
-    public static bool TryParseOperation(ReadOnlySpan<char> span, out SpecDynamicEquationTreeUnaryOperation operation)
+    /// <summary>
+    /// Attempt to parse a unary function.
+    /// </summary>
+    public static bool TryParseOperation(ReadOnlySpan<char> span, out SpecDynamicExpressionTreeUnaryOperation operation)
     {
         for (int i = 0; i < OperationFunctionNames.Length; ++i)
         {
             if (!span.Equals(OperationFunctionNames[i].AsSpan(), StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            operation = (SpecDynamicEquationTreeUnaryOperation)i;
+            operation = (SpecDynamicExpressionTreeUnaryOperation)i;
             return true;
         }
 
-        operation = (SpecDynamicEquationTreeUnaryOperation)(-1);
+        operation = (SpecDynamicExpressionTreeUnaryOperation)(-1);
         return false;
     }
 
-    public static string GetOperationName(SpecDynamicEquationTreeUnaryOperation operation)
+    /// <summary>
+    /// Get the name of a unary function.
+    /// </summary>
+    public static string GetOperationName(SpecDynamicExpressionTreeUnaryOperation operation)
     {
         return OperationFunctionNames[(int)operation];
     }
@@ -884,8 +917,8 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull) where TValue : default
     {
         if (Operation
-            is >= SpecDynamicEquationTreeUnaryOperation.SineRad
-            and <= SpecDynamicEquationTreeUnaryOperation.SquareRoot)
+            is >= SpecDynamicExpressionTreeUnaryOperation.SineRad
+            and <= SpecDynamicExpressionTreeUnaryOperation.SquareRoot)
         {
             return TryEvaluateFuncValue(in ctx, out value, out isNull);
         }
@@ -908,14 +941,14 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
         {
             TValue? v = Operation switch
             {
-                SpecDynamicEquationTreeUnaryOperation.Absolute => vectorType.Absolute(argValue),
-                SpecDynamicEquationTreeUnaryOperation.Round => vectorType.Round(argValue),
-                SpecDynamicEquationTreeUnaryOperation.Floor => vectorType.Floor(argValue),
-                SpecDynamicEquationTreeUnaryOperation.Ceiling => vectorType.Ceiling(argValue),
+                SpecDynamicExpressionTreeUnaryOperation.Absolute => vectorType.Absolute(argValue),
+                SpecDynamicExpressionTreeUnaryOperation.Round => vectorType.Round(argValue),
+                SpecDynamicExpressionTreeUnaryOperation.Floor => vectorType.Floor(argValue),
+                SpecDynamicExpressionTreeUnaryOperation.Ceiling => vectorType.Ceiling(argValue),
                 _ => argValue
             };
 
-            return SpecDynamicEquationTreeValueHelpers.TryConvertVector(v, argIsNull, out value, out isNull);
+            return SpecDynamicExpressionTreeValueHelpers.TryConvertVector(v, argIsNull, out value, out isNull);
         }
 
         // none of the operations have any effect on unsigned integers at this point
@@ -953,11 +986,11 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
 
             int v = Operation switch
             {
-                SpecDynamicEquationTreeUnaryOperation.Absolute => Math.Abs(argValueAsInt32),
+                SpecDynamicExpressionTreeUnaryOperation.Absolute => Math.Abs(argValueAsInt32),
                 _ => argValueAsInt32,
             };
 
-            return SpecDynamicEquationTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
+            return SpecDynamicExpressionTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
         }
 
         if (typeof(TValue) == typeof(long))
@@ -966,11 +999,11 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
 
             long v = Operation switch
             {
-                SpecDynamicEquationTreeUnaryOperation.Absolute => Math.Abs(argValueAsInt64),
+                SpecDynamicExpressionTreeUnaryOperation.Absolute => Math.Abs(argValueAsInt64),
                 _ => argValueAsInt64,
             };
 
-            return SpecDynamicEquationTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
+            return SpecDynamicExpressionTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
         }
 
         if (typeof(TValue) == typeof(float))
@@ -979,10 +1012,10 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
 
             float v = Operation switch
             {
-                SpecDynamicEquationTreeUnaryOperation.Absolute => MathF.Abs(argValueAsFloat),
-                SpecDynamicEquationTreeUnaryOperation.Round => MathF.Round(argValueAsFloat),
-                SpecDynamicEquationTreeUnaryOperation.Floor => MathF.Floor(argValueAsFloat),
-                SpecDynamicEquationTreeUnaryOperation.Ceiling => MathF.Ceiling(argValueAsFloat),
+                SpecDynamicExpressionTreeUnaryOperation.Absolute => MathF.Abs(argValueAsFloat),
+                SpecDynamicExpressionTreeUnaryOperation.Round => MathF.Round(argValueAsFloat),
+                SpecDynamicExpressionTreeUnaryOperation.Floor => MathF.Floor(argValueAsFloat),
+                SpecDynamicExpressionTreeUnaryOperation.Ceiling => MathF.Ceiling(argValueAsFloat),
                 _ => argValueAsFloat,
             };
 
@@ -996,10 +1029,10 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
 
             double v = Operation switch
             {
-                SpecDynamicEquationTreeUnaryOperation.Absolute => Math.Abs(argValueAsDouble),
-                SpecDynamicEquationTreeUnaryOperation.Round => Math.Round(argValueAsDouble),
-                SpecDynamicEquationTreeUnaryOperation.Floor => Math.Floor(argValueAsDouble),
-                SpecDynamicEquationTreeUnaryOperation.Ceiling => Math.Ceiling(argValueAsDouble),
+                SpecDynamicExpressionTreeUnaryOperation.Absolute => Math.Abs(argValueAsDouble),
+                SpecDynamicExpressionTreeUnaryOperation.Round => Math.Round(argValueAsDouble),
+                SpecDynamicExpressionTreeUnaryOperation.Floor => Math.Floor(argValueAsDouble),
+                SpecDynamicExpressionTreeUnaryOperation.Ceiling => Math.Ceiling(argValueAsDouble),
                 _ => argValueAsDouble,
             };
 
@@ -1013,14 +1046,14 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
 
             decimal v = Operation switch
             {
-                SpecDynamicEquationTreeUnaryOperation.Absolute => argValueAsDecimal < 0 ? -argValueAsDecimal : argValueAsDecimal,
-                SpecDynamicEquationTreeUnaryOperation.Round => decimal.Round(argValueAsDecimal),
-                SpecDynamicEquationTreeUnaryOperation.Floor => decimal.Floor(argValueAsDecimal),
-                SpecDynamicEquationTreeUnaryOperation.Ceiling => decimal.Ceiling(argValueAsDecimal),
+                SpecDynamicExpressionTreeUnaryOperation.Absolute => argValueAsDecimal < 0 ? -argValueAsDecimal : argValueAsDecimal,
+                SpecDynamicExpressionTreeUnaryOperation.Round => decimal.Round(argValueAsDecimal),
+                SpecDynamicExpressionTreeUnaryOperation.Floor => decimal.Floor(argValueAsDecimal),
+                SpecDynamicExpressionTreeUnaryOperation.Ceiling => decimal.Ceiling(argValueAsDecimal),
                 _ => argValueAsDecimal,
             };
 
-            return SpecDynamicEquationTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
+            return SpecDynamicExpressionTreeValueHelpers.TryConvert(v, argIsNull, out value, out isNull);
         }
 
         if (typeof(TValue) == typeof(string))
@@ -1045,23 +1078,23 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
             {
                 argValueAsInt64 = Operation switch
                 {
-                    SpecDynamicEquationTreeUnaryOperation.Absolute => Math.Abs(argValueAsInt64),
+                    SpecDynamicExpressionTreeUnaryOperation.Absolute => Math.Abs(argValueAsInt64),
                     _ => argValueAsInt64
                 };
-                return SpecDynamicEquationTreeValueHelpers.TryConvert(argValueAsInt64, argIsNull, out value, out isNull);
+                return SpecDynamicExpressionTreeValueHelpers.TryConvert(argValueAsInt64, argIsNull, out value, out isNull);
             }
 
             if (double.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out double argValueAsDouble))
             {
                 argValueAsDouble = Operation switch
                 {
-                    SpecDynamicEquationTreeUnaryOperation.Absolute => Math.Abs(argValueAsDouble),
-                    SpecDynamicEquationTreeUnaryOperation.Round => Math.Round(argValueAsDouble),
-                    SpecDynamicEquationTreeUnaryOperation.Floor => Math.Floor(argValueAsDouble),
-                    SpecDynamicEquationTreeUnaryOperation.Ceiling => Math.Ceiling(argValueAsDouble),
+                    SpecDynamicExpressionTreeUnaryOperation.Absolute => Math.Abs(argValueAsDouble),
+                    SpecDynamicExpressionTreeUnaryOperation.Round => Math.Round(argValueAsDouble),
+                    SpecDynamicExpressionTreeUnaryOperation.Floor => Math.Floor(argValueAsDouble),
+                    SpecDynamicExpressionTreeUnaryOperation.Ceiling => Math.Ceiling(argValueAsDouble),
                     _ => argValueAsDouble,
                 };
-                return SpecDynamicEquationTreeValueHelpers.TryConvert(argValueAsDouble, argIsNull, out value, out isNull);
+                return SpecDynamicExpressionTreeValueHelpers.TryConvert(argValueAsDouble, argIsNull, out value, out isNull);
             }
         }
 
@@ -1106,12 +1139,12 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
             }
 
             TValue? v;
-            if (Operation < SpecDynamicEquationTreeUnaryOperation.SquareRoot)
+            if (Operation < SpecDynamicExpressionTreeUnaryOperation.SquareRoot)
             {
-                bool deg = Operation >= SpecDynamicEquationTreeUnaryOperation.SineDeg;
+                bool deg = Operation >= SpecDynamicExpressionTreeUnaryOperation.SineDeg;
                 int op = deg
-                    ? (Operation - SpecDynamicEquationTreeUnaryOperation.SineDeg)
-                    : (Operation - SpecDynamicEquationTreeUnaryOperation.SineRad);
+                    ? (Operation - SpecDynamicExpressionTreeUnaryOperation.SineDeg)
+                    : (Operation - SpecDynamicExpressionTreeUnaryOperation.SineRad);
 
                 v = vectorType.TrigOperation(vector, op, deg);
             }
@@ -1119,12 +1152,12 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
             {
                 v = Operation switch
                 {
-                    SpecDynamicEquationTreeUnaryOperation.SquareRoot => vectorType.Sqrt(vector),
+                    SpecDynamicExpressionTreeUnaryOperation.SquareRoot => vectorType.Sqrt(vector),
                     _ => vector
                 };
             }
             
-            return SpecDynamicEquationTreeValueHelpers.TryConvertVector(v, vectorIsNull, out value, out isNull);
+            return SpecDynamicExpressionTreeValueHelpers.TryConvertVector(v, vectorIsNull, out value, out isNull);
         }
 
         isNull = false;
@@ -1143,19 +1176,19 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
 
             float v = Operation switch
             {
-                SpecDynamicEquationTreeUnaryOperation.SineRad => MathF.Sin(r32),
-                SpecDynamicEquationTreeUnaryOperation.CosineRad => MathF.Cos(r32),
-                SpecDynamicEquationTreeUnaryOperation.TangentRad => MathF.Tan(r32),
-                SpecDynamicEquationTreeUnaryOperation.ArcSineRad => MathF.Asin(r32),
-                SpecDynamicEquationTreeUnaryOperation.ArcCosineRad => MathF.Acos(r32),
-                SpecDynamicEquationTreeUnaryOperation.ArcTangentRad => MathF.Atan(r32),
-                SpecDynamicEquationTreeUnaryOperation.SineDeg => MathF.Sin(r32 * (MathF.PI / 180f)),
-                SpecDynamicEquationTreeUnaryOperation.CosineDeg => MathF.Cos(r32 * (MathF.PI / 180f)),
-                SpecDynamicEquationTreeUnaryOperation.TangentDeg => MathF.Tan(r32 * (MathF.PI / 180f)),
-                SpecDynamicEquationTreeUnaryOperation.ArcSineDeg => MathF.Asin(r32) * (180f / MathF.PI),
-                SpecDynamicEquationTreeUnaryOperation.ArcCosineDeg => MathF.Acos(r32) * (180 / MathF.PI),
-                SpecDynamicEquationTreeUnaryOperation.ArcTangentDeg => MathF.Atan(r32) * (180 / MathF.PI),
-                SpecDynamicEquationTreeUnaryOperation.SquareRoot => MathF.Sqrt(r32),
+                SpecDynamicExpressionTreeUnaryOperation.SineRad => MathF.Sin(r32),
+                SpecDynamicExpressionTreeUnaryOperation.CosineRad => MathF.Cos(r32),
+                SpecDynamicExpressionTreeUnaryOperation.TangentRad => MathF.Tan(r32),
+                SpecDynamicExpressionTreeUnaryOperation.ArcSineRad => MathF.Asin(r32),
+                SpecDynamicExpressionTreeUnaryOperation.ArcCosineRad => MathF.Acos(r32),
+                SpecDynamicExpressionTreeUnaryOperation.ArcTangentRad => MathF.Atan(r32),
+                SpecDynamicExpressionTreeUnaryOperation.SineDeg => MathF.Sin(r32 * (MathF.PI / 180f)),
+                SpecDynamicExpressionTreeUnaryOperation.CosineDeg => MathF.Cos(r32 * (MathF.PI / 180f)),
+                SpecDynamicExpressionTreeUnaryOperation.TangentDeg => MathF.Tan(r32 * (MathF.PI / 180f)),
+                SpecDynamicExpressionTreeUnaryOperation.ArcSineDeg => MathF.Asin(r32) * (180f / MathF.PI),
+                SpecDynamicExpressionTreeUnaryOperation.ArcCosineDeg => MathF.Acos(r32) * (180 / MathF.PI),
+                SpecDynamicExpressionTreeUnaryOperation.ArcTangentDeg => MathF.Atan(r32) * (180 / MathF.PI),
+                SpecDynamicExpressionTreeUnaryOperation.SquareRoot => MathF.Sqrt(r32),
                 _ => r32
             };
 
@@ -1163,7 +1196,7 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
             {
                 value = Unsafe.As<float, TValue>(ref v);
             }
-            else if (!SpecDynamicEquationTreeValueHelpers.TryConvert(v, false, out value, out isNull))
+            else if (!SpecDynamicExpressionTreeValueHelpers.TryConvert(v, false, out value, out isNull))
             {
                 isNull = true;
                 return false;
@@ -1182,19 +1215,19 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
 
             double v = Operation switch
             {
-                SpecDynamicEquationTreeUnaryOperation.SineRad => Math.Sin(r64),
-                SpecDynamicEquationTreeUnaryOperation.CosineRad => Math.Cos(r64),
-                SpecDynamicEquationTreeUnaryOperation.TangentRad => Math.Tan(r64),
-                SpecDynamicEquationTreeUnaryOperation.ArcSineRad => Math.Asin(r64),
-                SpecDynamicEquationTreeUnaryOperation.ArcCosineRad => Math.Acos(r64),
-                SpecDynamicEquationTreeUnaryOperation.ArcTangentRad => Math.Atan(r64),
-                SpecDynamicEquationTreeUnaryOperation.SineDeg => Math.Sin(r64 * (Math.PI / 180)),
-                SpecDynamicEquationTreeUnaryOperation.CosineDeg => Math.Cos(r64 * (Math.PI / 180)),
-                SpecDynamicEquationTreeUnaryOperation.TangentDeg => Math.Tan(r64 * (Math.PI / 180)),
-                SpecDynamicEquationTreeUnaryOperation.ArcSineDeg => Math.Asin(r64) * (180 / Math.PI),
-                SpecDynamicEquationTreeUnaryOperation.ArcCosineDeg => Math.Acos(r64) * (180 / Math.PI),
-                SpecDynamicEquationTreeUnaryOperation.ArcTangentDeg => Math.Atan(r64) * (180 / Math.PI),
-                SpecDynamicEquationTreeUnaryOperation.SquareRoot => Math.Sqrt(r64),
+                SpecDynamicExpressionTreeUnaryOperation.SineRad => Math.Sin(r64),
+                SpecDynamicExpressionTreeUnaryOperation.CosineRad => Math.Cos(r64),
+                SpecDynamicExpressionTreeUnaryOperation.TangentRad => Math.Tan(r64),
+                SpecDynamicExpressionTreeUnaryOperation.ArcSineRad => Math.Asin(r64),
+                SpecDynamicExpressionTreeUnaryOperation.ArcCosineRad => Math.Acos(r64),
+                SpecDynamicExpressionTreeUnaryOperation.ArcTangentRad => Math.Atan(r64),
+                SpecDynamicExpressionTreeUnaryOperation.SineDeg => Math.Sin(r64 * (Math.PI / 180)),
+                SpecDynamicExpressionTreeUnaryOperation.CosineDeg => Math.Cos(r64 * (Math.PI / 180)),
+                SpecDynamicExpressionTreeUnaryOperation.TangentDeg => Math.Tan(r64 * (Math.PI / 180)),
+                SpecDynamicExpressionTreeUnaryOperation.ArcSineDeg => Math.Asin(r64) * (180 / Math.PI),
+                SpecDynamicExpressionTreeUnaryOperation.ArcCosineDeg => Math.Acos(r64) * (180 / Math.PI),
+                SpecDynamicExpressionTreeUnaryOperation.ArcTangentDeg => Math.Atan(r64) * (180 / Math.PI),
+                SpecDynamicExpressionTreeUnaryOperation.SquareRoot => Math.Sqrt(r64),
                 _ => r64
             };
 
@@ -1202,7 +1235,7 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
             {
                 value = Unsafe.As<double, TValue>(ref v);
             }
-            else if (!SpecDynamicEquationTreeValueHelpers.TryConvert(v, false, out value, out isNull))
+            else if (!SpecDynamicExpressionTreeValueHelpers.TryConvert(v, false, out value, out isNull))
             {
                 isNull = true;
                 return false;
@@ -1228,28 +1261,51 @@ public class SpecDynamicEquationTreeUnaryValue : SpecDynamicEquationTreeValue
     public override string ToString() => $"={FunctionName}({ArgToString(Argument)})";
 }
 
-public enum SpecDynamicEquationTreeUnaryOperation
+/// <summary>
+/// Expression functions with one parameter.
+/// </summary>
+public enum SpecDynamicExpressionTreeUnaryOperation
 {
+    /// <summary><c>ABS</c></summary>
     Absolute,
+    /// <summary><c>ROUND</c></summary>
     Round,
+    /// <summary><c>FLOOR</c></summary>
     Floor,
+    /// <summary><c>CEIL</c></summary>
     Ceiling,
+    /// <summary><c>SINR</c></summary>
     SineRad,
+    /// <summary><c>COSR</c></summary>
     CosineRad,
+    /// <summary><c>TANR</c></summary>
     TangentRad,
+    /// <summary><c>ASINR</c></summary>
     ArcSineRad,
+    /// <summary><c>ACOSR</c></summary>
     ArcCosineRad,
+    /// <summary><c>ATANR</c></summary>
     ArcTangentRad,
+    /// <summary><c>SIND</c></summary>
     SineDeg,
+    /// <summary><c>COSD</c></summary>
     CosineDeg,
+    /// <summary><c>TAND</c></summary>
     TangentDeg,
+    /// <summary><c>ASIND</c></summary>
     ArcSineDeg,
+    /// <summary><c>ACOSD</c></summary>
     ArcCosineDeg,
+    /// <summary><c>ATAND</c></summary>
     ArcTangentDeg,
+    /// <summary><c>SQRT</c></summary>
     SquareRoot
 }
 
-public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
+/// <summary>
+/// An expression function with three parameters.
+/// </summary>
+public class SpecDynamicExpressionTreeTertiaryValue : SpecDynamicExpressionTreeValue
 {
     private static readonly string[] OperationFunctionNames =
     [
@@ -1260,16 +1316,16 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
     public ISpecDynamicValue Arg1 { get; }
     public ISpecDynamicValue Arg2 { get; }
     public ISpecDynamicValue Arg3 { get; }
-    public SpecDynamicEquationTreeTertiaryOperation Operation { get; }
+    public SpecDynamicExpressionTreeTertiaryOperation Operation { get; }
     public override string FunctionName { get; }
 
-    public SpecDynamicEquationTreeTertiaryValue(
+    public SpecDynamicExpressionTreeTertiaryValue(
         ISpecDynamicValue arg1,
         ISpecDynamicValue arg2,
         ISpecDynamicValue arg3,
-        SpecDynamicEquationTreeTertiaryOperation operation,
+        SpecDynamicExpressionTreeTertiaryOperation operation,
         ISpecPropertyType? expectedType)
-        : base(SpecDynamicEquationTreeValueHelpers.GetValueType(arg1, arg2, arg3, operation, expectedType))
+        : base(SpecDynamicExpressionTreeValueHelpers.GetValueType(arg1, arg2, arg3, operation, expectedType))
     {
         Arg1 = arg1;
         Arg2 = arg2;
@@ -1278,29 +1334,35 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
         FunctionName = GetOperationName(operation);
     }
 
-    public static bool TryParseOperation(ReadOnlySpan<char> span, out SpecDynamicEquationTreeTertiaryOperation operation)
+    /// <summary>
+    /// Attempt to parse a tertiary function.
+    /// </summary>
+    public static bool TryParseOperation(ReadOnlySpan<char> span, out SpecDynamicExpressionTreeTertiaryOperation operation)
     {
         for (int i = 0; i < OperationFunctionNames.Length; ++i)
         {
             if (!span.Equals(OperationFunctionNames[i].AsSpan(), StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            operation = (SpecDynamicEquationTreeTertiaryOperation)i;
+            operation = (SpecDynamicExpressionTreeTertiaryOperation)i;
             return true;
         }
 
-        operation = (SpecDynamicEquationTreeTertiaryOperation)(-1);
+        operation = (SpecDynamicExpressionTreeTertiaryOperation)(-1);
         return false;
     }
 
-    public static string GetOperationName(SpecDynamicEquationTreeTertiaryOperation operation)
+    /// <summary>
+    /// Get the name of a tertiary function.
+    /// </summary>
+    public static string GetOperationName(SpecDynamicExpressionTreeTertiaryOperation operation)
     {
         return OperationFunctionNames[(int)operation];
     }
 
     public override bool TryEvaluateValue<TValue>(in FileEvaluationContext ctx, out TValue? value, out bool isNull) where TValue : default
     {
-        if (Operation == SpecDynamicEquationTreeTertiaryOperation.BallisticGravityMultiplierCalculation)
+        if (Operation == SpecDynamicExpressionTreeTertiaryOperation.BallisticGravityMultiplierCalculation)
         {
             return TryEvaluateBallisticGravityMultiplier(in ctx, out value, out isNull);
         }
@@ -1308,7 +1370,7 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
         value = default;
         isNull = true;
 
-        if (Operation != SpecDynamicEquationTreeTertiaryOperation.Replace || typeof(TValue) != typeof(string))
+        if (Operation != SpecDynamicExpressionTreeTertiaryOperation.Replace || typeof(TValue) != typeof(string))
             return false;
 
         if (!TryGetArgumentValue(in ctx, 0, out string? arg1, out bool arg1Null)
@@ -1328,7 +1390,7 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
         else
             res = arg1!.Replace(arg2, arg3 ?? string.Empty);
 
-        value = SpecDynamicEquationTreeValueHelpers.As<string, TValue>(res);
+        value = SpecDynamicExpressionTreeValueHelpers.As<string, TValue>(res);
         isNull = false;
         return true;
     }
@@ -1372,7 +1434,7 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
             return true;
         }
 
-        return SpecDynamicEquationTreeValueHelpers.TryConvert(bulletGravityMultiplier, false, out value, out isNull);
+        return SpecDynamicExpressionTreeValueHelpers.TryConvert(bulletGravityMultiplier, false, out value, out isNull);
     }
 
     public override ISpecDynamicValue GetArgument(int index)
@@ -1394,8 +1456,16 @@ public class SpecDynamicEquationTreeTertiaryValue : SpecDynamicEquationTreeValue
     public override string ToString() => $"={FunctionName}({ArgToString(Arg1)} {ArgToString(Arg2)} {ArgToString(Arg3)})";
 }
 
-public enum SpecDynamicEquationTreeTertiaryOperation
+/// <summary>
+/// Expression functions with three parameters.
+/// </summary>
+public enum SpecDynamicExpressionTreeTertiaryOperation
 {
+    /// <summary><c>REP</c></summary>
     Replace,
+    /// <summary><c>CUSTOM_BALLISTIC_GRAV</c></summary>
+    /// <remarks>
+    /// Custom implementation for the <c>Bullet_Gravity_Multiplier</c> property in <see cref="T:SDG.Unturned.ItemGunAsset"/>.
+    /// </remarks>
     BallisticGravityMultiplierCalculation
 }

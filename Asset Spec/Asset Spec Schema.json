@@ -603,6 +603,12 @@
                                     "$ref": "#/$defs/switch"
                                 },
                                 {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
+                                },
+                                {
                                     "type":
                                     [
                                         "string",
@@ -632,6 +638,12 @@
                             [
                                 {
                                     "$ref": "#/$defs/switch"
+                                },
+                                {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
                                 },
                                 {
                                     "type":

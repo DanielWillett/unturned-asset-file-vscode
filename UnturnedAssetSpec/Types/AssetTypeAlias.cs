@@ -195,7 +195,7 @@ public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatabl
             return false;
         }
 
-        value = SpecDynamicEquationTreeValueHelpers.As<QualifiedType, TValue>(Value);
+        value = SpecDynamicExpressionTreeValueHelpers.As<QualifiedType, TValue>(Value);
         isNull = Value != null;
         return true;
     }
@@ -205,7 +205,7 @@ public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatabl
         if (typeof(TValue) == typeof(QualifiedType))
         {
             QualifiedType correspondingType = GetCorrespondingType(ctx.Information);
-            value = SpecDynamicEquationTreeValueHelpers.As<QualifiedType, TValue>(correspondingType);
+            value = SpecDynamicExpressionTreeValueHelpers.As<QualifiedType, TValue>(correspondingType);
             isNull = correspondingType.IsNull;
             return true;
         }

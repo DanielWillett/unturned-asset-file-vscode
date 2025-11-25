@@ -1,11 +1,14 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 
 public interface IWorkspaceEnvironment
 {
     IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath);
+
+    bool TryGetFileDifficulty(string file, out ServerDifficulty difficulty);
 }
 
 public interface IWorkspaceFile : IDisposable
