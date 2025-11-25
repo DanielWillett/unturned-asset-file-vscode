@@ -29,8 +29,8 @@ Data-Ref targets can use the following properties:
 | AssetName | The internal name of the asset. This is usually the file name. | `This` |
 | Difficulty | The contextual difficulty of the current file. | `This` |
 | KeyGroups | Array of key groups used for RegEx keys. | any |
-| IsLegacy | Whether or not the currently parsing property is being parsed in the legacy format (ex. with blueprints, spawn tables, etc using the v1 format). | `This`, `@Property` |
-| ValueType | Which type of value this property provides: 'Value', 'List', or 'Dictionary' | `This`, `@Property` |
+| IsLegacy | Whether or not the currently parsing property is being parsed in the legacy format (ex. with blueprints, spawn tables, etc using the v1 format). | `Self`, `@Property` |
+| ValueType | Which type of value this property provides: 'Value', 'List', or 'Dictionary' | `Self`, `@Property` |
 
 Properties are currently hard-coded and can't be extended.
 
@@ -81,6 +81,15 @@ Represented by the class: [AssetNameDataRef](/api/DanielWillett.UnturnedDataFile
 
 ### Difficulty
 Returns the contextual difficulty of the file being edited. This is based on the `Mode Xxxx` command in the `Commands.dat` file relative to the active file and is primarily used by the server `ConfigData` file. If the file has a specific difficulty like `Config_EasyDifficulty.txt`, this will return `EASY` instead of whatever's specified in the `Commands.dat` file.
+
+If the `difficulty` additional file property is provided, that value will be used instead.
+```cs
+// udat-difficulty: Easy
+
+// > Unturned Server Configuration File
+// > 
+// ...
+```
 
 Note that the difficulty is usually cached and may not auto-update in some cases. Also note that if the server uses a custom localization mod which changes the display name of the gamemodes, the LSP will not be able to parse the mode correctly.
 
@@ -136,7 +145,7 @@ Index can be used to reference a specific key group. Indexing is zero-based so 1
 ### IsLegacy
 Equal to `true` if the target is in a type such as the `LegacyCompatibleList` and the legacy (v1) format is being used.
 
-This property can not target cross-referenced properties or `#Self`.
+This property can not target cross-referenced properties or `#This`.
 
 Example:
 ```properties
@@ -174,7 +183,7 @@ Tables
 ### ValueType
 Returns a string value indicating which type of value the property provides, which is one of the following: 'Value', 'List', or 'Dictionary'.
 
-This property can not target cross-referenced properties or `#Self`.
+This property can not target cross-referenced properties or `#This`.
 
 By default 'Value' will be returned if the property isn't present or doesn't have any kind of value.
 

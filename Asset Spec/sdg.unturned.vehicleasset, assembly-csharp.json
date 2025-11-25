@@ -426,8 +426,7 @@
         },
         {
             "Key": "Has_Horn",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type": "Boolean",
             "DefaultValue":
             [
                 {
@@ -798,7 +797,7 @@
         {
             "Key": "Explosion_Min_Force",
             "Type": "ScaleOrLegacy",
-            "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) ((0 1 0)))",
+            "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) 0,1,0)",
             "Description": "Minimum amount of force applied to this vehicle when it explodes.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-min-force-vector3-0-1024-0",
             "Variable": "minExplosionForce"
@@ -806,7 +805,7 @@
         {
             "Key": "Explosion_Max_Force",
             "Type": "ScaleOrLegacy",
-            "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) ((0 1 0)))",
+            "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) 0,1,0)",
             "Description": "Maximum amount of force applied to this vehicle when it explodes.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-max-force-vector3-0-1024-0",
             "Variable": "maxExplosionForce"

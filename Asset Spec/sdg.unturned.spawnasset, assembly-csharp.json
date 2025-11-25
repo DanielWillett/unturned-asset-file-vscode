@@ -273,7 +273,7 @@
                             "And":
                             [
                                 {
-                                    "Variable": "#This.IsLegacy",
+                                    "Variable": "#Self.IsLegacy",
                                     "Operation": "eq",
                                     "Comparand": true
                                 }
@@ -291,7 +291,7 @@
                             "And":
                             [
                                 {
-                                    "Variable": "#This.IsLegacy",
+                                    "Variable": "#Self.IsLegacy",
                                     "Operation": "eq",
                                     "Comparand": true
                                 }
@@ -357,7 +357,7 @@
                                     "Or":
                                     [
                                         {
-                                            "Variable": "#This.IsLegacy",
+                                            "Variable": "#Self.IsLegacy",
                                             "Operation": "eq",
                                             "Comparand": false
                                         },

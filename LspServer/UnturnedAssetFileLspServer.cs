@@ -238,7 +238,7 @@ internal sealed class UnturnedAssetFileLspServer
 #if DEBUG
         db.UseInternet = false;
 #else
-        db.UseInternet = true;
+        db.UseInternet = Environment.GetEnvironmentVariable("UDAT_OFFLINE_SPEC") != "1";
 #endif
 
         _logger.LogInformation("Initializing asset specs...");

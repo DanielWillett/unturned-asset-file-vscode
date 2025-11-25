@@ -37,6 +37,7 @@ public class PropertyVirtualizerSandbox
 
         _env = new LspWorkspaceEnvironment(
             _fileTracker,
+            null,
             NullLogger<LspWorkspaceEnvironment>.Instance,
             _database,
             null,

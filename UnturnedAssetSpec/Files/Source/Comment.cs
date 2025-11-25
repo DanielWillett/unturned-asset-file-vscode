@@ -31,6 +31,12 @@ public readonly record struct Comment(CommentPrefix Prefix, string Content, Comm
     public const string TypeAdditionalProperty = "type";
 
     /// <summary>
+    /// Case-sensitive <c>udat-difficulty</c> additional property overriding the gamemode difficulty for the file.
+    /// </summary>
+    /// <remarks>Must go at the top of the file in a comment.</remarks>
+    public const string DifficultyAdditionalProperty = "difficulty";
+
+    /// <summary>
     /// Total length of this comment's prefix and content.
     /// </summary>
     public int Length => Prefix.Length + Content.Length;

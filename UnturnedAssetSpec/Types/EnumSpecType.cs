@@ -43,9 +43,17 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
 
     public override string ToString() => Type.ToString();
 
+    // todo: needs to be able to parse bitmasks (LandscapeMaterialAsset.Auto_Ray_Mask)
+
     /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
+        if (parse.AutoDefault)
+        {
+            value = parse.EvaluationContext.Self.DefaultValue!;
+            return value != null;
+        }
+
         if (!TryParseValue(in parse, out int index))
         {
             value = null!;

@@ -8,6 +8,10 @@ public interface IWorkspaceEnvironment
 {
     IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath);
 
+    /// <summary>
+    /// Attempts to get the difficulty of a file based on it's location.
+    /// </summary>
+    /// <remarks>Doesn't take <see cref="Comment.DifficultyAdditionalProperty"/> into account.</remarks>
     bool TryGetFileDifficulty(string file, out ServerDifficulty difficulty);
 }
 

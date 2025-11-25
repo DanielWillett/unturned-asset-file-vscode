@@ -62,6 +62,18 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
 
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
+        if (parse.AutoDefault)
+        {
+            value = parse.EvaluationContext.Self.DefaultValue!;
+            return value != null;
+        }
+
+        if (TryParseValue(in parse, out CustomSpecTypeInstance? inst))
+        {
+            value = inst == null ? SpecDynamicValue.Null : inst;
+            return true;
+        }
+
         value = null!;
         return false;
     }
@@ -78,6 +90,12 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
 
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out CustomSpecTypeInstance? value)
     {
+        if (parse.AutoDefault)
+        {
+            value = null;
+            return ReferenceEquals(parse.EvaluationContext.Self.DefaultValue, SpecDynamicValue.Null);
+        }
+
         return TryParseValue(in parse, out value, CustomSpecTypeParseOptions.Object);
     }
 

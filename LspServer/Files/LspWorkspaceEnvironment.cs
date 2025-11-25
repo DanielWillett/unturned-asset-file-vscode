@@ -20,7 +20,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<WorkspaceFolderChange>, IDisposable, IDidChangeWatchedFilesHandler
 {
     private readonly OpenedFileTracker _tracker;
-    private readonly UnturnedAssetFileSyncHandler _fileSync;
+    private readonly UnturnedAssetFileSyncHandler? _fileSync;
     private readonly ILogger<LspWorkspaceEnvironment> _logger;
     private readonly IAssetSpecDatabase _database;
     private readonly ILanguageServerFacade? _languageServer;
@@ -47,7 +47,7 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
 
     public LspWorkspaceEnvironment(
         OpenedFileTracker tracker,
-        UnturnedAssetFileSyncHandler fileSync,
+        UnturnedAssetFileSyncHandler? fileSync,
         ILogger<LspWorkspaceEnvironment> logger,
         IAssetSpecDatabase database,
         ILanguageServerFacade? languageServer,
@@ -60,8 +60,11 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         _database = database;
         _languageServer = languageServer;
 
-        //fileSync.FileAdded += OnFileOpened;
-        fileSync.FileRemoved += OnFileClosed;
+        if (fileSync != null)
+        {
+            //fileSync.FileAdded += OnFileOpened;
+            fileSync.FileRemoved += OnFileClosed;
+        }
 
         if (workspaceFolderManager == null || languageServer == null)
         {
@@ -351,8 +354,11 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
 
     public void Dispose()
     {
-        //_fileSync.FileAdded -= OnFileOpened;
-        _fileSync.FileRemoved -= OnFileClosed;
+        if (_fileSync != null)
+        {
+            //_fileSync.FileAdded -= OnFileOpened;
+            _fileSync.FileRemoved -= OnFileClosed;
+        }
 
         _workspaceFoldersUnsubscriber?.Dispose();
 

@@ -30,7 +30,7 @@
             "Key": "IconPath",
             "Type": "MasterBundleReferenceString",
             "ElementType": "UnityEngine.Texture2D, UnityEngine.CoreModule",
-            "DefaultValue": true,
+            "DefaultValue": null,
             "Description": "Whether or not the game should look for an icon in the asset bundle for this asset.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html#tag-properties",
             "Priority": 2,

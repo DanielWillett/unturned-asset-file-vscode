@@ -613,7 +613,6 @@
                                     [
                                         "string",
                                         "number",
-                                        "boolean",
                                         "null"
                                     ]
                                 },
@@ -650,7 +649,6 @@
                                     [
                                         "string",
                                         "number",
-                                        "boolean",
                                         "null"
                                     ]
                                 },

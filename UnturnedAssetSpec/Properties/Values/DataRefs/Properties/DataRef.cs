@@ -137,7 +137,7 @@ public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<
 
         if (name.Equals("IsLegacy".AsSpan(), StringComparison.Ordinal))
         {
-            if (target is SelfDataRef or PropertyDataRef { Property.Context: >= SpecPropertyContext.CrossReferenceUnspecified and <= SpecPropertyContext.CrossReferenceLocalization })
+            if (target is ThisDataRef or PropertyDataRef { Property.Context: >= SpecPropertyContext.CrossReferenceUnspecified and <= SpecPropertyContext.CrossReferenceLocalization })
             {
                 return null;
             }
@@ -147,8 +147,7 @@ public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<
 
         if (name.Equals("ValueType".AsSpan(), StringComparison.Ordinal))
         {
-            if (target is SelfDataRef
-                || target is PropertyDataRef { Property.Context: >= SpecPropertyContext.CrossReferenceUnspecified and <= SpecPropertyContext.CrossReferenceLocalization })
+            if (target is ThisDataRef or PropertyDataRef { Property.Context: >= SpecPropertyContext.CrossReferenceUnspecified and <= SpecPropertyContext.CrossReferenceLocalization })
             {
                 return null;
             }

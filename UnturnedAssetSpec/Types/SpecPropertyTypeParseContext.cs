@@ -26,6 +26,8 @@ public readonly ref struct SpecPropertyTypeParseContext
 
     public bool HasDiagnostics { get; }
 
+    internal bool AutoDefault => Node == null && EvaluationContext.Self?.Owner is { OverridableProperties: true };
+
     public SpecPropertyTypeParseContext WithoutDiagnostics()
     {
         if (!HasDiagnostics)

@@ -33,7 +33,7 @@ public abstract class BaseSpecPropertyType<TSpecPropertyType, TValue> :
 
     public virtual bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
-        if (parse.EvaluationContext.Self?.Owner is { OverridableProperties: true } && parse.Node == null)
+        if (parse.AutoDefault)
         {
             value = parse.EvaluationContext.Self.DefaultValue!;
             return value != null;

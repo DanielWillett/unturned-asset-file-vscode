@@ -775,7 +775,10 @@ public static class SpecDynamicValue
             char c1 = value[0];
 
             if (!TryTrimParenthesis(ref value, 1))
-                return false;
+            {
+                if (context != SpecDynamicValueContext.AssumeDataRef)
+                    return false;
+            }
 
             return c1 == '#'
                 ? TryParseDataRef(value, null, out reference)
@@ -787,7 +790,10 @@ public static class SpecDynamicValue
         {
             int l = value.Length;
             if (!TryTrimParenthesis(ref value, 0))
-                return false;
+            {
+                if (context != SpecDynamicValueContext.AssumeDataRef)
+                    return false;
+            }
 
             if (l != value.Length)
                 optionalString = null;
@@ -1147,7 +1153,9 @@ public static class SpecDynamicValue
         if (dot < 0)
             dot = value.Length;
 
+
         ReadOnlySpan<char> nameSpace = value.Slice(0, dot).Trim();
+        TryTrimParenthesis(ref nameSpace, 0);
         if (nameSpace.Length != value.Length)
             optionalString = null;
 
@@ -1257,9 +1265,33 @@ public static class SpecDynamicValue
             return true;
         }
 
+        bool allowVectorOnly = false;
         if (expectedType is IStringParseableSpecPropertyType strParsable)
         {
-            return strParsable.TryParse(value, optionalString, out reference);
+            if (strParsable.TryParse(value, optionalString, out reference))
+            {
+                return true;
+            }
+
+            allowVectorOnly = true;
+        }
+
+        if (expectedType is IVectorSpecPropertyType)
+        {
+#if NETSTANDARD2_1_OR_GREATER
+            if (double.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out double vectorComponent))
+#else
+            if (double.TryParse(optionalString ?? value.ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out double vectorComponent))
+#endif
+            {
+                reference = Float64(vectorComponent);
+                return true;
+            }
+        }
+        else if (allowVectorOnly)
+        {
+            reference = null!;
+            return false;
         }
 
         try

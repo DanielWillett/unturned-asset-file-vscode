@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -48,9 +49,49 @@ public sealed class DifficultyDataRef : DataRef, IEquatable<DifficultyDataRef>
         };
     }
 
+    /// <summary>
+    /// Attempt to get a contextual difficulty from an opened file.
+    /// </summary>
     public static bool TryGetFileDifficultyContext(in FileEvaluationContext ctx, out ServerDifficulty difficulty)
     {
         ISourceFile sourceFile = ctx.SourceFile;
+
+        if (sourceFile.TryGetAdditionalProperty(Comment.DifficultyAdditionalProperty, out string? diffStr) && !string.IsNullOrEmpty(diffStr))
+        {
+            switch (diffStr[0])
+            {
+                case 'e':
+                case 'E':
+                    if (diffStr.Length == 4 && diffStr.Equals("easy", StringComparison.OrdinalIgnoreCase))
+                    {
+                        difficulty = ServerDifficulty.Easy;
+                        return true;
+                    }
+
+                    break;
+
+                case 'n':
+                case 'N':
+                    if (diffStr.Length == 6 && diffStr.Equals("normal", StringComparison.OrdinalIgnoreCase))
+                    {
+                        difficulty = ServerDifficulty.Normal;
+                        return true;
+                    }
+
+                    break;
+
+                case 'h':
+                case 'H':
+                    if (diffStr.Length == 4 && diffStr.Equals("hard", StringComparison.OrdinalIgnoreCase))
+                    {
+                        difficulty = ServerDifficulty.Hard;
+                        return true;
+                    }
+
+                    break;
+            }
+        }
+
         if (ctx.Workspace != null)
         {
             return ctx.Workspace.TryGetFileDifficulty(sourceFile.WorkspaceFile.File, out difficulty);
