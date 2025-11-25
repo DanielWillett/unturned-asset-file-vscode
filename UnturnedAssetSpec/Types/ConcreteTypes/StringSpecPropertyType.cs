@@ -79,7 +79,7 @@ public sealed class StringSpecPropertyType : BaseSpecPropertyType<StringSpecProp
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
         stringValue ??= span.ToString();
-        dynamicValue = SpecDynamicValue.String(stringValue, this);
+        dynamicValue = SpecDynamicValue.String(string.IsInterned(stringValue) ?? stringValue, this);
         return true;
     }
 }
