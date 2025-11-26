@@ -1,7 +1,7 @@
 {
     "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
     "Type": "SDG.Unturned.ItemConsumeableAsset, Assembly-CSharp",
-    "DisplayName": "Consumable Item",
+    "DisplayName": "Consumeable Item",
     "Parent": "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html",
     "Category": "ITEM",
@@ -192,15 +192,6 @@
             "Description": "Specifies that this item can be used on other players.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
             "Variable": "hasAid",
-            "Priority": 4
-        },
-        {
-            "Key": "Should_Delete_After_Use",
-            "Type": "Boolean",
-            "DefaultValue": true,
-            "Description": "If this item should be deleted after being consumed.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "shouldDeleteAfterUse",
             "Priority": 4
         },
         {

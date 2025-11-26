@@ -1,0 +1,46 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.ItemGeneratorAsset, Assembly-CSharp",
+    "DisplayName": "Generator Barricade Item",
+    "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/generator-asset.html",
+    "Category": "ITEM",
+    "VanillaIdLimit": 2000,
+    "RequireId": true,
+    "Properties":
+    [
+        {
+            "Key": "Capacity",
+            "Type": "UInt16",
+            "DefaultValue": 0,
+            "Required": true,
+            "Description": "Maximum units of fuel that can be stored in the generator.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/generator-asset.html#item-asset-properties",
+            "Variable": "capacity",
+            "Priority": 5
+        },
+        {
+            "Key": "Wirerange",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "MinimumExclusive": 0.0,
+            "Maximum": 256.0,
+            "Required": true,
+            "Description": "The radius around the generator (in meters) that is provided electricity.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/generator-asset.html#item-asset-properties",
+            "Variable": "wirerange",
+            "Priority": 5
+        },
+        {
+            "Key": "Burn",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Minimum": 0.0,
+            "Required": true,
+            "Description": "The amount of time it takes (in seconds) to burn one unit of fuel.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/generator-asset.html#item-asset-properties",
+            "Variable": "burn",
+            "Priority": 5
+        }
+    ]
+}

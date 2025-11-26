@@ -289,7 +289,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
                                 break;
 
                             case IListTypeSpecPropertyType list:
-                                ISpecPropertyType? innerType = list.GetInnerType(database);
+                                ISpecPropertyType? innerType = list.GetInnerType();
                                 if (innerType == null)
                                     break;
                                 ++skipType;

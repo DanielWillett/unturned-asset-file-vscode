@@ -39,6 +39,16 @@ public sealed class ThisDataRef : IEquatable<ISpecDynamicValue>, IEquatable<This
 
     public bool EvaluateCondition(in FileEvaluationContext ctx, in SpecCondition condition)
     {
+        if (condition.Operation == ConditionOperation.ReferenceIsOfType
+            && ctx.Self != null
+            && condition.Comparand is string str)
+        {
+            QualifiedType conditionType = new QualifiedType(str, isCaseInsensitive: false);
+            QualifiedType thisType = ctx.Self.Owner.Type.CaseSensitive;
+            bool val = ctx.Information.Information.IsAssignableFrom(conditionType, thisType);
+            return condition.IsInverted ? !val : val;
+        }
+
         return condition.EvaluateNulls(false, condition.Comparand == null);
     }
 

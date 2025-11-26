@@ -172,6 +172,69 @@ public sealed class Color32RGBALegacySpecPropertyType : Color32SpecPropertyType
 }
 
 /// <summary>
+/// A floating-point color with only RGB components formatted as a hex string.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffff
+/// Prop ffffff
+/// </code>
+/// </summary>
+public sealed class Color32RGBStringSpecPropertyType : Color32SpecPropertyType
+{
+    public static readonly Color32RGBStringSpecPropertyType Instance = new Color32RGBStringSpecPropertyType();
+
+    public override int GetHashCode() => 99;
+
+    static Color32RGBStringSpecPropertyType() { }
+
+    /// <inheritdoc />
+    public override string Type => "Color32RGBString";
+
+    /// <inheritdoc />
+    public override string DisplayName => "Hex Color (RGB)";
+
+    /// <inheritdoc />
+    private protected override VectorTypeParseOptions Options => VectorTypeParseOptions.Composite;
+
+    /// <inheritdoc />
+    private protected override bool HasAlpha => false;
+}
+
+/// <summary>
+/// A floating-point color with RGBA components formatted as a hex string.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffffff
+/// Prop ffffffff
+/// 
+/// // or
+/// 
+/// Prop #ffffff
+/// Prop ffffff
+/// </code>
+/// </summary>
+public sealed class Color32RGBAStringSpecPropertyType : Color32SpecPropertyType
+{
+    public static readonly Color32RGBAStringSpecPropertyType Instance = new Color32RGBAStringSpecPropertyType();
+
+    public override int GetHashCode() => 100;
+
+    static Color32RGBAStringSpecPropertyType() { }
+
+    /// <inheritdoc />
+    public override string Type => "ColorRGBAString";
+
+    /// <inheritdoc />
+    public override string DisplayName => "Hex Color (RBGA)";
+
+    /// <inheritdoc />
+    private protected override VectorTypeParseOptions Options => VectorTypeParseOptions.Composite;
+
+    /// <inheritdoc />
+    private protected override bool HasAlpha => true;
+}
+
+/// <summary>
 /// A 32-bit color with only RGB components formatted as a strict 7-length hex string.
 /// <para>Currently unused by Unturned.</para>
 /// <code>

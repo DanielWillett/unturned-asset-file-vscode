@@ -377,7 +377,7 @@
                     "Description": "Whether or not to negate if this rule matches. (Ex. match all servers that don't use this IP range).",
                     "DefaultValue": false,
                     "Variable": "inverted"
-                },
+                }
             ]
         },
         {

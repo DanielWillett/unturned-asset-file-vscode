@@ -49,6 +49,8 @@ public abstract class BaseSpecPropertyType<TSpecPropertyType, TValue> :
         return true;
     }
 
+    ISpecDynamicValue ISpecPropertyType<TValue>.CreateValue(TValue? value) => value == null ? SpecDynamicValue.Null : CreateValue(value);
+
     protected virtual ISpecDynamicValue CreateValue(TValue value)
     {
         return new SpecDynamicConcreteValue<TValue>(value, this);

@@ -1,0 +1,140 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp",
+    "DisplayName": "Base Weather",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Fade_In_Duration",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Seconds between weather event starting and reaching full intensity.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "fadeInDuration",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Fade_Out_Duration",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Seconds between weather event ending and reaching zero intensity.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "fadeOutDuration",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Ambient_Audio_Clip",
+            "Type": "MasterBundleReference",
+            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "DefaultValue": null,
+            "Description": "Audio clip to play globally. Volume matches intensity.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "ambientAudio"
+        },
+        {
+            "Key": "Component_Type",
+            "Type": "Type",
+            "ElementType": "SDG.Unturned.WeatherComponentBase, Assembly-CSharp",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "#This",
+                            "Operation": "is-type",
+                            "Comparand": "SDG.Unturned.WeatherAsset, Assembly-CSharp"
+                        }
+                    ],
+                    "Value": "SDG.Unturned.CustomWeatherComponent, Assembly-CSharp"
+                },
+                {
+                    "Value": "SDG.Unturned.WeatherComponentBase, Assembly-CSharp"
+                }
+            ],
+            "Description": "Component to spawn for additional weather logic.",
+            "Variable": "componentType",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Component_Type",
+                    "Value": "SDG.Unturned.WeatherComponentBase, Assembly-CSharp",
+                    "Condition":
+                    {
+                            "Variable": "#This",
+                            "Operation": "is-type",
+                            "Comparand": "SDG.Unturned.WeatherAsset, Assembly-CSharp"
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Volume_Mask",
+            "Type": "UInt32",
+            "DefaultValue": 4294967295,
+            "IncludedDefaultValue": 0,
+            "Description": "Only enabled while inside an ambience volume with non-zero bitwise AND result. A player's current volume mask has to share bits with this value for this weather to be visible.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "volumeMask"
+        },
+        {
+            "Key": "Has_Lightning",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "If true, lightning will be enabled for this weather type. In the future this should get cleaned up, but for now it is hardcoded for assigning a net id.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "hasLightning"
+        },
+        {
+            "Key": "Min_Lightning_Interval",
+            "Type": "Float32",
+            "DefaultValue": 5.0,
+            "Minimum": 5.0,
+            "Description": "Minimum seconds between lightning strikes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "minLightningInterval",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Lightning",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Max_Lightning_Interval",
+            "Type": "Float32",
+            "DefaultValue": 5.0,
+            "Minimum": 5.0,
+            "Description": "Maximum seconds between lightning strikes.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "maxLightningInterval",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Lightning",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Lightning_Target_Radius",
+            "Type": "Float32",
+            "DefaultValue": 500.0,
+            "IncludedDefaultValue": 0.0,
+            "Minimum": 0.0,
+            "Description": "Radius around players (in meters) in which random position will be chosen for a lightning strike.",
+            "Variable": "lightningTargetRadius",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Has_Lightning",
+                    "Value": true
+                }
+            ]
+        }
+    ]
+}

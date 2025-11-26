@@ -64,7 +64,7 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
 
             case JsonTokenType.String:
                 // check if property by this name is true
-                return new SpecCondition(SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, KnownTypes.Boolean), ConditionOperation.Equal, BoxedPrimitives.True, false);
+                return new SpecCondition(SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AssumeProperty, KnownTypes.Boolean), ConditionOperation.Equal, BoxedPrimitives.True, false);
 
             default:
                 throw new JsonException($"Unexpected token {reader.TokenType} while reading SpecCondition.");
@@ -86,7 +86,7 @@ public class SpecConditionConverter : JsonConverter<SpecCondition>
                 if (!reader.Read())
                     throw new JsonException("Failed to read 'Variable' in SpecCondition.");
 
-                variable = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty);
+                variable = SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AssumeProperty);
             }
             else if (reader.ValueTextEquals(OperationProperty.EncodedUtf8Bytes))
             {

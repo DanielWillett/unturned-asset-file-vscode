@@ -44,12 +44,16 @@ public static class KnownTypes
         { "Color32RGBA", () => Color32RGBA },
         { "Color32RGBLegacy", () => Color32RGBLegacy },
         { "Color32RGBALegacy", () => Color32RGBALegacy },
+        { "Color32RGBString", () => Color32RGBString },
+        { "Color32RGBAString", () => Color32RGBAString },
         { "Color32RGBStrictHex", () => Color32RGBStrictHex },
         { "Color32RGBAStrictHex", () => Color32RGBAStrictHex },
         { "ColorRGB", () => ColorRGB },
         { "ColorRGBA", () => ColorRGBA },
         { "ColorRGBLegacy", () => ColorRGBLegacy },
         { "ColorRGBALegacy", () => ColorRGBALegacy },
+        { "ColorRGBString", () => ColorRGBString },
+        { "ColorRGBAString", () => ColorRGBAString },
         { "ColorRGBStrictHex", () => ColorRGBStrictHex },
         { "ColorRGBAStrictHex", () => ColorRGBAStrictHex },
         { "AudioReference", () => AudioReference },
@@ -478,12 +482,16 @@ public static class KnownTypes
     public static ISpecPropertyType<Color32> Color32RGBA => Color32RGBASpecPropertyType.Instance;
     public static ISpecPropertyType<Color32> Color32RGBLegacy => Color32RGBLegacySpecPropertyType.Instance;
     public static ISpecPropertyType<Color32> Color32RGBALegacy => Color32RGBALegacySpecPropertyType.Instance;
+    public static ISpecPropertyType<Color32> Color32RGBString => Color32RGBStringSpecPropertyType.Instance;
+    public static ISpecPropertyType<Color32> Color32RGBAString => Color32RGBAStringSpecPropertyType.Instance;
     public static ISpecPropertyType<Color32> Color32RGBStrictHex => Color32RGBStrictHexSpecPropertyType.Instance;
     public static ISpecPropertyType<Color32> Color32RGBAStrictHex => Color32RGBAStrictHexSpecPropertyType.Instance;
     public static ISpecPropertyType<Color> ColorRGB => ColorRGBSpecPropertyType.Instance;
     public static ISpecPropertyType<Color> ColorRGBA => ColorRGBASpecPropertyType.Instance;
     public static ISpecPropertyType<Color> ColorRGBLegacy => ColorRGBLegacySpecPropertyType.Instance;
     public static ISpecPropertyType<Color> ColorRGBALegacy => ColorRGBALegacySpecPropertyType.Instance;
+    public static ISpecPropertyType<Color> ColorRGBString => ColorRGBStringSpecPropertyType.Instance;
+    public static ISpecPropertyType<Color> ColorRGBAString => ColorRGBAStringSpecPropertyType.Instance;
     public static ISpecPropertyType<Color> ColorRGBStrictHex => ColorRGBStrictHexSpecPropertyType.Instance;
     public static ISpecPropertyType<Color> ColorRGBAStrictHex => ColorRGBAStrictHexSpecPropertyType.Instance;
 

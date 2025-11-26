@@ -1,0 +1,54 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp",
+    "DisplayName": "Vehicle Redirector",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-redirector-asset.html",
+    "Version": "3.24.4.0",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "TargetVehicle",
+            "Type": "AssetReferenceString",
+            "ElementType": "SDG.Unturned.VehicleAsset, Assembly-CSharp",
+            "DefaultValue": "00000000000000000000000000000000",
+            "Required": true,
+            "Description": "Actual vehicle to use when attempting to load or spawn this asset.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-redirector-asset.html#targetvehicle-asset-pointer",
+            "Variable": "TargetVehicle"
+        },
+        {
+            "Key": "LoadPaintColor",
+            "Type": "Color32RGB",
+            "DefaultValue": null,
+            "Description": "If set, overrides the default random paint color when loading a vehicle from a save file. Used to preserve colors of vehicles in existing saves.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-redirector-asset.html#loadpaintcolor-color",
+            "Variable": "LoadPaintColor",
+            "FileCrossRef": "TargetVehicle",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "$cr$::SDG.Unturned.VehicleAsset, Assembly-CSharp::PaintableSections",
+                    "Value": null
+                }
+            ]
+        },
+        {
+            "Key": "SpawnPaintColor",
+            "Type": "Color32RGB",
+            "DefaultValue": null,
+            "Description": "If set, overrides the default random paint color when spawning a new vehicle. Optionally used to preserve colors of vehicles in spawn tables.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-redirector-asset.html#spawnpaintcolor-color",
+            "Variable": "SpawnPaintColor",
+            "FileCrossRef": "TargetVehicle",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "$cr$::SDG.Unturned.VehicleAsset, Assembly-CSharp::PaintableSections",
+                    "Value": null
+                }
+            ]
+        }
+    ]
+}

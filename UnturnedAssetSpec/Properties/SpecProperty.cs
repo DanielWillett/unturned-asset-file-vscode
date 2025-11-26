@@ -327,6 +327,71 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
         return _aliasTemplateProcessors[index];
     }
 
+    /// <summary>
+    /// Determines the filter applied to the key currently being parsed.
+    /// </summary>
+    public LegacyExpansionFilter GetCorrespondingFilter(in SpecPropertyTypeParseContext parse)
+    {
+        string? key = parse.BaseKey ?? (parse.Parent as IPropertySourceNode)?.Key;
+        if (key == null)
+            return KeyLegacyExpansionFilter;
+
+        if (!IsTemplate)
+        {
+            if (string.Equals(key, Key, StringComparison.OrdinalIgnoreCase))
+            {
+                return KeyLegacyExpansionFilter;
+            }
+
+            foreach (Alias alias in Aliases)
+            {
+                if (string.Equals(key, alias.Value, StringComparison.OrdinalIgnoreCase))
+                {
+                    return alias.Filter;
+                }
+            }
+
+            return LegacyExpansionFilter.Either;
+        }
+
+        if (_keyTemplateProcessor != null)
+        {
+            Span<int> sp = stackalloc int[_keyTemplateProcessor.TemplateCount];
+            if (_keyTemplateProcessor.TryParseKeyValues(key, sp))
+            {
+                return KeyLegacyExpansionFilter;
+            }
+        }
+
+        if (_aliasTemplateProcessors != null)
+        {
+            int max = 0;
+            for (int i = 0; i < Aliases.Length && i < _aliasTemplateProcessors.Length; i++)
+            {
+                Alias alias = Aliases[i];
+                if (_aliasTemplateProcessors[i] is not { } templateProcessor)
+                    continue;
+
+                max = Math.Max(max, templateProcessor.TemplateCount);
+            }
+
+            Span<int> sp = stackalloc int[max];
+            for (int i = 0; i < Aliases.Length && i < _aliasTemplateProcessors.Length; i++)
+            {
+                Alias alias = Aliases[i];
+                if (_aliasTemplateProcessors[i] is not { } templateProcessor)
+                    continue;
+
+                if (templateProcessor.TryParseKeyValues(key, sp))
+                {
+                    return alias.Filter;
+                }
+            }
+        }
+
+        return LegacyExpansionFilter.Either;
+    }
+
     internal void CreateTemplateProcessors()
     {
         if (!IsTemplate)
@@ -357,6 +422,21 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
 
         if (!allAreNone)
             _aliasTemplateProcessors = aliasTemplateProcessors;
+    }
+
+    // used for use cases such as Asset.Type <-- ItemAsset.Type
+    public SpecProperty CreateOverriddenProperty(SpecProperty overridingProperty)
+    {
+        if (overridingProperty.CanBeInMetadata != CanBeInMetadata)
+        {
+            return overridingProperty;
+        }
+
+        SpecProperty newProperty = (SpecProperty)overridingProperty.Clone();
+        newProperty.Parent = overridingProperty;
+        if (newProperty.Priority == 0)
+            newProperty.Priority = Priority;
+        return newProperty;
     }
 
     public bool Equals(SpecProperty? other)

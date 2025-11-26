@@ -526,6 +526,14 @@
         {
             "SDG.Unturned.ArenaGameMode, Assembly-CSharp": { },
             "SDG.Unturned.SurvivalGameMode, Assembly-CSharp": { }
+        },
+        "SDG.Unturned.WeatherComponentBase, Assembly-CSharp":
+        {
+            "SDG.Unturned.CustomWeatherComponent, Assembly-CSharp":
+            {
+                "SDG.Unturned.LegacyRainComponent, Assembly-CSharp": { },
+                "SDG.Unturned.LegacySnowComponent, Assembly-CSharp": { }
+            }
         }
     },
     "AssetAliases":

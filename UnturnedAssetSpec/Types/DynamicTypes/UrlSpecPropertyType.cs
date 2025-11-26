@@ -21,7 +21,8 @@ public sealed class UrlSpecPropertyType :
     BaseSpecPropertyType<UrlSpecPropertyType, string>,
     ISpecPropertyType<string>,
     IEquatable<UrlSpecPropertyType?>,
-    ISpecialTypesSpecPropertyType
+    ISpecialTypesSpecPropertyType,
+    IStringParseableSpecPropertyType
 {
     public static readonly UrlSpecPropertyType Instance = new UrlSpecPropertyType(null, OneOrMore<string>.Null);
 
@@ -176,4 +177,15 @@ public sealed class UrlSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(UrlSpecPropertyType? other) => other != null && MimeTypes.Equals(other.MimeTypes, StringComparison.OrdinalIgnoreCase);
+
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
+    {
+        stringValue ??= span.ToString();
+        dynamicValue = span.IsEmpty ? SpecDynamicValue.Null : SpecDynamicValue.String(stringValue, this);
+        return true;
+    }
+
+    /// <inheritdoc />
+    public string? ToString(ISpecDynamicValue value) => value.AsConcrete<string>();
 }

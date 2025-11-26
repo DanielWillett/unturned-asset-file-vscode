@@ -330,6 +330,27 @@ public static class SpecDynamicValue
     public static SpecDynamicConcreteEnumValue Enum(EnumSpecType type, int value) => new SpecDynamicConcreteEnumValue(type, value);
 
     /// <summary>
+    /// An enum value based on the value index.
+    /// </summary>
+    /// <param name="type">The enum type.</param>
+    /// <param name="flags">List of indices included in the flag.</param>
+    public static SpecDynamicConcreteFlagsEnumValue EnumFlags(EnumSpecType type, params OneOrMore<int> flags) => new SpecDynamicConcreteFlagsEnumValue(type, flags);
+
+    /// <summary>
+    /// An enum value based on the composite bitwise value.
+    /// </summary>
+    /// <param name="type">The enum type.</param>
+    /// <param name="composite">Resulting bit-wise composite value.</param>
+    public static SpecDynamicConcreteFlagsEnumValue EnumFlags(EnumSpecType type, long composite) => new SpecDynamicConcreteFlagsEnumValue(type, composite);
+
+    /// <summary>
+    /// An enum value based on the composite bitwise value.
+    /// </summary>
+    /// <param name="type">The enum type.</param>
+    /// <param name="composite">Resulting bit-wise composite value.</param>
+    public static SpecDynamicConcreteFlagsEnumValue EnumFlags(EnumSpecType type, ulong composite) => new SpecDynamicConcreteFlagsEnumValue(type, unchecked ( (long)composite ));
+
+    /// <summary>
     /// An enum value based on the value record.
     /// </summary>
     /// <param name="value">The enum value from the enum type's value array.</param>
@@ -339,7 +360,10 @@ public static class SpecDynamicValue
     /// A null enum value.
     /// </summary>
     /// <param name="type">The enum type.</param>
-    public static SpecDynamicConcreteEnumValue EnumNull(EnumSpecType type) => new SpecDynamicConcreteEnumValue(type);
+    public static SpecDynamicConcreteEnumValue EnumNull(EnumSpecType type)
+    {
+        return type.Null;
+    }
 
     /// <summary>
     /// Attempts to convert this value to a concrete value without worspace context.
@@ -1317,9 +1341,9 @@ public static class SpecDynamicValue
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="context"/> is an invalid value.</exception>
     /// <exception cref="JsonException">Failed to parse value.</exception>
     /// <returns>The parsed value.</returns>
-    public static ISpecDynamicValue Read(ref Utf8JsonReader reader, JsonSerializerOptions? options, SpecDynamicValueContext context = SpecDynamicValueContext.Default, ISpecPropertyType? expectedType = null)
+    public static ISpecDynamicValue Read(ref Utf8JsonReader reader, JsonSerializerOptions? options, bool expandLists, SpecDynamicValueContext context = SpecDynamicValueContext.Default, ISpecPropertyType? expectedType = null)
     {
-        return Read(ref reader, options, context, expectedType == null ? default : new PropertyTypeOrSwitch(expectedType));
+        return Read(ref reader, options, context, expectedType == null ? default : new PropertyTypeOrSwitch(expectedType), expandLists);
     }
 
     /// <summary>
@@ -1330,7 +1354,7 @@ public static class SpecDynamicValue
     /// <exception cref="JsonException">Failed to parse value.</exception>
     /// <returns>The parsed value.</returns>
     [SkipLocalsInit]
-    public static ISpecDynamicValue Read(ref Utf8JsonReader reader, JsonSerializerOptions? options, SpecDynamicValueContext context, PropertyTypeOrSwitch expectedType)
+    public static ISpecDynamicValue Read(ref Utf8JsonReader reader, JsonSerializerOptions? options, SpecDynamicValueContext context, PropertyTypeOrSwitch expectedType, bool expandLists)
     {
         if (((int)context & 0b11) == 3)
         {
@@ -1350,7 +1374,14 @@ public static class SpecDynamicValue
             case JsonTokenType.String:
             case JsonTokenType.PropertyName:
                 string str = reader.GetString()!;
-                if (!TryParse(str, context, expectedType.Type, out ISpecDynamicValue reference))
+                if (expandLists && !expectedType.IsSwitch && expectedType.Type is IListTypeSpecPropertyType listType)
+                {
+                    ISpecPropertyType? t = listType.GetInnerType();
+                    if (t != null)
+                        expectedType = new PropertyTypeOrSwitch(t);
+                }
+
+                if (!TryParse(str, context, expectedType.Type, out ISpecDynamicValue? reference))
                     throw new JsonException("Failed to parse ISpecDynamicValue from a string value.");
 
                 return reference;
@@ -1362,6 +1393,7 @@ public static class SpecDynamicValue
                 return ReadValue(ref reader, expectedType.Type, (t, type) => t != null
                     ? throw new JsonException($"Failed to parse ISpecDynamicValue from an argument, expected type \"{type.Type}\" but was given type {t}.")
                     : throw new JsonException($"Failed to parse ISpecDynamicValue from an argument, expected type \"{type.Type}\".")
+                    , expandLists
                 );
 
             case JsonTokenType.StartArray:
@@ -1419,7 +1451,7 @@ public static class SpecDynamicValue
                 Utf8JsonReader readerCopy = reader;
                 try
                 {
-                    SpecDynamicSwitchValue @switch = SpecDynamicSwitchValueConverter.ReadSwitch(ref readerCopy, options, expectedType)!;
+                    SpecDynamicSwitchValue @switch = SpecDynamicSwitchValueConverter.ReadSwitch(ref readerCopy, options, expectedType, expandLists)!;
                     reader = readerCopy;
 
                     return @switch;
@@ -1455,7 +1487,7 @@ public static class SpecDynamicValue
                     readerCopy = reader;
                     try
                     {
-                        SpecDynamicSwitchCaseValue @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref readerCopy, options, expectedType.Type)!;
+                        SpecDynamicSwitchCaseValue @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref readerCopy, options, expectedType.Type, expandLists)!;
                         reader = readerCopy;
 
                         return @case;
@@ -1498,8 +1530,15 @@ public static class SpecDynamicValue
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="context"/> is an invalid value.</exception>
     /// <exception cref="JsonException">Failed to parse value.</exception>
     /// <returns>The parsed value.</returns>
-    public static ISpecDynamicValue ReadValue(ref Utf8JsonReader reader, ISpecPropertyType? expectedType, Func<Type?, ISpecPropertyType, ISpecDynamicValue> invalidTypeThrowHandler)
+    public static ISpecDynamicValue ReadValue(ref Utf8JsonReader reader, ISpecPropertyType? expectedType, Func<Type?, ISpecPropertyType, ISpecDynamicValue> invalidTypeThrowHandler, bool reduceLists)
     {
+        if (reduceLists && expectedType is IListTypeSpecPropertyType list)
+        {
+            ISpecPropertyType? t = list.GetInnerType();
+            if (t != null)
+                expectedType = t;
+        }
+
         switch (reader.TokenType)
         {
             case JsonTokenType.False:
@@ -1541,6 +1580,20 @@ public static class SpecDynamicValue
                     }
 
                     throw new JsonException("Failed to read 'Comparand' in SpecCondition.");
+                }
+
+                if (expectedType is EnumSpecType { IsFlags: true } enumType)
+                {
+                    if (reader.TryGetInt64(out long i8))
+                    {
+                        return EnumFlags(enumType, i8);
+                    }
+                    if (reader.TryGetUInt64(out ulong u8))
+                    {
+                        return EnumFlags(enumType, u8);
+                    }
+
+                    return invalidTypeThrowHandler(typeof(double), expectedType);
                 }
 
                 Type valueType = expectedType.ValueType;

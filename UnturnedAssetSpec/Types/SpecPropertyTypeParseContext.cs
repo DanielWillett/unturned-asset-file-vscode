@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -90,6 +91,30 @@ public readonly ref struct SpecPropertyTypeParseContext
         {
             Database.LogMessage($"Error adding diagnostics message{Environment.NewLine}{ex}");
         }
+    }
+
+    public bool TryParse(out ISpecDynamicValue? value)
+    {
+        return TryParse(out value, out _);
+    }
+
+    public bool TryParse([MaybeNullWhen(false)] out ISpecDynamicValue value, out IPropertySourceNode? property)
+    {
+        SpecProperty prop = EvaluationContext.Self;
+
+        if ((property = Parent as IPropertySourceNode) == null)
+        {
+            value = prop.DefaultValue!;
+            return value != null;
+        }
+
+        if (prop.Type.TryParseValue(in this, out value))
+        {
+            return true;
+        }
+
+        value = prop.IncludedDefaultValue ?? prop.DefaultValue!;
+        return value != null;
     }
 
     public GuidOrId GetThisId()

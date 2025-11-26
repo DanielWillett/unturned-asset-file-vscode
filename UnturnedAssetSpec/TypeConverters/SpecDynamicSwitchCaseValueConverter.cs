@@ -17,7 +17,7 @@ public class SpecDynamicSwitchCaseValueConverter : JsonConverter<SpecDynamicSwit
     private static readonly JsonEncodedText CasesProperty = JsonEncodedText.Encode("Cases");
     private static readonly JsonEncodedText CaseProperty = JsonEncodedText.Encode("Case");
 
-    public static SpecDynamicSwitchCaseValue? ReadCase(ref Utf8JsonReader reader, JsonSerializerOptions? options, ISpecPropertyType? expectedType)
+    public static SpecDynamicSwitchCaseValue? ReadCase(ref Utf8JsonReader reader, JsonSerializerOptions? options, ISpecPropertyType? expectedType, bool expandLists)
     {
         if (reader.TokenType == JsonTokenType.Null)
         {
@@ -93,24 +93,24 @@ public class SpecDynamicSwitchCaseValueConverter : JsonConverter<SpecDynamicSwit
             {
                 case 0: // And
                     operation = SpecDynamicSwitchCaseOperation.And;
-                    conditions = ReadConditions(ref reader, options, expectedType);
+                    conditions = ReadConditions(ref reader, options, expectedType, expandLists);
                     break;
 
                 case 1: // Or
                     operation = SpecDynamicSwitchCaseOperation.Or;
-                    conditions = ReadConditions(ref reader, options, expectedType);
+                    conditions = ReadConditions(ref reader, options, expectedType, expandLists);
                     break;
 
                 case 2: // Cases
                     operation = SpecDynamicSwitchCaseOperation.When;
                     value = null;
-                    cases = ReadCases(ref reader, options, expectedType);
+                    cases = ReadCases(ref reader, options, expectedType, expandLists);
                     break;
 
                 case 3: // Case
                     if (operation != SpecDynamicSwitchCaseOperation.When)
                         operation = SpecDynamicSwitchCaseOperation.And;
-                    SpecDynamicSwitchCaseValue @case = ReadCase(ref reader, options, expectedType)!;
+                    SpecDynamicSwitchCaseValue @case = ReadCase(ref reader, options, expectedType, expandLists)!;
                     conditions = new SpecDynamicSwitchCaseOrCondition(@case);
                     cases = @case;
                     break;
@@ -123,7 +123,7 @@ public class SpecDynamicSwitchCaseValueConverter : JsonConverter<SpecDynamicSwit
 
                 case 5: // Value
                     if (operation != SpecDynamicSwitchCaseOperation.When)
-                        value = SpecDynamicValue.Read(ref reader, options, expectedType: expectedType);
+                        value = SpecDynamicValue.Read(ref reader, options, expandLists, expectedType: expectedType);
                     else
                         reader.Skip();
                     break;
@@ -152,7 +152,8 @@ public class SpecDynamicSwitchCaseValueConverter : JsonConverter<SpecDynamicSwit
     private static SpecDynamicSwitchCaseOrCondition ReadCondition(
         ref Utf8JsonReader reader,
         JsonSerializerOptions? options,
-        ISpecPropertyType? expectedType
+        ISpecPropertyType? expectedType,
+        bool expandLists
     )
     {
         Utf8JsonReader readerCopy = reader;
@@ -168,15 +169,19 @@ public class SpecDynamicSwitchCaseValueConverter : JsonConverter<SpecDynamicSwit
         }
 
         return new SpecDynamicSwitchCaseOrCondition(
-            ReadCase(ref reader, options, expectedType)
+            ReadCase(ref reader, options, expectedType, expandLists)
         );
     }
 
-    private static OneOrMore<SpecDynamicSwitchCaseOrCondition> ReadConditions(ref Utf8JsonReader reader, JsonSerializerOptions? options, ISpecPropertyType? expectedType)
+    private static OneOrMore<SpecDynamicSwitchCaseOrCondition> ReadConditions(
+        ref Utf8JsonReader reader,
+        JsonSerializerOptions? options,
+        ISpecPropertyType? expectedType,
+        bool expandLists)
     {
         if (reader.TokenType == JsonTokenType.StartObject)
         {
-            return ReadCondition(ref reader, options, expectedType);
+            return ReadCondition(ref reader, options, expectedType, expandLists);
         }
 
         if (reader.TokenType != JsonTokenType.StartArray)
@@ -187,7 +192,7 @@ public class SpecDynamicSwitchCaseValueConverter : JsonConverter<SpecDynamicSwit
         OneOrMore<SpecDynamicSwitchCaseOrCondition> collection = OneOrMore<SpecDynamicSwitchCaseOrCondition>.Null;
         while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
         {
-            SpecDynamicSwitchCaseOrCondition condition = ReadCondition(ref reader, options, expectedType);
+            SpecDynamicSwitchCaseOrCondition condition = ReadCondition(ref reader, options, expectedType, expandLists);
             if (condition.IsNull)
                 continue;
             
@@ -197,11 +202,15 @@ public class SpecDynamicSwitchCaseValueConverter : JsonConverter<SpecDynamicSwit
         return collection;
     }
 
-    private static OneOrMore<SpecDynamicSwitchCaseValue> ReadCases(ref Utf8JsonReader reader, JsonSerializerOptions? options, ISpecPropertyType? expectedType)
+    private static OneOrMore<SpecDynamicSwitchCaseValue> ReadCases(
+        ref Utf8JsonReader reader,
+        JsonSerializerOptions? options,
+        ISpecPropertyType? expectedType,
+        bool expandLists)
     {
         if (reader.TokenType == JsonTokenType.StartObject)
         {
-            SpecDynamicSwitchCaseValue? condition = ReadCase(ref reader, options, expectedType);
+            SpecDynamicSwitchCaseValue? condition = ReadCase(ref reader, options, expectedType, expandLists);
             return condition ?? OneOrMore<SpecDynamicSwitchCaseValue>.Null;
         }
 
@@ -213,7 +222,7 @@ public class SpecDynamicSwitchCaseValueConverter : JsonConverter<SpecDynamicSwit
         OneOrMore<SpecDynamicSwitchCaseValue> collection = OneOrMore<SpecDynamicSwitchCaseValue>.Null;
         while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
         {
-            SpecDynamicSwitchCaseValue? @case = ReadCase(ref reader, options, expectedType);
+            SpecDynamicSwitchCaseValue? @case = ReadCase(ref reader, options, expectedType, expandLists);
             if (@case == null)
                 continue;
 
@@ -268,7 +277,7 @@ public class SpecDynamicSwitchCaseValueConverter : JsonConverter<SpecDynamicSwit
     /// <inheritdoc />
     public override SpecDynamicSwitchCaseValue? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return ReadCase(ref reader, options, null);
+        return ReadCase(ref reader, options, null, false);
     }
 
 

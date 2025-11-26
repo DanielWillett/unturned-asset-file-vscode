@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -17,6 +18,8 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
 {
     // example value could be Condition for Conditions
     public const string PluralBaseKeyProperty = "PluralBaseKey";
+
+    internal JsonDocument? DeferredDefaultValue;
 
     public required QualifiedType Type { get; init; }
     public required string DisplayName { get; init; }
@@ -35,6 +38,9 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
     /// A type used to parse this object as a string value.
     /// </summary>
     public string? StringParsableType { get; init; }
+
+    public CustomSpecTypeInstance? DefaultValue { get; internal set; }
+
     public required OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; init; }
 
     public Type ValueType => typeof(CustomSpecTypeInstance);
@@ -273,6 +279,19 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
         }
 
         return null;
+    }
+
+    /// <inheritdoc />
+    public ISpecDynamicValue CreateValue(CustomSpecTypeInstance? value)
+    {
+        return value == null ? SpecDynamicValue.Null : new SpecDynamicConcreteValue<CustomSpecTypeInstance>(value, this);
+    }
+
+    ~CustomSpecType()
+    {
+        // should be handled by FifthPass but just in case it's not
+        // FifthPass currently suppresses the finalizer, so that needs to be removed if more is added to this
+        Interlocked.Exchange(ref DeferredDefaultValue, null)?.Dispose();
     }
 
     void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);

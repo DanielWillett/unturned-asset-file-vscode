@@ -42,7 +42,11 @@ public class AssetSpecValidity
 
         protected override void Log(string msg)
         {
-            _hasRanIntoError = true;
+            if (!(msg.Contains("internet disabled") || msg.StartsWith("InstallDirUtility >>")))
+            {
+                _hasRanIntoError = true;
+            }
+
             Console.WriteLine(msg);
         }
     }

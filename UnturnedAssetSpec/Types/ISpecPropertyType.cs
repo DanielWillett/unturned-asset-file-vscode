@@ -38,6 +38,7 @@ public interface ISpecPropertyType : IEquatable<ISpecPropertyType?>
 
     /// <summary>
     /// Invokes the strongly typed <see cref="ISpecPropertyTypeVisitor.Visit{T}"/> on the <paramref name="visitor"/>.
+    /// If a type can be resolved to multiple types (like how lists can be resolved to their array or their count), this method will be invoked more than one time.
     /// <para>
     /// If this type is not strongly typed (such as <see cref="UnresolvedSpecPropertyType"/>), the visitor will not be invoked.
     /// </para>
@@ -53,6 +54,7 @@ public interface ISpecPropertyType<TValue> : ISpecPropertyType, IEquatable<ISpec
     where TValue : IEquatable<TValue>
 {
     bool TryParseValue(in SpecPropertyTypeParseContext parse, out TValue? value);
+    ISpecDynamicValue CreateValue(TValue? value);
 }
 
 /// <summary>
@@ -124,7 +126,7 @@ public interface IListTypeSpecPropertyType : IElementTypeSpecPropertyType
     /// <summary>
     /// Gets the element type of the list.
     /// </summary>
-    ISpecPropertyType? GetInnerType(IAssetSpecDatabase database);
+    ISpecPropertyType? GetInnerType();
 }
 
 /// <summary>

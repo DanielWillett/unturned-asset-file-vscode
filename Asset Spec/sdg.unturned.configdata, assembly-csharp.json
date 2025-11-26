@@ -106,7 +106,7 @@
             "Description": "Gameplay settings.",
             "DefaultValue": null,
             "Required": true
-        },
+        }
     ],
     "Types":
     [
@@ -244,9 +244,9 @@
                 },
                 {
                     "Key": "Is_Using_Anycast_Proxy",
-                    "Type": "String",
+                    "Type": "Boolean",
                     "Description": "If true, the server lobby warns that in-game ping may be higher than shown.",
-                    "DefaultValue": null
+                    "DefaultValue": false
                 },
                 {
                     "Key": "Monetization",
@@ -931,7 +931,7 @@
                     ]
                 },
                 {
-                    "Key": "Crate_Bullets_Full_Chance",
+                    "Key": "Crate_Bullets_Multiplier",
                     "Type": "Float32",
                     "Minimum": 0.0,
                     "Maximum": 1.0,

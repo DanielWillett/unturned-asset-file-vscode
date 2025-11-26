@@ -133,7 +133,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             minimumValue = defaultValueReader,
             maximumValue = defaultValueReader,
             exceptValue = defaultValueReader,
-            typeSwitch = defaultValueReader;
+            typeSwitch = defaultValueReader,
+            elementTypeSwitch = defaultValueReader;
 
         bool minimumIsExclusive = false,
             maximumIsExclusive = false;
@@ -259,6 +260,13 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     break;
 
                 case 10: // ElementType
+                    if (reader.TokenType is JsonTokenType.StartArray or JsonTokenType.StartObject)
+                    {
+                        elementTypeSwitch = reader;
+                        reader.Skip();
+                        break;
+                    }
+
                     if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.Null)
                         ThrowUnexpectedToken(reader.TokenType, propType);
                     elementTypeStr = reader.GetString();
@@ -282,7 +290,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                         case JsonTokenType.String:
                             try
                             {
-                                property.RequiredCondition = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, expectedType: KnownTypes.Boolean);
+                                property.RequiredCondition = SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AssumeProperty, expectedType: KnownTypes.Boolean);
                             }
                             catch (Exception ex)
                             {
@@ -293,7 +301,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                         case JsonTokenType.StartObject:
                             try
                             {
-                                property.RequiredCondition = SpecDynamicValue.Read(ref reader, options, expectedType: KnownTypes.Boolean);
+                                property.RequiredCondition = SpecDynamicValue.Read(ref reader, options, false, expectedType: KnownTypes.Boolean);
                             }
                             catch (Exception ex)
                             {
@@ -325,19 +333,19 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                     break;
 
                 case 16: // Description
-                    property.Description = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
+                    property.Description = SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
                     break;
 
                 case 17: // Variable
-                    property.Variable = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
+                    property.Variable = SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
                     break;
 
                 case 18: // Docs
-                    property.Docs = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
+                    property.Docs = SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
                     break;
 
                 case 19: // Markdown
-                    property.Markdown = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
+                    property.Markdown = SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AllowSwitch, KnownTypes.String);
                     break;
 
                 case 20: // Minimum
@@ -389,11 +397,11 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                             break;
 
                         case JsonTokenType.String:
-                            property.Deprecated = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, KnownTypes.Boolean);
+                            property.Deprecated = SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AssumeProperty, KnownTypes.Boolean);
                             break;
 
                         case JsonTokenType.StartObject:
-                            property.Deprecated = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowCondition | SpecDynamicValueContext.AllowSwitchCase, KnownTypes.Boolean);
+                            property.Deprecated = SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AllowCondition | SpecDynamicValueContext.AllowSwitchCase, KnownTypes.Boolean);
                             break;
 
                         default:
@@ -433,11 +441,11 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                             break;
 
                         case JsonTokenType.String:
-                            property.Experimental = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, KnownTypes.Boolean);
+                            property.Experimental = SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AssumeProperty, KnownTypes.Boolean);
                             break;
 
                         case JsonTokenType.StartObject:
-                            property.Experimental = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AllowCondition | SpecDynamicValueContext.AllowSwitchCase, KnownTypes.Boolean);
+                            property.Experimental = SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AllowCondition | SpecDynamicValueContext.AllowSwitchCase, KnownTypes.Boolean);
                             break;
 
                         default:
@@ -476,7 +484,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                         case JsonTokenType.Null: break;
 
                         case JsonTokenType.String:
-                            ctRestriction = SpecDynamicValue.Read(ref reader, options, SpecDynamicValueContext.AssumeProperty, KnownTypes.Int32);
+                            ctRestriction = SpecDynamicValue.Read(ref reader, options, false, SpecDynamicValueContext.AssumeProperty, KnownTypes.Int32);
                             break;
 
                         case JsonTokenType.StartObject:
@@ -484,6 +492,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                             ctRestriction = SpecDynamicValue.Read(
                                 ref reader,
                                 options,
+                                false,
                                 SpecDynamicValueContext.AllowCondition | SpecDynamicValueContext.AllowSwitchCase | SpecDynamicValueContext.AllowSwitch,
                                 KnownTypes.Int32
                             );
@@ -537,26 +546,33 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         PropertyTypeOrSwitch propertyType;
         if (typeSwitch.TokenType != JsonTokenType.None)
         {
-            propertyType = new PropertyTypeOrSwitch(ReadTypeSwitch(ref typeSwitch, options, in TypeProperty));
+            propertyType = new PropertyTypeOrSwitch(ReadTypeSwitch(ref typeSwitch, null, ref elementTypeSwitch, options, in TypeProperty));
         }
         else
         {
-            ISpecPropertyType? pt = KnownTypes.GetType(database, typeStr!, elementTypeStr, specialTypes);
-            pt ??= new UnresolvedSpecPropertyType(typeStr!);
+            if (elementTypeSwitch.TokenType != JsonTokenType.None)
+            {
+                propertyType = new PropertyTypeOrSwitch(ReadTypeSwitch(ref typeSwitch, typeStr, ref elementTypeSwitch, options, in ElementTypeProperty));
+            }
+            else
+            {
+                ISpecPropertyType? pt = KnownTypes.GetType(database, typeStr!, elementTypeStr, specialTypes);
+                pt ??= new UnresolvedSpecPropertyType(typeStr!);
 
-            propertyType = new PropertyTypeOrSwitch(pt);
+                propertyType = new PropertyTypeOrSwitch(pt);
+            }
         }
 
         property.Type = propertyType;
 
         if (defaultValueReader.TokenType != JsonTokenType.None)
         {
-            property.DefaultValue = ReadValue(propertyType, ref defaultValueReader, SpecDynamicValueContext.AllowConditionals, options, in DefaultValueProperty);
+            property.DefaultValue = ReadValue(propertyType, ref defaultValueReader, SpecDynamicValueContext.AllowConditionals, options, in DefaultValueProperty, false);
         }
 
         if (includedDefaultValueReader.TokenType != JsonTokenType.None)
         {
-            property.IncludedDefaultValue = ReadValue(propertyType, ref includedDefaultValueReader, SpecDynamicValueContext.AllowConditionals, options, in IncludedDefaultValueProperty);
+            property.IncludedDefaultValue = ReadValue(propertyType, ref includedDefaultValueReader, SpecDynamicValueContext.AllowConditionals, options, in IncludedDefaultValueProperty, false);
         }
 
         if (minimumValue.TokenType != JsonTokenType.None)
@@ -567,6 +583,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 SpecDynamicValueContext.AllowSwitch,
                 options,
                 minimumIsExclusive ? MinimumExclusiveProperty : MinimumProperty,
+                reduceLists: true,
                 numericFallback: true
             );
             property.ExceptionsAreWhitelist = true;
@@ -580,6 +597,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 SpecDynamicValueContext.AllowSwitch,
                 options,
                 maximumIsExclusive ? MaximumExclusiveProperty : MaximumProperty,
+                reduceLists: true,
                 numericFallback: true
             );
             property.ExceptionsAreWhitelist = true;
@@ -595,7 +613,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                         ref exceptValue,
                         SpecDynamicValueContext.AllowSwitch,
                         options,
-                        in ExceptProperty
+                        in ExceptProperty,
+                        reduceLists: true
                     )
                 );
             }
@@ -616,7 +635,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                                 ref exceptValue,
                                 SpecDynamicValueContext.AllowSwitch,
                                 options,
-                                in ExceptProperty
+                                in ExceptProperty,
+                                reduceLists: true
                             ));
                             break;
 
@@ -674,7 +694,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 ref reader,
                 SpecDynamicValueContext.AllowSwitch,
                 options,
-                in ExceptProperty)
+                in ExceptProperty,
+                reduceLists: true)
             );
         }
         while (reader.Read() && reader.TokenType != JsonTokenType.EndArray);
@@ -684,13 +705,58 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 
     private static SpecDynamicSwitchValue ReadTypeSwitch(
         ref Utf8JsonReader reader,
+        string? typeStr,
+        ref Utf8JsonReader elementTypeReader,
         JsonSerializerOptions? options,
         in JsonEncodedText property)
     {
         try
         {
-            SpecDynamicSwitchValue? vals = SpecDynamicSwitchValueConverter.ReadSwitch(ref reader, options, new PropertyTypeOrSwitch(SpecPropertyTypeType.Instance));
-            return vals ?? throw new JsonException($"Failed to read property \"{property.ToString()}\" while reading SpecProperty, null value.");
+            SpecDynamicSwitchValue? elementTypeSwitch;
+            if (reader.TokenType == JsonTokenType.None)
+            {
+                elementTypeSwitch = SpecDynamicSwitchValueConverter.ReadSwitch(ref elementTypeReader, options, new PropertyTypeOrSwitch(SpecPropertyTypeType.Instance), false);
+                if (elementTypeSwitch == null)
+                    throw new JsonException($"Failed to read property \"{ElementTypeProperty.ToString()}\" while reading SpecProperty, null value.");
+
+                elementTypeSwitch.UpdateValues(type =>
+                {
+                    string? elementType = type.AsConcrete<ISpecPropertyType>()?.Type;
+                    ISpecPropertyType? t = KnownTypes.GetType(null, typeStr!, elementType, OneOrMore<string>.Null);
+                    t ??= new UnresolvedSpecPropertyType(typeStr!, elementType, OneOrMore<string>.Null);
+                    return SpecPropertyTypeType.Instance.CreateValue(t);
+                });
+                return elementTypeSwitch;
+            }
+
+            SpecDynamicSwitchValue? vals = SpecDynamicSwitchValueConverter.ReadSwitch(ref reader, options, new PropertyTypeOrSwitch(SpecPropertyTypeType.Instance), false);
+            if (vals == null)
+                throw new JsonException($"Failed to read property \"{property.ToString()}\" while reading SpecProperty, null value.");
+
+            if (elementTypeReader.TokenType == JsonTokenType.None)
+            {
+                return vals;
+            }
+
+            elementTypeSwitch = SpecDynamicSwitchValueConverter.ReadSwitch(ref elementTypeReader, options, new PropertyTypeOrSwitch(SpecPropertyTypeType.Instance), false);
+            if (elementTypeSwitch == null)
+                throw new JsonException($"Failed to read property \"{ElementTypeProperty.ToString()}\" while reading SpecProperty, null value.");
+
+            if (!vals.TryZipExact(elementTypeSwitch, (type, elementType) =>
+                {
+                    string? elementTypeStr = elementType.AsConcrete<ISpecPropertyType>()?.Type;
+                    string? typeStr = type.AsConcrete<ISpecPropertyType>()?.Type;
+                    ISpecPropertyType? t = KnownTypes.GetType(null, typeStr!, elementTypeStr,
+                        OneOrMore<string>.Null);
+                    t ??= new UnresolvedSpecPropertyType(typeStr!, elementTypeStr, OneOrMore<string>.Null);
+                    return SpecPropertyTypeType.Instance.CreateValue(t);
+                }))
+            {
+                throw new JsonException(
+                    $"Failed to read property \"{ElementTypeProperty.ToString()}\" while reading SpecProperty, structure must exactly match \"{TypeProperty.ToString()}\".");
+            }
+
+            return vals;
         }
         catch (Exception ex)
         {
@@ -704,6 +770,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         SpecDynamicValueContext context,
         JsonSerializerOptions? options,
         in JsonEncodedText property,
+        bool reduceLists,
         // minimums and maximums can be used to indicate min/max string length as well, which is what this is for
         bool numericFallback = false)
     {
@@ -719,13 +786,14 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 JsonDocument.ParseValue(ref reader),
                 options,
                 $"SpecProperty.\"{property.ToString()}\"",
-                context
+                context,
+                reduceLists
             );
         }
 
         try
         {
-            return SpecDynamicValue.Read(ref reader, options, context, propertyType);
+            return SpecDynamicValue.Read(ref reader, options, context, propertyType, reduceLists);
         }
         catch (Exception ex)
         {
@@ -1316,8 +1384,17 @@ internal sealed class SpecPropertyTypeType : ISpecPropertyType<ISpecPropertyType
     }
 
     /// <inheritdoc />
+    public ISpecDynamicValue CreateValue(ISpecPropertyType? value) => value == null ? SpecDynamicValue.Null : new SpecDynamicConcreteValue<ISpecPropertyType>(value, this);
+
+    /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out ISpecDynamicValue dynamicValue)
     {
+        if (span.IsEmpty)
+        {
+            dynamicValue = null!;
+            return false;
+        }
+
         stringValue ??= span.ToString();
 
         ISpecPropertyType? t = KnownTypes.GetType(null, stringValue);
@@ -1327,8 +1404,8 @@ internal sealed class SpecPropertyTypeType : ISpecPropertyType<ISpecPropertyType
             return true;
         }
 
-        dynamicValue = null!;
-        return false;
+        dynamicValue = new SpecDynamicConcreteValue<ISpecPropertyType>(new UnresolvedSpecPropertyType(stringValue), this);
+        return true;
     }
 
     /// <inheritdoc />

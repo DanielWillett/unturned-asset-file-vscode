@@ -1,0 +1,270 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.VehiclePhysicsProfileAsset, Assembly-CSharp",
+    "DisplayName": "Vehicle Physics Profile",
+    "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Root_Mass",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, overrides vehicle rigidbody's mass.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "rootMassOverride",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Root_Mass_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, multiplies vehicle rigidbody's mass.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "rootMassMultiplier",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Root_Drag_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, multiplies vehicle rigidbody's positional drag force.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "rootDragMultiplier",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Root_Angular_Drag_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, multiplies vehicle rigidbody's angular drag force.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "rootAngularDragMultiplier",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Carjack_Force_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, multiplies carjack item's force applied.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "carjackForceMultiplier"
+        },
+        {
+            "Key": "Wheel_Mass",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, overrides wheel collider mass. Ignored if vehicle asset has @(SDG.Unturned.VehicleAsset, Assembly-CSharp::Wheel_Collider_Mass_Override) set.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "wheelMassOverride",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Wheel_Mass_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, multiplies wheel collider mass.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "wheelMassMultiplier",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Wheel_Damping_Rate",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, override wheel collider damping rate. Lower values accelerate faster.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "wheelDampingRate",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Wheel_Stiffness_Traction_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "Wheel collider stiffness multiplier when driving in snow. Wheels use 0.25 by default for this value.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "wheelStiffnessTractionMultiplier",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Wheel_Suspension_Force",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, overrides wheel collider suspension force.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "wheelSuspensionForce",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Wheel_Suspension_Damper",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, overrides wheel collider suspension damper.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "wheelSuspensionDamper",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Wheel_Friction_Sideways",
+            "Type": "SDG.Unturned.VehiclePhysicsProfileAsset+Friction, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Friction settings for wheels when moving sideways.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "sidewaysFriction"
+        },
+        {
+            "Key": "Wheel_Friction_Forward",
+            "Type": "SDG.Unturned.VehiclePhysicsProfileAsset+Friction, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Friction settings for wheels when moving forwards/backwards.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "forwardFriction"
+        },
+        {
+            "Key": "Motor_Torque_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, multiplies wheel collider motor torque which is usually driven by vehicle speed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "motorTorqueMultiplier",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Motor_Torque_Clamp_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, multiplies wheel collider motor torque when exceeding maximum speed. Wheels default to a value of 0.5.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "motorTorqueClampMultiplier",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Brake_Torque_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, multiplies wheel collider brake torque.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "brakeTorqueMultiplier",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Brake_Torque_Traction_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": null,
+            "IncludedDefaultValue": 0.0,
+            "Description": "If set, multiplies wheel collider brake torque when driving in snow. Wheels default to a value of 0.5.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "brakeTorqueTractionMultiplier",
+            "Minimum": 0.0
+        },
+        {
+            "Key": "Wheel_Drive_Model",
+            "Type": "SDG.Unturned.VehiclePhysicsProfileAsset+EDriveModel, Assembly-CSharp",
+            "DefaultValue": null,
+            "IncludedDefaultValue": "Front",
+            "Description": "Defines which wheels are powered when driving (front/rear/all-wheel-drive).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "wheelDriveModel"
+        },
+        {
+            "Key": "Wheel_Brake_Model",
+            "Type": "SDG.Unturned.VehiclePhysicsProfileAsset+EDriveModel, Assembly-CSharp",
+            "DefaultValue": null,
+            "IncludedDefaultValue": "Front",
+            "Description": "Defines which wheels are use for braking (front/rear/all-wheel-drive).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
+            "Variable": "wheelBrakeModel"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.VehiclePhysicsProfileAsset+Friction, Assembly-CSharp",
+            "DisplayName": "Vehicle Physics Friction Configuration",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html#asset-properties-reference",
+            "Properties":
+            [
+                {
+                    "Key": "Extremum_Slip",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Description": "Overrides friction curve extremum slip. See @https://docs.unity3d.com/2022.3/Documentation/ScriptReference/WheelFrictionCurve.html for more information.",
+                    "Variable": "extremumSlip",
+                    "Minimum": 0.0,
+                    "Required": true
+                },
+                {
+                    "Key": "Extremum_Value",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Description": "Overrides friction curve extremum value. See @https://docs.unity3d.com/2022.3/Documentation/ScriptReference/WheelFrictionCurve.html for more information.",
+                    "Variable": "extremumValue",
+                    "Minimum": 0.0,
+                    "Required": true
+                },
+                {
+                    "Key": "Asymptote_Slip",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Description": "Overrides friction curve asymptote slip. See @https://docs.unity3d.com/2022.3/Documentation/ScriptReference/WheelFrictionCurve.html for more information.",
+                    "Variable": "asymptoteSlip",
+                    "Minimum": 0.0,
+                    "Required": true
+                },
+                {
+                    "Key": "Asymptote_Value",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Description": "Overrides friction curve asymptote value. See @https://docs.unity3d.com/2022.3/Documentation/ScriptReference/WheelFrictionCurve.html for more information.",
+                    "Variable": "asymptoteValue",
+                    "Minimum": 0.0,
+                    "Required": true
+                },
+                {
+                    "Key": "Stiffness",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Description": "Overrides friction curve stiffness. Multiplies the extremum and asymptote values. Sideways default is 1.0 and forward default is 2.0. See @https://docs.unity3d.com/2022.3/Documentation/ScriptReference/WheelFrictionCurve.html for more information.",
+                    "Variable": "stiffness",
+                    "Minimum": 0.0,
+                    "Required": true
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.VehiclePhysicsProfileAsset+EDriveModel, Assembly-CSharp",
+            "DisplayName": "Vehicle Physics Drive Model",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html#asset-properties-reference",
+            "Values":
+            [
+                {
+                    "Value": "Front",
+                    "Description": "Front-wheel drive."
+                },
+                {
+                    "Value": "Rear",
+                    "Description": "Rear-wheel drive."
+                },
+                {
+                    "Value": "All",
+                    "Description": "All-wheel drive/braking."
+                }
+            ]
+        }
+    ]
+}

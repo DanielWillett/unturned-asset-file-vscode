@@ -10,7 +10,7 @@ public class SpecDynamicValueConverter : JsonConverter<ISpecDynamicValue>
     /// <inheritdoc />
     public override ISpecDynamicValue Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return SpecDynamicValue.ReadValue(ref reader, null, null!);
+        return SpecDynamicValue.ReadValue(ref reader, null, null!, false);
     }
 
     /// <inheritdoc />

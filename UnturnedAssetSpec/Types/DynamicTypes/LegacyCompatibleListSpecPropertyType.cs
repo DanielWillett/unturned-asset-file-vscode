@@ -41,6 +41,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <para>
 /// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for list element count limits.
 /// </para>
+/// <para>
+/// The defining property can set the <see cref="LegacyExpansionFilter"/> for the key being used to filter by only Legacy or Modern (although only modern should just use <see cref="ListSpecPropertyType{TElementType}"/>).
+/// </para>
 /// </summary>
 public sealed class LegacyCompatibleListSpecPropertyType :
     BaseSpecPropertyType<LegacyCompatibleListSpecPropertyType, EquatableArray<CustomSpecTypeInstance>>,
@@ -58,7 +61,7 @@ public sealed class LegacyCompatibleListSpecPropertyType :
 
     public override string DisplayName { get; }
 
-    ISpecPropertyType? IListTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database)
+    ISpecPropertyType? IListTypeSpecPropertyType.GetInnerType()
     {
         return _specifiedBaseType as ISpecPropertyType;
     }
@@ -96,8 +99,27 @@ public sealed class LegacyCompatibleListSpecPropertyType :
             return false;
         }
 
+        SpecProperty? property = parse.EvaluationContext.Self;
+        LegacyExpansionFilter filter = property?.GetCorrespondingFilter(in parse) ?? LegacyExpansionFilter.Either;
+
         if (parse.Node is IValueSourceNode stringNode)
         {
+            if (filter == LegacyExpansionFilter.Modern)
+            {
+                if (parse.HasDiagnostics)
+                {
+                    parse.Log(new DatDiagnosticMessage
+                    {
+                        Range = parse.Node?.Range ?? parse.Parent?.Range ?? default,
+                        Message = string.Format(DiagnosticResources.UNT2013_Legacy, _specifiedBaseType.Type.GetTypeName()),
+                        Diagnostic = DatDiagnostics.UNT2013
+                    });
+                }
+
+                value = default;
+                return false;
+            }
+
             if (!KnownTypeValueHelper.TryParseUInt8(stringNode.Value, out byte conditionCount))
             {
                 return FailedToParse(in parse, out value, stringNode);
@@ -109,29 +131,45 @@ public sealed class LegacyCompatibleListSpecPropertyType :
                 return true;
             }
 
-            CustomSpecTypeInstance[] conditions = new CustomSpecTypeInstance[conditionCount];
-            for (int i = 0; i < conditions.Length; ++i)
+            CustomSpecTypeInstance[] objects = new CustomSpecTypeInstance[conditionCount];
+            for (int i = 0; i < objects.Length; ++i)
             {
-                if (!TryParseLegacyInstance(in parse, i, out conditions[i], customType))
+                if (!TryParseLegacyInstance(in parse, i, out objects[i], customType))
                 {
                     passed = false;
                 }
             }
 
-            KnownTypeValueHelper.TryGetMinimaxCountWarning(conditions.Length, in parse);
+            KnownTypeValueHelper.TryGetMinimaxCountWarning(objects.Length, in parse);
 
             if (!passed)
             {
                 return FailedToParse(in parse, out value, stringNode);
             }
 
-            value = new EquatableArray<CustomSpecTypeInstance>(conditions);
+            value = new EquatableArray<CustomSpecTypeInstance>(objects);
             return true;
         }
 
         if (parse.Node is not IListSourceNode list)
         {
             return MissingNode(in parse, out value);
+        }
+
+        if (filter == LegacyExpansionFilter.Legacy)
+        {
+            if (parse.HasDiagnostics)
+            {
+                parse.Log(new DatDiagnosticMessage
+                {
+                    Range = parse.Node?.Range ?? parse.Parent?.Range ?? default,
+                    Message = string.Format(DiagnosticResources.UNT2013_Modern, _specifiedBaseType.Type.GetTypeName()),
+                    Diagnostic = DatDiagnostics.UNT2013
+                });
+            }
+
+            value = default;
+            return false;
         }
 
         ImmutableArray<ISourceNode> children = list.Children;
@@ -264,7 +302,7 @@ internal sealed class UnresolvedLegacyCompatibleListSpecPropertyType :
     IDisposable
 {
     public ISecondPassSpecPropertyType InnerType { get; }
-    ISpecPropertyType IListTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
+    ISpecPropertyType? IListTypeSpecPropertyType.GetInnerType() => InnerType;
     string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
 
     public string DisplayName => "LegacyCompatibleList";

@@ -217,4 +217,9 @@ public static class DatDiagnostics
     /// Malformed format string.
     /// </summary>
     public static readonly DatDiagnostic UNT2012 = new DatDiagnostic("UNT2012", DatDiagnosticSeverity.Error);
+
+    /// <summary>
+    /// Can't parse object in either modern or legacy format.
+    /// </summary>
+    public static readonly DatDiagnostic UNT2013 = new DatDiagnostic("UNT2013", DatDiagnosticSeverity.Error);
 }

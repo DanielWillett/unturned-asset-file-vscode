@@ -15,6 +15,7 @@ internal class UnresolvedDynamicValue : ISecondPassSpecDynamicValue, IDisposable
     private readonly JsonSerializerOptions? _options;
     private readonly string _context;
     private readonly SpecDynamicValueContext _readContext;
+    private readonly bool _reduceLists;
     private readonly Func<SpecProperty, IAssetSpecDatabase, AssetSpecType, ISpecPropertyType?>? _expectedTypeGetterOverride;
 
     public ISpecPropertyType ValueType => _unresolvedType;
@@ -25,6 +26,7 @@ internal class UnresolvedDynamicValue : ISecondPassSpecDynamicValue, IDisposable
         JsonSerializerOptions? options,
         string context,
         SpecDynamicValueContext readContext,
+        bool reduceLists,
         Func<SpecProperty, IAssetSpecDatabase, AssetSpecType, ISpecPropertyType?>? expectedTypeGetterOverride = null)
     {
         _unresolvedType = unresolvedType;
@@ -32,6 +34,7 @@ internal class UnresolvedDynamicValue : ISecondPassSpecDynamicValue, IDisposable
         _options = options;
         _context = context;
         _readContext = readContext;
+        _reduceLists = reduceLists;
         _expectedTypeGetterOverride = expectedTypeGetterOverride;
     }
 
@@ -80,7 +83,7 @@ internal class UnresolvedDynamicValue : ISecondPassSpecDynamicValue, IDisposable
         ISpecDynamicValue value;
         try
         {
-            value = SpecDynamicValue.Read(ref reader, _options, _readContext, expectedType);
+            value = SpecDynamicValue.Read(ref reader, _options, _reduceLists, _readContext, expectedType);
         }
         catch (Exception ex)
         {

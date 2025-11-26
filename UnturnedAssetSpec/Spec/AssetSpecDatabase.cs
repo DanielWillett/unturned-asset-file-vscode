@@ -324,6 +324,8 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
         Types = types;
 
+        PerformFifthPass(types);
+
         OnInitializeState[]? initializeListeners;
         lock (_initLock)
         {
@@ -886,8 +888,10 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                             int existingIndex = newProperties.FindIndex(x => ReferenceEquals(x.Owner, owner) && string.Equals(x.Key, prop.Key, StringComparison.Ordinal));
                             if (existingIndex != -1 && !ReferenceEquals(newProperties[existingIndex].Type.Type, HideInheritedPropertyType.Instance))
                             {
-                                Log($"Parent property {prop.Owner.Type.GetTypeName()}.{prop.Key} hidden by a duplicate property present in {owner.Type.GetTypeName()}.");
+                                newProperties.Add(newProperties[existingIndex].CreateOverriddenProperty(prop));
                                 continue;
+                                // Log($"Parent property {prop.Owner.Type.GetTypeName()}.{prop.Key} hidden by a duplicate property present in {owner.Type.GetTypeName()}.");
+                                // continue;
                             }
 
                             SpecProperty clone = (SpecProperty)prop.Clone();
@@ -921,6 +925,43 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
                 return true;
             });
+        }
+    }
+
+    /// <summary>
+    /// Resolves deferred default values for <see cref="CustomSpecType"/> types.
+    /// </summary>
+    private void PerformFifthPass(Dictionary<QualifiedType, AssetSpecType> types)
+    {
+        foreach (AssetSpecType info in types.Values)
+        {
+            foreach (CustomSpecType type in info.Types.OfType<CustomSpecType>())
+            {
+                JsonDocument? doc = Interlocked.Exchange(ref type.DeferredDefaultValue, null);
+                GC.SuppressFinalize(type);
+                if (doc == null)
+                    continue;
+
+                try
+                {
+                    Utf8JsonReader reader = JsonHelper.CreateUtf8JsonReader(doc, new JsonReaderOptions
+                    {
+                        AllowTrailingCommas = true,
+                        CommentHandling = JsonCommentHandling.Skip,
+                        MaxDepth = 12
+                    });
+
+                    SpecTypeConverter.ReadDefaultValue(ref reader, type, Options, this);
+                }
+                catch (Exception ex)
+                {
+                    Log($"Error creating default value for type \"{type}\" in asset type \"{info.Type}\".{Environment.NewLine}{ex}");
+                }
+                finally
+                {
+                    doc.Dispose();
+                }
+            }
         }
     }
 

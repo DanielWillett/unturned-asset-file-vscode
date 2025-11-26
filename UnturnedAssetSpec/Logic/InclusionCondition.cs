@@ -45,7 +45,7 @@ public sealed class InclusionConditionProperty : IEquatable<InclusionConditionPr
     public SpecDynamicSwitchCaseOrCondition Condition { get; }
 
     /// <summary>
-    /// If this is inclusive and condition refers to the same variabel as <see cref="PropertyName"/>, this condition is a requirement of <see cref="PropertyName"/> instead of a condition of inclusion.
+    /// If this is inclusive and condition refers to the same variable as <see cref="PropertyName"/>, this condition is a requirement of <see cref="PropertyName"/> instead of a condition of inclusion.
     /// </summary>
     public bool IsConditionRequirement
     {

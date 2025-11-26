@@ -228,4 +228,10 @@ public sealed class AssetSpecType : IPropertiesSpecType, IEquatable<AssetSpecTyp
         value = null;
         return false;
     }
+
+    /// <inheritdoc />
+    public ISpecDynamicValue CreateValue(CustomSpecTypeInstance? value)
+    {
+        return value == null ? SpecDynamicValue.Null : new SpecDynamicConcreteValue<CustomSpecTypeInstance>(value, this);
+    }
 }
