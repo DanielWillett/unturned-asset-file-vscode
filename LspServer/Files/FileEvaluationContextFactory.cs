@@ -73,13 +73,18 @@ internal class FileEvaluationContextFactory
             return false;
         }
 
-        PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(parentNode);
+        PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(valueNode?.Parent ?? parentNode);
         SpecProperty? property = _propertyVirtualizer.GetProperty(
             parentNode,
             in fileType,
             in breadcrumbs,
             out PropertyResolutionContext context
         );
+
+        if (property == null && parentNode.Parent is IDictionarySourceNode dict)
+        {
+
+        }
 
         FileEvaluationContext evalCtx = new FileEvaluationContext(
             property!,
@@ -108,9 +113,9 @@ internal class FileEvaluationContextFactory
         AssetFileType fileType = AssetFileType.FromFile(sourceFile, _specDatabase);
 
         ISourceNode? node = sourceFile.GetNodeFromPosition(position.ToFilePosition());
-        GetRelationalNodes(node, out _, out IPropertySourceNode? parentNode);
+        GetRelationalNodes(node, out IAnyValueSourceNode? value, out IPropertySourceNode? propertyNode);
 
-        if (parentNode == null)
+        if (propertyNode == null)
         {
             ctx = new FileEvaluationContext(
                 null!,
@@ -124,9 +129,9 @@ internal class FileEvaluationContextFactory
             return false;
         }
 
-        PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(parentNode);
+        PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(value?.Parent ?? propertyNode);
         SpecProperty? property = _propertyVirtualizer.GetProperty(
-            parentNode,
+            propertyNode,
             in fileType,
             in breadcrumbs,
             out PropertyResolutionContext context
@@ -144,22 +149,24 @@ internal class FileEvaluationContextFactory
         return property != null;
     }
 
-    private static void GetRelationalNodes(ISourceNode? node, out IAnyValueSourceNode? valueNode, out IPropertySourceNode? pairNode)
+    private static void GetRelationalNodes(ISourceNode? node, out IAnyValueSourceNode? valueNode, out IPropertySourceNode? propertyNode)
     {
         switch (node)
         {
             case IPropertySourceNode kvp:
-                pairNode = kvp;
+                propertyNode = kvp;
                 valueNode = kvp.Value;
                 break;
 
             case null:
-                pairNode = null;
+                propertyNode = null;
                 valueNode = null;
                 break;
 
             default:
-                pairNode = node.Parent as IPropertySourceNode;
+                ISourceNode parent = node.Parent;
+                for (; !ReferenceEquals(parent, parent.File) && parent is not IPropertySourceNode; parent = parent.Parent) ;
+                propertyNode = parent as IPropertySourceNode;
                 valueNode = node as IAnyValueSourceNode;
                 break;
         }

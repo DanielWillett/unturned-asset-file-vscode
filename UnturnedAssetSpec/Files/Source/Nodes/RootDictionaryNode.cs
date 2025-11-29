@@ -68,7 +68,7 @@ internal class RootDictionaryNode : DictionaryNode, ISourceFile
         SetParentInfo(this, this);
     }
 
-    internal sealed override void SetParentInfo(ISourceFile? file, ISourceNode parent)
+    internal sealed override void SetParentInfo(ISourceFile? file, IParentSourceNode parent)
     {
         base.SetParentInfo(file, parent);
     }

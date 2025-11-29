@@ -61,7 +61,7 @@ public class PropertyVirtualizerSandbox
     [Test]
     public async Task BasicProperty()
     {
-        string file = Path.GetFullPath("../../../Assets/TestGun.dat");
+        string file = Path.GetFullPath("../../../Assets/TestGun.asset");
 
         OpenedFile openedFile = _fileTracker.CreateFile(DocumentUri.File(file), File.ReadAllText(file));
 
@@ -92,7 +92,7 @@ public class PropertyVirtualizerSandbox
     [Test]
     public async Task LegacyProperty()
     {
-        string file = Path.GetFullPath("../../../Assets/TestDialogue.dat");
+        string file = Path.GetFullPath("../../../Assets/TestDialogue.asset");
 
         OpenedFile openedFile = _fileTracker.CreateFile(DocumentUri.File(file), File.ReadAllText(file));
 

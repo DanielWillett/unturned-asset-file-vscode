@@ -3,6 +3,9 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -138,6 +141,11 @@ public interface IDictionaryTypeSpecPropertyType : IElementTypeSpecPropertyType
     /// Gets the value type of the dictionary.
     /// </summary>
     ISpecPropertyType? GetInnerType(IAssetSpecDatabase database);
+
+    /// <summary>
+    /// Gets auto-complete results for the keys of this dictionary.
+    /// </summary>
+    Task<AutoCompleteResult[]> GetKeyAutoCompleteResults(in AutoCompleteParameters parameters, in FileEvaluationContext context);
 }
 
 /// <summary>

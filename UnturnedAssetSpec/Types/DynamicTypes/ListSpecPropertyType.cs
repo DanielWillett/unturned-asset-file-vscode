@@ -137,7 +137,7 @@ public sealed class ListSpecPropertyType<TElementType> :
         return parsedAll;
     }
 
-    private bool TryParseElement(IAnyValueSourceNode node, ISourceNode? parent, in SpecPropertyTypeParseContext parse, out TElementType element)
+    private bool TryParseElement(IAnyValueSourceNode node, IParentSourceNode? parent, in SpecPropertyTypeParseContext parse, out TElementType element)
     {
         SpecPropertyTypeParseContext context = parse with
         {

@@ -541,8 +541,8 @@ Key Value // not inline comment
             sourceFile,
             ref index,
             metadata,
-            new FileRange(1, 1, 1, 60),
-            60,
+            new FileRange(1, 1, 1, 54),
+            54,
             0,
             ref charIndex,
             node =>

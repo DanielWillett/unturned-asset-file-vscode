@@ -218,7 +218,7 @@
         },
         {
             "Key": "Size2_Z",
-            "Type": "Boolean",
+            "Type": "Float32",
             "DefaultValue": true,
             "Description": "Orthogonal camera size for economy icons.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#size2-z-float32-0",

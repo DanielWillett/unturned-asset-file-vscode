@@ -64,6 +64,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
     /// <summary>
     /// Maximum depth level before skipping node reading.
     /// </summary>
+    /// <remarks>Practically speaking this library can stop working properly after 63 levels of depth so no file should ever exceed that.</remarks>
     public int MaxDepth { get; init; } = 16;
 
     public readonly bool IsAtEnd => _index >= _file.Length;
@@ -694,7 +695,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                             LazySource source;
                             if (_char == '\n')
                                 TrySkipToListOrDictStart();
-                            if (startLine == _position.Line || _char is '[' or '{')
+                            if (_char != '\0' && startLine == _position.Line || _char is '[' or '{')
                             {
                                 TryReadPropertyValue(depth + 1, out source, out comments);
                             }

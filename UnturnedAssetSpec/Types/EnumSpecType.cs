@@ -20,7 +20,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
     [field: MaybeNull]
     public SpecDynamicConcreteEnumValue Null => field ??= new SpecDynamicConcreteEnumValue(this);
 
-    private AutoCompleteResult[]? _valueResults;
+    private Task<AutoCompleteResult[]>? _valueResults;
 
     public required QualifiedType Type { get; init; }
     public required string DisplayName { get; init; }
@@ -175,7 +175,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
                 DatDiagnosticMessage message = new DatDiagnosticMessage
                 {
                     Diagnostic = DatDiagnostics.UNT1014,
-                    Message = string.Format(DiagnosticResources.UNT1014_Specific, strValNode.Value, Type.GetTypeName()),
+                    Message = string.Format(DiagnosticResources.UNT1014_Specific, strValNode.Value, DisplayName),
                     Range = strValNode.Range
                 };
 
@@ -248,23 +248,25 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
     }
 
     /// <inheritdoc />
-    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters,
-        in FileEvaluationContext context)
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters, in FileEvaluationContext context)
     {
         if (_valueResults != null)
         {
-            return Task.FromResult(_valueResults);
+            return _valueResults;
         }
 
         AutoCompleteResult[] results = new AutoCompleteResult[Values.Length];
         for (int i = 0; i < results.Length; ++i)
         {
             ref EnumSpecTypeValue val = ref Values[i];
-            results[i] = new AutoCompleteResult(val.Casing, val.Description);
+            results[i] = new AutoCompleteResult(val.Casing, val.Description)
+            {
+                Deprecated = val.Deprecated
+            };
         }
 
-        _valueResults = results;
-        return Task.FromResult(results);
+        _valueResults = results.Length == 0 ? AutoCompleteResult.NoneTask : Task.FromResult(results);
+        return _valueResults;
     }
 
     SpecProperty? ISpecType.FindProperty(string propertyName, SpecPropertyContext context) => null;

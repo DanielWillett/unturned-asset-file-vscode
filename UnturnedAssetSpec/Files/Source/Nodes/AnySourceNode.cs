@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.Design;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -20,7 +19,7 @@ internal abstract class AnySourceNode : ISourceNode
 
     public ISourceFile File { get; private set; }
 
-    public ISourceNode Parent { get; private set; }
+    public IParentSourceNode Parent { get; private set; }
 
 #nullable restore
 
@@ -29,7 +28,7 @@ internal abstract class AnySourceNode : ISourceNode
     public int FirstCharacterIndex { get; private set; }
     public int LastCharacterIndex { get; private set; }
 
-    internal virtual void SetParentInfo(ISourceFile? file, ISourceNode parent)
+    internal virtual void SetParentInfo(ISourceFile? file, IParentSourceNode parent)
     {
         Parent = parent;
         File = file!;
@@ -50,10 +49,11 @@ internal abstract class AnySourceNode : ISourceNode
 
     protected void SetParentInfoOfChildren(ISourceNode[] values)
     {
+        IParentSourceNode thisParent = (IParentSourceNode)this;
         foreach (ISourceNode node in values)
         {
             if (node is AnySourceNode n)
-                n.SetParentInfo(File, this);
+                n.SetParentInfo(File, thisParent);
         }
     }
 
@@ -79,7 +79,7 @@ internal abstract class AnySourceNode : ISourceNode
         return Index == other.Index && Range == other.Range && File.Equals(other.File) && Parent.Equals(other.Parent) && Depth == other.Depth;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is ISourceNode n && Equals(n);
     }

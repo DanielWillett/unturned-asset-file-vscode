@@ -36,7 +36,7 @@ internal class ListNode : AnySourceNode, IListSourceNode
         SetParentInfoOfChildren(values);
     }
 
-    internal override void SetParentInfo(ISourceFile? file, ISourceNode parent)
+    internal override void SetParentInfo(ISourceFile? file, IParentSourceNode parent)
     {
         base.SetParentInfo(file, parent);
         SetParentInfoOfChildren(_values);

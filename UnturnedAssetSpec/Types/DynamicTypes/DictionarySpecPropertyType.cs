@@ -1,10 +1,14 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -26,7 +30,6 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for property count limits.
 /// </para>
 /// </summary>
-// todo: support for KeyEnumType, KeyAllowExtraValues
 public sealed class DictionarySpecPropertyType<TElementType> :
     BaseSpecPropertyType<DictionarySpecPropertyType<TElementType>, EquatableArray<DictionaryPair<TElementType>>>,
     ISpecPropertyType<EquatableArray<DictionaryPair<TElementType>>>,
@@ -35,6 +38,9 @@ public sealed class DictionarySpecPropertyType<TElementType> :
     where TElementType : IEquatable<TElementType>
 {
     private readonly IAssetSpecDatabase _database;
+    private bool _hasKeyEnumType;
+    private EnumSpecType? _keyEnumType;
+    private bool _keyEnumTypeAllowExtraValues;
 
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName { get; }
@@ -53,6 +59,63 @@ public sealed class DictionarySpecPropertyType<TElementType> :
     public override int GetHashCode()
     {
         return 68 ^ InnerType.GetHashCode();
+    }
+
+    [SkipLocalsInit]
+    private EnumSpecType? TryGetKeyEnumType(SpecProperty property, AssetFileType fileType, out bool keyAllowExtraValues, ISourceNode? range = null, ICollection<DatDiagnosticMessage>? diagnostics = null)
+    {
+        string? keyEnumTypeStr;
+        if (_hasKeyEnumType)
+        {
+            keyAllowExtraValues = _keyEnumTypeAllowExtraValues;
+            if (diagnostics != null
+                && _keyEnumType == null
+                && range != null
+                && property.TryGetAdditionalProperty("KeyEnumType", out keyEnumTypeStr)
+                && !string.IsNullOrEmpty(keyEnumTypeStr))
+            {
+                LogDiagnostic(diagnostics, keyEnumTypeStr, range!);
+            }
+
+            return _keyEnumType;
+        }
+
+        if (property.TryGetAdditionalProperty("KeyEnumType", out keyEnumTypeStr) && !string.IsNullOrEmpty(keyEnumTypeStr))
+        {
+            _keyEnumType = _database.FindType(keyEnumTypeStr, fileType) as EnumSpecType;
+            if (diagnostics != null
+                && range != null
+                && _keyEnumType == null)
+            {
+                LogDiagnostic(diagnostics, keyEnumTypeStr, range!);
+            }
+
+            property.TryGetAdditionalProperty("KeyAllowExtraValues", out _keyEnumTypeAllowExtraValues);
+            _hasKeyEnumType = true;
+        }
+
+
+        keyAllowExtraValues = _keyEnumTypeAllowExtraValues;
+        return _keyEnumType;
+
+        static void LogDiagnostic(ICollection<DatDiagnosticMessage> diagnostics, string keyEnumTypeStr, ISourceNode key)
+        {
+            diagnostics.Add(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2005,
+                Message = string.Format(DiagnosticResources.UNT2005, keyEnumTypeStr),
+                Range = key.Range
+            });
+        }
+    }
+
+    public Task<AutoCompleteResult[]> GetKeyAutoCompleteResults(in AutoCompleteParameters parameters, in FileEvaluationContext context)
+    {
+        ISpecType? type = TryGetKeyEnumType(parameters.Property, parameters.FileType, out _);
+        if (type is not EnumSpecType enumType)
+            return AutoCompleteResult.NoneTask;
+
+        return enumType.GetAutoCompleteResults(in parameters, in context);
     }
 
     public DictionarySpecPropertyType(IAssetSpecDatabase database, ISpecPropertyType<TElementType> innerType)
@@ -77,6 +140,17 @@ public sealed class DictionarySpecPropertyType<TElementType> :
 
         ImmutableArray<ISourceNode> children = dictNode.Children;
         EquatableArray<DictionaryPair<TElementType>> eqArray = new EquatableArray<DictionaryPair<TElementType>>(children.Length);
+
+        bool keyAllowsExtraValues = false;
+        EnumSpecType? keyEnumType = parse.HasDiagnostics
+            ? TryGetKeyEnumType(
+                parse.EvaluationContext.Self,
+                parse.FileType,
+                out keyAllowsExtraValues,
+                (ISourceNode?)(parse.Parent as IPropertySourceNode) ?? parse.Node,
+                parse.Diagnostics
+            )
+            : null;
 
         bool parsedAll = true;
         int index = 0;
@@ -114,6 +188,16 @@ public sealed class DictionarySpecPropertyType<TElementType> :
                 eqArray.Array[index] = new DictionaryPair<TElementType>(key, element);
             }
 
+            if (keyEnumType != null && !keyAllowsExtraValues && !keyEnumType.TryParse(key, out int _))
+            {
+                parse.Log(new DatDiagnosticMessage
+                {
+                    Range = property.Range,
+                    Diagnostic = DatDiagnostics.UNT1014,
+                    Message = string.Format(DiagnosticResources.UNT1014_Specific, key, keyEnumType.DisplayName)
+                });
+            }
+
             ++index;
         }
 
@@ -128,7 +212,7 @@ public sealed class DictionarySpecPropertyType<TElementType> :
         return parsedAll;
     }
 
-    private bool TryParseElement(IAnyValueSourceNode node, ISourceNode? parent, in SpecPropertyTypeParseContext parse, out TElementType element)
+    private bool TryParseElement(IAnyValueSourceNode node, IParentSourceNode? parent, in SpecPropertyTypeParseContext parse, out TElementType element)
     {
         SpecPropertyTypeParseContext context = parse with
         {
@@ -220,6 +304,10 @@ internal sealed class UnresolvedDictionarySpecPropertyType :
             d.Dispose();
     }
 
+    Task<AutoCompleteResult[]> IDictionaryTypeSpecPropertyType.GetKeyAutoCompleteResults(in AutoCompleteParameters parameters, in FileEvaluationContext context)
+    {
+        throw new NotSupportedException();
+    }
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
         value = null!;

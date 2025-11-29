@@ -16,7 +16,7 @@ public readonly ref struct SpecPropertyTypeParseContext
     public readonly PropertyBreadcrumbs Breadcrumbs;
 
     public required IAnyValueSourceNode? Node { get; init; }
-    public required ISourceNode? Parent { get; init; }
+    public required IParentSourceNode? Parent { get; init; }
     public string? BaseKey { get; init; }
 
     public IAssetSpecDatabase Database => EvaluationContext.Information;
@@ -68,7 +68,7 @@ public readonly ref struct SpecPropertyTypeParseContext
         Breadcrumbs = breadcrumbs;
     }
 
-    public static SpecPropertyTypeParseContext FromFileEvaluationContext(FileEvaluationContext evalContext, PropertyBreadcrumbs breadcrumbs, SpecProperty? property, ISourceNode? parentNode, IAnyValueSourceNode? valueNode, ICollection<DatDiagnosticMessage>? diagnostics = null)
+    public static SpecPropertyTypeParseContext FromFileEvaluationContext(FileEvaluationContext evalContext, PropertyBreadcrumbs breadcrumbs, SpecProperty? property, IParentSourceNode? parentNode, IAnyValueSourceNode? valueNode, ICollection<DatDiagnosticMessage>? diagnostics = null)
     {
         return new SpecPropertyTypeParseContext(evalContext, breadcrumbs, diagnostics)
         {

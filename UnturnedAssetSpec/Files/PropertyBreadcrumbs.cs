@@ -97,10 +97,13 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     }
     
     /// <summary>
-    /// Create breadcrums from a specific property node.
+    /// Create breadcrums from a specific property or list value node.
     /// </summary>
-    public static PropertyBreadcrumbs FromNode(IPropertySourceNode node)
+    public static PropertyBreadcrumbs FromNode(ISourceNode node)
     {
+        if (node is not IPropertySourceNode && node.Parent is not IListSourceNode)
+            throw new ArgumentException("Expected either a property or element in a list.");
+
         lock (node.File.TreeSync)
         {
             // property is in root dictionary
