@@ -34,7 +34,7 @@ public interface ICodeFix
     /// <summary>
     /// Adds every valid position under the given <paramref name="root"/> node for this code fix to a <paramref name="outputList"/>.
     /// </summary>
-    void GetValidPositions(ISourceNode root, IList<CodeFixInstance> outputList);
+    void GetValidPositions(ISourceNode root, FileRange? range, IList<CodeFixInstance> outputList);
 }
 
 /// <summary>
@@ -66,7 +66,7 @@ public abstract class CodeFix<TState> : ICodeFix<TState>
     }
 
     public abstract string GetLocalizedTitle();
-    public abstract void GetValidPositions(ISourceNode root, IList<CodeFixInstance> outputList);
+    public abstract void GetValidPositions(ISourceNode root, FileRange? range, IList<CodeFixInstance> outputList);
     public abstract void ApplyCodeFix(in CodeFixParameters<TState> parameters, IMutableWorkspaceFile file);
 }
 

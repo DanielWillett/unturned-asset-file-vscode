@@ -10,6 +10,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 
 internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewGuidState>
 {
+    private readonly InstallationEnvironment _installEnv;
+
     internal struct GenerateNewGuidState
     {
         public bool Dashes;
@@ -28,6 +30,7 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
         IWorkspaceEnvironment workspaceEnv)
         : base(DatDiagnostics.UNT107, virtualizer, database, installEnv, workspaceEnv)
     {
+        _installEnv = installEnv;
         database.OnInitialize(_ =>
         {
             ValidTypes = [ KnownTypes.Guid ];
@@ -61,7 +64,7 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
     public override void ApplyCodeFix(in CodeFixParameters<GenerateNewGuidState> parameters, IMutableWorkspaceFile file)
     {
         GenerateNewGuidState state = parameters.State;
-        file.UpdateText(state, static (updater, state) =>
+        file.UpdateText(state, (updater, state) =>
         {
             const string annotation = "a";
             updater.AddAnnotation(annotation,
@@ -70,7 +73,12 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
                 needsConfirmation: false
             );
 
-            Guid guid = Guid.NewGuid();
+            Guid guid;
+            do
+            {
+                guid = Guid.NewGuid();
+            }
+            while (!_installEnv.FindFile(guid).IsNull);
 
             updater.ReplaceText(state.Range, state.Dashes ? guid.ToString("D") : guid.ToString("N"), annotation);
         });

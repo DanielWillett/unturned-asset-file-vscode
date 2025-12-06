@@ -129,9 +129,9 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
         in SpecPropertyTypeParseContext parseContext
     );
 
-    public override void GetValidPositions(ISourceNode root, IList<CodeFixInstance> outputList)
+    public override void GetValidPositions(ISourceNode root, FileRange? range, IList<CodeFixInstance> outputList)
     {
-        PerPropertyVisitor visitor = new PerPropertyVisitor(_virtualizer, _database, _installEnv, _workspaceEnv, outputList, this, InclusionFlags);
+        PerPropertyVisitor visitor = new PerPropertyVisitor(_virtualizer, _database, _installEnv, _workspaceEnv, outputList, this, range, InclusionFlags);
 
         root.Visit(ref visitor);
     }
@@ -141,15 +141,15 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
         private readonly IList<CodeFixInstance> _outputList;
         private readonly PerPropertyCodeFix<TState> _codeFix;
 
-        public PerPropertyVisitor(
-            IFilePropertyVirtualizer virtualizer,
+        public PerPropertyVisitor(IFilePropertyVirtualizer virtualizer,
             IAssetSpecDatabase database,
             InstallationEnvironment installEnv,
             IWorkspaceEnvironment workspaceEnv,
             IList<CodeFixInstance> outputList,
             PerPropertyCodeFix<TState> codeFix,
+            FileRange? range,
             PropertyInclusionFlags flags = PropertyInclusionFlags.All)
-            : base(virtualizer, database, installEnv, workspaceEnv, flags)
+            : base(virtualizer, database, installEnv, workspaceEnv, range, flags)
         {
             _outputList = outputList;
             _codeFix = codeFix;

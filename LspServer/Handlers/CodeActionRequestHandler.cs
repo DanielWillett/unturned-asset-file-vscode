@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
@@ -118,6 +117,10 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
             Identifier = identifier
         };
 
+        FileRange range = request.Range.ToFileRange();
+        // allows including the value just before the caret
+        if (range.Start.Character > 1)
+            --range.Start.Character;
         listener.File = new MutableVirtualFile(file, listener);
         try
         {
@@ -125,7 +128,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
             {
                 InvokePerPropertyCodeFixesVisitor propertyVisitor = new InvokePerPropertyCodeFixesVisitor(
                     _virtualizer, _database, _installEnv, _workspaceEnv,
-                    perPropertyFixes, actions, listener, options, listener.File, inclusionFlags
+                    perPropertyFixes, actions, listener, options, listener.File, inclusionFlags, range
                 )
                 {
                     Token = token
@@ -139,7 +142,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
                 List<CodeFixInstance> instances = new List<CodeFixInstance>();
                 foreach (ICodeFix otherFix in otherFixes)
                 {
-                    otherFix.GetValidPositions(file.SourceFile, instances);
+                    otherFix.GetValidPositions(file.SourceFile, range, instances);
 
                     foreach (CodeFixInstance instance in instances)
                     {
@@ -185,15 +188,16 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
         instance.ApplyCodeFix(file);
         return new CodeAction
         {
-            Diagnostics = null/*new Container<Diagnostic>(new Diagnostic
-            {
-                Code = new DiagnosticCode(codeFix.Diagnostic.ErrorId),
-                Severity = (DiagnosticSeverity)codeFix.Diagnostic.Severity,
-                Range = range.ToRange(),
-                Source = UnturnedAssetFileLspServer.DiagnosticSource
-            })*/,
+            //Diagnostics = new Container<Diagnostic>(new Diagnostic
+            //{
+            //    Code = new DiagnosticCode(codeFix.Diagnostic.ErrorId),
+            //    Severity = (DiagnosticSeverity)codeFix.Diagnostic.Severity,
+            //    Range = range.ToRange(),
+            //    Source = UnturnedAssetFileLspServer.DiagnosticSource
+            //}),
             Title = codeFix.GetLocalizedTitle(),
             Edit = listener.GetEditAndReset(),
+            
             // todo
             Kind = CodeActionKind.Refactor
         };
@@ -207,8 +211,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
         private readonly Options _options;
         private readonly IMutableWorkspaceFile _file;
 
-        public InvokePerPropertyCodeFixesVisitor(
-            IFilePropertyVirtualizer virtualizer,
+        public InvokePerPropertyCodeFixesVisitor(IFilePropertyVirtualizer virtualizer,
             IAssetSpecDatabase database,
             InstallationEnvironment installEnv,
             IWorkspaceEnvironment workspaceEnv,
@@ -217,8 +220,9 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
             FileUpdateListener listener,
             Options options,
             IMutableWorkspaceFile file,
-            PropertyInclusionFlags flags)
-            : base(virtualizer, database, installEnv, workspaceEnv, flags)
+            PropertyInclusionFlags flags,
+            FileRange? requestRange)
+            : base(virtualizer, database, installEnv, workspaceEnv, requestRange, flags)
         {
             _perPropertyFixes = perPropertyFixes;
             _actions = actions;

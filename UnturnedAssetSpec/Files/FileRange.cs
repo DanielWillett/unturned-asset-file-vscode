@@ -67,6 +67,14 @@ public struct FileRange : IEquatable<FileRange>, IComparable<FileRange>, ICompar
                && (position.Line != End.Line || position.Character <= End.Character);
     }
 
+    public readonly bool Overlaps(FileRange range)
+    {
+        return Contains(range.Start)
+            || Contains(range.End)
+            || range.Contains(Start)
+            || range.Contains(End);
+    }
+
     /// <inheritdoc />
     public readonly bool Equals(FileRange other)
     {

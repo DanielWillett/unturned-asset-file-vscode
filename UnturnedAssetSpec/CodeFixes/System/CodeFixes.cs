@@ -30,7 +30,8 @@ public sealed class GlobalCodeFixes
 
         AllArray =
         [
-            new BlueprintUseThisKeyword(virtualizer, database, installEnv, workspaceEnv)
+            new BlueprintUseThisKeyword(virtualizer, database, installEnv, workspaceEnv),
+            new GenerateNewGuid(virtualizer, database, installEnv, workspaceEnv),
         ];
 
         for (int i = 0; i < AllArray.Length; ++i)
@@ -39,13 +40,5 @@ public sealed class GlobalCodeFixes
         }
 
         All = new ReadOnlyCollection<ICodeFix>(AllArray);
-    }
-
-    public ICodeFix? GetCodeFix(int index)
-    {
-        if (index < 0 || index >= AllArray.Length)
-            return null;
-
-        return AllArray[index];
     }
 }

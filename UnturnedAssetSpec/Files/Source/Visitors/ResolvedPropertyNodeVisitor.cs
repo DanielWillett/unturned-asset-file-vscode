@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -21,6 +22,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
     private AssetFileType _fileType;
     private bool _hasFileType;
     private HashSet<(PropertyBreadcrumbs, SpecProperty)>? _visitedMultiProperties;
+    private readonly FileRange? _range;
 
     protected override bool IgnoreMetadata => true;
 
@@ -29,6 +31,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         IAssetSpecDatabase database,
         InstallationEnvironment installEnv,
         IWorkspaceEnvironment workspaceEnv,
+        FileRange? range = null,
         PropertyInclusionFlags flags = PropertyInclusionFlags.All)
     {
         _virtualizer = virtualizer;
@@ -36,6 +39,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         _installEnv = installEnv;
         _workspaceEnv = workspaceEnv;
         _flags = flags;
+        _range = range;
     }
 
     protected abstract void AcceptResolvedProperty(
@@ -49,6 +53,20 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
     {
         if (!node.IsIncluded(_flags))
             return;
+
+        if (_range.HasValue)
+        {
+            FileRange valueRange = node.GetValueRange();
+            FileRange keyRange = node.Range;
+            FileRange propertyRange = valueRange.End.Character == 0
+                ? keyRange
+                : new FileRange(keyRange.Start, valueRange.End);
+
+            if (!_range.Value.Overlaps(propertyRange))
+            {
+                return;
+            }
+        }
 
         if (!_hasFileType)
         {
