@@ -206,7 +206,11 @@ internal sealed class UnturnedAssetFileLspServer
         });
 
         await server.WaitForExit.ConfigureAwait(false);
-        _closeTimer?.Dispose();
+
+        if (_closeTimer != null)
+        {
+            await _closeTimer.DisposeAsync();
+        }
     }
 
     private static bool CheckClientProcessAlive()
@@ -234,7 +238,7 @@ internal sealed class UnturnedAssetFileLspServer
 #if DEBUG
         db.UseInternet = false;
 #else
-        db.UseInternet = true;
+        db.UseInternet = Environment.GetEnvironmentVariable("UDAT_OFFLINE_SPEC") != "1";
 #endif
 
         _logger.LogInformation("Initializing asset specs...");

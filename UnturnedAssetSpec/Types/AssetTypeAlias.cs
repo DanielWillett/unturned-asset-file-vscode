@@ -18,7 +18,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop Vehicle_Paint_Tool
 /// </code>
 /// </summary>
-public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, string>,
+public sealed class AssetTypeAlias : BaseSpecPropertyType<AssetTypeAlias, string>,
     IStringParseableSpecPropertyType,
     IEquatable<AssetTypeAlias>,
     IAutoCompleteSpecPropertyType,
@@ -61,7 +61,7 @@ public sealed class AssetTypeAlias : BasicSpecPropertyType<AssetTypeAlias, strin
         );
     }
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new AssetTypeAliasValue(value!, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new AssetTypeAliasValue(value!, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
@@ -195,7 +195,7 @@ public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatabl
             return false;
         }
 
-        value = SpecDynamicEquationTreeValueHelpers.As<QualifiedType, TValue>(Value);
+        value = SpecDynamicExpressionTreeValueHelpers.As<QualifiedType, TValue>(Value);
         isNull = Value != null;
         return true;
     }
@@ -205,7 +205,7 @@ public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatabl
         if (typeof(TValue) == typeof(QualifiedType))
         {
             QualifiedType correspondingType = GetCorrespondingType(ctx.Information);
-            value = SpecDynamicEquationTreeValueHelpers.As<QualifiedType, TValue>(correspondingType);
+            value = SpecDynamicExpressionTreeValueHelpers.As<QualifiedType, TValue>(correspondingType);
             isNull = correspondingType.IsNull;
             return true;
         }

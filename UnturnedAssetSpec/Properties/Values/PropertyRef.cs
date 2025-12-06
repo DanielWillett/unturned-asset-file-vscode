@@ -52,6 +52,7 @@ public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
             : _info.GetValue(in ctx, prop, default, null);
     }
 
+    /// <param name="valueIncluded">Whether or not there has to also be a value included.</param>
     public bool GetIsIncluded(bool valueIncluded, in FileEvaluationContext ctx)
     {
         SpecProperty? prop = ResolveProperty(in ctx);
@@ -281,6 +282,7 @@ public readonly struct PropertyRefInfo
         crossRefProperty = new PropertyRefInfo(ctx.Self.FileCrossRef.AsSpan(), ctx.Self.FileCrossRef);
     }
 
+    /// <param name="valueIncluded">Whether or not there has to also be a value included.</param>
     internal static bool EvaluateIsIncluded(SpecProperty? property, bool valueIncluded, in FileEvaluationContext context)
     {
         if (property != null && context.SourceFile.TryGetProperty(property, out IPropertySourceNode? prop2, context.PropertyContext))
@@ -322,6 +324,7 @@ public readonly struct PropertyRefInfo
         return ValueTypeDataRefType.Value;
     }
 
+    /// <param name="valueIncluded">Whether or not there has to also be a value included.</param>
     public bool GetIsIncluded(bool valueIncluded, in FileEvaluationContext ctx, SpecProperty? prop, PropertyRefInfo crossReferencePropertyInfo, SpecProperty? crossReferenceProperty)
     {
         if (prop == null)
@@ -424,7 +427,7 @@ public readonly struct PropertyRefInfo
             return null;
         }
 
-        using IWorkspaceFile? workspaceFile = ctx.Workspace.TemporarilyGetOrLoadFile(file);
+        using IWorkspaceFile? workspaceFile = ctx.Workspace.TemporarilyGetOrLoadFile(file.FilePath);
         if (workspaceFile == null)
         {
             return null;
@@ -447,6 +450,7 @@ public readonly struct PropertyRefInfo
         return crossValueInfo.GetValue(in crossValueCtx, crossedProperty, default, null);
     }
 
+    /// <param name="valueIncluded">Whether or not there has to also be a value included.</param>
     private bool CrossReferenceIsIncluded(bool valueIncluded, in FileEvaluationContext ctx, PropertyRefInfo crossReferencePropertyInfo, SpecProperty? crossReferenceProperty)
     {
         if (crossReferenceProperty == null)
@@ -507,7 +511,7 @@ public readonly struct PropertyRefInfo
             return false;
         }
 
-        using IWorkspaceFile? workspaceFile = ctx.Workspace.TemporarilyGetOrLoadFile(file);
+        using IWorkspaceFile? workspaceFile = ctx.Workspace.TemporarilyGetOrLoadFile(file.FilePath);
         if (workspaceFile == null)
         {
             return false;

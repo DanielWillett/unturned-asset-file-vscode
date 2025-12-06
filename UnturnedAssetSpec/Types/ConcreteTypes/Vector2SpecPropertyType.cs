@@ -21,7 +21,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// }
 /// </code>
 /// </summary>
-public sealed class Vector2SpecPropertyType : BasicSpecPropertyType<Vector2SpecPropertyType, Vector2>,
+public sealed class Vector2SpecPropertyType : BaseSpecPropertyType<Vector2SpecPropertyType, Vector2>,
     IStringParseableSpecPropertyType,
     IVectorSpecPropertyType<Vector2>
 {

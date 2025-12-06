@@ -12,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 00:30:00
 /// </code>
 /// </summary>
-public sealed class TimeSpanSpecPropertyType : BasicSpecPropertyType<TimeSpanSpecPropertyType, TimeSpan>, IStringParseableSpecPropertyType
+public sealed class TimeSpanSpecPropertyType : BaseSpecPropertyType<TimeSpanSpecPropertyType, TimeSpan>, IStringParseableSpecPropertyType
 {
     public static readonly TimeSpanSpecPropertyType Instance = new TimeSpanSpecPropertyType();
 

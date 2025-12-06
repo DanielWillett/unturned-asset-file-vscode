@@ -23,7 +23,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </para>
 /// </summary>
 public sealed class GuidOrIdSpecPropertyType :
-    BaseSpecPropertyType<GuidOrId>,
+    BaseSpecPropertyType<GuidOrIdSpecPropertyType, GuidOrId>,
     ISpecPropertyType<GuidOrId>,
     IElementTypeSpecPropertyType,
     ISpecialTypesSpecPropertyType,
@@ -40,10 +40,7 @@ public sealed class GuidOrIdSpecPropertyType :
     public override string Type => "GuidOrId";
 
     /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
-
-    /// <inheritdoc />
-    public Type ValueType => typeof(GuidOrId);
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
     OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
@@ -93,20 +90,7 @@ public sealed class GuidOrIdSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out GuidOrId val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteValue<GuidOrId>(val, this);
-        return true;
-    }
-
-    /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out GuidOrId value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out GuidOrId value)
     {
         // todo: remember that [vehicle ]redirect assets need to work properly
         
@@ -175,12 +159,4 @@ public sealed class GuidOrIdSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(GuidOrIdSpecPropertyType other) => other != null && ElementType.Equals(other.ElementType) && OtherElementTypes.Equals(other.OtherElementTypes);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is GuidOrIdSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<GuidOrId>? other) => other is GuidOrIdSpecPropertyType t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

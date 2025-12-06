@@ -38,7 +38,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for character count limits.
 /// </para>
 /// </summary>
-public sealed class LocalizableStringSpecPropertyType : BasicSpecPropertyType<LocalizableStringSpecPropertyType, string>
+public sealed class LocalizableStringSpecPropertyType : BaseSpecPropertyType<LocalizableStringSpecPropertyType, string>
 {
     /// <summary>
     /// A <see cref="LocalizableStringSpecPropertyType"/> where the property
@@ -95,7 +95,7 @@ public sealed class LocalizableStringSpecPropertyType : BasicSpecPropertyType<Lo
     /// <inheritdoc />
     public override string DisplayName => _isTarget ? _isRich ? "Localization Key (Rich)" : "Localization Key" : _isRich ? "Localization Text (Rich)" : "Localization Text";
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)

@@ -189,6 +189,9 @@
   <data name="UNT1014_Specific" xml:space="preserve">
     <value>Enum value "{0}" of enum "{1}" isn't recognized. See documentation for a list of valid values.</value>
   </data>
+  <data name="UNT1014_Flags" xml:space="preserve">
+    <value>At least one value in "{0}" of enum "{1}" isn't recognized. See documentation for a list of valid values.</value>
+  </data>
   <data name="UNT1015" xml:space="preserve">
     <value>Expected a type deriving from '{0}'.</value>
   </data>
@@ -263,6 +266,12 @@
   </data>
   <data name="UNT1024_Less" xml:space="preserve">
     <value>Property "{0}" should must contain at least {1} element(s).</value>
+  </data>
+  <data name="UNT2013_Legacy" xml:space="preserve">
+    <value>This {0} object can not be parsed using the legacy object format.</value>
+  </data>
+  <data name="UNT2013_Modern" xml:space="preserve">
+    <value>This {0} object can not be parsed using the modern object format.</value>
   </data>
   <data name="UNT107_New_Guid" xml:space="preserve">
     <value>Generate new GUID</value>

@@ -3,6 +3,9 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -38,6 +41,7 @@ public interface ISpecPropertyType : IEquatable<ISpecPropertyType?>
 
     /// <summary>
     /// Invokes the strongly typed <see cref="ISpecPropertyTypeVisitor.Visit{T}"/> on the <paramref name="visitor"/>.
+    /// If a type can be resolved to multiple types (like how lists can be resolved to their array or their count), this method will be invoked more than one time.
     /// <para>
     /// If this type is not strongly typed (such as <see cref="UnresolvedSpecPropertyType"/>), the visitor will not be invoked.
     /// </para>
@@ -53,6 +57,7 @@ public interface ISpecPropertyType<TValue> : ISpecPropertyType, IEquatable<ISpec
     where TValue : IEquatable<TValue>
 {
     bool TryParseValue(in SpecPropertyTypeParseContext parse, out TValue? value);
+    ISpecDynamicValue CreateValue(TValue? value);
 }
 
 /// <summary>
@@ -124,7 +129,7 @@ public interface IListTypeSpecPropertyType : IElementTypeSpecPropertyType
     /// <summary>
     /// Gets the element type of the list.
     /// </summary>
-    ISpecPropertyType? GetInnerType(IAssetSpecDatabase database);
+    ISpecPropertyType? GetInnerType();
 }
 
 /// <summary>
@@ -136,6 +141,11 @@ public interface IDictionaryTypeSpecPropertyType : IElementTypeSpecPropertyType
     /// Gets the value type of the dictionary.
     /// </summary>
     ISpecPropertyType? GetInnerType(IAssetSpecDatabase database);
+
+    /// <summary>
+    /// Gets auto-complete results for the keys of this dictionary.
+    /// </summary>
+    Task<AutoCompleteResult[]> GetKeyAutoCompleteResults(in AutoCompleteParameters parameters, in FileEvaluationContext context);
 }
 
 /// <summary>
@@ -172,7 +182,7 @@ public interface ISecondPassSpecPropertyType : ISpecPropertyType
     /// <param name="property">The property this type is on.</param>
     /// <param name="database">The database service.</param>
     /// <param name="assetFile">The file this property belongs to.</param>
-    /// <returns></returns>
+    /// <returns>The new type, or the same reference to the old type if a new type didn't need to be created.</returns>
     ISpecPropertyType Transform(SpecProperty property, IAssetSpecDatabase database, AssetSpecType assetFile);
 }
 

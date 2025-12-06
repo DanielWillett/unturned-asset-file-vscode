@@ -12,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 123
 /// </code>
 /// </summary>
-public sealed class UInt8SpecPropertyType : BasicSpecPropertyType<UInt8SpecPropertyType, byte>, IStringParseableSpecPropertyType
+public sealed class UInt8SpecPropertyType : BaseSpecPropertyType<UInt8SpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly UInt8SpecPropertyType Instance = new UInt8SpecPropertyType();
 

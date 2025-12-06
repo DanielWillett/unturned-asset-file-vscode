@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop Washington
 /// </code>
 /// </summary>
-public sealed class MapNameSpecPropertyType : BasicSpecPropertyType<MapNameSpecPropertyType, string>
+public sealed class MapNameSpecPropertyType : BaseSpecPropertyType<MapNameSpecPropertyType, string>
 {
     public static readonly MapNameSpecPropertyType Instance = new MapNameSpecPropertyType();
 
@@ -28,7 +28,7 @@ public sealed class MapNameSpecPropertyType : BasicSpecPropertyType<MapNameSpecP
     /// <inheritdoc />
     public override string DisplayName => "Map Name";
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)

@@ -17,7 +17,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// </summary>
 public sealed class SkillLevelSpecPropertyType :
-    BasicSpecPropertyType<SkillLevelSpecPropertyType, byte>,
+    BaseSpecPropertyType<SkillLevelSpecPropertyType, byte>,
     IStringParseableSpecPropertyType,
     IElementTypeSpecPropertyType,
     IAutoCompleteSpecPropertyType

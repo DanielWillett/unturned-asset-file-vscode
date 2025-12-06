@@ -89,6 +89,10 @@ public class InstallDirUtility
         }
 
         installDir = default;
+
+        if (_gameName == "\0" || _gameId == "\0")
+            return false;
+
         string libraryFilePath;
         bool isUnix = false;
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

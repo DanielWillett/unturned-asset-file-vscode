@@ -16,7 +16,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// </summary>
 public class DefaultableIdSpecPropertyType :
-    BaseSpecPropertyType<int>,
+    BaseSpecPropertyType<DefaultableIdSpecPropertyType, int>,
     ISpecPropertyType<int>,
     IElementTypeSpecPropertyType,
     ISpecialTypesSpecPropertyType,
@@ -35,10 +35,7 @@ public class DefaultableIdSpecPropertyType :
     public override string Type => "DefaultableId";
 
     /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
-
-    /// <inheritdoc />
-    public Type ValueType => typeof(int);
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Number;
 
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
     OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
@@ -104,20 +101,10 @@ public class DefaultableIdSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out int val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteConvertibleValue<int>(val, this);
-        return true;
-    }
+    protected override ISpecDynamicValue CreateValue(int value) => new SpecDynamicConcreteConvertibleValue<int>(value, this);
 
     /// <inheritdoc />
-    public virtual bool TryParseValue(in SpecPropertyTypeParseContext parse, out int value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out int value)
     {
         if (parse.Node == null)
         {
@@ -141,12 +128,4 @@ public class DefaultableIdSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(DefaultableIdSpecPropertyType other) => other != null && GetType() == other.GetType() && Category.Equals(other.Category) && OtherElementTypes.Equals(other.OtherElementTypes);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is DefaultableIdSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<int>? other) => other is DefaultableIdSpecPropertyType t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

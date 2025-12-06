@@ -9,7 +9,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// An included or excluded value. Just the presence of the property counts as a <see langword="true"/> value, even if the value is set to 'False'.
 /// <para>Example: <c>ItemBarricadeAsset.Vulnerable</c></para>
 /// </summary>
-public sealed class FlagSpecPropertyType : BasicSpecPropertyType<FlagSpecPropertyType, bool>, IStringParseableSpecPropertyType
+public sealed class FlagSpecPropertyType : BaseSpecPropertyType<FlagSpecPropertyType, bool>, IStringParseableSpecPropertyType
 {
     public static readonly FlagSpecPropertyType Instance = new FlagSpecPropertyType();
 

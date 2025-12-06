@@ -41,9 +41,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <para>
 /// Also supports the <c>MinimumCount</c> and <c>MaximumCount</c> properties for list element count limits.
 /// </para>
+/// <para>
+/// The defining property can set the <see cref="LegacyExpansionFilter"/> for the key being used to filter by only Legacy or Modern (although only modern should just use <see cref="ListSpecPropertyType{TElementType}"/>).
+/// </para>
 /// </summary>
 public sealed class LegacyCompatibleListSpecPropertyType :
-    BaseSpecPropertyType<EquatableArray<CustomSpecTypeInstance>>,
+    BaseSpecPropertyType<LegacyCompatibleListSpecPropertyType, EquatableArray<CustomSpecTypeInstance>>,
     ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>>,
     IListTypeSpecPropertyType,
     IEquatable<LegacyCompatibleListSpecPropertyType>
@@ -51,14 +54,14 @@ public sealed class LegacyCompatibleListSpecPropertyType :
     private readonly ISpecType _specifiedBaseType;
 
     public override string Type => "LegacyCompatibleList";
-    public Type ValueType => typeof(EquatableArray<CustomSpecTypeInstance>);
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     string IElementTypeSpecPropertyType.ElementType => _specifiedBaseType.Type;
 
     public override string DisplayName { get; }
 
-    ISpecPropertyType? IListTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database)
+    ISpecPropertyType? IListTypeSpecPropertyType.GetInnerType()
     {
         return _specifiedBaseType as ISpecPropertyType;
     }
@@ -74,25 +77,9 @@ public sealed class LegacyCompatibleListSpecPropertyType :
         DisplayName = $"List of {type.DisplayName} (Legacy Compatible)";
     }
 
-    public bool Equals(ISpecPropertyType? other) => other is LegacyCompatibleListSpecPropertyType;
-    public bool Equals(ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>>? other) => other is LegacyCompatibleListSpecPropertyType;
     public bool Equals(LegacyCompatibleListSpecPropertyType? other) => other != null;
 
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (TryParseValue(in parse, out EquatableArray<CustomSpecTypeInstance> array))
-        {
-            value = array.Array is not { Length: > 0 }
-                ? SpecDynamicValue.Null
-                : new SpecDynamicConcreteValue<EquatableArray<CustomSpecTypeInstance>>(array, this);
-            return true;
-        }
-
-        value = null!;
-        return false;
-    }
-
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out EquatableArray<CustomSpecTypeInstance> value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out EquatableArray<CustomSpecTypeInstance> value)
     {
         bool passed = true;
 
@@ -112,8 +99,27 @@ public sealed class LegacyCompatibleListSpecPropertyType :
             return false;
         }
 
+        SpecProperty? property = parse.EvaluationContext.Self;
+        LegacyExpansionFilter filter = property?.GetCorrespondingFilter(in parse) ?? LegacyExpansionFilter.Either;
+
         if (parse.Node is IValueSourceNode stringNode)
         {
+            if (filter == LegacyExpansionFilter.Modern)
+            {
+                if (parse.HasDiagnostics)
+                {
+                    parse.Log(new DatDiagnosticMessage
+                    {
+                        Range = parse.Node?.Range ?? parse.Parent?.Range ?? default,
+                        Message = string.Format(DiagnosticResources.UNT2013_Legacy, _specifiedBaseType.Type.GetTypeName()),
+                        Diagnostic = DatDiagnostics.UNT2013
+                    });
+                }
+
+                value = default;
+                return false;
+            }
+
             if (!KnownTypeValueHelper.TryParseUInt8(stringNode.Value, out byte conditionCount))
             {
                 return FailedToParse(in parse, out value, stringNode);
@@ -125,29 +131,45 @@ public sealed class LegacyCompatibleListSpecPropertyType :
                 return true;
             }
 
-            CustomSpecTypeInstance[] conditions = new CustomSpecTypeInstance[conditionCount];
-            for (int i = 0; i < conditions.Length; ++i)
+            CustomSpecTypeInstance[] objects = new CustomSpecTypeInstance[conditionCount];
+            for (int i = 0; i < objects.Length; ++i)
             {
-                if (!TryParseLegacyInstance(in parse, i, out conditions[i], customType))
+                if (!TryParseLegacyInstance(in parse, i, out objects[i], customType))
                 {
                     passed = false;
                 }
             }
 
-            KnownTypeValueHelper.TryGetMinimaxCountWarning(conditions.Length, in parse);
+            KnownTypeValueHelper.TryGetMinimaxCountWarning(objects.Length, in parse);
 
             if (!passed)
             {
                 return FailedToParse(in parse, out value, stringNode);
             }
 
-            value = new EquatableArray<CustomSpecTypeInstance>(conditions);
+            value = new EquatableArray<CustomSpecTypeInstance>(objects);
             return true;
         }
 
         if (parse.Node is not IListSourceNode list)
         {
             return MissingNode(in parse, out value);
+        }
+
+        if (filter == LegacyExpansionFilter.Legacy)
+        {
+            if (parse.HasDiagnostics)
+            {
+                parse.Log(new DatDiagnosticMessage
+                {
+                    Range = parse.Node?.Range ?? parse.Parent?.Range ?? default,
+                    Message = string.Format(DiagnosticResources.UNT2013_Modern, _specifiedBaseType.Type.GetTypeName()),
+                    Diagnostic = DatDiagnostics.UNT2013
+                });
+            }
+
+            value = default;
+            return false;
         }
 
         ImmutableArray<ISourceNode> children = list.Children;
@@ -271,8 +293,6 @@ public sealed class LegacyCompatibleListSpecPropertyType :
         instance = type!;
         return instance != null;
     }
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }
 
 internal sealed class UnresolvedLegacyCompatibleListSpecPropertyType :
@@ -282,7 +302,7 @@ internal sealed class UnresolvedLegacyCompatibleListSpecPropertyType :
     IDisposable
 {
     public ISecondPassSpecPropertyType InnerType { get; }
-    ISpecPropertyType IListTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
+    ISpecPropertyType? IListTypeSpecPropertyType.GetInnerType() => InnerType;
     string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
 
     public string DisplayName => "LegacyCompatibleList";

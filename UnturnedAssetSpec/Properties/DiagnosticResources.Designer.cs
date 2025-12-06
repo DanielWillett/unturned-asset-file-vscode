@@ -250,6 +250,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to At least one value in &quot;{0}&quot; of enum &quot;{1}&quot; isn&apos;t recognized. See documentation for a list of valid values..
+        /// </summary>
+        internal static string UNT1014_Flags {
+            get {
+                return ResourceManager.GetString("UNT1014_Flags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enum value &quot;{0}&quot; of enum &quot;{1}&quot; isn&apos;t recognized. See documentation for a list of valid values..
         /// </summary>
         internal static string UNT1014_Specific {
@@ -525,6 +534,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string UNT2012_WithMessage {
             get {
                 return ResourceManager.GetString("UNT2012_WithMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This {0} object can not be parsed using the legacy object format..
+        /// </summary>
+        internal static string UNT2013_Legacy {
+            get {
+                return ResourceManager.GetString("UNT2013_Legacy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This {0} object can not be parsed using the modern object format..
+        /// </summary>
+        internal static string UNT2013_Modern {
+            get {
+                return ResourceManager.GetString("UNT2013_Modern", resourceCulture);
             }
         }
     }

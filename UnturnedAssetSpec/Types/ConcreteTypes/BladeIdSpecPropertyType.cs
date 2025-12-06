@@ -17,7 +17,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 123
 /// </code>
 /// </summary>
-public sealed class BladeIdSpecPropertyType : BasicSpecPropertyType<BladeIdSpecPropertyType, byte>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
+public sealed class BladeIdSpecPropertyType : BaseSpecPropertyType<BladeIdSpecPropertyType, byte>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType
 {
     public static readonly BladeIdSpecPropertyType Instance = new BladeIdSpecPropertyType();
 

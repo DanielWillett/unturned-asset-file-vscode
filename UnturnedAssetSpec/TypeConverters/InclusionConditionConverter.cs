@@ -152,7 +152,7 @@ public class InclusionConditionConverter : JsonConverter<InclusionCondition?>
                         catch (JsonException)
                         {
                             cond = new SpecDynamicSwitchCaseOrCondition(
-                                SpecDynamicSwitchCaseValueConverter.ReadCase(ref reader, options, KnownTypes.Boolean)
+                                SpecDynamicSwitchCaseValueConverter.ReadCase(ref reader, options, KnownTypes.Boolean, false)
                             );
                         }
 

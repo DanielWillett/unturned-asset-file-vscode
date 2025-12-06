@@ -14,7 +14,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// </summary>
 public sealed class PaintableVehicleSectionStringParseableSpecPropertyType :
-    BaseSpecPropertyType<CustomSpecTypeInstance>,
+    BaseSpecPropertyType<PaintableVehicleSectionStringParseableSpecPropertyType, CustomSpecTypeInstance>,
     ISpecPropertyType<CustomSpecTypeInstance>,
     IEquatable<PaintableVehicleSectionStringParseableSpecPropertyType?>
 {
@@ -32,23 +32,12 @@ public sealed class PaintableVehicleSectionStringParseableSpecPropertyType :
 
     public override string DisplayName => "Paintable Vehicle Section";
 
-    public Type ValueType => typeof(CustomSpecTypeInstance);
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+    /// <inheritdoc />
+    protected override ISpecDynamicValue CreateValue(CustomSpecTypeInstance value) => (ISpecDynamicValue?)value ?? SpecDynamicValue.Null;
 
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (TryParseValue(in parse, out CustomSpecTypeInstance? instance))
-        {
-            value = (ISpecDynamicValue?)instance ?? SpecDynamicValue.Null;
-            return true;
-        }
-
-        value = null!;
-        return false;
-    }
-
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out CustomSpecTypeInstance? value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out CustomSpecTypeInstance? value)
     {
         if (parse.Node == null)
         {
@@ -110,9 +99,5 @@ public sealed class PaintableVehicleSectionStringParseableSpecPropertyType :
         return true;
     }
 
-    public bool Equals(ISpecPropertyType? other) => other is PaintableVehicleSectionStringParseableSpecPropertyType;
-    public bool Equals(ISpecPropertyType<CustomSpecTypeInstance>? other) => other is PaintableVehicleSectionStringParseableSpecPropertyType;
     public bool Equals(PaintableVehicleSectionStringParseableSpecPropertyType? other) => other != null;
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

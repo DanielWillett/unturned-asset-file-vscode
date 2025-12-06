@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -16,7 +15,7 @@ public readonly record struct Comment(CommentPrefix Prefix, string Content, Comm
     /// <para>
     /// They must be formatted as a property starting in this value (case-sensitive), followed by a colon, then an optional value.
     /// <code>
-    /// // udat-type: SDG.Unturned.ServerConfigData, Assembly-CSharp
+    /// // udat-type: SDG.Unturned.ConfigData, Assembly-CSharp
     /// // udat-prop:
     /// Key Value
     /// </code>
@@ -30,6 +29,12 @@ public readonly record struct Comment(CommentPrefix Prefix, string Content, Comm
     /// </summary>
     /// <remarks>Must go at the top of the file in a comment.</remarks>
     public const string TypeAdditionalProperty = "type";
+
+    /// <summary>
+    /// Case-sensitive <c>udat-difficulty</c> additional property overriding the gamemode difficulty for the file.
+    /// </summary>
+    /// <remarks>Must go at the top of the file in a comment.</remarks>
+    public const string DifficultyAdditionalProperty = "difficulty";
 
     /// <summary>
     /// Total length of this comment's prefix and content.

@@ -1,0 +1,435 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "Type": "SDG.Unturned.WeatherAsset, Assembly-CSharp",
+    "DisplayName": "Custom Weather",
+    "Parent": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html",
+    "RequireId": false,
+    "Properties":
+    [
+        {
+            "Key": "Override_Fog",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Should fog configured in the lighting be overridden?",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "overrideFog"
+        },
+        {
+            "Key": "Override_Atmospheric_Fog",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Should fog affect the skybox?",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "overrideAtmosphericFog",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Override_Fog",
+                    "Value": true,
+                    "Condition":
+                    {
+                        "Variable": "Override_Atmospheric_Fog",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "Override_Cloud_Colors",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Should this weather affect cloud colors?",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "overrideCloudColors"
+        },
+        {
+            "Key": "Shadow_Strength_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "Directional light shadow strength multiplier.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "shadowStrengthMultiplier"
+        },
+        {
+            "Key": "Fog_Blend_Exponent",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "Power applied to fog blending alpha.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "fogBlendExponent",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Override_Fog",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Cloud_Blend_Exponent",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "IncludedDefaultValue": 0.0,
+            "Description": "Power applied to cloud blending alpha.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "cloudBlendExponent",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Override_Cloud_Colors",
+                    "Value": true
+                }
+            ]
+        },
+        {
+            "Key": "Wind_Main",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Wind zone windMain value. Will be replaced by more configurable game-specific wind eventually.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "windMain"
+        },
+        {
+            "Key": "Stamina_Per_Second",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Player stamina increase or decrease applied per second for all players influenced by this weather, fading in as the weather activates.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "staminaPerSecond"
+        },
+        {
+            "Key": "Health_Per_Second",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Player health increase or decrease applied per second for all players influenced by this weather, fading in as the weather activates.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "healthPerSecond"
+        },
+        {
+            "Key": "Food_Per_Second",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Player food increase or decrease applied per second for all players influenced by this weather, fading in as the weather activates.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "foodPerSecond"
+        },
+        {
+            "Key": "Water_Per_Second",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Player food increase or decrease applied per second for all players influenced by this weather, fading in as the weather activates.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "waterPerSecond"
+        },
+        {
+            "Key": "Virus_Per_Second",
+            "Type": "Float32",
+            "DefaultValue": 0.0,
+            "Description": "Player immunity increase or decrease applied per second for all players influenced by this weather, fading in as the weather activates.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "virusPerSecond"
+        },
+        {
+            "Key": "Dawn",
+            "Type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Time of Day Properties during the 'Dawn' time.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#time-of-day-properties",
+            "Variable": "timeValues"
+        },
+        {
+            "Key": "Midday",
+            "Type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Time of Day Properties during the 'Midday' time.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#time-of-day-properties",
+            "Variable": "timeValues"
+        },
+        {
+            "Key": "Dusk",
+            "Type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Time of Day Properties during the 'Dusk' time.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#time-of-day-properties",
+            "Variable": "timeValues"
+        },
+        {
+            "Key": "Midnight",
+            "Type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Time of Day Properties during the 'Midnight' time.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#time-of-day-properties",
+            "Variable": "timeValues"
+        },
+        {
+            "Key": "Effects",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.WeatherAsset+Effect, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Multiple effects can be instantiated while the weather is active.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#effect-properties",
+            "Variable": "effects"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
+            "DisplayName": "Weather Time Configuration",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#time-of-day-properties",
+            "DefaultValue":
+            {
+                "Brightness_Multiplier": 1.0
+            },
+            "Properties":
+            [
+                {
+                    "Key": "Fog_Color",
+                    "Type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
+                    "Priority": 4,
+                    "Description": "Color of the distance-based fog. Optionally overrides the skybox color.",
+                    "DefaultValue": null,
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "SDG.Unturned.WeatherAsset::Override_Fog",
+                            "Value": true
+                        }
+                    ]
+                },
+                {
+                    "Key": "Fog_Density",
+                    "Type": "Float32",
+                    "Priority": 4,
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Description": "Functions similarly to fog intensity in ambiance volume.",
+                    "DefaultValue": 0.0,
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "SDG.Unturned.WeatherAsset::Override_Fog",
+                            "Value": true
+                        }
+                    ]
+                },
+                {
+                    "Key": "Cloud_Color",
+                    "Type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
+                    "Priority": 3,
+                    "Description": "Color of the inner body of cloud.",
+                    "DefaultValue": null,
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "SDG.Unturned.WeatherAsset::Override_Cloud_Colors",
+                            "Value": true
+                        }
+                    ]
+                },
+                {
+                    "Key": "Cloud_Rim_Color",
+                    "Type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
+                    "Priority": 3,
+                    "Description": "Color of the outer edge of cloud. More visible than @Cloud_Color.",
+                    "DefaultValue": null,
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "SDG.Unturned.WeatherAsset::Override_Cloud_Colors",
+                            "Value": true
+                        }
+                    ]
+                },
+                {
+                    "Key": "Brightness_Multiplier",
+                    "Type": "Float32",
+                    "Priority": 2,
+                    "DefaultValue": 1.0,
+                    "IncludedDefaultValue": 0.0,
+                    "Variable": "brightnessMultiplier"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
+            "DisplayName": "Weather Color Configuration",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#color-properties",
+            "DefaultValue":
+            {
+                "R": 0,
+                "G": 0,
+                "B": 0
+            },
+            "Properties":
+            [
+                {
+                    "Key": "R",
+                    "Type": "UInt8",
+                    "Description": "Red color channel value.",
+                    "DefaultValue": 255,
+                    "Variable": "customColor",
+                    "Priority": 2
+                },
+                {
+                    "Key": "G",
+                    "Type": "UInt8",
+                    "Description": "Green color channel value.",
+                    "DefaultValue": 255,
+                    "Variable": "customColor",
+                    "Priority": 1
+                },
+                {
+                    "Key": "B",
+                    "Type": "UInt8",
+                    "Description": "Blue color channel value.",
+                    "DefaultValue": 255,
+                    "Variable": "customColor",
+                    "Priority": 0
+                },
+                {
+                    "Key": "Level_Enum",
+                    "Type": "SDG.Unturned.ELightingColor, Assembly-CSharp",
+                    "Description": "If set, then the RGB specified are multiplied by this color.",
+                    "DefaultValue": "CUSTOM_OVERRIDE",
+                    "Variable": "levelEnum",
+                    "Priority": 3
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ELightingColor, Assembly-CSharp",
+            "DisplayName": "Lighting Color Preset",
+            "Values":
+            [
+                {
+                    "Value": "SUN",
+                    "Casing": "Sun",
+                    "Description": "Corresponds to the 'Sun' color set in the level editor."
+                },
+                {
+                    "Value": "SEA",
+                    "Casing": "Sea",
+                    "Description": "Corresponds to the 'Sea' color set in the level editor."
+                },
+                {
+                    "Value": "FOG",
+                    "Casing": "Fog",
+                    "Description": "Corresponds to the 'Fog' color set in the level editor."
+                },
+                {
+                    "Value": "SKY_SKY",
+                    "Casing": "Sky_Sky",
+                    "Description": "Corresponds to the 'Top Sky' color set in the level editor."
+                },
+                {
+                    "Value": "SKY_EQUATOR",
+                    "Casing": "Sky_Equator",
+                    "Description": "Corresponds to the 'Middle Sky' color set in the level editor."
+                },
+                {
+                    "Value": "SKY_GROUND",
+                    "Casing": "Sky_Ground",
+                    "Description": "Corresponds to the 'Bottom Sky' color set in the level editor."
+                },
+                {
+                    "Value": "AMBIENT_SKY",
+                    "Casing": "Ambient_Sky",
+                    "Description": "Corresponds to the 'Top Ambient' color set in the level editor."
+                },
+                {
+                    "Value": "AMBIENT_EQUATOR",
+                    "Casing": "Ambient_Equator",
+                    "Description": "Corresponds to the 'Middle Ambient' color set in the level editor."
+                },
+                {
+                    "Value": "AMBIENT_GROUND",
+                    "Casing": "Ambient_Ground",
+                    "Description": "Corresponds to the 'Bottom Ambient' color set in the level editor."
+                },
+                {
+                    "Value": "CLOUDS",
+                    "Casing": "Clouds",
+                    "Description": "Corresponds to the 'Clouds' color set in the level editor."
+                },
+                {
+                    "Value": "RAYS",
+                    "Casing": "Rays",
+                    "Description": "Corresponds to the 'Rays' color set in the level editor."
+                },
+                {
+                    "Value": "PARTICLE_LIGHTING",
+                    "Casing": "Particle_Lighting",
+                    "Description": "Corresponds to the 'Particle Lighting' color set in the level editor."
+                },
+                {
+                    "Value": "CUSTOM_OVERRIDE",
+                    "Casing": "Custom_Override",
+                    "Description": "Indicates that the color should not be multiplied by a color configured in the level editor. Instead the RGB value should just be used directly."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.WeatherAsset+Effect, Assembly-CSharp",
+            "DisplayName": "Weather Effect",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#effect-properties",
+            "Properties":
+            [
+                {
+                    "Key": "Prefab",
+                    "Type": "MasterBundleReference",
+                    "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
+                    "Description": "Game object with a particle system. 'PlayOnAwake' should be disabled. For effects tied to the view it may be helpful to change the culling mode to \"Always Simulate\".",
+                    "DefaultValue": null,
+                    "Variable": "prefab",
+                    "Required": true,
+                    "Priority": 5
+                },
+                {
+                    "Key": "Emission_Exponent",
+                    "Type": "Float32",
+                    "Description": "Power applied to weather intensity multiplied by default constant rate over time.",
+                    "DefaultValue": 0.0,
+                    "Variable": "emissionExponent",
+                    "Required": true,
+                    "Priority": 4
+                },
+                {
+                    "Key": "Pitch",
+                    "Type": "Float32",
+                    "Description": "X-axis rotation when @Rotate_Yaw_With_Wind is enabled.",
+                    "DefaultValue": 0.0,
+                    "Variable": "pitch",
+                    "Priority": 3,
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Rotate_Yaw_With_Wind",
+                            "Value": true
+                        }
+                    ]
+                },
+                {
+                    "Key": "Translate_With_View",
+                    "Type": "Boolean",
+                    "Description": "Should position in world-space match the camera? The built-in snow and rain move with the view. Position is zeroed when false. May be useful for transition effects like dust blowing into the map signaling the start of a sandstorm.",
+                    "DefaultValue": false,
+                    "Variable": "translateWithView",
+                    "Priority": 2
+                },
+                {
+                    "Key": "Rotate_Yaw_With_Wind",
+                    "Type": "Boolean",
+                    "Description": "Should y-axis rotation match the wind direction? The built-in snow and rain rotate with wind.",
+                    "DefaultValue": false,
+                    "Variable": "rotateYawWithWind",
+                    "Priority": 1
+                }
+            ]
+        }
+    ]
+}

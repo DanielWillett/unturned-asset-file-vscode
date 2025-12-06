@@ -45,12 +45,12 @@ internal class HoverHandler : IHoverHandler
         SpecProperty? prop = ctx.EvaluationContext.Self;
         if (prop == null)
         {
-            builder.UnknownProperty(ctx.BaseKey, ctx.Breadcrumbs);
+            builder.UnknownProperty(in ctx);
         }
         else
         {
             ISpecPropertyType? type = prop.Type.GetType(in ctx.EvaluationContext);
-            bool hasValue = ctx.EvaluationContext.TryGetValue(out ISpecDynamicValue? propValue);
+            bool hasValue = ctx.TryParse(out ISpecDynamicValue? propValue);
             ValueHoverProviderResult? result = null;
             if (hasValue && propValue != null && hoverNode is IValueSourceNode && type is IValueHoverProviderSpecPropertyType valueHoverProvider)
                 result = valueHoverProvider.GetDescription(in ctx, propValue);
@@ -91,12 +91,11 @@ public readonly struct HoverMarkdownBuilder
         return _hov.ToString();
     }
 
-    public void UnknownProperty(string? propertyName, PropertyBreadcrumbs breadcrumbs)
+    public void UnknownProperty(in SpecPropertyTypeParseContext ctx)
     {
         _hov.Append(Properties.Resources.Hover_UnknownProperty)
             .Append(": '")
-            .Append(breadcrumbs.ToString())
-            .Append(propertyName)
+            .Append(ctx.GetParseTargetDisplayName())
             .Append('\'');
     }
 
@@ -215,6 +214,19 @@ public readonly struct HoverMarkdownBuilder
                 .AppendLine().AppendLine().Append('-', 3).AppendLine().AppendLine();
         }
 
+        if (value?.ValueType is IStringParseableSpecPropertyType && value is not ISpecConcreteValue)
+        {
+            ReduceToConcreteVisitor visitor;
+            visitor.Value = value;
+            visitor.OutValue = null;
+            visitor.OutValueIsNull = true;
+            visitor.Context = ctx.EvaluationContext;
+            value.ValueType.Visit(ref visitor);
+
+            hasValue = visitor.OutValue != null;
+            value = visitor.OutValueIsNull ? null : visitor.OutValue;
+        }
+
         if (!hasValue)
         {
             _hov.Append("-# ").Append(Properties.Resources.Hover_InvalidValue);
@@ -232,7 +244,17 @@ public readonly struct HoverMarkdownBuilder
                 if (sp.ToString(value) is not { Length: > 0 } str)
                     _hov.Append(Properties.Resources.Hover_ValueTitle).Append(": **null**");
                 else
-                    _hov.Append(Properties.Resources.Hover_ValueTitle).Append(": `").Append(str).Append('`');
+                {
+                    // todo: better escaping
+                    if (str.IndexOf('\n') >= 0)
+                    {
+                        _hov.AppendLine(Properties.Resources.Hover_ValueTitle).AppendLine(str);
+                    }
+                    else
+                    {
+                        _hov.Append(Properties.Resources.Hover_ValueTitle).Append(": `").Append(str).Append('`');
+                    }
+                }
             }
             catch (InvalidCastException)
             {
@@ -249,6 +271,29 @@ public readonly struct HoverMarkdownBuilder
                 case IDictionarySourceNode dict:
                     _hov.Append(Properties.Resources.Hover_DictionaryTitle).Append(": { n = ").Append(dict.Count).Append(" }");
                     break;
+            }
+        }
+    }
+
+    private struct ReduceToConcreteVisitor : ISpecPropertyTypeVisitor
+    {
+        public ISpecDynamicValue Value;
+        public ISpecDynamicValue? OutValue;
+        public bool OutValueIsNull;
+        public FileEvaluationContext Context;
+
+        /// <inheritdoc />
+        public void Visit<T>(ISpecPropertyType<T> type) where T : IEquatable<T>
+        {
+            if (Value.TryEvaluateValue(in Context, out T? val, out bool isNull))
+            {
+                OutValueIsNull = isNull;
+                OutValue = isNull ? SpecDynamicValue.Null : type.CreateValue(val);
+            }
+            else
+            {
+                OutValueIsNull = true;
+                OutValue = null;
             }
         }
     }

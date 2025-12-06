@@ -71,7 +71,7 @@ public class MatchingSwitches
         Assert.That(reader.Read(), Is.True);
 
         SpecDynamicSwitchValue? valueSwitch
-            = SpecDynamicSwitchValueConverter.ReadSwitch(ref reader, db.Options, new PropertyTypeOrSwitch(typeSwitch));
+            = SpecDynamicSwitchValueConverter.ReadSwitch(ref reader, db.Options, new PropertyTypeOrSwitch(typeSwitch), false);
 
         Assert.That(valueSwitch, Is.Not.Null);
         Assert.That(valueSwitch.HasCases, Is.True);

@@ -1,11 +1,18 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 
 public interface IWorkspaceEnvironment
 {
-    IWorkspaceFile? TemporarilyGetOrLoadFile(DiscoveredDatFile datFile);
+    IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath);
+
+    /// <summary>
+    /// Attempts to get the difficulty of a file based on it's location.
+    /// </summary>
+    /// <remarks>Doesn't take <see cref="Comment.DifficultyAdditionalProperty"/> into account.</remarks>
+    bool TryGetFileDifficulty(string file, out ServerDifficulty difficulty);
 }
 
 public interface IWorkspaceFile : IDisposable
@@ -20,6 +27,11 @@ public interface IWorkspaceFile : IDisposable
     /// Gets the entire text of the file as a string in it's current state.
     /// </summary>
     string GetFullText();
+
+    /// <summary>
+    /// Invoked when this file's contents are updated.
+    /// </summary>
+    event Action<IWorkspaceFile, FileRange>? OnUpdated;
 }
 
 public delegate void SpanAction<TState>(ReadOnlySpan<char> span, ref TState state);

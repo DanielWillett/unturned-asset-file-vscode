@@ -8,8 +8,14 @@ using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
+/// <summary>
+/// A boolean value wrapper for the value of a <see cref="SpecCondition"/>.
+/// </summary>
 public sealed class ConditionSpecDynamicValue : ISpecDynamicValue, IEquatable<ISpecDynamicValue>, IEquatable<ConditionSpecDynamicValue>
 {
+    /// <summary>
+    /// The backing condition evaluated for this value.
+    /// </summary>
     public SpecCondition Condition { get; }
 
     public ConditionSpecDynamicValue(SpecCondition condition)

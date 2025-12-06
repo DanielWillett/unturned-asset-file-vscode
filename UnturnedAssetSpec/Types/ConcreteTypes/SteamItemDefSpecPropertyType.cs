@@ -13,7 +13,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 52400
 /// </code>
 /// </summary>
-public sealed class SteamItemDefSpecPropertyType : BasicSpecPropertyType<SteamItemDefSpecPropertyType, int>, IStringParseableSpecPropertyType
+public sealed class SteamItemDefSpecPropertyType : BaseSpecPropertyType<SteamItemDefSpecPropertyType, int>, IStringParseableSpecPropertyType
 {
     public static readonly SteamItemDefSpecPropertyType Instance = new SteamItemDefSpecPropertyType();
 

@@ -118,6 +118,14 @@
                     "title": "A color with red, green, blue, and alpha components."
                 },
                 {
+                    "const": "Color32RGBString",
+                    "title": "A color with red, green, and blue components in a 6-character hex format with an optional '#' prefix."
+                },
+                {
+                    "const": "Color32RGBAString",
+                    "title": "A color with red, green, and blue components in a 6 or 8-character hex format with an optional '#' prefix."
+                },
+                {
                     "const": "Color32RGBStrictHex",
                     "title": "A hex color that follows the following format strictly: #ffffff."
                 },
@@ -140,6 +148,14 @@
                 {
                     "const": "ColorRGBALegacy",
                     "title": "A color with red, green, blue, and alpha components."
+                },
+                {
+                    "const": "ColorRGBString",
+                    "title": "A color with red, green, and blue components in a 6-character hex format with an optional '#' prefix."
+                },
+                {
+                    "const": "ColorRGBAString",
+                    "title": "A color with red, green, and blue components in a 6 or 8-character hex format with an optional '#' prefix."
                 },
                 {
                     "const": "ColorRGBStrictHex",
@@ -406,6 +422,10 @@
                     "title": "A URL with content type optionally supplied."
                 },
                 {
+                    "const": "Path",
+                    "title": "A path to a Unity component or GameObject."
+                },
+                {
                     "$ref": "#/$defs/switch"
                 }
             ]
@@ -600,18 +620,32 @@
                             "oneOf":
                             [
                                 {
+                                    "$ref": "#/$defs/switch"
+                                },
+                                {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
+                                },
+                                {
                                     "type":
                                     [
-                                        "string",
                                         "number",
-                                        "integer",
-                                        "boolean",
-                                        "null",
-                                        "array"
+                                        "null"
                                     ]
                                 },
                                 {
-                                    "$ref": "#/$defs/switch"
+                                    "type": "array",
+                                    "items": {
+                                        "type":
+                                        [
+                                            "string",
+                                            "number",
+                                            "boolean",
+                                            "null"
+                                        ]
+                                    }
                                 }
                             ]
                         },
@@ -621,18 +655,32 @@
                             "oneOf":
                             [
                                 {
+                                    "$ref": "#/$defs/switch"
+                                },
+                                {
+                                    "$ref": "#/$defs/condition"
+                                },
+                                {
+                                    "$ref": "#/$defs/switchCase"
+                                },
+                                {
                                     "type":
                                     [
-                                        "string",
                                         "number",
-                                        "integer",
-                                        "boolean",
-                                        "null",
-                                        "array"
+                                        "null"
                                     ]
                                 },
                                 {
-                                    "$ref": "#/$defs/switch"
+                                    "type": "array",
+                                    "items": {
+                                        "type":
+                                        [
+                                            "string",
+                                            "number",
+                                            "boolean",
+                                            "null"
+                                        ]
+                                    }
                                 }
                             ]
                         },
@@ -761,6 +809,42 @@
                                 }
                             ],
                             "description": "Inclusive maximum value of the property. Can also be another property."
+                        },
+                        "MinimumCount":
+                        {
+                            "oneOf":
+                            [
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
+                            ],
+                            "description": "Inclusive minimum number of elements in this property's list."
+                        },
+                        "MaximumCount":
+                        {
+                            "oneOf":
+                            [
+                                {
+                                    "type":
+                                    [
+                                        "string",
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
+                            ],
+                            "description": "Inclusive maximum number of elements in this property's list."
                         },
                         "MinimumExclusive":
                         {
@@ -1704,6 +1788,11 @@
                     {
                         "type": "boolean",
                         "description": "If this enum is a [Flags] enum and should be parsed by comma-separated values."
+                    },
+                    "DefaultValue":
+                    {
+                        "description": "Property values when this object is passed a null dictionary (ex. property doesn't exist or isn't a dictionary).",
+                        "type": "object"
                     },
                     "Properties":
                     {

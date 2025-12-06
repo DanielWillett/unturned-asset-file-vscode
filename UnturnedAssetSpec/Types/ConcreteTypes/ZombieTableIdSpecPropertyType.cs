@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 1
 /// </code>
 /// </summary>
-public sealed class ZombieTableIdSpecPropertyType : BasicSpecPropertyType<ZombieTableIdSpecPropertyType, int>
+public sealed class ZombieTableIdSpecPropertyType : BaseSpecPropertyType<ZombieTableIdSpecPropertyType, int>
 {
     public static readonly ZombieTableIdSpecPropertyType Instance = new ZombieTableIdSpecPropertyType();
 

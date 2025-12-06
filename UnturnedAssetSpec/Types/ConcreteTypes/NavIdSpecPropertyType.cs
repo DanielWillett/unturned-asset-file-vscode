@@ -14,7 +14,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 255
 /// </code>
 /// </summary>
-public sealed class NavIdSpecPropertyType : BasicSpecPropertyType<NavIdSpecPropertyType, byte>, IStringParseableSpecPropertyType
+public sealed class NavIdSpecPropertyType : BaseSpecPropertyType<NavIdSpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly NavIdSpecPropertyType Instance = new NavIdSpecPropertyType();
 

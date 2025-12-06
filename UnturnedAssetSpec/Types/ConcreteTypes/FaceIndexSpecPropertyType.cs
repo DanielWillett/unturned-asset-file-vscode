@@ -13,7 +13,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 31
 /// </code>
 /// </summary>
-public sealed class FaceIndexSpecPropertyType : BasicSpecPropertyType<FaceIndexSpecPropertyType, byte>, IStringParseableSpecPropertyType
+public sealed class FaceIndexSpecPropertyType : BaseSpecPropertyType<FaceIndexSpecPropertyType, byte>, IStringParseableSpecPropertyType
 {
     public static readonly FaceIndexSpecPropertyType Instance = new FaceIndexSpecPropertyType();
 

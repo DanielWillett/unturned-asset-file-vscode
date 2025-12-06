@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop mega_zombie_spawn
 /// </code>
 /// </summary>
-public sealed class ZombieCooldownIdSpecPropertyType : BasicSpecPropertyType<ZombieCooldownIdSpecPropertyType, string>
+public sealed class ZombieCooldownIdSpecPropertyType : BaseSpecPropertyType<ZombieCooldownIdSpecPropertyType, string>
 {
     public static readonly ZombieCooldownIdSpecPropertyType Instance = new ZombieCooldownIdSpecPropertyType();
 
@@ -28,7 +28,7 @@ public sealed class ZombieCooldownIdSpecPropertyType : BasicSpecPropertyType<Zom
     /// <inheritdoc />
     public override string DisplayName => "Zombie Cooldown ID";
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)

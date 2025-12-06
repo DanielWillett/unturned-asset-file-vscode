@@ -71,7 +71,7 @@ internal class DictionaryNode : AnySourceNode, IDictionarySourceNode
         SetParentInfoOfChildren(values);
     }
 
-    internal override void SetParentInfo(ISourceFile? file, ISourceNode parent)
+    internal override void SetParentInfo(ISourceFile? file, IParentSourceNode parent)
     {
         base.SetParentInfo(file, parent);
         SetParentInfoOfChildren(Values);

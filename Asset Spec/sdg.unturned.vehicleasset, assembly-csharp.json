@@ -5,7 +5,6 @@
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html",
     "RequireId": false,
-    "VanillaIdLimit": 2000,
     "Properties":
     [
         {
@@ -219,7 +218,7 @@
         },
         {
             "Key": "Size2_Z",
-            "Type": "Boolean",
+            "Type": "Float32",
             "DefaultValue": true,
             "Description": "Orthogonal camera size for economy icons.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#size2-z-float32-0",
@@ -426,8 +425,7 @@
         },
         {
             "Key": "Has_Horn",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type": "Boolean",
             "DefaultValue":
             [
                 {
@@ -600,6 +598,7 @@
         {
             "Key": "Steering_LeaningForceMultiplier",
             "Type": "Float32",
+            "Version": "3.24.5.0",
             "DefaultValue": -1.0,
             "Description": "If greater than zero, torque is applied on the forward axis according to steering input for bikes and motorcycles.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steering-leaningforcemultiplier-float32-1-0",
@@ -777,6 +776,7 @@
             "Type": "List",
             "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp",
             "DefaultValue": null,
+            "Version": "3.24.7.0",
             "Description": "Optionally specifies which materials should be darkened after an explosion.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosionburnmaterialsections-list-of-paintablevehiclesection",
             "Variable": "explosionBurnMaterialSections",
@@ -798,7 +798,7 @@
         {
             "Key": "Explosion_Min_Force",
             "Type": "ScaleOrLegacy",
-            "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) ((0 1 0)))",
+            "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) 0,1,0)",
             "Description": "Minimum amount of force applied to this vehicle when it explodes.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-min-force-vector3-0-1024-0",
             "Variable": "minExplosionForce"
@@ -806,7 +806,7 @@
         {
             "Key": "Explosion_Max_Force",
             "Type": "ScaleOrLegacy",
-            "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) ((0 1 0)))",
+            "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) 0,1,0)",
             "Description": "Maximum amount of force applied to this vehicle when it explodes.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-max-force-vector3-0-1024-0",
             "Variable": "maxExplosionForce"
@@ -1047,7 +1047,7 @@
             "TemplateGroups": [ "vehicle-turrets" ],
             "DefaultValue": 0,
             "Required": true,
-            "Description": "The zero-based index of the seat to mount turret #(Self.KeyGroups[0]) to.",
+            "Description": "The zero-based index of the seat to mount turret #(Self.TemplateGroups[0]) to.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-seat-index-uint8-0",
             "Variable": "TurretInfo.seatIndex"
         },
@@ -1059,7 +1059,7 @@
             "TemplateGroups": [ "vehicle-turrets" ],
             "DefaultValue": 0,
             "Required": true,
-            "Description": "The gun asset to use for turret #(Self.KeyGroups[0]).",
+            "Description": "The gun asset to use for turret #(Self.TemplateGroups[0]).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-item-id-uint16-0",
             "Variable": "TurretInfo.itemID"
         },
@@ -1085,7 +1085,7 @@
             "TemplateGroups": [ "vehicle-turrets" ],
             "DefaultValue": 0.0,
             "Required": true,
-            "Description": "Minimum allowed rotation of turret #(Self.KeyGroups[0]) through the azimuth, in degrees. If this is set to -360, it can rotate leftward forever.",
+            "Description": "Minimum allowed rotation of turret #(Self.TemplateGroups[0]) through the azimuth, in degrees. If this is set to -360, it can rotate leftward forever.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-yaw-max-float32-0",
             "Variable": "TurretInfo.yawMax"
         },
@@ -1455,7 +1455,8 @@
             "IncludedDefaultValue": 1.0,
             "Description": "Overrides the mass (in kilograms) of wheels.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#wheel-collider-mass-override-float32-null",
-            "Variable": "wheelColliderMassOverride"
+            "Variable": "wheelColliderMassOverride",
+            "Minimum": 0.0
         },
         {
             "Key": "Train_Track_Offset",
@@ -1552,6 +1553,294 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#crawlertracktilingmaterials-list-of-crawlertracktilingmaterial",
             "Variable": "crawlerTrackTilingMaterials"
         },
+        {
+            "Key": "AdditionalTransparentSections",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Materials to register as needing transparent sorting. Their render queue is periodically updated according to whether their pivot point is underwater.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#additionaltransparentsections-list-of-paintablevehiclesection",
+            "Variable": "extraTransparentSections"
+        },
+        {
+            "Key": "DefaultPaintColors",
+            "Type": "List",
+            "ElementType": "Color32RGBString",
+            "DefaultValue": null,
+            "Version": "3.24.4.0",
+            "Description": "List of random colors to pick from when spawning a new vehicle. Can be overridden by a Vehicle Redirector's @(SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp::LoadPaintColor) and @(SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp::SpawnPaintColor) properties.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#defaultpaintcolors-list-of-colors",
+            "Variable": "DefaultPaintColors",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "DefaultPaintColor_Mode",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "DefaultPaintColor_Mode",
+                        "Operation": "neq",
+                        "Comparand": "List"
+                    }
+                },
+                {
+                    "Key": "DefaultPaintColor_Configuration",
+                    "Value": "*"
+                }
+            ],
+            "Required":
+            {
+                "Variable": "DefaultPaintColor_Mode",
+                "Operation": "eq",
+                "Comparand": "List"
+            }
+        },
+        {
+            "Key": "DefaultPaintColor_Mode",
+            "Type": "SDG.Unturned.EVehicleDefaultPaintColorMode, Assembly-CSharp",
+            "DefaultValue":
+            [
+                {
+                    "And":
+                    [
+                        {
+                            "Variable": "#DefaultPaintColors.ValueType",
+                            "Operation": "eq",
+                            "Comparand": "List"
+                        }
+                    ],
+                    "Value": "List"
+                },
+                {
+                    "Value": "None"
+                }
+            ],
+            "Version": "3.24.5.0",
+            "Description": "This property controls the mode that should be used when randomly picking a paint color for a newly-spawned vehicle.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#defaultpaintcolor-mode-evehicledefaultpaintcolormode",
+            "Variable": "defaultPaintColorMode"
+        },
+        {
+            "Key": "DefaultPaintColor_Configuration",
+            "Type": "SDG.Unturned.VehicleRandomPaintColorConfiguration, Assembly-CSharp",
+            "DefaultValue": null,
+            "Version": "3.24.5.0",
+            "Description": "Determines the potential colors of a newly-spawned vehicle with a fully randomized hue. Can be overridden by a Vehicle Redirector's @(SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp::LoadPaintColor) and @(SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp::SpawnPaintColor) properties.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#defaultpaintcolor-configuration-vehiclerandompaintcolorconfiguration",
+            "Variable": "DefaultPaintColors",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "DefaultPaintColor_Mode",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "DefaultPaintColor_Mode",
+                        "Operation": "neq",
+                        "Comparand": "RandomHueOrGrayscale"
+                    }
+                },
+                {
+                    "Key": "DefaultPaintColors",
+                    "Value": "*"
+                }
+            ],
+            "Required":
+            {
+                "Variable": "DefaultPaintColor_Mode",
+                "Operation": "eq",
+                "Comparand": "RandomHueOrGrayscale"
+            }
+        },
+        {
+            "Key": "WheelBalancing_ForceMultiplier",
+            "Type": "Float32",
+            "DefaultValue": -1.0,
+            "MinimumExclusive": 0.0,
+            "Except": [ -1.0 ],
+            "Description": "If greater than zero, torque is applied on the Z axis multiplied by this factor to align vehicle up with ground up.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#wheelbalancing-forcemultiplier-float32-1-0",
+            "Variable": "wheelBalancingForceMultiplier"
+        },
+        {
+            "Key": "WheelBalancing_UprightExponent",
+            "Type": "Float32",
+            "DefaultValue": 1.5,
+            "Minimum": 0.0,
+            "Description": "Exponent on the 0 to 1 factor representing how aligned the vehicle is with the ground up vector. For example, a value of 2 would apply much less force while nearly aligned with up, whereas a value of 0.5 would apply more force even while nearly aligned with up.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#wheelbalancing-uprightexponent-float32-1-5",
+            "Variable": "wheelBalancingUprightExponent"
+        },
+        {
+            "Key": "RollAngularVelocityDamping",
+            "Type": "Float32",
+            "DefaultValue": -1.0,
+            "MinimumExclusive": 0.0,
+            "Except": [ -1.0 ],
+            "Description": "If greater than zero, an acceleration is applied to angular velocity on Z-axis toward zero.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#rollangularvelocitydamping-float32-1-0",
+            "Variable": "rollAngularVelocityDamping"
+        },
+        {
+            "Key": "WheelConfigurations",
+            "Type": "List",
+            "ElementType": "SDG.Unturned.VehicleWheelConfiguration, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "Controls WheelCollider components and their corresponding visual models.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#wheelconfigurations-list-of-vehiclewheelconfiguration",
+            "Variable": "wheelConfiguration"
+        },
+        {
+            "Key": "ReverseGearRatio",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 0.0,
+            "Description": "Ratio between engine RPM and wheel RPM when reversing. For example, if the wheel RPM is 6 and the gear ratio is 5 then the engine RPM is 30.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#reversegearratio-float32-1-0",
+            "Variable": "reverseGearRatio"
+        },
+        {
+            "Key": "ForwardGearRatios",
+            "Type": "List",
+            "ElementType": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": null,
+            "Description": "Ratio between engine RPM and wheel RPM in a given gear. For example, if the wheel RPM is 6 and the gear ratio is 5 then the engine RPM is 30.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#reversegearratio-float32-1-0",
+            "Variable": "forwardGearRatios"
+        },
+        {
+            "Key": "GearShift_VisibleInHUD",
+            "Type": "Boolean",
+            "DefaultValue":
+            {
+                "Variable": "ForwardGearRatios",
+                "Operation": "neq",
+                "Comparand": null
+            },
+            "Description": "If gears are configured and this is true, RPM and gear number will be shown in the user interface.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#gearshift-visibleinhud-bool-true",
+            "Variable": "AllowsEngineRpmAndGearsInHud",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "ForwardGearRatios",
+                    "Value": "*",
+                    "Condition":
+                    {
+                        "Variable": "ForwardGearRatios",
+                        "Operation": "neq",
+                        "Comparand": null
+                    }
+                }
+            ]
+        },
+        {
+            "Key": "GearShift_DownThresholdRPM",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": 1500.0,
+            "Description": "When engine RPM is below this value and a lower gear is available the car will shift gears down.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#gearshift-downthresholdrpm-float32-1500-0",
+            "Variable": "GearShiftDownThresholdRpm"
+        },
+        {
+            "Key": "GearShift_UpThresholdRPM",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": 5500.0,
+            "Description": "When engine RPM is above this value and a higher gear is available the car will shift gears up.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#gearshift-upthresholdrpm-float32-5500-0",
+            "Variable": "GearShiftUpThresholdRpm"
+        },
+        {
+            "Key": "GearShift_Duration",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": 0.5,
+            "Description": "How long it takes to shift gears, measured in seconds. Wheels do not provide any torque for this duration.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#gearshift-duration-float32-0-5",
+            "Variable": "GearShiftDuration"
+        },
+        {
+            "Key": "GearShift_Interval",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": 1.0,
+            "Description": "How long to wait since the last gear change before shifting gears, measured in seconds. It can take a moment for the engine RPM to adjust after a gear change, so without a delay the RPM would still exceed the threshold.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#gearshift-interval-float32-1-0",
+            "Variable": "GearShiftInterval"
+        },
+        {
+            "Key": "EngineIdleRPM",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": 1000.0,
+            "Description": "Engine RPM will never drop below this value regardless of whether wheel RPM * gear ratio is lower. Otherwise, the engine wouldn't be able to start the wheels rolling from zero.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#engineidlerpm-float32-1000-0",
+            "Variable": "EngineIdleRpm"
+        },
+        {
+            "Key": "EngineMaxRPM",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": 7000.0,
+            "Description": "Engine RPM will never exceed this value regardless of whether wheel RPM * gear ratio is higher. It should be kept to a reasonable value because the normalized engine RPM is used in a variety of places like sampling the torque curve and network replication.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#enginemaxrpm-float32-7000-0",
+            "Variable": "EngineMaxRpm"
+        },
+        {
+            "Key": "EngineRPM_IncreaseRate",
+            "Type": "Float32",
+            "MinimumExclusive": 0.001,
+            "Except": [ -1.0 ],
+            "DefaultValue": -1.0,
+            "Description": "How quickly engine RPM can increase in RPM/s. For example, 1000 will take 2 seconds to go from 2000 to 4000 RPM. Defaults to -1 which instantly changes RPM.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#enginerpm-increaserate-float32-1-0",
+            "Variable": "EngineRpmIncreaseRate"
+        },
+        {
+            "Key": "EngineRPM_DecreaseRate",
+            "Type": "Float32",
+            "MinimumExclusive": 0.001,
+            "Except": [ -1.0 ],
+            "DefaultValue": -1.0,
+            "Description": "How quickly engine RPM can decrease in RPM/s. For example, 1000 will take 2 seconds to go from 4000 to 2000 RPM. Defaults to -1 which instantly changes RPM.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#enginerpm-decreaserate-float32-1-0",
+            "Variable": "EngineRpmDecreaseRate"
+        },
+        {
+            "Key": "EngineMaxTorque",
+            "Type": "Float32",
+            "Minimum": 0.0,
+            "DefaultValue": 1.0,
+            "Description": "Multiplier for the amount of torque provided to the wheels.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#enginemaxtorque-float32-1-0",
+            "Variable": "EngineMaxTorque"
+        },
+        {
+            "Key": "EngineSound_Type",
+            "Type": "SDG.Unturned.EVehicleEngineSoundType, Assembly-CSharp",
+            "DefaultValue": "Legacy",
+            "Description": "The sound system used for vehicle engine sounds.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#enginesound-type-evehicleenginesoundtype-legacy",
+            "Variable": "engineSoundType"
+        },
+        {
+            "Key": "EngineSound",
+            "Type": "SDG.Unturned.RpmEngineSoundConfiguration, Assembly-CSharp",
+            "DefaultValue": null,
+            "Description": "When @EngineSound_Type is set to 'EngineRPMSimple', configures the sound settings for engine RPM sound mode.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#enginesound-rpmenginesoundconfiguration",
+            "Variable": "engineSoundConfiguration",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "EngineSound_Type",
+                    "Value": "EngineRPMSimple"
+                }
+            ]
+        }
     ],
     "Types":
     [
@@ -1644,7 +1933,8 @@
                     "DefaultValue": false,
                     "Description": "Whether or not all materials should be painted instead of just @MaterialIndex.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-paintablevehiclesection-allmaterials",
-                    "Variable": "allMaterials"
+                    "Variable": "allMaterials",
+                    "Version": "3.24.7.0"
                 }
             ]
         },
@@ -1734,9 +2024,474 @@
                             }
                         }
                     ]
-                },
+                }
             ]
         },
+        {
+            "Type": "SDG.Unturned.EVehicleDefaultPaintColorMode, Assembly-CSharp",
+            "DisplayName": "Vehicle Default Paint Color Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-evehicledefaultpaintcolormode",
+            "Values":
+            [
+                {
+                    "Value": "None",
+                    "Description": "Not configured."
+                },
+                {
+                    "Value": "List",
+                    "Description": "Pick from the @(SDG.Unturned.VehicleAsset, Assembly-CSharp::DefaultPaintColors) list."
+                },
+                {
+                    "Value": "RandomHueOrGrayscale",
+                    "Description": "Pick a random HSV using @(SDG.Unturned.VehicleAsset, Assembly-CSharp::DefaultPaintColor_Configuration)."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.VehicleRandomPaintColorConfiguration, Assembly-CSharp",
+            "DisplayName": "Vehicle Random Paint Color Configuration",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-vehiclerandompaintcolorconfiguration-dictionary",
+            "Version": "3.24.5.0",
+            "Properties":
+            [
+                {
+                    "Key": "MinSaturation",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": "@MaxSaturation",
+                    "Required": true,
+                    "DefaultValue": 0.0,
+                    "Description": "Minimum saturation value of the color of this vehicle. Saturation is used to blend between white (0) and the color determined by the hue (1).",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-vehiclerandompaintcolorconfiguration-minsaturation",
+                    "Variable": "minSaturation"
+                },
+                {
+                    "Key": "MaxSaturation",
+                    "Type": "Float32",
+                    "Minimum": "@MinSaturation",
+                    "Maximum": 1.0,
+                    "Required": true,
+                    "DefaultValue": 0.0,
+                    "Description": "Maximum saturation value of the color of this vehicle. Saturation is used to blend between white (0) and the color determined by the hue (1).",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-vehiclerandompaintcolorconfiguration-maxsaturation",
+                    "Variable": "maxSaturation"
+                },
+                {
+                    "Key": "MinValue",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": "@MaxValue",
+                    "Required": true,
+                    "DefaultValue": 0.0,
+                    "Description": "Minimum white level (value) of the color of this vehicle. Value is used to blend between black (0) and white (1) which determines the brightness of the color.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-vehiclerandompaintcolorconfiguration-minvalue",
+                    "Variable": "minValue"
+                },
+                {
+                    "Key": "MaxValue",
+                    "Type": "Float32",
+                    "Minimum": "@MinValue",
+                    "Maximum": 1.0,
+                    "Required": true,
+                    "DefaultValue": 0.0,
+                    "Description": "Maximum white level (value) of the color of this vehicle. Value is used to blend between black (0) and white (1) which determines the brightness of the color.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-vehiclerandompaintcolorconfiguration-maxvalue",
+                    "Variable": "maxValue"
+                },
+                {
+                    "Key": "GrayscaleChance",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Required": true,
+                    "DefaultValue": 0.0,
+                    "Description": "Percentage change that the color generated is greyscale, meaning the saturation will be 0.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-vehiclerandompaintcolorconfiguration-grayscalechance",
+                    "Variable": "grayscaleChance"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EWheelMotionEffectsMode, Assembly-CSharp",
+            "DisplayName": "Wheel Motion Effect Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-ewheelmotioneffectsmode",
+            "Values":
+            [
+                {
+                    "Value": "None",
+                    "Description": "Turn off motion effects. Default for wheels not using collider pose."
+                },
+                {
+                    "Value": "BothDirections",
+                    "Description": "Enable motion effects. Default for wheels using collider pose."
+                },
+                {
+                    "Value": "ForwardOnly",
+                    "Description": "Enable motion effects, but turn them off while moving backward."
+                },
+                {
+                    "Value": "BackwardOnly",
+                    "Description": "Enable motion effects, but turn them off while moving forward."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EWheelSteeringMode, Assembly-CSharp",
+            "DisplayName": "Wheel Steering Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-ewheelsteeringmode",
+            "Values":
+            [
+                {
+                    "Value": "None",
+                    "Description": "Wheel does not affect steering."
+                },
+                {
+                    "Value": "BothDirections",
+                    "Description": "Set WheelCollider steering angle according to @(SDG.Unturned.VehicleAsset, Assembly-CSharp::Steer_Min) and @(SDG.Unturned.VehicleAsset, Assembly-CSharp::Steer_Max)."
+                },
+                {
+                    "Value": "CrawlerTrack",
+                    "Description": "Increase or decrease motor torque to rotate vehicle in-place."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.ECrawlerTrackForwardMode, Assembly-CSharp",
+            "DisplayName": "Crawler Track Forward Mode",
+            "Version": "3.24.7.0",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-ecrawlertrackforwardmode",
+            "Values":
+            [
+                {
+                    "Value": "Auto",
+                    "Description": "Assigns a forward mode based on wheel collider position. Wheels on the left side are clockwise and wheels on the right side are counterclockwise."
+                },
+                {
+                    "Value": "Clockwise",
+                    "Description": "Positive motor torque on this wheel rotates the vehicle clockwise."
+                },
+                {
+                    "Value": "CounterClockwise",
+                    "Description": "Positive motor torque on this wheel rotates the vehicle counterclockwise."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.VehicleWheelConfiguration, Assembly-CSharp",
+            "DisplayName": "Vehicle Wheel Configuration",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-vehiclewheelconfiguration-dictionary",
+            "Version": "3.24.4.0",
+            "Properties":
+            [
+                {
+                    "Key": "WheelColliderPath",
+                    "Type": "Path",
+                    "ElementType": "UnityEngine.WheelCollider, UnityEngine.VehiclesModule",
+                    "DefaultValue": null,
+                    "Description": "Scene hierarchy path of a WheelCollider component relative to the vehicle's root transform.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-wheelcolliderpath",
+                    "Variable": "wheelColliderPath"
+                },
+                {
+                    "Key": "IsColliderPowered",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Description": "If true, collider is connected to the engine and responds to player's acceleration input.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-iscolliderpowered",
+                    "Variable": "isColliderPowered"
+                },
+                {
+                    "Key": "IsColliderSteered",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Deprecated": true,
+                    "Description": "If true, collider's steering angle responds to player input. Use @SteeringMode instead.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-iscollidersteered",
+                    "Variable": "steeringMode"
+                },
+                {
+                    "Key": "ModelPath",
+                    "Type": "Path",
+                    "DefaultValue": null,
+                    "Description": "Scene hierarchy path of visual representation of wheel relative to the vehicle's root transform.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-modelpath",
+                    "Variable": "modelPath"
+                },
+                {
+                    "Key": "IsModelSteered",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Description": "If true, model is rotated according to steering input.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-ismodelsteered",
+                    "Variable": "isModelSteered",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "ModelUseColliderPose",
+                            "Value": true
+                        }
+                    ]
+                },
+                {
+                    "Key": "ModelUseColliderPose",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Description": "If true, model ignores @IsModelSteered and instead uses the wheel collider state (or an approximation when not simulating).",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-modelusecolliderpose",
+                    "Variable": "modelUseColliderPose"
+                },
+                {
+                    "Key": "ModelRadius",
+                    "Type": "Float32",
+                    "DefaultValue": -1.0,
+                    "MinimumExclusive": 0.0,
+                    "Except": [ -1.0 ],
+                    "Version": "3.24.5.0",
+                    "Description": "If greater than zero, visual-only wheels (without a collider) like the extra wheels of the Snowmobile use this radius to calculate their rolling speed.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-modelradius",
+                    "Variable": "modelRadius"
+                },
+                {
+                    "Key": "CopyColliderRpmIndex",
+                    "Type": "Int32",
+                    "DefaultValue": -1,
+                    "Minimum": 0,
+                    "Except": [ -1 ],
+                    "Version": "3.24.5.0",
+                    "ValueTemplateGroupReference": "#(SDG.Unturned.VehicleAsset, Assembly-CSharp::WheelConfiguration).TemplateGroups[0]{PreventSelfReference=true}",
+                    "Description": "If set, visual-only wheels without a collider (like the back wheels of the snowmobile) can copy RPM from a wheel that does have a collider.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-copycolliderrpmindex",
+                    "Variable": "copyColliderRpmIndex",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "ModelRadius",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "And":
+                                [
+                                    {
+                                        "Variable": "ModelRadius",
+                                        "Operation": "gt",
+                                        "Comparand": 0
+                                    },
+                                    {
+                                        "Variable": "CopyColliderRpmIndex",
+                                        "Operation": "gte",
+                                        "Comparand": 0
+                                    }
+                                ],
+                                "Value": null
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "CopyCrawlerTrackSpeedIndex",
+                    "Type": "Int16",
+                    "DefaultValue": -1,
+                    "Minimum": 0,
+                    "Except": [ -1 ],
+                    "Version": "3.24.7.0",
+                    "ValueTemplateGroupReference": "#(SDG.Unturned.VehicleAsset, Assembly-CSharp::WheelConfiguration).TemplateGroups[0]",
+                    "Description": "If set, wheel model uses this crawler track's speed (average RPM of wheels). Prevents wheel model from spinning out of sync with overall track.",
+                    "Variable": "copyCrawlerTrackSpeedIndex",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "CrawlerTrackTilingMaterials",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "And":
+                                [
+                                    {
+                                        "Variable": "CrawlerTrackTilingMaterials",
+                                        "Operation": "value-included",
+                                        "Comparand": null
+                                    },
+                                    {
+                                        "Variable": "CopyCrawlerTrackSpeedIndex",
+                                        "Operation": "gte",
+                                        "Comparand": 0
+                                    }
+                                ],
+                                "Value": null
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "SteeringAngleMultiplier",
+                    "Type": "Float32",
+                    "DefaultValue": 1.0,
+                    "Version": "3.24.7.0",
+                    "Description": "Target steering angle is multiplied by this value. For example, can be set to a negative number for rear-wheel steering.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-steeringanglemultiplier",
+                    "Variable": "steeringAngleMultiplier"
+                },
+                {
+                    "Key": "ModelSuspensionOffset",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Version": "3.24.7.0",
+                    "Description": "Vertical offset of model from simulated suspension position. Used by crawler tracks because the visual wheel rests on the tread above the physics wheel.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-modelsuspensionoffset",
+                    "Variable": "modelSuspensionOffset"
+                },
+                {
+                    "Key": "ModelSuspensionSpeed",
+                    "Type": "Float32",
+                    "DefaultValue": -1.0,
+                    "Minimum": 0.0,
+                    "Except": [ -1.0 ],
+                    "Version": "3.24.7.0",
+                    "Description": "How quickly to interpolate model toward suspension position in meters per second. If negative, position teleports immediately.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-modelsuspensionspeed",
+                    "Variable": "modelSuspensionSpeed"
+                },
+                {
+                    "Key": "MotionEffects",
+                    "Type": "SDG.Unturned.EWheelMotionEffectsMode, Assembly-CSharp",
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            {
+                                "Variable": "ModelUseColliderPose",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
+                            "Value": "BothDirections"
+                        },
+                        {
+                            "Value": "None"
+                        }
+                    ],
+                    "Version": "3.24.7.0",
+                    "Description": "Controls whether wheel creates particle kickup effects for the ground surface material underneath.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-motioneffects",
+                    "Variable": "motionEffectsMode"
+                },
+                {
+                    "Key": "CanExplode",
+                    "Type": "Boolean",
+                    "DefaultValue": true,
+                    "Version": "3.24.7.0",
+                    "Description": "If true, wheel should fly off when vehicle explodes. Used to simplify destroying vehicles with crawler tracks.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-canexplode",
+                    "Variable": "canExplode"
+                },
+                {
+                    "Key": "SteeringMode",
+                    "Type": "SDG.Unturned.EWheelSteeringMode, Assembly-CSharp",
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "IsColliderSteered",
+                                    "Operation": "value-included",
+                                    "Comparand": null
+                                }
+                            ],
+                            "Value": "SteeringAngle"
+                        },
+                        {
+                            "Value": "None"
+                        }
+                    ],
+                    "Version": "3.24.7.0",
+                    "Description": "Controls whether wheel contributes to steering and if so, which kind of steering to simulate.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-modelsuspensionspeed",
+                    "Variable": "steeringMode",
+                    "ExclusiveWith": [ "IsColliderSteered" ]
+                },
+                {
+                    "Key": "CrawlerTrackForwardMode",
+                    "Type": "SDG.Unturned.ECrawlerTrackForwardMode, Assembly-CSharp",
+                    "DefaultValue": "Auto",
+                    "Version": "3.24.7.0",
+                    "Description": "For 'CrawlerTrack' @SteeringMode, indicates how a positive motor torque (forward) rotates the vehicle.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#crawlertrackforwardmode-ecrawlertrackforwardmode-auto",
+                    "Variable": "crawlerTrackForwardMode",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "SteeringMode",
+                            "Value": "CrawlerTrack"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.EVehicleEngineSoundType, Assembly-CSharp",
+            "DisplayName": "Vehicle Engine Sound Type",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-evehicleenginesoundtype",
+            "Values":
+            [
+                {
+                    "Value": "Legacy",
+                    "Description": "@(SDG.Unturned.VehicleAsset, Assembly-CSharp::Pitch_Idle) and @(SDG.Unturned.VehicleAsset, Assembly-CSharp::Pitch_Drive) are used to control engine audio pitch."
+                },
+                {
+                    "Value": "EngineRPMSimple",
+                    "Description": "Set pitch and volume of a single clip according to engine RPM."
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.RpmEngineSoundConfiguration, Assembly-CSharp",
+            "DisplayName": "RPM Engine Sound Configuration",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-rpmenginesoundconfiguration-dictionary",
+            "Version": "3.24.4.0",
+            "Properties":
+            [
+                {
+                    "Key": "IdlePitch",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Minimum": -3.0,
+                    "Maximum": 3.0,
+                    "Description": "AudioSource pitch when engine RPM is at @EngineIdleRPM.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-rpmenginesoundconfiguration-idlepitch",
+                    "Variable": "idlePitch"
+                },
+                {
+                    "Key": "IdleVolume",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Description": "AudioSource volume when engine RPM is at @EngineIdleRPM.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-rpmenginesoundconfiguration-idlevolume",
+                    "Variable": "idleVolume"
+                },
+                {
+                    "Key": "MaxPitch",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Minimum": -3.0,
+                    "Maximum": 3.0,
+                    "Description": "AudioSource pitch when engine RPM is at @EngineMaxRPM.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-rpmenginesoundconfiguration-maxpitch",
+                    "Variable": "maxPitch"
+                },
+                {
+                    "Key": "MaxVolume",
+                    "Type": "Float32",
+                    "DefaultValue": 0.0,
+                    "Minimum": 0.0,
+                    "Maximum": 1.0,
+                    "Description": "AudioSource volume when engine RPM is at @EngineMaxRPM.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-rpmenginesoundconfiguration-maxvolume",
+                    "Variable": "maxVolume"
+                }
+            ]
+        }
     ],
     "Localization":
     [

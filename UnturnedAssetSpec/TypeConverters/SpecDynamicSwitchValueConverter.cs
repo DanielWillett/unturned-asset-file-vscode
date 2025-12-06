@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 
 public class SpecDynamicSwitchValueConverter : JsonConverter<SpecDynamicSwitchValue?>
 {
-    public static SpecDynamicSwitchValue? ReadSwitch(ref Utf8JsonReader reader, JsonSerializerOptions? options, PropertyTypeOrSwitch expectedType)
+    public static SpecDynamicSwitchValue? ReadSwitch(ref Utf8JsonReader reader, JsonSerializerOptions? options, PropertyTypeOrSwitch expectedType, bool expandLists)
     {
         if (reader.TokenType == JsonTokenType.Null)
         {
@@ -28,7 +28,7 @@ public class SpecDynamicSwitchValueConverter : JsonConverter<SpecDynamicSwitchVa
         {
             ISpecPropertyType? type = endType;
             Utf8JsonReader r2 = reader;
-            SpecDynamicSwitchCaseValue? @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref reader, options, type);
+            SpecDynamicSwitchCaseValue? @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref reader, options, type, expandLists);
             if (@case == null)
                 continue;
 
@@ -37,7 +37,7 @@ public class SpecDynamicSwitchValueConverter : JsonConverter<SpecDynamicSwitchVa
                 && expectedType.TypeSwitch.TryEvaluateMatchingSwitchCase(buffer, @case, out SpecDynamicSwitchCaseValue? matchingCase)
                 && matchingCase.Value is SpecDynamicConcreteValue<ISpecPropertyType> { Value: { } caseType })
             {
-                @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref r2, options, caseType);
+                @case = SpecDynamicSwitchCaseValueConverter.ReadCase(ref r2, options, caseType, expandLists);
                 if (@case == null)
                     continue;
             }
@@ -69,7 +69,7 @@ public class SpecDynamicSwitchValueConverter : JsonConverter<SpecDynamicSwitchVa
     /// <inheritdoc />
     public override SpecDynamicSwitchValue? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return ReadSwitch(ref reader, options, default);
+        return ReadSwitch(ref reader, options, default, false);
     }
 
 

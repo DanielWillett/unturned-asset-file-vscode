@@ -24,7 +24,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </remarks>
 /// </summary>
 public sealed class SkillSpecPropertyType :
-    BasicSpecPropertyType<SkillSpecPropertyType, string>,
+    BaseSpecPropertyType<SkillSpecPropertyType, string>,
     IStringParseableSpecPropertyType,
     IAutoCompleteSpecPropertyType
 {
@@ -42,7 +42,7 @@ public sealed class SkillSpecPropertyType :
     /// <inheritdoc cref="ISpecPropertyType" />
     public override string DisplayName { get; }
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     public override int GetHashCode()
     {

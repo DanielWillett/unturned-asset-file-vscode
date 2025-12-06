@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop liberator_spawn_jet
 /// </code>
 /// </summary>
-public sealed class SpawnpointIdSpecPropertyType : BasicSpecPropertyType<SpawnpointIdSpecPropertyType, string>
+public sealed class SpawnpointIdSpecPropertyType : BaseSpecPropertyType<SpawnpointIdSpecPropertyType, string>
 {
     public static readonly SpawnpointIdSpecPropertyType Instance = new SpawnpointIdSpecPropertyType();
 
@@ -28,7 +28,7 @@ public sealed class SpawnpointIdSpecPropertyType : BasicSpecPropertyType<Spawnpo
     /// <inheritdoc />
     public override string DisplayName => "Spawnpoint ID";
 
-    protected override ISpecDynamicValue CreateValue(string? value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)

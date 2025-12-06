@@ -6,11 +6,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
+/// <summary>
+/// A switch statement which maps ordered conditions to different values.
+/// </summary>
 public class SpecDynamicSwitchValue :
     ISpecDynamicValue,
     IEquatable<ISpecDynamicValue>,
@@ -36,7 +38,6 @@ public class SpecDynamicSwitchValue :
         foreach (SpecDynamicSwitchCaseValue c in Cases)
         {
             queue.Enqueue(c);
-            anyUpdates |= Visit(c, valueTransformation);
         }
 
         while (queue.Count > 0)
@@ -56,13 +57,56 @@ public class SpecDynamicSwitchValue :
 
         static bool Visit(SpecDynamicSwitchCaseValue c, Func<ISpecDynamicValue, ISpecDynamicValue> valueTransformation)
         {
-            ISpecDynamicValue newValue = valueTransformation(c);
+            ISpecDynamicValue newValue = valueTransformation(c.Value);
             if (ReferenceEquals(newValue, c.Value))
             {
                 return false;
             }
 
             c.Value = newValue;
+            return true;
+        }
+    }
+
+    internal bool TryZipExact(SpecDynamicSwitchValue other, Func<ISpecDynamicValue, ISpecDynamicValue, ISpecDynamicValue> combinator)
+    {
+        Queue<(SpecDynamicSwitchCaseValue c1, SpecDynamicSwitchCaseValue c2)> queue = new Queue<(SpecDynamicSwitchCaseValue, SpecDynamicSwitchCaseValue)>(4);
+        bool anyUpdates = false;
+        
+        if (other.Cases.Length != Cases.Length)
+            return false;
+
+        for (int i = 0; i < Cases.Length; i++)
+        {
+            SpecDynamicSwitchCaseValue c1 = Cases[i];
+            SpecDynamicSwitchCaseValue c2 = other.Cases[i];
+            if (!c1.ConditionsEqual(c2))
+                return false;
+
+            queue.Enqueue((c1, c2));
+        }
+
+        while (queue.Count > 0)
+        {
+            (SpecDynamicSwitchCaseValue c1, SpecDynamicSwitchCaseValue c2) = queue.Dequeue();
+            anyUpdates |= Visit(c1, c2, combinator);
+            for (int i = 0; i < c1.Conditions.Length; i++)
+            {
+                SpecDynamicSwitchCaseOrCondition cond = c1.Conditions[i];
+                if (cond.Case == null)
+                    continue;
+                
+                // already checked they're equal with recursive ConditionsEqual
+                queue.Enqueue((cond.Case, c2.Conditions[i].Case!));
+            }
+        }
+
+        return anyUpdates;
+
+        static bool Visit(SpecDynamicSwitchCaseValue c1, SpecDynamicSwitchCaseValue c2, Func<ISpecDynamicValue, ISpecDynamicValue, ISpecDynamicValue> combinator)
+        {
+            ISpecDynamicValue newValue = combinator(c1.Value, c2.Value);
+            c1.Value = newValue;
             return true;
         }
     }
@@ -558,6 +602,9 @@ public class SpecDynamicSwitchValue :
     }
 }
 
+/// <summary>
+/// A case of a <see cref="SpecDynamicSwitchValue"/>. Can also be used as a standalone value.
+/// </summary>
 public sealed class SpecDynamicSwitchCaseValue : ISpecDynamicValue, IEquatable<ISpecDynamicValue>, IEquatable<SpecDynamicSwitchCaseValue>
 {
     public ISpecPropertyType? ValueType { get; }
@@ -689,6 +736,38 @@ public sealed class SpecDynamicSwitchCaseValue : ISpecDynamicValue, IEquatable<I
     }
 
     public bool Equals(ISpecDynamicValue? other) => other is SpecDynamicSwitchCaseValue v && Equals(v);
+
+    internal bool ConditionsEqual(SpecDynamicSwitchCaseValue other)
+    {
+        if (!HasConditions)
+            return WhenCondition.Equals(other.WhenCondition);
+
+        if (!other.HasConditions)
+            return false;
+
+        OneOrMore<SpecDynamicSwitchCaseOrCondition> c1 = Conditions, c2 = other.Conditions;
+        if (c1.Length != c2.Length)
+            return false;
+
+        for (int i = 0; i < c1.Length; i++)
+        {
+            SpecDynamicSwitchCaseOrCondition cc1 = c1[i];
+            SpecDynamicSwitchCaseOrCondition cc2 = c2[i];
+            if (cc1.Case == null)
+            {
+                if (cc2.Case != null || !cc1.Condition.Equals(cc2.Condition))
+                    return false;
+            }
+            else
+            {
+                if (cc2.Case == null || !cc1.Case.ConditionsEqual(cc2.Case))
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
     public override bool Equals(object? obj) => obj is SpecDynamicSwitchCaseValue v && Equals(v);
     public override string ToString() => Conditions.IsSingle ? $"{Operation} Case [1 case]" : $"{Operation} Case [{Conditions.Length} cases]";
     public override int GetHashCode()
@@ -702,15 +781,33 @@ public sealed class SpecDynamicSwitchCaseValue : ISpecDynamicValue, IEquatable<I
             return hashCode;
         }
     }
+
 }
 
+/// <summary>
+/// An operation of a <see cref="SpecDynamicSwitchCaseValue"/> condition list.
+/// </summary>
 public enum SpecDynamicSwitchCaseOperation
 {
+    /// <summary>
+    /// All conditions or cases must be <see langword="true"/>.
+    /// </summary>
     And,
+
+    /// <summary>
+    /// At least one condition or case must be <see langword="true"/>.
+    /// </summary>
     Or,
+
+    /// <summary>
+    /// Defines one condition which, when <see langword="true"/>, will be resolved to a nested switch statement.
+    /// </summary>
     When
 }
 
+/// <summary>
+/// A nested case or <see cref="SpecCondition"/> as a condition of a <see cref="SpecDynamicSwitchCaseValue"/>.
+/// </summary>
 public readonly struct SpecDynamicSwitchCaseOrCondition : IEquatable<SpecDynamicSwitchCaseOrCondition>
 {
     public readonly SpecCondition Condition;

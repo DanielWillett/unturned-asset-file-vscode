@@ -42,10 +42,10 @@
     ],
     "KnownFileNames":
     {
-        "Config.txt": "SDG.Unturned.ServerConfigData, Assembly-CSharp",
-        "Config_EasyDifficulty.txt": "SDG.Unturned.ServerConfigData, Assembly-CSharp",
-        "Config_NormalDifficulty.txt": "SDG.Unturned.ServerConfigData, Assembly-CSharp",
-        "Config_HardDifficulty.txt": "SDG.Unturned.ServerConfigData, Assembly-CSharp",
+        "Config.txt": "SDG.Unturned.ConfigData, Assembly-CSharp",
+        "Config_EasyDifficulty.txt": "SDG.Unturned.ConfigData, Assembly-CSharp",
+        "Config_NormalDifficulty.txt": "SDG.Unturned.ConfigData, Assembly-CSharp",
+        "Config_HardDifficulty.txt": "SDG.Unturned.ConfigData, Assembly-CSharp",
         "Level.hierarchy": "SDG.Framework.Devkit.LevelHierarchy, Assembly-CSharp",
         "MasterBundle.dat": "SDG.Unturned.MasterBundleConfig, Assembly-CSharp"
     },
@@ -346,7 +346,7 @@
         {
             "HasDataFiles": true
         },
-        "SDG.Unturned.ServerConfigData, Assembly-CSharp":
+        "SDG.Unturned.ConfigData, Assembly-CSharp":
         {
             "HasDataFiles": true
         },
@@ -526,6 +526,14 @@
         {
             "SDG.Unturned.ArenaGameMode, Assembly-CSharp": { },
             "SDG.Unturned.SurvivalGameMode, Assembly-CSharp": { }
+        },
+        "SDG.Unturned.WeatherComponentBase, Assembly-CSharp":
+        {
+            "SDG.Unturned.CustomWeatherComponent, Assembly-CSharp":
+            {
+                "SDG.Unturned.LegacyRainComponent, Assembly-CSharp": { },
+                "SDG.Unturned.LegacySnowComponent, Assembly-CSharp": { }
+            }
         }
     },
     "AssetAliases":

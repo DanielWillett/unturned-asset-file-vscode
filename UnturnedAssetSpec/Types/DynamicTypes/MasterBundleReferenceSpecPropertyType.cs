@@ -39,7 +39,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// </summary>
 public sealed class MasterBundleReferenceSpecPropertyType :
-    BaseSpecPropertyType<BundleReference>,
+    BaseSpecPropertyType<MasterBundleReferenceSpecPropertyType, BundleReference>,
     ISpecPropertyType<BundleReference>,
     IElementTypeSpecPropertyType,
     IEquatable<MasterBundleReferenceSpecPropertyType?>,
@@ -68,10 +68,7 @@ public sealed class MasterBundleReferenceSpecPropertyType :
     public override string Type { get; }
 
     /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
-
-    /// <inheritdoc />
-    public Type ValueType => typeof(BundleReference);
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
 
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
 
@@ -130,20 +127,7 @@ public sealed class MasterBundleReferenceSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out BundleReference val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteValue<BundleReference>(val, this);
-        return true;
-    }
-
-    /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out BundleReference value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out BundleReference value)
     {
         if (parse.Node == null)
         {
@@ -261,14 +245,6 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(MasterBundleReferenceSpecPropertyType? other) => other != null && ElementType.Equals(other.ElementType);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is MasterBundleReferenceSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<BundleReference>? other) => other is MasterBundleReferenceSpecPropertyType t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }
 
 /// <summary>

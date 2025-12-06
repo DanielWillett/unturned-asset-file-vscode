@@ -159,7 +159,7 @@ For most cases a <b>Condition</b> switch will be sufficient.
 ]
 ```
 > [!NOTE]
-> See [Equations](./equations.md) for more information on equations.
+> See [Expressions](./expressions.md) for more information on expressions.
 
 This translates to the following C# code:
 ```cs

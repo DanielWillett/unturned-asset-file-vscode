@@ -72,42 +72,42 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
         //Debugger.Launch();
         //_logger.LogInformation("Document diagnostic pull request received.");
         //
-        if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))
-        {
-            return new RelatedFullDocumentDiagnosticReport { Items = new Container<Diagnostic>() };
-        }
-        
-        ISourceFile tree = file.SourceFile;
-        
-        DiagnosticsNodeVisitor visitor = new DiagnosticsNodeVisitor(_specDatabase, _virtualizer, _workspace, _installationEnvironment);
-        
-        if (tree is IAssetSourceFile asset)
-        {
-            asset.GetMetadataDictionary()?.Visit(ref visitor);
-            asset.AssetData.Visit(ref visitor);
-        }
-        else
-        {
-            tree.Visit(ref visitor);
-        }
-        
-        List<Diagnostic> diagnostics = new List<Diagnostic>(visitor.Diagnostics.Count);
-        foreach (DatDiagnosticMessage msg in visitor.Diagnostics)
-        {
-            diagnostics.Add(new Diagnostic
-            {
-                Code = new DiagnosticCode(msg.Diagnostic.ErrorId),
-                Source = UnturnedAssetFileLspServer.DiagnosticSource,
-                Message = msg.Message,
-                Range = msg.Range.ToRange(),
-                Tags = msg.Diagnostic == DatDiagnostics.UNT1018 ? new Container<DiagnosticTag>(DiagnosticTag.Deprecated) : null
-            });
-        }
-        
-        return new RelatedFullDocumentDiagnosticReport
-        {
-            Items = diagnostics
-        };
+        //if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))
+        //{
+        //    return new RelatedFullDocumentDiagnosticReport { Items = new Container<Diagnostic>() };
+        //}
+        //
+        //ISourceFile tree = file.SourceFile;
+        //
+        //DiagnosticsNodeVisitor visitor = new DiagnosticsNodeVisitor(_specDatabase, _virtualizer, _workspace, _installationEnvironment);
+        //
+        //if (tree is IAssetSourceFile asset)
+        //{
+        //    asset.GetMetadataDictionary()?.Visit(ref visitor);
+        //    asset.AssetData.Visit(ref visitor);
+        //}
+        //else
+        //{
+        //    tree.Visit(ref visitor);
+        //}
+        //
+        //List<Diagnostic> diagnostics = new List<Diagnostic>(visitor.Diagnostics.Count);
+        //foreach (DatDiagnosticMessage msg in visitor.Diagnostics)
+        //{
+        //    diagnostics.Add(new Diagnostic
+        //    {
+        //        Code = new DiagnosticCode(msg.Diagnostic.ErrorId),
+        //        Source = UnturnedAssetFileLspServer.DiagnosticSource,
+        //        Message = msg.Message,
+        //        Range = msg.Range.ToRange(),
+        //        Tags = msg.Diagnostic == DatDiagnostics.UNT1018 ? new Container<DiagnosticTag>(DiagnosticTag.Deprecated) : null
+        //    });
+        //}
+        //
+        //return new RelatedFullDocumentDiagnosticReport
+        //{
+        //    Items = diagnostics
+        //};
     }
 
     private class DiagnosticsNodeVisitor : ResolvedPropertyNodeVisitor, IDiagnosticSink

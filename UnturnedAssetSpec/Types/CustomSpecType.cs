@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -17,6 +18,8 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
 {
     // example value could be Condition for Conditions
     public const string PluralBaseKeyProperty = "PluralBaseKey";
+
+    internal JsonDocument? DeferredDefaultValue;
 
     public required QualifiedType Type { get; init; }
     public required string DisplayName { get; init; }
@@ -35,6 +38,9 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
     /// A type used to parse this object as a string value.
     /// </summary>
     public string? StringParsableType { get; init; }
+
+    public CustomSpecTypeInstance? DefaultValue { get; internal set; }
+
     public required OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; init; }
 
     public Type ValueType => typeof(CustomSpecTypeInstance);
@@ -62,6 +68,18 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
 
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
+        if (parse.AutoDefault)
+        {
+            value = parse.EvaluationContext.Self.DefaultValue!;
+            return value != null;
+        }
+
+        if (TryParseValue(in parse, out CustomSpecTypeInstance? inst))
+        {
+            value = inst == null ? SpecDynamicValue.Null : inst;
+            return true;
+        }
+
         value = null!;
         return false;
     }
@@ -78,6 +96,12 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
 
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out CustomSpecTypeInstance? value)
     {
+        if (parse.AutoDefault)
+        {
+            value = null;
+            return ReferenceEquals(parse.EvaluationContext.Self.DefaultValue, SpecDynamicValue.Null);
+        }
+
         return TryParseValue(in parse, out value, CustomSpecTypeParseOptions.Object);
     }
 
@@ -257,6 +281,19 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
         return null;
     }
 
+    /// <inheritdoc />
+    public ISpecDynamicValue CreateValue(CustomSpecTypeInstance? value)
+    {
+        return value == null ? SpecDynamicValue.Null : new SpecDynamicConcreteValue<CustomSpecTypeInstance>(value, this);
+    }
+
+    ~CustomSpecType()
+    {
+        // should be handled by FifthPass but just in case it's not
+        // FifthPass currently suppresses the finalizer, so that needs to be removed if more is added to this
+        Interlocked.Exchange(ref DeferredDefaultValue, null)?.Dispose();
+    }
+
     void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }
 
@@ -335,7 +372,7 @@ public class CustomSpecTypeInstance : IEquatable<CustomSpecTypeInstance>, ISpecD
             return false;
         }
 
-        value = SpecDynamicEquationTreeValueHelpers.As<CustomSpecTypeInstance, TValue>(this);
+        value = SpecDynamicExpressionTreeValueHelpers.As<CustomSpecTypeInstance, TValue>(this);
         isNull = false;
         return true;
     }

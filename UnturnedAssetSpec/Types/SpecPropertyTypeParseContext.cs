@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -15,7 +16,7 @@ public readonly ref struct SpecPropertyTypeParseContext
     public readonly PropertyBreadcrumbs Breadcrumbs;
 
     public required IAnyValueSourceNode? Node { get; init; }
-    public required ISourceNode? Parent { get; init; }
+    public required IParentSourceNode? Parent { get; init; }
     public string? BaseKey { get; init; }
 
     public IAssetSpecDatabase Database => EvaluationContext.Information;
@@ -25,6 +26,8 @@ public readonly ref struct SpecPropertyTypeParseContext
     public ICollection<DatDiagnosticMessage>? Diagnostics { get; }
 
     public bool HasDiagnostics { get; }
+
+    internal bool AutoDefault => Node == null && EvaluationContext.Self?.Owner is { OverridableProperties: true };
 
     public SpecPropertyTypeParseContext WithoutDiagnostics()
     {
@@ -65,13 +68,13 @@ public readonly ref struct SpecPropertyTypeParseContext
         Breadcrumbs = breadcrumbs;
     }
 
-    public static SpecPropertyTypeParseContext FromFileEvaluationContext(FileEvaluationContext evalContext, PropertyBreadcrumbs breadcrumbs, SpecProperty? property, ISourceNode? parentNode, IAnyValueSourceNode? valueNode, ICollection<DatDiagnosticMessage>? diagnostics = null)
+    public static SpecPropertyTypeParseContext FromFileEvaluationContext(FileEvaluationContext evalContext, PropertyBreadcrumbs breadcrumbs, SpecProperty? property, IParentSourceNode? parentNode, IAnyValueSourceNode? valueNode, ICollection<DatDiagnosticMessage>? diagnostics = null)
     {
         return new SpecPropertyTypeParseContext(evalContext, breadcrumbs, diagnostics)
         {
             Parent = parentNode,
             Node = valueNode,
-            BaseKey = property?.Key
+            BaseKey = property?.Key ?? (parentNode as IPropertySourceNode)?.Key
         };
     }
 
@@ -88,6 +91,30 @@ public readonly ref struct SpecPropertyTypeParseContext
         {
             Database.LogMessage($"Error adding diagnostics message{Environment.NewLine}{ex}");
         }
+    }
+
+    public bool TryParse(out ISpecDynamicValue? value)
+    {
+        return TryParse(out value, out _);
+    }
+
+    public bool TryParse([MaybeNullWhen(false)] out ISpecDynamicValue value, out IPropertySourceNode? property)
+    {
+        SpecProperty prop = EvaluationContext.Self;
+
+        if ((property = Parent as IPropertySourceNode) == null)
+        {
+            value = prop.DefaultValue!;
+            return value != null;
+        }
+
+        if (prop.Type.TryParseValue(in this, out value))
+        {
+            return true;
+        }
+
+        value = prop.IncludedDefaultValue ?? prop.DefaultValue!;
+        return value != null;
     }
 
     public GuidOrId GetThisId()
@@ -112,9 +139,9 @@ public readonly ref struct SpecPropertyTypeParseContext
         {
             AssetSpecDatabaseExtensions.PropertyFindResult result
                 = AssetSpecDatabaseExtensions.GetPropertyKeyInfo(EvaluationContext.Self, prop.Key, EvaluationContext.PropertyContext);
-            return Breadcrumbs.ToString(false, result.Key ?? EvaluationContext.Self.Key);
+            return Breadcrumbs.ToString(false, result.Key ?? BaseKey);
         }
 
-        return Breadcrumbs.ToString(false);
+        return Breadcrumbs.ToString(false, BaseKey);
     }
 }

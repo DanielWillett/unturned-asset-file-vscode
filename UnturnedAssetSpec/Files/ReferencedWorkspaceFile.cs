@@ -23,6 +23,12 @@ internal class ReferencedWorkspaceFile : IWorkspaceFile
         return _fullText;
     }
 
+    event Action<IWorkspaceFile, FileRange>? IWorkspaceFile.OnUpdated
+    {
+        add { }
+        remove { }
+    }
+
     public ReferencedWorkspaceFile(string file, IAssetSpecDatabase database, object? state, string text, Func<ReferencedWorkspaceFile, object?, string, ISourceFile> factory)
     {
         Database = database;

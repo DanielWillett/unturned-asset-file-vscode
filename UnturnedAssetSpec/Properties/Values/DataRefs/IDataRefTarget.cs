@@ -5,6 +5,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 public interface IDataRefTarget : IEquatable<IDataRefTarget>, ISpecDynamicValue
 {
+    /// <param name="valueIncluded">Whether or not there has to also be a value included.</param>
     bool EvaluateIsIncluded(bool valueIncluded, in FileEvaluationContext ctx);
     bool EvaluateIsLegacy(in FileEvaluationContext ctx);
     ValueTypeDataRefType EvaluateValueType(in FileEvaluationContext ctx);

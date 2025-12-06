@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
@@ -17,12 +18,15 @@ public class StaticSourceFileWorkspaceEnvironment : IWorkspaceEnvironment, IDisp
     private InstallationEnvironment? _installationEnvironment;
     private readonly ConcurrentDictionary<string, StaticSourceFile>? _cache;
 
+    private readonly ServerDifficultyCache _difficultyCache;
+
     public StaticSourceFileWorkspaceEnvironment(
         bool useCache,
         IAssetSpecDatabase database,
         SourceNodeTokenizerOptions defaultSourceOptions = SourceNodeTokenizerOptions.Lazy,
         InstallationEnvironment? installationEnvironment = null)
     {
+        _difficultyCache = ServerDifficultyCache.Create();
         _database = database;
         _defaultSourceOptions = defaultSourceOptions;
         _cache = useCache ? new ConcurrentDictionary<string, StaticSourceFile>(OSPathHelper.PathComparer) : null;
@@ -56,25 +60,48 @@ public class StaticSourceFileWorkspaceEnvironment : IWorkspaceEnvironment, IDisp
     }
 
     /// <inheritdoc />
-    public IWorkspaceFile? TemporarilyGetOrLoadFile(DiscoveredDatFile datFile)
+    public IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath)
     {
+        StaticSourceFile file;
         if (_cache == null)
         {
-            return StaticSourceFile.FromAssetFile(datFile.FilePath, _database, _defaultSourceOptions);
+            file = StaticSourceFile.FromAssetFile(filePath, _database, _defaultSourceOptions);
+            file.Environment = this;
+            return file;
         }
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER || NET472_OR_GREATER
-        StaticSourceFile file = _cache.GetOrAdd(
-            datFile.FilePath,
-            static (filePath, env) => StaticSourceFile.FromAssetFile(filePath, env._database, env._defaultSourceOptions),
+        file = _cache.GetOrAdd(
+            filePath,
+            static (filePath, env) =>
+            {
+                StaticSourceFile file = StaticSourceFile.FromAssetFile(filePath, env._database, env._defaultSourceOptions);
+                file.Environment = env;
+                return file;
+            },
             this
         );
 #else
-        StaticSourceFile file = _cache.GetOrAdd(
-            datFile.FilePath,
-            filePath => StaticSourceFile.FromAssetFile(filePath, _database, _defaultSourceOptions)
-        );
+        file = _cache.GetOrAdd(
+            filePath,
+            filePath =>
+            {
+                StaticSourceFile file = StaticSourceFile.FromAssetFile(filePath, _database, _defaultSourceOptions);
+                file.Environment = this;
+                return file;
+            });
 #endif
         return file;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetFileDifficulty(string file, out ServerDifficulty difficulty)
+    {
+        return _difficultyCache.TryGetDifficulty(file, out difficulty);
+    }
+
+    public void CloseFile(StaticSourceFile file)
+    {
+        _difficultyCache.RemoveCachedFile(file.File);
     }
 }

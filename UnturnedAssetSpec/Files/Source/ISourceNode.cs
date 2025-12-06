@@ -20,7 +20,7 @@ public interface ISourceNode : IEquatable<ISourceNode>
     /// <summary>
     /// The parent of this node. Will be equal to itself for the root node of a document.
     /// </summary>
-    ISourceNode Parent { get; }
+    IParentSourceNode Parent { get; }
 
     /// <summary>
     /// The range within the file that this node occupies.
@@ -72,6 +72,20 @@ public interface ISourceNode : IEquatable<ISourceNode>
 }
 
 /// <summary>
+/// A node that can contain one or more children.
+/// </summary>
+/// <remarks>One of <see cref="IDictionarySourceNode"/>, <see cref="IListSourceNode"/>, or <see cref="IPropertySourceNode"/>.</remarks>
+public interface IParentSourceNode : ISourceNode
+{
+    /// <summary>
+    /// The number of logical nodes present in the parent. This does not include whitespace or comments.
+    /// <para>Will be 0 or 1 for properties, depending on whether or not they have a value.</para>
+    /// </summary>
+    /// <remarks>This is not the same as the length of <see cref="IAnyChildrenSourceNode.Children"/>.</remarks>
+    int Count { get; }
+}
+
+/// <summary>
 /// A node in a dat file that indicates one or more blank lines.
 /// </summary>
 public interface IWhiteSpaceSourceNode : ISourceNode
@@ -111,7 +125,7 @@ public interface IAnyValueSourceNode : ISourceNode
 /// <summary>
 /// A node with a key and optional value.
 /// </summary>
-public interface IPropertySourceNode : ISourceNode
+public interface IPropertySourceNode : IParentSourceNode
 {
     /// <summary>
     /// The key of the property.
@@ -173,14 +187,8 @@ public interface IValueSourceNode : IAnyValueSourceNode
 /// <summary>
 /// A node that can have multiple children, like a list or dictionary.
 /// </summary>
-public interface IAnyChildrenSourceNode : IAnyValueSourceNode
+public interface IAnyChildrenSourceNode : IParentSourceNode, IAnyValueSourceNode
 {
-    /// <summary>
-    /// The number of properties or values present in the list. This does not include whitespace or comments.
-    /// </summary>
-    /// <remarks>This is not the same as the length of <see cref="Children"/>.</remarks>
-    int Count { get; }
-
     /// <summary>
     /// Set of all nodes contained in this list in their original order, including whitespace and comments.
     /// </summary>

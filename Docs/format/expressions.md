@@ -1,6 +1,6 @@
-# Equations
+# Expressions
 
-Equations allow calculating values based on other values. Usually this is used for the [DefaultValue](./default-values.md) property.
+Expressions allow calculating values based on other values. Usually this is used for the [DefaultValue](./default-values.md) property.
 
 
 ## Functions
@@ -45,7 +45,7 @@ The following functions are available:
 | REP      | Replace (all "arg2" -> "arg3" in "arg1") | `REP(any any any) -> string`     |
 
 ## Format
-All equations start with an equal sign, then are followed with a function name.
+All expressions start with an equal sign, then are followed with a function name.
 
 After a function, arguments are specified with parenthesis. Arguments are input values for functions. Functions with no arguments should not specify parenthesis.
 
@@ -89,7 +89,7 @@ Arguments which require spaces can be surrounded in parenthesis. There is curren
 
 ### Invalid examples
 > [!CAUTION]
-> The following examples are invalid equations.
+> The following examples are invalid expressions.
 ```json
 // extra spaces
 "= MAX ( 3 5 )"

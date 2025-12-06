@@ -1,6 +1,8 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Handlers;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
@@ -18,10 +20,14 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<WorkspaceFolderChange>, IDisposable, IDidChangeWatchedFilesHandler
 {
     private readonly OpenedFileTracker _tracker;
+    private readonly UnturnedAssetFileSyncHandler? _fileSync;
     private readonly ILogger<LspWorkspaceEnvironment> _logger;
     private readonly IAssetSpecDatabase _database;
     private readonly ILanguageServerFacade? _languageServer;
     private readonly IDisposable? _workspaceFoldersUnsubscriber;
+
+    private readonly ServerDifficultyCache _difficultyCache;
+
     private bool _hasInitialized;
 
     private readonly ConcurrentDictionary<DocumentUri, WorkspaceFolderTracker> _folderTrackers =
@@ -41,15 +47,25 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
 
     public LspWorkspaceEnvironment(
         OpenedFileTracker tracker,
+        UnturnedAssetFileSyncHandler? fileSync,
         ILogger<LspWorkspaceEnvironment> logger,
         IAssetSpecDatabase database,
         ILanguageServerFacade? languageServer,
         ILanguageServerWorkspaceFolderManager? workspaceFolderManager)
     {
+        _difficultyCache = ServerDifficultyCache.Create();
         _tracker = tracker;
+        _fileSync = fileSync;
         _logger = logger;
         _database = database;
         _languageServer = languageServer;
+
+        if (fileSync != null)
+        {
+            //fileSync.FileAdded += OnFileOpened;
+            fileSync.FileRemoved += OnFileClosed;
+        }
+
         if (workspaceFolderManager == null || languageServer == null)
         {
             _rootUris = new List<DocumentUri>(0);
@@ -136,6 +152,16 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         folder.FileDeleted += OnFileDeleted;
         folder.FileUpdated += OnFileUpdated;
         folder.FileRenamed += OnFileRenamed;
+    }
+
+    //private void OnFileOpened(OpenedFile obj)
+    //{
+    //    
+    //}
+
+    private void OnFileClosed(OpenedFile obj)
+    {
+        _difficultyCache.RemoveCachedFile(obj.File);
     }
 
     private void OnFileCreated(WorkspaceFolderTracker tracker, string fullPath)
@@ -298,12 +324,12 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         };
     }
 
-    public IWorkspaceFile? TemporarilyGetOrLoadFile(DiscoveredDatFile datFile)
+    public IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath)
     {
-        if (!File.Exists(datFile.FilePath))
+        if (!File.Exists(filePath))
             return null;
 
-        DocumentUri uri = DocumentUri.File(datFile.FilePath);
+        DocumentUri uri = DocumentUri.File(filePath);
         if (_tracker.Files.TryGetValue(uri, out OpenedFile? file))
         {
             return new DontDisposeWorkspaceFile(file);
@@ -311,18 +337,31 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
 
         try
         {
-            return StaticSourceFile.FromAssetFile(datFile.FilePath, _database, SourceNodeTokenizerOptions.Lazy);
+            return StaticSourceFile.FromAssetFile(filePath, _database, SourceNodeTokenizerOptions.Lazy);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to read file {0}.", datFile.FilePath);
+            _logger.LogWarning(ex, "Failed to read file {0}.", filePath);
             return null;
         }
     }
 
+    /// <inheritdoc />
+    public bool TryGetFileDifficulty(string file, out ServerDifficulty difficulty)
+    {
+        return _difficultyCache.TryGetDifficulty(file, out difficulty);
+    }
+
     public void Dispose()
     {
+        if (_fileSync != null)
+        {
+            //_fileSync.FileAdded -= OnFileOpened;
+            _fileSync.FileRemoved -= OnFileClosed;
+        }
+
         _workspaceFoldersUnsubscriber?.Dispose();
+
         while (_folderTrackers.Count > 0)
         {
             foreach (DocumentUri uri in _folderTrackers.Keys.ToList())
@@ -345,6 +384,13 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
 
         /// <inheritdoc />
         public string GetFullText() => file.GetFullText();
+
+        /// <inheritdoc />
+        public event Action<IWorkspaceFile, FileRange>? OnUpdated
+        {
+            add => file.OnUpdated += value;
+            remove => file.OnUpdated -= value;
+        }
 
         /// <inheritdoc />
         public void Dispose() { }

@@ -1,5 +1,5 @@
-﻿using System;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -18,7 +18,6 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </summary>
 public sealed class BlueprintSupplyStringParseableSpecPropertyType :
     BlueprintItemStringParseableSpecPropertyType,
-    ISpecPropertyType<CustomSpecTypeInstance>,
     IEquatable<BlueprintSupplyStringParseableSpecPropertyType?>
 {
     public BlueprintSupplyStringParseableSpecPropertyType(IAssetSpecDatabase database)
@@ -35,10 +34,6 @@ public sealed class BlueprintSupplyStringParseableSpecPropertyType :
 
     public override string BackingType => "SDG.Unturned.BlueprintSupply, Assembly-CSharp";
 
-    public override bool Equals(ISpecPropertyType? other) => other is BlueprintSupplyStringParseableSpecPropertyType;
-    public override bool Equals(ISpecPropertyType<CustomSpecTypeInstance>? other) => other is BlueprintSupplyStringParseableSpecPropertyType;
     public override bool Equals(BlueprintItemStringParseableSpecPropertyType? other) => other is BlueprintSupplyStringParseableSpecPropertyType;
     public bool Equals(BlueprintSupplyStringParseableSpecPropertyType? other) => other != null;
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

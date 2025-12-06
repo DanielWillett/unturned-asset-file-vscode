@@ -2585,36 +2585,6 @@
         },
         {
             "Key": "Conditions",
-            "Type": "Boolean",
-            "DefaultValue":
-            [
-                {
-                    "Or":
-                    [
-                        {
-                            "Variable": "Type",
-                            "Operation": "eq",
-                            "Comparand": "MEDIUM"
-                        },
-                        {
-                            "Variable": "Type",
-                            "Operation": "eq",
-                            "Comparand": "LARGE"
-                        }
-                    ],
-                    "Value": true
-                },
-                {
-                    "Value": false
-                }
-            ],
-            "Description": "Whether or not this object has collision when baking NPC navigation.",
-            "Priority": 15,
-            "Variable": "ShouldLoadNavInEditor",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
-        },
-        {
-            "Key": "Conditions",
             "Type": "LegacyCompatibleList",
             "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
             "DefaultValue": null,

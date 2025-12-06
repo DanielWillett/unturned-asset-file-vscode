@@ -12,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 2025-11-15T21:30:35
 /// </code>
 /// </summary>
-public sealed class DateTimeSpecPropertyType : BasicSpecPropertyType<DateTimeSpecPropertyType, DateTime>, IStringParseableSpecPropertyType
+public sealed class DateTimeSpecPropertyType : BaseSpecPropertyType<DateTimeSpecPropertyType, DateTime>, IStringParseableSpecPropertyType
 {
     public static readonly DateTimeSpecPropertyType Instance = new DateTimeSpecPropertyType();
 

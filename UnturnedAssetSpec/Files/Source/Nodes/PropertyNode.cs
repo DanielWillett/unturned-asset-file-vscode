@@ -44,6 +44,8 @@ internal class PropertyNode : AnySourceNode, IPropertySourceNode
         }
     }
 
+    int IParentSourceNode.Count => _value == null ? 0 : 1;
+
     public override SourceNodeType Type => SourceNodeType.Property;
 
     public static PropertyNode Create(string key, bool keyIsQuoted, LazySource valueSource, OneOrMore<Comment> comments, in AnySourceNodeProperties properties)
@@ -73,27 +75,27 @@ internal class PropertyNode : AnySourceNode, IPropertySourceNode
         }
     }
 
-    internal override void SetParentInfo(ISourceFile? file, ISourceNode parent)
+    internal override void SetParentInfo(ISourceFile? file, IParentSourceNode parent)
     {
         base.SetParentInfo(file, parent);
-        if (_value != null)
+        if (_value == null)
+            return;
+
+        if (file != null)
         {
-            if (file != null)
-            {
-                lock (file.TreeSync)
-                {
-                    if (_value is AnySourceNode n)
-                    {
-                        n.SetParentInfo(file, this);
-                    }
-                }
-            }
-            else
+            lock (file.TreeSync)
             {
                 if (_value is AnySourceNode n)
                 {
-                    n.SetParentInfo(null, this);
+                    n.SetParentInfo(file, this);
                 }
+            }
+        }
+        else
+        {
+            if (_value is AnySourceNode n)
+            {
+                n.SetParentInfo(null, this);
             }
         }
     }

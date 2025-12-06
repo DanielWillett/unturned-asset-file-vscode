@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System.Collections.Immutable;
+using System.IO;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
@@ -51,17 +52,23 @@ internal class RootDictionaryNode : DictionaryNode, ISourceFile
             builder.Add(pn);
         }
 
-        if (this is not RootAssetNodeSkippedLocalization and not RootLocalizationNode
-            && this.TryGetAdditionalProperty(Comment.TypeAdditionalProperty, out string? str) && str != null)
+        if (this is not RootAssetNodeSkippedLocalization and not RootLocalizationNode)
         {
-            ActualType = new QualifiedType(str, true);
+            if (this.TryGetAdditionalProperty(Comment.TypeAdditionalProperty, out string? str) && str != null)
+            {
+                ActualType = new QualifiedType(str, true);
+            }
+            else if (database.Information.KnownFileNames.TryGetValue(Path.GetFileName(file.File), out QualifiedType t) && !t.IsNull)
+            {
+                ActualType = t.CaseInsensitive;
+            }
         }
 
         Properties = builder.MoveToImmutableOrCopy();
         SetParentInfo(this, this);
     }
 
-    internal sealed override void SetParentInfo(ISourceFile? file, ISourceNode parent)
+    internal sealed override void SetParentInfo(ISourceFile? file, IParentSourceNode parent)
     {
         base.SetParentInfo(file, parent);
     }

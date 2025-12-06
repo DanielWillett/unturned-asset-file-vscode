@@ -50,7 +50,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </para>
 /// </summary>
 public class BackwardsCompatibleAssetReferenceSpecPropertyType :
-    BaseSpecPropertyType<GuidOrId>,
+    BaseSpecPropertyType<BackwardsCompatibleAssetReferenceSpecPropertyType, GuidOrId>,
     ISpecPropertyType<GuidOrId>,
     IElementTypeSpecPropertyType,
     ISpecialTypesSpecPropertyType,
@@ -70,10 +70,7 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
     public override string Type => "BcAssetReference";
 
     /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
-
-    /// <inheritdoc />
-    public Type ValueType => typeof(GuidOrId);
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     string IElementTypeSpecPropertyType.ElementType => ElementType.Type;
     OneOrMore<string?> ISpecialTypesSpecPropertyType.SpecialTypes => OtherElementTypes.Select<string?>(x => x.Type);
@@ -173,23 +170,10 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
         return KnownTypeValueHelper.TryParseGuidOrId(span, stringValue, out guidOrId, ElementType.Type);
     }
 
-    /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out GuidOrId val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteValue<GuidOrId>(val, this);
-        return true;
-    }
-
     private bool? _isTypeValid;
 
     /// <inheritdoc />
-    public virtual bool TryParseValue(in SpecPropertyTypeParseContext parse, out GuidOrId value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out GuidOrId value)
     {
         if (!_isTypeValid.HasValue)
         {
@@ -290,12 +274,4 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(BackwardsCompatibleAssetReferenceSpecPropertyType? other) => ReferenceEquals(this, other) || (other != null && ElementType.Equals(other.ElementType) && OtherElementTypes.Equals(other.OtherElementTypes) && GetType() == other.GetType());
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is BackwardsCompatibleAssetReferenceSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<GuidOrId>? other) => other is BackwardsCompatibleAssetReferenceSpecPropertyType t && Equals(t);
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

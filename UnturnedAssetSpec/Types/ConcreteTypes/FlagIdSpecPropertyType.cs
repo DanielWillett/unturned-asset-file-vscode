@@ -12,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop 123
 /// </code>
 /// </summary>
-public sealed class FlagIdSpecPropertyType : BasicSpecPropertyType<FlagIdSpecPropertyType, ushort>, IStringParseableSpecPropertyType
+public sealed class FlagIdSpecPropertyType : BaseSpecPropertyType<FlagIdSpecPropertyType, ushort>, IStringParseableSpecPropertyType
 {
 
     public static readonly FlagIdSpecPropertyType Instance = new FlagIdSpecPropertyType();

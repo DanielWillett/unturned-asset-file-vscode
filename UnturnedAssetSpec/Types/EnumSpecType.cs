@@ -5,6 +5,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -13,7 +14,13 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 [DebuggerDisplay("Enum: {Type.GetTypeName()}")]
 public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<EnumSpecType>, IStringParseableSpecPropertyType, IAutoCompleteSpecPropertyType, IValueHoverProviderSpecPropertyType
 {
-    private AutoCompleteResult[]? _valueResults;
+    /// <summary>
+    /// The singleton null value for this enum type.
+    /// </summary>
+    [field: MaybeNull]
+    public SpecDynamicConcreteEnumValue Null => field ??= new SpecDynamicConcreteEnumValue(this);
+
+    private Task<AutoCompleteResult[]>? _valueResults;
 
     public required QualifiedType Type { get; init; }
     public required string DisplayName { get; init; }
@@ -43,9 +50,48 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
 
     public override string ToString() => Type.ToString();
 
+    // todo: needs to be able to parse bitmasks (LandscapeMaterialAsset.Auto_Ray_Mask)
+
     /// <inheritdoc />
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
     {
+        if (parse.AutoDefault)
+        {
+            value = parse.EvaluationContext.Self.DefaultValue!;
+            return value != null;
+        }
+
+        if (!TryGetStringNode(in parse, out IValueSourceNode? strValNode))
+        {
+            value = null!;
+            return false;
+        }
+
+        if (IsFlags)
+        {
+            if (SpecDynamicConcreteFlagsEnumValue.TryParseFlags(this, strValNode.Value.AsSpan(), out OneOrMore<int> indices))
+            {
+                value = SpecDynamicValue.EnumFlags(this, indices);
+                return true;
+            }
+
+            if (parse.HasDiagnostics)
+            {
+                DatDiagnosticMessage message = new DatDiagnosticMessage
+                {
+                    Diagnostic = DatDiagnostics.UNT1014,
+                    Message = string.Format(DiagnosticResources.UNT1014_Flags, strValNode.Value,
+                        Type.GetTypeName()),
+                    Range = strValNode.Range
+                };
+
+                parse.Log(message);
+            }
+
+            value = null!;
+            return false;
+        }
+        
         if (!TryParseValue(in parse, out int index))
         {
             value = null!;
@@ -68,7 +114,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
         return true;
     }
 
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out int index)
+    private bool TryGetStringNode(in SpecPropertyTypeParseContext parse, [MaybeNullWhen(false)] out IValueSourceNode node)
     {
         if (parse.Node == null)
         {
@@ -84,7 +130,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
                 parse.Log(message);
             }
 
-            index = -1;
+            node = null;
             return false;
         }
 
@@ -106,6 +152,18 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
                 parse.Log(message);
             }
 
+            node = null;
+            return false;
+        }
+
+        node = strValNode;
+        return true;
+    }
+
+    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out int index)
+    {
+        if (!TryGetStringNode(in parse, out IValueSourceNode? strValNode))
+        {
             index = -1;
             return false;
         }
@@ -117,8 +175,8 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
                 DatDiagnosticMessage message = new DatDiagnosticMessage
                 {
                     Diagnostic = DatDiagnostics.UNT1014,
-                    Message = string.Format(DiagnosticResources.UNT1014_Specific, strValNode.Value, Type.GetTypeName()),
-                    Range = parse.Node.Range
+                    Message = string.Format(DiagnosticResources.UNT1014_Specific, strValNode.Value, DisplayName),
+                    Range = strValNode.Range
                 };
 
                 parse.Log(message);
@@ -190,26 +248,36 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
     }
 
     /// <inheritdoc />
-    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters,
-        in FileEvaluationContext context)
+    public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters, in FileEvaluationContext context)
     {
         if (_valueResults != null)
         {
-            return Task.FromResult(_valueResults);
+            return _valueResults;
         }
 
         AutoCompleteResult[] results = new AutoCompleteResult[Values.Length];
         for (int i = 0; i < results.Length; ++i)
         {
             ref EnumSpecTypeValue val = ref Values[i];
-            results[i] = new AutoCompleteResult(val.Casing, val.Description);
+            results[i] = new AutoCompleteResult(val.Casing, val.Description)
+            {
+                Deprecated = val.Deprecated
+            };
         }
 
-        _valueResults = results;
-        return Task.FromResult(results);
+        _valueResults = results.Length == 0 ? AutoCompleteResult.NoneTask : Task.FromResult(results);
+        return _valueResults;
     }
 
     SpecProperty? ISpecType.FindProperty(string propertyName, SpecPropertyContext context) => null;
+
+    /// <inheritdoc />
+    public ISpecDynamicValue CreateValue(string? value)
+    {
+        return value != null && TryParse(value, out int index, ignoreCase: false)
+            ? SpecDynamicValue.Enum(this, index)
+            : Null;
+    }
 
     void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 

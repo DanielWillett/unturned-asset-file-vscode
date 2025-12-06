@@ -172,6 +172,69 @@ public sealed class ColorRGBALegacySpecPropertyType : ColorSpecPropertyType
 }
 
 /// <summary>
+/// A floating-point color with only RGB components formatted as a hex string.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffff
+/// Prop ffffff
+/// </code>
+/// </summary>
+public sealed class ColorRGBStringSpecPropertyType : ColorSpecPropertyType
+{
+    public static readonly ColorRGBStringSpecPropertyType Instance = new ColorRGBStringSpecPropertyType();
+
+    public override int GetHashCode() => 97;
+
+    static ColorRGBStringSpecPropertyType() { }
+
+    /// <inheritdoc />
+    public override string Type => "ColorRGBString";
+
+    /// <inheritdoc />
+    public override string DisplayName => "Hex Color (RGB)";
+
+    /// <inheritdoc />
+    private protected override VectorTypeParseOptions Options => VectorTypeParseOptions.Composite;
+
+    /// <inheritdoc />
+    private protected override bool HasAlpha => false;
+}
+
+/// <summary>
+/// A floating-point color with RGBA components formatted as a hex string.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffffff
+/// Prop ffffffff
+/// 
+/// // or
+/// 
+/// Prop #ffffff
+/// Prop ffffff
+/// </code>
+/// </summary>
+public sealed class ColorRGBAStringSpecPropertyType : ColorSpecPropertyType
+{
+    public static readonly ColorRGBAStringSpecPropertyType Instance = new ColorRGBAStringSpecPropertyType();
+
+    public override int GetHashCode() => 98;
+
+    static ColorRGBAStringSpecPropertyType() { }
+
+    /// <inheritdoc />
+    public override string Type => "ColorRGBAString";
+
+    /// <inheritdoc />
+    public override string DisplayName => "Hex Color (RBGA)";
+
+    /// <inheritdoc />
+    private protected override VectorTypeParseOptions Options => VectorTypeParseOptions.Composite;
+
+    /// <inheritdoc />
+    private protected override bool HasAlpha => true;
+}
+
+/// <summary>
 /// A floating-point color with only RGB components formatted as a strict 7-length hex string.
 /// <para>Example: <c>ObjectNPCAsset.Color_Skin</c></para>
 /// <code>
@@ -588,7 +651,7 @@ public abstract class ColorStrictHexSpecPropertyType :
 /// <typeparam name="TSelf">Property type.</typeparam>
 /// <typeparam name="T">Color type.</typeparam>
 public abstract class BaseColorSpecPropertyType<TSelf, T>
-    : BasicSpecPropertyType<TSelf, T>,
+    : BaseSpecPropertyType<TSelf, T>,
         IVectorSpecPropertyType<Color>,
         IVectorSpecPropertyType<Color32>,
         ILegacyCompositeTypeProvider

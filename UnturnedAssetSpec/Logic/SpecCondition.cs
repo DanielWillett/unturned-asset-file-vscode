@@ -29,6 +29,7 @@ public readonly struct SpecCondition : IEquatable<SpecCondition>
         Variable = variable;
         Operation = operation;
         Comparand = comparand;
+        IsInverted = isInverted;
     }
 
     public bool TryGetOpposite(out SpecCondition condition)

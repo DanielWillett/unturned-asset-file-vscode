@@ -12,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// </summary>
 /// <remarks>This type should not be used for asset references, instead <see cref="AssetReferenceSpecPropertyType"/> should be used instead ('AssetReferenceString').</remarks>
-public sealed class GuidSpecPropertyType : BasicSpecPropertyType<GuidSpecPropertyType, Guid>, IStringParseableSpecPropertyType
+public sealed class GuidSpecPropertyType : BaseSpecPropertyType<GuidSpecPropertyType, Guid>, IStringParseableSpecPropertyType
 {
     public static readonly GuidSpecPropertyType Instance = new GuidSpecPropertyType();
 

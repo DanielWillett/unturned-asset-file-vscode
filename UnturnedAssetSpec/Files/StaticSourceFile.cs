@@ -12,6 +12,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 /// </summary>
 public sealed class StaticSourceFile : IWorkspaceFile
 {
+    internal StaticSourceFileWorkspaceEnvironment? Environment;
+
     private readonly ReadOnlyMemory<char> _fileContent;
     private string? _fileContentStr;
 
@@ -212,5 +214,14 @@ public sealed class StaticSourceFile : IWorkspaceFile
         return _fileContentStr;
     }
 
-    public void Dispose() { }
+    event Action<IWorkspaceFile, FileRange>? IWorkspaceFile.OnUpdated
+    {
+        add { }
+        remove { }
+    }
+
+    public void Dispose()
+    {
+        Environment?.CloseFile(this);
+    }
 }

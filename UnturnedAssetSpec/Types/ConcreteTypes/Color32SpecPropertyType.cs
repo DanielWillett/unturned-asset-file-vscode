@@ -66,6 +66,8 @@ public sealed class Color32RGBASpecPropertyType : Color32SpecPropertyType
 
     static Color32RGBASpecPropertyType() { }
 
+    public override int GetHashCode() => 92;
+
     /// <inheritdoc />
     public override string Type => "Color32RGBA";
 
@@ -107,6 +109,8 @@ public sealed class Color32RGBLegacySpecPropertyType : Color32SpecPropertyType
     public static readonly Color32RGBLegacySpecPropertyType Instance = new Color32RGBLegacySpecPropertyType();
 
     static Color32RGBLegacySpecPropertyType() { }
+
+    public override int GetHashCode() => 93;
 
     /// <inheritdoc />
     public override string Type => "Color32RGBLegacy";
@@ -152,6 +156,8 @@ public sealed class Color32RGBALegacySpecPropertyType : Color32SpecPropertyType
 
     static Color32RGBALegacySpecPropertyType() { }
 
+    public override int GetHashCode() => 94;
+
     /// <inheritdoc />
     public override string Type => "Color32RGBALegacy";
 
@@ -160,6 +166,69 @@ public sealed class Color32RGBALegacySpecPropertyType : Color32SpecPropertyType
 
     /// <inheritdoc />
     private protected override VectorTypeParseOptions Options => VectorTypeParseOptions.Composite | VectorTypeParseOptions.Object | VectorTypeParseOptions.Legacy;
+
+    /// <inheritdoc />
+    private protected override bool HasAlpha => true;
+}
+
+/// <summary>
+/// A floating-point color with only RGB components formatted as a hex string.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffff
+/// Prop ffffff
+/// </code>
+/// </summary>
+public sealed class Color32RGBStringSpecPropertyType : Color32SpecPropertyType
+{
+    public static readonly Color32RGBStringSpecPropertyType Instance = new Color32RGBStringSpecPropertyType();
+
+    public override int GetHashCode() => 99;
+
+    static Color32RGBStringSpecPropertyType() { }
+
+    /// <inheritdoc />
+    public override string Type => "Color32RGBString";
+
+    /// <inheritdoc />
+    public override string DisplayName => "Hex Color (RGB)";
+
+    /// <inheritdoc />
+    private protected override VectorTypeParseOptions Options => VectorTypeParseOptions.Composite;
+
+    /// <inheritdoc />
+    private protected override bool HasAlpha => false;
+}
+
+/// <summary>
+/// A floating-point color with RGBA components formatted as a hex string.
+/// <para>Currently unused by Unturned.</para>
+/// <code>
+/// Prop #ffffffff
+/// Prop ffffffff
+/// 
+/// // or
+/// 
+/// Prop #ffffff
+/// Prop ffffff
+/// </code>
+/// </summary>
+public sealed class Color32RGBAStringSpecPropertyType : Color32SpecPropertyType
+{
+    public static readonly Color32RGBAStringSpecPropertyType Instance = new Color32RGBAStringSpecPropertyType();
+
+    public override int GetHashCode() => 100;
+
+    static Color32RGBAStringSpecPropertyType() { }
+
+    /// <inheritdoc />
+    public override string Type => "ColorRGBAString";
+
+    /// <inheritdoc />
+    public override string DisplayName => "Hex Color (RBGA)";
+
+    /// <inheritdoc />
+    private protected override VectorTypeParseOptions Options => VectorTypeParseOptions.Composite;
 
     /// <inheritdoc />
     private protected override bool HasAlpha => true;
@@ -177,6 +246,8 @@ public sealed class Color32RGBStrictHexSpecPropertyType : Color32StrictHexSpecPr
     public static readonly Color32RGBStrictHexSpecPropertyType Instance = new Color32RGBStrictHexSpecPropertyType();
 
     static Color32RGBStrictHexSpecPropertyType() { }
+
+    public override int GetHashCode() => 95;
 
     /// <inheritdoc />
     public override string Type => "Color32RGBStrictHex";
@@ -200,6 +271,8 @@ public sealed class Color32RGBAStrictHexSpecPropertyType : Color32StrictHexSpecP
     public static readonly Color32RGBAStrictHexSpecPropertyType Instance = new Color32RGBAStrictHexSpecPropertyType();
 
     static Color32RGBAStrictHexSpecPropertyType() { }
+
+    public override int GetHashCode() => 96;
 
     /// <inheritdoc />
     public override string Type => "Color32RGBAStrictHex";

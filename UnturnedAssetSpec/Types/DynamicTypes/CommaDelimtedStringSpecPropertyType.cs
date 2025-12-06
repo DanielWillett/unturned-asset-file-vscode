@@ -17,7 +17,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </summary>
 /// <remarks>A primitive element type such as Int32 can be defined for diagnostics.</remarks>
 public sealed class CommaDelimitedStringSpecPropertyType :
-    BaseSpecPropertyType<string>,
+    BaseSpecPropertyType<CommaDelimitedStringSpecPropertyType, string>,
     ISpecPropertyType<string>,
     ISecondPassSpecPropertyType,
     IElementTypeSpecPropertyType,
@@ -33,10 +33,7 @@ public sealed class CommaDelimitedStringSpecPropertyType :
     public override string Type => "CommaDelimitedString";
 
     /// <inheritdoc />
-    public Type ValueType => typeof(string);
-
-    /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
 
     public ISpecPropertyType InnerType { get; private set; }
 
@@ -79,20 +76,10 @@ public sealed class CommaDelimitedStringSpecPropertyType :
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out string? val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = val == null ? SpecDynamicValue.Null : new SpecDynamicConcreteConvertibleValue<string>(val, this);
-        return true;
-    }
+    protected override ISpecDynamicValue CreateValue(string value) => new SpecDynamicConcreteConvertibleValue<string>(value, this);
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
     {
         if (parse.Node == null)
         {
@@ -117,12 +104,6 @@ public sealed class CommaDelimitedStringSpecPropertyType :
 
     /// <inheritdoc />
     public bool Equals(CommaDelimitedStringSpecPropertyType? other) => other != null && InnerType.Equals(other.InnerType);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is CommaDelimitedStringSpecPropertyType t && Equals(t);
-
-    /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<string>? other) => other is CommaDelimitedStringSpecPropertyType t && Equals(t);
 
     private abstract class ParseHandler
     {
@@ -204,6 +185,4 @@ public sealed class CommaDelimitedStringSpecPropertyType :
         if (InnerType is ISecondPassSpecPropertyType and IDisposable disp)
             disp.Dispose();
     }
-
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
 }

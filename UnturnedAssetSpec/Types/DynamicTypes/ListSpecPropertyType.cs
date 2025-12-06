@@ -36,8 +36,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </para>
 /// </summary>
 public sealed class ListSpecPropertyType<TElementType> :
-    BaseSpecPropertyType<EquatableArray<TElementType>>,
+    BaseSpecPropertyType<ListSpecPropertyType<TElementType>, EquatableArray<TElementType>>,
     ISpecPropertyType<EquatableArray<TElementType>>,
+    ISpecPropertyType<int>,
     IEquatable<ListSpecPropertyType<TElementType>?>,
     IListTypeSpecPropertyType
     where TElementType : IEquatable<TElementType>
@@ -51,13 +52,10 @@ public sealed class ListSpecPropertyType<TElementType> :
     public override string Type => AllowSingle ? "ListOrSingle" : "List";
 
     /// <inheritdoc />
-    public Type ValueType => typeof(EquatableArray<TElementType>);
-
-    /// <inheritdoc />
-    public SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Class;
+    public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Struct;
 
     public ISpecPropertyType<TElementType> InnerType { get; }
-    ISpecPropertyType IListTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
+    ISpecPropertyType? IListTypeSpecPropertyType.GetInnerType() => InnerType;
 
     string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
 
@@ -75,20 +73,7 @@ public sealed class ListSpecPropertyType<TElementType> :
     }
 
     /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out ISpecDynamicValue value)
-    {
-        if (!TryParseValue(in parse, out EquatableArray<TElementType> val))
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new SpecDynamicConcreteValue<EquatableArray<TElementType>>(val, this);
-        return true;
-    }
-
-    /// <inheritdoc />
-    public bool TryParseValue(in SpecPropertyTypeParseContext parse, out EquatableArray<TElementType> value)
+    public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out EquatableArray<TElementType> value)
     {
         if (parse.Node == null)
         {
@@ -152,7 +137,7 @@ public sealed class ListSpecPropertyType<TElementType> :
         return parsedAll;
     }
 
-    private bool TryParseElement(IAnyValueSourceNode node, ISourceNode? parent, in SpecPropertyTypeParseContext parse, out TElementType element)
+    private bool TryParseElement(IAnyValueSourceNode node, IParentSourceNode? parent, in SpecPropertyTypeParseContext parse, out TElementType element)
     {
         SpecPropertyTypeParseContext context = parse with
         {
@@ -167,12 +152,40 @@ public sealed class ListSpecPropertyType<TElementType> :
     public bool Equals(ListSpecPropertyType<TElementType>? other) => other != null && InnerType.Equals(other.InnerType) && AllowSingle == other.AllowSingle;
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType? other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
+    bool IEquatable<ISpecPropertyType<int>?>.Equals(ISpecPropertyType<int>? other) => other is ListSpecPropertyType<TElementType> l && Equals(l);
 
     /// <inheritdoc />
-    public bool Equals(ISpecPropertyType<EquatableArray<TElementType>>? other) => other is ListSpecPropertyType<TElementType> t && Equals(t);
+    bool ISpecPropertyType<int>.TryParseValue(in SpecPropertyTypeParseContext parse, out int value)
+    {
+        if (parse.Node == null)
+        {
+            value = 0;
+            return MissingNode(in parse, out _);
+        }
 
-    void ISpecPropertyType.Visit<TVisitor>(ref TVisitor visitor) => visitor.Visit(this);
+        bool parsedAll = true;
+        if (parse.Node is not IListSourceNode listNode)
+        {
+            if (!AllowSingle)
+            {
+                value = 0;
+                return FailedToParse(in parse, out _);
+            }
+
+            value = 1;
+        }
+        else
+        {
+            value = listNode.Children.Length;
+        }
+
+        KnownTypeValueHelper.TryGetMinimaxCountWarning(value, in parse);
+
+        return parsedAll;
+    }
+
+    /// <inheritdoc />
+    ISpecDynamicValue ISpecPropertyType<int>.CreateValue(int value) => SpecDynamicValue.Int32(value, this);
 }
 
 internal sealed class UnresolvedListSpecPropertyType :
@@ -182,7 +195,7 @@ internal sealed class UnresolvedListSpecPropertyType :
     IDisposable
 {
     public ISecondPassSpecPropertyType InnerType { get; }
-    ISpecPropertyType IListTypeSpecPropertyType.GetInnerType(IAssetSpecDatabase database) => InnerType;
+    ISpecPropertyType? IListTypeSpecPropertyType.GetInnerType() => InnerType;
     string IElementTypeSpecPropertyType.ElementType => InnerType.Type;
 
     public bool AllowSingle { get; }
