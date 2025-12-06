@@ -32,6 +32,7 @@ public sealed class GlobalCodeFixes
         [
             new BlueprintUseThisKeyword(virtualizer, database, installEnv, workspaceEnv),
             new GenerateNewGuid(virtualizer, database, installEnv, workspaceEnv),
+            new UnknownProperty(virtualizer, database, installEnv, workspaceEnv),
         ];
 
         for (int i = 0; i < AllArray.Length; ++i)

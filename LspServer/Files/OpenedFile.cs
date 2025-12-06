@@ -877,6 +877,8 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
         [ExcludeFromCodeCoverage]
         public OpenedFile File => _file;
 
+        IMutableWorkspaceFile IMutableWorkspaceFileUpdater.File => _file;
+
         internal void Reset()
         {
             _file._fullRangeBeforeChange = _file.FullRange;

@@ -25,6 +25,7 @@ public interface ISourceNode : IEquatable<ISourceNode>
     /// <summary>
     /// The range within the file that this node occupies.
     /// </summary>
+    /// <remarks>On properties this only includes the key.</remarks>
     FileRange Range { get; }
 
     /// <summary>

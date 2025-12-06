@@ -10,6 +10,9 @@ public class MutableVirtualFile : IMutableWorkspaceFile, IMutableWorkspaceFileUp
 {
     private readonly IMutableWorkspaceFile _parent;
     private readonly IFileUpdateListener _listener;
+
+    IMutableWorkspaceFile IMutableWorkspaceFileUpdater.File => _parent;
+
     public string File => _parent.File;
     public ISourceFile SourceFile => _parent.SourceFile;
     public object SyncRoot => _parent.SyncRoot;

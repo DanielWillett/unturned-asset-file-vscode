@@ -858,23 +858,23 @@ public static class KnownTypeValueHelper
         while (crlfInd + 1 < str.Length)
         {
             crlfInd = str.IndexOf('\n', crlfInd + 1);
-            if (crlfInd >= 0)
-            {
-                int startIndex = crlfInd > 0 && str[crlfInd - 1] == '\r' ? crlfInd - 1 : crlfInd;
-                int len = crlfInd - startIndex + 1;
+            if (crlfInd < 0)
+                break;
 
-                FileRange range = node.Range;
-                range.Start.Character += startIndex;
-                if (node.IsQuoted)
-                    ++range.Start.Character;
-                range.End.Character = range.Start.Character + (len - 1);
-                parse.Log(new DatDiagnosticMessage
-                {
-                    Range = range,
-                    Diagnostic = DatDiagnostics.UNT106,
-                    Message = DiagnosticResources.UNT106
-                });
-            }
+            int startIndex = crlfInd > 0 && str[crlfInd - 1] == '\r' ? crlfInd - 1 : crlfInd;
+            int len = crlfInd - startIndex + 1;
+
+            FileRange range = node.Range;
+            range.Start.Character += startIndex;
+            if (node.IsQuoted)
+                ++range.Start.Character;
+            range.End.Character = range.Start.Character + (len - 1);
+            parse.Log(new DatDiagnosticMessage
+            {
+                Range = range,
+                Diagnostic = DatDiagnostics.UNT106,
+                Message = DiagnosticResources.UNT106
+            });
         }
 
         foreach (Match match in InvalidLineBreakTagsMatcher.Matches(str))

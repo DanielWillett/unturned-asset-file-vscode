@@ -109,6 +109,11 @@ public interface IMutableWorkspaceFile : IWorkspaceFile
 public interface IMutableWorkspaceFileUpdater
 {
     /// <summary>
+    /// The file being mutated.
+    /// </summary>
+    IMutableWorkspaceFile File { get; }
+
+    /// <summary>
     /// Inserts text at a specific position in the document.
     /// </summary>
     void InsertText(FilePosition position, ReadOnlySpan<char> text, string? annotationId = null);
@@ -151,4 +156,32 @@ public interface IMutableWorkspaceFileUpdater
     /// <param name="description">A human-readable string which is rendered less prominent in the user interface.</param>
     /// <param name="needsConfirmation">A flag which indicates that user confirmation is needed before applying the change.</param>
     void AddAnnotation(string annotationId, string label, string? description = null, bool? needsConfirmation = null);
+}
+
+public static class MutableWorkspaceFileUpdaterExtensions
+{
+    /// <summary>
+    /// Fully remove all lines within the given range.
+    /// </summary>
+    /// <param name="range">A range which will cause any overlapping lines to be fully removed.</param>
+    /// <param name="annotationId">Unique ID of the annotation.</param>
+    public static void RemoveOverlappingLines(this IMutableWorkspaceFileUpdater updater, FileRange range, string? annotationId = null)
+    {
+        FileRange fullFileRange = updater.File.FullRange;
+        if (fullFileRange.End.Line > range.End.Line)
+        {
+            // remove entire line and next line's \n if not at end of file
+            range.Start.Character = 1;
+            ++range.End.Line;
+            range.End.Character = 0;
+        }
+        else if (range.Start.Line > 1)
+        {
+            // remove from previous line's \n to end of property
+            --range.Start.Line;
+            range.Start.Character = updater.File.GetLineLength(range.Start.Line, includeNewLine: false) + 1;
+        }
+
+        updater.RemoveText(range, annotationId);
+    }
 }

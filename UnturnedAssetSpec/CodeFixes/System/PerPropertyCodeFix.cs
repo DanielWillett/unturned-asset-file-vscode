@@ -37,6 +37,15 @@ public interface IPerPropertyCodeFix : ICodeFix
     );
 
     /// <summary>
+    /// Final check to see if this code fix should be added to an unresolved property.
+    /// </summary>
+    /// <remarks>No need to check type and inclusion flags if they're included.</remarks>
+    CodeFixInstance? TryApplyToUnknownProperty(
+        IPropertySourceNode propertyNode,
+        in PropertyBreadcrumbs breadcrumbs
+    );
+
+    /// <summary>
     /// Checks if a type passes the type check on <see cref="Type"/> and <see cref="Types"/>.
     /// </summary>
     bool PassesTypeCheck(ISpecPropertyType propertyType);
@@ -63,7 +72,17 @@ public enum PropertyInclusionFlags
     NonRootProperties = 1 << 2,
 
     /// <summary>
-    /// All properties.
+    /// Only include unresolved properties.
+    /// </summary>
+    UnresolvedOnly = 1 << 3,
+
+    /// <summary>
+    /// Only include resolved properties
+    /// </summary>
+    ResolvedOnly = 1 << 4,
+
+    /// <summary>
+    /// All resolved properties.
     /// </summary>
     All = Metadata | AssetOrRoot | NonRootProperties
 }
@@ -89,7 +108,7 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
         _workspaceEnv = workspaceEnv;
     }
 
-    public virtual PropertyInclusionFlags InclusionFlags => PropertyInclusionFlags.All;
+    public virtual PropertyInclusionFlags InclusionFlags => PropertyInclusionFlags.All | PropertyInclusionFlags.ResolvedOnly;
 
 
     public CodeFixInstance? TryApplyToProperty(
@@ -100,7 +119,8 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
         in SpecPropertyTypeParseContext parseContext
     )
     {
-        if (!TryApplyToProperty(out TState? state, out FileRange range, propertyNode, propertyType, property, in breadcrumbs, in parseContext))
+        bool hasDiagnostic = false;
+        if (!TryApplyToProperty(out TState? state, out FileRange range, ref hasDiagnostic, propertyNode, propertyType, property, in breadcrumbs, in parseContext))
         {
             return null;
         }
@@ -108,7 +128,24 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
         return new CodeFixInstance<TState>(new CodeFixParameters<TState>
         {
             State = state
-        }, this, range);
+        }, this, range, hasDiagnostic);
+    }
+
+    public CodeFixInstance? TryApplyToUnknownProperty(
+        IPropertySourceNode propertyNode,
+        in PropertyBreadcrumbs breadcrumbs
+    )
+    {
+        bool hasDiagnostic = false;
+        if (!TryApplyToUnknownProperty(out TState? state, out FileRange range, ref hasDiagnostic, propertyNode, in breadcrumbs))
+        {
+            return null;
+        }
+
+        return new CodeFixInstance<TState>(new CodeFixParameters<TState>
+        {
+            State = state
+        }, this, range, hasDiagnostic);
     }
 
     public bool PassesTypeCheck(ISpecPropertyType propertyType)
@@ -122,12 +159,26 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
     public abstract bool TryApplyToProperty(
         [MaybeNullWhen(false)] out TState state,
         out FileRange range,
+        ref bool hasDiagnostic,
         IPropertySourceNode propertyNode,
         ISpecPropertyType propertyType,
         SpecProperty property,
         in PropertyBreadcrumbs breadcrumbs,
         in SpecPropertyTypeParseContext parseContext
     );
+
+    public virtual bool TryApplyToUnknownProperty(
+        [MaybeNullWhen(false)] out TState state,
+        out FileRange range,
+        ref bool hasDiagnostic,
+        IPropertySourceNode propertyNode,
+        in PropertyBreadcrumbs breadcrumbs
+    )
+    {
+        state = default;
+        range = default;
+        return false;
+    }
 
     public override void GetValidPositions(ISourceNode root, FileRange? range, IList<CodeFixInstance> outputList)
     {
@@ -148,7 +199,7 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
             IList<CodeFixInstance> outputList,
             PerPropertyCodeFix<TState> codeFix,
             FileRange? range,
-            PropertyInclusionFlags flags = PropertyInclusionFlags.All)
+            PropertyInclusionFlags flags = PropertyInclusionFlags.All | PropertyInclusionFlags.ResolvedOnly)
             : base(virtualizer, database, installEnv, workspaceEnv, range, flags)
         {
             _outputList = outputList;
@@ -160,18 +211,33 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
             ISpecPropertyType propertyType,
             in SpecPropertyTypeParseContext parseCtx,
             IPropertySourceNode node,
-            PropertyBreadcrumbs breadcrumbs)
+            in PropertyBreadcrumbs breadcrumbs)
         {
             if (!_codeFix.PassesTypeCheck(propertyType))
             {
                 return;
             }
-            if (_codeFix.TryApplyToProperty(out TState? state, out FileRange range, node, propertyType, property, in breadcrumbs, in parseCtx))
+
+            bool hasDiagnostic = false;
+            if (_codeFix.TryApplyToProperty(out TState? state, out FileRange range, ref hasDiagnostic, node, propertyType, property, in breadcrumbs, in parseCtx))
             {
                 _outputList.Add(new CodeFixInstance<TState>(new CodeFixParameters<TState>
                 {
                     State = state
-                }, _codeFix, range));
+                }, _codeFix, range, hasDiagnostic));
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void AcceptUnresolvedProperty(IPropertySourceNode node, in PropertyBreadcrumbs breadcrumbs)
+        {
+            bool hasDiagnostic = false;
+            if (_codeFix.TryApplyToUnknownProperty(out TState? state, out FileRange range, ref hasDiagnostic, node, in breadcrumbs))
+            {
+                _outputList.Add(new CodeFixInstance<TState>(new CodeFixParameters<TState>
+                {
+                    State = state
+                }, _codeFix, range, hasDiagnostic));
             }
         }
     }

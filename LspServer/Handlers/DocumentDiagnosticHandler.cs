@@ -131,7 +131,7 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
             ISpecPropertyType propertyType,
             in SpecPropertyTypeParseContext parseCtx,
             IPropertySourceNode node,
-            PropertyBreadcrumbs breadcrumbs)
+            in PropertyBreadcrumbs breadcrumbs)
         {
             SpecPropertyTypeParseContext ctx = parseCtx.WithDiagnostics(Diagnostics);
             propertyType.TryParseValue(in ctx, out _);

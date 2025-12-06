@@ -1,4 +1,6 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -172,15 +174,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
                 _diagnosticBuffer
             );
 
-            if (sourceFile is IAssetSourceFile asset)
-            {
-                asset.GetMetadataDictionary()?.Visit(ref visitor);
-                asset.AssetData.Visit(ref visitor);
-            }
-            else
-            {
-                sourceFile.Visit(ref visitor);
-            }
+            ResolvedPropertyNodeVisitor.VisitFile(sourceFile, ref visitor);
 
             _diagnostics.Clear();
 
@@ -189,7 +183,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
 
             foreach (DatDiagnosticMessage msg in _diagnosticBuffer)
             {
-                _diagnostics.Add(_manager.CreateDiagnostic(msg));
+                _diagnostics.Add(_manager.CreateDiagnostic(in msg));
             }
 
             _diagnosticBuffer.Clear();
@@ -287,7 +281,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
             IWorkspaceEnvironment workspace,
             InstallationEnvironment installEnvironment,
             List<DatDiagnosticMessage> diagnostics)
-            : base(virtualizer, database, installEnvironment, workspace)
+            : base(virtualizer, database, installEnvironment, workspace, flags: PropertyInclusionFlags.All)
         {
             Diagnostics = diagnostics;
         }
@@ -298,10 +292,23 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
             ISpecPropertyType propertyType,
             in SpecPropertyTypeParseContext parseCtx,
             IPropertySourceNode node,
-            PropertyBreadcrumbs breadcrumbs)
+            in PropertyBreadcrumbs breadcrumbs)
         {
             SpecPropertyTypeParseContext ctx = parseCtx.WithDiagnostics(Diagnostics);
             propertyType.TryParseValue(in ctx, out _);
+        }
+
+        /// <inheritdoc />
+        protected override void AcceptUnresolvedProperty(
+            IPropertySourceNode node,
+            in PropertyBreadcrumbs breadcrumbs)
+        {
+            Diagnostics.Add(new DatDiagnosticMessage
+            {
+                Range = node.GetFullRange(),
+                Diagnostic = DatDiagnostics.UNT1025,
+                Message = string.Format(DiagnosticResources.UNT1025, breadcrumbs.ToString(false, node.Key))
+            });
         }
 
         /// <inheritdoc />

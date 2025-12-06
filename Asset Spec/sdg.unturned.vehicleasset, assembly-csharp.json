@@ -1906,7 +1906,7 @@
             "Type": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp",
             "DisplayName": "Paintable Vehicle Section",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-paintablevehiclesection-dictionary",
-            "StringParsableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.PaintableVehicleSectionStringParseableSpecPropertyType, UnturnedAssetSpec",
+            "StringParseableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.PaintableVehicleSectionStringParseableSpecPropertyType, UnturnedAssetSpec",
             "Version": "3.24.4.0",
             "Properties":
             [

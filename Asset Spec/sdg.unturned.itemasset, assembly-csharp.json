@@ -1066,7 +1066,7 @@
             "Type": "SDG.Unturned.BlueprintSupply, Assembly-CSharp",
             "DisplayName": "Blueprint Supply",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html",
-            "StringParsableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.BlueprintSupplyStringParseableSpecPropertyType, UnturnedAssetSpec",
+            "StringParseableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.BlueprintSupplyStringParseableSpecPropertyType, UnturnedAssetSpec",
             "Properties":
             [
                 {
@@ -1209,7 +1209,7 @@
             "Type": "SDG.Unturned.BlueprintOutput, Assembly-CSharp",
             "DisplayName": "Blueprint Output",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_outputitem.html",
-            "StringParsableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.BlueprintOutputStringParseableSpecPropertyType, UnturnedAssetSpec",
+            "StringParseableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.BlueprintOutputStringParseableSpecPropertyType, UnturnedAssetSpec",
             "Properties":
             [
                 {
@@ -1254,6 +1254,41 @@
                     "Deprecated": true,
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#type-eblueprinttype",
                     "Variable": "type"
+                },
+                {
+                    "Key": "Operation",
+                    "Type": "SDG.Unturned.EBlueprintOperation, Assembly-CSharp",
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "AMMO"
+                                }
+                            ],
+                            "Value": "FillTargetItem"
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "REPAIR"
+                                }
+                            ],
+                            "Value": "RepairTargetItem"
+                        },
+                        {
+                            "Value": "None"
+                        }
+                    ],
+                    "Description": "Controls what this blueprint does with input items.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#operation-eblueprintoperation-none",
+                    "Variable": "Operation"
                 },
                 {
                     "Key": "InputItems",

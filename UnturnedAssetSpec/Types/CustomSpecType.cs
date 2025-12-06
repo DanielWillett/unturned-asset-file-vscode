@@ -19,6 +19,8 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
     // example value could be Condition for Conditions
     public const string PluralBaseKeyProperty = "PluralBaseKey";
 
+    private ISpecPropertyType? _stringParseableType;
+
     internal JsonDocument? DeferredDefaultValue;
 
     public required QualifiedType Type { get; init; }
@@ -115,8 +117,8 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
         {
             if (!string.IsNullOrEmpty(StringParsableType) && parse.Node is IValueSourceNode stringValue)
             {
-                ISpecPropertyType? type = KnownTypes.GetType(parse.Database, StringParsableType!, null, OneOrMore<string>.Null, resolvedOnly: true);
-                if (type == null)
+                _stringParseableType ??= KnownTypes.GetType(parse.Database, StringParsableType!, null, OneOrMore<string>.Null, resolvedOnly: true);
+                if (_stringParseableType == null)
                 {
                     if (parse.HasDiagnostics)
                     {
@@ -128,7 +130,7 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
                         });
                     }
                 }
-                else if (!type.TryParseValue(in parse, out ISpecDynamicValue v))
+                else if (!_stringParseableType.TryParseValue(in parse, out ISpecDynamicValue v))
                 {
                     return false;
                 }
@@ -239,7 +241,7 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
         }
 
         value = new CustomSpecTypeInstance(this, properties);
-        return false;
+        return true;
     }
 
     /// <inheritdoc />

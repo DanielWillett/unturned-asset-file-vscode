@@ -174,7 +174,12 @@ public static class DatDiagnostics
     /// <summary>
     /// A list or dictionary has too many or too few elements. <see cref="SpecProperty.MinimumCount"/> and <see cref="SpecProperty.MaximumCount"/> trigger this warning.
     /// </summary>
-    public static readonly DatDiagnostic UNT1024 = new DatDiagnostic("UNT1023", DatDiagnosticSeverity.Warning);
+    public static readonly DatDiagnostic UNT1024 = new DatDiagnostic("UNT1024", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// A property that was used isn't recognized by the game.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1025 = new DatDiagnostic("UNT1025", DatDiagnosticSeverity.Warning);
 
     /* Errors */
 

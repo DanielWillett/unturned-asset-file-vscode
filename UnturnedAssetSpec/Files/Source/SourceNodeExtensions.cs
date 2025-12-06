@@ -160,6 +160,24 @@ public static class SourceNodeExtensions
                 _ => (inclusionFlags & PropertyInclusionFlags.NonRootProperties) != 0
             };
         }
+
+        /// <summary>
+        /// Gets the range of this property including the key and value if it exists.
+        /// </summary>
+        public FileRange GetFullRange()
+        {
+            FileRange r = property.Range;
+            if (!property.HasValue)
+                return r;
+
+            FileRange valueRange = property.GetValueRange();
+            if (valueRange.Start.Line >= r.Start.Line)
+            {
+                r.Encapsulate(valueRange);
+            }
+
+            return r;
+        }
     }
 
     extension(IAssetSourceFile root)

@@ -22,7 +22,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class DiagnosticResources {
+    public class DiagnosticResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DanielWillett.UnturnedDataFileLspServer.Data.Properties.DiagnosticResources", typeof(DiagnosticResources).Assembly);
@@ -51,7 +51,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Dictionary and list properties can not also supply a value..
         /// </summary>
-        internal static string UNT1001 {
+        public static string UNT1001 {
             get {
                 return ResourceManager.GetString("UNT1001", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Expected double quotation mark at end of quoted string..
         /// </summary>
-        internal static string UNT1002 {
+        public static string UNT1002 {
             get {
                 return ResourceManager.GetString("UNT1002", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to This property is a flag (no value) and supplying a value may be misleading or cause unexpected results..
         /// </summary>
-        internal static string UNT1003 {
+        public static string UNT1003 {
             get {
                 return ResourceManager.GetString("UNT1003", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Escape sequence &apos;\{0}&apos; not recognized. Expected &apos;\n&apos;, &apos;\t&apos;, &apos;\&quot;&apos;, or &apos;\\&apos;..
         /// </summary>
-        internal static string UNT1004 {
+        public static string UNT1004 {
             get {
                 return ResourceManager.GetString("UNT1004", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Double-quotation marks can not be escaped in non-quoted strings. Use quoted strings if the first character needs to be a double-quotation mark. For example: &quot;\&quot;Value\&quot;&quot;, which parses to [&quot;Value&quot;]..
         /// </summary>
-        internal static string UNT1004_LeadingEscapedSlash {
+        public static string UNT1004_LeadingEscapedSlash {
             get {
                 return ResourceManager.GetString("UNT1004_LeadingEscapedSlash", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Trailing unescaped backslash. Use two backslashes to escape a backslash: &apos;\\&apos;..
         /// </summary>
-        internal static string UNT1004_Trailing {
+        public static string UNT1004_Trailing {
             get {
                 return ResourceManager.GetString("UNT1004_Trailing", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Value expected for property &apos;{0}&apos;..
         /// </summary>
-        internal static string UNT1005 {
+        public static string UNT1005 {
             get {
                 return ResourceManager.GetString("UNT1005", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to This property does not support rich text..
         /// </summary>
-        internal static string UNT1006 {
+        public static string UNT1006 {
             get {
                 return ResourceManager.GetString("UNT1006", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Property &apos;{0}&apos; requires property &apos;{1}&apos; to be present..
         /// </summary>
-        internal static string UNT1007 {
+        public static string UNT1007 {
             get {
                 return ResourceManager.GetString("UNT1007", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to There is not a face with this index, valid indexes include 0 through {0}..
         /// </summary>
-        internal static string UNT1008_Beard {
+        public static string UNT1008_Beard {
             get {
                 return ResourceManager.GetString("UNT1008_Beard", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to There is not a beard with this index, valid indexes include 0 through {0}..
         /// </summary>
-        internal static string UNT1008_Face {
+        public static string UNT1008_Face {
             get {
                 return ResourceManager.GetString("UNT1008_Face", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to There is not a hair with this index, valid indexes include 0 through {0}..
         /// </summary>
-        internal static string UNT1008_Hair {
+        public static string UNT1008_Hair {
             get {
                 return ResourceManager.GetString("UNT1008_Hair", resourceCulture);
             }
@@ -171,7 +171,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Unknown asset bundle version, expected a value between {0} and {1}..
         /// </summary>
-        internal static string UNT1009 {
+        public static string UNT1009 {
             get {
                 return ResourceManager.GetString("UNT1009", resourceCulture);
             }
@@ -180,7 +180,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Blueprint supply IDs that are the same as their containing asset can be replaced with &apos;This&apos;..
         /// </summary>
-        internal static string UNT101 {
+        public static string UNT101 {
             get {
                 return ResourceManager.GetString("UNT101", resourceCulture);
             }
@@ -189,7 +189,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The &quot;this&quot; keyword can be used to reference the current asset instead of using an ID or GUID..
         /// </summary>
-        internal static string UNT101_CodeFix_Annotation_Desc {
+        public static string UNT101_CodeFix_Annotation_Desc {
             get {
                 return ResourceManager.GetString("UNT101_CodeFix_Annotation_Desc", resourceCulture);
             }
@@ -198,7 +198,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Use &quot;this&quot; Keyword.
         /// </summary>
-        internal static string UNT101_CodeFix_Annotation_Label {
+        public static string UNT101_CodeFix_Annotation_Label {
             get {
                 return ResourceManager.GetString("UNT101_CodeFix_Annotation_Label", resourceCulture);
             }
@@ -207,7 +207,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Paths should only use forward slashes to maintain compatibility with Unity and Unix-based operating systems..
         /// </summary>
-        internal static string UNT1010 {
+        public static string UNT1010 {
             get {
                 return ResourceManager.GetString("UNT1010", resourceCulture);
             }
@@ -216,7 +216,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to File path should match pattern &quot;{0}&quot;..
         /// </summary>
-        internal static string UNT1011 {
+        public static string UNT1011 {
             get {
                 return ResourceManager.GetString("UNT1011", resourceCulture);
             }
@@ -225,7 +225,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to This legacy color is expected to have components between 0 and 1. Using values outside this range may cause unexpected results or visual glitches..
         /// </summary>
-        internal static string UNT1012 {
+        public static string UNT1012 {
             get {
                 return ResourceManager.GetString("UNT1012", resourceCulture);
             }
@@ -234,7 +234,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Achievement ID &quot;{0}&quot; either doesn&apos;t exist or isn&apos;t a valid NPC achievement..
         /// </summary>
-        internal static string UNT1013 {
+        public static string UNT1013 {
             get {
                 return ResourceManager.GetString("UNT1013", resourceCulture);
             }
@@ -243,7 +243,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Enum value &quot;{0}&quot; isn&apos;t recognized. See documentation for a list of valid values..
         /// </summary>
-        internal static string UNT1014 {
+        public static string UNT1014 {
             get {
                 return ResourceManager.GetString("UNT1014", resourceCulture);
             }
@@ -252,7 +252,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to At least one value in &quot;{0}&quot; of enum &quot;{1}&quot; isn&apos;t recognized. See documentation for a list of valid values..
         /// </summary>
-        internal static string UNT1014_Flags {
+        public static string UNT1014_Flags {
             get {
                 return ResourceManager.GetString("UNT1014_Flags", resourceCulture);
             }
@@ -261,7 +261,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Enum value &quot;{0}&quot; of enum &quot;{1}&quot; isn&apos;t recognized. See documentation for a list of valid values..
         /// </summary>
-        internal static string UNT1014_Specific {
+        public static string UNT1014_Specific {
             get {
                 return ResourceManager.GetString("UNT1014_Specific", resourceCulture);
             }
@@ -270,7 +270,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Expected a type deriving from &apos;{0}&apos;..
         /// </summary>
-        internal static string UNT1015 {
+        public static string UNT1015 {
             get {
                 return ResourceManager.GetString("UNT1015", resourceCulture);
             }
@@ -279,7 +279,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Level {0} is not a valid level for the {1} skill..
         /// </summary>
-        internal static string UNT1016 {
+        public static string UNT1016 {
             get {
                 return ResourceManager.GetString("UNT1016", resourceCulture);
             }
@@ -288,7 +288,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Unexpected amount supplied for an item ID or GUID..
         /// </summary>
-        internal static string UNT1017 {
+        public static string UNT1017 {
             get {
                 return ResourceManager.GetString("UNT1017", resourceCulture);
             }
@@ -297,7 +297,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Property &quot;{0}&quot; is deprecated..
         /// </summary>
-        internal static string UNT1018 {
+        public static string UNT1018 {
             get {
                 return ResourceManager.GetString("UNT1018", resourceCulture);
             }
@@ -306,7 +306,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The Translation Reference format is no longer supported by Unturned..
         /// </summary>
-        internal static string UNT1018_TranslationReference {
+        public static string UNT1018_TranslationReference {
             get {
                 return ResourceManager.GetString("UNT1018_TranslationReference", resourceCulture);
             }
@@ -315,7 +315,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to This property shouldn&apos;t reference the asset it&apos;s defined in..
         /// </summary>
-        internal static string UNT1019 {
+        public static string UNT1019 {
             get {
                 return ResourceManager.GetString("UNT1019", resourceCulture);
             }
@@ -324,7 +324,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to This format string should include argument {{{0}}}..
         /// </summary>
-        internal static string UNT102 {
+        public static string UNT102 {
             get {
                 return ResourceManager.GetString("UNT102", resourceCulture);
             }
@@ -333,7 +333,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to This document exceeds the maximum depth of the parser, which is {0} levels..
         /// </summary>
-        internal static string UNT1020 {
+        public static string UNT1020 {
             get {
                 return ResourceManager.GetString("UNT1020", resourceCulture);
             }
@@ -342,7 +342,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to New-line formatting is not supported for this string..
         /// </summary>
-        internal static string UNT1021 {
+        public static string UNT1021 {
             get {
                 return ResourceManager.GetString("UNT1021", resourceCulture);
             }
@@ -351,7 +351,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The correct new-line tag is &quot;&lt;br&gt;&quot;. No other variations are accepted..
         /// </summary>
-        internal static string UNT1022 {
+        public static string UNT1022 {
             get {
                 return ResourceManager.GetString("UNT1022", resourceCulture);
             }
@@ -360,7 +360,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Type references should use assembly-qualified type names. These are formatted as the full type and the assembly name separated by a comma. For example: &apos;SDG.Unturned.Asset, Assembly-CSharp&apos;..
         /// </summary>
-        internal static string UNT1023 {
+        public static string UNT1023 {
             get {
                 return ResourceManager.GetString("UNT1023", resourceCulture);
             }
@@ -369,7 +369,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Property &quot;{0}&quot; should must contain at least {1} element(s)..
         /// </summary>
-        internal static string UNT1024_Less {
+        public static string UNT1024_Less {
             get {
                 return ResourceManager.GetString("UNT1024_Less", resourceCulture);
             }
@@ -378,16 +378,43 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Property &quot;{0}&quot; should not contain more than {1} element(s)..
         /// </summary>
-        internal static string UNT1024_More {
+        public static string UNT1024_More {
             get {
                 return ResourceManager.GetString("UNT1024_More", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unrecognized property &quot;{0}&quot;. If you believe this is an error please open an issue on the GitHub page for this extension..
+        /// </summary>
+        public static string UNT1025 {
+            get {
+                return ResourceManager.GetString("UNT1025", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove this property from the asset file since it&apos;s not recognized by Unturned..
+        /// </summary>
+        public static string UNT1025_CodeFix_Annotation_Desc {
+            get {
+                return ResourceManager.GetString("UNT1025_CodeFix_Annotation_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove &quot;{0}&quot; Property.
+        /// </summary>
+        public static string UNT1025_CodeFix_Annotation_Label {
+            get {
+                return ResourceManager.GetString("UNT1025_CodeFix_Annotation_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type {0} is unknown and may not be assignable to &apos;{1}&apos;..
         /// </summary>
-        internal static string UNT103 {
+        public static string UNT103 {
             get {
                 return ResourceManager.GetString("UNT103", resourceCulture);
             }
@@ -396,7 +423,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The MasterBundleReference (&quot;MasterBundle&quot;, &quot;AssetPath&quot;) format is preferred here over the legacy ContentReference (&quot;Name&quot;, &quot;Path&quot;) format..
         /// </summary>
-        internal static string UNT104 {
+        public static string UNT104 {
             get {
                 return ResourceManager.GetString("UNT104", resourceCulture);
             }
@@ -405,7 +432,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Unnecessary trailing comma after quoted string..
         /// </summary>
-        internal static string UNT105 {
+        public static string UNT105 {
             get {
                 return ResourceManager.GetString("UNT105", resourceCulture);
             }
@@ -414,7 +441,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Use &quot;&lt;br&gt;&quot; instead of an explicit new-line..
         /// </summary>
-        internal static string UNT106 {
+        public static string UNT106 {
             get {
                 return ResourceManager.GetString("UNT106", resourceCulture);
             }
@@ -423,7 +450,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Generates a new GUID in the same format as the current one..
         /// </summary>
-        internal static string UNT107_CodeFix_Annotation_Desc {
+        public static string UNT107_CodeFix_Annotation_Desc {
             get {
                 return ResourceManager.GetString("UNT107_CodeFix_Annotation_Desc", resourceCulture);
             }
@@ -432,25 +459,16 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Generate Random GUID.
         /// </summary>
-        internal static string UNT107_CodeFix_Annotation_Label {
+        public static string UNT107_CodeFix_Annotation_Label {
             get {
                 return ResourceManager.GetString("UNT107_CodeFix_Annotation_Label", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Generate new GUID.
-        /// </summary>
-        internal static string UNT107_New_Guid {
-            get {
-                return ResourceManager.GetString("UNT107_New_Guid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Expected &apos;}&apos; at end of dictionary..
         /// </summary>
-        internal static string UNT2001 {
+        public static string UNT2001 {
             get {
                 return ResourceManager.GetString("UNT2001", resourceCulture);
             }
@@ -459,7 +477,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Expected &apos;]&apos; at end of list..
         /// </summary>
-        internal static string UNT2002 {
+        public static string UNT2002 {
             get {
                 return ResourceManager.GetString("UNT2002", resourceCulture);
             }
@@ -468,7 +486,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to This property is a flag, meaning just the presence of the property equates to a &apos;true&apos; value. The &apos;{0}&apos; value here is ignored..
         /// </summary>
-        internal static string UNT2003 {
+        public static string UNT2003 {
             get {
                 return ResourceManager.GetString("UNT2003", resourceCulture);
             }
@@ -477,7 +495,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Value &apos;{0}&apos; can not be converted to a value of type &apos;{1}&apos;..
         /// </summary>
-        internal static string UNT2004 {
+        public static string UNT2004 {
             get {
                 return ResourceManager.GetString("UNT2004", resourceCulture);
             }
@@ -486,7 +504,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Type &apos;{0}&apos; can not be resolved..
         /// </summary>
-        internal static string UNT2005 {
+        public static string UNT2005 {
             get {
                 return ResourceManager.GetString("UNT2005", resourceCulture);
             }
@@ -495,7 +513,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Unknown asset bundle version, expected a value between {0} and {1}..
         /// </summary>
-        internal static string UNT2009 {
+        public static string UNT2009 {
             get {
                 return ResourceManager.GetString("UNT2009", resourceCulture);
             }
@@ -504,7 +522,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to A GUID is required for this asset..
         /// </summary>
-        internal static string UNT2010 {
+        public static string UNT2010 {
             get {
                 return ResourceManager.GetString("UNT2010", resourceCulture);
             }
@@ -513,7 +531,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to A legacy ID is required for this asset..
         /// </summary>
-        internal static string UNT2011 {
+        public static string UNT2011 {
             get {
                 return ResourceManager.GetString("UNT2011", resourceCulture);
             }
@@ -522,7 +540,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Malformed format string. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method..
         /// </summary>
-        internal static string UNT2012 {
+        public static string UNT2012 {
             get {
                 return ResourceManager.GetString("UNT2012", resourceCulture);
             }
@@ -531,7 +549,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Malformed format string: {0}. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method..
         /// </summary>
-        internal static string UNT2012_WithMessage {
+        public static string UNT2012_WithMessage {
             get {
                 return ResourceManager.GetString("UNT2012_WithMessage", resourceCulture);
             }
@@ -540,7 +558,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to This {0} object can not be parsed using the legacy object format..
         /// </summary>
-        internal static string UNT2013_Legacy {
+        public static string UNT2013_Legacy {
             get {
                 return ResourceManager.GetString("UNT2013_Legacy", resourceCulture);
             }
@@ -549,7 +567,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         /// <summary>
         ///   Looks up a localized string similar to This {0} object can not be parsed using the modern object format..
         /// </summary>
-        internal static string UNT2013_Modern {
+        public static string UNT2013_Modern {
             get {
                 return ResourceManager.GetString("UNT2013_Modern", resourceCulture);
             }

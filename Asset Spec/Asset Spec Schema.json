@@ -1694,7 +1694,7 @@
                             "null"
                         ]
                     },
-                    "StringParsableType":
+                    "StringParseableType":
                     {
                         "description": "Custom parser type for string value nodes.",
                         "$ref": "#/$defs/datPropertyType"

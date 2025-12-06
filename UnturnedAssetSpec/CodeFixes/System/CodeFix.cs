@@ -29,7 +29,7 @@ public interface ICodeFix
     /// <summary>
     /// Gets the localized label of the fix in the IDE.
     /// </summary>
-    string GetLocalizedTitle();
+    string GetLocalizedTitle(CodeFixInstance instance);
 
     /// <summary>
     /// Adds every valid position under the given <paramref name="root"/> node for this code fix to a <paramref name="outputList"/>.
@@ -65,7 +65,8 @@ public abstract class CodeFix<TState> : ICodeFix<TState>
         Diagnostic = diagnostic;
     }
 
-    public abstract string GetLocalizedTitle();
+    public string GetLocalizedTitle(CodeFixInstance instance) => GetLocalizedTitle((CodeFixInstance<TState>)instance);
+    protected abstract string GetLocalizedTitle(CodeFixInstance<TState> instance);
     public abstract void GetValidPositions(ISourceNode root, FileRange? range, IList<CodeFixInstance> outputList);
     public abstract void ApplyCodeFix(in CodeFixParameters<TState> parameters, IMutableWorkspaceFile file);
 }
@@ -75,6 +76,7 @@ public abstract class CodeFixInstance
     public abstract ICodeFix CodeFix { get; }
     public abstract FileRange Range { get; }
     public abstract object? State { get; }
+    public bool HasDiagnostic { get; protected set; }
     public abstract void ApplyCodeFix(IMutableWorkspaceFile file);
 }
 
@@ -85,15 +87,18 @@ public class CodeFixInstance<TState> : CodeFixInstance
 
     public override ICodeFix CodeFix => _codeFix;
 
+    public ref readonly CodeFixParameters<TState> Parameters => ref _parameters;
+
     public override FileRange Range { get; }
 
     public override object? State => _parameters.State;
 
-    public CodeFixInstance(CodeFixParameters<TState> parameters, ICodeFix<TState> codeFix, FileRange range)
+    public CodeFixInstance(CodeFixParameters<TState> parameters, ICodeFix<TState> codeFix, FileRange range, bool hasDiagnostic)
     {
         _parameters = parameters;
         _codeFix = codeFix;
         Range = range;
+        HasDiagnostic = hasDiagnostic;
     }
 
     public override void ApplyCodeFix(IMutableWorkspaceFile file)

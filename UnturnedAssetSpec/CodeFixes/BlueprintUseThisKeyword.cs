@@ -21,8 +21,10 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
 
     public override bool NeedsExplicitDiscover => false;
 
-    /// <inheritdoc />
-    public override string GetLocalizedTitle() => DiagnosticResources.UNT101_CodeFix_Annotation_Label;
+    protected override string GetLocalizedTitle(CodeFixInstance<BlueprintUseThisKeywordState> instance)
+    {
+        return DiagnosticResources.UNT101_CodeFix_Annotation_Label;
+    }
 
     public BlueprintUseThisKeyword(
         IFilePropertyVirtualizer virtualizer,
@@ -64,6 +66,7 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
     public override bool TryApplyToProperty(
         out BlueprintUseThisKeywordState state,
         out FileRange range,
+        ref bool hasDiagnostic,
         IPropertySourceNode propertyNode,
         ISpecPropertyType propertyType,
         SpecProperty property,

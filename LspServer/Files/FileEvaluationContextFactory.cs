@@ -73,18 +73,20 @@ internal class FileEvaluationContextFactory
             return false;
         }
 
-        PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(valueNode?.Parent ?? parentNode);
+        PropertyBreadcrumbs breadcrumbs;
+        if (valueNode?.Parent is IListSourceNode)
+        {
+            for (; valueNode.Parent is IAnyValueSourceNode v; valueNode = v) ;
+            breadcrumbs = PropertyBreadcrumbs.FromNode(valueNode.Parent);
+        }
+        else
+            breadcrumbs = PropertyBreadcrumbs.FromNode(valueNode?.Parent ?? parentNode);
         SpecProperty? property = _propertyVirtualizer.GetProperty(
             parentNode,
             in fileType,
             in breadcrumbs,
             out PropertyResolutionContext context
         );
-
-        if (property == null && parentNode.Parent is IDictionarySourceNode dict)
-        {
-
-        }
 
         FileEvaluationContext evalCtx = new FileEvaluationContext(
             property!,

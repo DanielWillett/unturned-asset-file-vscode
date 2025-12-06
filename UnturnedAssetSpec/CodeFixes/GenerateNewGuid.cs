@@ -20,8 +20,10 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
 
     public override bool NeedsExplicitDiscover => false;
 
-    /// <inheritdoc />
-    public override string GetLocalizedTitle() => DiagnosticResources.UNT107_New_Guid;
+    protected override string GetLocalizedTitle(CodeFixInstance<GenerateNewGuidState> instance)
+    {
+        return DiagnosticResources.UNT107_CodeFix_Annotation_Label;
+    }
 
     public GenerateNewGuid(
         IFilePropertyVirtualizer virtualizer,
@@ -41,6 +43,7 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
     public override bool TryApplyToProperty(
         out GenerateNewGuidState state,
         out FileRange range,
+        ref bool hasDiagnostic,
         IPropertySourceNode propertyNode,
         ISpecPropertyType propertyType,
         SpecProperty property,

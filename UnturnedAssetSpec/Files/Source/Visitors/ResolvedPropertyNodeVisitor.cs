@@ -32,7 +32,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         InstallationEnvironment installEnv,
         IWorkspaceEnvironment workspaceEnv,
         FileRange? range = null,
-        PropertyInclusionFlags flags = PropertyInclusionFlags.All)
+        PropertyInclusionFlags flags = PropertyInclusionFlags.All | PropertyInclusionFlags.ResolvedOnly)
     {
         _virtualizer = virtualizer;
         _database = database;
@@ -42,17 +42,60 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         _range = range;
     }
 
-    protected abstract void AcceptResolvedProperty(
+    public static void VisitFile<T>(ISourceFile sourceFile, ref T visitor) where T : ResolvedPropertyNodeVisitor
+    {
+        if (sourceFile is IAssetSourceFile asset)
+        {
+            IDictionarySourceNode? metadata = asset.GetMetadataDictionary();
+            if (metadata != null)
+            {
+                IDictionarySourceNode assetData = asset.AssetData;
+                metadata.Visit(ref visitor);
+                assetData.Visit(ref visitor);
+                if ((visitor._flags & PropertyInclusionFlags.ResolvedOnly) != 0)
+                {
+                    return;
+                }
+
+                foreach (IPropertySourceNode property in asset.Properties)
+                {
+                    if (ReferenceEquals(property, metadata.Parent) || ReferenceEquals(property, assetData.Parent))
+                        continue;
+
+                    visitor.AcceptUnresolvedProperty(property, PropertyBreadcrumbs.Root);
+                }
+
+                return;
+            }
+        }
+
+        sourceFile.Visit(ref visitor);
+    }
+
+    protected virtual void AcceptResolvedProperty(
         SpecProperty property,
         ISpecPropertyType propertyType,
         in SpecPropertyTypeParseContext parseCtx,
         IPropertySourceNode node,
-        PropertyBreadcrumbs breadcrumbs);
+        in PropertyBreadcrumbs breadcrumbs) { }
+
+    protected virtual void AcceptUnresolvedProperty(
+        IPropertySourceNode node,
+        in PropertyBreadcrumbs breadcrumbs) { }
 
     protected override void AcceptProperty(IPropertySourceNode node)
     {
         if (!node.IsIncluded(_flags))
             return;
+        
+        if (node is { File: IAssetSourceFile, ValueKind: ValueTypeDataRefType.Dictionary }
+            && ReferenceEquals(node.Parent, node.File)
+            && (node.Key.Equals("Asset", StringComparison.OrdinalIgnoreCase) || node.Key.Equals("Metadata", StringComparison.OrdinalIgnoreCase))
+            )
+        {
+            // Metadata { } or Asset { } properties
+            return;
+        }
 
         if (_range.HasValue)
         {
@@ -78,6 +121,15 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
 
         SpecProperty? property = _virtualizer.GetProperty(node, in _fileType, in breadcrumbs, out PropertyResolutionContext context);
         if (property == null)
+        {
+            if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0)
+            {
+                AcceptUnresolvedProperty(node, in breadcrumbs);
+            }
+            return;
+        }
+
+        if ((_flags & PropertyInclusionFlags.UnresolvedOnly) != 0)
             return;
 
         FileEvaluationContext ctx = new FileEvaluationContext(property, node.File, _workspaceEnv, _installEnv, _database, context);
@@ -96,12 +148,12 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
             _visitedMultiProperties ??= new HashSet<(PropertyBreadcrumbs, SpecProperty)>();
             if (_visitedMultiProperties.Add((breadcrumbs, property)))
             {
-                AcceptResolvedProperty(property, type, in parseContext, node, breadcrumbs);
+                AcceptResolvedProperty(property, type, in parseContext, node, in breadcrumbs);
             }
         }
         else
         {
-            AcceptResolvedProperty(property, type, in parseContext, node, breadcrumbs);
+            AcceptResolvedProperty(property, type, in parseContext, node, in breadcrumbs);
         }
     }
 }

@@ -92,18 +92,27 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
         }
 
         PropertyInclusionFlags inclusionFlags = PropertyInclusionFlags.None;
+        bool allowUnresolved = false, allowResolved = false;
         foreach (ICodeFix codeFix in _codeFixes.All)
         {
             if (codeFix is IPerPropertyCodeFix perProperty)
             {
                 perPropertyFixes.Add(perProperty);
-                inclusionFlags |= perProperty.InclusionFlags;
+                PropertyInclusionFlags flags = perProperty.InclusionFlags;
+                if ((flags & PropertyInclusionFlags.ResolvedOnly) == 0)
+                    allowUnresolved = true;
+                if ((flags & PropertyInclusionFlags.UnresolvedOnly) == 0)
+                    allowResolved = true;
+                inclusionFlags |= flags;
             }
             else
             {
                 otherFixes.Add(codeFix);
             }
         }
+
+        if (allowUnresolved && allowResolved)
+            inclusionFlags &= ~(PropertyInclusionFlags.UnresolvedOnly | PropertyInclusionFlags.ResolvedOnly);
 
         OptionalVersionedTextDocumentIdentifier identifier = new OptionalVersionedTextDocumentIdentifier
         {
@@ -128,7 +137,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
             {
                 InvokePerPropertyCodeFixesVisitor propertyVisitor = new InvokePerPropertyCodeFixesVisitor(
                     _virtualizer, _database, _installEnv, _workspaceEnv,
-                    perPropertyFixes, actions, listener, options, listener.File, inclusionFlags, range
+                    perPropertyFixes, actions, listener, options, request, listener.File, inclusionFlags, range
                 )
                 {
                     Token = token
@@ -146,19 +155,19 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
 
                     foreach (CodeFixInstance instance in instances)
                     {
-                        GetCodeActionFromFix(instance, listener.File, options, listener, instance.Range);
+                        GetCodeActionFromFix(instance, listener.File, options, request, listener, instance.Range);
                     }
 
                     instances.Clear();
                 }
             }
-
-            return new CommandOrCodeActionContainer(actions);
         }
         finally
         {
             listener.File.Dispose();
         }
+
+        return new CommandOrCodeActionContainer(actions);
     }
 
     [Flags]
@@ -181,25 +190,36 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
         CodeFixInstance instance,
         IMutableWorkspaceFile file,
         Options options,
+        CodeActionParams request,
         FileUpdateListener listener,
         FileRange range)
     {
         ICodeFix codeFix = instance.CodeFix;
         instance.ApplyCodeFix(file);
+        Container<Diagnostic>? diagnostics = null;
+        if (instance.HasDiagnostic)
+        {
+            diagnostics = Container<Diagnostic>.From(
+                request.Context.Diagnostics.Where(x =>
+                {
+                    FileRange fr = x.Range.ToFileRange();
+                    --fr.End.Character;
+                    if (!range.Contains(fr.Start) || !range.Contains(fr.End))
+                        return false;
+
+                    if (!x.Code.HasValue)
+                        return false;
+
+                    DiagnosticCode code = x.Code.Value;
+                    return code.IsString && code.String!.Equals(codeFix.Diagnostic.ErrorId);
+                }));
+        }
         return new CodeAction
         {
-            //Diagnostics = new Container<Diagnostic>(new Diagnostic
-            //{
-            //    Code = new DiagnosticCode(codeFix.Diagnostic.ErrorId),
-            //    Severity = (DiagnosticSeverity)codeFix.Diagnostic.Severity,
-            //    Range = range.ToRange(),
-            //    Source = UnturnedAssetFileLspServer.DiagnosticSource
-            //}),
-            Title = codeFix.GetLocalizedTitle(),
+            Diagnostics = diagnostics,
+            Title = codeFix.GetLocalizedTitle(instance),
             Edit = listener.GetEditAndReset(),
-            
-            // todo
-            Kind = CodeActionKind.Refactor
+            Kind = instance.HasDiagnostic ? CodeActionKind.QuickFix : CodeActionKind.Refactor
         };
     }
 
@@ -209,6 +229,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
         private readonly List<CommandOrCodeAction> _actions;
         private readonly FileUpdateListener _listener;
         private readonly Options _options;
+        private readonly CodeActionParams _request;
         private readonly IMutableWorkspaceFile _file;
 
         public InvokePerPropertyCodeFixesVisitor(IFilePropertyVirtualizer virtualizer,
@@ -219,6 +240,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
             List<CommandOrCodeAction> actions,
             FileUpdateListener listener,
             Options options,
+            CodeActionParams request,
             IMutableWorkspaceFile file,
             PropertyInclusionFlags flags,
             FileRange? requestRange)
@@ -228,6 +250,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
             _actions = actions;
             _listener = listener;
             _options = options;
+            _request = request;
             _file = file;
         }
 
@@ -236,11 +259,12 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
             ISpecPropertyType propertyType,
             in SpecPropertyTypeParseContext parseCtx,
             IPropertySourceNode node,
-            PropertyBreadcrumbs breadcrumbs)
+            in PropertyBreadcrumbs breadcrumbs)
         {
             foreach (IPerPropertyCodeFix codeFix in _perPropertyFixes)
             {
-                if (!node.IsIncluded(codeFix.InclusionFlags))
+                PropertyInclusionFlags flags = codeFix.InclusionFlags;
+                if (!node.IsIncluded(flags) || (flags & PropertyInclusionFlags.UnresolvedOnly) != 0)
                     continue;
 
                 if (!codeFix.PassesTypeCheck(propertyType))
@@ -250,7 +274,28 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
                 if (instance == null)
                     continue;
 
-                CodeAction? action = GetCodeActionFromFix(instance, _file, _options, _listener, node.GetValueRange());
+                CodeAction? action = GetCodeActionFromFix(instance, _file, _options, _request, _listener, instance.Range);
+                if (action != null)
+                    _actions.Add(action);
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void AcceptUnresolvedProperty(
+            IPropertySourceNode node,
+            in PropertyBreadcrumbs breadcrumbs)
+        {
+            foreach (IPerPropertyCodeFix codeFix in _perPropertyFixes)
+            {
+                PropertyInclusionFlags flags = codeFix.InclusionFlags;
+                if (!node.IsIncluded(flags) || (flags & PropertyInclusionFlags.ResolvedOnly) != 0)
+                    continue;
+
+                CodeFixInstance? instance = codeFix.TryApplyToUnknownProperty(node, in breadcrumbs);
+                if (instance == null)
+                    continue;
+
+                CodeAction? action = GetCodeActionFromFix(instance, _file, _options, _request, _listener, instance.Range);
                 if (action != null)
                     _actions.Add(action);
             }

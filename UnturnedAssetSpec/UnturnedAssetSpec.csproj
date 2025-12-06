@@ -58,7 +58,7 @@
 
   <ItemGroup>
     <EmbeddedResource Update="Properties\DiagnosticResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>DiagnosticResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>

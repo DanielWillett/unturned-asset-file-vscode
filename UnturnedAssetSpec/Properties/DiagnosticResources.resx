@@ -273,13 +273,19 @@
   <data name="UNT2013_Modern" xml:space="preserve">
     <value>This {0} object can not be parsed using the modern object format.</value>
   </data>
-  <data name="UNT107_New_Guid" xml:space="preserve">
-    <value>Generate new GUID</value>
-  </data>
   <data name="UNT107_CodeFix_Annotation_Desc" xml:space="preserve">
     <value>Generates a new GUID in the same format as the current one.</value>
   </data>
   <data name="UNT107_CodeFix_Annotation_Label" xml:space="preserve">
     <value>Generate Random GUID</value>
+  </data>
+  <data name="UNT1025" xml:space="preserve">
+    <value>Unrecognized property "{0}". If you believe this is an error please open an issue on the GitHub page for this extension.</value>
+  </data>
+  <data name="UNT1025_CodeFix_Annotation_Desc" xml:space="preserve">
+    <value>Remove this property from the asset file since it's not recognized by Unturned.</value>
+  </data>
+  <data name="UNT1025_CodeFix_Annotation_Label" xml:space="preserve">
+    <value>Remove "{0}" Property</value>
   </data>
 </root>

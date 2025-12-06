@@ -47,7 +47,7 @@ public sealed class BlueprintIdSpecPropertyType :
     public override string Type => "BlueprintId";
 
     public BlueprintIdSpecPropertyType(IAssetSpecDatabase database, bool canParseDictionary)
-        : base(database, AssetCategory.Item.Value, canParseDictionary, OneOrMore<string>.Null) { }
+        : base(database, QualifiedType.ItemAssetType, canParseDictionary, OneOrMore<string>.Null) { }
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out GuidOrId value)
