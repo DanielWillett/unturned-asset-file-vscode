@@ -65,7 +65,7 @@ internal sealed class UnturnedAssetFileLspServer
             .CreateLogger();
 
 #if DEBUG
-        //if (Environment.GetEnvironmentVariable("UNTURNED_LSP_DEBUG") == "1")
+        if (Environment.GetEnvironmentVariable("UNTURNED_LSP_DEBUG") == "1")
         {
             Debugger.Launch();
         }

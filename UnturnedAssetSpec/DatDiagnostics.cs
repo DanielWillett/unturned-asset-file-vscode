@@ -49,6 +49,11 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT106 = new DatDiagnostic("UNT106", DatDiagnosticSeverity.Hint);
 
+    /// <summary>
+    /// Code action only - generate a new GUID.
+    /// </summary>
+    public static readonly DatDiagnostic UNT107 = new DatDiagnostic("UNT107", DatDiagnosticSeverity.Hint);
+
     /* Warnings */
 
     /// <summary>

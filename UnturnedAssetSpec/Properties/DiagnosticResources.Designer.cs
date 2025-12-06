@@ -412,6 +412,33 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Generates a new GUID in the same format as the current one..
+        /// </summary>
+        internal static string UNT107_CodeFix_Annotation_Desc {
+            get {
+                return ResourceManager.GetString("UNT107_CodeFix_Annotation_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generate Random GUID.
+        /// </summary>
+        internal static string UNT107_CodeFix_Annotation_Label {
+            get {
+                return ResourceManager.GetString("UNT107_CodeFix_Annotation_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generate new GUID.
+        /// </summary>
+        internal static string UNT107_New_Guid {
+            get {
+                return ResourceManager.GetString("UNT107_New_Guid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected &apos;}&apos; at end of dictionary..
         /// </summary>
         internal static string UNT2001 {

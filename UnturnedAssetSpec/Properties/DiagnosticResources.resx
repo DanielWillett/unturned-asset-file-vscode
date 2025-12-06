@@ -264,4 +264,13 @@
   <data name="UNT1024_Less" xml:space="preserve">
     <value>Property "{0}" should must contain at least {1} element(s).</value>
   </data>
+  <data name="UNT107_New_Guid" xml:space="preserve">
+    <value>Generate new GUID</value>
+  </data>
+  <data name="UNT107_CodeFix_Annotation_Desc" xml:space="preserve">
+    <value>Generates a new GUID in the same format as the current one.</value>
+  </data>
+  <data name="UNT107_CodeFix_Annotation_Label" xml:space="preserve">
+    <value>Generate Random GUID</value>
+  </data>
 </root>
