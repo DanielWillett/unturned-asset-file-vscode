@@ -15,11 +15,13 @@ using Serilog;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Diagnostics;
+using DanielWillett.UnturnedDataFileLspServer.Utility;
 using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace DanielWillett.UnturnedDataFileLspServer;
@@ -131,6 +133,14 @@ internal sealed class UnturnedAssetFileLspServer
                     if (index >= 0 && index < args.Length - 1 && int.TryParse(args[index + 1], NumberStyles.Any, CultureInfo.InvariantCulture, out int pid))
                     {
                         ClientProcessId = pid;
+                    }
+
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        FileAssociationUtility util = ActivatorUtilities.CreateInstance<FileAssociationUtility>(server.Services);
+                        await util.AssociateFileTypesAsync(force: false);
+                        if (util is IDisposable d)
+                            d.Dispose();
                     }
 
                     IWorkDoneObserver workDoneManager = server.WorkDoneManager.For(

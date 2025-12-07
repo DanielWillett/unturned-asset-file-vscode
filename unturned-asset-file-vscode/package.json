@@ -23,10 +23,14 @@
       {
         "id": "unturned-dat",
         "aliases": [ "Unturned Data File", "unturned-dat", "unturned-data-file", "Unturned Asset File" ],
-        "extensions": [ ".dat", ".asset", ".vdf", ".tool" ],
+        "extensions": [ ".dat", ".asset", ".vdf", ".tool", ".udat", ".udatproj" ],
         "configuration": "./language-configuration.json",
         "firstLine": "^(?:\\/+\\s*udat-.*:\\s*(?:.*)\\s*|\\/\\/\\s\\>\\sUnturned\\sServer\\sConfiguration\\sFile)$",
-        "filenames": [ "Config_EasyDifficulty.txt", "Config_NormalDifficulty.txt", "Config_HardDifficulty.txt", "Config.txt", "Level.hierarchy", "Visibility.config" ] 
+        "filenames": [ "Config_EasyDifficulty.txt", "Config_NormalDifficulty.txt", "Config_HardDifficulty.txt", "Config.txt", "Level.hierarchy", "Visibility.config" ],
+        "icon": {
+          "light": "./resources/file-icon-offcenter.png",
+          "dark": "./resources/file-icon-offcenter.png"
+        }
       }
     ],
     "grammars": [

@@ -1,0 +1,36 @@
+// UnturnedAssetFileIconHandler.idl : IDL source for UnturnedAssetFileIconHandler
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UnturnedAssetFileIconHandler.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(e0747a3b-d068-42ed-b1b4-8941b88e7423),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IIconHandler : IDispatch
+{
+};
+[
+	uuid(21a84523-c7ae-4fb7-9ec5-f24790490915),
+	version(1.0),
+]
+library UnturnedAssetFileIconHandlerLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(4e7807f2-0487-45c5-80a9-e71f7a986bfe)
+	]
+	coclass IconHandler
+	{
+		[default] interface IIconHandler;
+	};
+};
+
+import "shobjidl.idl";

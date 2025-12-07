@@ -1,0 +1,29 @@
+HKCR
+{
+    NoRemove '.dat' = s 'UnturnedDat'
+    {
+    }
+    NoRemove '.asset' = s 'UnturnedDat'
+    {
+    }
+    NoRemove '.udat' = s 'UnturnedDat'
+    {
+    }
+    NoRemove UnturnedDat = s 'Unturned Asset File'
+    {
+        NoRemove ShellEx
+        {
+            IconHandler = s '{4e7807f2-0487-45c5-80a9-e71f7a986bfe}'
+        }
+    }
+    NoRemove '.udatproj' = s 'UnturnedDatProject'
+    {
+    }
+    NoRemove UnturnedDatProject = s 'Unturned Asset Project'
+    {
+        NoRemove ShellEx
+        {
+            IconHandler = s '{4e7807f2-0487-45c5-80a9-e71f7a986bfe}'
+        }
+    }
+}

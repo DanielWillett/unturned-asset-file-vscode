@@ -61,6 +61,60 @@ namespace DanielWillett.UnturnedDataFileLspServer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to find installed location of Visual Studio Code..
+        /// </summary>
+        internal static string Error_FailedToFindVscode {
+            get {
+                return ResourceManager.GetString("Error_FailedToFindVscode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to clear file association for &quot;{0}&quot; files..
+        /// </summary>
+        internal static string Error_FileAssocFailedToClear {
+            get {
+                return ResourceManager.GetString("Error_FileAssocFailedToClear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to create VSCode file association for ProgId &quot;{0}&quot;..
+        /// </summary>
+        internal static string Error_FileAssocFailedToCreate {
+            get {
+                return ResourceManager.GetString("Error_FileAssocFailedToCreate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to run &quot;{0}&quot;. Exit code: &quot;{1}&quot;..
+        /// </summary>
+        internal static string Error_RegSvr32Exception {
+            get {
+                return ResourceManager.GetString("Error_RegSvr32Exception", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to find regsvr32.exe at &quot;{0}&quot;, which is needed to register file associations. Falling back to regsvr32 in PATH..
+        /// </summary>
+        internal static string Error_RegSvr32NotFound {
+            get {
+                return ResourceManager.GetString("Error_RegSvr32NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timed out running &quot;{0}&quot; to set up file associations..
+        /// </summary>
+        internal static string Error_RegSvr32Timeout {
+            get {
+                return ResourceManager.GetString("Error_RegSvr32Timeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Added in.
         /// </summary>
         internal static string Hover_AddedVersion {
