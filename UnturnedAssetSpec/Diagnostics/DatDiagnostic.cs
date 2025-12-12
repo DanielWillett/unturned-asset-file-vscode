@@ -1,4 +1,6 @@
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 
 public record struct DatDiagnostic
 {

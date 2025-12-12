@@ -103,7 +103,7 @@ public sealed class ListSpecPropertyType<TElementType> :
             ImmutableArray<ISourceNode> children = listNode.Children;
             EquatableArray<TElementType> eqArray = new EquatableArray<TElementType>(children.Length);
             
-            suppliedCount = children.Length;
+            suppliedCount = listNode.Count;
 
             int index = 0;
             foreach (ISourceNode node in children)

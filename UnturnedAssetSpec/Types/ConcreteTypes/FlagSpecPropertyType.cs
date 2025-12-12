@@ -1,3 +1,4 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
@@ -71,17 +72,29 @@ public sealed class FlagSpecPropertyType : BaseSpecPropertyType<FlagSpecProperty
                 Range = range
             };
 
-            if (parse.Node is IValueSourceNode stringValue
-                && KnownTypeValueHelper.TryParseBoolean(stringValue.Value, out bool boolValue)
-                && !boolValue)
+            diagnostic.Diagnostic = DatDiagnostics.UNT1003;
+            switch (parse.Node)
             {
-                diagnostic.Diagnostic = DatDiagnostics.UNT2003;
-                diagnostic.Message = string.Format(DiagnosticResources.UNT2003, stringValue.Value);
-            }
-            else
-            {
-                diagnostic.Diagnostic = DatDiagnostics.UNT1003;
-                diagnostic.Message = DiagnosticResources.UNT1003;
+                case IValueSourceNode stringValue:
+                    if (KnownTypeValueHelper.TryParseBoolean(stringValue.Value, out bool boolValue) && !boolValue)
+                    {
+                        diagnostic.Diagnostic = DatDiagnostics.UNT2003;
+                        diagnostic.Message = string.Format(DiagnosticResources.UNT2003, parse.EvaluationContext.Self.Key, stringValue.Value);
+                    }
+                    else
+                    {
+                        diagnostic.Message = string.Format(DiagnosticResources.UNT1003_Value, parse.EvaluationContext.Self.Key, stringValue.Value);
+                    }
+
+                    break;
+                
+                case IListSourceNode:
+                    diagnostic.Message = string.Format(DiagnosticResources.UNT1003_List, parse.EvaluationContext.Self.Key);
+                    break;
+                
+                default:
+                    diagnostic.Message = string.Format(DiagnosticResources.UNT1003_Dictionary, parse.EvaluationContext.Self.Key);
+                    break;
             }
 
             parse.Log(diagnostic);

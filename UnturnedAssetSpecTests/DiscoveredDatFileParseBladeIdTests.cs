@@ -14,7 +14,7 @@ public class DiscoveredDatFileParseBladeIdTests
     [OneTimeSetUp]
     public async Task Setup()
     {
-        _db = new AssetSpecDatabase { UseInternet = false };
+        _db = AssetSpecDatabase.FromOffline();
         await _db.InitializeAsync();
     }
 

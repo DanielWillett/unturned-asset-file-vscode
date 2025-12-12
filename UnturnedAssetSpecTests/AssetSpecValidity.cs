@@ -25,6 +25,7 @@ public class AssetSpecValidity
         TestAssetSpecDatabase db = new TestAssetSpecDatabase(util)
         {
             UseInternet = false,
+            // makes debugging easier
             MultiThreaded = false
         };
 
@@ -42,7 +43,7 @@ public class AssetSpecValidity
     {
         public TestAssetSpecDatabase(InstallDirUtility installDir) : base(installDir)
         {
-            
+
         }
 
         protected override void Log(string msg)

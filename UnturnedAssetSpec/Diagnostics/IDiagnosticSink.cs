@@ -1,4 +1,4 @@
-﻿namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 
 public interface IDiagnosticSink
 {

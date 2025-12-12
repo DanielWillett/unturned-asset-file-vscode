@@ -1067,6 +1067,7 @@
             "DisplayName": "Blueprint Supply",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html",
             "StringParseableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.BlueprintSupplyStringParseableSpecPropertyType, UnturnedAssetSpec",
+            "PluralBaseKey": "Supply",
             "Properties":
             [
                 {
@@ -1258,6 +1259,7 @@
                 {
                     "Key": "Operation",
                     "Type": "SDG.Unturned.EBlueprintOperation, Assembly-CSharp",
+                    "KeyLegacyExpansionFilter": "Modern",
                     "DefaultValue":
                     [
                         {
@@ -1292,8 +1294,17 @@
                 },
                 {
                     "Key": "InputItems",
-                    "Type": "ListOrSingle",
+                    "Type": "LegacyCompatibleList",
+                    "AllowSingleModern": true,
                     "ElementType": "SDG.Unturned.BlueprintSupply, Assembly-CSharp",
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Aliases":
+                    [
+                        {
+                            "LegacyExpansionFilter": "Legacy",
+                            "Alias": "Supplies"
+                        }
+                    ],
                     "DefaultValue": null,
                     "Description": "Input items defined for this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#inputitems-list-of-doc-item-asset-blueprints-inputitem",
@@ -1301,9 +1312,50 @@
                     "Variable": "supplies"
                 },
                 {
+                    "Key": "Tool",
+                    "Type": "Id",
+                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                    "DefaultValue": 0,
+                    "KeyLegacyExpansionFilter": "Legacy",
+                    "Description": "Adds an extra supply that won't be consumed when the item is crafted.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-tool-uint16-0",
+                    "Variable": "supplies"
+                },
+                {
+                    "Key": "Tool_Critical",
+                    "Type": "Flag",
+                    "DefaultValue": false,
+                    "KeyLegacyExpansionFilter": "Legacy",
+                    "Description": "Indicates that this blueprint will only be visible to a player that has @Tool in their inventory.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-tool-critical-flag",
+                    "Variable": "supplies",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "Tool",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Tool",
+                                "Operation": "neq",
+                                "Comparand": 0
+                            }
+                        }
+                    ]
+                },
+                {
                     "Key": "OutputItems",
-                    "Type": "ListOrSingle",
+                    "Type": "LegacyCompatibleList",
+                    "AllowSingleModern": true,
                     "ElementType": "SDG.Unturned.BlueprintOutput, Assembly-CSharp",
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Aliases":
+                    [
+                        {
+                            "LegacyExpansionFilter": "Legacy",
+                            "Alias": "Outputs"
+                        }
+                    ],
                     "DefaultValue": null,
                     "Description": "Output items defined for this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#outputitems-list-of-doc-item-asset-blueprints-outputitem",
@@ -1311,8 +1363,84 @@
                     "Variable": "outputs"
                 },
                 {
+                    "Key": "Product",
+                    "Type": "Id",
+                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                    "DefaultValue": "@ID",
+                    "KeyLegacyExpansionFilter": "Legacy",
+                    "Description": "Defines a single output item, defaulting to this file's item.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-product-uint16",
+                    "Variable": "outputs",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Outputs",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Outputs",
+                                "Operation": "gt",
+                                "Comparand": 0
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "Products",
+                    "Type": "UInt8",
+                    "DefaultValue": 1,
+                    "Minimum": 1,
+                    "KeyLegacyExpansionFilter": "Legacy",
+                    "Description": "Amount of @Product to give when this blueprint is crafted.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-products-uint8-1",
+                    "Variable": "outputs",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Outputs",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Outputs",
+                                "Operation": "gt",
+                                "Comparand": 0
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Key": "Origin",
+                    "Type": "SDG.Unturned.EItemOrigin, Assembly-CSharp",
+                    "DefaultValue": "CRAFT",
+                    "KeyLegacyExpansionFilter": "Legacy",
+                    "Description": "The item origin of @Product, determining how full the item's state is (such as ammo count, water level, etc.).",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-origin-doc-data-eitemorigin-craft",
+                    "Variable": "outputs",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Outputs",
+                            "Value": "*",
+                            "Condition":
+                            {
+                                "Variable": "Outputs",
+                                "Operation": "gt",
+                                "Comparand": 0
+                            }
+                        }
+                    ]
+                },
+                {
                     "Key": "Effect",
                     "Type": "BcAssetReference",
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Aliases":
+                    [
+                        {
+                            "LegacyExpansionFilter": "Legacy",
+                            "Alias": "Build"
+                        }
+                    ],
                     "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "Reference to an effect that will be spawned when this blueprint is crafted.",
@@ -1324,6 +1452,14 @@
                     "Type": "SkillLevel",
                     "DefaultValue": 0,
                     "SpecialTypes": [ "Skill" ],
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Aliases":
+                    [
+                        {
+                            "LegacyExpansionFilter": "Legacy",
+                            "Alias": "Level"
+                        }
+                    ],
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#skill-level-int32-0",
                     "Description": "The level of @Skill needed to craft this blueprint.",
                     "Variable": "level",
@@ -1342,8 +1478,40 @@
                 },
                 {
                     "Key": "Skill",
-                    "Type": "BlueprintSkill",
-                    "DefaultValue": null,
+                    "Type": 
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#Self.IsLegacy",
+                                    "Operation": "eq",
+                                    "Comparand": true
+                                }
+                            ],
+                            "Value": "SDG.Unturned.EBlueprintSkill, Assembly-CSharp"
+                        },
+                        {
+                            "Value": "BlueprintSkill"
+                        }
+                    ],
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#Self.IsLegacy",
+                                    "Operation": "eq",
+                                    "Comparand": true
+                                }
+                            ],
+                            "Value": "NONE"
+                        },
+                        {
+                            "Value": "BlueprintSkill"
+                        }
+                    ],
                     "Required":
                     {
                         "Variable": "Skill_Level",
@@ -1368,8 +1536,48 @@
                 },
                 {
                     "Key": "StateTransfer",
-                    "Type": "Boolean",
-                    "DefaultValue": false,
+                    "Type":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#Self.IsLegacy",
+                                    "Operation": "eq",
+                                    "Comparand": true
+                                }
+                            ],
+                            "Value": "Flag"
+                        },
+                        {
+                            "Value": "Boolean"
+                        }
+                    ],
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#Self.IsLegacy",
+                                    "Operation": "eq",
+                                    "Comparand": true
+                                }
+                            ],
+                            "Value": false
+                        },
+                        {
+                            "Value": false
+                        }
+                    ],
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Aliases":
+                    [
+                        {
+                            "LegacyExpansionFilter": "Legacy",
+                            "Alias": "State_Transfer"
+                        }
+                    ],
                     "Variable": "transferState",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#statetransfer-bool-false",
                     "Description": "Transfers special states of some items to the output, like fuel level, gun info, amount, quality, etc."
@@ -1378,6 +1586,14 @@
                     "Key": "StateTransfer_DeleteAttachments",
                     "Type": "Boolean",
                     "DefaultValue": false,
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Aliases":
+                    [
+                        {
+                            "LegacyExpansionFilter": "Legacy",
+                            "Alias": "State_Transfer_Delete_Attachments"
+                        }
+                    ],
                     "Variable": "withoutAttachments",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#statetransfer-deleteattachments-bool-false",
                     "Description": "Prevents attachments from being transferred when @State_Transfer is enabled.",
@@ -1427,6 +1643,7 @@
                     "Key": "VisibleWithUnmetConditions",
                     "Type": "Boolean",
                     "DefaultValue": false,
+                    "KeyLegacyExpansionFilter": "Modern",
                     "Variable": "CanBeVisibleWithUnmetConditions",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#visiblewithunmetconditions-bool-false",
                     "Description": "Makes this blueprint visible in the crafting menu even when conditions aren't met."
@@ -1436,11 +1653,13 @@
                     "Type": "String",
                     "DefaultValue": null,
                     "Variable": "Name",
+                    "KeyLegacyExpansionFilter": "Modern",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#name-string",
                     "Description": "Case-sensitive unique identifier for this blueprint. Used to reference blueprints from other assets or options, such as @(SDG.Unturned.ItemAsset, Assembly-CSharp::Actions)."
                 },
                 {
                     "Key": "RequiresNearbyCraftingTags",
+                    "KeyLegacyExpansionFilter": "Modern",
                     "Type": "List",
                     "ElementType": "AssetReference",
                     "SpecialTypes": [ "SDG.Unturned.TagAsset, Assembly-CSharp" ],
@@ -1467,11 +1686,105 @@
                     "Description": "List of tags that all need to be available nearby to craft this blueprint."
                 },
                 {
+                    "Key": "RequiresStaticTags",
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Type": "List",
+                    "ElementType": "AssetReference",
+                    "SpecialTypes": [ "SDG.Unturned.TagAsset, Assembly-CSharp" ],
+                    "IncludeedDefaultValue": null,
+                    "DefaultValue":
+                    [
+                        {
+                            "When":
+                            {
+                                "Variable": "#Self.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": false
+                            },
+                            "Cases":
+                            {
+                                "And":
+                                [
+                                    {
+                                        "Variable": "RequiresHeat",
+                                        "Operation": "eq",
+                                        "Comparand": true
+                                    }
+                                ],
+                                "Value": [ "20f30322bbcc4b01a4f116d22b24c21a" ]
+                            }
+                        },
+                        {
+                            "When":
+                            {
+                                "Variable": "#Self.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
+                            "Cases":
+                            {
+                                "And":
+                                [
+                                    {
+                                        "Variable": "Skill_Level",
+                                        "Operation": "gt",
+                                        "Comparand": 0
+                                    },
+                                    {
+                                        "Variable": "Skill",
+                                        "Operation": "eq",
+                                        "Comparand": "COOK"
+                                    }
+                                ],
+                                "Value": [ "20f30322bbcc4b01a4f116d22b24c21a" ]
+                            }
+                        },
+                        {
+                            "Value": null
+                        }
+                    ],
+                    "Variable": "RequiresNearbyCraftingTags",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#requiresnearbycraftingtags-list-of-asset-pointer-to-doc-assets-tag",
+                    "Description": "List of tags that all need to be available nearby to craft this blueprint."
+                },
+                {
                     "Key": "CategoryTag",
+                    "KeyLegacyExpansionFilter": "Modern",
                     "Type": "AssetReference",
                     "ElementType": "SDG.Unturned.TagAsset, Assembly-CSharp",
                     "DefaultValue":
                     [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#Self.IsLegacy",
+                                    "Operation": "eq",
+                                    "Comparand": true
+                                },
+                                {
+                                    "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Add_Default_Actions",
+                                    "Operation": "eq",
+                                    "Comparand": false
+                                },
+                                {
+                                    "Variable": "Operation",
+                                    "Operation": "eq",
+                                    "Comparand": "None"
+                                },
+                                {
+                                    "Variable": "InputItems",
+                                    "Operation": "eq",
+                                    "Comparand": "1"
+                                },
+                                {
+                                    "Variable": "InputItems[0].ID",
+                                    "Operation": "eq",
+                                    "Comparand": "@GUID"
+                                }
+                            ],
+                            "Value": "7ed29f9101ae4523a3b2e389414b7bd9"
+                        },
                         {
                             "And":
                             [

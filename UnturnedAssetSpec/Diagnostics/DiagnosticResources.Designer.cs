@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DanielWillett.UnturnedDataFileLspServer.Data.Properties.DiagnosticResources", typeof(DiagnosticResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics.DiagnosticResources", typeof(DiagnosticResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -79,11 +79,29 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This property is a flag (no value) and supplying a value may be misleading or cause unexpected results..
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; is a flag, meaning just the presence of the property indicates a &apos;true&apos; value. The dictionary will be ignored..
         /// </summary>
-        public static string UNT1003 {
+        public static string UNT1003_Dictionary {
             get {
-                return ResourceManager.GetString("UNT1003", resourceCulture);
+                return ResourceManager.GetString("UNT1003_Dictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; is a flag, meaning just the presence of the property indicates a &apos;true&apos; value. The list will be ignored..
+        /// </summary>
+        public static string UNT1003_List {
+            get {
+                return ResourceManager.GetString("UNT1003_List", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; is a flag, meaning just the presence of the property indicates a &apos;true&apos; value. The &apos;{1}&apos; value will be ignored..
+        /// </summary>
+        public static string UNT1003_Value {
+            get {
+                return ResourceManager.GetString("UNT1003_Value", resourceCulture);
             }
         }
         
@@ -484,7 +502,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This property is a flag, meaning just the presence of the property equates to a &apos;true&apos; value. The &apos;{0}&apos; value here is ignored..
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; is a flag, meaning just the presence of the property indicates a &apos;true&apos; value. The &apos;{1}&apos; value will be ignored..
         /// </summary>
         public static string UNT2003 {
             get {
@@ -498,6 +516,96 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         public static string UNT2004 {
             get {
                 return ResourceManager.GetString("UNT2004", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value &apos;{0}&apos; can not be converted to a value of type &apos;{1}&apos;. Single-character boolean values must be lowercase, try using &quot;{2}&quot; instead..
+        /// </summary>
+        public static string UNT2004_BooleanSingleCharCapitalized {
+            get {
+                return ResourceManager.GetString("UNT2004_BooleanSingleCharCapitalized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dictionary can not be converted to a value of type &apos;{0}&apos;. Property &apos;{1}&apos; expects a list..
+        /// </summary>
+        public static string UNT2004_DictionaryInsteadOfList {
+            get {
+                return ResourceManager.GetString("UNT2004_DictionaryInsteadOfList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dictionary can not be converted to a value of type &apos;{0}&apos;. Property &apos;{1}&apos; expects a value..
+        /// </summary>
+        public static string UNT2004_DictionaryInsteadOfValue {
+            get {
+                return ResourceManager.GetString("UNT2004_DictionaryInsteadOfValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to List can not be converted to a value of type &apos;{0}&apos;. Property &apos;{1}&apos; expects a dictionary..
+        /// </summary>
+        public static string UNT2004_ListInsteadOfDictionary {
+            get {
+                return ResourceManager.GetString("UNT2004_ListInsteadOfDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to List can not be converted to a value of type &apos;{0}&apos;. Property &apos;{1}&apos; expects a value..
+        /// </summary>
+        public static string UNT2004_ListInsteadOfValue {
+            get {
+                return ResourceManager.GetString("UNT2004_ListInsteadOfValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; expects a dictionary..
+        /// </summary>
+        public static string UNT2004_NoDictionary {
+            get {
+                return ResourceManager.GetString("UNT2004_NoDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; expects a list..
+        /// </summary>
+        public static string UNT2004_NoList {
+            get {
+                return ResourceManager.GetString("UNT2004_NoList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; expects a value..
+        /// </summary>
+        public static string UNT2004_NoValue {
+            get {
+                return ResourceManager.GetString("UNT2004_NoValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value &apos;{0}&apos; can not be converted to a value of type &apos;{1}&apos;. Property &apos;{2}&apos; expects a dictionary..
+        /// </summary>
+        public static string UNT2004_ValueInsteadOfDictionary {
+            get {
+                return ResourceManager.GetString("UNT2004_ValueInsteadOfDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value &apos;{0}&apos; can not be converted to a value of type &apos;{1}&apos;. Property &apos;{2}&apos; expects a list..
+        /// </summary>
+        public static string UNT2004_ValueInsteadOfList {
+            get {
+                return ResourceManager.GetString("UNT2004_ValueInsteadOfList", resourceCulture);
             }
         }
         

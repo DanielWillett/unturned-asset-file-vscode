@@ -527,6 +527,8 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             property.CreateTemplateProcessors();
         }
 
+        property.AdditionalProperties = extraData;
+
         if (typeStr == null && typeSwitch.TokenType == JsonTokenType.None)
         {
             if (isHidingInherited)
@@ -546,17 +548,17 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         PropertyTypeOrSwitch propertyType;
         if (typeSwitch.TokenType != JsonTokenType.None)
         {
-            propertyType = new PropertyTypeOrSwitch(ReadTypeSwitch(ref typeSwitch, null, ref elementTypeSwitch, options, in TypeProperty));
+            propertyType = new PropertyTypeOrSwitch(ReadTypeSwitch(ref typeSwitch, null, ref elementTypeSwitch, options, property, in TypeProperty));
         }
         else
         {
             if (elementTypeSwitch.TokenType != JsonTokenType.None)
             {
-                propertyType = new PropertyTypeOrSwitch(ReadTypeSwitch(ref typeSwitch, typeStr, ref elementTypeSwitch, options, in ElementTypeProperty));
+                propertyType = new PropertyTypeOrSwitch(ReadTypeSwitch(ref typeSwitch, typeStr, ref elementTypeSwitch, options, property, in ElementTypeProperty));
             }
             else
             {
-                ISpecPropertyType? pt = KnownTypes.GetType(database, typeStr!, elementTypeStr, specialTypes);
+                ISpecPropertyType? pt = KnownTypes.GetType(database, typeStr!, elementTypeStr, specialTypes, property);
                 pt ??= new UnresolvedSpecPropertyType(typeStr!);
 
                 propertyType = new PropertyTypeOrSwitch(pt);
@@ -652,8 +654,6 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             property.Exceptions = OneOrMore<ISpecDynamicValue>.Null;
         }
 
-        property.AdditionalProperties = extraData;
-
         return property;
     }
 
@@ -708,6 +708,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
         string? typeStr,
         ref Utf8JsonReader elementTypeReader,
         JsonSerializerOptions? options,
+        IAdditionalPropertyProvider additionalPropertyProvider,
         in JsonEncodedText property)
     {
         try
@@ -722,7 +723,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 elementTypeSwitch.UpdateValues(type =>
                 {
                     string? elementType = type.AsConcrete<ISpecPropertyType>()?.Type;
-                    ISpecPropertyType? t = KnownTypes.GetType(null, typeStr!, elementType, OneOrMore<string>.Null);
+                    ISpecPropertyType? t = KnownTypes.GetType(null, typeStr!, elementType, OneOrMore<string>.Null, additionalPropertyProvider);
                     t ??= new UnresolvedSpecPropertyType(typeStr!, elementType, OneOrMore<string>.Null);
                     return SpecPropertyTypeType.Instance.CreateValue(t);
                 });
@@ -746,8 +747,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
                 {
                     string? elementTypeStr = elementType.AsConcrete<ISpecPropertyType>()?.Type;
                     string? typeStr = type.AsConcrete<ISpecPropertyType>()?.Type;
-                    ISpecPropertyType? t = KnownTypes.GetType(null, typeStr!, elementTypeStr,
-                        OneOrMore<string>.Null);
+                    ISpecPropertyType? t = KnownTypes.GetType(null, typeStr!, elementTypeStr, OneOrMore<string>.Null, additionalPropertyProvider);
                     t ??= new UnresolvedSpecPropertyType(typeStr!, elementTypeStr, OneOrMore<string>.Null);
                     return SpecPropertyTypeType.Instance.CreateValue(t);
                 }))
@@ -1397,7 +1397,7 @@ internal sealed class SpecPropertyTypeType : ISpecPropertyType<ISpecPropertyType
 
         stringValue ??= span.ToString();
 
-        ISpecPropertyType? t = KnownTypes.GetType(null, stringValue);
+        ISpecPropertyType? t = KnownTypes.GetType(null, stringValue, null, OneOrMore<string>.Null, null, resolvedOnly: false);
         if (t != null)
         {
             dynamicValue = new SpecDynamicConcreteValue<ISpecPropertyType>(t, this);

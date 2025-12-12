@@ -79,7 +79,7 @@ internal sealed class UnresolvedSpecPropertyType :
     {
         if (IsKnownType)
         {
-            ISpecPropertyType? knownType = KnownTypes.GetType(database, Value, ElementType, SpecialTypes);
+            ISpecPropertyType? knownType = KnownTypes.GetType(database, Value, ElementType, SpecialTypes, property);
             if (knownType != null)
                 return knownType;
 

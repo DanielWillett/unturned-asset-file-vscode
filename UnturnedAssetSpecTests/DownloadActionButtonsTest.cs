@@ -23,7 +23,7 @@ public class DownloadActionButtonsTest
             Assert.Inconclusive("Game not installed where it's expected.");
         }
 
-        _runner = new AssetSpecDatabase { UseInternet = false };
+        _runner = AssetSpecDatabase.FromOffline(useInstallDir: true);
 
         await _runner.InitializeAsync();
 
@@ -31,6 +31,7 @@ public class DownloadActionButtonsTest
     }
 
     [Test]
+    [Ignore("Makes network requests.")]
     public async Task TestFromInternet()
     {
         _runner = new AssetSpecDatabase(new InstallDirUtility("NotUnturned", "Not304930")) { UseInternet = true };
@@ -41,6 +42,7 @@ public class DownloadActionButtonsTest
     }
 
     [Test]
+    [Ignore("Makes network requests.")]
     public async Task TestInitializedSuccessfully()
     {
         _runner = new AssetSpecDatabase { UseInternet = true };

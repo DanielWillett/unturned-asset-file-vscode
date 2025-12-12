@@ -35,6 +35,7 @@ public class StatusTests
     }
 
     [Test]
+    [Ignore("Makes network requests.")]
     public async Task TestFromInternet()
     {
         _runner = new AssetSpecDatabase(new InstallDirUtility("NotUnturned", "Not304930")) { UseInternet = true };
@@ -46,6 +47,7 @@ public class StatusTests
     }
 
     [Test]
+    [Ignore("Makes network requests.")]
     public async Task TestInitializedSuccessfully()
     {
         _runner = new AssetSpecDatabase { UseInternet = true };

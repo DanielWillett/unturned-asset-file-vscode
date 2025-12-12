@@ -1,0 +1,92 @@
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using System;
+
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+
+/// <summary>
+/// A type of <see cref="ITypeParser{T}"/> that parses only string values using an <see cref="ITypeConverter{T}"/>.
+/// </summary>
+/// <typeparam name="T">The type being parsed.</typeparam>
+public class TypeConverterParser<T>(ITypeConverter<T> typeConverter)
+    : ITypeParser<T>
+    where T : IEquatable<T>
+{
+    private readonly ITypeConverter<T> _typeConverter = typeConverter;
+
+    /// <summary>
+    /// Overridable behavior for parsing a string value, allowing for injecting more diagnostics after parsing.
+    /// </summary>
+    /// <param name="v">The value node being parsed.</param>
+    /// <param name="args">Other arguments passed to all parsers.</param>
+    /// <param name="ctx">Workspace context.</param>
+    /// <param name="value">The parsed value wrapped in an <see cref="Optional{T}"/> object.</param>
+    /// <returns>Whether or not the value could be parsed successfully.</returns>
+    protected virtual bool TryParseValueNode(IValueSourceNode v, ref TypeParserArgs<T> args, in FileEvaluationContext ctx, out Optional<T> value)
+    {
+        args.CreateTypeConverterParseArgs(out TypeConverterParseArgs<T> parseArgs, v.Value);
+
+        if (_typeConverter.TryParse(v.Value.AsSpan(), ref parseArgs, out T? parsedValue))
+        {
+            if (parseArgs.ShouldIgnoreFailureDiagnostic)
+                args.ShouldIgnoreFailureDiagnostic = true;
+            value = parsedValue;
+            return true;
+        }
+
+        if (parseArgs.ShouldIgnoreFailureDiagnostic)
+            args.ShouldIgnoreFailureDiagnostic = true;
+
+        value = Optional<T>.Null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    public bool TryParse(ref TypeParserArgs<T> args, in FileEvaluationContext ctx, out Optional<T> value)
+    {
+        switch (args.ValueNode)
+        {
+            case IValueSourceNode v:
+                if (TryParseValueNode(v, ref args, in ctx, out value))
+                {
+                    return true;
+                }
+
+                if (!args.ShouldIgnoreFailureDiagnostic)
+                {
+                    args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
+                    args.ShouldIgnoreFailureDiagnostic = true;
+                }
+
+                return false;
+
+            case IListSourceNode l:
+                args.DiagnosticSink?.UNT2004_ListInsteadOfValue(ref args, l, args.Type);
+                break;
+
+            case IDictionarySourceNode d:
+                args.DiagnosticSink?.UNT2004_DictionaryInsteadOfValue(ref args, d, args.Type);
+                break;
+
+            default:
+                args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                break;
+        }
+
+        value = Optional<T>.Null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return obj is TypeConverterParser<T> p && _typeConverter.Equals(p._typeConverter);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return _typeConverter.GetHashCode() * 397;
+    }
+}

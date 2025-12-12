@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -47,7 +48,7 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
             {
                 types.Add(outputPropType);
                 types.Add(KnownTypes.List(outputPropType, allowSingle: true));
-                types.Add(KnownTypes.LegacyCompatibleList(outputType));
+                types.Add(KnownTypes.LegacyCompatibleList(outputPropType, allowSingleLegacy: false, allowSingleModern: true));
             }
 
             ISpecType? supplyType = database.FindType("SDG.Unturned.BlueprintSupply, Assembly-CSharp", assetFileType);
@@ -55,7 +56,7 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
             {
                 types.Add(supplyPropType);
                 types.Add(KnownTypes.List(supplyPropType, allowSingle: true));
-                types.Add(KnownTypes.LegacyCompatibleList(supplyType));
+                types.Add(KnownTypes.LegacyCompatibleList(supplyPropType, allowSingleLegacy: false, allowSingleModern: true));
             }
 
             ValidTypes = types;

@@ -1,3 +1,4 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
@@ -104,11 +105,20 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
             return ReferenceEquals(parse.EvaluationContext.Self.DefaultValue, SpecDynamicValue.Null);
         }
 
-        return TryParseValue(in parse, out value, CustomSpecTypeParseOptions.Object);
+        return TryParseValue(in parse, out value, CustomSpecTypeParseOptions.Assume);
     }
 
     public bool TryParseValue(in SpecPropertyTypeParseContext parse, out CustomSpecTypeInstance? value, CustomSpecTypeParseOptions options)
     {
+        if (options is not CustomSpecTypeParseOptions.Legacy and not CustomSpecTypeParseOptions.Object)
+        {
+            options = parse.EvaluationContext.PropertyContext switch
+            {
+                PropertyResolutionContext.Legacy => CustomSpecTypeParseOptions.Legacy,
+                _ => CustomSpecTypeParseOptions.Object
+            };
+        }
+
         value = null;
         if (options == CustomSpecTypeParseOptions.Legacy && !IsLegacyExpandedType)
             return false;
@@ -301,6 +311,7 @@ public sealed class CustomSpecType : IPropertiesSpecType, ISpecPropertyType<Cust
 
 public enum CustomSpecTypeParseOptions
 {
+    Assume,
     Object,
     Legacy
 }

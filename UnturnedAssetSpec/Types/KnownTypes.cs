@@ -144,7 +144,7 @@ public static class KnownTypes
 
         if (database == null)
         {
-            return new UnresolvedSpecPropertyType(knownType);
+            return new UnresolvedSpecPropertyType(knownType, isKnownType: true);
         }
 
         return (ISpecPropertyType)ctor.Invoke([ database ]);
@@ -154,7 +154,13 @@ public static class KnownTypes
     /// Parse the type from a type name and element types.
     /// </summary>
     /// <remarks>If possible use <see cref="GetType(IAssetSpecDatabase?,string,string?,OneOrMore{string},bool)"/> instead.</remarks>
-    public static ISpecPropertyType? GetType(IAssetSpecDatabase? database, string knownType, string? elementType, OneOrMore<string> specialTypes, bool resolvedOnly = false)
+    public static ISpecPropertyType? GetType(
+        IAssetSpecDatabase? database,
+        string knownType,
+        string? elementType,
+        OneOrMore<string> specialTypes,
+        IAdditionalPropertyProvider? additionalPropertiesProvider = null,
+        bool resolvedOnly = false)
     {
         if (string.IsNullOrEmpty(knownType))
             return null;
@@ -313,7 +319,7 @@ public static class KnownTypes
             return CommaDelimitedString(
                 string.IsNullOrEmpty(elementType)
                     ? String
-                    : GetType(database, elementType!, elementType2, specialTypes.Remove(elementType2!)) ?? new UnresolvedSpecPropertyType(elementType!));
+                    : GetType(database, elementType!, elementType2, specialTypes.Remove(elementType2!), additionalPropertiesProvider) ?? new UnresolvedSpecPropertyType(elementType!));
         }
 
         if (knownType.Equals("TypeReference", StringComparison.Ordinal))
@@ -331,7 +337,7 @@ public static class KnownTypes
 
             ISpecPropertyType? resolvedElementType = string.IsNullOrEmpty(elementType)
                 ? String
-                : GetType(database, elementType!, elementType2, specialTypes.Remove(elementType2!), resolvedOnly);
+                : GetType(database, elementType!, elementType2, specialTypes.Remove(elementType2!), additionalPropertiesProvider, resolvedOnly);
 
             if (resolvedOnly && resolvedElementType == null)
             {
@@ -350,7 +356,7 @@ public static class KnownTypes
 
             ISpecPropertyType? resolvedElementType = string.IsNullOrEmpty(elementType)
                 ? String
-                : GetType(database, elementType!, elementType2, specialTypes.Remove(elementType2!), resolvedOnly);
+                : GetType(database, elementType!, elementType2, specialTypes.Remove(elementType2!), additionalPropertiesProvider, resolvedOnly);
 
             if (resolvedOnly && resolvedElementType == null)
             {
@@ -367,16 +373,21 @@ public static class KnownTypes
 
             string? elementType2 = specialTypes.FirstOrDefault();
 
-            ISpecType? resolvedElementType = string.IsNullOrEmpty(elementType)
+            ISpecPropertyType? resolvedElementType = string.IsNullOrEmpty(elementType)
                 ? null
-                : GetType(database, elementType, elementType2, specialTypes.Remove(elementType2!), resolvedOnly) as ISpecType;
+                : GetType(database, elementType, elementType2, specialTypes.Remove(elementType2!), additionalPropertiesProvider, resolvedOnly);
 
             if (resolvedOnly && resolvedElementType == null)
                 return null;
+
+            bool allowSingleModern = false, allowSingleLegacy = false;
+
+            additionalPropertiesProvider?.TryGetAdditionalProperty("AllowSingleModern", out allowSingleModern);
+            additionalPropertiesProvider?.TryGetAdditionalProperty("AllowSingleLegacy", out allowSingleLegacy);
             
             return resolvedElementType == null
-                ? LegacyCompatibleList(new UnresolvedSpecPropertyType(elementType))
-                : LegacyCompatibleList(resolvedElementType);
+                ? LegacyCompatibleList(new UnresolvedSpecPropertyType(elementType), allowSingleModern, allowSingleLegacy)
+                : LegacyCompatibleList(resolvedElementType, allowSingleModern, allowSingleLegacy);
         }
 
         if (knownType.Equals("Skill", StringComparison.Ordinal))
@@ -613,13 +624,21 @@ public static class KnownTypes
     public static ISpecPropertyType<string> Skill(IAssetSpecDatabase database, bool allowStandardSkills = true, bool allowBlueprintSkills = false)
         => new SkillSpecPropertyType(database, allowStandardSkills, allowBlueprintSkills);
 
-    public static ISpecPropertyType<EquatableArray<CustomSpecTypeInstance>> LegacyCompatibleList(ISpecType type)
+    public static ISpecPropertyType<EquatableArray<TValue>> LegacyCompatibleList<TValue>(ISpecPropertyType<TValue> innerType, bool allowSingleModern = false, bool allowSingleLegacy = false) where TValue : IEquatable<TValue>
+        => new LegacyCompatibleListSpecPropertyType<TValue>(innerType ?? throw new ArgumentNullException(nameof(innerType)), allowSingleModern, allowSingleLegacy);
+
+    public static ISpecPropertyType LegacyCompatibleList(ISpecPropertyType innerType, bool allowSingleModern = false, bool allowSingleLegacy = false)
     {
-        return new LegacyCompatibleListSpecPropertyType(type);
-    }
-    public static ISpecPropertyType LegacyCompatibleList(ISecondPassSpecPropertyType type)
-    {
-        return new UnresolvedLegacyCompatibleListSpecPropertyType(type);
+        if (innerType == null)
+            throw new ArgumentNullException(nameof(innerType));
+
+        if (innerType is ISecondPassSpecPropertyType secondPassType)
+        {
+            return new UnresolvedLegacyCompatibleListSpecPropertyType(secondPassType, allowSingleModern, allowSingleLegacy);
+        }
+
+        Type type = typeof(LegacyCompatibleListSpecPropertyType<>).MakeGenericType(innerType.ValueType);
+        return (ISpecPropertyType)Activator.CreateInstance(type, innerType, allowSingleModern, allowSingleLegacy);
     }
 
     public static ISpecPropertyType<int> SteamItemDef => SteamItemDefSpecPropertyType.Instance;

@@ -485,7 +485,7 @@ public class StringDictionary<T> : IDictionary<string, T>, IReadOnlyDictionary<s
             bucket = CreateBucket(0, 1);
             Count = 1;
             unchecked { ++_version; }
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER
             Array.Fill(_buckets, 1ul, bucketIndex + 1, BucketCount - bucketIndex - 1);
 #else
             for (int i = bucketIndex + 1; i < BucketCount; ++i)

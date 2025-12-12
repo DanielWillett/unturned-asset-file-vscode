@@ -33,7 +33,7 @@ public readonly struct ServerDifficultyCache
         {
             return _cache.TryRemove(oldFilePath, out _);
         }
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
         ReadOnlySpan<char> dirName = Path.GetDirectoryName(oldFilePath.AsSpan());
         if (dirName.IsEmpty)
             return false;
@@ -148,7 +148,7 @@ public readonly struct ServerDifficultyCache
 
     private static string GetCommandFilePath(string filePath)
     {
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
         ReadOnlySpan<char> dirName = Path.GetDirectoryName(filePath.AsSpan());
         string commandFilePath = Path.Join(dirName, "Server", "Commands.dat");
 #else

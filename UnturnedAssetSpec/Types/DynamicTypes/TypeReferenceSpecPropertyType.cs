@@ -1,3 +1,4 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -81,6 +82,8 @@ public sealed class TypeReferenceSpecPropertyType :
         return false;
     }
 
+#pragma warning disable CS8500
+
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out QualifiedType value)
     {
@@ -136,7 +139,7 @@ public sealed class TypeReferenceSpecPropertyType :
             }
 
             const int defaultAssemblyNameLen = 15;
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
             unsafe
             {
                 ConcatAssemblyNameState state;
@@ -186,7 +189,7 @@ public sealed class TypeReferenceSpecPropertyType :
 
         return true;
     }
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
     private unsafe struct ConcatAssemblyNameState
     {
         public ReadOnlySpan<char>* Ptr;

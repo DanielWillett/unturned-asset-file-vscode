@@ -1,3 +1,4 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
 using System.Collections.Generic;

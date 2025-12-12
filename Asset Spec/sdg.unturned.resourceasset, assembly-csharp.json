@@ -426,6 +426,38 @@
             "Priority": 5,
             "Variable": "shouldExcludeFromLevelBatching",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties"
+        },
+        {
+            "Key": "Armor_FalloffMaxRange",
+            "Type": "Float32",
+            "DefaultValue": -1.0,
+            "Minimum": "@Armor_FalloffRange",
+            "Except": [ -1 ],
+            "Description": "Ranged damage (guns) from greater than this distance finishes decreasing toward falloff multiplier. -1 indicates that falloff should be ignored.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "Variable": "ArmorFalloffMaxRange"
+        },
+        {
+            "Key": "Armor_FalloffRange",
+            "Type": "Float32",
+            "DefaultValue": "@Armor_FalloffMaxRange",
+            "Minimum": 0.0,
+            "Maximum": "@Armor_FalloffMaxRange",
+            "Except": [ -1 ],
+            "Description": "Ranged damage (guns) from greater than this distance begins decreasing toward falloff multiplier.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "Variable": "ArmorFalloffRange"
+        },
+        {
+            "Key": "Armor_FalloffMultiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 0.0,
+            "Maximum": 1.0,
+            "Except": [ -1 ],
+            "Description": "Percentage of incoming damage to apply past @Armor_FalloffMaxRange.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
+            "Variable": "ArmorFalloffMultiplier"
         }
     ],
     "Localization":

@@ -1,4 +1,4 @@
-#if NET
+#if TEST_LSP
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Files;
@@ -12,6 +12,7 @@ namespace UnturnedAssetSpecTests;
 internal class EnvironmentCacheTests
 {
     [Test]
+    [Ignore("Makes network requests.")]
     public async Task SaveToEmptyCache()
     {
         string testFolder = Path.GetFullPath("./test_no_cache");

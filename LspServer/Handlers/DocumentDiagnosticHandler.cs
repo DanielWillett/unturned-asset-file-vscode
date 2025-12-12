@@ -13,6 +13,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Diagnostics;
 using OmniSharp.Extensions.LanguageServer.Protocol;
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 

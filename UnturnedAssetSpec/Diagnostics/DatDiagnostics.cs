@@ -1,9 +1,8 @@
 // ReSharper disable InconsistentNaming
 
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 
 /// <summary>
 /// Common diagnostics.
@@ -194,7 +193,7 @@ public static class DatDiagnostics
     public static readonly DatDiagnostic UNT2002 = new DatDiagnostic("UNT2002", DatDiagnosticSeverity.Error);
 
     /// <summary>
-    /// Displayed when there is a false value provided for a flag property.
+    /// Displayed when there is a <see langword="false"/> value provided for a flag property.
     /// </summary>
     public static readonly DatDiagnostic UNT2003 = new DatDiagnostic("UNT2003", DatDiagnosticSeverity.Error);
 

@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 

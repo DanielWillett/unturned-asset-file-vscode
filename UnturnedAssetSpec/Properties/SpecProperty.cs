@@ -6,6 +6,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
@@ -250,24 +251,24 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
     /// </summary>
     public OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; set; } = OneOrMore<KeyValuePair<string, object?>>.Null;
 
+    /// <summary>
+    /// Runs a transformation process over every single exposed <see cref="ISpecDynamicValue"/> on this property.
+    /// </summary>
     internal void ProcessValues(Func<ISpecDynamicValue, ISpecDynamicValue?> process)
     {
-        if (RequiredCondition != null)
-            RequiredCondition = process(RequiredCondition);
-        if (DefaultValue != null)
-            DefaultValue = process(DefaultValue);
-        if (IncludedDefaultValue != null)
-            IncludedDefaultValue = process(IncludedDefaultValue);
-        if (MinimumValue != null)
-            MinimumValue = process(MinimumValue);
-        if (MaximumValue != null)
-            MaximumValue = process(MaximumValue);
-        if (MinimumCount != null)
-            MinimumCount = process(MinimumCount);
-        if (MaximumCount != null)
-            MaximumCount = process(MaximumCount);
+        RequiredCondition    = Process(RequiredCondition, process);
+        DefaultValue         = Process(DefaultValue, process);
+        IncludedDefaultValue = Process(IncludedDefaultValue, process);
+        MinimumValue         = Process(MinimumValue, process);
+        MaximumValue         = Process(MaximumValue, process);
+        MinimumCount         = Process(MinimumCount, process);
+        MaximumCount         = Process(MaximumCount, process);
+        Docs                 = Process(Docs, process);
+        Markdown             = Process(Markdown, process);
+        Version              = Process(Version, process);
 
-        foreach (ISpecDynamicValue value in Exceptions)
+        OneOrMore<ISpecDynamicValue> except = Exceptions;
+        foreach (ISpecDynamicValue value in except)
         {
             ISpecDynamicValue? newValue = process(value);
             if (ReferenceEquals(newValue, value))
@@ -276,6 +277,128 @@ public class SpecProperty : IEquatable<SpecProperty?>, ICloneable, IAdditionalPr
             Exceptions = Exceptions.Remove(value);
             if (newValue != null)
                 Exceptions = Exceptions.Add(newValue);
+        }
+
+        if (InclusiveProperties != null)
+        {
+            foreach (InclusionConditionProperty condition in InclusiveProperties.Properties)
+            {
+                SpecDynamicSwitchCaseOrCondition cond = condition.Condition;
+                bool anyChanges = false;
+                SpecDynamicSwitchCaseOrCondition cOut = ProcessValuesInCaseOrCondition(in cond, ref anyChanges, process);
+                if (anyChanges)
+                    condition.Condition = cOut;
+            }
+        }
+
+        if (ExclusiveProperties != null)
+        {
+            foreach (InclusionConditionProperty condition in ExclusiveProperties.Properties)
+            {
+                SpecDynamicSwitchCaseOrCondition cond = condition.Condition;
+                bool anyChanges = false;
+                SpecDynamicSwitchCaseOrCondition cOut = ProcessValuesInCaseOrCondition(in cond, ref anyChanges, process);
+                if (anyChanges)
+                    condition.Condition = cOut;
+            }
+        }
+
+        if (Type.IsSwitch)
+        {
+            Process(Type.TypeSwitch, process);
+        }
+
+        return;
+
+        [return: NotNullIfNotNull(nameof(value))]
+        static ISpecDynamicValue? Process(ISpecDynamicValue? value, Func<ISpecDynamicValue, ISpecDynamicValue?> process)
+        {
+            if (value is SpecDynamicSwitchValue sw)
+            {
+                foreach (SpecDynamicSwitchCaseValue c in sw.Cases)
+                {
+                    OneOrMore<SpecDynamicSwitchCaseOrCondition> conditions = c.Conditions;
+                    for (int i = 0; i < conditions.Length; i++)
+                    {
+                        SpecDynamicSwitchCaseOrCondition cond = conditions[i];
+                        bool anyChanges = false;
+                        SpecDynamicSwitchCaseOrCondition cOut =
+                            ProcessValuesInCaseOrCondition(in cond, ref anyChanges, process);
+                        if (anyChanges)
+                        {
+                            if (conditions.IsSingle)
+                            {
+                                c.Conditions = new OneOrMore<SpecDynamicSwitchCaseOrCondition>(cOut);
+                            }
+                            else
+                            {
+                                conditions.Values[i] = cOut;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (value != null)
+            {
+                return process(value);
+            }
+
+            return value;
+        }
+
+        static SpecDynamicSwitchCaseOrCondition ProcessValuesInCaseOrCondition(
+            in SpecDynamicSwitchCaseOrCondition cond,
+            ref bool anyChanges,
+            Func<ISpecDynamicValue, ISpecDynamicValue?> process)
+        {
+            if (cond.Case != null)
+            {
+                if (cond.Case.HasConditions)
+                {
+                    OneOrMore<SpecDynamicSwitchCaseOrCondition> conditions = cond.Case.Conditions;
+                    for (int i = 0; i < conditions.Length; i++)
+                    {
+                        SpecDynamicSwitchCaseOrCondition c = conditions[i];
+                        bool ac = false;
+                        SpecDynamicSwitchCaseOrCondition cOut = ProcessValuesInCaseOrCondition(in c, ref ac, process);
+                        if (ac)
+                        {
+                            anyChanges = true;
+                            if (conditions.IsSingle)
+                            {
+                                cond.Case.Conditions = new OneOrMore<SpecDynamicSwitchCaseOrCondition>(cOut);
+                            }
+                            else
+                            {
+                                conditions.Values[i] = cOut;
+                            }
+                        }
+                    }
+                }
+
+                if (cond.Case.Operation == SpecDynamicSwitchCaseOperation.When)
+                {
+                    SpecCondition c = cond.Condition;
+                    ISpecDynamicValue? v = process(c.Variable);
+                    if (!ReferenceEquals(v, c.Variable) && v != null)
+                    {
+                        anyChanges = true;
+                        cond.Case.WhenCondition = new SpecCondition(v, c.Operation, c.Comparand, c.IsInverted);
+                    }
+                }
+            }
+            else
+            {
+                SpecCondition c = cond.Condition;
+                ISpecDynamicValue? v = process(c.Variable);
+                if (!ReferenceEquals(v, c.Variable) && v != null)
+                {
+                    anyChanges = true;
+                    return new SpecDynamicSwitchCaseOrCondition(new SpecCondition(v, c.Operation, c.Comparand, c.IsInverted));
+                }
+            }
+
+            return cond;
         }
     }
 

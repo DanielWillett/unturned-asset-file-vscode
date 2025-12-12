@@ -98,7 +98,11 @@ public sealed class TemplateProcessor
 
     public static string EscapeKey(string key, TemplateProcessor processor)
     {
+#if NET7_0_OR_GREATER
         ReadOnlySpan<char> stops = [ '\\', '*' ];
+#else
+        ReadOnlySpan<char> stops = stackalloc[] { '\\', '*' };
+#endif
 
         OneOrMore<ReadOnlyMemory<char>> segments = processor._segments;
 
@@ -174,8 +178,12 @@ public sealed class TemplateProcessor
 
         ReadOnlySpan<char> span = key.AsSpan();
 
+#if NET7_0_OR_GREATER
         ReadOnlySpan<char> stops = [ '\\', '*' ];
-        
+#else
+        ReadOnlySpan<char> stops = stackalloc[] { '\\', '*' };
+#endif
+
         int index = span.IndexOfAny(stops);
 
         if (index == -1)

@@ -11,7 +11,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
 {
-    private readonly PropertyRefInfo _info;
+    private PropertyRefInfo _info;
 
     private SpecProperty? _property;
     private PropertyRef? _crossReferenceProperty;
@@ -28,9 +28,9 @@ public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
         _info = info;
     }
 
-    public PropertyRef(ReadOnlySpan<char> propertyName, string? originalString)
+    public PropertyRef(ReadOnlySpan<char> propertyName, string? originalString, PropertyResolutionContext context = PropertyResolutionContext.Modern)
     {
-        _info = new PropertyRefInfo(propertyName, originalString);
+        _info = new PropertyRefInfo(propertyName, originalString, context);
     }
 
     public bool Equals(PropertyRef? other) => other != null && string.Equals(PropertyName, other.PropertyName, StringComparison.Ordinal) && Context == other.Context && Type.Equals(other.Type);
@@ -154,17 +154,20 @@ public class PropertyRef : IEquatable<PropertyRef>, ISpecDynamicValue
     public override string ToString() => _info.PropertyName;
 }
 
-public readonly struct PropertyRefInfo
+public struct PropertyRefInfo
 {
-    public SpecPropertyContext Context { get; }
-    public string PropertyName { get; }
-    public QualifiedType Type { get; }
+    public readonly SpecPropertyContext Context;
+    public readonly string PropertyName;
+    public readonly QualifiedType Type;
+    public PropertyBreadcrumbs Breadcrumbs;
+    public SpecProperty? Property;
 
     public PropertyRefInfo(SpecProperty property)
     {
         PropertyName = property.Key;
         Context = SpecPropertyContext.Unspecified;
         Type = property.Owner.Type;
+        Property = property;
     }
 
     public override string ToString()
@@ -181,7 +184,15 @@ public readonly struct PropertyRefInfo
         } + PropertyName;
     }
 
-    public PropertyRefInfo(ReadOnlySpan<char> propertyName, string? originalString)
+    public PropertyRefInfo(SpecPropertyContext context, string propertyName, QualifiedType type, PropertyBreadcrumbs breadcrumbs)
+    {
+        Context = context;
+        PropertyName = propertyName;
+        Type = type;
+        Breadcrumbs = breadcrumbs;
+    }
+
+    public PropertyRefInfo(ReadOnlySpan<char> propertyName, string? originalString, PropertyResolutionContext context = PropertyResolutionContext.Modern)
     {
         if (propertyName == null)
             throw new ArgumentNullException(nameof(propertyName));
@@ -231,7 +242,19 @@ public readonly struct PropertyRefInfo
             }
         }
 
-        PropertyName = originalString != null && propertyName.Length == originalString.Length ? originalString : propertyName.ToString();
+        string propName;
+        PropertyBreadcrumbs c;
+        if (originalString != null && propertyName.Length == originalString.Length)
+        {
+            c = PropertyBreadcrumbs.FromPropertyRef(originalString, out propName, context);
+        }
+        else
+        {
+            c = PropertyBreadcrumbs.FromPropertyRef(propertyName, out propName, context);
+        }
+
+        Breadcrumbs = c;
+        PropertyName = propName;
     }
 
     public void ResolveProperty(in FileEvaluationContext ctx, out SpecProperty? property, out PropertyRefInfo crossRefProperty)
@@ -253,6 +276,11 @@ public readonly struct PropertyRefInfo
             return;
         }
 
+        if (!Breadcrumbs.IsRoot && Breadcrumbs[0].Property is not SpecProperty)
+        {
+            Breadcrumbs.ResolveFromPropertyRef(type, ctx.Information, Context);
+        }
+
         SpecPropertyContext context = Context;
         bool crossReference = false;
         if (context == SpecPropertyContext.CrossReferenceUnspecified)
@@ -271,7 +299,11 @@ public readonly struct PropertyRefInfo
             context = SpecPropertyContext.Property;
         }
 
-        property = type.FindProperty(PropertyName, context);
+            property = type.FindProperty(PropertyName, context);
+        if (Breadcrumbs.IsRoot)
+        {
+            // todo
+        }
 
         if (!crossReference || string.IsNullOrWhiteSpace(ctx.Self.FileCrossRef))
         {
@@ -279,7 +311,7 @@ public readonly struct PropertyRefInfo
             return;
         }
 
-        crossRefProperty = new PropertyRefInfo(ctx.Self.FileCrossRef.AsSpan(), ctx.Self.FileCrossRef);
+        crossRefProperty = new PropertyRefInfo(ctx.Self.FileCrossRef.AsSpan(), ctx.Self.FileCrossRef, PropertyResolutionContext.Modern);
     }
 
     /// <param name="valueIncluded">Whether or not there has to also be a value included.</param>

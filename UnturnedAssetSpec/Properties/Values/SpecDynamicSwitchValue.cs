@@ -609,8 +609,8 @@ public sealed class SpecDynamicSwitchCaseValue : ISpecDynamicValue, IEquatable<I
 {
     public ISpecPropertyType? ValueType { get; }
 
-    public OneOrMore<SpecDynamicSwitchCaseOrCondition> Conditions { get; }
-    public SpecCondition WhenCondition { get; }
+    public OneOrMore<SpecDynamicSwitchCaseOrCondition> Conditions { get; internal set; }
+    public SpecCondition WhenCondition { get; internal set; }
     public SpecDynamicSwitchCaseOperation Operation { get; }
     public ISpecDynamicValue Value { get; internal set; }
 

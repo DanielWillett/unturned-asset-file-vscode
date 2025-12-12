@@ -61,7 +61,7 @@ public sealed class SpecDynamicConcreteFlagsEnumValue :
     }
 
     /// <inheritdoc />
-    public bool Equals(SpecDynamicConcreteFlagsEnumValue other)
+    public bool Equals(SpecDynamicConcreteFlagsEnumValue? other)
     {
         if (!Type.Equals(other.Type))
             return false;
@@ -70,7 +70,7 @@ public sealed class SpecDynamicConcreteFlagsEnumValue :
     }
 
     /// <inheritdoc />
-    public bool Equals(ISpecDynamicValue other)
+    public bool Equals(ISpecDynamicValue? other)
     {
         if (Values.IsNull && other is SpecDynamicConcreteNullValue)
             return true;
@@ -167,7 +167,7 @@ public sealed class SpecDynamicConcreteFlagsEnumValue :
             ttlLength += (useCasing ? value.Casing : value.Value).Length;
         }
 
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
         unsafe
         {
             GetStringFromIndicesState state = default;
@@ -239,7 +239,7 @@ public sealed class SpecDynamicConcreteFlagsEnumValue :
 #endif
     }
 
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
     private unsafe struct GetStringFromIndicesState
     {
         public EnumSpecType Type;

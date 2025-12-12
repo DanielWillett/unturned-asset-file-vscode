@@ -1302,7 +1302,7 @@ public static class SpecDynamicValue
 
         if (expectedType is IVectorSpecPropertyType)
         {
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
             if (double.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out double vectorComponent))
 #else
             if (double.TryParse(optionalString ?? value.ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out double vectorComponent))
@@ -1324,7 +1324,7 @@ public static class SpecDynamicValue
                 ? null
                 : Convert.ChangeType(optionalString ?? value.ToString(), expectedType.ValueType);
 
-            reference = (ISpecDynamicValue)Activator.CreateInstance(typeof(SpecDynamicConcreteValue<>).MakeGenericType(expectedType.ValueType), val);
+            reference = (ISpecDynamicValue?)Activator.CreateInstance(typeof(SpecDynamicConcreteValue<>).MakeGenericType(expectedType.ValueType), val)!;
             return true;
         }
         catch (InvalidCastException)
@@ -1691,13 +1691,13 @@ public static class SpecDynamicValue
                         return new SpecDynamicConcreteValue<DateTimeOffset>(dtOffset, KnownTypes.DateTimeOffset);
                     }
 
-                    return String(reader.GetString(), expectedType as ISpecPropertyType<string> ?? KnownTypes.String);
+                    return String(reader.GetString()!, expectedType as ISpecPropertyType<string> ?? KnownTypes.String);
                 }
 
                 valueType = expectedType.ValueType;
                 if (valueType == typeof(string))
                 {
-                    return String(reader.GetString(), expectedType as ISpecPropertyType<string> ?? KnownTypes.String);
+                    return String(reader.GetString()!, expectedType as ISpecPropertyType<string> ?? KnownTypes.String);
                 }
                 if (valueType == typeof(Guid))
                 {
@@ -1713,7 +1713,7 @@ public static class SpecDynamicValue
                 }
                 if (valueType == typeof(char))
                 {
-                    string str = reader.GetString();
+                    string str = reader.GetString()!;
                     if (str.Length != 1)
                         invalidTypeThrowHandler(typeof(string), expectedType);
 
@@ -1721,7 +1721,7 @@ public static class SpecDynamicValue
                 }
                 if (expectedType is IStringParseableSpecPropertyType stringParseable)
                 {
-                    string str = reader.GetString();
+                    string str = reader.GetString()!;
                     if (!stringParseable.TryParse(str.AsSpan(), str, out ISpecDynamicValue value))
                     {
                         invalidTypeThrowHandler(typeof(string), expectedType);

@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
@@ -95,7 +96,338 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
             return ref _sections[index];
         }
     }
-    
+
+    /// <summary>
+    /// Parses a property with it's optional breadcrumbs from a string such as 'Blueprints[3].InputItems[0].Id'.
+    /// </summary>
+    /// <remarks>The value returned by this method needs to be further resolved using <see cref="ResolveFromPropertyRef"/> before it can function properly.</remarks>
+    /// <param name="propertyRef">The input string to parse.</param>
+    /// <param name="propertyName">The name of the property which is located at the returned breadcrumbs.</param>
+    /// <returns>The location of the described property.</returns>
+    public static PropertyBreadcrumbs FromPropertyRef(ReadOnlySpan<char> propertyRef, out string propertyName, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+    {
+        return FromPropertyRef(propertyRef, null, out propertyName, context);
+    }
+
+    /// <summary>
+    /// Parses a property with it's optional breadcrumbs from a string such as 'Blueprints[3].InputItems[0].Id'.
+    /// </summary>
+    /// <remarks>The value returned by this method needs to be further resolved using <see cref="ResolveFromPropertyRef"/> before it can function properly.</remarks>
+    /// <param name="propertyRef">The input string to parse.</param>
+    /// <param name="propertyName">The name of the property which is located at the returned breadcrumbs.</param>
+    /// <returns>The location of the described property.</returns>
+    public static PropertyBreadcrumbs FromPropertyRef(string propertyRef, out string propertyName, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+    {
+        return FromPropertyRef(propertyRef.AsSpan(), propertyRef, out propertyName, context);
+    }
+
+    private static PropertyBreadcrumbs FromPropertyRef(ReadOnlySpan<char> propertyRef, string? propertyRefStr, out string propertyName, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+    {
+        if (propertyRef.IsEmpty)
+        {
+            propertyName = string.Empty;
+            return Root;
+        }
+
+        int ct = 0;
+        int escCount = 0;
+        bool hasEsc = false;
+        for (int i = 0; i < propertyRef.Length; ++i)
+        {
+            switch (propertyRef[i])
+            {
+                case '\\':
+                    ++escCount;
+                    hasEsc = true;
+                    break;
+
+                case '.':
+                    if (escCount % 2 == 1)
+                        break;
+
+                    escCount = 0;
+                    ++ct;
+                    break;
+
+                case '[':
+                    if (escCount % 2 == 1)
+                        goto default;
+
+                    escCount = 0;
+                    int p = TryParseIndex(propertyRef, i, out int lastIndex, apply: false);
+                    if (p == -1)
+                        continue;
+                    ++ct;
+                    i = lastIndex;
+                    break;
+
+                default:
+                    escCount = 0;
+                    break;
+            }
+        }
+
+        if (ct == 0 && !hasEsc)
+        {
+            propertyName = propertyRefStr ?? propertyRef.ToString();
+            return Root;
+        }
+
+        PropertyBreadcrumbSection[] section = ct == 0 ? Array.Empty<PropertyBreadcrumbSection>() : new PropertyBreadcrumbSection[ct];
+        int sectionIndex = 0;
+
+        if (hasEsc)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            escCount = 0;
+            for (int i = 0; i < propertyRef.Length; ++i)
+            {
+                switch (propertyRef[i])
+                {
+                    case '\\':
+                        ++escCount;
+                        if (escCount % 2 == 0)
+                            sb.Append('\\');
+                        break;
+
+                    case '.':
+                        if (escCount % 2 == 1)
+                            goto default;
+
+                        escCount = 0;
+                        section[sectionIndex] = new PropertyBreadcrumbSection(sb.ToString(), context);
+                        ++sectionIndex;
+                        sb.Clear();
+                        break;
+
+                    case '[':
+                        if (escCount % 2 == 1)
+                            goto default;
+
+                        escCount = 0;
+                        int specifiedIndex = TryParseIndex(propertyRef, i, out int lastIndex, apply: true);
+                        if (specifiedIndex == -1)
+                            goto default;
+                        ref PropertyBreadcrumbSection sec = ref section[sectionIndex];
+                        ++sectionIndex;
+                        if (sb.Length > 0)
+                        {
+                            sec = new PropertyBreadcrumbSection(sb.ToString(), context, specifiedIndex);
+                            sb.Clear();
+                        }
+                        else
+                        {
+                            sec = new PropertyBreadcrumbSection(context, specifiedIndex);
+                        }
+                        i = lastIndex;
+                        break;
+
+                    default:
+                        escCount = 0;
+                        sb.Append(propertyRef[i]);
+                        break;
+                }
+            }
+
+            propertyName = sb.ToString();
+        }
+        else
+        {
+            ReadOnlySpan<char> triggerChars = [ '[', '.' ];
+            int firstIndex = propertyRef.IndexOfAny(triggerChars);
+            if (firstIndex < 0)
+            {
+                propertyName = propertyRefStr ?? propertyRef.ToString();
+                return Root;
+            }
+
+            int lastIndex = -1;
+            bool hasDictSection = firstIndex > 0;
+            while (true)
+            {
+                int index = lastIndex < 0 ? firstIndex : propertyRef.Slice(lastIndex + 1).IndexOfAny(triggerChars);
+                if (index < 0)
+                {
+                    break;
+                }
+
+                index += lastIndex + 1;
+                int prevIndex = lastIndex;
+                lastIndex = index;
+
+                char c = propertyRef[index];
+                switch (c)
+                {
+                    case '[':
+
+                        int specifiedIndex = TryParseIndex(propertyRef, index, out lastIndex, apply: true);
+
+                        ref PropertyBreadcrumbSection sec = ref section[sectionIndex];
+                        ++sectionIndex;
+                        if (hasDictSection)
+                        {
+                            sec = new PropertyBreadcrumbSection(propertyRef.Slice(prevIndex + 1, index - prevIndex - 1).ToString(), context, specifiedIndex);
+                        }
+                        else
+                        {
+                            sec = new PropertyBreadcrumbSection(context, specifiedIndex);
+                        }
+                        hasDictSection = propertyRef[lastIndex] == '.';
+                        break;
+
+                    case '.':
+                        hasDictSection = true;
+                        section[sectionIndex] = new PropertyBreadcrumbSection(propertyRef.Slice(prevIndex + 1, index - prevIndex - 1).ToString(), context);
+                        ++sectionIndex;
+                        break;
+                }
+            }
+
+            if (hasDictSection && lastIndex + 1 < propertyRef.Length)
+            {
+                propertyName = propertyRef.Slice(lastIndex + 1).ToString();
+            }
+            else
+            {
+                propertyName = string.Empty;
+            }
+        }
+
+        if (sectionIndex < section.Length)
+        {
+            Array.Resize(ref section, sectionIndex);
+        }
+
+        return new PropertyBreadcrumbs(section);
+
+        static int TryParseIndex(ReadOnlySpan<char> propertyRef, int index, out int lastIndex, bool apply)
+        {
+            lastIndex = index;
+            int endIndex = propertyRef.Slice(index + 1).IndexOf(']');
+            if (endIndex <= 0)
+                return -1;
+
+            ReadOnlySpan<char> indexValue = propertyRef.Slice(index + 1, endIndex);
+            indexValue = indexValue.Trim();
+            bool isFromEnd = indexValue[0] == '^';
+            if (isFromEnd)
+            {
+                indexValue = indexValue[1..];
+                indexValue = indexValue.TrimStart();
+            }
+
+            endIndex += index + 1;
+            lastIndex = endIndex;
+            if (endIndex + 1 < propertyRef.Length && propertyRef[endIndex + 1] == '.')
+            {
+                lastIndex = endIndex + 1;
+            }
+
+            int specifiedIndex;
+            if (!apply)
+            {
+                specifiedIndex = 0;
+                for (int j = 0; j < indexValue.Length; ++j)
+                {
+                    if (char.IsDigit(indexValue[j]))
+                        continue;
+
+                    specifiedIndex = -1;
+                    break;
+                }
+            }
+            else
+            {
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+                if (!int.TryParse(indexValue, NumberStyles.None, CultureInfo.InvariantCulture, out specifiedIndex))
+#else
+                if (!int.TryParse(indexValue.ToString(), NumberStyles.None, CultureInfo.InvariantCulture, out specifiedIndex))
+#endif
+                {
+                    lastIndex = index;
+                    return -1;
+                }
+            }
+
+            if (specifiedIndex < 0)
+            {
+                lastIndex = index;
+                return -1;
+            }
+
+            return isFromEnd ? -specifiedIndex - 1 : specifiedIndex;
+        }
+    }
+
+    /// <summary>
+    /// Resolves possible properties in-place from this property-ref.
+    /// </summary>
+    public void ResolveFromPropertyRef(ISpecType baseType, IAssetSpecDatabase database, SpecPropertyContext context = SpecPropertyContext.Property)
+    {
+        if (IsRoot)
+            return;
+
+        ISpecType? typeOwner = baseType;
+        int skipType = 0;
+
+        for (int i = 0; i < _sections.Length; ++i)
+        {
+            ref PropertyBreadcrumbSection section = ref _sections[i];
+            if (typeOwner != null && skipType <= 0)
+            {
+                SpecProperty? property = section.Property as SpecProperty;
+                if (property == null && section.Property is string propertyName && typeOwner != null)
+                {
+                    property = database.FindPropertyInfoByKey(propertyName, typeOwner, section.Context, context: context).Property;
+                }
+
+                if (property == null)
+                {
+                    typeOwner = null;
+                }
+                else
+                {
+                    section = new PropertyBreadcrumbSection(in section, property);
+                    ISpecPropertyType? typeOrListType = property.Type.Type;
+                    skipType = 0;
+                    typeOwner = null;
+                    while (typeOrListType != null)
+                    {
+                        switch (typeOrListType)
+                        {
+                            case ISpecType t:
+                                typeOwner = t;
+                                break;
+
+                            case IListTypeSpecPropertyType list:
+                                ISpecPropertyType? innerType = list.GetInnerType();
+                                if (innerType == null)
+                                    break;
+                                ++skipType;
+                                typeOrListType = innerType;
+                                continue;
+
+                            case IDictionaryTypeSpecPropertyType dict:
+                                innerType = dict.GetInnerType(database);
+                                if (innerType == null)
+                                    break;
+                                ++skipType;
+                                typeOrListType = innerType;
+                                continue;
+                        }
+
+                        break;
+                    }
+                }
+            }
+            else if (skipType > 0)
+            {
+                --skipType;
+            }
+        }
+    }
+
     /// <summary>
     /// Create breadcrums from a specific property or list value node.
     /// </summary>
@@ -441,6 +773,14 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
     
     public readonly PropertyResolutionContext Context;
 
+    internal PropertyBreadcrumbSection(in PropertyBreadcrumbSection other, object? newProperty)
+    {
+        Index = other.Index;
+        Property = newProperty;
+        ParentNode = other.ParentNode;
+        Context = other.Context;
+    }
+
     public PropertyBreadcrumbSection(PropertyResolutionContext context, int index)
     {
         Context = context;
@@ -500,9 +840,16 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
         if (value == null)
             return null;
 
-        if (Index >= 0 && value is IListSourceNode list)
+        if (value is IListSourceNode list)
         {
-            return list.TryGetElement(Index, out IAnyValueSourceNode? av) ? av as IAnyChildrenSourceNode : null;
+            if (Index >= 0)
+            {
+                return list.TryGetElement(Index, out IAnyValueSourceNode? av) ? av as IAnyChildrenSourceNode : null;
+            }
+            if (Index < -1)
+            {
+                return list.TryGetElement(list.Count + Index + 1, out IAnyValueSourceNode? av) ? av as IAnyChildrenSourceNode : null;
+            }
         }
 
         return value as IAnyChildrenSourceNode;
@@ -544,9 +891,16 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
         if (value == null)
             return null;
 
-        if (Index >= 0 && value is IListSourceNode list)
+        if (value is IListSourceNode list)
         {
-            return list.TryGetElement(Index, out IAnyValueSourceNode? av) ? av as IAnyChildrenSourceNode : null;
+            if (Index >= 0)
+            {
+                return list.TryGetElement(Index, out IAnyValueSourceNode? av) ? av as IAnyChildrenSourceNode : null;
+            }
+            if (Index < -1)
+            {
+                return list.TryGetElement(list.Count + Index + 1, out IAnyValueSourceNode? av) ? av as IAnyChildrenSourceNode : null;
+            }
         }
 
         return value as IAnyChildrenSourceNode;
@@ -586,6 +940,8 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
     public readonly override string ToString()
     {
         string key = GetKey();
+        if (Index < -1)
+            return key + "[^" + -(Index + 1) + "]";
         return Index >= 0 ? key + "[" + Index + "]" : key;
     }
 
@@ -595,6 +951,10 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
         if (Index >= 0)
         {
             sb.Append('[').Append(Index).Append(']');
+        }
+        else if (Index < -1)
+        {
+            sb.Append("[^").Append(-(Index + 1)).Append(']');
         }
     }
 }

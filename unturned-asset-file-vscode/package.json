@@ -1,116 +1,242 @@
 {
-  "name": "unturned-data-file-lsp",
-  "displayName": "Unturned Data File Format",
-  "description": "LSP for the Unturned Data File format.",
-  "author": "DanielWillett",
-  "publisher": "DanielWillett",
-  "version": "0.0.1",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/DanielWillett/unturned-asset-file-vscode"
-  },
-  "license": "GPL-3.0-only",
-  "engines": {
-    "vscode": "^1.97.0"
-  },
-  "categories": [
-    "Programming Languages"
-  ],
-  "activationEvents": [],
-  "main": "./dist/extension.js",
-  "contributes": {
-    "languages": [
-      {
-        "id": "unturned-dat",
-        "aliases": [ "Unturned Data File", "unturned-dat", "unturned-data-file", "Unturned Asset File" ],
-        "extensions": [ ".dat", ".asset", ".vdf", ".tool", ".udat", ".udatproj" ],
-        "configuration": "./language-configuration.json",
-        "firstLine": "^(?:\\/+\\s*udat-.*:\\s*(?:.*)\\s*|\\/\\/\\s\\>\\sUnturned\\sServer\\sConfiguration\\sFile)$",
-        "filenames": [ "Config_EasyDifficulty.txt", "Config_NormalDifficulty.txt", "Config_HardDifficulty.txt", "Config.txt", "Level.hierarchy", "Visibility.config" ],
-        "icon": {
-          "light": "./resources/file-icon-offcenter.png",
-          "dark": "./resources/file-icon-offcenter.png"
-        }
-      }
-    ],
-    "grammars": [
-      {
-        "language": "unturned-dat",
-        "scopeName": "source.unturned-dat",
-        "path": "./syntaxes/unturned-dat.tmLanguage.json"
-      }
-    ],
-    "views": {
-      "explorer": [
-        {
-          "id": "unturnedDataFile.assetProperties",
-          "name": "Asset Properties"
-        }
-      ]
+    "name": "unturned-data-file-lsp",
+    "displayName": "Unturned Data File",
+    "description": "LSP for the Unturned Data File format.",
+    "author": "DanielWillett",
+    "publisher": "DanielWillett",
+    "version": "0.0.1",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/DanielWillett/unturned-asset-file-vscode"
     },
-    "commands": [
-      {
-        "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
-        "title": "Refresh Asset Properties",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
-      },
-      {
-        "command": "unturnedDataFile.cursorMoveTo",
-        "title": "Move Cursor To"
-      },
-      {
-        "command": "unturnedDataFile.addProperty",
-        "title": "Add Property"
-      }
+    "license": "GPL-3.0-only",
+    "engines":
+    {
+        "vscode": "^1.97.0"
+    },
+    "categories":
+    [
+        "Programming Languages"
     ],
-    "menus": {
-      "view/title": [
+    "activationEvents":
+    [
+    ],
+    "main": "./dist/extension.js",
+    "contributes":
+    {
+        "languages":
+        [
+            {
+                "id": "unturned-dat",
+                "aliases":
+                [
+                    "Unturned Data File",
+                    "unturned-dat",
+                    "unturned-data-file",
+                    "Unturned Asset File"
+                ],
+                "extensions":
+                [
+                    ".dat",
+                    ".asset",
+                    ".vdf",
+                    ".tool",
+                    ".udat",
+                    ".udatproj"
+                ],
+                "configuration": "./language-configuration.json",
+                "firstLine": "^(?:\\/+\\s*udat-.*:\\s*(?:.*)\\s*|\\/\\/\\s\\>\\sUnturned\\sServer\\sConfiguration\\sFile)$",
+                "filenames":
+                [
+                    "Config_EasyDifficulty.txt",
+                    "Config_NormalDifficulty.txt",
+                    "Config_HardDifficulty.txt",
+                    "Config.txt",
+                    "Level.hierarchy",
+                    "Visibility.config"
+                ],
+                "icon":
+                {
+                    "light": "./resources/file-icon-offcenter.png",
+                    "dark": "./resources/file-icon-offcenter.png"
+                }
+            }
+        ],
+        "grammars":
+        [
+            {
+                "language": "unturned-dat",
+                "scopeName": "source.unturned-dat",
+                "path": "./syntaxes/unturned-dat.tmLanguage.json"
+            }
+        ],
+        "views":
         {
-          "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
-          "when": "view == unturnedDataFile.assetProperties",
-          "group": "navigation"
-        }
-      ],
-      "commandPalette": [
+            "explorer":
+            [
+                {
+                    "id": "unturnedDataFile.assetProperties",
+                    "name": "Asset Properties"
+                }
+            ]
+        },
+        "commands":
+        [
+            {
+                "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
+                "title": "Refresh Asset Properties",
+                "icon":
+                {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                }
+            },
+            {
+                "command": "unturnedDataFile.cursorMoveTo",
+                "title": "Move Cursor To"
+            },
+            {
+                "command": "unturnedDataFile.addProperty",
+                "title": "Add Property"
+            }
+        ],
+        "menus":
         {
-          "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
-          "when": "editorLangId == unturned-dat"
+            "view/title":
+            [
+                {
+                    "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
+                    "when": "view == unturnedDataFile.assetProperties",
+                    "group": "navigation"
+                }
+            ],
+            "commandPalette":
+            [
+                {
+                    "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
+                    "when": "editorLangId == unturned-dat"
+                }
+            ]
+        },
+        "configuration":
+        {
+            "type": "object",
+            "title": "Unturned Data File",
+            "properties":
+            {
+                "unturned-data-file-lsp.registerFileAssociations":
+                {
+                    "type": "boolean",
+                    "scope": "application",
+                    "descriptionMarkdown": "On Windows only, indicates whether or not `.dat`, `.asset`, `.udat`, and `.udatproj` files will be registered for the current user on startup.",
+                    "default": false
+                },
+                "unturned-data-file-lsp.u3dsInstallDir":
+                {
+                    "type": "string",
+                    "scope": "machine-overridable",
+                    "description": "If set, overrides the absolute path to U3DS. If not set this will be automatically detected.",
+                    "default": "",
+                    "format": "uri"
+                },
+                "unturned-data-file-lsp.unturnedInstallDir":
+                {
+                    "type": "string",
+                    "scope": "machine-overridable",
+                    "description": "If set, overrides the absolute path to the Unturned client. If not set this will be automatically detected.",
+                    "default": "",
+                    "format": "uri"
+                },
+                "unturned-data-file-lsp.globalProjectFile":
+                {
+                    "type": "string",
+                    "scope": "machine-overridable",
+                    "description": "If set, specifies the path to a global project file which will contain the default settings for all projects. Most LSP-specific settings should be configured here. It is valid to put an absolute file path or even a URL here as long as it can be accessed without any authorization and returns plain-text.",
+                    "default": "",
+                    "format": "uri"
+                },
+                "unturned-data-file-lsp.guidStyle":
+                {
+                    "type": "string",
+                    "scope": "resource",
+                    "descriptionMarkdown": "If set, overrides the default GUID/UUID style for GUID generation tools. This should be some value from the format specifier table on [this page](https://learn.microsoft.com/en-us/dotnet/api/system.guid.tostring?view=net-10.0#system-guid-tostring%28system-string%29). Lowercase values indicate a lowercase GUID, uppercase values indicate an uppercase GUID.",
+                    "default": "n",
+                    "enumItemLabels":
+                    [
+                        "n",
+                        "N",
+                        "d",
+                        "D",
+                        "b",
+                        "B",
+                        "p",
+                        "P",
+                        "x",
+                        "X"
+                    ],
+                    "markdownEnumDescriptions":
+                    [
+                        "32 lowercase digits: `0123456789abcdef0123456789abcdef`",
+                        "32 uppercase digits: `0123456789ABCDEF0123456789ABCDEF`",
+                        "32 lowercase digits separated by hyphens: `01234567-89ab-cdef-0123-456789abcdef`",
+                        "32 uppercase digits separated by hyphens: `01234567-89AB-CDEF-0123-456789ABCDEF`",
+                        "32 lowercase digits separated by hyphens, enclosed in braces: `{01234567-89ab-cdef-0123-456789abcdef}`",
+                        "32 uppercase digits separated by hyphens, enclosed in braces: `{01234567-89AB-CDEF-0123-456789ABCDEF}`",
+                        "32 lowercase digits separated by hyphens, enclosed in parentheses: `(01234567-89ab-cdef-0123-456789abcdef)`",
+                        "32 uppercase digits separated by hyphens, enclosed in parentheses: `(01234567-89AB-CDEF-0123-456789ABCDEF)`",
+                        "Four lowercase hexadecimal values enclosed in braces, where the fourth value is a subset of eight hexadecimal values that is also enclosed in braces: `{0x01234567,0x89ab,0xcdef,{0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef}}`",
+                        "Four uppercase hexadecimal values enclosed in braces, where the fourth value is a subset of eight hexadecimal values that is also enclosed in braces: `{0X01234567,0X89AB,0XCDEF,{0X01,0X23,0X45,0X67,0X89,0XAB,0XCD,0XEF}}`"
+                    ],
+                    "enum":
+                    [
+                        "0123456789abcdef0123456789abcdef",
+                        "0123456789ABCDEF0123456789ABCDEF",
+                        "01234567-89ab-cdef-0123-456789abcdef",
+                        "01234567-89AB-CDEF-0123-456789ABCDEF",
+                        "{01234567-89ab-cdef-0123-456789abcdef}",
+                        "{01234567-89AB-CDEF-0123-456789ABCDEF}",
+                        "(01234567-89ab-cdef-0123-456789abcdef)",
+                        "(01234567-89AB-CDEF-0123-456789ABCDEF)",
+                        "{0x01234567,0x89ab,0xcdef,{0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef}}",
+                        "{0X01234567,0X89AB,0XCDEF,{0X01,0X23,0X45,0X67,0X89,0XAB,0XCD,0XEF}}"
+                    ]
+                }
+            }
         }
-      ]
+    },
+    "scripts":
+    {
+        "vscode:prepublish": "npm run package",
+        "compile": "npm run check-types && npm run lint && node esbuild.js",
+        "watch": "npm-run-all -p watch:*",
+        "watch:esbuild": "node esbuild.js --watch",
+        "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+        "package": "npm run check-types && npm run lint && node esbuild.js --production",
+        "compile-tests": "tsc -p . --outDir out",
+        "watch-tests": "tsc -p . -w --outDir out",
+        "pretest": "npm run compile-tests && npm run compile && npm run lint",
+        "check-types": "tsc --noEmit",
+        "lint": "eslint src",
+        "test": "vscode-test"
+    },
+    "devDependencies":
+    {
+        "@types/mocha": "^10.0.10",
+        "@types/node": "20.x",
+        "@types/vscode": "^1.97.0",
+        "@typescript-eslint/eslint-plugin": "^8.22.0",
+        "@typescript-eslint/parser": "^8.22.0",
+        "@vscode/test-cli": "^0.0.10",
+        "@vscode/test-electron": "^2.4.1",
+        "esbuild": "^0.25.0",
+        "eslint": "^9.19.0",
+        "npm-run-all": "^4.1.5",
+        "typescript": "^5.7.3"
+    },
+    "dependencies":
+    {
+        "vscode-jsonrpc": "^8.2.1",
+        "vscode-languageclient": "^9.0.1"
     }
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "npm run check-types && npm run lint && node esbuild.js",
-    "watch": "npm-run-all -p watch:*",
-    "watch:esbuild": "node esbuild.js --watch",
-    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package": "npm run check-types && npm run lint && node esbuild.js --production",
-    "compile-tests": "tsc -p . --outDir out",
-    "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "check-types": "tsc --noEmit",
-    "lint": "eslint src",
-    "test": "vscode-test"
-  },
-  "devDependencies": {
-    "@types/mocha": "^10.0.10",
-    "@types/node": "20.x",
-    "@types/vscode": "^1.97.0",
-    "@typescript-eslint/eslint-plugin": "^8.22.0",
-    "@typescript-eslint/parser": "^8.22.0",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1",
-    "esbuild": "^0.25.0",
-    "eslint": "^9.19.0",
-    "npm-run-all": "^4.1.5",
-    "typescript": "^5.7.3"
-  },
-  "dependencies": {
-    "vscode-jsonrpc": "^8.2.1",
-    "vscode-languageclient": "^9.0.1"
-  }
 }

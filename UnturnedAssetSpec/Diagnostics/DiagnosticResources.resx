@@ -118,10 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="UNT2003" xml:space="preserve">
-    <value>This property is a flag, meaning just the presence of the property equates to a 'true' value. The '{0}' value here is ignored.</value>
+    <value>Property "{0}" is a flag, meaning just the presence of the property indicates a 'true' value. The '{1}' value will be ignored.</value>
   </data>
-  <data name="UNT1003" xml:space="preserve">
-    <value>This property is a flag (no value) and supplying a value may be misleading or cause unexpected results.</value>
+  <data name="UNT1003_Value" xml:space="preserve">
+    <value>Property "{0}" is a flag, meaning just the presence of the property indicates a 'true' value. The '{1}' value will be ignored.</value>
+  </data>
+  <data name="UNT1003_List" xml:space="preserve">
+    <value>Property "{0}" is a flag, meaning just the presence of the property indicates a 'true' value. The list will be ignored.</value>
+  </data>
+  <data name="UNT1003_Dictionary" xml:space="preserve">
+    <value>Property "{0}" is a flag, meaning just the presence of the property indicates a 'true' value. The dictionary will be ignored.</value>
   </data>
   <data name="UNT1001" xml:space="preserve">
     <value>Dictionary and list properties can not also supply a value.</value>
@@ -287,5 +293,35 @@
   </data>
   <data name="UNT1025_CodeFix_Annotation_Label" xml:space="preserve">
     <value>Remove "{0}" Property</value>
+  </data>
+  <data name="UNT2004_BooleanSingleCharCapitalized" xml:space="preserve">
+    <value>Value '{0}' can not be converted to a value of type '{1}'. Single-character boolean values must be lowercase, try using "{2}" instead.</value>
+  </data>
+  <data name="UNT2004_ListInsteadOfValue" xml:space="preserve">
+    <value>List can not be converted to a value of type '{0}'. Property '{1}' expects a value.</value>
+  </data>
+  <data name="UNT2004_ValueInsteadOfList" xml:space="preserve">
+    <value>Value '{0}' can not be converted to a value of type '{1}'. Property '{2}' expects a list.</value>
+  </data>
+  <data name="UNT2004_ValueInsteadOfDictionary" xml:space="preserve">
+    <value>Value '{0}' can not be converted to a value of type '{1}'. Property '{2}' expects a dictionary.</value>
+  </data>
+  <data name="UNT2004_DictionaryInsteadOfList" xml:space="preserve">
+    <value>Dictionary can not be converted to a value of type '{0}'. Property '{1}' expects a list.</value>
+  </data>
+  <data name="UNT2004_ListInsteadOfDictionary" xml:space="preserve">
+    <value>List can not be converted to a value of type '{0}'. Property '{1}' expects a dictionary.</value>
+  </data>
+  <data name="UNT2004_DictionaryInsteadOfValue" xml:space="preserve">
+    <value>Dictionary can not be converted to a value of type '{0}'. Property '{1}' expects a value.</value>
+  </data>
+  <data name="UNT2004_NoValue" xml:space="preserve">
+    <value>Property '{0}' expects a value.</value>
+  </data>
+  <data name="UNT2004_NoDictionary" xml:space="preserve">
+    <value>Property '{0}' expects a dictionary.</value>
+  </data>
+  <data name="UNT2004_NoList" xml:space="preserve">
+    <value>Property '{0}' expects a list.</value>
   </data>
 </root>

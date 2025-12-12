@@ -28,7 +28,7 @@ public class MatchingSwitches
                 OneOrMore<SpecDynamicSwitchCaseOrCondition>.Null)
         ]));
 
-        IAssetSpecDatabase db = new AssetSpecDatabase { UseInternet = false };
+        IAssetSpecDatabase db = AssetSpecDatabase.FromOffline();
 
         await db.InitializeAsync();
 

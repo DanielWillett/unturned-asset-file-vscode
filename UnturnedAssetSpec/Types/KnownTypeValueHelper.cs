@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -282,7 +283,7 @@ public static class KnownTypeValueHelper
             value = default;
             return false;
         }
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
         if (!float.TryParse(str.Slice(startIndex, comma1 - startIndex), out float x))
         {
             value = default;
@@ -395,7 +396,7 @@ public static class KnownTypeValueHelper
             value = default;
             return false;
         }
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
         if (!float.TryParse(str.Slice(startIndex, comma1 - startIndex), out float x))
         {
             value = default;
@@ -492,7 +493,7 @@ public static class KnownTypeValueHelper
             value = default;
             return false;
         }
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
         if (!float.TryParse(str.Slice(startIndex, comma - startIndex), out float x))
         {
             value = default;
@@ -715,7 +716,7 @@ public static class KnownTypeValueHelper
         {
             if (AssetCategory.TryParse(assetCategory, out EnumSpecTypeValue category)
                 && category != AssetCategory.None
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
                 && ushort.TryParse(span, NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort id)
 #else
                 && ushort.TryParse(stringValue ?? span.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort id)
@@ -725,7 +726,7 @@ public static class KnownTypeValueHelper
                 guidOrId = id == 0 ? GuidOrId.Empty : new GuidOrId(id, category);
                 return true;
             }
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
             if (Guid.TryParse(span, out Guid guid))
 #else
             if (Guid.TryParse(stringValue ?? span.ToString(), out Guid guid))
@@ -759,7 +760,7 @@ public static class KnownTypeValueHelper
             }
 
             ReadOnlySpan<char> number = input.Slice(index + 1);
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
             if (!int.TryParse(number, NumberStyles.Integer, CultureInfo.InvariantCulture, out amount))
 #else
             if (!int.TryParse(number.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out amount))
@@ -797,7 +798,7 @@ public static class KnownTypeValueHelper
     {
         if (!value.IsEmpty
             && value.Length == (alpha ? 9 : 7)
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
             && uint.TryParse(value.Slice(1, value.Length - 1), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint result)
 #else
             && uint.TryParse(value.Slice(1, value.Length - 1).ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint result)

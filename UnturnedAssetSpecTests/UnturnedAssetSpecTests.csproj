@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0;net481</TargetFrameworks>
+    <TargetFrameworks>net9.0;net6.0;net481</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -18,6 +18,14 @@
     <AppDesignerFolder>FileProperties</AppDesignerFolder>
 
     <StrongNameKeyPath>C:\Strong Name Keys\UnturnedAssetSpec\UnturnedAssetSpec_Tests.dll.snk</StrongNameKeyPath>
+    <TestLsp>False</TestLsp>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
+
+    <TestLsp>True</TestLsp>
+    <DefineConstants>$(DefineConstants);TEST_LSP</DefineConstants>
+
   </PropertyGroup>
 
   <PropertyGroup Condition="exists($(StrongNameKeyPath))">
@@ -45,7 +53,7 @@
     <ProjectReference Include="../UnturnedAssetSpec/UnturnedAssetSpec.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+  <ItemGroup Condition="$(TestLsp)">
 
     <ProjectReference Include="../LspServer/LspServer.csproj" />
 

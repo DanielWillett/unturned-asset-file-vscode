@@ -263,7 +263,11 @@ internal class NodeWriteToTextWriterVisitor : OrderedNodeVisitor, IDisposable
     private void WriteEscapableString(string unescaped)
     {
         ReadOnlySpan<char> span = unescaped.AsSpan();
+#if NET7_0_OR_GREATER
         ReadOnlySpan<char> escapables = [ '\\', '\n', '\t', '"' ];
+#else
+        ReadOnlySpan<char> escapables = stackalloc[] { '\\', '\n', '\t', '"' };
+#endif
         int firstIndex = span.IndexOfAny(escapables);
         if (firstIndex < 0)
         {

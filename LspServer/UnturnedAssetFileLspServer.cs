@@ -138,7 +138,7 @@ internal sealed class UnturnedAssetFileLspServer
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
                         FileAssociationUtility util = ActivatorUtilities.CreateInstance<FileAssociationUtility>(server.Services);
-                        await util.AssociateFileTypesAsync(force: false);
+                        await util.AssociateFileTypesAsync(force: Environment.GetEnvironmentVariable("UNTURNED_LSP_RESET_FILE_ASSOC") == "1");
                         if (util is IDisposable d)
                             d.Dispose();
                     }

@@ -1,4 +1,4 @@
-﻿#if NET
+﻿#if TEST_LSP
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using Microsoft.Extensions.Logging;

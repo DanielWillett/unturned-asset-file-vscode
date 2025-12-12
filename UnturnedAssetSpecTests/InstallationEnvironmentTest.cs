@@ -26,7 +26,7 @@ public class InstallationEnvironmentTest
             Assert.Inconclusive("Game not installed where it's expected.");
         }
 
-        _database = new AssetSpecDatabase { UseInternet = false };
+        _database = AssetSpecDatabase.FromOffline(useInstallDir: true);
 
         await _database.InitializeAsync();
 
@@ -100,7 +100,7 @@ public class InstallationEnvironmentTest
             writer.WriteLine("Name Test Asset 4");
         }
 
-        _database = new AssetSpecDatabase { UseInternet = false };
+        _database = AssetSpecDatabase.FromOffline();
 
         await _database.InitializeAsync();
 
@@ -161,13 +161,15 @@ public class InstallationEnvironmentTest
             writer.WriteLine("Name Test Asset 1");
         }
 
-        _database = new AssetSpecDatabase { UseInternet = false };
+        _database = AssetSpecDatabase.FromOffline();
         await _database.InitializeAsync();
 
         _runner = new InstallationEnvironment(_database, homeDir.FullName);
         _runner.Discover();
 
         _runner.OnFileUpdated += RunnerOnOnFileUpdated;
+
+        await Task.Delay(100);
 
         // -----
 
@@ -277,7 +279,7 @@ public class InstallationEnvironmentTest
             writer.WriteLine("Name Test Asset 1");
         }
 
-        _database = new AssetSpecDatabase { UseInternet = false };
+        _database = AssetSpecDatabase.FromOffline();
         await _database.InitializeAsync();
 
         _runner = new InstallationEnvironment(_database, homeDir.FullName);
@@ -285,6 +287,8 @@ public class InstallationEnvironmentTest
 
         Assert.That(_runner.FileCount, Is.EqualTo(1));
         _runner.OnFileUpdated += RunnerOnOnFileUpdated;
+
+        await Task.Delay(100);
 
         // -----
 
@@ -353,7 +357,7 @@ public class InstallationEnvironmentTest
             writer.WriteLine("Name Test Asset 1");
         }
 
-        _database = new AssetSpecDatabase { UseInternet = false };
+        _database = AssetSpecDatabase.FromOffline();
         await _database.InitializeAsync();
 
         _runner = new InstallationEnvironment(_database, homeDir.FullName);
@@ -361,6 +365,8 @@ public class InstallationEnvironmentTest
 
         Assert.That(_runner.FileCount, Is.EqualTo(1));
         _runner.OnFileRemoved += RunnerOnOnFileAddedOrRemoved;
+
+        await Task.Delay(100);
 
         // -----
 
@@ -405,7 +411,7 @@ public class InstallationEnvironmentTest
             writer.WriteLine("Name Test Asset 1");
         }
 
-        _database = new AssetSpecDatabase { UseInternet = false };
+        _database = AssetSpecDatabase.FromOffline();
         await _database.InitializeAsync();
 
         _runner = new InstallationEnvironment(_database, homeDir.FullName);
@@ -413,6 +419,8 @@ public class InstallationEnvironmentTest
 
         Assert.That(_runner.FileCount, Is.EqualTo(1));
         _runner.OnFileAdded += RunnerOnOnFileAddedOrRemoved;
+
+        await Task.Delay(100);
 
         // -----
 

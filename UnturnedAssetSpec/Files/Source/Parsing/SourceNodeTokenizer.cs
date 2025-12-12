@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -255,7 +256,11 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             return false;
         }
 
+#if NET7_0_OR_GREATER
         ReadOnlySpan<char> ends = [ '\r', '\n' ];
+#else
+        ReadOnlySpan<char> ends = stackalloc[] { '\r', '\n' };
+#endif
 
         int allCommentLength = _file.Slice(_index).IndexOfAny(ends);
         if (allCommentLength == -1)
@@ -303,8 +308,12 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             range = default;
             return;
         }
-
+        
+#if NET7_0_OR_GREATER
         ReadOnlySpan<char> ends = [ '\r', '\n' ];
+#else
+        ReadOnlySpan<char> ends = stackalloc[] { '\r', '\n' };
+#endif
 
         int allCommentLength = _file.Slice(_index).IndexOfAny(ends);
         if (allCommentLength == -1)
@@ -1138,7 +1147,11 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             SkipToNextToken();
             return string.Empty;
         }
+#if NET7_0_OR_GREATER
         ReadOnlySpan<char> stops = [ '"', '\r', '\n', '\\' ];
+#else
+        ReadOnlySpan<char> stops = stackalloc[] { '"', '\r', '\n', '\\' };
+#endif
 
         ReadOnlySpan<char> str = _file.Slice(firstChar);
         EscapeSequenceStepper escStepper = new EscapeSequenceStepper(str, stops);
@@ -1249,7 +1262,11 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             return;
         }
 
+#if NET7_0_OR_GREATER
         ReadOnlySpan<char> stops = [ '"', '\r', '\n', '\\' ];
+#else
+        ReadOnlySpan<char> stops = stackalloc[] { '"', '\r', '\n', '\\' };
+#endif
 
         ReadOnlySpan<char> str = _file.Slice(firstChar);
         EscapeSequenceStepper escStepper = new EscapeSequenceStepper(str, stops);
@@ -1441,7 +1458,11 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 
         LightweightBitStack stack = new LightweightBitStack();
 
+#if NET7_0_OR_GREATER
         ReadOnlySpan<char> tokens = [ '\r', '\n', '[', ']', '{', '}' ];
+#else
+        ReadOnlySpan<char> tokens = stackalloc[] { '\r', '\n', '[', ']', '{', '}' };
+#endif
 
         int index = _index + 1;
         int lastNewLineIndex = _index - 1;

@@ -50,7 +50,6 @@ public class PropertyBreadcrumbsTests
 
         PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.Root;
 
-
         SpecProperty? testProperty = _database.FindPropertyInfo("ID", AssetFileType.AssetBaseType(_database));
         Assert.That(testProperty, Is.Not.Null);
 
@@ -69,6 +68,13 @@ public class PropertyBreadcrumbsTests
             path?.Clear();
             Assert.That(breadcrumbs.TryGetDictionaryAndType(sourceFile, in ft, _database, out _, out ISpecType? type, path));
             Assert.That(type, Is.SameAs(ft.Information));
+
+            PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("ID", out string propertyName);
+            Assert.That(bc.IsRoot);
+            Assert.That(propertyName, Is.EqualTo("ID"));
+
+            bc.ResolveFromPropertyRef(ft.Information, _database);
+            Assert.That(bc.IsRoot);
         }
 
         if (withPath)
@@ -122,6 +128,13 @@ public class PropertyBreadcrumbsTests
             path?.Clear();
             Assert.That(breadcrumbs.TryGetDictionaryAndType(sourceFile, in ft, _database, out _, out ISpecType? type, path));
             Assert.That(type, Is.SameAs(ft.Information));
+
+            PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("ID", out string propertyName);
+            Assert.That(bc.IsRoot);
+            Assert.That(propertyName, Is.EqualTo("ID"));
+
+            bc.ResolveFromPropertyRef(ft.Information, _database);
+            Assert.That(bc.IsRoot);
         }
 
         if (withPath)
@@ -175,6 +188,13 @@ public class PropertyBreadcrumbsTests
             path?.Clear();
             Assert.That(breadcrumbs.TryGetDictionaryAndType(sourceFile, in ft, _database, out _, out ISpecType? type, path));
             Assert.That(type, Is.SameAs(ft.Information));
+
+            PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("GUID", out string propertyName);
+            Assert.That(bc.IsRoot);
+            Assert.That(propertyName, Is.EqualTo("GUID"));
+
+            bc.ResolveFromPropertyRef(ft.Information, _database);
+            Assert.That(bc.IsRoot);
         }
 
         if (withPath)
@@ -254,7 +274,12 @@ public class PropertyBreadcrumbsTests
             new PropertyBreadcrumbSection(testProperty, PropertyResolutionContext.Modern)
         );
 
-        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs ];
+        PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config.A", out string propertyName);
+        Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(1));
+        Assert.That(propertyName, Is.EqualTo("A"));
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _database);
+
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
 
         foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
         {
@@ -347,7 +372,12 @@ public class PropertyBreadcrumbsTests
             new PropertyBreadcrumbSection(nestedProperty1, PropertyResolutionContext.Modern)
         );
 
-        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs ];
+        PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config.NestedConfig.A", out string propertyName);
+        Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(2));
+        Assert.That(propertyName, Is.EqualTo("A"));
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _database);
+
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
 
         foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
         {
@@ -469,7 +499,12 @@ public class PropertyBreadcrumbsTests
             new PropertyBreadcrumbSection("Entry2", PropertyResolutionContext.Modern)
         );
 
-        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs ];
+        PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config.NestedConfig.List[1].Entry2.A", out string propertyName);
+        Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(4));
+        Assert.That(propertyName, Is.EqualTo("A"));
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _database);
+
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
 
         foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
         {
@@ -567,8 +602,13 @@ public class PropertyBreadcrumbsTests
             new PropertyBreadcrumbSection(testProperty, PropertyResolutionContext.Modern, 1),
             new PropertyBreadcrumbSection(PropertyResolutionContext.Modern, 1)
         );
+        
+        PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config[1][1].A", out string propertyName);
+        Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(2));
+        Assert.That(propertyName, Is.EqualTo("A"));
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _database);
 
-        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs ];
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
 
         foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
         {
@@ -600,6 +640,7 @@ public class PropertyBreadcrumbsTests
             }
         }
     }
+
     [Test]
     public void NestedLists3([Values(true, false)] bool withPath, [Values(true, false)] bool withType)
     {
@@ -666,8 +707,13 @@ public class PropertyBreadcrumbsTests
             new PropertyBreadcrumbSection(PropertyResolutionContext.Modern, 0),
             new PropertyBreadcrumbSection(PropertyResolutionContext.Modern, 0)
         );
+        
+        PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config[1][0][0].A", out string propertyName);
+        Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(3));
+        Assert.That(propertyName, Is.EqualTo("A"));
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _database);
 
-        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs ];
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
 
         foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
         {
@@ -699,5 +745,22 @@ public class PropertyBreadcrumbsTests
                 Assert.That(path[3], Is.SameAs(sn4));
             }
         }
+    }
+
+    [Test]
+    [TestCase("", "", "")]
+    [TestCase("Property", "", "Property")]
+    [TestCase("Dictionary.Property", "Dictionary/", "Property")]
+    [TestCase("List[2].Property", "List[2]/", "Property")]
+    [TestCase("List[2].Dictionary.Property", "List[2]/Dictionary/", "Property")]
+    [TestCase("List[2][3].Property", "List[2]/[3]/", "Property")]
+    [TestCase(@"List\[2][3].Property\.Name", "List[2][3]/", "Property.Name")]
+    [TestCase(@"Property\.Name", "", "Property.Name")]
+    public void FromPropertyRef(string propertyRef, string expectedBreadcrumbs, string expectedProperty)
+    {
+        PropertyBreadcrumbs crumbs = PropertyBreadcrumbs.FromPropertyRef(propertyRef, out string propertyName);
+        
+        Assert.That(crumbs.ToString(rootSlash: false), Is.EqualTo(expectedBreadcrumbs));
+        Assert.That(propertyName, Is.EqualTo(expectedProperty));
     }
 }

@@ -140,7 +140,10 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         ParentTypes = new Dictionary<QualifiedType, InverseTypeHierarchy>(0)
     };
 
-    public static AssetSpecDatabase FromOffline() => new AssetSpecDatabase(new InstallDirUtility("\0", "\0"))
+    public static AssetSpecDatabase FromOffline(bool useInstallDir = false) => new AssetSpecDatabase(new InstallDirUtility(
+        useInstallDir ? "Unturned" : "\0",
+        useInstallDir ? "304930" : "\0"
+    ))
     {
         UseInternet = false
     };
