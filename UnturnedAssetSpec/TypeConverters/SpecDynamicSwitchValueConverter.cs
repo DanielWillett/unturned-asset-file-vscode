@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Json;
 
 public class SpecDynamicSwitchValueConverter : JsonConverter<SpecDynamicSwitchValue?>
 {

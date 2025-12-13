@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -22,6 +23,12 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T> where T : IEquatable
     public bool IsNull => true;
 
     public bool TryGetConcreteValue(out Optional<T> value)
+    {
+        value = Optional<T>.Null;
+        return true;
+    }
+
+    public bool TryEvaluateValue(out Optional<T> value, in FileEvaluationContext ctx)
     {
         value = Optional<T>.Null;
         return true;

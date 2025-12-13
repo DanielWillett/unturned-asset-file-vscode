@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -42,11 +43,15 @@ public sealed class ConcreteValue<TValue> : IValue<TValue>, IEquatable<TValue?>,
         Type = type;
     }
 
-    /// <inheritdoc />
     public bool TryGetConcreteValue(out Optional<TValue> value)
     {
         value = IsNull ? Optional<TValue>.Null : new Optional<TValue>(_value);
         return true;
+    }
+
+    public bool TryEvaluateValue(out Optional<TValue> value, in FileEvaluationContext ctx)
+    {
+        return TryGetConcreteValue(out value);
     }
 
     public bool Equals(TValue? value)

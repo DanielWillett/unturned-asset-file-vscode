@@ -1,13 +1,13 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Json;
 
 public class AssetSpecTypeConverter : JsonConverter<AssetSpecType?>
 {

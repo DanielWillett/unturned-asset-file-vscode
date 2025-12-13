@@ -1,5 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <UsingTask AssemblyFile="../UnturnedAssetSpecMSBuildTasks/bin/UnturnedAssetSpecMSBuildTasks.dll" TaskName="UnturnedAssetSpecMSBuildTasks.MergeAssetSpecTask" />
+
+  <Target Name="MergeAssetSpecFiles" BeforeTargets="Build">
+    <MergeAssetSpecTask Folder="../Asset Spec" OutputFile="../Asset Spec/asset-spec.g.bin" Blacklist="Asset Spec Schema.json" />
+  </Target>
+
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net7.0</TargetFrameworks>
     <Nullable>enable</Nullable>
@@ -46,6 +52,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
+
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0" Condition="'$(TargetFramework)' != 'net7.0'"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" Condition="'$(TargetFramework)' == 'net7.0'"/>
+
   </ItemGroup>
 
   <ItemGroup>

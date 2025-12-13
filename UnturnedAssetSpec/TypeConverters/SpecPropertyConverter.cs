@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Json;
 
 public class SpecPropertyConverter : JsonConverter<SpecProperty?>
 {

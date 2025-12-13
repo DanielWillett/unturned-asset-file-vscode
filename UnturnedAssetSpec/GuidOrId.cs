@@ -1,4 +1,4 @@
-using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
+using DanielWillett.UnturnedDataFileLspServer.Data.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Globalization;

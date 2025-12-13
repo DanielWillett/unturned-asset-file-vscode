@@ -120,6 +120,18 @@
   <data name="FormatException_IPv4Format_FailedToParse" xml:space="preserve">
     <value>Failed to parse IPv4Filter, expected a value in the format: "0.0.0.0[/0][:0[-0]]".</value>
   </data>
+  <data name="InvalidOperationException_InvalidCountType" xml:space="preserve">
+    <value>Invalid count type: '{0}'. Expected an integer type.</value>
+  </data>
+  <data name="Log_FailedToDownloadInternetResource" xml:space="preserve">
+    <value>Unable to download internet resource at "{0}".</value>
+  </data>
+  <data name="Log_FailedToFindEmbeddedResource" xml:space="preserve">
+    <value>Unable to locate embedded resource "{0}", which was expected to exist.</value>
+  </data>
+  <data name="Log_FailedToParseResource" xml:space="preserve">
+    <value>Unable to read resource at "{0}".</value>
+  </data>
   <data name="Type_Name_Boolean" xml:space="preserve">
     <value>Boolean</value>
   </data>
@@ -129,7 +141,43 @@
   <data name="Type_Name_Flag" xml:space="preserve">
     <value>Flag</value>
   </data>
+  <data name="Type_Name_Float32" xml:space="preserve">
+    <value>Single-Precision Decimal</value>
+  </data>
+  <data name="Type_Name_Float64" xml:space="preserve">
+    <value>Double-Precision Decimal</value>
+  </data>
+  <data name="Type_Name_Float128" xml:space="preserve">
+    <value>Decimal</value>
+  </data>
+  <data name="Type_Name_Int8" xml:space="preserve">
+    <value>Signed 8-Bit Integer</value>
+  </data>
+  <data name="Type_Name_Int16" xml:space="preserve">
+    <value>Signed 16-Bit Integer</value>
+  </data>
+  <data name="Type_Name_Int32" xml:space="preserve">
+    <value>Signed 32-Bit Integer</value>
+  </data>
+  <data name="Type_Name_Int64" xml:space="preserve">
+    <value>Signed 64-Bit Integer</value>
+  </data>
   <data name="Type_Name_List_Generic" xml:space="preserve">
     <value>List of {0}</value>
+  </data>
+  <data name="Type_Name_String" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="Type_Name_UInt8" xml:space="preserve">
+    <value>Unsigned 8-Bit Integer</value>
+  </data>
+  <data name="Type_Name_UInt16" xml:space="preserve">
+    <value>Unsigned 16-Bit Integer</value>
+  </data>
+  <data name="Type_Name_UInt32" xml:space="preserve">
+    <value>Unsigned 32-Bit Integer</value>
+  </data>
+  <data name="Type_Name_UInt64" xml:space="preserve">
+    <value>Unsigned 64-Bit Integer</value>
   </data>
 </root>

@@ -2,7 +2,9 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.NewTypes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -77,6 +79,7 @@ public class ListType<TCountType, TElementType>
     private readonly ListTypeArgs<TCountType, TElementType> _args;
     private readonly IType<TElementType> _subType;
     private readonly ITypeConverter<TCountType>? _countConverter;
+    private readonly IType<TCountType>? _countType;
     private readonly int? _minCount;
     private readonly int? _maxCount;
 
@@ -93,11 +96,12 @@ public class ListType<TCountType, TElementType>
     {
         _args = args;
         _subType = subType;
-        DisplayName = string.Format(Properties.Resources.Type_Name_List_Generic, subType.DisplayName);
+        DisplayName = string.Format(Resources.Type_Name_List_Generic, subType.DisplayName);
 
         if ((args.Mode & ListMode.Legacy) != 0)
         {
-            _countConverter = Parsing.TypeConverters.Get<TCountType>();
+            _countType = CommonTypes.GetIntegerType<TCountType>();
+            _countConverter = TypeConverters.Get<TCountType>();
         }
 
         try
@@ -144,9 +148,11 @@ public class ListType<TCountType, TElementType>
     public bool TryParse(ref TypeParserArgs<EquatableArray<TElementType>> args, in FileEvaluationContext ctx, out Optional<EquatableArray<TElementType>> value)
     {
         value = Optional<EquatableArray<TElementType>>.Null;
-        bool legacy = (_args.Mode & ListMode.Legacy) != 0;
-        bool modern = (_args.Mode & ListMode.Modern) != 0;
+        bool legacy = (_args.Mode & ListMode.Legacy) != 0 && args.KeyFilter != LegacyExpansionFilter.Modern;
+        bool modern = (_args.Mode & ListMode.Modern) != 0 && args.KeyFilter != LegacyExpansionFilter.Legacy;
         if (!modern && !legacy) modern = true;
+
+        TElementType?[] array;
 
         if (legacy && (_args.Mode & ListMode.LegacySingle) == ListMode.LegacySingle)
         {
@@ -167,10 +173,30 @@ public class ListType<TCountType, TElementType>
                 }
             }
 
-            if (args.ParentNode is not IPropertySourceNode { Parent: IDictionarySourceNode dictionary }
-                || !dictionary.TryGetProperty(singlePropertyName!, out IPropertySourceNode? singularProperty))
+            if (args.ParentNode is IPropertySourceNode { Parent: IDictionarySourceNode dictionary }
+                && dictionary.TryGetProperty(singlePropertyName!, out IPropertySourceNode? singularProperty))
             {
-                // todo
+                args.ReferencedPropertySink?.AcceptReferencedDiagnostic(singularProperty);
+
+                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, singularProperty.Value, args.ParentNode, _subType, LegacyExpansionFilter.Modern);
+
+                if (!_subType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> element))
+                {
+                    if (!parseArgs.ShouldIgnoreFailureDiagnostic)
+                        args.DiagnosticSink?.UNT2004_Generic(ref args, singularProperty.Value == null ? "-" : singularProperty.Value.ToString(), _subType);
+                }
+                else if (!element.HasValue)
+                {
+                    // value = null;
+                    return true;
+                }
+                else
+                {
+                    array = new TElementType[1];
+                    array[0] = element.Value;
+                    value = new EquatableArray<TElementType>(array!);
+                    return true;
+                }
             }
         }
 
@@ -184,7 +210,7 @@ public class ListType<TCountType, TElementType>
                 else
                     args.DiagnosticSink?.UNT2004_NoList(ref args, args.ParentNode);
 
-                return false;
+                break;
 
             // wrong type of value
             case IDictionarySourceNode dictionaryNode:
@@ -193,13 +219,13 @@ public class ListType<TCountType, TElementType>
                 else
                     args.DiagnosticSink?.UNT2004_DictionaryInsteadOfList(ref args, dictionaryNode, this);
 
-                return false;
+                break;
 
             case IListSourceNode listNode:
                 if ((_args.Mode & ListMode.ModernList) != ListMode.ModernList)
                 {
                     args.DiagnosticSink?.UNT2004_ListInsteadOfValue(ref args, listNode, this);
-                    return false;
+                    break;
                 }
 
                 CheckCount(listNode.Count, ref args);
@@ -209,7 +235,7 @@ public class ListType<TCountType, TElementType>
                     return true;
                 }
 
-                TElementType?[] array = new TElementType?[listNode.Count];
+                array = new TElementType?[listNode.Count];
                 int index = 0;
                 ImmutableArray<ISourceNode> values = listNode.Children;
                 for (int i = 0; i < values.Length; ++i)
@@ -218,11 +244,11 @@ public class ListType<TCountType, TElementType>
                     if (node is not IAnyValueSourceNode v)
                         continue;
 
-                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, v, listNode, _subType);
+                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, v, listNode, _subType, LegacyExpansionFilter.Modern);
 
-                    if (!_subType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
+                    if (!_subType.Parser.TryParse(ref elementParseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
                     {
-                        if (!parseArgs.ShouldIgnoreFailureDiagnostic)
+                        if (!elementParseArgs.ShouldIgnoreFailureDiagnostic)
                         {
                             args.DiagnosticSink?.UNT2004_Generic(ref args, v.ToString(), _subType);
                         }
@@ -239,21 +265,179 @@ public class ListType<TCountType, TElementType>
                 return !allFailed;
 
             case IValueSourceNode valueNode:
-                bool couldBeModernSingle = modern && (_args.Mode & ListMode.ModernSingle) == ListMode.ModernSingle;
-                if (!legacy && !couldBeModernSingle)
+                bool couldBeModernSingle = modern && (_args.Mode & ListMode.ModernSingle) == ListMode.ModernSingle && args.KeyFilter != LegacyExpansionFilter.Legacy;
+                bool couldBeLegacyCount = legacy && (_args.Mode & ListMode.LegacyList) == ListMode.LegacyList && args.KeyFilter != LegacyExpansionFilter.Modern;
+                if (!couldBeLegacyCount && !couldBeModernSingle)
                 {
                     args.DiagnosticSink?.UNT2004_ValueInsteadOfList(ref args, valueNode, this);
-                    return false;
+                    break;
                 }
 
+                if (couldBeLegacyCount && _countConverter != null && _countType != null)
+                {
+                    args.CreateTypeConverterParseArgs(out TypeConverterParseArgs<TCountType> parseArgs, _countType, valueNode.Value);
+                    bool success = _countConverter.TryParse(valueNode.Value.AsSpan(), ref parseArgs, out TCountType countValue);
+                    int count = 0;
+                    if (success)
+                    {
+                        try
+                        {
+                            count = countValue.ToInt32(CultureInfo.InvariantCulture);
+                        }
+                        catch (OverflowException)
+                        {
+                            success = false;
+                        }
+                        catch (InvalidCastException)
+                        {
+                            success = false;
+                        }
+                    }
 
+                    if (success)
+                    {
+                        CheckCount(count, ref args);
+
+                        if (args.ParentNode is not IPropertySourceNode { Parent: IDictionarySourceNode dictionary })
+                        {
+                            if (!couldBeModernSingle)
+                                args.DiagnosticSink?.UNT2004_Generic(ref args, valueNode.Value, _countType);
+                        }
+                        else
+                        {
+                            string? singularPropertyName = _args.LegacySingularKey;
+
+                            if (string.IsNullOrEmpty(singularPropertyName))
+                            {
+                                if (args.ParentNode is IPropertySourceNode property)
+                                {
+                                    singularPropertyName = property.Key;
+                                }
+                                else
+                                {
+                                    singularPropertyName = ctx.Self.Key;
+                                }
+                            }
+
+                            array = new TElementType?[count];
+                            allFailed = true;
+                            for (int i = 0; i < count; ++i)
+                            {
+                                string newKey = CreateLegacyKey(singularPropertyName!, i);
+                                bool needsDefault = false;
+                                if (!dictionary.TryGetProperty(newKey, out IPropertySourceNode? property))
+                                {
+                                    args.DiagnosticSink?.UNT1007(ref args, valueNode, newKey);
+                                    needsDefault = true;
+                                }
+                                else
+                                {
+                                    args.ReferencedPropertySink?.AcceptReferencedDiagnostic(property);
+                                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, property.Value, property, _subType, LegacyExpansionFilter.Modern);
+
+                                    if (!_subType.Parser.TryParse(ref elementParseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
+                                    {
+                                        if (!elementParseArgs.ShouldIgnoreFailureDiagnostic)
+                                        {
+                                            args.DiagnosticSink?.UNT2004_Generic(ref args, property.Value == null ? "-" : property.Value.ToString(), _subType);
+                                        }
+
+                                        needsDefault = true;
+                                    }
+                                    else
+                                    {
+                                        array[i] = elementType.Value;
+                                        allFailed = false;
+                                    }
+                                }
+
+                                if (needsDefault
+                                    && _args.LegacyDefaultElementTypeValue != null
+                                    && _args.LegacyDefaultElementTypeValue.TryEvaluateValue(out Optional<TElementType> elementValue, in ctx))
+                                {
+                                    array[i] = elementValue.Value;
+                                }
+                            }
+
+                            value = new EquatableArray<TElementType>(array!);
+                            return !allFailed;
+                        }
+                    }
+                    else if (!couldBeModernSingle && !parseArgs.ShouldIgnoreFailureDiagnostic)
+                    {
+                        args.DiagnosticSink?.UNT2004_Generic(ref args, valueNode.Value, _countType);
+                    }
+                }
+
+                if (couldBeModernSingle)
+                {
+                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, args.ValueNode, args.ParentNode, _subType, LegacyExpansionFilter.Modern);
+
+                    if (!_subType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> element))
+                    {
+                        if (!parseArgs.ShouldIgnoreFailureDiagnostic)
+                            args.DiagnosticSink?.UNT2004_Generic(ref args, valueNode.Value, _subType);
+                    }
+                    else if (!element.HasValue)
+                    {
+                        // value = null;
+                        return true;
+                    }
+                    else
+                    {
+                        array = new TElementType[1];
+                        array[0] = element.Value;
+                        value = new EquatableArray<TElementType>(array!);
+                        return true;
+                    }
+                }
 
                 break;
-
         }
 
         return false;
     }
+
+    private string CreateLegacyKey(string baseKey, int i)
+    {
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+        int l = baseKey.Length + StringHelper.CountDigits(i);
+        CreateLegacyKeyState state;
+        state.BaseKey = baseKey;
+        state.Index = i;
+        if (_args.SkipUnderscoreInLegacyKey)
+        {
+            return string.Create(l, state, static (span, state) =>
+            {
+                state.BaseKey.AsSpan().CopyTo(span);
+                state.Index.TryFormat(span.Slice(state.BaseKey.Length), out _, provider: CultureInfo.InvariantCulture);
+            });
+        }
+
+        ++l;
+        return string.Create(l, state, static (span, state) =>
+        {
+            state.BaseKey.AsSpan().CopyTo(span);
+            span[state.BaseKey.Length] = '_';
+            state.Index.TryFormat(span.Slice(state.BaseKey.Length + 1), out _, provider: CultureInfo.InvariantCulture);
+        });
+#else
+        if (_args.SkipUnderscoreInLegacyKey)
+        {
+            return baseKey + i.ToString(CultureInfo.InvariantCulture);
+        }
+
+        return baseKey + "_" + i.ToString(CultureInfo.InvariantCulture);
+#endif
+    }
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+    private struct CreateLegacyKeyState
+    {
+        public string BaseKey;
+        public int Index;
+    }
+#endif
 
     public override int GetHashCode() => HashCode.Combine(1745437037, _args.GetHashCode());
 }
@@ -292,6 +476,16 @@ public readonly struct ListTypeArgs<TCountType, TElementType>
     /// </summary>
     public string? LegacySingleKey { get; init; }
 
+    /// <summary>
+    /// If <see langword="true"/>, skips the '_' separator when creating legacy element keys.
+    /// </summary>
+    public bool SkipUnderscoreInLegacyKey { get; init; }
+
+    /// <summary>
+    /// The default value for missing legacy list elements.
+    /// </summary>
+    public IValue<TElementType> LegacyDefaultElementTypeValue { get; init; }
+
     public bool Equals(in ListTypeArgs<TCountType, TElementType> other)
     {
         return other.Mode == Mode
@@ -299,12 +493,14 @@ public readonly struct ListTypeArgs<TCountType, TElementType>
                && string.Equals(other.LegacySingleKey, LegacySingleKey, StringComparison.OrdinalIgnoreCase)
                && EqualityComparer<TCountType?>.Default.Equals(other.MinimumCount, MinimumCount)
                && EqualityComparer<TCountType?>.Default.Equals(other.MaximumCount, MaximumCount)
+               && SkipUnderscoreInLegacyKey == other.SkipUnderscoreInLegacyKey
+               && Equals(LegacyDefaultElementTypeValue, other.LegacyDefaultElementTypeValue)
                ;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Mode, LegacySingularKey, LegacySingleKey, MinimumCount, MaximumCount);
+        return HashCode.Combine(Mode, LegacySingularKey, LegacySingleKey, MinimumCount, MaximumCount, SkipUnderscoreInLegacyKey, LegacyDefaultElementTypeValue);
     }
 }
 

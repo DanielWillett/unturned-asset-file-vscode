@@ -86,7 +86,7 @@ public static class DatDiagnostics
     public static readonly DatDiagnostic UNT1006 = new DatDiagnostic("UNT1006", DatDiagnosticSeverity.Warning);
 
     /// <summary>
-    /// Displayed when a joint property is missing one of its components (like a legacy Vector3).
+    /// Displayed when a joint property is missing one of its components (like a legacy Vector3), or a legacy list is missing an element.
     /// </summary>
     public static readonly DatDiagnostic UNT1007 = new DatDiagnostic("UNT1007", DatDiagnosticSeverity.Warning);
 

@@ -3,13 +3,12 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Json;
 
 public sealed class SpecTypeConverter : JsonConverter<ISpecType?>
 {

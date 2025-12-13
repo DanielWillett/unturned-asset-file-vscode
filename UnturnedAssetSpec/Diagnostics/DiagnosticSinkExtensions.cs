@@ -55,6 +55,22 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
+        /// Reports a related property missing for a property. 
+        /// </summary>
+        public void UNT1007<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            ISourceNode node, string requiredPropertyName
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1007,
+                Message = string.Format(DiagnosticResources.UNT1007, NodePropertyName(node), requiredPropertyName),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
         /// Reports a <see langword="false"/> value provided for a flag property. 
         /// </summary>
         public void UNT2003<TDiagnosticProvider>(

@@ -70,6 +70,42 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid count type: &apos;{0}&apos;. Expected an integer type..
+        /// </summary>
+        internal static string InvalidOperationException_InvalidCountType {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_InvalidCountType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to download internet resource at &quot;{0}&quot;..
+        /// </summary>
+        internal static string Log_FailedToDownloadInternetResource {
+            get {
+                return ResourceManager.GetString("Log_FailedToDownloadInternetResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to locate embedded resource &quot;{0}&quot;, which was expected to exist..
+        /// </summary>
+        internal static string Log_FailedToFindEmbeddedResource {
+            get {
+                return ResourceManager.GetString("Log_FailedToFindEmbeddedResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to read resource at &quot;{0}&quot;..
+        /// </summary>
+        internal static string Log_FailedToParseResource {
+            get {
+                return ResourceManager.GetString("Log_FailedToParseResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Boolean.
         /// </summary>
         internal static string Type_Name_Boolean {
@@ -97,11 +133,119 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Decimal.
+        /// </summary>
+        internal static string Type_Name_Float128 {
+            get {
+                return ResourceManager.GetString("Type_Name_Float128", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Single-Precision Decimal.
+        /// </summary>
+        internal static string Type_Name_Float32 {
+            get {
+                return ResourceManager.GetString("Type_Name_Float32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Double-Precision Decimal.
+        /// </summary>
+        internal static string Type_Name_Float64 {
+            get {
+                return ResourceManager.GetString("Type_Name_Float64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signed 16-Bit Integer.
+        /// </summary>
+        internal static string Type_Name_Int16 {
+            get {
+                return ResourceManager.GetString("Type_Name_Int16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signed 32-Bit Integer.
+        /// </summary>
+        internal static string Type_Name_Int32 {
+            get {
+                return ResourceManager.GetString("Type_Name_Int32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signed 64-Bit Integer.
+        /// </summary>
+        internal static string Type_Name_Int64 {
+            get {
+                return ResourceManager.GetString("Type_Name_Int64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signed 8-Bit Integer.
+        /// </summary>
+        internal static string Type_Name_Int8 {
+            get {
+                return ResourceManager.GetString("Type_Name_Int8", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to List of {0}.
         /// </summary>
         internal static string Type_Name_List_Generic {
             get {
                 return ResourceManager.GetString("Type_Name_List_Generic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text.
+        /// </summary>
+        internal static string Type_Name_String {
+            get {
+                return ResourceManager.GetString("Type_Name_String", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsigned 16-Bit Integer.
+        /// </summary>
+        internal static string Type_Name_UInt16 {
+            get {
+                return ResourceManager.GetString("Type_Name_UInt16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsigned 32-Bit Integer.
+        /// </summary>
+        internal static string Type_Name_UInt32 {
+            get {
+                return ResourceManager.GetString("Type_Name_UInt32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsigned 64-Bit Integer.
+        /// </summary>
+        internal static string Type_Name_UInt64 {
+            get {
+                return ResourceManager.GetString("Type_Name_UInt64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsigned 8-Bit Integer.
+        /// </summary>
+        internal static string Type_Name_UInt8 {
+            get {
+                return ResourceManager.GetString("Type_Name_UInt8", resourceCulture);
             }
         }
     }

@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -60,6 +61,11 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
     public bool ShouldIgnoreFailureDiagnostic;
 
     /// <summary>
+    /// The filter currently active based on the key used.
+    /// </summary>
+    public LegacyExpansionFilter KeyFilter;
+
+    /// <summary>
     /// Creates <see cref="TypeParserArgs{TElementType}"/> used to parse sub-values, such as the elements in a list.
     /// </summary>
     /// <typeparam name="TElementType"></typeparam>
@@ -69,9 +75,10 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
     /// <param name="type">The type of value being parsed.</param>
     public void CreateSubTypeParserArgs<TElementType>(
         out TypeParserArgs<TElementType> args,
-        IAnyValueSourceNode valueNode,
+        IAnyValueSourceNode? valueNode,
         IParentSourceNode parentNode,
-        IType<TElementType> type)
+        IType<TElementType> type,
+        LegacyExpansionFilter filter)
         where TElementType : IEquatable<TElementType>
     {
         args.ValueNode = valueNode;
@@ -80,6 +87,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         args.ShouldIgnoreFailureDiagnostic = false;
         args.DiagnosticSink = DiagnosticSink;
         args.ReferencedPropertySink = ReferencedPropertySink;
+        args.KeyFilter = filter;
     }
 
     /// <summary>
@@ -104,6 +112,36 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
     public void CreateTypeConverterParseArgsWithoutDiagnostics(out TypeConverterParseArgs<T> parseArgs, string? text = null)
     {
         parseArgs.Type = Type;
+        parseArgs.DiagnosticSink = null;
+        parseArgs.ShouldIgnoreFailureDiagnostic = false;
+        parseArgs.ValueRange = ValueNode?.Range ?? ParentNode.Range;
+        parseArgs.TextAsString = text;
+    }
+
+    /// <summary>
+    /// Creates <see cref="TypeConverterParseArgs{TElementType}"/> to read from <see cref="ValueNode"/> as another type.
+    /// </summary>
+    /// <param name="parseArgs">Arguments to pass to <see cref="ITypeConverter{TElementType}.TryParse"/>.</param>
+    /// <param name="text">The text being read.</param>
+    public void CreateTypeConverterParseArgs<TElementType>(out TypeConverterParseArgs<TElementType> parseArgs, IType<TElementType> type, string? text = null)
+        where TElementType : IEquatable<TElementType>
+    {
+        parseArgs.Type = type;
+        parseArgs.DiagnosticSink = DiagnosticSink;
+        parseArgs.ShouldIgnoreFailureDiagnostic = false;
+        parseArgs.ValueRange = ValueNode?.Range ?? ParentNode.Range;
+        parseArgs.TextAsString = text;
+    }
+
+    /// <summary>
+    /// Creates <see cref="TypeConverterParseArgs{TElementType}"/> to read from <see cref="ValueNode"/> as another type.
+    /// </summary>
+    /// <param name="parseArgs">Arguments to pass to <see cref="ITypeConverter{TElementType}.TryParse"/>.</param>
+    /// <param name="text">The text being read.</param>
+    public void CreateTypeConverterParseArgsWithoutDiagnostics<TElementType>(out TypeConverterParseArgs<TElementType> parseArgs, IType<TElementType> type, string? text = null)
+        where TElementType : IEquatable<TElementType>
+    {
+        parseArgs.Type = type;
         parseArgs.DiagnosticSink = null;
         parseArgs.ShouldIgnoreFailureDiagnostic = false;
         parseArgs.ValueRange = ValueNode?.Range ?? ParentNode.Range;

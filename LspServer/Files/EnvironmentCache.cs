@@ -204,6 +204,22 @@ internal class EnvironmentCache : ISpecDatabaseCache
         }
     }
 
+    public Task<bool> ReadAssetAsync<TState>(QualifiedType type, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default)
+    {
+        string path = Path.Combine(_cacheDir, type.Normalized.Type.ToLowerInvariant() + ".json");
+        return ReadFileAsync(path, state, action, token);
+    }
+
+    public Task<bool> ReadKnownFileAsync<TState>(KnownConfigurationFile file, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default)
+    {
+        if (file != KnownConfigurationFile.Assets)
+        {
+            return Task.FromResult(false);
+        }
+
+        return ReadFileAsync(_informationFile, state, action, token);
+    }
+
     private async Task WriteCacheFileAsync<T>(string file, T value, JsonSerializerOptions options, CancellationToken token = default)
     {
         try
@@ -257,6 +273,28 @@ internal class EnvironmentCache : ISpecDatabaseCache
         return cacheValue;
     }
 
+    private async Task<bool> ReadFileAsync<TState>(string file, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default)
+    {
+        FileInfo fileInfo = new FileInfo(file);
+        if (fileInfo.Length > 524288)
+        {
+            _logger.LogWarning("Cache file too long: {0}. Files > 512 KB ignored.", file);
+            return false;
+        }
+
+        using FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 8192, FileOptions.SequentialScan);
+        try
+        {
+            await action(fs, state, token).ConfigureAwait(false);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to read cache file {0}, null value.", file);
+            return false;
+        }
+    }
+
     /// <inheritdoc />
     public async Task<AssetInformation?> GetCachedInformationAsync(CancellationToken token = default)
     {
@@ -304,10 +342,6 @@ internal partial class EnvironmentCacheGeneratedSerializerContext : JsonSerializ
 
 internal class EnvironmentCacheFile : IDisposable
 {
-    /*
-     *   - store json files
-     */
-
     private readonly LspInstallationEnvironment _installEnvironment;
 
     public EnvironmentCacheEntry[] Entries { get; private set; }

@@ -1,23 +1,21 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.TypeConverters;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -242,7 +240,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
         if (_cache != null)
         {
-            string? latestCommit = await GetLatestCommitAsync(lazy.Value, token);
+            string? latestCommit = await SpecificationFileReader.GetLatestCommitAsync(lazy.Value, token);
             if (latestCommit != null)
             {
                 _commit = latestCommit;
@@ -373,7 +371,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
                     if (IsCacheUpToDate)
                     {
-                        typeInfo = await _cache.GetCachedTypeAsync(typeName, token).ConfigureAwait(false);
+                        //todo: typeInfo = await _cache.GetCachedTypeAsync(typeName, token).ConfigureAwait(false);
                     }
 
                     if (typeInfo == null)
@@ -455,53 +453,13 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     {
         Log(message);
     }
-    private static async Task<string?> GetLatestCommitAsync(HttpClient httpClient, CancellationToken token)
-    {
-        const string getLatestCommitUrl = $"https://api.github.com/repos/{Repository}/commits?per_page=1";
-
-        HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, getLatestCommitUrl);
-        msg.Headers.Add("Accept", "application/vnd.github+json");
-        msg.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
-        msg.Headers.Add("User-Agent", $"unturned-asset-file-vscode/{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}");
-
-        HttpResponseMessage response = await httpClient.SendAsync(msg, HttpCompletionOption.ResponseContentRead, token);
-
-        // read commit @ root[0].sha
-        using JsonDocument doc = await JsonDocument.ParseAsync(
-            await response.Content.ReadAsStreamAsync(),
-            new JsonDocumentOptions
-            {
-                AllowTrailingCommas = false,
-                CommentHandling = JsonCommentHandling.Disallow,
-                MaxDepth = 8
-            }, token);
-
-        JsonElement root = doc.RootElement;
-        if (root.ValueKind != JsonValueKind.Array)
-            return null;
-
-        JsonElement commitInfo;
-        using (JsonElement.ArrayEnumerator arrayEnumerator = root.EnumerateArray())
-        {
-            if (!arrayEnumerator.MoveNext())
-                return null;
-
-            commitInfo = arrayEnumerator.Current;
-        }
-
-        if (!commitInfo.TryGetProperty("sha"u8, out JsonElement sha) || sha.ValueKind != JsonValueKind.String)
-            return null;
-
-        return sha.GetString();
-    }
-
     private async Task<AssetInformation> DownloadAssetInfoAsync(Lazy<HttpClient> lazy, CancellationToken token)
     {
         AssetInformation? assetInfo = null;
 
         if (IsCacheUpToDate)
         {
-            assetInfo = await _cache.GetCachedInformationAsync(token);
+            // todo: assetInfo = await _cache.GetCachedInformationAsync(token);
             if (assetInfo != null)
                 return assetInfo;
         }

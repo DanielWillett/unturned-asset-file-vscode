@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -34,4 +35,9 @@ public interface IValue<TValue> : IValue where TValue : IEquatable<TValue>
     /// Attempts to evaluate the value without any workspace context.
     /// </summary>
     bool TryGetConcreteValue(out Optional<TValue> value);
+
+    /// <summary>
+    /// Attempts to evaluate the current value of this <see cref="IValue{TValue}"/>.
+    /// </summary>
+    bool TryEvaluateValue(out Optional<TValue> value, in FileEvaluationContext ctx);
 }

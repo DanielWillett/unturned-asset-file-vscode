@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -18,12 +19,15 @@ public readonly struct FileEvaluationContext
     public readonly IWorkspaceEnvironment Workspace;
     public readonly InstallationEnvironment Environment;
     public readonly IAssetSpecDatabase Information;
+
+    // todo:
     public readonly PropertyResolutionContext PropertyContext;
+    public readonly OneOrMore<int> TemplateIndices;
 
     public FileEvaluationContext(SpecProperty self, ISourceFile file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information, PropertyResolutionContext propertyContext)
         : this(self, self.Owner, file, workspace, environment, information, propertyContext)
     {
-
+        TemplateIndices = OneOrMore<int>.Null;
     }
     public FileEvaluationContext(SpecProperty self, ISpecType @this, ISourceFile file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information, PropertyResolutionContext propertyContext)
     {
@@ -35,6 +39,7 @@ public readonly struct FileEvaluationContext
         Environment = environment;
         Information = information;
         PropertyContext = propertyContext;
+        TemplateIndices = OneOrMore<int>.Null;
     }
 
     public FileEvaluationContext(in FileEvaluationContext self, SpecProperty newProperty, PropertyResolutionContext propertyContext)
@@ -47,6 +52,7 @@ public readonly struct FileEvaluationContext
         Workspace = self.Workspace;
         Environment = self.Environment;
         Information = self.Information;
+        TemplateIndices = OneOrMore<int>.Null;
     }
 
     public FileEvaluationContext(in FileEvaluationContext self, IWorkspaceFile openedFile)
@@ -59,6 +65,7 @@ public readonly struct FileEvaluationContext
         Workspace = self.Workspace;
         Environment = self.Environment;
         Information = self.Information;
+        TemplateIndices = OneOrMore<int>.Null;
     }
 
     public bool TryGetValue(out ISpecDynamicValue? value, ICollection<DatDiagnosticMessage>? diagnostics = null)
