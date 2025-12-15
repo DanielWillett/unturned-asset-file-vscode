@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.AirdropAsset, Assembly-CSharp",
     "DisplayName": "Airdrop",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -10,9 +10,12 @@
     [
         {
             "Key": "Landed_Barricade",
-            "Type": "AssetReference",
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Unturned.ItemStorageAsset, Assembly-CSharp"
+            },
             "DefaultValue": "fe71781c60314468b22c6b0642a51cd9",
-            "ElementType": "SDG.Unturned.ItemStorageAsset, Assembly-CSharp",
             "Description": "The barricade to spawn when the airdrop lands.",
             "Variable": "barricadeRef",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/airdrop-asset.html#airdrop-assets"

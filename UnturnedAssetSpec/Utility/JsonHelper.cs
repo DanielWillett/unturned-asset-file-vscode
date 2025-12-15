@@ -1,3 +1,5 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,8 +11,6 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
@@ -362,6 +362,19 @@ internal static class JsonHelper
         return Guid.TryParse(str, out guid);
     }
 
+    public static bool TryGetGuid(in JsonElement element, out Guid guid)
+    {
+        // doesn't support non-dashed GUID format
+        if (element.TryGetGuid(out guid))
+            return true;
+
+        if (element.ValueKind != JsonValueKind.String)
+            return false;
+        
+        string str = element.GetString()!;
+        return Guid.TryParse(str, out guid);
+    }
+
     /// <summary>
     /// Attempts to read a value of the given type from JSON.
     /// </summary>
@@ -655,7 +668,7 @@ internal static class JsonHelper
             case JsonTokenType.StartObject:
                 if (typeof(TTo).GetGenericTypeDefinition() == typeof(DictionaryPair<>))
                 {
-                    DictionaryPairParseCache<TTo>.Delegate(ref reader, out TTo array);
+                    DictionaryPairParseCache<TTo>.ReaderDelegate(ref reader, out TTo array);
                     value = array;
                     return true;
                 }
@@ -665,7 +678,7 @@ internal static class JsonHelper
             case JsonTokenType.StartArray:
                 if (typeof(TTo).GetGenericTypeDefinition() == typeof(EquatableArray<>))
                 {
-                    ArrayParseCache<TTo>.Delegate(ref reader, out TTo array);
+                    ArrayParseCache<TTo>.ReaderDelegate(ref reader, out TTo array);
                     value = array;
                     return true;
                 }
@@ -677,8 +690,304 @@ internal static class JsonHelper
     }
 
 
+    [SkipLocalsInit]
+    public static bool TryReadGenericValue<TTo>(in JsonElement json, out Optional<TTo> value) where TTo : IEquatable<TTo>
+    {
+        if (json.ValueKind == JsonValueKind.Null)
+        {
+            value = Optional<TTo>.Null;
+            return true;
+        }
+
+        if (json.ValueKind == JsonValueKind.Number)
+        {
+            if (typeof(TTo) == typeof(int))
+            {
+                bool s = json.TryGetInt32(out int v);
+                value = Unsafe.As<int, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(uint))
+            {
+                bool s = json.TryGetUInt32(out uint v);
+                value = Unsafe.As<uint, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(long))
+            {
+                bool s = json.TryGetInt64(out long v);
+                value = Unsafe.As<long, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(ulong))
+            {
+                bool s = json.TryGetUInt64(out ulong v);
+                value = Unsafe.As<ulong, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(short))
+            {
+                bool s = json.TryGetInt16(out short v);
+                value = Unsafe.As<short, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(ushort))
+            {
+                bool s = json.TryGetUInt16(out ushort v);
+                value = Unsafe.As<ushort, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(GuidOrId))
+            {
+                bool s = json.TryGetUInt16(out ushort v);
+                value = SpecDynamicExpressionTreeValueHelpers.As<GuidOrId, TTo>(new GuidOrId(v));
+                return s;
+            }
+            if (typeof(TTo) == typeof(sbyte))
+            {
+                bool s = json.TryGetSByte(out sbyte v);
+                value = Unsafe.As<sbyte, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(byte))
+            {
+                bool s = json.TryGetByte(out byte v);
+                value = Unsafe.As<byte, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(float))
+            {
+                bool s = json.TryGetSingle(out float v);
+                value = Unsafe.As<float, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(double))
+            {
+                bool s = json.TryGetDouble(out double v);
+                value = Unsafe.As<double, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(decimal))
+            {
+                bool s = json.TryGetDecimal(out decimal v);
+                value = Unsafe.As<decimal, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(char))
+            {
+                bool s = json.TryGetUInt16(out ushort v);
+                value = SpecDynamicExpressionTreeValueHelpers.As<char, TTo>((char)v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(bool))
+            {
+                bool s = json.TryGetDouble(out double d);
+                value = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(d != 0);
+                return s;
+            }
+        }
+        else if (json.ValueKind is JsonValueKind.True or JsonValueKind.False)
+        {
+            bool v = json.ValueKind == JsonValueKind.True;
+            if (typeof(TTo) == typeof(bool))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(v);
+                return true;
+            }
+            if (typeof(TTo) == typeof(int))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<int, TTo>(v ? 1 : 0);
+                return true;
+            }
+            if (typeof(TTo) == typeof(uint))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<uint, TTo>(v ? 1u : 0u);
+                return true;
+            }
+            if (typeof(TTo) == typeof(long))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<long, TTo>(v ? 1L : 0L);
+                return true;
+            }
+            if (typeof(TTo) == typeof(ulong))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<ulong, TTo>(v ? 1ul : 0ul);
+                return true;
+            }
+            if (typeof(TTo) == typeof(short))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<short, TTo>(v ? (short)1 : (short)0);
+                return true;
+            }
+            if (typeof(TTo) == typeof(ushort))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<ushort, TTo>(v ? (ushort)1 : (ushort)0);
+                return true;
+            }
+            if (typeof(TTo) == typeof(GuidOrId))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<GuidOrId, TTo>(new GuidOrId(v ? (ushort)1 : (ushort)0));
+                return true;
+            }
+            if (typeof(TTo) == typeof(sbyte))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<sbyte, TTo>(v ? (sbyte)1 : (sbyte)0);
+                return true;
+            }
+            if (typeof(TTo) == typeof(byte))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<byte, TTo>(v ? (byte)1 : (byte)0);
+                return true;
+            }
+            if (typeof(TTo) == typeof(float))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<float, TTo>(v ? 1f : 0f);
+                return true;
+            }
+            if (typeof(TTo) == typeof(double))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<double, TTo>(v ? 1d : 0d);
+                return true;
+            }
+            if (typeof(TTo) == typeof(decimal))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<decimal, TTo>(v ? decimal.One : decimal.Zero);
+                return true;
+            }
+            if (typeof(TTo) == typeof(char))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<char, TTo>(v ? '1' : '0');
+                return true;
+            }
+            if (typeof(TTo) == typeof(string))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(v ? "true" : "false");
+                return true;
+            }
+        }
+
+        if (typeof(TTo) == typeof(string))
+        {
+            value = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(json.ValueKind == JsonValueKind.String ? json.GetString()! : json.GetRawText());
+            return true;
+        }
+
+        if (json.ValueKind == JsonValueKind.String)
+        {
+            string str = json.GetString()!;
+            if (typeof(TTo) == typeof(Guid))
+            {
+                bool s = Guid.TryParse(str, out Guid v);
+                value = Unsafe.As<Guid, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(GuidOrId))
+            {
+                bool s = GuidOrId.TryParse(str, out GuidOrId v);
+                value = Unsafe.As<GuidOrId, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(BundleReference))
+            {
+                bool s = BundleReference.TryParse(str, out BundleReference v);
+                value = Unsafe.As<BundleReference, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(QualifiedType))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<QualifiedType, TTo>(new QualifiedType(str, isCaseInsensitive: true));
+                return true;
+            }
+            if (typeof(TTo) == typeof(QualifiedOrAliasedType))
+            {
+                value = SpecDynamicExpressionTreeValueHelpers.As<QualifiedOrAliasedType, TTo>(new QualifiedType(str, isCaseInsensitive: true));
+                return true;
+            }
+            if (typeof(TTo) == typeof(DateTime))
+            {
+                bool s = json.TryGetDateTime(out DateTime dateTime);
+                value = Unsafe.As<DateTime, TTo>(ref dateTime);
+                return s;
+            }
+            if (typeof(TTo) == typeof(DateTimeOffset))
+            {
+                bool s = json.TryGetDateTimeOffset(out DateTimeOffset dateTime);
+                value = Unsafe.As<DateTimeOffset, TTo>(ref dateTime);
+                return s;
+            }
+            if (typeof(TTo) == typeof(TimeSpan))
+            {
+                bool s = TimeSpan.TryParse(str, out TimeSpan v);
+                value = Unsafe.As<TimeSpan, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(IPv4Filter))
+            {
+                bool s = IPv4Filter.TryParse(str, out IPv4Filter v);
+                value = Unsafe.As<IPv4Filter, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(Color32))
+            {
+                bool s = KnownTypeValueHelper.TryParseColorHex(str, out Color32 v, allowAlpha: true);
+                value = Unsafe.As<Color32, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(Color))
+            {
+                bool s = KnownTypeValueHelper.TryParseColorHex(str, out Color32 v, allowAlpha: true);
+                value = SpecDynamicExpressionTreeValueHelpers.As<Color, TTo>(v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(Vector2))
+            {
+                bool s = KnownTypeValueHelper.TryParseVector2Components(str, out Vector2 v);
+                value = Unsafe.As<Vector2, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(Vector3))
+            {
+                bool s = KnownTypeValueHelper.TryParseVector3Components(str, out Vector3 v);
+                value = Unsafe.As<Vector3, TTo>(ref v);
+                return s;
+            }
+            if (typeof(TTo) == typeof(Vector4))
+            {
+                bool s = KnownTypeValueHelper.TryParseVector4Components(str, out Vector4 v);
+                value = Unsafe.As<Vector4, TTo>(ref v);
+                return s;
+            }
+
+            value = Optional<TTo>.Null;
+            return false;
+        }
+
+        if (json.ValueKind == JsonValueKind.Object)
+        {
+            if (typeof(TTo).GetGenericTypeDefinition() == typeof(DictionaryPair<>))
+            {
+                DictionaryPairParseCache<TTo>.ElementDelegate(in json, out TTo array);
+                value = array;
+                return true;
+            }
+        }
+        else if (json.ValueKind == JsonValueKind.Array)
+        {
+            if (typeof(TTo).GetGenericTypeDefinition() == typeof(EquatableArray<>))
+            {
+                ArrayParseCache<TTo>.ElementDelegate(in json, out TTo array);
+                value = array;
+                return true;
+            }
+        }
+
+        value = Optional<TTo>.Null;
+        return false;
+    }
+
+
 #pragma warning disable IDE0051 // Used implicitly
-    private static bool TryReadGenericEquatableArrayElements<TElementType>(ref Utf8JsonReader reader, out EquatableArray<TElementType> array) where TElementType : IEquatable<TElementType>
+    private static bool TryReadGenericEquatableArrayElementsReader<TElementType>(ref Utf8JsonReader reader, out EquatableArray<TElementType> array) where TElementType : IEquatable<TElementType>
     {
         Utf8JsonReader readerCopy = reader;
         int elementCount = 0;
@@ -715,11 +1024,42 @@ internal static class JsonHelper
         array = new EquatableArray<TElementType>(buffer, elementCount);
         return !failed;
     }
+    
+    private static bool TryReadGenericEquatableArrayElementsElement<TElementType>(in JsonElement element, out EquatableArray<TElementType> array) where TElementType : IEquatable<TElementType>
+    {
+        int elementCount = element.GetArrayLength();
+        if (elementCount == 0)
+        {
+            array = EquatableArray<TElementType>.Empty;
+            return true;
+        }
+
+        TElementType[] buffer = new TElementType[elementCount];
+        elementCount = 0;
+        bool failed = false;
+        for (int i = 0; i < elementCount; ++i)
+        {
+            JsonElement e = element[i];
+            if (!TryReadGenericValue<TElementType>(in e, out Optional<TElementType> elementType) || !elementType.HasValue)
+            {
+                failed = true;
+            }
+            else
+            {
+                buffer[elementCount] = elementType.Value;
+            }
+
+            ++elementCount;
+        }
+
+        array = new EquatableArray<TElementType>(buffer, elementCount);
+        return !failed;
+    }
 
     private static readonly JsonEncodedText DictionaryPairKeyProperty = JsonEncodedText.Encode("Key");
     private static readonly JsonEncodedText DictionaryPairValueProperty = JsonEncodedText.Encode("Value");
 
-    private static bool TryReadDictionaryPair<TElementType>(ref Utf8JsonReader reader, out DictionaryPair<TElementType> pair) where TElementType : IEquatable<TElementType>
+    private static bool TryReadDictionaryPairReader<TElementType>(ref Utf8JsonReader reader, out DictionaryPair<TElementType> pair) where TElementType : IEquatable<TElementType>
     {
         string? key = null;
         TElementType? value = default;
@@ -750,7 +1090,7 @@ internal static class JsonHelper
                 if (!reader.Read())
                     break;
 
-                if (!TryReadGenericValue<TElementType>(ref reader, out Optional<TElementType> elementType) || !elementType.HasValue)
+                if (!TryReadGenericValue<TElementType>(ref reader, out Optional<TElementType> elementType))
                 {
                     reader.Skip();
                 }
@@ -770,37 +1110,82 @@ internal static class JsonHelper
         pair = new DictionaryPair<TElementType>(key!, value!);
         return hasValue && key != null;
     }
+
+    private static bool TryReadDictionaryPairElement<TElementType>(in JsonElement element, out DictionaryPair<TElementType> pair) where TElementType : IEquatable<TElementType>
+    {
+        string? key = null;
+        TElementType? value = default;
+
+        if (element.TryGetProperty(DictionaryPairKeyProperty.EncodedUtf8Bytes, out JsonElement valueElement))
+        {
+            if (valueElement.ValueKind != JsonValueKind.String)
+            {
+                pair = default;
+                return false;
+            }
+
+            key = valueElement.GetString()!;
+        }
+
+        if (element.TryGetProperty(DictionaryPairValueProperty.EncodedUtf8Bytes, out valueElement))
+        {
+            if (!TryReadGenericValue<TElementType>(in valueElement, out Optional<TElementType> elementType) || !elementType.HasValue)
+            {
+                pair = default;
+                return false;
+            }
+
+            value = elementType.Value;
+        }
+
+        pair = new DictionaryPair<TElementType>(key!, value!);
+        return key != null;
+    }
 #pragma warning restore IDE0051
 
     private static class ArrayParseCache<TArrayType>
     {
-        public delegate bool TryReadGenericTypeArrayElement(ref Utf8JsonReader reader, out TArrayType arrayType);
+        public delegate bool TryReadGenericTypeArrayElementReader(ref Utf8JsonReader reader, out TArrayType arrayType);
+        public delegate bool TryReadGenericTypeArrayElementElement(in JsonElement element, out TArrayType arrayType);
 
-        public static readonly TryReadGenericTypeArrayElement Delegate;
+        public static readonly TryReadGenericTypeArrayElementReader ReaderDelegate;
+        public static readonly TryReadGenericTypeArrayElementElement ElementDelegate;
         static ArrayParseCache()
         {
             Type elementType = typeof(TArrayType).GetGenericArguments()[0];
-            MethodInfo method = typeof(JsonHelper)
-                .GetMethod("TryReadGenericEquatableArrayElements", BindingFlags.NonPublic | BindingFlags.Static)
-                ?? throw new MissingMethodException("Method not found: JsonHelper.TryReadGenericEquatableArrayElements");
-
-            Delegate = (TryReadGenericTypeArrayElement)method.MakeGenericMethod(elementType).CreateDelegate(typeof(TryReadGenericTypeArrayElement));
+            MethodInfo readerMethod = typeof(JsonHelper)
+                .GetMethod("TryReadGenericEquatableArrayElementsReader", BindingFlags.NonPublic | BindingFlags.Static)
+                ?? throw new MissingMethodException("Method not found: JsonHelper.TryReadGenericEquatableArrayElementsReader");
+            MethodInfo elementMethod = typeof(JsonHelper)
+                .GetMethod("TryReadGenericEquatableArrayElementsElement", BindingFlags.NonPublic | BindingFlags.Static)
+                ?? throw new MissingMethodException("Method not found: JsonHelper.TryReadGenericEquatableArrayElementsElement");
+            
+            Type[] args = [ elementType ];
+            ReaderDelegate = (TryReadGenericTypeArrayElementReader)readerMethod.MakeGenericMethod(args).CreateDelegate(typeof(TryReadGenericTypeArrayElementReader));
+            ElementDelegate = (TryReadGenericTypeArrayElementElement)readerMethod.MakeGenericMethod(args).CreateDelegate(typeof(TryReadGenericTypeArrayElementElement));
         }
     }
 
     private static class DictionaryPairParseCache<TDictionaryPairType>
     {
-        public delegate bool TryReadDictionaryPair(ref Utf8JsonReader reader, out TDictionaryPairType arrayType);
+        public delegate bool TryReadDictionaryPairReader(ref Utf8JsonReader reader, out TDictionaryPairType dictionaryType);
+        public delegate bool TryReadDictionaryPairElement(in JsonElement element, out TDictionaryPairType dictionaryType);
 
-        public static readonly TryReadDictionaryPair Delegate;
+        public static readonly TryReadDictionaryPairReader ReaderDelegate;
+        public static readonly TryReadDictionaryPairElement ElementDelegate;
         static DictionaryPairParseCache()
         {
             Type elementType = typeof(TDictionaryPairType).GetGenericArguments()[0];
-            MethodInfo method = typeof(JsonHelper)
-                .GetMethod("TryReadDictionaryPair", BindingFlags.NonPublic | BindingFlags.Static)
-                ?? throw new MissingMethodException("Method not found: JsonHelper.TryReadDictionaryPair");
+            MethodInfo readerMethod = typeof(JsonHelper)
+                .GetMethod("TryReadDictionaryPairReader", BindingFlags.NonPublic | BindingFlags.Static)
+                ?? throw new MissingMethodException("Method not found: JsonHelper.TryReadDictionaryPairReader");
+            MethodInfo elementMethod = typeof(JsonHelper)
+                .GetMethod("TryReadDictionaryPairElement", BindingFlags.NonPublic | BindingFlags.Static)
+                ?? throw new MissingMethodException("Method not found: JsonHelper.TryReadDictionaryPairElement");
 
-            Delegate = (TryReadDictionaryPair)method.MakeGenericMethod(elementType).CreateDelegate(typeof(TryReadDictionaryPair));
+            Type[] args = [ elementType ];
+            ReaderDelegate = (TryReadDictionaryPairReader)readerMethod.MakeGenericMethod(args).CreateDelegate(typeof(TryReadDictionaryPairReader));
+            ElementDelegate = (TryReadDictionaryPairElement)elementMethod.MakeGenericMethod(args).CreateDelegate(typeof(TryReadDictionaryPairElement));
         }
     }
 }

@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.OutfitAsset, Assembly-CSharp",
     "DisplayName": "Outfit",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -10,9 +10,15 @@
     [
         {
             "Key": "Items",
-            "Type": "List",
-            "ElementType": "AssetReference",
-            "SpecialTypes": [ "SDG.Unturned.ItemClothingAsset, Assembly-CSharp" ],
+            "Type":
+            {
+                "Type": "List",
+                "ElementType":
+                {
+                    "Type": "AssetReference",
+                    "AssetType": "SDG.Unturned.ItemClothingAsset, Assembly-CSharp"
+                }
+            },
             "DefaultValue": null,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/outfit-asset.html#outfit-properties",
             "Description": "List of clothing items to be worn in the preview image.",

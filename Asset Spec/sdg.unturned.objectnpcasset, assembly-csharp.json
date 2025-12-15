@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ObjectNPCAsset, Assembly-CSharp",
     "DisplayName": "NPC Level Object",
     "Parent": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
@@ -10,8 +10,11 @@
     [
         {
             "Key": "Shirt",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Shirt for the NPC to wear.",
@@ -20,8 +23,11 @@
         },
         {
             "Key": "Pants",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Pants for the NPC to wear.",
@@ -30,8 +36,11 @@
         },
         {
             "Key": "Hat",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Hat for the NPC to wear.",
@@ -40,8 +49,11 @@
         },
         {
             "Key": "Backpack",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Backpack for the NPC to wear.",
@@ -50,8 +62,11 @@
         },
         {
             "Key": "Vest",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Vest for the NPC to wear.",
@@ -60,8 +75,11 @@
         },
         {
             "Key": "Mask",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Mask for the NPC to wear.",
@@ -70,8 +88,11 @@
         },
         {
             "Key": "Glasses",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Glasses for the NPC to wear.",
@@ -88,8 +109,11 @@
         },
         {
             "Key": "Halloween_Shirt",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Shirt for the NPC to wear during the 'Halloween' holiday.",
@@ -105,8 +129,11 @@
         },
         {
             "Key": "Halloween_Pants",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Pants for the NPC to wear during the 'Halloween' holiday.",
@@ -122,8 +149,11 @@
         },
         {
             "Key": "Halloween_Hat",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Hat for the NPC to wear during the 'Halloween' holiday.",
@@ -139,8 +169,11 @@
         },
         {
             "Key": "Halloween_Backpack",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Backpack for the NPC to wear during the 'Halloween' holiday.",
@@ -156,8 +189,11 @@
         },
         {
             "Key": "Halloween_Vest",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Vest for the NPC to wear during the 'Halloween' holiday.",
@@ -173,8 +209,11 @@
         },
         {
             "Key": "Halloween_Mask",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Mask for the NPC to wear during the 'Halloween' holiday.",
@@ -190,8 +229,11 @@
         },
         {
             "Key": "Halloween_Glasses",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Glasses for the NPC to wear during the 'Halloween' holiday.",
@@ -215,8 +257,11 @@
         },
         {
             "Key": "Christmas_Shirt",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Shirt for the NPC to wear during the 'Christmas' holiday.",
@@ -232,8 +277,11 @@
         },
         {
             "Key": "Christmas_Pants",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Pants for the NPC to wear during the 'Christmas' holiday.",
@@ -249,8 +297,11 @@
         },
         {
             "Key": "Christmas_Hat",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Hat for the NPC to wear during the 'Christmas' holiday.",
@@ -266,8 +317,11 @@
         },
         {
             "Key": "Christmas_Backpack",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Backpack for the NPC to wear during the 'Christmas' holiday.",
@@ -283,8 +337,11 @@
         },
         {
             "Key": "Christmas_Vest",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Vest for the NPC to wear during the 'Christmas' holiday.",
@@ -300,8 +357,11 @@
         },
         {
             "Key": "Christmas_Mask",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Mask for the NPC to wear during the 'Christmas' holiday.",
@@ -317,8 +377,11 @@
         },
         {
             "Key": "Christmas_Glasses",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Glasses for the NPC to wear during the 'Christmas' holiday.",
@@ -398,8 +461,11 @@
         },
         {
             "Key": "Primary",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "The weapon that's carried on the NPC's back.",
@@ -408,8 +474,11 @@
         },
         {
             "Key": "Secondary",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "The weapon that's carried on the NPC's hip.",
@@ -418,8 +487,11 @@
         },
         {
             "Key": "Tertiary",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "Another item the NPC can carry.",
@@ -438,8 +510,11 @@
         },
         {
             "Key": "Dialogue",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.DialogueAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.DialogueAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "The dialogue to use when first interacting with the NPC.",
@@ -517,7 +592,11 @@
     [
         {
             "Key": "Character",
-            "Type": "RichTextString",
+            "Type":
+            {
+                "Type": "String",
+                "SupportsRichText": true
+            },
             "DefaultValue": "Character",
             "Description": "Localized name of the NPC.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#localization",

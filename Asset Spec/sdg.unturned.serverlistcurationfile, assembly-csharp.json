@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ServerListCurationFile, Assembly-CSharp",
     "DisplayName": "Curated Server List File",
     "Parent": null,
@@ -29,8 +29,11 @@
         },
         {
             "Key": "Labels",
-            "Type": "List",
-            "ElementType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.ServerListCurationLabel, UnturnedAssetSpec",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.ServerListCurationLabel, UnturnedAssetSpec"
+            },
             "Description": "Defines a list of labels that can be applied by rules.",
             "Variable": "labels",
             "Priority": 6,
@@ -39,8 +42,11 @@
         },
         {
             "Key": "Rules",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.ServerListCurationRule, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.ServerListCurationRule, Assembly-CSharp"
+            },
             "Description": "Defines a list of rules that are applied to each discovered server in order.",
             "Variable": "rules",
             "Priority": 4,
@@ -98,8 +104,11 @@
                 },
                 {
                     "Key": "Regexes",
-                    "Type": "List",
-                    "ElementType": "RegEx",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "RegEx"
+                    },
                     "Description": "List of regular expressions, one of which must match against a server's name for this rule to match it.",
                     "Required":
                     {
@@ -181,8 +190,11 @@
                 },
                 {
                     "Key": "Filters",
-                    "Type": "List",
-                    "ElementType": "IPv4Range",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "IPv4Filter"
+                    },
                     "Description": "List of IPv4 ranges, one of which must match against a server's public IP for this rule to match it.",
                     "Required":
                     {
@@ -223,7 +235,7 @@
                 },
                 {
                     "Key": "Filter",
-                    "Type": "IPv4Range",
+                    "Type": "IPv4Filter",
                     "Description": "An IPv4 range which must match against a server's public IP for this rule to match it.",
                     "Required":
                     {
@@ -264,9 +276,15 @@
                 },
                 {
                     "Key": "Values",
-                    "Type": "List",
-                    "ElementType": "Steam64ID",
-                    "SpecialTypes": [ "3" ],
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType":
+                        {
+                            "Type": "Steam64ID",
+                            "AccountType": 3
+                        }
+                    },
                     "Description": "List of Steam server IDs (server codes), one of which must match against a server's code for this rule to match it.",
                     "Required":
                     {
@@ -307,8 +325,11 @@
                 },
                 {
                     "Key": "Value",
-                    "Type": "Steam64ID",
-                    "ElementType": "3",
+                    "Type":
+                    {
+                        "Type": "Steam64ID",
+                        "AccountType": 3
+                    },
                     "Description": "A Steam server ID (server code) which must match against a server's code for this rule to match it.",
                     "Required":
                     {

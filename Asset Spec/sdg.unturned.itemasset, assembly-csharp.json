@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemAsset, Assembly-CSharp",
     "DisplayName": "Item",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -132,8 +132,11 @@
         },
         {
             "Key": "Shared_Skin_Lookup_ID",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+            },
             "DefaultValue": "@ID",
             "Description": "The item who's skins can be used for this item. Usually this is the same ID as the current item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#shared-skin-lookup-id-uint16",
@@ -722,8 +725,14 @@
         },
         {
             "Key": "Blueprints",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.Blueprint, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.Blueprint, Assembly-CSharp",
+                "CountType": "UInt8",
+                "Mode": "LegacyList, ModernList",
+                "LegacySingularKey": "Blueprint"
+            },
             "DefaultValue": null,
             "Description": "Blueprints defined for this item. Blueprints are crafting recipes that either consume this item or produce this item.",
             "Variable": "blueprints",
@@ -732,8 +741,14 @@
         },
         {
             "Key": "Actions",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.Action, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.Action, Assembly-CSharp",
+                "CountType": "UInt8",
+                "Mode": "LegacyList, ModernList",
+                "LegacySingularKey": "Blueprint"
+            },
             "DefaultValue": null,
             "Description": "Context menu actions defined for this item.",
             "Variable": "actions",
@@ -805,7 +820,11 @@
         },
         {
             "Key": "Deleted_At_Zero_Quality_Effect",
-            "Type": "AssetReference",
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Variable": "_deletedAtZeroQualityEffectRef",
             "Description": "If this item should be destroyed when it reaches 0% quality.",
@@ -819,8 +838,13 @@
         },
         {
             "Key": "Deleted_At_Zero_Quality_Rewards",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                "LegacySingularKey": "Deleted_At_Zero_Quality_Reward",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Variable": "DeletedAtZeroQualityRewards",
             "Description": "Rewards granted when the item reaches zero quality.",
@@ -900,8 +924,12 @@
         },
         {
             "Key": "Description",
-            "Type": "RichTextString",
-            "SupportsNewLines": true,
+            "Type":
+            {
+                "Type": "String",
+                "SupportsRichText": true,
+                "SupportsNewLines": true
+            },
             "DefaultValue": "Description",
             "Description": "Localized description of the item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#localization",
@@ -1294,9 +1322,72 @@
                 },
                 {
                     "Key": "InputItems",
-                    "Type": "LegacyCompatibleList",
-                    "AllowSingleModern": true,
-                    "ElementType": "SDG.Unturned.BlueprintSupply, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.BlueprintSupply, Assembly-CSharp",
+                        "Mode": "LegacyList, ModernSingle, ModernList",
+                        "LegacySingularKey": "Supply",
+                        "CountType": "UInt8",
+                        "LegacyDefaultElementTypeValue":
+                        {
+                            "$udat-type": "SDG.Unturned.BlueprintSupply, Assembly-CSharp",
+                            "ID": 0,
+                            "Critical":
+                            {
+                                "And":
+                                [
+                                    {
+                                        "Variable": "#This.TemplateGroups[0]",
+                                        "Operation": "eq",
+                                        "Comparand": 0
+                                    },
+                                    {
+                                        "Variable": "SDG.Unturned.Blueprint, Assembly-CSharp::Operation",
+                                        "Operation": "eq",
+                                        "Comparand": "FillTargetItem"
+                                    }
+                                ],
+                                "Value": true
+                            },
+                            "AllowEmpty": false,
+                            "Prioritization":
+                            [
+                                {
+                                    "And":
+                                    [
+                                        {
+                                            "Variable": "SDG.Unturned.Blueprint, Assembly-CSharp::Operation",
+                                            "Operation": "eq",
+                                            "Comparand": "FillTargetItem"
+                                        }
+                                    ],
+                                    "Value": "LowestAmount"
+                                },
+                                {
+                                    "Value": "LowestQuality"
+                                }
+                            ],
+                            "Amount": 1,
+                            "CountingMethod":
+                            [
+                                {
+                                    "And":
+                                    [
+                                        {
+                                            "Variable": "SDG.Unturned.Blueprint, Assembly-CSharp::Operation",
+                                            "Operation": "eq",
+                                            "Comparand": "FillTargetItem"
+                                        }
+                                    ],
+                                    "Value": "TotalAmount"
+                                },
+                                {
+                                    "Value": "TotalItems"
+                                }
+                            ]
+                        }
+                    },
                     "KeyLegacyExpansionFilter": "Modern",
                     "Aliases":
                     [
@@ -1313,8 +1404,11 @@
                 },
                 {
                     "Key": "Tool",
-                    "Type": "Id",
-                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "Id",
+                        "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": 0,
                     "KeyLegacyExpansionFilter": "Legacy",
                     "Description": "Adds an extra supply that won't be consumed when the item is crafted.",
@@ -1345,9 +1439,21 @@
                 },
                 {
                     "Key": "OutputItems",
-                    "Type": "LegacyCompatibleList",
-                    "AllowSingleModern": true,
-                    "ElementType": "SDG.Unturned.BlueprintOutput, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.BlueprintOutput, Assembly-CSharp",
+                        "Mode": "LegacyList, ModernSingle, ModernList",
+                        "LegacySingularKey": "Supply",
+                        "CountType": "UInt8",
+                        "LegacyDefaultElementTypeValue":
+                        {
+                            "$udat-type": "SDG.Unturned.BlueprintOutput, Assembly-CSharp",
+                            "ID": 0,
+                            "Amount": 1,
+                            "Origin": "CRAFT"
+                        }
+                    },
                     "KeyLegacyExpansionFilter": "Modern",
                     "Aliases":
                     [
@@ -1356,7 +1462,31 @@
                             "Alias": "Outputs"
                         }
                     ],
-                    "DefaultValue": null,
+                    "DefaultValue":
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#Self.IsLegacy",
+                                    "Operation": "eq",
+                                    "Comparand": true
+                                }
+                            ],
+                            "Value":
+                            [
+                                {
+                                    "$udat-type": "SDG.Unturned.BlueprintOutput, Assembly-CSharp",
+                                    "ID": "@Product",
+                                    "Amount": "@Products",
+                                    "Origin": "@Origin"
+                                }
+                            ]
+                        },
+                        {
+                            "Value": null
+                        }
+                    ],
                     "Description": "Output items defined for this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#outputitems-list-of-doc-item-asset-blueprints-outputitem",
                     "CountForTemplateGroup": "item-blueprints-outputs",
@@ -1364,8 +1494,11 @@
                 },
                 {
                     "Key": "Product",
-                    "Type": "Id",
-                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "Id",
+                        "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": "@ID",
                     "KeyLegacyExpansionFilter": "Legacy",
                     "Description": "Defines a single output item, defaulting to this file's item.",
@@ -1432,7 +1565,11 @@
                 },
                 {
                     "Key": "Effect",
-                    "Type": "BcAssetReference",
+                    "Type":
+                    {
+                        "Type": "BcAssetReference",
+                        "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+                    },
                     "KeyLegacyExpansionFilter": "Modern",
                     "Aliases":
                     [
@@ -1441,7 +1578,6 @@
                             "Alias": "Build"
                         }
                     ],
-                    "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "Reference to an effect that will be spawned when this blueprint is crafted.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#effect-asset-pointer-to-doc-assets-effect",
@@ -1509,7 +1645,7 @@
                             "Value": "NONE"
                         },
                         {
-                            "Value": "BlueprintSkill"
+                            "Value": null
                         }
                     ],
                     "Required":
@@ -1615,8 +1751,13 @@
                 },
                 {
                     "Key": "Conditions",
-                    "Type": "LegacyCompatibleList",
-                    "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                        "LegacySingularKey": "Condition",
+                        "Mode": "LegacyList, ModernList"
+                    },
                     "Description": "Conditions that must be met for this blueprint to be visible and craftable.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "questConditionsList",
@@ -1624,8 +1765,13 @@
                 },
                 {
                     "Key": "Rewards",
-                    "Type": "LegacyCompatibleList",
-                    "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                        "LegacySingularKey": "Reward",
+                        "Mode": "LegacyList, ModernList"
+                    },
                     "Description": "Rewards applied after crafting this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "questRewardsList",
@@ -1660,15 +1806,42 @@
                 {
                     "Key": "RequiresNearbyCraftingTags",
                     "KeyLegacyExpansionFilter": "Modern",
-                    "Type": "List",
-                    "ElementType": "AssetReference",
-                    "SpecialTypes": [ "SDG.Unturned.TagAsset, Assembly-CSharp" ],
-                    "IncludeedDefaultValue": null,
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType":
+                        {
+                            "Type": "AssetReference",
+                            "AssetType": "SDG.Unturned.TagAsset, Assembly-CSharp"
+                        }
+                    },
+                    "IncludedDefaultValue": null,
                     "DefaultValue":
                     [
                         {
                             "And":
                             [
+                                {
+                                    "Variable": "#Self.IsLegacy",
+                                    "Operation": "eq",
+                                    "Comparand": true
+                                },
+                                {
+                                    "Variable": "Skill",
+                                    "Operation": "eq",
+                                    "Comparand": "COOK"
+                                }
+                            ],
+                            "Value": [ "20f30322bbcc4b01a4f116d22b24c21a" ]
+                        },
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "#Self.IsLegacy",
+                                    "Operation": "eq",
+                                    "Comparand": false
+                                },
                                 {
                                     "Variable": "RequiresHeat",
                                     "Operation": "eq",
@@ -1688,70 +1861,28 @@
                 {
                     "Key": "RequiresStaticTags",
                     "KeyLegacyExpansionFilter": "Modern",
-                    "Type": "List",
-                    "ElementType": "AssetReference",
-                    "SpecialTypes": [ "SDG.Unturned.TagAsset, Assembly-CSharp" ],
-                    "IncludeedDefaultValue": null,
-                    "DefaultValue":
-                    [
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType":
                         {
-                            "When":
-                            {
-                                "Variable": "#Self.IsLegacy",
-                                "Operation": "eq",
-                                "Comparand": false
-                            },
-                            "Cases":
-                            {
-                                "And":
-                                [
-                                    {
-                                        "Variable": "RequiresHeat",
-                                        "Operation": "eq",
-                                        "Comparand": true
-                                    }
-                                ],
-                                "Value": [ "20f30322bbcc4b01a4f116d22b24c21a" ]
-                            }
-                        },
-                        {
-                            "When":
-                            {
-                                "Variable": "#Self.IsLegacy",
-                                "Operation": "eq",
-                                "Comparand": true
-                            },
-                            "Cases":
-                            {
-                                "And":
-                                [
-                                    {
-                                        "Variable": "Skill_Level",
-                                        "Operation": "gt",
-                                        "Comparand": 0
-                                    },
-                                    {
-                                        "Variable": "Skill",
-                                        "Operation": "eq",
-                                        "Comparand": "COOK"
-                                    }
-                                ],
-                                "Value": [ "20f30322bbcc4b01a4f116d22b24c21a" ]
-                            }
-                        },
-                        {
-                            "Value": null
+                            "Type": "AssetReference",
+                            "AssetType": "SDG.Unturned.TagAsset, Assembly-CSharp"
                         }
-                    ],
-                    "Variable": "RequiresNearbyCraftingTags",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#requiresnearbycraftingtags-list-of-asset-pointer-to-doc-assets-tag",
-                    "Description": "List of tags that all need to be available nearby to craft this blueprint."
+                    },
+                    "DefaultValue": null,
+                    "Variable": "RequiresStaticTags",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#requiresstatictags-list-of-asset-pointer-to-doc-assets-tag",
+                    "Description": "Similar to @RequiresNearbyCraftingTags, but only checked once during level startup. Can test for Level Assets Tags."
                 },
                 {
                     "Key": "CategoryTag",
                     "KeyLegacyExpansionFilter": "Modern",
-                    "Type": "AssetReference",
-                    "ElementType": "SDG.Unturned.TagAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "AssetReference",
+                        "AssetType": "SDG.Unturned.TagAsset, Assembly-CSharp"
+                    },
                     "DefaultValue":
                     [
                         {
@@ -1906,6 +2037,7 @@
                 {
                     "Key": "RequiresHeat",
                     "Type": "Boolean",
+                    "KeyLegacyExpansionFilter": "Modern",
                     "DefaultValue":
                     [
                         {
@@ -1994,7 +2126,10 @@
                 },
                 {
                     "Key": "BlueprintOwner",
-                    "Type": "AssetReference",
+                    "Type":
+                    {
+                        "Type": "AssetReference"
+                    },
                     "DefaultValue": "@SDG.Unturned.Asset, Assembly-CSharp::GUID",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-source-uint16",
                     "Description": "The asset this action's @BlueprintName is on, defaulting to this item.",

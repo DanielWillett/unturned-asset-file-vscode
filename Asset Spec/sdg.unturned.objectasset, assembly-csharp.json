@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
     "DisplayName": "Level Object",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -497,8 +497,11 @@
             "Key": "Interactability_Drop_*",
             "Template": true,
             "TemplateGroups": [ "object-interactability-drops" ],
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "An option for item drops from this dropper object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
@@ -507,8 +510,11 @@
         },
         {
             "Key": "Interactability_Reward_ID",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "Spawn table to use for drops from this dropper object. Takes priority over the item drop list.",
             "Docs":
@@ -594,8 +600,11 @@
         },
         {
             "Key": "Interactability_Effect",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Effect to play when this object is interacted with or a section of rubble is destroyed.",
             "Docs":
@@ -676,8 +685,11 @@
         },
         {
             "Key": "Interactability_Dialogue",
-            "Type": "AssetReferenceString",
-            "ElementType": "SDG.Unturned.DialogueAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Unturned.DialogueAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Dialogue asset to open when this dialogue object is interacted with.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
@@ -764,8 +776,13 @@
         },
         {
             "Key": "Interactability_Conditions",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                "LegacySingularKey": "Interactability_Condition",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Description": "Conditions that must be met to succesfully interact with this object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#conditions-and-rewards",
@@ -826,7 +843,6 @@
         {
             "Key": "Interactability_Resource",
             "Type": "UInt16",
-            "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
             "DefaultValue": null,
             "Description": "Units of fuel or water that is stored in this object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
@@ -905,8 +921,11 @@
         },
         {
             "Key": "Interactability_Finale",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Effect to play when this all rubble sections are destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
@@ -1389,8 +1408,11 @@
         },
         {
             "Key": "Rubble_Effect",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Effect to play when a section of rubble is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
@@ -1421,8 +1443,11 @@
         },
         {
             "Key": "Rubble_Finale",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Effect to play when this all rubble sections are destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
@@ -1453,8 +1478,11 @@
         },
         {
             "Key": "Rubble_Reward_ID",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "Spawn table to use for drops when a section of rubble is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
@@ -2278,9 +2306,12 @@
         },
         {
             "Key": "Foliage",
-            "Type": "AssetReferenceString",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
-            "ElementType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
             "Description": "The collection of foliage that can be baked onto this object's surface.",
             "Priority": 15,
             "Variable": "foliage",
@@ -2379,9 +2410,12 @@
         },
         {
             "Key": "Material_Palette",
-            "Type": "AssetReferenceString",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Unturned.MaterialPaletteAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
-            "ElementType": "SDG.Unturned.MaterialPaletteAsset, Assembly-CSharp",
             "Description": "A default material palette that should be used to randomize the material of this object.",
             "Priority": 15,
             "Variable": "materialPalette",
@@ -2430,9 +2464,13 @@
         },
         {
             "Key": "Christmas_Redirect",
-            "Type": "AssetReferenceString",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
+                "PreventSelfReference": true
+            },
             "DefaultValue": "00000000000000000000000000000000",
-            "ElementType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
             "Description": "The object to replace this object with during the 'Christmas' holiday.",
             "Priority": 14,
             "Variable": "christmasRedirect",
@@ -2440,9 +2478,13 @@
         },
         {
             "Key": "Halloween_Redirect",
-            "Type": "AssetReferenceString",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
+                "PreventSelfReference": true
+            },
             "DefaultValue": "00000000000000000000000000000000",
-            "ElementType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
             "Description": "The object to replace this object with during the 'Halloween' holiday.",
             "Priority": 14,
             "Variable": "halloweenRedirect",
@@ -2585,8 +2627,13 @@
         },
         {
             "Key": "Conditions",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                "LegacySingularKey": "Condition",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Description": "Conditions that must be met for this object to be visible.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#conditions-and-rewards",
@@ -2957,20 +3004,28 @@
             "Key": "Interactability_Text_Line_*",
             "Template": true,
             "TemplateGroups": [ "object-interactability-note-lines" ],
-            "Type": "RichTextString",
+            "Type":
+            {
+                "Type": "String",
+                "SupportsRichText": true,
+                "SupportsNewLines": true
+            },
             "DefaultValue": "#Self.Key",
             "Variable": "interactabilityText",
-            "SupportsNewLines": true,
             "Description": "A line in this object's note.",
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables"
         },
         {
             "Key": "Interact",
-            "Type": "FormatString",
-            "ElementType": "1|T",
+            "Type":
+            {
+                "Type": "String",
+                "SupportsRichText": true,
+                "SupportsNewLines": true,
+                "FormatArguments": 1
+            },
             "DefaultValue": null,
-            "SupportsNewLines": true,
             "Description": "Custom text when interacting with the object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Required":

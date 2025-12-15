@@ -756,7 +756,7 @@ public static class SpecDynamicValue
     /// <param name="reference">The parsed value.</param>
     /// <returns>Whether or not parsing was successful.</returns>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="context"/> is an invalid value.</exception>
-    public static bool TryParse(string value, SpecDynamicValueContext context, ISpecPropertyType? expectedType, [MaybeNullWhen(false)] out ISpecDynamicValue reference)
+    public static bool TryParse(string value, SpecDynamicValueContext context, ISpecPropertyType? expectedType, [NotNullWhen(true)] out ISpecDynamicValue? reference)
     {
         if (value != null)
             return TryParse(value.AsSpan(), value, context, expectedType, out reference);
@@ -774,12 +774,12 @@ public static class SpecDynamicValue
     /// <param name="reference">The parsed value.</param>
     /// <returns>Whether or not parsing was successful.</returns>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="context"/> is an invalid value.</exception>
-    public static bool TryParse(ReadOnlySpan<char> value, SpecDynamicValueContext context, ISpecPropertyType? expectedType, [MaybeNullWhen(false)] out ISpecDynamicValue reference)
+    public static bool TryParse(ReadOnlySpan<char> value, SpecDynamicValueContext context, ISpecPropertyType? expectedType, [NotNullWhen(true)] out ISpecDynamicValue? reference)
     {
         return TryParse(value, null, context, expectedType, out reference);
     }
 
-    private static bool TryParse(ReadOnlySpan<char> value, string? optionalString, SpecDynamicValueContext context, ISpecPropertyType? expectedType, [MaybeNullWhen(false)] out ISpecDynamicValue reference)
+    private static bool TryParse(ReadOnlySpan<char> value, string? optionalString, SpecDynamicValueContext context, ISpecPropertyType? expectedType, [NotNullWhen(true)] out ISpecDynamicValue? reference)
     {
         if (((int)context & 0b11) == 3)
         {
@@ -1165,13 +1165,13 @@ public static class SpecDynamicValue
         return -1;
     }
 
-    private static bool TryParsePropertyRef(ReadOnlySpan<char> value, string? optionalString, [MaybeNullWhen(false)] out ISpecDynamicValue reference)
+    private static bool TryParsePropertyRef(ReadOnlySpan<char> value, string? optionalString, [NotNullWhen(true)] out ISpecDynamicValue? reference)
     {
         reference = new PropertyRef(value, optionalString);
         return true;
     }
 
-    private static bool TryParseDataRef(ReadOnlySpan<char> value, string? optionalString, [MaybeNullWhen(false)] out ISpecDynamicValue reference)
+    private static bool TryParseDataRef(ReadOnlySpan<char> value, string? optionalString, [NotNullWhen(true)] out ISpecDynamicValue? reference)
     {
         int dot = IndexOfAtCurrentDepth(value, 0, '.', '(');
         if (dot < 0)

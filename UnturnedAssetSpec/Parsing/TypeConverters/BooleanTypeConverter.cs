@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -226,5 +227,50 @@ internal sealed class BooleanTypeConverter : ITypeConverter<bool>
 
         result = Optional<TTo>.Null;
         return false;
+    }
+
+    public void WriteJson(Utf8JsonWriter writer, bool value, ref TypeConverterFormatArgs args)
+    {
+        writer.WriteBooleanValue(value);
+    }
+
+    public bool TryReadJson(in JsonElement json, out Optional<bool> value, ref TypeConverterParseArgs<bool> args)
+    {
+        switch (json.ValueKind)
+        {
+            case JsonValueKind.Null:
+                value = Optional<bool>.Null;
+                return true;
+
+            case JsonValueKind.String:
+                if (TryParse(json.GetString()!, ref args, out bool parsedValue))
+                {
+                    value = parsedValue;
+                    return true;
+                }
+
+                goto default;
+
+            case JsonValueKind.False:
+                value = false;
+                return true;
+
+            case JsonValueKind.True:
+                value = true;
+                return true;
+
+            case JsonValueKind.Number:
+                if (json.TryGetDouble(out double d))
+                {
+                    value = d != 0;
+                    return true;
+                }
+
+                goto default;
+
+            default:
+                value = Optional<bool>.Null;
+                return false;
+        }
     }
 }

@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -55,5 +56,33 @@ internal sealed class IPv4FilterTypeConverter : ITypeConverter<IPv4Filter>
 
         result = Optional<TTo>.Null;
         return false;
+    }
+
+    public void WriteJson(Utf8JsonWriter writer, IPv4Filter value, ref TypeConverterFormatArgs args)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+
+    public bool TryReadJson(in JsonElement json, out Optional<IPv4Filter> value, ref TypeConverterParseArgs<IPv4Filter> args)
+    {
+        switch (json.ValueKind)
+        {
+            case JsonValueKind.Null:
+                value = Optional<IPv4Filter>.Null;
+                return true;
+
+            case JsonValueKind.String:
+                if (IPv4Filter.TryParse(json.GetString()!, out IPv4Filter dt))
+                {
+                    value = dt;
+                    return true;
+                }
+
+                goto default;
+
+            default:
+                value = Optional<IPv4Filter>.Null;
+                return false;
+        }
     }
 }

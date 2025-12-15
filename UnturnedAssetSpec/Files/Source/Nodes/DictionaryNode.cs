@@ -37,7 +37,7 @@ internal class DictionaryNode : AnySourceNode, IDictionarySourceNode
         }
     }
 
-    public bool TryGetProperty(string propertyName, [MaybeNullWhen(false)] out IPropertySourceNode node)
+    public bool TryGetProperty(string propertyName, [NotNullWhen(true)] out IPropertySourceNode? node)
     {
         StringDictionary<IPropertySourceNode>? p = _properties;
         if (p == null)

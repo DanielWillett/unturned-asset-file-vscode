@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
     "DisplayName": "Landscape Material",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -36,35 +36,47 @@
         },
         {
             "Key": "Foliage",
-            "Type": "AssetReference",
-            "ElementType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Description": "The default foliage to spawn on this material when baking it.",
             "Variable": "foliage"
         },
         {
             "Key": "Christmas_Redirect",
-            "Type": "AssetReference",
-            "ElementType": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
-            "PreventSelfReference": true,
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
+                "PreventSelfReference": true
+            },
             "DefaultValue": null,
             "Description": "Replacement for this material during the 'Christmas' holiday.",
             "Variable": "christmasRedirect"
         },
         {
             "Key": "Halloween_Redirect",
-            "Type": "AssetReference",
-            "ElementType": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
-            "PreventSelfReference": true,
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
+                "PreventSelfReference": true
+            },
             "DefaultValue": null,
             "Description": "Replacement for this material during the 'Halloween' holiday.",
             "Variable": "halloweenRedirect"
         },
         {
             "Key": "AprilFools_Redirect",
-            "Type": "AssetReference",
-            "ElementType": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
-            "PreventSelfReference": true,
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
+                "PreventSelfReference": true
+            },
             "DefaultValue": null,
             "Description": "Replacement for this material during the 'April Fools' holiday.",
             "Variable": "aprilFoolsRedirect"

@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
@@ -27,15 +28,30 @@ public interface IType
     /// </summary>
     /// <remarks>Used to create a generic context for a <see cref="IType{T}"/> implementation.</remarks>
     void Visit<TVisitor>(ref TVisitor visitor) where TVisitor : ITypeVisitor;
+
+    /// <summary>
+    /// Writes all the information for this type instance to a JSON string or object.
+    /// </summary>
+    void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options);
+}
+
+/// <summary>
+/// A factory that can create types from JSON information.
+/// </summary>
+public interface ITypeFactory
+{
+    /// <summary>
+    /// Resolves the type.
+    /// </summary>
+    /// <remarks>Some factories will just return themselves.</remarks>
+    IType CreateType(in JsonElement typeDefinition, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context = "");
 }
 
 /// <summary>
 /// A strongly-typed parsable property type.
 /// </summary>
 /// <typeparam name="TValue"></typeparam>
-public interface IType<TValue>
-    : IType
-    where TValue : IEquatable<TValue>
+public interface IType<TValue> : IType where TValue : IEquatable<TValue>
 {
     /// <summary>
     /// The converter used to parse values for this type.
@@ -46,11 +62,6 @@ public interface IType<TValue>
     /// Creates a dynamic value from a concrete value.
     /// </summary>
     IValue<TValue> CreateValue(Optional<TValue> value);
-    
-    /// <summary>
-    /// Attempts to read a value of this type from a <see cref="Utf8JsonReader"/>.
-    /// </summary>
-    bool TryValueFromJson(ref Utf8JsonReader reader, [MaybeNullWhen(false)] out IValue<TValue> value);
 }
 
 

@@ -1,7 +1,9 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -27,6 +29,16 @@ internal sealed class FlagParser : ITypeParser<bool>
 
         value = new Optional<bool>(true);
         return true;
+    }
+
+    public bool TryReadValueFromJson(in JsonElement json, out Optional<bool> value, IType<bool> valueType)
+    {
+        return TypeParsers.Boolean.TryReadValueFromJson(in json, out value, valueType);
+    }
+
+    public void WriteValueToJson(Utf8JsonWriter writer, bool value, IType<bool> valueType)
+    {
+        TypeParsers.Boolean.WriteValueToJson(writer, value, valueType);
     }
 
     public override int GetHashCode() => 1959769108;

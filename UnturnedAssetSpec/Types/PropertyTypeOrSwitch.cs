@@ -24,6 +24,12 @@ public readonly struct PropertyTypeOrSwitch : IEquatable<PropertyTypeOrSwitch>
     {
         Type = type;
     }
+
+    public PropertyTypeOrSwitch(IType type)
+    {
+        // todo
+        Type = null;
+    }
     public PropertyTypeOrSwitch(SpecDynamicSwitchValue typeSwitch)
     {
         TypeSwitch = typeSwitch;
@@ -73,7 +79,7 @@ public readonly struct PropertyTypeOrSwitch : IEquatable<PropertyTypeOrSwitch>
         return string.Empty;
     }
 
-    public bool TryParseValue(in SpecPropertyTypeParseContext context, [MaybeNullWhen(false)] out ISpecDynamicValue propertyValue)
+    public bool TryParseValue(in SpecPropertyTypeParseContext context, [NotNullWhen(true)] out ISpecDynamicValue? propertyValue)
     {
         ISpecPropertyType? type = GetType(in context.EvaluationContext);
 

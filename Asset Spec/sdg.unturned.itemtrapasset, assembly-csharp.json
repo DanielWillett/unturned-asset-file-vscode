@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemTrapAsset, Assembly-CSharp",
     "DisplayName": "Trap Barricade Item",
     "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
@@ -118,8 +118,11 @@
         },
         {
             "Key": "Explosion2",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Effect spawned when the trap explodes.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",

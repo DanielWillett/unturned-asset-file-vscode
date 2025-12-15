@@ -220,7 +220,7 @@ public interface IListSourceNode : IAnyChildrenSourceNode
     /// <summary>
     /// Try to get an element by index.
     /// </summary>
-    bool TryGetElement(int index, [MaybeNullWhen(false)] out IAnyValueSourceNode node);
+    bool TryGetElement(int index, [NotNullWhen(true)] out IAnyValueSourceNode? node);
 }
 
 /// <summary>
@@ -231,7 +231,7 @@ public interface IDictionarySourceNode : IAnyChildrenSourceNode
     /// <summary>
     /// Try to get a property by name.
     /// </summary>
-    bool TryGetProperty(string propertyName, [MaybeNullWhen(false)] out IPropertySourceNode node);
+    bool TryGetProperty(string propertyName, [NotNullWhen(true)] out IPropertySourceNode? node);
 }
 
 /// <summary>

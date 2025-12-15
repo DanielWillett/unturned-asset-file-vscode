@@ -394,11 +394,29 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; should must be at least {1} character(s) long..
+        /// </summary>
+        public static string UNT1024_LessString {
+            get {
+                return ResourceManager.GetString("UNT1024_LessString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property &quot;{0}&quot; should not contain more than {1} element(s)..
         /// </summary>
         public static string UNT1024_More {
             get {
                 return ResourceManager.GetString("UNT1024_More", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; should not be longer than {1} character(s)..
+        /// </summary>
+        public static string UNT1024_MoreString {
+            get {
+                return ResourceManager.GetString("UNT1024_MoreString", resourceCulture);
             }
         }
         
@@ -592,6 +610,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Value &apos;{0}&apos; can not be converted to a regular expression..
+        /// </summary>
+        public static string UNT2004_Regex {
+            get {
+                return ResourceManager.GetString("UNT2004_Regex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value &apos;{0}&apos; can not be converted to a value of type &apos;{1}&apos;. Property &apos;{2}&apos; expects a dictionary..
         /// </summary>
         public static string UNT2004_ValueInsteadOfDictionary {
@@ -646,7 +673,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Malformed format string. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method..
+        ///   Looks up a localized string similar to Malformed format string. This could be caused by having too many formatting arguments. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method..
         /// </summary>
         public static string UNT2012 {
             get {
@@ -655,7 +682,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Malformed format string: {0}. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method..
+        ///   Looks up a localized string similar to Malformed format string: {0} This could be caused by having too many formatting arguments. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method..
         /// </summary>
         public static string UNT2012_WithMessage {
             get {

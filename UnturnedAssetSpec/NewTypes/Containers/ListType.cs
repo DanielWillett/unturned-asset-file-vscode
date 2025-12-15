@@ -9,16 +9,27 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 /// <summary>
 /// Factory class for the <see cref="ListType{TCountType,TElementType}"/> type.
 /// </summary>
-public static class ListType
+public sealed class ListType : ITypeFactory
 {
     public const string TypeId = "List";
+
+    /// <summary>
+    /// Factory used to create <see cref="ListType{TCountType,TElementType}"/> values from JSON.
+    /// </summary>
+    public static ITypeFactory Factory { get; } = new ListType();
+
+    private ListType() { }
+    static ListType() { }
 
     /// <summary>
     /// Create a new list type.
@@ -63,10 +74,171 @@ public static class ListType
             Mode = ListMode.ModernList
         }, subType);
     }
+
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    {
+        ElementTypeVisitor v;
+        v.Result = null;
+        v.Spec = spec;
+        v.Owner = owner;
+        v.Context = context;
+        v.Json = typeDefinition;
+        if (typeDefinition.TryGetProperty("ElementType"u8, out JsonElement element) && element.ValueKind != JsonValueKind.Null)
+        {
+            IType elementType = spec.ReadType(in element, owner, context);
+            elementType.Visit(ref v);
+        }
+        else
+        {
+            throw new JsonException(
+                string.Format(
+                    Resources.JsonException_RequiredTypePropertyMissing,
+                    "ElementType",
+                    "List",
+                    context.Length != 0 ? $"{owner.FullName}.{context}" : owner.FullName
+                )
+            );
+        }
+
+        return v.Result ?? throw new JsonException(
+            string.Format(
+                Resources.JsonException_FailedToParseValue,
+                "IType<> (invalid type)",
+                context.Length != 0 ? $"{owner.FullName}.{context}" : $"{owner.FullName}"
+            )
+        );
+    }
+
+    private struct ElementTypeVisitor : ITypeVisitor
+    {
+        public IType? Result;
+        public JsonElement Json;
+        public IDatSpecificationReadContext Spec;
+        public IDatSpecificationObject Owner;
+        public string Context;
+
+        public void Accept<TElementType>(IType<TElementType> type) where TElementType : IEquatable<TElementType>
+        {
+            CountTypeVisitor<TElementType> v;
+            v.Result = null;
+            v.Spec = Spec;
+            v.Owner = Owner;
+            v.Context = Context;
+            v.Json = Json;
+            v.SubType = type;
+            if (Json.TryGetProperty("CountType"u8, out JsonElement element) && element.ValueKind != JsonValueKind.Null)
+            {
+                IType countType = Spec.ReadType(in element, Owner, Context);
+                countType.Visit(ref v);
+            }
+            else
+            {
+                v.Accept(Int32Type.Instance);
+            }
+
+            Result = v.Result;
+        }
+    }
+    private struct CountTypeVisitor<TElementType> : ITypeVisitor where TElementType : IEquatable<TElementType>
+    {
+        public IType? Result;
+        public JsonElement Json;
+        public IDatSpecificationReadContext Spec;
+        public IDatSpecificationObject Owner;
+        public IType<TElementType> SubType;
+        public string Context;
+
+        public void Accept<TCountType>(IType<TCountType> type) where TCountType : IEquatable<TCountType>
+        {
+            ListMode mode = ListMode.ModernList;
+
+            if (Json.TryGetProperty("Mode"u8, out JsonElement element) && element.ValueKind != JsonValueKind.Null)
+            {
+                if (!Enum.TryParse(element.GetString(), out mode) || (mode & (ListMode.Modern | ListMode.Legacy)) == 0)
+                {
+                    throw new JsonException(
+                        string.Format(
+                            Resources.JsonException_FailedToParseEnum,
+                            nameof(ListMode),
+                            element.GetString(),
+                            Context.Length != 0 ? $"{Owner.FullName}.{Context}.Mode" : $"{Owner.FullName}.Mode"
+                        )
+                    );
+                }
+            }
+
+
+            Optional<TCountType> minValue = Optional<TCountType>.Null, maxValue = Optional<TCountType>.Null;
+            if (Json.TryGetProperty("MinimumCount"u8, out element) && element.ValueKind != JsonValueKind.Null)
+            {
+                TypeConverterParseArgs<TCountType> parseArgs = new TypeConverterParseArgs<TCountType>(type);
+                if (!TypeConverters.Get<TCountType>().TryReadJson(in Json, out minValue, ref parseArgs))
+                    throw new JsonException(string.Format(
+                            Resources.JsonException_FailedToParseValue,
+                            type.Id,
+                            Context.Length != 0 ? $"{Owner.FullName}.{Context}.MinimumCount" : $"{Owner.FullName}.MinimumCount"
+                        )
+                    );
+            }
+            
+            if (Json.TryGetProperty("MaximumCount"u8, out element) && element.ValueKind != JsonValueKind.Null)
+            {
+                TypeConverterParseArgs<TCountType> parseArgs = new TypeConverterParseArgs<TCountType>(type);
+                if (!TypeConverters.Get<TCountType>().TryReadJson(in Json, out minValue, ref parseArgs))
+                    throw new JsonException(string.Format(
+                            Resources.JsonException_FailedToParseValue,
+                            type.Id,
+                            Context.Length != 0 ? $"{Owner.FullName}.{Context}.MaximumCount" : $"{Owner.FullName}.MaximumCount"
+                        )
+                    );
+            }
+
+            IValue<TElementType>? defaultValue = null;
+            if (Json.TryGetProperty("LegacyDefaultElementTypeValue"u8, out element))
+            {
+                defaultValue = Spec.ReadValue(in element, SubType, Owner, Context.Length == 0 ? "LegacyDefaultElementTypeValue" : $"{Context}.LegacyDefaultElementTypeValue");
+            }
+
+            string? legacySingleKey = null, legacySingularKey = null;
+            if (Json.TryGetProperty("LegacySingleKey"u8, out element) && element.ValueKind != JsonValueKind.Null)
+                legacySingleKey = element.GetString();
+            if (Json.TryGetProperty("LegacySingularKey"u8, out element) && element.ValueKind != JsonValueKind.Null)
+                legacySingularKey = element.GetString();
+
+            bool skipUnderscoreInLegacyKey = false;
+            if (Json.TryGetProperty("SkipUnderscoreInLegacyKey"u8, out element) && element.ValueKind != JsonValueKind.Null)
+                skipUnderscoreInLegacyKey = element.GetBoolean();
+
+            Result = new ListType<TCountType, TElementType>(new ListTypeArgs<TCountType, TElementType>
+            {
+                Mode = mode,
+                MinimumCount = minValue,
+                MaximumCount = maxValue,
+                LegacyDefaultElementTypeValue = defaultValue,
+                LegacySingleKey = legacySingleKey,
+                LegacySingularKey = legacySingularKey,
+                SkipUnderscoreInLegacyKey = skipUnderscoreInLegacyKey
+            }, SubType);
+        }
+    }
 }
 
 /// <summary>
 /// A container type which allows multiple <see cref="TElementType"/> sub-elements.
+/// <para>
+/// Supports the following properties:
+/// <list type="bullet">
+///     <item><c><see cref="IType{TElementType}"/> ElementType</c> - The type of elements in the list - required.</item>
+///     <item><c><see cref="IType{TCountType}"/> CountType</c> - The type of number to parse for legacy list counts. Defaults to <see cref="Int32Type"/>.</item>
+///     <item><c><see cref="ListMode"/> Mode</c> - What kinds of lists to parse (bitwise flag). Defaults to <see cref="ListMode.ModernList"/>.</item>
+///     <item><c><typeparamref name="TCountType"/> MinimumCount</c> - Minimum number of items (inclusive).</item>
+///     <item><c><typeparamref name="TCountType"/> MaximumCount</c> - Maximum number of items (inclusive).</item>
+///     <item><c><see cref="IValue{TElementType}"/> LegacyDefaultElementTypeValue</c> - Default value for undefined legacy elements or elements without values.</item>
+///     <item><c><see cref="string"/> LegacySingleKey</c> - Key for the single property when <see cref="ListMode.LegacySingle"/> is included. Defaults to <c>LegacySingularKey</c>.</item>
+///     <item><c><see cref="string"/> LegacySingularKey</c> - Base key for elements in legacy lists. For example, 'Condition', for Conditions, Condition_0, etc.</item>
+///     <item><c><see cref="string"/> SkipUnderscoreInLegacyKey</c> - Indicates that the '_' should not be used to separate <c>LegacySingularKey</c> and the index. Defaults to <see langword="false"/>.</item>
+/// </list>
+/// </para>
 /// </summary>
 /// <remarks>Use the factory methods in <see cref="ListType"/> to create a list type.</remarks>
 /// <typeparam name="TElementType">The type of values to read from the elements of the list.</typeparam>
@@ -74,7 +246,7 @@ public static class ListType
 public class ListType<TCountType, TElementType>
     : BaseType<EquatableArray<TElementType>, ListType<TCountType, TElementType>>, ITypeParser<EquatableArray<TElementType>>
     where TElementType : IEquatable<TElementType>
-    where TCountType : unmanaged, IConvertible, IComparable<TCountType>, IEquatable<TCountType>
+    where TCountType : IEquatable<TCountType>
 {
     private readonly ListTypeArgs<TCountType, TElementType> _args;
     private readonly IType<TElementType> _subType;
@@ -98,34 +270,126 @@ public class ListType<TCountType, TElementType>
         _subType = subType;
         DisplayName = string.Format(Resources.Type_Name_List_Generic, subType.DisplayName);
 
+        ITypeConverter<TCountType> countConverter = TypeConverters.Get<TCountType>();
         if ((args.Mode & ListMode.Legacy) != 0)
         {
             _countType = CommonTypes.GetIntegerType<TCountType>();
-            _countConverter = TypeConverters.Get<TCountType>();
+            _countConverter = countConverter;
         }
 
-        try
-        {
-            _minCount = _args.MinimumCount?.ToInt32(CultureInfo.InvariantCulture);
-            if (_minCount is <= 0)
-                _minCount = null;
-        }
-        catch (OverflowException)
-        {
+        countConverter.TryConvertTo(_args.MinimumCount, out Optional<int> newMinCount);
+        countConverter.TryConvertTo(_args.MaximumCount, out Optional<int> newMaxCount);
+        _minCount = newMinCount.AsNullable();
+        if (_minCount is <= 0)
             _minCount = null;
+
+        _maxCount = newMaxCount.AsNullable();
+        if (_maxCount is < 0)
+            _maxCount = null;
+    }
+
+    #region JSON
+
+    public override void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
+    {
+        WriteTypeName(writer);
+        writer.WritePropertyName("ElementType"u8);
+        _subType.WriteToJson(writer, options);
+
+        if (_countType != null && !Int32Type.Instance.Equals(_countType))
+        {
+            writer.WritePropertyName("CountType"u8);
+            _countType.WriteToJson(writer, options);
         }
 
-        try
+        if (_minCount is > 0)
+            writer.WriteNumber("MinimumCount"u8, _minCount.Value);
+
+        if (_maxCount is > 0)
+            writer.WriteNumber("MaximumCount"u8, _maxCount.Value);
+
+        if (_args.Mode != ListMode.ModernList)
+            writer.WriteString("Mode"u8, _args.Mode.ToString());
+
+        if (_args.LegacySingularKey != null)
+            writer.WriteString("LegacySingularKey"u8, _args.LegacySingularKey);
+
+        if (_args.LegacySingleKey != null)
+            writer.WriteString("LegacySingleKey"u8, _args.LegacySingleKey);
+
+        if (_args.SkipUnderscoreInLegacyKey)
+            writer.WriteBoolean("SkipUnderscoreInLegacyKey"u8, _args.SkipUnderscoreInLegacyKey);
+
+        if (_args.LegacyDefaultElementTypeValue != null)
         {
-            _maxCount = _args.MaximumCount?.ToInt32(CultureInfo.InvariantCulture);
-            if (_maxCount is < 0)
-                _maxCount = null;
-        }
-        catch (OverflowException)
-        {
-            _maxCount = null;
+            writer.WritePropertyName("LegacyDefaultElementTypeValue"u8);
+            _args.LegacyDefaultElementTypeValue.WriteToJson(writer);
         }
     }
+
+    public bool TryReadValueFromJson(in JsonElement json, out Optional<EquatableArray<TElementType>> value, IType<EquatableArray<TElementType>> valueType)
+    {
+        value = Optional<EquatableArray<TElementType>>.Null;
+        switch (json.ValueKind)
+        {
+            case JsonValueKind.Null:
+                value = EquatableArray<TElementType>.Empty;
+                return true;
+
+            case JsonValueKind.Array:
+                Optional<TElementType> o;
+                int len = json.GetArrayLength();
+                TElementType[] arr = new TElementType[len];
+                for (int i = 0; i < len; ++i)
+                {
+                    JsonElement element = json[i];
+                    if (!_subType.Parser.TryReadValueFromJson(in element, out o, _subType) || !o.HasValue)
+                    {
+                        return false;
+                    }
+
+                    arr[i] = o.Value;
+                }
+
+                value = new EquatableArray<TElementType>(arr);
+                return true;
+
+            default:
+                if (!_subType.Parser.TryReadValueFromJson(in json, out o, _subType) || !o.HasValue)
+                {
+                    return false;
+                }
+                value = new EquatableArray<TElementType>(new TElementType[] { o.Value });
+                return true;
+        }
+    }
+
+    public void WriteValueToJson(Utf8JsonWriter writer, EquatableArray<TElementType> value, IType<EquatableArray<TElementType>> valueType)
+    {
+        if (value.Array == null || value.Array.Length == 0)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+
+        writer.WriteStartArray();
+
+        foreach (TElementType element in value.Array)
+        {
+            if (element == null)
+            {
+                writer.WriteNullValue();
+            }
+            else
+            {
+                _subType.Parser.WriteValueToJson(writer, element, _subType);
+            }
+        }
+
+        writer.WriteEndArray();
+    }
+
+    #endregion
 
     protected override bool Equals(ListType<TCountType, TElementType> other)
     {
@@ -174,7 +438,7 @@ public class ListType<TCountType, TElementType>
             }
 
             if (args.ParentNode is IPropertySourceNode { Parent: IDictionarySourceNode dictionary }
-                && dictionary.TryGetProperty(singlePropertyName!, out IPropertySourceNode? singularProperty))
+                && dictionary.TryGetProperty(singlePropertyName, out IPropertySourceNode? singularProperty))
             {
                 args.ReferencedPropertySink?.AcceptReferencedDiagnostic(singularProperty);
 
@@ -183,7 +447,7 @@ public class ListType<TCountType, TElementType>
                 if (!_subType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> element))
                 {
                     if (!parseArgs.ShouldIgnoreFailureDiagnostic)
-                        args.DiagnosticSink?.UNT2004_Generic(ref args, singularProperty.Value == null ? "-" : singularProperty.Value.ToString(), _subType);
+                        args.DiagnosticSink?.UNT2004_Generic(ref args, singularProperty.Value == null ? "-" : singularProperty.Value.ToString()!, _subType);
                 }
                 else if (!element.HasValue)
                 {
@@ -250,7 +514,7 @@ public class ListType<TCountType, TElementType>
                     {
                         if (!elementParseArgs.ShouldIgnoreFailureDiagnostic)
                         {
-                            args.DiagnosticSink?.UNT2004_Generic(ref args, v.ToString(), _subType);
+                            args.DiagnosticSink?.UNT2004_Generic(ref args, v.ToString()!, _subType);
                         }
                     }
                     else
@@ -276,22 +540,12 @@ public class ListType<TCountType, TElementType>
                 if (couldBeLegacyCount && _countConverter != null && _countType != null)
                 {
                     args.CreateTypeConverterParseArgs(out TypeConverterParseArgs<TCountType> parseArgs, _countType, valueNode.Value);
-                    bool success = _countConverter.TryParse(valueNode.Value.AsSpan(), ref parseArgs, out TCountType countValue);
+                    bool success = _countConverter.TryParse(valueNode.Value.AsSpan(), ref parseArgs, out TCountType? countValue);
                     int count = 0;
                     if (success)
                     {
-                        try
-                        {
-                            count = countValue.ToInt32(CultureInfo.InvariantCulture);
-                        }
-                        catch (OverflowException)
-                        {
-                            success = false;
-                        }
-                        catch (InvalidCastException)
-                        {
-                            success = false;
-                        }
+                        success = _countConverter.TryConvertTo(new Optional<TCountType>(countValue!), out Optional<int> newCount) && newCount.HasValue;
+                        count = newCount.Value;
                     }
 
                     if (success)
@@ -323,7 +577,7 @@ public class ListType<TCountType, TElementType>
                             allFailed = true;
                             for (int i = 0; i < count; ++i)
                             {
-                                string newKey = CreateLegacyKey(singularPropertyName!, i);
+                                string newKey = CreateLegacyKey(singularPropertyName, i);
                                 bool needsDefault = false;
                                 if (!dictionary.TryGetProperty(newKey, out IPropertySourceNode? property))
                                 {
@@ -339,7 +593,7 @@ public class ListType<TCountType, TElementType>
                                     {
                                         if (!elementParseArgs.ShouldIgnoreFailureDiagnostic)
                                         {
-                                            args.DiagnosticSink?.UNT2004_Generic(ref args, property.Value == null ? "-" : property.Value.ToString(), _subType);
+                                            args.DiagnosticSink?.UNT2004_Generic(ref args, property.Value == null ? "-" : property.Value.ToString()!, _subType);
                                         }
 
                                         needsDefault = true;
@@ -449,7 +703,7 @@ public class ListType<TCountType, TElementType>
 /// <typeparam name="TCountType">The data-type of the count of the list.</typeparam>
 public readonly struct ListTypeArgs<TCountType, TElementType>
     where TElementType : IEquatable<TElementType>
-    where TCountType : unmanaged, IConvertible, IComparable<TCountType>, IEquatable<TCountType>
+    where TCountType : IEquatable<TCountType>
 {
     /// <summary>
     /// The type of lists to parse.
@@ -459,12 +713,12 @@ public readonly struct ListTypeArgs<TCountType, TElementType>
     /// <summary>
     /// Minimum number of elements in the list (inclusive).
     /// </summary>
-    public TCountType? MinimumCount { get; init; }
+    public Optional<TCountType> MinimumCount { get; init; }
 
     /// <summary>
     /// Maximum number of elements in the list (inclusive).
     /// </summary>
-    public TCountType? MaximumCount { get; init; }
+    public Optional<TCountType> MaximumCount { get; init; }
 
     /// <summary>
     /// The key used for legacy list elements. Ex 'Condition'_0 for 'Conditions'.
@@ -484,15 +738,15 @@ public readonly struct ListTypeArgs<TCountType, TElementType>
     /// <summary>
     /// The default value for missing legacy list elements.
     /// </summary>
-    public IValue<TElementType> LegacyDefaultElementTypeValue { get; init; }
+    public IValue<TElementType>? LegacyDefaultElementTypeValue { get; init; }
 
     public bool Equals(in ListTypeArgs<TCountType, TElementType> other)
     {
         return other.Mode == Mode
                && string.Equals(other.LegacySingularKey, LegacySingularKey, StringComparison.OrdinalIgnoreCase)
                && string.Equals(other.LegacySingleKey, LegacySingleKey, StringComparison.OrdinalIgnoreCase)
-               && EqualityComparer<TCountType?>.Default.Equals(other.MinimumCount, MinimumCount)
-               && EqualityComparer<TCountType?>.Default.Equals(other.MaximumCount, MaximumCount)
+               && MinimumCount.Equals(other.MinimumCount)
+               && MaximumCount.Equals(other.MaximumCount)
                && SkipUnderscoreInLegacyKey == other.SkipUnderscoreInLegacyKey
                && Equals(LegacyDefaultElementTypeValue, other.LegacyDefaultElementTypeValue)
                ;

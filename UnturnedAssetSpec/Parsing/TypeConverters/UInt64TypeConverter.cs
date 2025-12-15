@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -162,5 +163,43 @@ internal sealed class UInt64TypeConverter : ITypeConverter<ulong>
 
         result = Optional<TTo>.Null;
         return false;
+    }
+
+    public void WriteJson(Utf8JsonWriter writer, ulong value, ref TypeConverterFormatArgs args)
+    {
+        writer.WriteNumberValue(value);
+    }
+
+    public bool TryReadJson(in JsonElement json, out Optional<ulong> value, ref TypeConverterParseArgs<ulong> args)
+    {
+        switch (json.ValueKind)
+        {
+            case JsonValueKind.Null:
+                value = Optional<ulong>.Null;
+                return true;
+
+            case JsonValueKind.String:
+                string str = json.GetString()!;
+                if (ulong.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out ulong v))
+                {
+                    value = v;
+                    return true;
+                }
+
+                goto default;
+
+            case JsonValueKind.Number:
+                if (json.TryGetUInt64(out v))
+                {
+                    value = v;
+                    return true;
+                }
+
+                goto default;
+
+            default:
+                value = Optional<ulong>.Null;
+                return false;
+        }
     }
 }

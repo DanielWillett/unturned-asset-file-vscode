@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.MaterialPaletteAsset, Assembly-CSharp",
     "DisplayName": "Material Palette",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -10,9 +10,15 @@
     [
         {
             "Key": "Materials",
-            "Type": "List",
-            "ElementType": "ContentReference",
-            "SpecialTypes": [ "UnityEngine.Material, UnityEngine.CoreModule" ],
+            "Type":
+            {
+                "Type": "List",
+                "ElementType":
+                {
+                    "Type": "ContentReference",
+                    "BaseType": "UnityEngine.Material, UnityEngine.CoreModule"
+                }
+            },
             "DefaultValue": null,
             "Description": "List of available materials.",
             "Variable": "materials"

@@ -115,7 +115,7 @@ public class EnumSpecType : ISpecType, ISpecPropertyType<string>, IEquatable<Enu
         return true;
     }
 
-    private bool TryGetStringNode(in SpecPropertyTypeParseContext parse, [MaybeNullWhen(false)] out IValueSourceNode node)
+    private bool TryGetStringNode(in SpecPropertyTypeParseContext parse, [NotNullWhen(true)] out IValueSourceNode? node)
     {
         if (parse.Node == null)
         {

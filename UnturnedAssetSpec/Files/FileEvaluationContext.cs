@@ -73,7 +73,7 @@ public readonly struct FileEvaluationContext
         return TryGetValue(out value, out _, diagnostics);
     }
 
-    public bool TryGetValue([MaybeNullWhen(false)] out ISpecDynamicValue value, out IPropertySourceNode? property, ICollection<DatDiagnosticMessage>? diagnostics = null)
+    public bool TryGetValue([NotNullWhen(true)] out ISpecDynamicValue? value, out IPropertySourceNode? property, ICollection<DatDiagnosticMessage>? diagnostics = null)
     {
         if (diagnostics is { IsReadOnly: true })
             throw new ArgumentException("Diagnostics collection is readonly.", nameof(diagnostics));

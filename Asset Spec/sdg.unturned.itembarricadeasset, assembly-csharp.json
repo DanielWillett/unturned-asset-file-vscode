@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
     "DisplayName": "Barricade Item",
     "Parent": "SDG.Unturned.ItemPlaceableAsset, Assembly-CSharp",
@@ -104,9 +104,11 @@
         },
         {
             "Key": "Explosion",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
-            "SpecialTypes": [ "SDG.Unturned.VehicleAsset, Assembly-CSharp" ],
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetTypes": [ "SDG.Unturned.EffectAsset, Assembly-CSharp", "SDG.Unturned.VehicleAsset, Assembly-CSharp" ]
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Effect played when this barricade is destroyed. If @Build is 'Vehicle', this is the vehicle that will be spawned.",
             "Variable": "explosionGuid",

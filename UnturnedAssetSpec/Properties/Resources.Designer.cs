@@ -61,6 +61,33 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enums can not have a base type..
+        /// </summary>
+        internal static string ArgumentException_BaseTypeNotAllowedForEnums {
+            get {
+                return ResourceManager.GetString("ArgumentException_BaseTypeNotAllowedForEnums", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Casing and value must have the same length..
+        /// </summary>
+        internal static string ArgumentException_CasingValueLengthMismatch {
+            get {
+                return ResourceManager.GetString("ArgumentException_CasingValueLengthMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value list can not contain a value made up of other values..
+        /// </summary>
+        internal static string ArgumentException_CompositeFlagValue {
+            get {
+                return ResourceManager.GetString("ArgumentException_CompositeFlagValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to parse IPv4Filter, expected a value in the format: &quot;0.0.0.0[/0][:0[-0]]&quot;..
         /// </summary>
         internal static string FormatException_IPv4Format_FailedToParse {
@@ -75,6 +102,132 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string InvalidOperationException_InvalidCountType {
             get {
                 return ResourceManager.GetString("InvalidOperationException_InvalidCountType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enum value &quot;{0}&quot; didn&apos;t define a value string..
+        /// </summary>
+        internal static string JsonException_EnumMissingValue {
+            get {
+                return ResourceManager.GetString("JsonException_EnumMissingValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to parse enum of type {0} from value &quot;{1}&quot; in file &quot;{2}&quot;..
+        /// </summary>
+        internal static string JsonException_FailedToParseEnum {
+            get {
+                return ResourceManager.GetString("JsonException_FailedToParseEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to parse value of type &quot;{0}&quot; in file &quot;{1}&quot;..
+        /// </summary>
+        internal static string JsonException_FailedToParseValue {
+            get {
+                return ResourceManager.GetString("JsonException_FailedToParseValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to read value of type {0} from JSON at {1}..
+        /// </summary>
+        internal static string JsonException_FailedToReadValue {
+            get {
+                return ResourceManager.GetString("JsonException_FailedToReadValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Flag enum value &quot;{0}&quot; did not define a numeric value, which is required for flag enum values..
+        /// </summary>
+        internal static string JsonException_FlagEnumMissingNumericValue {
+            get {
+                return ResourceManager.GetString("JsonException_FlagEnumMissingNumericValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected token &quot;{0}&quot; while reading file &quot;{1}&quot;..
+        /// </summary>
+        internal static string JsonException_InvalidJsonToken {
+            get {
+                return ResourceManager.GetString("JsonException_InvalidJsonToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;Type&quot; property was set to &quot;{0}&quot; in the file type definition for &quot;{1}&quot;..
+        /// </summary>
+        internal static string JsonException_InvalidTypeInDatFileType {
+            get {
+                return ResourceManager.GetString("JsonException_InvalidTypeInDatFileType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to find a property named &quot;{0}&quot; in any parent types to override in file &quot;{1}&quot;..
+        /// </summary>
+        internal static string JsonException_OverriddenPropertyNotFound {
+            get {
+                return ResourceManager.GetString("JsonException_OverriddenPropertyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to locate parent type &quot;{0}&quot; for type &quot;{1}&quot;..
+        /// </summary>
+        internal static string JsonException_ParentTypeNotFound {
+            get {
+                return ResourceManager.GetString("JsonException_ParentTypeNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; doesn&apos;t define a key, which is required..
+        /// </summary>
+        internal static string JsonException_PropertyKeyMissing {
+            get {
+                return ResourceManager.GetString("JsonException_PropertyKeyMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; doesn&apos;t define a type, which is required unless the property is updating/hiding a base property..
+        /// </summary>
+        internal static string JsonException_PropertyTypeMissing {
+            get {
+                return ResourceManager.GetString("JsonException_PropertyTypeMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown type &quot;{0}&quot; for property &quot;{1}&quot;..
+        /// </summary>
+        internal static string JsonException_PropertyTypeNotFound {
+            get {
+                return ResourceManager.GetString("JsonException_PropertyTypeNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Required property &quot;{0}&quot; for type &quot;{1}&quot; missing in file &quot;{2}&quot;..
+        /// </summary>
+        internal static string JsonException_RequiredTypePropertyMissing {
+            get {
+                return ResourceManager.GetString("JsonException_RequiredTypePropertyMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type &quot;{0}&quot; does not define a &quot;Type&quot; property with a type name..
+        /// </summary>
+        internal static string JsonException_TypeMissingTypeName {
+            get {
+                return ResourceManager.GetString("JsonException_TypeMissingTypeName", resourceCulture);
             }
         }
         
@@ -106,6 +259,42 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to read specification for type &quot;{0}&quot;. This type and all child types will be skipped..
+        /// </summary>
+        internal static string Log_FailedToReadAssetFile {
+            get {
+                return ResourceManager.GetString("Log_FailedToReadAssetFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to read latest commit hash from GitHub API. They may have changed their API or the current network is being blocked..
+        /// </summary>
+        internal static string Log_FailedToReadCommitHashFromRepo {
+            get {
+                return ResourceManager.GetString("Log_FailedToReadCommitHashFromRepo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internet resource at &quot;{0}&quot; is corrupted..
+        /// </summary>
+        internal static string Log_InternetResourceCorrupted {
+            get {
+                return ResourceManager.GetString("Log_InternetResourceCorrupted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to read file &quot;{0}&quot; from any of the available sources..
+        /// </summary>
+        internal static string Log_UnableToReadFile {
+            get {
+                return ResourceManager.GetString("Log_UnableToReadFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Boolean.
         /// </summary>
         internal static string Type_Name_Boolean {
@@ -120,6 +309,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_BooleanOrFlag {
             get {
                 return ResourceManager.GetString("Type_Name_BooleanOrFlag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Character.
+        /// </summary>
+        internal static string Type_Name_Character {
+            get {
+                return ResourceManager.GetString("Type_Name_Character", resourceCulture);
             }
         }
         
@@ -201,6 +399,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_List_Generic {
             get {
                 return ResourceManager.GetString("Type_Name_List_Generic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Regular Expression (RegEx).
+        /// </summary>
+        internal static string Type_Name_RegEx {
+            get {
+                return ResourceManager.GetString("Type_Name_RegEx", resourceCulture);
             }
         }
         

@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemFisherAsset, Assembly-CSharp",
     "DisplayName": "Fisher Item (Rod)",
     "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
@@ -11,8 +11,11 @@
     [
         {
             "Key": "Reward_ID",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "Spawn table used to reward items when a fish is caught.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
@@ -43,8 +46,13 @@
         },
         {
             "Key": "Quest_Rewards",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                "LegacySingularKey": "Quest_Reward",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Description": "Rewards applied when catching a fish.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",

@@ -114,8 +114,8 @@ public class SpecDynamicSwitchValue :
     public bool TryEvaluateMatchingSwitchCase(
         IReadOnlyList<SpecDynamicSwitchCaseValue>? previousCases,
         SpecDynamicSwitchCaseValue @case,
-        [MaybeNullWhen(false)]
-        out SpecDynamicSwitchCaseValue matchingCase)
+        [NotNullWhen(true)]
+        out SpecDynamicSwitchCaseValue? matchingCase)
     {
         // all in previousCases can be assumed false
         // all in case can be assumed true
@@ -164,8 +164,8 @@ public class SpecDynamicSwitchValue :
     }
 
     private bool EvaluateConditionIntl(
-        [MaybeNullWhen(false)]
-        out SpecDynamicSwitchCaseValue matchingCase,
+        [NotNullWhen(true)]
+        out SpecDynamicSwitchCaseValue? matchingCase,
         List<SpecCondition> falseConditions,
         List<SpecCondition> trueConditions,
         List<SpecCondition[]> falseConditionGroups,

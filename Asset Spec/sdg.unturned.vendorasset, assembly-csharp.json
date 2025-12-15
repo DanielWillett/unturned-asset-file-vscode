@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.VendorAsset, Assembly-CSharp",
     "DisplayName": "Vendor (NPC Shop)",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -19,9 +19,13 @@
         },
         {
             "Key": "Buying",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.VendorBuying, Assembly-CSharp",
-            "KeyLegacyExpansionFilter": "Legacy",
+            "Type":
+            {
+                "Type": "List",
+                "Mode": "LegacyList",
+                "CountType": "UInt8",
+                "ElementType": "SDG.Unturned.VendorBuying, Assembly-CSharp"
+            },
             "CountForTemplateGroup": "vendor-buying",
             "MaximumCount": 255,
             "DefaultValue": null,
@@ -30,10 +34,14 @@
             "Variable": "buying"
         },
         {
-            "Key": "Buying",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.VendorBuying, Assembly-CSharp",
-            "KeyLegacyExpansionFilter": "Legacy",
+            "Key": "Selling",
+            "Type":
+            {
+                "Type": "List",
+                "Mode": "LegacyList",
+                "CountType": "UInt8",
+                "ElementType": "SDG.Unturned.VendorSellingBase, Assembly-CSharp"
+            },
             "CountForTemplateGroup": "vendor-selling",
             "MaximumCount": 255,
             "DefaultValue": null,
@@ -51,8 +59,11 @@
         },
         {
             "Key": "Currency",
-            "Type": "AssetReferenceString",
-            "ElementType": "SDG.Unturned.ItemCurrencyAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Unturned.ItemCurrencyAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "GUID of the currency asset to use as currency instead of experience points.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/vendor-asset.html#other-properties",
@@ -70,8 +81,11 @@
             [
                 {
                     "Key": "ID",
-                    "Type": "GuidOrId",
-                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "GuidOrId",
+                        "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "GUID or ID of the item to buy from the player.",
                     "Variable": "TargetAssetGuid",
@@ -86,8 +100,13 @@
                 },
                 {
                     "Key": "Conditions",
-                    "Type": "LegacyCompatibleList",
-                    "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                        "LegacySingularKey": "Condition",
+                        "Mode": "LegacyList, ModernList"
+                    },
                     "DefaultValue": null,
                     "Description": "Conditions that must be met for players to be able to sell item #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
@@ -96,8 +115,13 @@
                 },
                 {
                     "Key": "Rewards",
-                    "Type": "LegacyCompatibleList",
-                    "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                        "LegacySingularKey": "Reward",
+                        "Mode": "LegacyList, ModernList"
+                    },
                     "DefaultValue": null,
                     "Description": "Rewards applied after the player sells item #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
@@ -109,7 +133,11 @@
             [
                 {
                     "Key": "Description",
-                    "Type": "RichTextString",
+                    "Type":
+                    {
+                        "Type": "String",
+                        "SupportsRichText": true
+                    },
                     "DefaultValue": null,
                     "Description": "If set, overrides item description shown in the vendor menu. I.e., how the vendor would describe the item rather than how the player would.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/vendor-asset.html#localization",
@@ -126,30 +154,33 @@
             [
                 {
                     "Key": "Type",
-                    "Type": "DanielWillett.UnturnedDataFileLspServer.Data.Types.VendorSellingBaseType",
+                    "Type": "DanielWillett.UnturnedDataFileLspServer.Data.Types.VendorSellingBaseType, UnturnedAssetSpec",
                     "DefaultValue": "Item",
                     "Description": "Whether this vendor listing is for an item or vehicle."
                 },
                 {
                     "Key": "ID",
-                    "Type": "GuidOrId",
-                    "ElementType":
-                    [
-                        {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "Vehicle"
-                                }
-                            ],
-                            "Value": "SDG.Unturned.VehicleAsset, Assembly-CSharp"
-                        },
-                        {
-                            "Value": "SDG.Unturned.ItemAsset, Assembly-CSharp"
-                        }
-                    ],
+                    "Type":
+                    {
+                        "Type": "GuidOrId",
+                        "AssetType":
+                        [
+                            {
+                                "And":
+                                [
+                                    {
+                                        "Variable": "Type",
+                                        "Operation": "eq",
+                                        "Comparand": "Vehicle"
+                                    }
+                                ],
+                                "Value": "SDG.Unturned.VehicleAsset, Assembly-CSharp"
+                            },
+                            {
+                                "Value": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                            }
+                        ]
+                    },
                     "Description":
                     [
                         {
@@ -179,8 +210,13 @@
                 },
                 {
                     "Key": "Conditions",
-                    "Type": "LegacyCompatibleList",
-                    "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                        "LegacySingularKey": "Condition",
+                        "Mode": "LegacyList, ModernList"
+                    },
                     "DefaultValue": null,
                     "Description": "Conditions that must be met for players to be able to buy listing #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
@@ -189,8 +225,13 @@
                 },
                 {
                     "Key": "Rewards",
-                    "Type": "LegacyCompatibleList",
-                    "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                        "LegacySingularKey": "Reward",
+                        "Mode": "LegacyList, ModernList"
+                    },
                     "DefaultValue": null,
                     "Description": "Rewards applied after the player buys listing #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
@@ -199,8 +240,11 @@
                 },
                 {
                     "Key": "Sight",
-                    "Type": "DefaultableId",
-                    "ElementType": "SDG.Unturned.ItemSightAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "DefaultableId",
+                        "AssetType": "SDG.Unturned.ItemSightAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": -1,
                     "Description": "Override for the sight attachment that should be attached to the item sold.",
                     "Variable": "sight",
@@ -223,8 +267,11 @@
                 },
                 {
                     "Key": "Tactical",
-                    "Type": "DefaultableId",
-                    "ElementType": "SDG.Unturned.ItemTacticalAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "DefaultableId",
+                        "AssetType": "SDG.Unturned.ItemTacticalAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": -1,
                     "Description": "Override for the tactical attachment that should be attached to the item sold.",
                     "Variable": "tactical",
@@ -247,8 +294,11 @@
                 },
                 {
                     "Key": "Grip",
-                    "Type": "DefaultableId",
-                    "ElementType": "SDG.Unturned.ItemGripAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "DefaultableId",
+                        "AssetType": "SDG.Unturned.ItemGripAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": -1,
                     "Description": "Override for the grip attachment that should be attached to the item sold.",
                     "Variable": "grip",
@@ -271,8 +321,11 @@
                 },
                 {
                     "Key": "Barrel",
-                    "Type": "DefaultableId",
-                    "ElementType": "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "DefaultableId",
+                        "AssetType": "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": -1,
                     "Description": "Override for the barrel attachment that should be attached to the item sold.",
                     "Variable": "barrel",
@@ -295,8 +348,11 @@
                 },
                 {
                     "Key": "Magazine",
-                    "Type": "DefaultableId",
-                    "ElementType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "DefaultableId",
+                        "AssetType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": -1,
                     "Description": "Override for the magazine attachment that should be attached to the item sold.",
                     "Variable": "magazine",
@@ -396,7 +452,11 @@
             [
                 {
                     "Key": "Description",
-                    "Type": "RichTextString",
+                    "Type":
+                    {
+                        "Type": "String",
+                        "SupportsRichText": true
+                    },
                     "DefaultValue": null,
                     "Description": "If set, overrides item description shown in the vendor menu. I.e., how the vendor would describe the item rather than how the player would.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/vendor-asset.html#localization",
@@ -405,7 +465,7 @@
             ]
         },
         {
-            "Type": "DanielWillett.UnturnedDataFileLspServer.Data.Types.VendorSellingBaseType",
+            "Type": "DanielWillett.UnturnedDataFileLspServer.Data.Types.VendorSellingBaseType, UnturnedAssetSpec",
             "DisplayName": "Vendor Listing Type",
             "Values":
             [
@@ -426,7 +486,11 @@
     [
         {
             "Key": "Name",
-            "Type": "RichTextString",
+            "Type":
+            {
+                "Type": "String",
+                "SupportsRichText": true
+            },
             "DefaultValue": "Name",
             "Description": "Localized name of the vendor shop.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/vendor-asset.html#localization",
@@ -434,10 +498,14 @@
         },
         {
             "Key": "Description",
-            "Type": "RichTextString",
+            "Type":
+            {
+                "Type": "String",
+                "SupportsRichText": true,
+                "SupportsNewLines": true
+            },
             "DefaultValue": "Description",
             "Description": "Localized description of the vendor shop.",
-            "SupportsNewLines": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/vendor-asset.html#localization",
             "Variable": "vendorDescription"
         }

@@ -3,7 +3,9 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json.Serialization;
 
@@ -31,7 +33,8 @@ public class AssetInformation
     public Dictionary<string, QualifiedType> KnownFileNames { get; set; }
 
     [JsonIgnore] // generated at runtime from Types
-    public Dictionary<QualifiedType, InverseTypeHierarchy> ParentTypes { get; set; }
+    [field: MaybeNull]
+    public Dictionary<QualifiedType, InverseTypeHierarchy> ParentTypes => field ??= RegenParentTypes();
 
     public int FaceCount { get; set; } = 32;
     public int BeardCount { get; set; } = 16;
@@ -181,29 +184,26 @@ public class AssetInformation
         if (type.IsCaseInsensitive)
             type = type.CaseSensitive;
 
-        if (ParentTypes == null)
-        {
-            if (Types == null || Types.Count == 0)
-                return new InverseTypeHierarchy(new TypeHierarchy { Type = type }, Array.Empty<QualifiedType>(), false);
-
-            Stack<QualifiedType> typeStack = new Stack<QualifiedType>();
-            Dictionary<QualifiedType, InverseTypeHierarchy> parentTypes = new Dictionary<QualifiedType, InverseTypeHierarchy>(96);
-            QualifiedType[]? arrNull = null;
-            foreach (KeyValuePair<QualifiedType, TypeHierarchy> h in Types)
-            {
-                h.Value.Type = h.Key;
-                RegenParentTypes(h.Value, typeStack, ref arrNull, parentTypes);
-            }
-
-            ParentTypes = parentTypes;
-        }
-
         return ParentTypes.TryGetValue(type, out InverseTypeHierarchy? typeHierarchy)
             ? typeHierarchy
             : new InverseTypeHierarchy(new TypeHierarchy { Type = type }, Array.Empty<QualifiedType>(), false);
     }
 
-    private static void RegenParentTypes(
+    private Dictionary<QualifiedType, InverseTypeHierarchy> RegenParentTypes()
+    {
+        Stack<QualifiedType> typeStack = new Stack<QualifiedType>();
+        Dictionary<QualifiedType, InverseTypeHierarchy> parentTypes = new Dictionary<QualifiedType, InverseTypeHierarchy>(96);
+        QualifiedType[]? arrNull = null;
+        foreach (KeyValuePair<QualifiedType, TypeHierarchy> h in Types)
+        {
+            h.Value.Type = h.Key;
+            RegenParentTypesRecursive(h.Value, typeStack, ref arrNull, parentTypes);
+        }
+
+        return parentTypes;
+    }
+
+    private static void RegenParentTypesRecursive(
         TypeHierarchy hierarchy,
         Stack<QualifiedType> typeStack,
         ref QualifiedType[]? arr,
@@ -223,7 +223,7 @@ public class AssetInformation
         {
             h.HasDataFiles |= hierarchy.HasDataFiles;
             h.Parent = hierarchy;
-            RegenParentTypes(h, typeStack, ref arrNull, parentTypes);
+            RegenParentTypesRecursive(h, typeStack, ref arrNull, parentTypes);
         }
 
         typeStack.Pop();
@@ -308,7 +308,7 @@ public class TypeHierarchy
     public QualifiedType Type { get; set; }
     public TypeHierarchy? Parent { get; set; }
 #nullable disable
-    public IReadOnlyDictionary<QualifiedType, TypeHierarchy> ChildTypes { get; set; }
+    public Dictionary<QualifiedType, TypeHierarchy> ChildTypes { get; set; }
 #nullable restore
 }
 

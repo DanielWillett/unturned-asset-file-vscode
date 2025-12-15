@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
     "DisplayName": "Spawn Table",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -10,8 +10,12 @@
     [
         {
             "Key": "Roots",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.SpawnTable, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "Mode": "LegacyList, ModernList",
+                "ElementType": "SDG.Unturned.SpawnTable, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Description": "Roots specify a list of other spawns where this spawn table will be inserted into with the given weight.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#roots",
@@ -19,8 +23,12 @@
         },
         {
             "Key": "Tables",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.SpawnTable, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "Mode": "LegacyList, ModernList",
+                "ElementType": "SDG.Unturned.SpawnTable, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Description": "A list of items or spawns that can be resolved from this spawn asset.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#tables",
@@ -45,7 +53,10 @@
                             "LegacyExpansionFilter": "Legacy"
                         }
                     ],
-                    "Type": "AssetReferenceString",
+                    "Type":
+                    {
+                        "Type": "AssetReferenceString"
+                    },
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description":
                     [
@@ -135,10 +146,12 @@
                             "LegacyExpansionFilter": "Legacy"
                         }
                     ],
-                    "Type": "Id",
                     "DefaultValue": 0,
-                    "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
-                    "SpecialTypes": [ "SDG.Unturned.VehicleAsset, Assembly-CSharp", "SDG.Unturned.AnimalAsset, Assembly-CSharp" ],
+                    "Type":
+                    {
+                        "Type": "Id",
+                        "AssetTypes": [ "SDG.Unturned.ItemAsset, Assembly-CSharp", "SDG.Unturned.VehicleAsset, Assembly-CSharp", "SDG.Unturned.AnimalAsset, Assembly-CSharp" ]
+                    },
                     "Description": "Specifies the ID of a resolved asset.",
                     "Deprecated": true,
                     "Docs":
@@ -200,9 +213,12 @@
                             "LegacyExpansionFilter": "Legacy"
                         }
                     ],
-                    "Type": "Id",
+                    "Type":
+                    {
+                        "Type": "Id",
+                        "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": 0,
-                    "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
                     "Description":
                     [
                         {
@@ -284,7 +300,6 @@
                             "Value": "Boolean"
                         }
                     ],
-                    "$comment": "DefaultValue is done this way so that it lines up with the type switch, allowing each value to be linked with it's respective type.",
                     "DefaultValue":
                     [
                         {

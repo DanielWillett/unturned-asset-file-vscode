@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.QuestAsset, Assembly-CSharp",
     "DisplayName": "NPC Quest",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -18,8 +18,13 @@
         },
         {
             "Key": "Conditions",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                "LegacySingularKey": "Condition",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Description": "Conditions that must be met for this quest to be able to be turned in.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
@@ -29,8 +34,13 @@
         },
         {
             "Key": "Rewards",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                "LegacySingularKey": "Reward",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Description": "Rewards granted when a player turns in this quest.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
@@ -40,8 +50,13 @@
         },
         {
             "Key": "AbandonmentRewards",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                "LegacySingularKey": "AbandonmentReward",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Description": "Rewards granted when a player abandons the quest without completing it.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
@@ -54,7 +69,11 @@
     [
         {
             "Key": "Name",
-            "Type": "RichTextString",
+            "Type":
+            {
+                "Type": "String",
+                "SupportsRichText": true
+            },
             "Required": true,
             "DefaultValue": "Name",
             "Description": "Localized display name of the quest.",
@@ -63,8 +82,12 @@
         },
         {
             "Key": "Description",
-            "Type": "RichTextString",
-            "SupportsNewLines": true,
+            "Type":
+            {
+                "Type": "String",
+                "SupportsRichText": true,
+                "SupportsNewLines": true
+            },
             "Required": true,
             "DefaultValue": "Description",
             "Description": "Localized description of the quest.",

@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemSentryAsset, Assembly-CSharp",
     "DisplayName": "Sentry Barricade Item",
     "Parent": "SDG.Unturned.ItemStorageAsset, Assembly-CSharp",
@@ -173,8 +173,11 @@
         },
         {
             "Key": "Target_Acquired_Effect",
-            "Type": "AssetReferenceString",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "ab5f0056b54545c8a051159659da8bea",
             "Description": "The audio effect played when a target is detected.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
@@ -183,8 +186,11 @@
         },
         {
             "Key": "Target_Lost_Effect",
-            "Type": "AssetReferenceString",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "288b98b718084699ba3653c592e57803",
             "Description": "The audio effect played when a target is no longer detected.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",

@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemFoodAsset, Assembly-CSharp",
     "DisplayName": "Food Item",
     "Parent": "SDG.Unturned.ItemConsumeableAsset, Assembly-CSharp",

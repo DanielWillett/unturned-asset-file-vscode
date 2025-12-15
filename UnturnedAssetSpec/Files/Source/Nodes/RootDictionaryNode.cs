@@ -9,7 +9,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 internal class RootDictionaryNode : DictionaryNode, ISourceFile
 {
-    internal IAssetSpecDatabase Database { get; }
+    internal IAssetSpecDatabase? Database { get; }
     public OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; }
 
     public IWorkspaceFile WorkspaceFile { get; internal set; }
@@ -19,7 +19,7 @@ internal class RootDictionaryNode : DictionaryNode, ISourceFile
 
     public static RootDictionaryNode Create(
         IWorkspaceFile file,
-        IAssetSpecDatabase database,
+        IAssetSpecDatabase? database,
         int count,
         ISourceNode[] nodes,
         in AnySourceNodeProperties properties,
@@ -30,7 +30,7 @@ internal class RootDictionaryNode : DictionaryNode, ISourceFile
 
     private protected RootDictionaryNode(
         IWorkspaceFile file,
-        IAssetSpecDatabase database,
+        IAssetSpecDatabase? database,
         int count,
         ISourceNode[] nodes,
         in AnySourceNodeProperties properties,
@@ -52,7 +52,7 @@ internal class RootDictionaryNode : DictionaryNode, ISourceFile
             builder.Add(pn);
         }
 
-        if (this is not RootAssetNodeSkippedLocalization and not RootLocalizationNode)
+        if (database is { IsInitialized: true } && this is not RootAssetNodeSkippedLocalization and not RootLocalizationNode)
         {
             if (this.TryGetAdditionalProperty(Comment.TypeAdditionalProperty, out string? str) && str != null)
             {

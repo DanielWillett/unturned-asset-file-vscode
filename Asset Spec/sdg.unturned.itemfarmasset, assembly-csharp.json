@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemFarmAsset, Assembly-CSharp",
     "DisplayName": "Farm Barricade Item (Plant)",
     "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
@@ -21,8 +21,11 @@
         },
         {
             "Key": "Grow",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "ID of the item to spawn when harvested.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
@@ -50,8 +53,11 @@
         },
         {
             "Key": "Grow_SpawnTable",
-            "Type": "AssetReferenceString",
-            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "ExclusiveWith": 
             [
@@ -124,8 +130,13 @@
         },
         {
             "Key": "Harvest_Rewards",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                "LegacySingularKey": "Harvest_Reward",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Description": "Rewards applied when harvesting this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",

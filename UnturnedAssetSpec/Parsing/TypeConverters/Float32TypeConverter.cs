@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -258,5 +259,43 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
 
         result = Optional<TTo>.Null;
         return false;
+    }
+
+    public void WriteJson(Utf8JsonWriter writer, float value, ref TypeConverterFormatArgs args)
+    {
+        writer.WriteNumberValue(value);
+    }
+
+    public bool TryReadJson(in JsonElement json, out Optional<float> value, ref TypeConverterParseArgs<float> args)
+    {
+        switch (json.ValueKind)
+        {
+            case JsonValueKind.Null:
+                value = Optional<float>.Null;
+                return true;
+
+            case JsonValueKind.String:
+                string str = json.GetString()!;
+                if (float.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out float v))
+                {
+                    value = v;
+                    return true;
+                }
+
+                goto default;
+
+            case JsonValueKind.Number:
+                if (json.TryGetSingle(out v))
+                {
+                    value = v;
+                    return true;
+                }
+
+                goto default;
+
+            default:
+                value = Optional<float>.Null;
+                return false;
+        }
     }
 }

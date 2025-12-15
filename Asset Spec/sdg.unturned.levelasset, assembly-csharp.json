@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.LevelAsset, Assembly-CSharp",
     "DisplayName": "Level",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -18,9 +18,12 @@
         },
         {
             "Key": "Supported_Game_Modes",
-            "Type": "List",
-            "ElementType": "TypeReference",
-            "SpecialTypes": [ "SDG.Unturned.GameMode, Assembly-CSharp" ],
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "TypeReference",
+                "SpecialTypes": [ "SDG.Unturned.GameMode, Assembly-CSharp" ]
+            },
             "DefaultValue": null,
             "Description": "List of gamemodes supported by this map. Doesn't appear to be used by the game.",
             "Deprecated": true,
@@ -37,8 +40,11 @@
         },
         {
             "Key": "Airdrop",
-            "Type": "AssetReference",
-            "ElementType": "SDG.Unturned.AirdropAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Unturned.AirdropAsset, Assembly-CSharp"
+            },
             "DefaultValue": "229440c249dc490ba26ce71e8a59d5c6",
             "Description": "The default airdrop to use for the carepackage.",
             "Variable": "airdropRef",
@@ -46,9 +52,15 @@
         },
         {
             "Key": "Crafting_Blacklists",
-            "Type": "List",
-            "ElementType": "AssetReference",
-            "SpecialTypes": [ "SDG.Unturned.CraftingBlacklistAsset, Assembly-CSharp" ],
+            "Type":
+            {
+                "Type": "List",
+                "ElementType":
+                {
+                    "Type": "AssetReference",
+                    "AssetType": "SDG.Unturned.CraftingBlacklistAsset, Assembly-CSharp"
+                }
+            },
             "DefaultValue": null,
             "Description": "List of crafting blacklists applied to this level by default.",
             "Variable": "craftingBlacklists",
@@ -56,8 +68,11 @@
         },
         {
             "Key": "Weather_Types",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.LevelAsset+SchedulableWeather, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.LevelAsset+SchedulableWeather, Assembly-CSharp"
+            },
             "Description": "List making up this level's weather schedule. Ignored if @Perpetual_Weather_Asset is set.",
             "DefaultValue": null,
             "Variable": "schedulableWeathers",
@@ -66,8 +81,11 @@
         },
         {
             "Key": "Perpetual_Weather_Asset",
-            "Type": "AssetReference",
-            "ElementType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp"
+            },
             "Description": "This weather will always be active on this level. Weather scheduling is ignored.",
             "DefaultValue": "00000000000000000000000000000000",
             "Variable": "perpetualWeatherRef",
@@ -76,8 +94,11 @@
         },
         {
             "Key": "Loading_Screen_Music",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.LevelAsset+LoadingScreenMusic, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.LevelAsset+LoadingScreenMusic, Assembly-CSharp"
+            },
             "Description": "List of loading screen music options. A random clip will be chosen from the list.",
             "DefaultValue": null,
             "Variable": "loadingScreenMusic",
@@ -111,8 +132,11 @@
         },
         {
             "Key": "Skills",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.LevelAsset+SkillRule, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.LevelAsset+SkillRule, Assembly-CSharp"
+            },
             "Description": "List of skill rules that take effect on this level.",
             "DefaultValue": null,
             "Variable": "skillRules",
@@ -166,8 +190,11 @@
         },
         {
             "Key": "CloudOverride_ParticleSystems",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.LevelAsset+CloudOverrideParticleSystemsPath, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.LevelAsset+CloudOverrideParticleSystemsPath, Assembly-CSharp"
+            },
             "Description": "List of particle system configurations attached to the object specified in @CloudOverride_Prefab.",
             "DefaultValue": null,
             "Variable": "CloudOverrideParticleSystemPaths",
@@ -176,8 +203,11 @@
         },
         {
             "Key": "TerrainColors",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.LevelAsset+TerrainColorRule, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.LevelAsset+TerrainColorRule, Assembly-CSharp"
+            },
             "Description": "Specifies which colors are too similar to terrain colors.",
             "DefaultValue": null,
             "Variable": "terrainColorRules",
@@ -224,8 +254,11 @@
             [
                 {
                     "Key": "Asset",
-                    "Type": "AssetReference",
-                    "ElementType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "AssetReference",
+                        "AssetType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp"
+                    },
                     "Required": true,
                     "DefaultValue": null,
                     "Description": "The weather this entry is scheduling.",
@@ -471,8 +504,11 @@
                 },
                 {
                     "Key": "MaterialColorPropertyNames",
-                    "Type": "List",
-                    "ElementType": "String",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "String"
+                    },
                     "DefaultValue": [ "_Color" ],
                     "Variable": "MaterialColorPropertyNames",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#cloud-override-properties",

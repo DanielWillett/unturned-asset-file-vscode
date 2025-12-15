@@ -540,7 +540,7 @@ public static class KnownTypeValueHelper
         return !string.IsNullOrEmpty(path);
     }
     
-    public static bool TryParseTranslationReference(ReadOnlySpan<char> str, [MaybeNullWhen(false)] out string @namespace, [MaybeNullWhen(false)] out string token)
+    public static bool TryParseTranslationReference(ReadOnlySpan<char> str, [NotNullWhen(true)] out string? @namespace, [NotNullWhen(true)] out string? token)
     {
         @namespace = null;
         token = null;

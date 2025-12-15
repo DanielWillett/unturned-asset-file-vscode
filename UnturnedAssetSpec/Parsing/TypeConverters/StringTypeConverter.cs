@@ -5,12 +5,13 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class StringTypeConverter : ITypeConverter<string>
 {
-    public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<string> args, [MaybeNullWhen(false)] out string parsedValue)
+    public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<string> args, [NotNullWhen(true)] out string? parsedValue)
     {
         parsedValue = args.GetString(text);
         return true;
@@ -428,5 +429,34 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
 
         result = SpecDynamicExpressionTreeValueHelpers.As<float, TTo>(parsed);
         return true;
+    }
+
+    public void WriteJson(Utf8JsonWriter writer, string value, ref TypeConverterFormatArgs args)
+    {
+        writer.WriteStringValue(value);
+    }
+
+    public bool TryReadJson(in JsonElement json, out Optional<string> value, ref TypeConverterParseArgs<string> args)
+    {
+        switch (json.ValueKind)
+        {
+            case JsonValueKind.Null:
+                value = Optional<string>.Null;
+                return true;
+
+            case JsonValueKind.String:
+                value = json.GetString()!;
+                return true;
+
+            case JsonValueKind.False:
+            case JsonValueKind.True:
+            case JsonValueKind.Number:
+                value = json.GetRawText();
+                return true;
+
+            default:
+                value = Optional<string>.Null;
+                return false;
+        }
     }
 }

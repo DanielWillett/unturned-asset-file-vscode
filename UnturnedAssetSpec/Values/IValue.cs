@@ -1,7 +1,8 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -19,6 +20,11 @@ public interface IValue
     /// The type stored in this value.
     /// </summary>
     IType Type { get; }
+
+    /// <summary>
+    /// Writes this value to a <see cref="Utf8JsonWriter"/> in a way that it can be recreated later.
+    /// </summary>
+    void WriteToJson(Utf8JsonWriter writer);
 }
 
 /// <summary>
@@ -40,4 +46,13 @@ public interface IValue<TValue> : IValue where TValue : IEquatable<TValue>
     /// Attempts to evaluate the current value of this <see cref="IValue{TValue}"/>.
     /// </summary>
     bool TryEvaluateValue(out Optional<TValue> value, in FileEvaluationContext ctx);
+}
+
+public static class ValueExtensions
+{
+    extension<T>(IValue<T> value) where T : IEquatable<T>
+    {
+        
+
+    }
 }

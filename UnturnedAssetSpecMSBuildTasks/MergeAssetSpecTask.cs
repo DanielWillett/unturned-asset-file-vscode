@@ -59,7 +59,7 @@ public class MergeAssetSpecTask : Task
             info.FileName = Path.GetFileName(allFiles[i]);
             info.FullPath = allFiles[i];
             info.FileNameSize = Encoding.UTF8.GetByteCount(info.FileName);
-            maxFileNameSize = Math.Max(maxFileNameSize, info.FileNameSize);
+            maxFileNameSize = Math.Max(maxFileNameSize, info.FileName.Length);
             totalFileNameSize += info.FileNameSize;
         }
 

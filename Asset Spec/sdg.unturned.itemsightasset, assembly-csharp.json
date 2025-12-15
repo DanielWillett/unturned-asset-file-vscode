@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemSightAsset, Assembly-CSharp",
     "DisplayName": "Sight Attachment Item",
     "Parent": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp",
@@ -228,8 +228,11 @@
         },
         {
             "Key": "DistanceMarkers",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.ItemSightAsset+DistanceMarker, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.ItemSightAsset+DistanceMarker, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Description": "List of accurate distance markers on the sight that account for the gun's bullet drop.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#distancemarkers-list-of-distancemarker",

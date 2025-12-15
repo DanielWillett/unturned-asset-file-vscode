@@ -900,7 +900,11 @@ public readonly struct OneOrMore<T> : IEquatable<OneOrMore<T>>, IEquatable<T>, I
         return this;
     }
 
-    /// <inheritdoc />
+
+    /// <summary>
+    /// Checks if the lists contain the same set of values (in any order) using the default <see cref="IEqualityComparer{T}"/>.
+    /// </summary>
+    /// <param name="other">The other list.</param>
     [Pure]
     public bool Equals(OneOrMore<T> other)
     {
@@ -960,6 +964,68 @@ public readonly struct OneOrMore<T> : IEquatable<OneOrMore<T>>, IEquatable<T>, I
         return true;
     }
 
+    /// <summary>
+    /// Checks if the lists contain the same set of values (in any order) using an equality function.
+    /// </summary>
+    /// <param name="other">The other list.</param>
+    /// <param name="equality">A function that defines whether or not two values are equal.</param>
+    [Pure]
+    public bool Equals(OneOrMore<T> other, Func<T, T, bool> equality)
+    {
+        if (Values == null)
+        {
+            if (other.Values == null)
+                return equality(Value, other.Value);
+            if (other.Values.Length == 1)
+                return equality(Value, other.Values[0]);
+            return false;
+        }
+
+        if (other.Values == null)
+        {
+            return Values.Length == 1 && equality(Value, Values[0]);
+        }
+
+        if (Values.Length == 0)
+            return other.Values.Length == 0;
+        if (other.Values.Length == 0)
+            return false;
+
+        if (Values.Length == 1)
+            return other.Values.Length == 1 && equality(other.Values[0], Values[0]);
+
+        if (other.Values.Length == 1)
+            return Values.Length == 1 && equality(Values[0], other.Values[0]);
+
+        if (other.Values.Length != Values.Length)
+            return false;
+
+        if (ReferenceEquals(Values, other.Values))
+        {
+            return true;
+        }
+
+        int n = Values.Length;
+        for (int i = 0; i < n; ++i)
+        {
+            T ind = Values[i];
+            bool foundOne = false;
+            for (int j = 0; j < n; ++j)
+            {
+                if (!equality(other.Values[(j + i) % n], ind))
+                    continue;
+
+                foundOne = true;
+                break;
+            }
+
+            if (!foundOne)
+                return false;
+        }
+
+        return true;
+    }
+
     /// <inheritdoc />
     [Pure]
     public bool Equals(T other)
@@ -993,6 +1059,29 @@ public readonly struct OneOrMore<T> : IEquatable<OneOrMore<T>>, IEquatable<T>, I
             for (int i = 0; i < Values.Length; ++i)
             {
                 hashCode = (hashCode * 397) ^ comparer.GetHashCode(Values[i]);
+            }
+        }
+
+        return hashCode;
+    }
+
+    /// <summary>
+    /// Get the hash code of this collection with a custom hash code function.
+    /// </summary>
+    [Pure]
+    public int GetHashCode(Func<T, int> getHashCode)
+    {
+        if (Values == null)
+            return getHashCode(Value);
+        if (Values.Length == 0)
+            return 0;
+
+        int hashCode = 0;
+        unchecked
+        {
+            for (int i = 0; i < Values.Length; ++i)
+            {
+                hashCode = (hashCode * 397) ^ getHashCode(Values[i]);
             }
         }
 

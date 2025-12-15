@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.VehicleAsset, Assembly-CSharp",
     "DisplayName": "Vehicle",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -81,8 +81,11 @@
         },
         {
             "Key": "Physics_Profile",
-            "Type": "AssetReferenceString",
-            "ElementType": "SDG.Unturned.VehiclePhysicsProfileAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Unturned.VehiclePhysicsProfileAsset, Assembly-CSharp"
+            },
             "DefaultValue":
             [
                 {
@@ -234,8 +237,11 @@
         },
         {
             "Key": "Shared_Skin_Lookup_ID",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.VehicleAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.VehicleAsset, Assembly-CSharp"
+            },
             "DefaultValue": "@GUID",
             "Description": "GUID or legacy ID of another vehicle, which this vehicle should share skins with.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#shared-skin-lookup-id-doc-data-guid-or-uint16",
@@ -374,8 +380,11 @@
         },
         {
             "Key": "Default_Battery",
-            "Type": "AssetReferenceString",
-            "ElementType": "SDG.Unturned.ItemVehicleRepairToolAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemVehicleRepairToolAsset, Assembly-CSharp"
+            },
             "DefaultValue": "098b13be34a7411db7736b7f866ada69",
             "Description": "Battery item given to the player when a specific battery hasn't been manually installed yet.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#default-battery-doc-data-guid-098b13be34a7411db7736b7f866ada69",
@@ -706,8 +715,11 @@
         },
         {
             "Key": "Explosion",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Effect to play when this vehicle is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-doc-data-guid-or-uint16",
@@ -773,8 +785,11 @@
         },
         {
             "Key": "ExplosionBurnMaterialSections",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Version": "3.24.7.0",
             "Description": "Optionally specifies which materials should be darkened after an explosion.",
@@ -1053,8 +1068,11 @@
         },
         {
             "Key": "Turret_*_Item_ID",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemGunAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+            },
             "Template": true,
             "TemplateGroups": [ "vehicle-turrets" ],
             "DefaultValue": 0,
@@ -1357,8 +1375,11 @@
         },
         {
             "Key": "Drops_Table_ID",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
+            },
             "DefaultValue": 962,
             "Description": "Spawn table ID to use to drop scrap items when this vehicle explodes.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#drops-table-id-uint16-962",
@@ -1382,8 +1403,11 @@
         },
         {
             "Key": "Tire_ID",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemTireAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemTireAsset, Assembly-CSharp"
+            },
             "DefaultValue": 1451,
             "Description": "ID of the item that acts as the tire for this vehicle, meaning it can be added to and removed from the wheels.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#tire-id-uint16-1451",
@@ -1513,8 +1537,11 @@
         },
         {
             "Key": "PaintableSections",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Description": "Each section's material's \"_PaintColor\" property is set to the paint color. This vehicle is not paintable unless this property is defined with at least one section.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosionburnmaterialsections-list-of-paintablevehiclesection",
@@ -1546,8 +1573,11 @@
         },
         {
             "Key": "CrawlerTrackTilingMaterials",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.CrawlerTrackTilingMaterial, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.CrawlerTrackTilingMaterial, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Description": "List of materials which offset their UVs in sync with wheels rolling.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#crawlertracktilingmaterials-list-of-crawlertracktilingmaterial",
@@ -1555,8 +1585,11 @@
         },
         {
             "Key": "AdditionalTransparentSections",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Description": "Materials to register as needing transparent sorting. Their render queue is periodically updated according to whether their pivot point is underwater.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#additionaltransparentsections-list-of-paintablevehiclesection",
@@ -1564,8 +1597,11 @@
         },
         {
             "Key": "DefaultPaintColors",
-            "Type": "List",
-            "ElementType": "Color32RGBString",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "Color32RGBString"
+            },
             "DefaultValue": null,
             "Version": "3.24.4.0",
             "Description": "List of random colors to pick from when spawning a new vehicle. Can be overridden by a Vehicle Redirector's @(SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp::LoadPaintColor) and @(SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp::SpawnPaintColor) properties.",
@@ -1683,8 +1719,11 @@
         },
         {
             "Key": "WheelConfigurations",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.VehicleWheelConfiguration, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.VehicleWheelConfiguration, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Description": "Controls WheelCollider components and their corresponding visual models.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#wheelconfigurations-list-of-vehiclewheelconfiguration",
@@ -1701,8 +1740,11 @@
         },
         {
             "Key": "ForwardGearRatios",
-            "Type": "List",
-            "ElementType": "Float32",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "Float32"
+            },
             "Minimum": 0.0,
             "DefaultValue": null,
             "Description": "Ratio between engine RPM and wheel RPM in a given gear. For example, if the wheel RPM is 6 and the gear ratio is 5 then the engine RPM is 30.",
@@ -2035,8 +2077,11 @@
                 },
                 {
                     "Key": "WheelIndices",
-                    "Type": "List",
-                    "ElementType": "Int32",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "Int32"
+                    },
                     "Minimum": 0,
                     "DefaultValue": null,
                     "Required": true,

@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.CraftingAsset, Assembly-CSharp",
     "DisplayName": "Crafting Blueprint List",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -10,8 +10,11 @@
     [
         {
             "Key": "Blueprints",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp::SDG.Unturned.Blueprint, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp::SDG.Unturned.Blueprint, Assembly-CSharp"
+            },
             "Description": "List of blueprints to define.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-asset.html#properties",
             "Variable": "_blueprints",

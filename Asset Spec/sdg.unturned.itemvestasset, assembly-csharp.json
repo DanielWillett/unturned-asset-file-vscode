@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemVestAsset, Assembly-CSharp",
     "DisplayName": "Vest Item",
     "Parent": "SDG.Unturned.ItemBagAsset, Assembly-CSharp",
@@ -34,8 +34,11 @@
         },
         {
             "Key": "Fallback_Shirt",
-            "Type": "AssetReference",
-            "ElementType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Shirt to display when the player is using this vest and has no shirt.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vest-asset.html#properties",

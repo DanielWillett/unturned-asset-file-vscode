@@ -1,9 +1,10 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -21,6 +22,16 @@ public interface ITypeParser<T> where T : IEquatable<T>
     /// <param name="value">The parsed value wrapped in an <see cref="Optional{T}"/> object.</param>
     /// <returns>Whether or not the value could be parsed successfully.</returns>
     bool TryParse(ref TypeParserArgs<T> args, in FileEvaluationContext ctx, out Optional<T> value);
+
+    /// <summary>
+    /// Attempts to read a value of this type from a <see cref="Utf8JsonReader"/>.
+    /// </summary>
+    bool TryReadValueFromJson(in JsonElement json, out Optional<T> value, IType<T> valueType);
+
+    /// <summary>
+    /// Write a value to a <see cref="Utf8JsonWriter"/>.
+    /// </summary>
+    void WriteValueToJson(Utf8JsonWriter writer, T value, IType<T> valueType);
 }
 
 

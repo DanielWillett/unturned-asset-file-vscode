@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Framework.Foliage.FoliageResourceInfoAsset, Assembly-CSharp",
     "DisplayName": "Resource Foliage",
     "Parent": "SDG.Framework.Foliage.FoliageInfoAsset, Assembly-CSharp",
@@ -10,9 +10,12 @@
     [
         {
             "Key": "Resource",
-            "Type": "AssetReference",
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Unturned.ResourceAsset, Assembly-CSharp"
+            },
             "Required": true,
-            "ElementType": "SDG.Unturned.ResourceAsset, Assembly-CSharp",
             "Description": "The resource to spawn when this foliage is placed.",
             "Variable": "resource",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html#foliageresourceinfoasset-properties-reference"

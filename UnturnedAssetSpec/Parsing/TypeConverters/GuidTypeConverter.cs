@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -78,5 +79,33 @@ internal sealed class GuidTypeConverter : ITypeConverter<Guid>
 
         result = Optional<TTo>.Null;
         return false;
+    }
+
+    public void WriteJson(Utf8JsonWriter writer, Guid value, ref TypeConverterFormatArgs args)
+    {
+        writer.WriteStringValue(value);
+    }
+
+    public bool TryReadJson(in JsonElement json, out Optional<Guid> value, ref TypeConverterParseArgs<Guid> args)
+    {
+        switch (json.ValueKind)
+        {
+            case JsonValueKind.Null:
+                value = Optional<Guid>.Null;
+                return true;
+
+            case JsonValueKind.String:
+                if (JsonHelper.TryGetGuid(in json, out Guid dt))
+                {
+                    value = dt;
+                    return true;
+                }
+
+                goto default;
+
+            default:
+                value = Optional<Guid>.Null;
+                return false;
+        }
     }
 }

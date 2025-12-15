@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.WeatherAsset, Assembly-CSharp",
     "DisplayName": "Custom Weather",
     "Parent": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp",
@@ -167,8 +167,11 @@
         },
         {
             "Key": "Effects",
-            "Type": "List",
-            "ElementType": "SDG.Unturned.WeatherAsset+Effect, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.WeatherAsset+Effect, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Description": "Multiple effects can be instantiated while the weather is active.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#effect-properties",

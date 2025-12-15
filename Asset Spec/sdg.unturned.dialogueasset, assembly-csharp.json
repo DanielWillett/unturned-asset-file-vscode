@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.DialogueAsset, Assembly-CSharp",
     "DisplayName": "Dialogue",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -101,8 +101,11 @@
                 },
                 {
                     "Key": "Prev",
-                    "Type": "GuidOrId",
-                    "ElementType": "SDG.Unturned.DialogueAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "GuidOrId",
+                        "AssetType": "SDG.Unturned.DialogueAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "The GUID or short ID of the previous dialogue page of message #(Self.TemplateGroups[0]). The player will be returned to this dialogue if no responses are available.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
@@ -118,8 +121,13 @@
                 },
                 {
                     "Key": "Conditions",
-                    "Type": "LegacyCompatibleList",
-                    "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                        "LegacySingularKey": "Condition",
+                        "Mode": "LegacyList, ModernList"
+                    },
                     "DefaultValue": null,
                     "Description": "Conditions that must be met for message #(Self.TemplateGroups[0]) to be shown.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
@@ -128,8 +136,13 @@
                 },
                 {
                     "Key": "Rewards",
-                    "Type": "LegacyCompatibleList",
-                    "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                        "LegacySingularKey": "Reward",
+                        "Mode": "LegacyList, ModernList"
+                    },
                     "DefaultValue": null,
                     "Description": "Rewards applied before viewing message #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
@@ -141,12 +154,16 @@
             [
                 {
                     "Key": "Page_*",
-                    "Type": "RichTextString",
+                    "Type":
+                    {
+                        "Type": "String",
+                        "SupportsRichText": true,
+                        "SupportsNewLines": true,
+                        "ExtraTags": [ "<name_npc>", "<name_char>", "<pause>" ]
+                    },
                     "Template": true,
                     "TemplateGroups": [ "dialogue-message-pages" ],
                     "Required": true,
-                    "SupportsNewLines": true,
-                    "ExtraTags": [ "<name_npc>", "<name_char>", "<pause>" ],
                     "Variable": "text",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#localization",
                     "Description": "The localized text on page @dialogue-message-pages of message @dialogue-messages."
@@ -185,8 +202,11 @@
                 },
                 {
                     "Key": "Dialogue",
-                    "Type": "GuidOrId",
-                    "ElementType": "SDG.Unturned.DialogueAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "GuidOrId",
+                        "AssetType": "SDG.Unturned.DialogueAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "The dialogue to open after the player selects response @dialogue-responses.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
@@ -195,8 +215,11 @@
                 },
                 {
                     "Key": "Quest",
-                    "Type": "GuidOrId",
-                    "ElementType": "SDG.Unturned.QuestAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "GuidOrId",
+                        "AssetType": "SDG.Unturned.QuestAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "The quest to start after the player selects response @dialogue-responses.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
@@ -205,8 +228,11 @@
                 },
                 {
                     "Key": "Vendor",
-                    "Type": "GuidOrId",
-                    "ElementType": "SDG.Unturned.VendorAsset, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "GuidOrId",
+                        "AssetType": "SDG.Unturned.VendorAsset, Assembly-CSharp"
+                    },
                     "DefaultValue": "00000000000000000000000000000000",
                     "Description": "The vendor (shop) to open after the player selects response @dialogue-responses.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
@@ -215,8 +241,13 @@
                 },
                 {
                     "Key": "Conditions",
-                    "Type": "LegacyCompatibleList",
-                    "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                        "LegacySingularKey": "Condition",
+                        "Mode": "LegacyList, ModernList"
+                    },
                     "DefaultValue": null,
                     "Description": "Conditions that must be met for response #(Self.TemplateGroups[0]) to be shown.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
@@ -225,8 +256,13 @@
                 },
                 {
                     "Key": "Rewards",
-                    "Type": "LegacyCompatibleList",
-                    "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                        "LegacySingularKey": "Reward",
+                        "Mode": "LegacyList, ModernList"
+                    },
                     "DefaultValue": null,
                     "Description": "Rewards applied before viewing response #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
@@ -238,10 +274,14 @@
             [
                 {
                     "Key": "#This.Key",
-                    "Type": "RichTextString",
+                    "Type":
+                    {
+                        "Type": "String",
+                        "SupportsRichText": true,
+                        "SupportsNewLines": true,
+                        "ExtraTags": [ "<name_npc>", "<name_char>" ]
+                    },
                     "Required": true,
-                    "SupportsNewLines": true,
-                    "ExtraTags": [ "<name_npc>", "<name_char>" ],
                     "Description": "The text shown for response #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#localization",
                     "Variable": "text"

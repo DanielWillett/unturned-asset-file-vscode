@@ -12,10 +12,7 @@ public class TypeHierarchyConverter : JsonConverter<TypeHierarchy?>
     private static readonly JsonEncodedText IsAbstractProperty = JsonEncodedText.Encode("IsAbstract"u8);
     private static readonly JsonEncodedText HasDataFilesProperty = JsonEncodedText.Encode("HasDataFiles"u8);
 
-    private static readonly IReadOnlyDictionary<QualifiedType, TypeHierarchy> EmptyDictionary =
-        new ReadOnlyDictionary<QualifiedType, TypeHierarchy>(
-            new Dictionary<QualifiedType, TypeHierarchy>()
-        );
+    private static readonly Dictionary<QualifiedType, TypeHierarchy> EmptyDictionary = new Dictionary<QualifiedType, TypeHierarchy>();
 
     /// <inheritdoc />
     public override TypeHierarchy? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

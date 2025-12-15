@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemChargeAsset, Assembly-CSharp",
     "DisplayName": "Charge Barricade Item",
     "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
@@ -102,8 +102,11 @@
         },
         {
             "Key": "Explosion2",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "Description": "Effect to play upon detonation.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
             "Variable": "DetonationEffectGuid",

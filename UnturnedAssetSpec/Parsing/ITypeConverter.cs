@@ -5,6 +5,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -48,6 +49,16 @@ public interface ITypeConverter<T> where T : IEquatable<T>
     /// <param name="obj">The value to convert to <typeparamref name="TTo"/>.</param>
     /// <returns>Whether or not <paramref name="obj"/> could be converted to <typeparamref name="TTo"/>.</returns>
     bool TryConvertTo<TTo>(Optional<T> obj, out Optional<TTo> result) where TTo : IEquatable<TTo>;
+    
+    /// <summary>
+    /// Writes a value to a <see cref="Utf8JsonWriter"/>.
+    /// </summary>
+    void WriteJson(Utf8JsonWriter writer, T value, ref TypeConverterFormatArgs args);
+
+    /// <summary>
+    /// Reads a value from a <see cref="JsonElement"/>.
+    /// </summary>
+    bool TryReadJson(in JsonElement json, out Optional<T> value, ref TypeConverterParseArgs<T> args);
 }
 
 /// <summary>

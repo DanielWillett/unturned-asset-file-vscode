@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ConfigData, Assembly-CSharp",
     "DisplayName": "Server Configuration",
     "Parent": null,
@@ -175,7 +175,11 @@
             [
                 {
                     "Key": "Message",
-                    "Type": "RichTextString",
+                    "Type":
+                    {
+                        "Type": "String",
+                        "SupportsRichText": true
+                    },
                     "Description": "Button text.",
                     "Variable": "Message",
                     "DefaultValue": null,
@@ -214,19 +218,31 @@
                 },
                 {
                     "Key": "Desc_Hint",
-                    "Type": "RichTextString",
+                    "Type":
+                    {
+                        "Type": "String",
+                        "SupportsRichText": true
+                    },
                     "Description": "Short description underneath the server name in the server lobby menu.",
                     "DefaultValue": null
                 },
                 {
                     "Key": "Desc_Full",
-                    "Type": "RichTextString",
+                    "Type":
+                    {
+                        "Type": "String",
+                        "SupportsRichText": true
+                    },
                     "Description": "Long description in the lower-right of the server lobby menu.",
                     "DefaultValue": null
                 },
                 {
                     "Key": "Desc_Server_List",
-                    "Type": "RichTextString",
+                    "Type":
+                    {
+                        "Type": "String",
+                        "SupportsRichText": true
+                    },
                     "Description": "Short description underneath the server name in the server list.",
                     "DefaultValue": null
                 },
@@ -256,8 +272,11 @@
                 },
                 {
                     "Key": "Links",
-                    "Type": "List",
-                    "ElementType": "SDG.Unturned.BrowserConfigData+Link, Assembly-CSharp",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.BrowserConfigData+Link, Assembly-CSharp"
+                    },
                     "Description": "Buttons shown in the server lobby menu.",
                     "DefaultValue": null
                 }
@@ -446,8 +465,11 @@
                 },
                 {
                     "Key": "Scheduled_Shutdown_Warnings",
-                    "Type": "List",
-                    "ElementType": "TimeSpan",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "TimeSpan"
+                    },
                     "Description": "Broadcast \"shutting down for scheduled maintenance\" warnings at these intervals.",
                     "DefaultValue":
                     [
@@ -476,8 +498,11 @@
                 },
                 {
                     "Key": "Update_Shutdown_Warnings",
-                    "Type": "List",
-                    "ElementType": "TimeSpan",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "TimeSpan"
+                    },
                     "Description": "Broadcast \"shutting down for update\" warnings at these intervals. Refer to @Scheduled_Shutdown_Warnings for an explanation of the format.",
                     "DefaultValue":
                     [

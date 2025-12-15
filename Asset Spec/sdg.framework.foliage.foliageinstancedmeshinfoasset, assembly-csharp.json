@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Framework.Foliage.FoliageInstancedMeshInfoAsset, Assembly-CSharp",
     "DisplayName": "Instanced Mesh Foliage",
     "Parent": "SDG.Framework.Foliage.FoliageInfoAsset, Assembly-CSharp",
@@ -65,18 +65,24 @@
         },
         {
             "Key": "Christmas_Redirect",
-            "Type": "AssetReference",
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Framework.Foliage.FoliageInstancedMeshInfoAsset, Assembly-CSharp"
+            },
             "DefaultValue": null,
-            "ElementType": "SDG.Framework.Foliage.FoliageInstancedMeshInfoAsset, Assembly-CSharp",
             "Description": "The foliage to spawn during the Christmas holiday.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "christmasRedirect"
         },
         {
             "Key": "Halloween_Redirect",
-            "Type": "AssetReference",
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Framework.Foliage.FoliageInstancedMeshInfoAsset, Assembly-CSharp"
+            },
             "DefaultValue": null,
-            "ElementType": "SDG.Framework.Foliage.FoliageInstancedMeshInfoAsset, Assembly-CSharp",
             "Description": "The foliage to spawn during the Halloween holiday.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "halloweenRedirect"

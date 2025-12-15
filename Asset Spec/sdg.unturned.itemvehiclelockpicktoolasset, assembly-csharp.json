@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemVehicleLockpickToolAsset, Assembly-CSharp",
     "DisplayName": "Vehicle Lockpick Tool Item",
     "Parent": "SDG.Unturned.ItemToolAsset, Assembly-CSharp",
@@ -12,8 +12,11 @@
     [
         {
             "Key": "FailureEffect",
-            "Type": "BcAssetReference",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "BcAssetReference",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "Description": "Effect to play when lockpicking fails.",
             "DefaultValue": null,
             "Variable": "FailureEffect",

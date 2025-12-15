@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemConsumeableAsset, Assembly-CSharp",
     "DisplayName": "Consumeable Item",
     "Parent": "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp",
@@ -205,8 +205,13 @@
         },
         {
             "Key": "Quest_Rewards",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                "LegacySingularKey": "Quest_Reward",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Description": "Rewards applied when consuming this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#rewards",
@@ -216,8 +221,11 @@
         },
         {
             "Key": "Item_Reward_Spawn_ID",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "Spawn table used to reward items when consuming this item. A random amount of items between @Min_Item_Rewards and @Max_Item_Rewards will be given.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
@@ -248,8 +256,11 @@
         },
         {
             "Key": "Explosion",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Effect to play when consuming this item, also causing the item to explode, instantly killing the player. The explosion strength is decided by the @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) and damage properties.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",

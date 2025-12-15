@@ -146,7 +146,7 @@ public sealed class StaticSourceFile : IWorkspaceFile
     /// <exception cref="System.Security.SecurityException">Unable to access the file at <paramref name="filePath"/>.</exception>
     public static StaticSourceFile FromOtherFile(
         string filePath,
-        IAssetSpecDatabase database,
+        IAssetSpecDatabase? database,
         SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
     {
         return FromOtherFile(filePath, System.IO.File.ReadAllText(filePath, Encoding.UTF8).AsMemory(), database, options);
@@ -164,7 +164,7 @@ public sealed class StaticSourceFile : IWorkspaceFile
     public static StaticSourceFile FromOtherFile(
         string filePath,
         ReadOnlyMemory<char> fileContents,
-        IAssetSpecDatabase database,
+        IAssetSpecDatabase? database,
         SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
     {
         if (filePath == null)

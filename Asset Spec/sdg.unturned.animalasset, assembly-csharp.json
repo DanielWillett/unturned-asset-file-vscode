@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.AnimalAsset, Assembly-CSharp",
     "DisplayName": "Animal",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -70,8 +70,11 @@
         },
         {
             "Key": "Meat",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "The short ID of the meat item dropped by the animal. 2-4 meat items will be dropped.",
             "Variable": "meat",
@@ -80,8 +83,11 @@
         },
         {
             "Key": "Pelt",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "The short ID of the pelt item dropped by the animal. 2-4 pelt items will be dropped.",
             "Variable": "pelt",
@@ -90,8 +96,11 @@
         },
         {
             "Key": "Reward_ID",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "The short ID of a spawn table to use for the animal drops. A random amount of items between @Reward_Min and @Reward_Max will be dropped. Pelt and Meat are ignored if this is set.",
             "Variable": "rewardID",

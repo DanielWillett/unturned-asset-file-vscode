@@ -43,7 +43,7 @@ internal class ListNode : AnySourceNode, IListSourceNode
     }
 
     /// <inheritdoc />
-    public bool TryGetElement(int index, [MaybeNullWhen(false)] out IAnyValueSourceNode node)
+    public bool TryGetElement(int index, [NotNullWhen(true)] out IAnyValueSourceNode? node)
     {
         if (index < 0 || index >= Count)
         {

@@ -134,8 +134,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     {
         AssetAliases = new Dictionary<string, QualifiedType>(0),
         AssetCategories = new Dictionary<QualifiedType, string>(0),
-        Types = new Dictionary<QualifiedType, TypeHierarchy>(0),
-        ParentTypes = new Dictionary<QualifiedType, InverseTypeHierarchy>(0)
+        Types = new Dictionary<QualifiedType, TypeHierarchy>(0)
     };
 
     public static AssetSpecDatabase FromOffline(bool useInstallDir = false) => new AssetSpecDatabase(new InstallDirUtility(
@@ -268,7 +267,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         }
 
         assetInfo.GetParentTypes(default);
-        assetInfo.ParentTypes ??= new Dictionary<QualifiedType, InverseTypeHierarchy>(0);
+        //assetInfo.ParentTypes ??= new Dictionary<QualifiedType, InverseTypeHierarchy>(0);
 
         Task statusTask = DownloadStatusAsync(assetInfo, token);
         Task downloadActionButtons = DownloadPlayerDashboardInventoryLocalizationAsync(assetInfo, token);

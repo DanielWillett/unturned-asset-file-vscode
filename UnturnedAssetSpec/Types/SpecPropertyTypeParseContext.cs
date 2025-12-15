@@ -99,7 +99,7 @@ public readonly ref struct SpecPropertyTypeParseContext
         return TryParse(out value, out _);
     }
 
-    public bool TryParse([MaybeNullWhen(false)] out ISpecDynamicValue value, out IPropertySourceNode? property)
+    public bool TryParse([NotNullWhen(true)] out ISpecDynamicValue? value, out IPropertySourceNode? property)
     {
         SpecProperty prop = EvaluationContext.Self;
 

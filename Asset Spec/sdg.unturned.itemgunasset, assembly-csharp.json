@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemGunAsset, Assembly-CSharp",
     "DisplayName": "Gun Item",
     "Parent": "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp",
@@ -144,8 +144,11 @@
         },
         {
             "Key": "Sight",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemSightAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemSightAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "The sight attachment that naturally spawns on this gun. Usually this is the iron sights.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#sight-uint16-0",
@@ -154,8 +157,11 @@
         },
         {
             "Key": "Tactical",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemTacticalAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemTacticalAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "The tactical attachment that naturally spawns on this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#tactical-uint16-0",
@@ -164,8 +170,11 @@
         },
         {
             "Key": "Grip",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemGripAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemGripAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "The grip attachment that naturally spawns on this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#grip-uint16-0",
@@ -174,8 +183,11 @@
         },
         {
             "Key": "Barrel",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "The barrel attachment that naturally spawns on this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#barrel-uint16-0",
@@ -184,8 +196,11 @@
         },
         {
             "Key": "Magazine",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "The magazine that naturally spawns on this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-uint16-0",
@@ -207,8 +222,11 @@
             "Key": "Magazine_Replacement_*_ID",
             "Template": true,
             "TemplateGroups": [ "gun-magazine-replacements" ],
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Required": true,
             "Description": "The magazine that naturally spawns on this gun for magazine replacement #(Self.TemplateGroups[0])'s map.",
@@ -988,8 +1006,11 @@
         },
         {
             "Key": "Muzzle",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "The GUID or ID of the effect to play after shooting. This is emitted from this weapon's \"Barrel\" hook.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#muzzle-doc-data-guid-or-uint16",
@@ -998,8 +1019,11 @@
         },
         {
             "Key": "Explosion",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "The GUID or ID of the effect that should be used for explosions caused by projectiles.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#explosion-doc-data-guid-or-uint16",
@@ -1009,8 +1033,11 @@
         },
         {
             "Key": "Shell",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "IncludedDefaultValue": "00000000000000000000000000000000",
             "DefaultValue":
             [
@@ -1290,8 +1317,13 @@
         },
         {
             "Key": "Shoot_Quest_Rewards",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                "LegacySingularKey": "Shoot_Quest_Reward",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Description": "Rewards applied when the player fires a shot.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#npc-rewards",

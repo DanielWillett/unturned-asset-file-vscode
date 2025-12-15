@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.NPCRewardsAsset, Assembly-CSharp",
     "DisplayName": "NPC Reward List",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -10,8 +10,13 @@
     [
         {
             "Key": "Conditions",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
+                "LegacySingularKey": "Condition",
+                "Mode": "LegacyList, ModernList"
+            },
             "Description": "Conditions that must be met to grant the rewards.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards-list-asset.html#rewards-list-assets",
             "Variable": "conditionsList",
@@ -19,8 +24,13 @@
         },
         {
             "Key": "Rewards",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                "LegacySingularKey": "Reward",
+                "Mode": "LegacyList, ModernList"
+            },
             "Description": "Rewards to grant upon activation.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards-list-asset.html#rewards-list-assets",
             "Variable": "rewardsList",

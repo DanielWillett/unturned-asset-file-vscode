@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemMeleeAsset, Assembly-CSharp",
     "DisplayName": "Melee Item",
     "Parent": "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp",
@@ -165,8 +165,13 @@
         },
         {
             "Key": "Weak_Attack_Quest_Rewards",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                "LegacySingularKey": "Weak_Attack_Quest_Reward",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Description": "Rewards applied when the player performs a weak attack.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#npc-rewards",
@@ -176,8 +181,13 @@
         },
         {
             "Key": "Strong_Attack_Quest_Rewards",
-            "Type": "LegacyCompatibleList",
-            "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
+                "LegacySingularKey": "Strong_Attack_Quest_Reward",
+                "Mode": "LegacyList, ModernList"
+            },
             "DefaultValue": null,
             "Description": "Rewards applied when the player performs a strong attack.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#npc-rewards",

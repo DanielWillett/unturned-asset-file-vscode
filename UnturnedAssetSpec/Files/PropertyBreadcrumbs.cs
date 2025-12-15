@@ -507,7 +507,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     /// <summary>
     /// Try to find the property in <paramref name="file"/> in the dictionary this breadcrumb points to.
     /// </summary>
-    public bool TryGetProperty(ISourceFile file, SpecProperty property, [MaybeNullWhen(false)] out IPropertySourceNode propertyNode, ICollection<ISourceNode>? nodePath = null)
+    public bool TryGetProperty(ISourceFile file, SpecProperty property, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, ICollection<ISourceNode>? nodePath = null)
     {
         lock (file.TreeSync)
         {
@@ -530,7 +530,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     /// <summary>
     /// Try to find the the object type this breadcrumb points to.
     /// </summary>
-    public bool TryGetDictionaryAndType(ISourceFile file, in AssetFileType fileType, IAssetSpecDatabase database, [MaybeNullWhen(false)] out IDictionarySourceNode dictionary, [MaybeNullWhen(false)] out ISpecType type, ICollection<ISourceNode>? nodePath = null)
+    public bool TryGetDictionaryAndType(ISourceFile file, in AssetFileType fileType, IAssetSpecDatabase database, [NotNullWhen(true)] out IDictionarySourceNode? dictionary, [MaybeNullWhen(false)] out ISpecType type, ICollection<ISourceNode>? nodePath = null)
     {
         if (database == null)
             throw new ArgumentNullException(nameof(database));
@@ -543,7 +543,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     /// <summary>
     /// Try to find the the dictionary this breadcrumb points to.
     /// </summary>
-    public bool TryGetDictionary(ISourceFile file, [MaybeNullWhen(false)] out IDictionarySourceNode dictionary, ICollection<ISourceNode>? nodePath = null)
+    public bool TryGetDictionary(ISourceFile file, [NotNullWhen(true)] out IDictionarySourceNode? dictionary, ICollection<ISourceNode>? nodePath = null)
     {
         lock (file.TreeSync)
         {
@@ -552,7 +552,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
         }
     }
 
-    private bool TryGetDictionaryAndTypeIntl(ISourceFile file, [MaybeNullWhen(false)] out IDictionarySourceNode referencedDictionary, IAssetSpecDatabase? database, in AssetFileType fileType, out ISpecType? type, ICollection<ISourceNode>? nodePath)
+    private bool TryGetDictionaryAndTypeIntl(ISourceFile file, [NotNullWhen(true)] out IDictionarySourceNode? referencedDictionary, IAssetSpecDatabase? database, in AssetFileType fileType, out ISpecType? type, ICollection<ISourceNode>? nodePath)
     {
         type = null;
         if (IsRoot)

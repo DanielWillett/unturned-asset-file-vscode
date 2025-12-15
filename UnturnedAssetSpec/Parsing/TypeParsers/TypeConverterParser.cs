@@ -1,7 +1,9 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -76,6 +78,20 @@ public class TypeConverterParser<T>(ITypeConverter<T> typeConverter)
 
         value = Optional<T>.Null;
         return false;
+    }
+
+    /// <inheritdoc />
+    public bool TryReadValueFromJson(in JsonElement json, out Optional<T> value, IType<T> valueType)
+    {
+        TypeConverterParseArgs<T> parseArgs = new TypeConverterParseArgs<T>(valueType);
+        return _typeConverter.TryReadJson(in json, out value, ref parseArgs);
+    }
+
+    /// <inheritdoc />
+    public void WriteValueToJson(Utf8JsonWriter writer, T value, IType<T> valueType)
+    {
+        TypeConverterFormatArgs args = default;
+        _typeConverter.WriteJson(writer, value, ref args);
     }
 
     /// <inheritdoc />

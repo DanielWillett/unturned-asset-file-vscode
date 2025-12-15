@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -185,5 +186,53 @@ internal sealed class CharacterTypeConverter : ITypeConverter<char>
         f:
         result = Optional<TTo>.Null;
         return false;
+    }
+
+    public void WriteJson(Utf8JsonWriter writer, char value, ref TypeConverterFormatArgs args)
+    {
+        Span<char> span = stackalloc char[1];
+        span[0] = value;
+        writer.WriteStringValue(span);
+    }
+
+    public bool TryReadJson(in JsonElement json, out Optional<char> value, ref TypeConverterParseArgs<char> args)
+    {
+        switch (json.ValueKind)
+        {
+            case JsonValueKind.Null:
+                value = Optional<char>.Null;
+                return true;
+
+            case JsonValueKind.String:
+                string str = json.GetString()!;
+                if (str.Length == 1)
+                {
+                    value = str[0];
+                    return true;
+                }
+
+                goto default;
+
+            case JsonValueKind.False:
+                value = '0';
+                return true;
+
+            case JsonValueKind.True:
+                value = '1';
+                return true;
+
+            case JsonValueKind.Number:
+                if (json.TryGetInt32(out int v) && v is >= '0' and <= '9')
+                {
+                    value = new Optional<char>((char)(v - '0'));
+                    return true;
+                }
+
+                goto default;
+
+            default:
+                value = Optional<char>.Null;
+                return false;
+        }
     }
 }

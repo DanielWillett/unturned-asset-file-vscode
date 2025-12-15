@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Text.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
@@ -12,6 +13,11 @@ public sealed class NullValue(IType type) : IValue
 {
     public IType Type { get; } = type;
     public bool IsNull => true;
+
+    public void WriteToJson(Utf8JsonWriter writer)
+    {
+        writer.WriteNullValue();
+    }
 }
 
 /// <summary>
@@ -20,6 +26,7 @@ public sealed class NullValue(IType type) : IValue
 public sealed class NullValue<T>(IType<T> type) : IValue<T> where T : IEquatable<T>
 {
     public IType<T> Type { get; } = type;
+
     public bool IsNull => true;
 
     public bool TryGetConcreteValue(out Optional<T> value)
@@ -32,6 +39,11 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T> where T : IEquatable
     {
         value = Optional<T>.Null;
         return true;
+    }
+
+    public void WriteToJson(Utf8JsonWriter writer)
+    {
+        writer.WriteNullValue();
     }
 
     IType IValue.Type => Type;

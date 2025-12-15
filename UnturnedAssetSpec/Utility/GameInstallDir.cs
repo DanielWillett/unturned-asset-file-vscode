@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -27,8 +28,12 @@ public readonly struct GameInstallDir : IEquatable<GameInstallDir>
     /// <summary>
     /// Gets an absolute file path from a path relative to the game's root folder.
     /// </summary>
-    public string GetFile(string relativePath)
+    [return: NotNullIfNotNull(nameof(relativePath))]
+    public string? GetFile(string? relativePath)
     {
+        if (relativePath == null)
+            return null;
+
         if (Path.DirectorySeparatorChar != '\\')
         {
             relativePath = relativePath.Replace('\\', Path.DirectorySeparatorChar);

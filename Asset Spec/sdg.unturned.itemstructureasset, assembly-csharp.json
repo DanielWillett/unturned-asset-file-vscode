@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemStructureAsset, Assembly-CSharp",
     "DisplayName": "Structure Item",
     "Parent": "SDG.Unturned.ItemPlaceableAsset, Assembly-CSharp",
@@ -70,8 +70,11 @@
         },
         {
             "Key": "Explosion",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "Effect played when this structure is destroyed.",
             "Variable": "explosionGuid",

@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemArrestEndAsset, Assembly-CSharp",
     "DisplayName": "Releaser Item",
     "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
@@ -11,8 +11,11 @@
     [
         {
             "Key": "Recover",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemArrestStartAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemArrestStartAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Description": "The ID of the item to unlock.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/arrest-end-asset.html#property-descriptions",

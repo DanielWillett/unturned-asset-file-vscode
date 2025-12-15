@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -112,5 +113,33 @@ internal sealed class DateTimeTypeConverter : ITypeConverter<DateTime>
 
         result = Optional<TTo>.Null;
         return false;
+    }
+
+    public void WriteJson(Utf8JsonWriter writer, DateTime value, ref TypeConverterFormatArgs args)
+    {
+        writer.WriteStringValue(value);
+    }
+
+    public bool TryReadJson(in JsonElement json, out Optional<DateTime> value, ref TypeConverterParseArgs<DateTime> args)
+    {
+        switch (json.ValueKind)
+        {
+            case JsonValueKind.Null:
+                value = Optional<DateTime>.Null;
+                return true;
+
+            case JsonValueKind.String:
+                if (json.TryGetDateTime(out DateTime dt))
+                {
+                    value = dt;
+                    return true;
+                }
+
+                goto default;
+
+            default:
+                value = Optional<DateTime>.Null;
+                return false;
+        }
     }
 }

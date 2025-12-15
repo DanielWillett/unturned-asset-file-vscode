@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -73,6 +74,18 @@ public sealed class ConcreteValue<TValue> : IValue<TValue>, IEquatable<TValue?>,
             null => IsNull,
             _ => false
         };
+    }
+
+    public void WriteToJson(Utf8JsonWriter writer)
+    {
+        if (IsNull)
+        {
+            writer.WriteNullValue();
+        }
+        else
+        {
+            Type.Parser.WriteValueToJson(writer, _value, Type);
+        }
     }
 
     public override int GetHashCode()

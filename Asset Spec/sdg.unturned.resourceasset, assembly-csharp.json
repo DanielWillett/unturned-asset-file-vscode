@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ResourceAsset, Assembly-CSharp",
     "DisplayName": "Resource",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -155,8 +155,11 @@
         },
         {
             "Key": "Explosion",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Effect to play when this resource is destroyed.",
@@ -165,8 +168,11 @@
         },
         {
             "Key": "Log",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "ID of an item that should be dropped when the resource is destroyed. Before multipliers, this item is dropped in bunches of 3 to 7. This is also the item that is given to the player when this resource is foraged.",
@@ -182,8 +188,11 @@
         },
         {
             "Key": "Stick",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "ID of an item that should be dropped when the resource is destroyed. Before multipliers, this item is dropped in bunches of 2 to 5.",
@@ -203,8 +212,11 @@
         },
         {
             "Key": "Reward_ID",
-            "Type": "Id",
-            "ElementType": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
+            },
             "DefaultValue": 0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "ID of an item spawn table to pull items from that should be dropped when this resource is destroyed or foraged.",
@@ -391,8 +403,11 @@
         },
         {
             "Key": "Christmas_Redirect",
-            "Type": "AssetReferenceString",
-            "ElementType": "SDG.Unturned.ResourceAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Unturned.ResourceAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "The resource to replace this resource with during the 'Christmas' holiday.",
             "Priority": 4,
@@ -401,8 +416,11 @@
         },
         {
             "Key": "Halloween_Redirect",
-            "Type": "AssetReferenceString",
-            "ElementType": "SDG.Unturned.ResourceAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "AssetReferenceString",
+                "AssetType": "SDG.Unturned.ResourceAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "The resource to replace this resource with during the 'Halloween' holiday.",
             "Priority": 4,
@@ -464,7 +482,11 @@
     [
         {
             "Key": "Name",
-            "Type": "RichTextString",
+            "Type":
+            {
+                "Type": "String",
+                "SupportsRichText": true
+            },
             "Required": true,
             "DefaultValue": "Name",
             "Description": "Localized display name of the resource.",
@@ -473,8 +495,12 @@
         },
         {
             "Key": "Interact",
-            "Type": "FormatString",
-            "ElementType": "1|T",
+            "Type":
+            {
+                "Type": "String",
+                "SupportsRichText": true,
+                "FormatArguments": 1
+            },
             "DefaultValue": "Interact",
             "Description": "Localized text displayed when the character looks at this resource. The keybind is formatted into '{0}'.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#localization",

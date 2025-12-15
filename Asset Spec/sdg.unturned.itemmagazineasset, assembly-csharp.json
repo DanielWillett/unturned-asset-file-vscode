@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp",
     "DisplayName": "Magazine Attachment Item",
     "Parent": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp",
@@ -169,8 +169,11 @@
         },
         {
             "Key": "Explosion",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "GUID or legacy ID of the explosion set off by when a bullet lands if the @Explosive flag is present, or when a projectile explodes, overriding the explosion effect set in the gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#explosion-doc-data-guid-or-uint16-0",
@@ -190,8 +193,11 @@
         },
         {
             "Key": "Tracer",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "GUID or legacy ID of the effect used for the bullet tracer. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#tracer-doc-data-guid-or-uint16-0",
@@ -200,8 +206,11 @@
         },
         {
             "Key": "Impact",
-            "Type": "GuidOrId",
-            "ElementType": "SDG.Unturned.EffectAsset, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "GuidOrId",
+                "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
+            },
             "DefaultValue": "00000000000000000000000000000000",
             "Description": "GUID or legacy ID of the effect used for the bullet impact. Doesn't have any effect when used in a projectile gun. The default bullet impact effect is fetched from the impacted physics material.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#impact-doc-data-guid-or-uint16-0",

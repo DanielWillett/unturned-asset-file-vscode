@@ -117,11 +117,62 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ArgumentException_BaseTypeNotAllowedForEnums" xml:space="preserve">
+    <value>Enums can not have a base type.</value>
+  </data>
+  <data name="ArgumentException_CasingValueLengthMismatch" xml:space="preserve">
+    <value>Casing and value must have the same length.</value>
+  </data>
+  <data name="ArgumentException_CompositeFlagValue" xml:space="preserve">
+    <value>Value list can not contain a value made up of other values.</value>
+  </data>
   <data name="FormatException_IPv4Format_FailedToParse" xml:space="preserve">
     <value>Failed to parse IPv4Filter, expected a value in the format: "0.0.0.0[/0][:0[-0]]".</value>
   </data>
   <data name="InvalidOperationException_InvalidCountType" xml:space="preserve">
     <value>Invalid count type: '{0}'. Expected an integer type.</value>
+  </data>
+  <data name="JsonException_EnumMissingValue" xml:space="preserve">
+    <value>Enum value "{0}" didn't define a value string.</value>
+  </data>
+  <data name="JsonException_FailedToParseEnum" xml:space="preserve">
+    <value>Failed to parse enum of type {0} from value "{1}" in file "{2}".</value>
+  </data>
+  <data name="JsonException_FailedToParseValue" xml:space="preserve">
+    <value>Failed to parse value of type "{0}" in file "{1}".</value>
+  </data>
+  <data name="JsonException_FailedToReadValue" xml:space="preserve">
+    <value>Unable to read value of type {0} from JSON at {1}.</value>
+  </data>
+  <data name="JsonException_FlagEnumMissingNumericValue" xml:space="preserve">
+    <value>Flag enum value "{0}" did not define a numeric value, which is required for flag enum values.</value>
+  </data>
+  <data name="JsonException_InvalidJsonToken" xml:space="preserve">
+    <value>Unexpected token "{0}" while reading file "{1}".</value>
+  </data>
+  <data name="JsonException_InvalidTypeInDatFileType" xml:space="preserve">
+    <value>"Type" property was set to "{0}" in the file type definition for "{1}".</value>
+  </data>
+  <data name="JsonException_OverriddenPropertyNotFound" xml:space="preserve">
+    <value>Unable to find a property named "{0}" in any parent types to override in file "{1}".</value>
+  </data>
+  <data name="JsonException_ParentTypeNotFound" xml:space="preserve">
+    <value>Unable to locate parent type "{0}" for type "{1}".</value>
+  </data>
+  <data name="JsonException_PropertyKeyMissing" xml:space="preserve">
+    <value>Property "{0}" doesn't define a key, which is required.</value>
+  </data>
+  <data name="JsonException_PropertyTypeMissing" xml:space="preserve">
+    <value>Property "{0}" doesn't define a type, which is required unless the property is updating/hiding a base property.</value>
+  </data>
+  <data name="JsonException_PropertyTypeNotFound" xml:space="preserve">
+    <value>Unknown type "{0}" for property "{1}".</value>
+  </data>
+  <data name="JsonException_RequiredTypePropertyMissing" xml:space="preserve">
+    <value>Required property "{0}" for type "{1}" missing in file "{2}".</value>
+  </data>
+  <data name="JsonException_TypeMissingTypeName" xml:space="preserve">
+    <value>Type "{0}" does not define a "Type" property with a type name.</value>
   </data>
   <data name="Log_FailedToDownloadInternetResource" xml:space="preserve">
     <value>Unable to download internet resource at "{0}".</value>
@@ -132,11 +183,26 @@
   <data name="Log_FailedToParseResource" xml:space="preserve">
     <value>Unable to read resource at "{0}".</value>
   </data>
+  <data name="Log_FailedToReadAssetFile" xml:space="preserve">
+    <value>Unable to read specification for type "{0}". This type and all child types will be skipped.</value>
+  </data>
+  <data name="Log_FailedToReadCommitHashFromRepo" xml:space="preserve">
+    <value>Unable to read latest commit hash from GitHub API. They may have changed their API or the current network is being blocked.</value>
+  </data>
+  <data name="Log_InternetResourceCorrupted" xml:space="preserve">
+    <value>Internet resource at "{0}" is corrupted.</value>
+  </data>
+  <data name="Log_UnableToReadFile" xml:space="preserve">
+    <value>Unable to read file "{0}" from any of the available sources.</value>
+  </data>
   <data name="Type_Name_Boolean" xml:space="preserve">
     <value>Boolean</value>
   </data>
   <data name="Type_Name_BooleanOrFlag" xml:space="preserve">
     <value>Boolean or Flag</value>
+  </data>
+  <data name="Type_Name_Character" xml:space="preserve">
+    <value>Character</value>
   </data>
   <data name="Type_Name_Flag" xml:space="preserve">
     <value>Flag</value>
@@ -164,6 +230,9 @@
   </data>
   <data name="Type_Name_List_Generic" xml:space="preserve">
     <value>List of {0}</value>
+  </data>
+  <data name="Type_Name_RegEx" xml:space="preserve">
+    <value>Regular Expression (RegEx)</value>
   </data>
   <data name="Type_Name_String" xml:space="preserve">
     <value>Text</value>

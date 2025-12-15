@@ -353,7 +353,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 
         public readonly IAssetSourceFile LocalAsset;
         public readonly IWorkspaceFile File;
-        public readonly IAssetSpecDatabase Database;
+        public readonly IAssetSpecDatabase? Database;
         public readonly RootType Type;
 
         public static RootInfo Localization(IWorkspaceFile file, IAssetSpecDatabase database, IAssetSourceFile asset)
@@ -366,12 +366,12 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             return new RootInfo(null!, file, database, RootType.Asset);
         }
         
-        public static RootInfo Other(IWorkspaceFile file, IAssetSpecDatabase database)
+        public static RootInfo Other(IWorkspaceFile file, IAssetSpecDatabase? database)
         {
             return new RootInfo(null!, file, database, RootType.Other);
         }
         
-        private RootInfo(IAssetSourceFile asset, IWorkspaceFile file, IAssetSpecDatabase database, RootType type)
+        private RootInfo(IAssetSourceFile asset, IWorkspaceFile file, IAssetSpecDatabase? database, RootType type)
         {
             LocalAsset = asset;
             File = file;
@@ -781,9 +781,9 @@ public ref partial struct SourceNodeTokenizer : IDisposable
         IAnyChildrenSourceNode node = rootType.Type switch
         {
             RootType.Asset => (_options & SourceNodeTokenizerOptions.SkipLocalizationInAssets) != 0
-                ? RootAssetNodeSkippedLocalization.Create(rootType.File, rootType.Database, nonMetaDataNodeCount, array, in props, additionalProperties)
-                : RootAssetNode.Create(rootType.File, rootType.Database, nonMetaDataNodeCount, array, in props, additionalProperties),
-            RootType.Localization => RootLocalizationNode.Create(rootType.File, rootType.LocalAsset, rootType.Database, nonMetaDataNodeCount, array, in props, additionalProperties),
+                ? RootAssetNodeSkippedLocalization.Create(rootType.File, rootType.Database!, nonMetaDataNodeCount, array, in props, additionalProperties)
+                : RootAssetNode.Create(rootType.File, rootType.Database!, nonMetaDataNodeCount, array, in props, additionalProperties),
+            RootType.Localization => RootLocalizationNode.Create(rootType.File, rootType.LocalAsset, rootType.Database!, nonMetaDataNodeCount, array, in props, additionalProperties),
             RootType.Other => RootDictionaryNode.Create(rootType.File, rootType.Database, nonMetaDataNodeCount, array, in props, additionalProperties),
             _ => isList ? ListNode.Create(nonMetaDataNodeCount, array, comments, in props)
                         : DictionaryNode.Create(nonMetaDataNodeCount, array, comments, in props)

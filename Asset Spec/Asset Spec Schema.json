@@ -6,16 +6,274 @@
     "type": "object",
     "$defs":
     {
+        "fullyQualifiedType":
+        {
+            "type": "string",
+            "description": "Fully qualified type name.",
+            "pattern": "[^\\s]+, [^\\s]+"
+        },
         "datPropertyType":
         {
             "anyOf":
             [
                 {
-                    "type":
-                    [
-                        "string",
-                        "object"
-                    ]
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "String",
+                            "title": "Zero or more characters of UTF-16 text."
+                        },
+                        "MinimumLength":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum character count (inclusive)."
+                        },
+                        "MaximumLength":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Maximum character count (inclusive)."
+                        },
+                        "SupportsRichText":
+                        {
+                            "type": "boolean",
+                            "description": "Whether or not rich text is allowed."
+                        },
+                        "SupportsNewLines":
+                        {
+                            "type": "boolean",
+                            "description": "Whether or not the line break tag is allowed (<br>)."
+                        },
+                        "FormatArguments":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Maximum number of formatting args that can be present in the string."
+                        },
+                        "ExtraTag":
+                        {
+                            "type": "string",
+                            "minimum": 0,
+                            "description": "An additional rich text tags that can be used."
+                        },
+                        "ExtraTags":
+                        {
+                            "type": "array",
+                            "minimum": 0,
+                            "description": "Additional rich text tags that can be used.",
+                            "items":
+                            {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "RegEx",
+                            "title": "A regular expression."
+                        },
+                        "MinimumLength":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum character count (inclusive)."
+                        },
+                        "MaximumLength":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Maximum character count (inclusive)."
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "List",
+                            "title": "A list of values."
+                        },
+                        "ElementType":
+                        {
+                            "$ref": "#/$defs/datPropertyType",
+                            "description": "Type of elements in the list."
+                        },
+                        "CountType":
+                        {
+                            "$ref": "#/$defs/datPropertyType",
+                            "description": "Type of integer used to parse the legacy count."
+                        },
+                        "Mode":
+                        {
+                            "type": "string",
+                            "enum":
+                            [
+                                "LegacySingle, LegacyList, ModernSingle, ModernList",
+                                "LegacySingle, LegacyList, ModernSingle",
+                                "LegacySingle, LegacyList, ModernList",
+                                "LegacySingle, ModernSingle, ModernList",
+                                "LegacyList, ModernSingle, ModernList",
+                                "LegacySingle, LegacyList",
+                                "LegacySingle, ModernSingle",
+                                "LegacySingle, ModernList",
+                                "LegacyList, ModernSingle",
+                                "LegacyList, ModernList",
+                                "ModernSingle, ModernList",
+                                "LegacySingle",
+                                "LegacyList",
+                                "ModernSingle",
+                                "ModernList"
+                            ],
+                            "description": "What kinds of lists to parse (bitwise flag)."
+                        },
+                        "MinimumCount":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum number of items (inclusive)."
+                        },
+                        "MaximumCount":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum number of items (inclusive)."
+                        },
+                        "LegacySingleKey":
+                        {
+                            "type": "string",
+                            "description": "Key for the single property when \"LegacySingle\" is included. Defaults to the value of LegacySingularKey."
+                        },
+                        "LegacySingularKey":
+                        {
+                            "type": "string",
+                            "description": "Base key for elements in legacy lists. For example, 'Condition', for Conditions, Condition_0, etc."
+                        },
+                        "SkipUnderscoreInLegacyKey":
+                        {
+                            "type": "boolean",
+                            "description": "Indicates that the '_' should not be used to separate LegacySingularKey's value and the index. Defaults to false."
+                        },
+                        "LegacyDefaultElementTypeValue":
+                        {
+                            "description": "Default value for undefined legacy elements or elements without values.",
+                            "$ref": "#/$defs/datValue"
+                        }
+                    },
+                    "required": [ "Type", "ElementType" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "Steam64ID",
+                            "title": "A CSteamID in decimal format."
+                        },
+                        "AccountType":
+                        {
+                            "type": "integer",
+                            "description": "Numeric EAccountType to verify against values."
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "anyOf":
+                            [
+                                {
+                                    "const": "AssetReference",
+                                    "title": "A Globally Unique Identifier (also called a UUID) referencing another asset. Can be parsed as a string or object."
+                                },
+                                {
+                                    "const": "AssetReferenceString",
+                                    "title": "A Globally Unique Identifier (also called a UUID) referencing another asset. Can only be parsed as a string."
+                                },
+                                {
+                                    "const": "BcAssetReference",
+                                    "title": "A backwards-compatible GUID or ID referencing another asset. Can be parsed as a string or object."
+                                },
+                                {
+                                    "const": "BcAssetReferenceString",
+                                    "title": "A backwards-compatible GUID or ID referencing another asset. Can only be parsed as a string."
+                                },
+                                {
+                                    "const": "GuidOrId",
+                                    "title": "An asset GUID or short ID, where ElementType is the category or asset type."
+                                },
+                                {
+                                    "const": "Id",
+                                    "title": "A short/legacy ID to an asset."
+                                },
+                                {
+                                    "const": "DefaultableId",
+                                    "title": "A short/legacy ID to an asset that can be left as a negative number to indicate the default value."
+                                }
+                            ]
+                        },
+                        "AssetType":
+                        {
+                            "anyOf":
+                            [
+                                {
+                                    "$ref": "#/$defs/fullyQualifiedType"
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
+                            ],
+                            "description": "Any references must have this type in their type hierarchy."
+                        },
+                        "AssetTypes":
+                        {
+                            "type": "array",
+                            "items": {
+                                "anyOf":
+                                [
+                                    {
+                                        "$ref": "#/$defs/fullyQualifiedType"
+                                    },
+                                    {
+                                        "$ref": "#/$defs/switch"
+                                    }
+                                ]
+                            },
+                            "description": "Any references must have at least one of these types in their type hierarchy."
+                        },
+                        "SupportsThis":
+                        {
+                            "type": "boolean",
+                            "description": "Whether or not the word 'this' can be used to refer to the current asset."
+                        },
+                        "PreventSelfReference":
+                        {
+                            "type": "boolean",
+                            "description": "Whether or not referencing the current asset should produce a warning."
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
                 },
                 {
                     "const": "Flag",
@@ -60,10 +318,6 @@
                 {
                     "const": "RegEx",
                     "title": "A regular expression."
-                },
-                {
-                    "const": "RichTextString",
-                    "title": "Zero or more characters of UTF-16 text with rich-text tags supported."
                 },
                 {
                     "const": "Float32",
@@ -166,22 +420,6 @@
                     "title": "A hex color that follows the following format strictly: #ffffffff."
                 },
                 {
-                    "const": "AssetReference",
-                    "title": "A Globally Unique Identifier (also called a UUID) referencing another asset."
-                },
-                {
-                    "const": "BcAssetReference",
-                    "title": "A backwards-compatible GUID or ID referencing another asset."
-                },
-                {
-                    "const": "AssetReferenceString",
-                    "title": "A Globally Unique Identifier (also called a UUID) referencing another asset."
-                },
-                {
-                    "const": "BcAssetReferenceString",
-                    "title": "A backwards-compatible GUID or ID referencing another asset."
-                },
-                {
                     "const": "ContentReference",
                     "title": "A reference to a Unity object in the specified masterbundle. Exact same as MasterBundleReference."
                 },
@@ -216,18 +454,6 @@
                 {
                     "const": "HairIndex",
                     "title": "An index of a built-in hair texture."
-                },
-                {
-                    "const": "GuidOrId",
-                    "title": "An asset GUID or short ID, where ElementType is the category or asset type."
-                },
-                {
-                    "const": "Id",
-                    "title": "A short ID, where ElementType is the category."
-                },
-                {
-                    "const": "DefaultableId",
-                    "title": "A short ID, where ElementType is the category. A negative value is treated as a 'default' value (such as the default attachment for a gun)."
                 },
                 {
                     "const": "NavId",
@@ -318,16 +544,8 @@
                     "title": "A comma-separated list of values in a string."
                 },
                 {
-                    "const": "List",
-                    "title": "A list of values."
-                },
-                {
                     "const": "Dictionary",
                     "title": "A string dictionary of values."
-                },
-                {
-                    "const": "ListOrSingle",
-                    "title": "A list of values or one value."
                 },
                 {
                     "const": "MasterBundleName",
@@ -370,10 +588,6 @@
                     "title": "The level of a skill, where the special type is the skill name, the property containing the skill name, or two properties separated by a colon containing the speciality and skill indices."
                 },
                 {
-                    "const": "LegacyCompatibleList",
-                    "title": "List of a custom type, or a legacy list (such as a condition or reward list). The custom type should be entered as the ElementType."
-                },
-                {
                     "const": "Skill",
                     "title": "The name of a skill."
                 },
@@ -383,7 +597,7 @@
                 },
                 {
                     "const": "SkillLevel",
-                    "title": "The name of a skill or blueprint skill."
+                    "title": "The level of a skill or blueprint skill."
                 },
                 {
                     "const": "SteamItemDef",
@@ -410,7 +624,7 @@
                     "title": "A TypeReference<> taking an assembly-qualified type name."
                 },
                 {
-                    "const": "IPv4Range",
+                    "const": "IPv4Filter",
                     "title": "An IPv4 range in the form: 0.0.0.0[/32][:27015[-27015]]."
                 },
                 {
@@ -426,7 +640,49 @@
                     "title": "A path to a Unity component or GameObject."
                 },
                 {
+                    "$ref": "#/$defs/fullyQualifiedType"
+                },
+                {
                     "$ref": "#/$defs/switch"
+                }
+            ]
+        },
+        "datValue":
+        {
+            "anyOf":
+            [
+                {
+                    "$ref": "#/$defs/switch"
+                },
+                {
+                    "$ref": "#/$defs/condition"
+                },
+                {
+                    "$ref": "#/$defs/switchCase"
+                },
+                {
+                    "type":
+                    [
+                        "number",
+                        "null"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "$udat-type":
+                        {
+                            "$ref": "#/$defs/fullyQualifiedType"
+                        }
+                    },
+                    "required": [ "$udat-type" ]
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/datValue"
+                    }
                 }
             ]
         },
@@ -442,6 +698,11 @@
                         {
                             "description": "The key of the flag or property.",
                             "type": "string"
+                        },
+                        "RequireOverride":
+                        {
+                            "type": [ "boolean", "null" ],
+                            "description": "Behaves similar to Java's @Override when true, throwing an error if there is no parent property with the same key."
                         },
                         "KeyLegacyExpansionFilter":
                         {
@@ -578,29 +839,14 @@
                             "description": "Indicates that the value of this property should change this object's type based on this property in the enum. The type should be a subtype of the current type.",
                             "type": "string"
                         },
-                        "ElementType":
-                        {
-                            "description": "The type of the elements of a List.",
-                            "$ref": "#/$defs/datPropertyType"
-                        },
-                        "SpecialTypes":
-                        {
-                            "description": "A special subset of element type, such as barricade or useable type.",
-                            "type": "array",
-                            "items":
-                            {
-                                "type":
-                                [
-                                    "string",
-                                    "null"
-                                ]
-                            }
-                        },
                         "Required":
                         {
                             "description": "If this property is required.",
-                            "oneOf":
+                            "anyOf":
                             [
+                                {
+                                    "$ref": "#/$defs/switch"
+                                },
                                 {
                                     "$ref": "#/$defs/condition"
                                 },
@@ -617,77 +863,17 @@
                         "DefaultValue":
                         {
                             "description": "The default value for this property if applicable. If IncludedDefaultValue is used, this indicates the default value if the property is not included.",
-                            "oneOf":
-                            [
-                                {
-                                    "$ref": "#/$defs/switch"
-                                },
-                                {
-                                    "$ref": "#/$defs/condition"
-                                },
-                                {
-                                    "$ref": "#/$defs/switchCase"
-                                },
-                                {
-                                    "type":
-                                    [
-                                        "number",
-                                        "null"
-                                    ]
-                                },
-                                {
-                                    "type": "array",
-                                    "items": {
-                                        "type":
-                                        [
-                                            "string",
-                                            "number",
-                                            "boolean",
-                                            "null"
-                                        ]
-                                    }
-                                }
-                            ]
+                            "$ref": "#/$defs/datValue"
                         },
                         "IncludedDefaultValue":
                         {
                             "description": "The default value for this property if applicable. Indicates the default value if the property is included but not parsed correctly.",
-                            "oneOf":
-                            [
-                                {
-                                    "$ref": "#/$defs/switch"
-                                },
-                                {
-                                    "$ref": "#/$defs/condition"
-                                },
-                                {
-                                    "$ref": "#/$defs/switchCase"
-                                },
-                                {
-                                    "type":
-                                    [
-                                        "number",
-                                        "null"
-                                    ]
-                                },
-                                {
-                                    "type": "array",
-                                    "items": {
-                                        "type":
-                                        [
-                                            "string",
-                                            "number",
-                                            "boolean",
-                                            "null"
-                                        ]
-                                    }
-                                }
-                            ]
+                            "$ref": "#/$defs/datValue"
                         },
                         "Description":
                         {
                             "description": "Short description of the property.",
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type":
@@ -704,7 +890,7 @@
                         "Variable":
                         {
                             "description": "Name of the variable in the C# class.",
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type":
@@ -721,7 +907,7 @@
                         "Version":
                         {
                             "description": "Unturned version when this option was added.",
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type":
@@ -738,7 +924,7 @@
                         "Docs":
                         {
                             "description": "Link to the Unturned modding docs when a page is available.",
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type":
@@ -756,7 +942,7 @@
                         "Markdown":
                         {
                             "description": "Longer markdown description of the property.",
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type":
@@ -772,7 +958,7 @@
                         },
                         "Minimum":
                         {
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type":
@@ -792,7 +978,7 @@
                         },
                         "Maximum":
                         {
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type":
@@ -812,7 +998,7 @@
                         },
                         "MinimumCount":
                         {
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type":
@@ -830,7 +1016,7 @@
                         },
                         "MaximumCount":
                         {
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type":
@@ -848,7 +1034,7 @@
                         },
                         "MinimumExclusive":
                         {
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type":
@@ -868,7 +1054,7 @@
                         },
                         "MaximumExclusive":
                         {
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type":
@@ -888,13 +1074,13 @@
                         },
                         "Except":
                         {
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type": "array",
                                     "items":
                                     {
-                                        "oneOf":
+                                        "anyOf":
                                         [
                                             {
                                                 "type":
@@ -913,7 +1099,7 @@
                                     }
                                 },
                                 {
-                                    "oneOf":
+                                    "anyOf":
                                     [
                                         {
                                             "type":
@@ -935,7 +1121,7 @@
                         },
                         "ExclusiveWith":
                         {
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type": "array",
@@ -997,7 +1183,7 @@
                         },
                         "InclusiveWith":
                         {
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "type": "array",
@@ -1036,7 +1222,7 @@
                                             },
                                             "Condition":
                                             {
-                                                "oneOf":
+                                                "anyOf":
                                                 [
                                                     {
                                                         "$ref": "#/$defs/condition"
@@ -1059,7 +1245,7 @@
                         "Deprecated":
                         {
                             "description": "If this property shouldn't be used anymore or was left in for legacy features.",
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "$ref": "#/$defs/condition"
@@ -1072,7 +1258,7 @@
                         "Experimental":
                         {
                             "description": "If this property is experimental and may change in the future.",
-                            "oneOf":
+                            "anyOf":
                             [
                                 {
                                     "$ref": "#/$defs/condition"
@@ -1087,7 +1273,8 @@
                     [
                         "Key",
                         "Type"
-                    ]
+                    ],
+                    "additionalProperties": false
                 },
                 {
                     "type": "object",
@@ -1096,7 +1283,8 @@
                         "Key":
                         {
                             "description": "The key of the flag or property in a parent type.",
-                            "type": "string"
+                            "type": "string",
+                            "minLength": 1
                         },
                         "HideInherited":
                         {
@@ -1108,7 +1296,8 @@
                     [
                         "Key",
                         "HideInherited"
-                    ]
+                    ],
+                    "additionalProperties": false
                 }
             ]
         },
@@ -1124,7 +1313,8 @@
             {
                 "Variable":
                 {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The variable to perform a comparison on, defaulting to a property-ref."
                 },
                 "Operation":
                 {
@@ -1163,7 +1353,17 @@
                         "boolean",
                         "number",
                         "pattern"
-                    ]
+                    ],
+                    "description": "The value to compare Variable to."
+                },
+                "Inverted":
+                {
+                    "type":
+                    [
+                        "null",
+                        "boolean"
+                    ],
+                    "description": "Whether or not this condition should be inverted."
                 }
             },
             "required":
@@ -1171,7 +1371,8 @@
                 "Variable",
                 "Operation",
                 "Comparand"
-            ]
+            ],
+            "additionalProperties": false
         },
         "switch":
         {
@@ -1258,19 +1459,14 @@
                         },
                         "Value":
                         {
-                            "type":
-                            [
-                                "null",
-                                "string",
-                                "boolean",
-                                "number"
-                            ]
+                            "$ref": "#/$defs/datValue"
                         }
                     },
                     "required":
                     [
                         "Value"
-                    ]
+                    ],
+                    "additionalProperties": false
                 },
                 {
                     "properties":
@@ -1322,7 +1518,8 @@
                     "required":
                     [
                         "Cases"
-                    ]
+                    ],
+                    "additionalProperties": false
                 }
             ]
         }
@@ -1332,7 +1529,7 @@
         "Type":
         {
             "description": "Assembly-qualified name of the asset type.",
-            "type": "string"
+            "$ref": "#/$defs/fullyQualifiedType"
         },
         "Category":
         {
@@ -1393,6 +1590,11 @@
         {
             "description": "All property keys have the exact same name as their field/property name in code unless otherwise defined.",
             "type": "boolean"
+        },
+        "Version":
+        {
+            "description": "Unturned version when this option was added.",
+            "type": [ "string", "null" ]
         },
         "OverridableProperties":
         {
@@ -1470,8 +1672,25 @@
                         "description": "If 'Template', then this is a list of groups by name to match with other properties within the given template group.",
                         "items":
                         {
-                            "type": "string",
-                            "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                            "oneOf": [
+                                {
+                                    "type": "string",
+                                    "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "Name": {
+                                            "type": "string",
+                                            "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                                        },
+                                        "UseValueOf": {
+                                            "type": "string",
+                                            "description": "The name of a property with $n formatted for each template group (like $1 for group 1's value)."
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "InclusiveWith":
@@ -1520,25 +1739,31 @@
                     "Deprecated":
                     {
                         "description": "If this property shouldn't be used anymore or was left in for legacy features.",
-                        "oneOf":
+                        "anyOf":
                         [
                             {
                                 "$ref": "#/$defs/condition"
                             },
                             {
                                 "$ref": "#/$defs/switchCase"
+                            },
+                            {
+                                "$ref": "#/$defs/switch"
                             }
                         ]
                     },
                     "Required":
                     {
-                        "oneOf":
+                        "anyOf":
                         [
                             {
                                 "$ref": "#/$defs/condition"
                             },
                             {
                                 "$ref": "#/$defs/switchCase"
+                            },
+                            {
+                                "$ref": "#/$defs/switch"
                             }
                         ],
                         "description": "If the prefab is required to exist (or doesn't make sense to not exist)."
@@ -1583,13 +1808,16 @@
                                 },
                                 "Required":
                                 {
-                                    "oneOf":
+                                    "anyOf":
                                     [
                                         {
                                             "$ref": "#/$defs/condition"
                                         },
                                         {
                                             "$ref": "#/$defs/switchCase"
+                                        },
+                                        {
+                                            "$ref": "#/$defs/switch"
                                         }
                                     ],
                                     "description": "If the animation is required."
@@ -1656,8 +1884,25 @@
                                     "description": "If 'Template', then this is a list of groups by name to match with other properties within the given template group.",
                                     "items":
                                     {
-                                        "type": "string",
-                                        "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                                        "oneOf": [
+                                            {
+                                                "type": "string",
+                                                "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "Name": {
+                                                        "type": "string",
+                                                        "description": "Unique name of this group (amongst the this asset type's hierarchy)."
+                                                    },
+                                                    "UseValueOf": {
+                                                        "type": "string",
+                                                        "description": "The name of a property with $n formatted for each template group (like $1 for group 1's value)."
+                                                    }
+                                                }
+                                            }
+                                        ]
                                     }
                                 }
                             }
@@ -1678,7 +1923,7 @@
                     "Type":
                     {
                         "description": "Fully qualified type name.",
-                        "type": "string"
+                        "$ref": "#/$defs/fullyQualifiedType"
                     },
                     "DisplayName":
                     {
@@ -1814,6 +2059,11 @@
                     }
                 }
             }
+        },
+        "$schema":
+        {
+            "type": "string",
+            "description": "File schema."
         }
     },
     "required":
@@ -1821,5 +2071,6 @@
         "Type",
         "DisplayName",
         "Parent"
-    ]
+    ],
+    "additionalProperties": false
 }

@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/DanielWillett/unturned-asset-file-vscode/refs/heads/master/Asset%20Spec/Asset%20Spec%20Schema.json",
+    "$schema": "./Asset Spec Schema.json",
     "Type": "SDG.Unturned.SkinAsset, Assembly-CSharp",
     "DisplayName": "Skin",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
@@ -109,10 +109,13 @@
         },
         {
             "Key": "Secondary_*",
-            "Type": "Id",
+            "Type":
+            {
+                "Type": "Id",
+                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+            },
             "Template": true,
             "TemplateGroups": [ "skin-secondary" ],
-            "ElementType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
             "Required": true,
             "TemplateGroupUniqueValue": true,
             "DefaultValue": 0,

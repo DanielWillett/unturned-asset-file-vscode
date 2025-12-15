@@ -3,6 +3,8 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -12,7 +14,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <typeparam name="TValue">The CLR type to parse.</typeparam>
 /// <typeparam name="TSelf">The implementing type.</typeparam>
 public abstract class PrimitiveType<TValue, TSelf>
-    : BaseType<TValue, TSelf>
+    : BaseType<TValue, TSelf>, ITypeFactory
     where TValue : IEquatable<TValue>
     where TSelf : PrimitiveType<TValue, TSelf>, new()
 {
@@ -32,14 +34,21 @@ public abstract class PrimitiveType<TValue, TSelf>
 
 #pragma warning disable CS0659
 
-    protected override bool Equals(TSelf other)
+    /// <inheritdoc cref="IEquatable{T}"/>
+    protected override bool Equals(TSelf other) => true;
+
+    /// <inheritdoc cref="ITypeFactory.CreateType"/>
+    protected virtual IType CreateType(in JsonElement typeDefinition, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context) => this;
+
+    /// <inheritdoc />
+    public override void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
-        return true;
+        writer.WriteStringValue(Id);
     }
 
-    public override bool Equals(object? other)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
     {
-        return other is TSelf;
+        return CreateType(in typeDefinition, spec, owner, context);
     }
 
 #pragma warning restore CS0659

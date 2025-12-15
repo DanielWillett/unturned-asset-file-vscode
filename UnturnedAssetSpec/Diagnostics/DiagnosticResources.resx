@@ -217,10 +217,10 @@
     <value>Property "{0}" is deprecated.</value>
   </data>
   <data name="UNT2012_WithMessage" xml:space="preserve">
-    <value>Malformed format string: {0}. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method.</value>
+    <value>Malformed format string: {0} This could be caused by having too many formatting arguments. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method.</value>
   </data>
   <data name="UNT2012" xml:space="preserve">
-    <value>Malformed format string. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method.</value>
+    <value>Malformed format string. This could be caused by having too many formatting arguments. Read about format strings here: https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-string-format#get-started-with-the-stringformat-method.</value>
   </data>
   <data name="UNT102" xml:space="preserve">
     <value>This format string should include argument {{{0}}}.</value>
@@ -323,5 +323,14 @@
   </data>
   <data name="UNT2004_NoList" xml:space="preserve">
     <value>Property '{0}' expects a list.</value>
+  </data>
+  <data name="UNT2004_Regex" xml:space="preserve">
+    <value>Value '{0}' can not be converted to a regular expression.</value>
+  </data>
+  <data name="UNT1024_LessString" xml:space="preserve">
+    <value>Property "{0}" should must be at least {1} character(s) long.</value>
+  </data>
+  <data name="UNT1024_MoreString" xml:space="preserve">
+    <value>Property "{0}" should not be longer than {1} character(s).</value>
   </data>
 </root>

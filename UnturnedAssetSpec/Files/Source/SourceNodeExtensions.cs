@@ -20,7 +20,7 @@ public static class SourceNodeExtensions
         /// <summary>
         /// Try to get a property's value by name.
         /// </summary>
-        public bool TryGetPropertyValue(string propertyName, [MaybeNullWhen(false)] out IAnyValueSourceNode value)
+        public bool TryGetPropertyValue(string propertyName, [NotNullWhen(true)] out IAnyValueSourceNode? value)
         {
             if (!node.TryGetProperty(propertyName, out IPropertySourceNode? property) || !property.HasValue)
             {
@@ -35,7 +35,7 @@ public static class SourceNodeExtensions
         /// <summary>
         /// Try to get a property's string value by name.
         /// </summary>
-        public bool TryGetPropertyValue(string propertyName, [MaybeNullWhen(false)] out IValueSourceNode value)
+        public bool TryGetPropertyValue(string propertyName, [NotNullWhen(true)] out IValueSourceNode? value)
         {
             return node.TryGetPropertyValue(propertyName, out IAnyValueSourceNode? anyValue) & ((value = anyValue as IValueSourceNode) != null);
         }
@@ -43,7 +43,7 @@ public static class SourceNodeExtensions
         /// <summary>
         /// Try to get a property's dictionary value by name.
         /// </summary>
-        public bool TryGetPropertyValue(string propertyName, [MaybeNullWhen(false)] out IDictionarySourceNode value)
+        public bool TryGetPropertyValue(string propertyName, [NotNullWhen(true)] out IDictionarySourceNode? value)
         {
             return node.TryGetPropertyValue(propertyName, out IAnyValueSourceNode? anyValue) & ((value = anyValue as IDictionarySourceNode) != null);
         }
@@ -51,7 +51,7 @@ public static class SourceNodeExtensions
         /// <summary>
         /// Try to get a property's list value by name.
         /// </summary>
-        public bool TryGetPropertyValue(string propertyName, [MaybeNullWhen(false)] out IListSourceNode value)
+        public bool TryGetPropertyValue(string propertyName, [NotNullWhen(true)] out IListSourceNode? value)
         {
             return node.TryGetPropertyValue(propertyName, out IAnyValueSourceNode? anyValue) & ((value = anyValue as IListSourceNode) != null);
         }
@@ -60,7 +60,7 @@ public static class SourceNodeExtensions
         /// Try to get a property by it's key or alias.
         /// </summary>
         /// <remarks>Does not support template properties.</remarks>
-        public bool TryGetProperty(SpecProperty property, [MaybeNullWhen(false)] out IPropertySourceNode propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+        public bool TryGetProperty(SpecProperty property, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
         {
             if (property.IsTemplate || property.IsImport)
             {
@@ -91,7 +91,7 @@ public static class SourceNodeExtensions
         /// Gets a property of this asset from the root level of the asset data. This properly handles 'Metadata' properties.
         /// </summary>
         /// <remarks>Also will look for localization properties in the corresponding localization files, and vice versa with asset properties.</remarks>
-        public bool TryResolveProperty(SpecProperty property, [MaybeNullWhen(false)] out IPropertySourceNode propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+        public bool TryResolveProperty(SpecProperty property, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
         {
             if (node is ILocalizationSourceFile local && property.Context != SpecPropertyContext.Localization)
                 node = local.Asset;
@@ -216,7 +216,7 @@ public static class SourceNodeExtensions
         /// <summary>
         /// Attempts to add localization to the node later on. Used with the 
         /// </summary>
-        public bool TryAddLocalization(ImmutableArray<ILocalizationSourceFile> localization, [MaybeNullWhen(false)] out IAssetSourceFile sourceFile)
+        public bool TryAddLocalization(ImmutableArray<ILocalizationSourceFile> localization, [NotNullWhen(true)] out IAssetSourceFile? sourceFile)
         {
             if (root is not RootAssetNodeSkippedLocalization rootAssetNode)
             {

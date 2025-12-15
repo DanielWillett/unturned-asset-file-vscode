@@ -1,5 +1,8 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using System;
+using System.Text.RegularExpressions;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 // ReSharper disable InconsistentNaming
 
@@ -10,6 +13,13 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 /// </summary>
 public static class DiagnosticSinkExtensions
 {
+    // match any <[ ]br[ ][/][ ]>
+    private static readonly Regex AnyLineBreakTagsMatcher =
+        new Regex(@"\<\s*br\s*\/{0,1}\s*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    // match any <[ ]br[ ]/[ ]>
+    private static readonly Regex InvalidLineBreakTagsMatcher =
+        new Regex(@"\<\s*br\s*\/\s*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
     private static string NodePropertyName(ISourceNode node)
     {
         return node switch
@@ -30,6 +40,22 @@ public static class DiagnosticSinkExtensions
     
     extension(IDiagnosticSink diagnosticSink)
     {
+
+        /// <summary>
+        /// Reports a malformed format string. 
+        /// </summary>
+        public void UNT102<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            string formattingArg
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT102,
+                Message = string.Format(DiagnosticResources.UNT102, formattingArg),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
 
         /// <summary>
         /// Reports a value provided for a flag property. 
@@ -55,6 +81,25 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
+        /// Reports a warning when rich text is used in a string that doesn't support it. 
+        /// </summary>
+        public void CheckUNT1006<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            IValueSourceNode node
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            if (!KnownTypeValueHelper.ContainsRichText(node.Value))
+                return;
+
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1006,
+                Message = DiagnosticResources.UNT1006,
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
         /// Reports a related property missing for a property. 
         /// </summary>
         public void UNT1007<TDiagnosticProvider>(
@@ -68,6 +113,175 @@ public static class DiagnosticSinkExtensions
                 Message = string.Format(DiagnosticResources.UNT1007, NodePropertyName(node), requiredPropertyName),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
+        }
+
+        /// <summary>
+        /// Checks a node for unexpected new-line tags and reports them as warnings.
+        /// </summary>
+        public void CheckUNT1021<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            IValueSourceNode node
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            foreach (Match match in AnyLineBreakTagsMatcher.Matches(node.Value))
+            {
+                FileRange range = node.Range;
+                range.Start.Character += match.Index;
+                if (node.IsQuoted)
+                    ++range.Start.Character;
+                range.End.Character = range.Start.Character + (match.Length - 1);
+                diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+                {
+                    Diagnostic = DatDiagnostics.UNT1021,
+                    Message = DiagnosticResources.UNT1021,
+                    Range = range
+                });
+            }
+        }
+
+        /// <summary>
+        /// Checks a node for invalid new-line tags and reports them as warnings, as well as adding suggestions to replace \n and \r\n with &lt;br&gt;.
+        /// </summary>
+        internal void CheckUNT1022_UNT106<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            IValueSourceNode node
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            string str = node.Value;
+
+            int crlfInd = -1;
+            while (crlfInd + 1 < str.Length)
+            {
+                crlfInd = str.IndexOf('\n', crlfInd + 1);
+                if (crlfInd < 0)
+                    break;
+
+                int startIndex = crlfInd > 0 && str[crlfInd - 1] == '\r' ? crlfInd - 1 : crlfInd;
+                int len = crlfInd - startIndex + 1;
+
+                FileRange range = node.Range;
+                range.Start.Character += startIndex;
+                if (node.IsQuoted)
+                    ++range.Start.Character;
+                range.End.Character = range.Start.Character + (len - 1);
+                diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+                {
+                    Range = range,
+                    Diagnostic = DatDiagnostics.UNT106,
+                    Message = DiagnosticResources.UNT106
+                });
+            }
+
+            foreach (Match match in InvalidLineBreakTagsMatcher.Matches(str))
+            {
+                FileRange range = node.Range;
+                range.Start.Character += match.Index;
+                if (node.IsQuoted)
+                    ++range.Start.Character;
+                range.End.Character = range.Start.Character + (match.Length - 1);
+                diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+                {
+                    Range = range,
+                    Diagnostic = DatDiagnostics.UNT1022,
+                    Message = DiagnosticResources.UNT1022
+                });
+            }
+        }
+
+        /// <summary>
+        /// Reports a list or dictionary that has too few entries. 
+        /// </summary>
+        public void UNT1024_Less<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            IParentSourceNode parentNode, int minimum
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1024,
+                Message = string.Format(DiagnosticResources.UNT1024_Less, NodePropertyName(parentNode), minimum),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a list or dictionary that has too many entries. 
+        /// </summary>
+        public void UNT1024_More<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            IParentSourceNode parentNode, int maximum
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1024,
+                Message = string.Format(DiagnosticResources.UNT1024_More, NodePropertyName(parentNode), maximum),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a string that has too few characters. 
+        /// </summary>
+        public void UNT1024_LessString<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            IParentSourceNode parentNode, int minimum
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1024,
+                Message = string.Format(DiagnosticResources.UNT1024_LessString, NodePropertyName(parentNode), minimum),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a string that has too many characters. 
+        /// </summary>
+        public void UNT1024_MoreString<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            IParentSourceNode parentNode, int maximum
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1024,
+                Message = string.Format(DiagnosticResources.UNT1024_MoreString, NodePropertyName(parentNode), maximum),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Checks the length of a list or dictionary and emits any necessary diagnostics.
+        /// </summary>
+        public void CheckUNT1024<TDiagnosticProvider>(
+            int length,
+            ref TDiagnosticProvider provider,
+            IParentSourceNode parentNode,
+            int minCount, int maxCount
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            if (length < minCount)
+                diagnosticSink.UNT1024_Less(ref provider, parentNode, minCount);
+            else if (length < maxCount)
+                diagnosticSink.UNT1024_More(ref provider, parentNode, maxCount);
+        }
+
+        /// <summary>
+        /// Checks the length of a string and emits any necessary diagnostics.
+        /// </summary>
+        public void CheckUNT1024_String<TDiagnosticProvider>(
+            int length,
+            ref TDiagnosticProvider provider,
+            IParentSourceNode parentNode,
+            int minCount, int maxCount
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            if (length < minCount)
+                diagnosticSink.UNT1024_LessString(ref provider, parentNode, minCount);
+            else if (length < maxCount)
+                diagnosticSink.UNT1024_MoreString(ref provider, parentNode, maxCount);
         }
 
         /// <summary>
@@ -98,6 +312,35 @@ public static class DiagnosticSinkExtensions
             {
                 Diagnostic = DatDiagnostics.UNT2004,
                 Message = string.Format(DiagnosticResources.UNT2004, original, type.DisplayName),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a failed to parse RegEx message for a type. 
+        /// </summary>
+        public void UNT2004_Regex<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            Exception ex, string original
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            string fmt = string.Format(DiagnosticResources.UNT2004_Regex, original);
+            string message;
+            if (!string.IsNullOrEmpty(ex.Message))
+            {
+                message = ex.Message[^1] == '.'
+                    ? $"{fmt} {ex.Message}"
+                    : $"{fmt} {ex.Message}.";
+            }
+            else
+            {
+                message = fmt;
+            }
+
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2004,
+                Message = message,
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -273,33 +516,30 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a list or dictionary that has too few entries. 
+        /// Reports a malformed format string. 
         /// </summary>
-        public void UNT1024_Less<TDiagnosticProvider>(
+        public void UNT2012<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
-            IParentSourceNode parentNode, int minimum
+            string value,
+            FormatException ex
         ) where TDiagnosticProvider : struct, IDiagnosticProvider
         {
-            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            string? message;
+            if (!string.IsNullOrEmpty(ex.Message))
             {
-                Diagnostic = DatDiagnostics.UNT1024,
-                Message = string.Format(DiagnosticResources.UNT1024_Less, NodePropertyName(parentNode), minimum),
-                Range = provider.GetRangeAndRegisterDiagnostic()
-            });
-        }
+                message = ex.Message[^1] == '.'
+                    ? ex.Message
+                    : $"{ex.Message}.";
+            }
+            else
+            {
+                message = null;
+            }
 
-        /// <summary>
-        /// Reports a list or dictionary that has too many entries. 
-        /// </summary>
-        public void UNT1024_More<TDiagnosticProvider>(
-            ref TDiagnosticProvider provider,
-            IParentSourceNode parentNode, int maximum
-        ) where TDiagnosticProvider : struct, IDiagnosticProvider
-        {
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
-                Diagnostic = DatDiagnostics.UNT1024,
-                Message = string.Format(DiagnosticResources.UNT1024_More, NodePropertyName(parentNode), maximum),
+                Diagnostic = DatDiagnostics.UNT2012,
+                Message = message == null ? DiagnosticResources.UNT2012 : string.Format(DiagnosticResources.UNT2012_WithMessage, message),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
