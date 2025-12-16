@@ -502,6 +502,33 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reduce to string format..
+        /// </summary>
+        public static string UNT108 {
+            get {
+                return ResourceManager.GetString("UNT108", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The string format of bundle references is more concise and easy to read..
+        /// </summary>
+        public static string UNT108_CodeFix_Annotation_Description {
+            get {
+                return ResourceManager.GetString("UNT108_CodeFix_Annotation_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reduce to string format: &quot;{0}&quot;..
+        /// </summary>
+        public static string UNT108_CodeFix_Annotation_Label {
+            get {
+                return ResourceManager.GetString("UNT108_CodeFix_Annotation_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected &apos;}&apos; at end of dictionary..
         /// </summary>
         public static string UNT2001 {
@@ -543,6 +570,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         public static string UNT2004_BooleanSingleCharCapitalized {
             get {
                 return ResourceManager.GetString("UNT2004_BooleanSingleCharCapitalized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dictionary can not be converted to a value of type &apos;{0}&apos;, which expects bundle references in the format &quot;name:path&quot;. Property &apos;{1}&apos; expects a value..
+        /// </summary>
+        public static string UNT2004_BundleReferenceStringOnly {
+            get {
+                return ResourceManager.GetString("UNT2004_BundleReferenceStringOnly", resourceCulture);
             }
         }
         

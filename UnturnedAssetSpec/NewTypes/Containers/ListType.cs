@@ -75,7 +75,7 @@ public sealed class ListType : ITypeFactory
         }, subType);
     }
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
     {
         ElementTypeVisitor v;
         v.Result = null;

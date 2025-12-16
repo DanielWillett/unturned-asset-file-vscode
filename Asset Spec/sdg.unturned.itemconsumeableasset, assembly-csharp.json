@@ -11,8 +11,11 @@
     [
         {
             "Key": "ConsumeAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "DefaultValue": null,
             "Variable": "use",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",

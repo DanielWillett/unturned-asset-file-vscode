@@ -326,8 +326,11 @@
         },
         {
             "Key": "EquipAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "DefaultValue": null,
             "InclusiveWith":
             [
@@ -357,8 +360,11 @@
         },
         {
             "Key": "EquipablePrefab",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.GameObject, UnityEngine.CoreModule"
+            },
             "DefaultValue": null,
             "InclusiveWith":
             [

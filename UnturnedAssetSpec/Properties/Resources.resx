@@ -195,6 +195,9 @@
   <data name="Log_UnableToReadFile" xml:space="preserve">
     <value>Unable to read file "{0}" from any of the available sources.</value>
   </data>
+  <data name="Type_Name_AudioReference" xml:space="preserve">
+    <value>Audio Reference</value>
+  </data>
   <data name="Type_Name_Boolean" xml:space="preserve">
     <value>Boolean</value>
   </data>
@@ -203,6 +206,9 @@
   </data>
   <data name="Type_Name_Character" xml:space="preserve">
     <value>Character</value>
+  </data>
+  <data name="Type_Name_ContentReference" xml:space="preserve">
+    <value>Content Reference</value>
   </data>
   <data name="Type_Name_Flag" xml:space="preserve">
     <value>Flag</value>
@@ -231,11 +237,23 @@
   <data name="Type_Name_List_Generic" xml:space="preserve">
     <value>List of {0}</value>
   </data>
+  <data name="Type_Name_MasterBundleOrContentReference" xml:space="preserve">
+    <value>Masterbundle or Content Reference</value>
+  </data>
+  <data name="Type_Name_MasterBundleReference" xml:space="preserve">
+    <value>Masterbundle Reference</value>
+  </data>
+  <data name="Type_Name_MasterBundleReferenceString" xml:space="preserve">
+    <value>Masterbundle Reference (Legacy)</value>
+  </data>
   <data name="Type_Name_RegEx" xml:space="preserve">
     <value>Regular Expression (RegEx)</value>
   </data>
   <data name="Type_Name_String" xml:space="preserve">
     <value>Text</value>
+  </data>
+  <data name="Type_Name_TranslationReference" xml:space="preserve">
+    <value>Legacy Translation Token Reference</value>
   </data>
   <data name="Type_Name_UInt8" xml:space="preserve">
     <value>Unsigned 8-Bit Integer</value>

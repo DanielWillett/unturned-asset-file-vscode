@@ -235,7 +235,7 @@ partial class SpecificationFileReader
             if (clrType != null && typeof(ITypeFactory).IsAssignableFrom(clrType))
             {
                 ITypeFactory factory = (ITypeFactory?)Activator.CreateInstance(clrType, true)!;
-                IType newType = factory.CreateType(in root, this, owner, key);
+                IType newType = factory.CreateType(in root, type, this, owner, key);
                 return new PropertyTypeOrSwitch(newType);
             }
         }
@@ -243,7 +243,7 @@ partial class SpecificationFileReader
         if (CommonTypes.TypeFactories.TryGetValue(type, out Func<ITypeFactory>? factoryGetter))
         {
             ITypeFactory factory = factoryGetter();
-            IType newType = factory.CreateType(in root, this, owner, key);
+            IType newType = factory.CreateType(in root, type, this, owner, key);
             return new PropertyTypeOrSwitch(newType);
         }
 

@@ -416,8 +416,11 @@
         },
         {
             "Key": "IgnitionAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "DefaultValue": null,
             "Description": "Audio clip to play after entering the driver's seat.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#ignitionaudioclip-master-bundle-pointer",
@@ -425,8 +428,11 @@
         },
         {
             "Key": "HornAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "DefaultValue": null,
             "Description": "Audio clip to play when using the horn.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#hornaudioclip-master-bundle-pointer",

@@ -22,9 +22,12 @@
         },
         {
             "Key": "Carepackage_Prefab",
-            "Type": "MasterBundleReference",
+            "Type":
+            {
+                "Type": "MasterBundleReference",
+                "BaseType": "UnityEngine.GameObject, UnityEngine.CoreModule"
+            },
             "DefaultValue": "core.masterbundle:Level/Carepackage.prefab",
-            "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The game object that falls from the sky.",
             "Variable": "model",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/airdrop-asset.html#airdrop-assets"

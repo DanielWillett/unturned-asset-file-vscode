@@ -84,7 +84,7 @@ public sealed class RegexStringType : PrimitiveType<string, RegexStringType>, IT
         TypeParsers.String.WriteValueToJson(writer, value, valueType);
     }
 
-    protected override IType CreateType(in JsonElement typeDefinition, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    protected override IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
     {
         if (typeDefinition.ValueKind == JsonValueKind.String)
         {

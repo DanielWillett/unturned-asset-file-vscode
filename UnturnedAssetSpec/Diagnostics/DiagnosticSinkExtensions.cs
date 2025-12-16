@@ -2,7 +2,6 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Text.RegularExpressions;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 // ReSharper disable InconsistentNaming
 
@@ -42,7 +41,7 @@ public static class DiagnosticSinkExtensions
     {
 
         /// <summary>
-        /// Reports a malformed format string. 
+        /// Reports a format string that isn't using one or more of the arguments. 
         /// </summary>
         public void UNT102<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -53,6 +52,36 @@ public static class DiagnosticSinkExtensions
             {
                 Diagnostic = DatDiagnostics.UNT102,
                 Message = string.Format(DiagnosticResources.UNT102, formattingArg),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports the usage of a ContentReference when a MasterBundleReference could've been used instead. 
+        /// </summary>
+        public void UNT104<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT104,
+                Message = DiagnosticResources.UNT104,
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports the usage of an object for a bundle reference. 
+        /// </summary>
+        public void UNT108<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT108,
+                Message = DiagnosticResources.UNT108,
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -111,6 +140,21 @@ public static class DiagnosticSinkExtensions
             {
                 Diagnostic = DatDiagnostics.UNT1007,
                 Message = string.Format(DiagnosticResources.UNT1007, NodePropertyName(node), requiredPropertyName),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports an unsupported TranslationReference. 
+        /// </summary>
+        public void UNT1018<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1018,
+                Message = DiagnosticResources.UNT1018_TranslationReference,
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -514,6 +558,22 @@ public static class DiagnosticSinkExtensions
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
+
+        /// <summary>
+        /// Reports a dictionary value given for a BundleReference type that only supports string values.. 
+        /// </summary>
+        public void UNT2004_BundleReferenceStringOnly<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, IType type, IParentSourceNode parent
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2004,
+                Message = string.Format(DiagnosticResources.UNT2004_BundleReferenceStringOnly, type.DisplayName, NodePropertyName(parent)),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
 
         /// <summary>
         /// Reports a malformed format string. 

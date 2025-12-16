@@ -333,4 +333,16 @@
   <data name="UNT1024_MoreString" xml:space="preserve">
     <value>Property "{0}" should not be longer than {1} character(s).</value>
   </data>
+  <data name="UNT2004_BundleReferenceStringOnly" xml:space="preserve">
+    <value>Dictionary can not be converted to a value of type '{0}', which expects bundle references in the format "name:path". Property '{1}' expects a value.</value>
+  </data>
+  <data name="UNT108" xml:space="preserve">
+    <value>Reduce to string format.</value>
+  </data>
+  <data name="UNT108_CodeFix_Annotation_Label" xml:space="preserve">
+    <value>Reduce to string format: "{0}".</value>
+  </data>
+  <data name="UNT108_CodeFix_Annotation_Description" xml:space="preserve">
+    <value>The string format of bundle references is more concise and easy to read.</value>
+  </data>
 </root>

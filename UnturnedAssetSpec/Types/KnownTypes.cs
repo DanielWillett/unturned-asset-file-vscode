@@ -515,14 +515,14 @@ public static class KnownTypes
     public static ISpecPropertyType<GuidOrId> BackwardsCompatibleAssetReferenceString(IAssetSpecDatabase database, QualifiedType elementType, OneOrMore<string> specialTypes = default)
         => new BackwardsCompatibleAssetReferenceSpecPropertyType(database, elementType, false, specialTypes);
     public static ISpecPropertyType<BundleReference> MasterBundleReference(QualifiedType elementType)
-        => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.MasterBundleReference);
+        => new MasterBundleReferenceSpecPropertyType(elementType, BundleReferenceMode.MasterBundleReference);
     public static ISpecPropertyType<BundleReference> MasterBundleReferenceString(QualifiedType elementType)
-        => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.MasterBundleReferenceString);
+        => new MasterBundleReferenceSpecPropertyType(elementType, BundleReferenceMode.MasterBundleReferenceString);
     public static ISpecPropertyType<BundleReference> ContentReference(QualifiedType elementType)
-        => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.ContentReference);
+        => new MasterBundleReferenceSpecPropertyType(elementType, BundleReferenceMode.ContentReference);
     public static ISpecPropertyType<BundleReference> AudioReference => MasterBundleReferenceSpecPropertyType.AudioReference;
     public static ISpecPropertyType<BundleReference> MasterBundleOrContentReference(QualifiedType elementType)
-        => new MasterBundleReferenceSpecPropertyType(elementType, MasterBundleReferenceType.MasterBundleOrContentReference);
+        => new MasterBundleReferenceSpecPropertyType(elementType, BundleReferenceMode.MasterBundleOrContentReference);
 
     public static ISpecPropertyType<GuidOrId> GuidOrId(QualifiedType elementType, OneOrMore<string> specialTypes = default)
         => new GuidOrIdSpecPropertyType(elementType, specialTypes);

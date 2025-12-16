@@ -60,7 +60,7 @@ public static class CommonTypes
         knownTypes["BcAssetReferenceString"]            = () => StringType.Instance;    // todo
         knownTypes["ContentReference"]                  = () => StringType.Instance;    // todo
         knownTypes["AudioReference"]                    = () => StringType.Instance;    // todo
-        knownTypes["MasterBundleReference"]             = () => StringType.Instance;    // todo
+        knownTypes["MasterBundleReference"]             = () => BundleReferenceType.Factory;
         knownTypes["MasterBundleOrContentReference"]    = () => StringType.Instance;    // todo
         knownTypes["MasterBundleReferenceString"]       = () => StringType.Instance;    // todo
         knownTypes["TranslationReference"]              = () => StringType.Instance;    // todo

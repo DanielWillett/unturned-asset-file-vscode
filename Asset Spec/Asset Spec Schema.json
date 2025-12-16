@@ -276,6 +276,73 @@
                     "additionalProperties": false
                 },
                 {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "anyOf":
+                            [
+                                {
+                                    "const": "ContentReference",
+                                    "title": "A reference to a Unity object in the specified masterbundle. Exact same as MasterBundleReference."
+                                },
+                                {
+                                    "const": "AudioReference",
+                                    "title": "A reference to an AudioClip or OneShotAudioDefinition in the specified masterbundle using the same syntax as a MasterBundleReference."
+                                },
+                                {
+                                    "const": "MasterBundleReference",
+                                    "title": "A reference to a Unity object in the specified masterbundle."
+                                },
+                                {
+                                    "const": "MasterBundleOrContentReference",
+                                    "title": "A reference to a Unity object in the specified masterbundle, with either the MasterBundleReference or the ContentReference format. MasterBundleReference is preferred."
+                                },
+                                {
+                                    "const": "MasterBundleReferenceString",
+                                    "title": "A reference to a Unity object in the specified masterbundle, but the dictionary syntax isn't allowed."
+                                },
+                                {
+                                    "const": "TranslationReference",
+                                    "title": "No longer in the game, but used to be a reference to a localization token by namespace and token."
+                                }
+                            ]
+                        },
+                        "BaseType":
+                        {
+                            "anyOf":
+                            [
+                                {
+                                    "$ref": "#/$defs/fullyQualifiedType"
+                                },
+                                {
+                                    "$ref": "#/$defs/switch"
+                                }
+                            ],
+                            "description": "Any objects being referenced must have this type in their type hierarchy."
+                        },
+                        "BaseTypes":
+                        {
+                            "type": "array",
+                            "items": {
+                                "anyOf":
+                                [
+                                    {
+                                        "$ref": "#/$defs/fullyQualifiedType"
+                                    },
+                                    {
+                                        "$ref": "#/$defs/switch"
+                                    }
+                                ]
+                            },
+                            "description": "Any objects being referenced must have at least one of these types in their type hierarchy."
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
                     "const": "Flag",
                     "title": "A flag which does not have a value."
                 },
@@ -420,30 +487,6 @@
                     "title": "A hex color that follows the following format strictly: #ffffffff."
                 },
                 {
-                    "const": "ContentReference",
-                    "title": "A reference to a Unity object in the specified masterbundle. Exact same as MasterBundleReference."
-                },
-                {
-                    "const": "AudioReference",
-                    "title": "A reference to an AudioClip or OneShotAudioDefinition in the specified masterbundle using the same syntax as a MasterBundleReference."
-                },
-                {
-                    "const": "MasterBundleReference",
-                    "title": "A reference to a Unity object in the specified masterbundle."
-                },
-                {
-                    "const": "MasterBundleOrContentReference",
-                    "title": "A reference to a Unity object in the specified masterbundle, with either the MasterBundleReference or the ContentReference format. MasterBundleReference is preferred."
-                },
-                {
-                    "const": "MasterBundleReferenceString",
-                    "title": "A reference to a Unity object in the specified masterbundle, but the dictionary syntax isn't allowed."
-                },
-                {
-                    "const": "TranslationReference",
-                    "title": "No longer in the game, but used to be a reference to a localization token by namespace and token."
-                },
-                {
                     "const": "FaceIndex",
                     "title": "An index of a built-in face texture."
                 },
@@ -546,6 +589,30 @@
                 {
                     "const": "Dictionary",
                     "title": "A string dictionary of values."
+                },
+                {
+                    "const": "ContentReference",
+                    "title": "A reference to a Unity object in the specified masterbundle. Exact same as MasterBundleReference."
+                },
+                {
+                    "const": "AudioReference",
+                    "title": "A reference to an AudioClip or OneShotAudioDefinition in the specified masterbundle using the same syntax as a MasterBundleReference."
+                },
+                {
+                    "const": "MasterBundleReference",
+                    "title": "A reference to a Unity object in the specified masterbundle."
+                },
+                {
+                    "const": "MasterBundleOrContentReference",
+                    "title": "A reference to a Unity object in the specified masterbundle, with either the MasterBundleReference or the ContentReference format. MasterBundleReference is preferred."
+                },
+                {
+                    "const": "MasterBundleReferenceString",
+                    "title": "A reference to a Unity object in the specified masterbundle, but the dictionary syntax isn't allowed."
+                },
+                {
+                    "const": "TranslationReference",
+                    "title": "No longer in the game, but used to be a reference to a localization token by namespace and token."
                 },
                 {
                     "const": "MasterBundleName",

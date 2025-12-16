@@ -27,8 +27,11 @@
         },
         {
             "Key": "Ambient_Audio_Clip",
-            "Type": "MasterBundleReference",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReference",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "DefaultValue": null,
             "Description": "Audio clip to play globally. Volume matches intensity.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",

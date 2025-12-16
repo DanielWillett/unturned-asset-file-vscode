@@ -44,7 +44,7 @@ public interface ITypeFactory
     /// Resolves the type.
     /// </summary>
     /// <remarks>Some factories will just return themselves.</remarks>
-    IType CreateType(in JsonElement typeDefinition, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context = "");
+    IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context = "");
 }
 
 /// <summary>

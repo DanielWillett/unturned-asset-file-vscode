@@ -32,7 +32,7 @@
     <EmbeddedResource Include="../Asset Spec/**">
       <Link>%(RecursiveDir)/Asset Spec/%(Filename)%(Extension)</Link>
     </EmbeddedResource>
-    <EmbeddedResource Remove="../Asset Spec/asset-spec.g.bin"/>
+    <EmbeddedResource Remove="../Asset Spec/asset-spec.g.bin" />
   </ItemGroup>
 
 
@@ -52,11 +52,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Immutable" Version="1.7.1" Condition="'$(TargetFramework)' != 'net7.0'"/>
-    <PackageReference Include="System.Collections.Immutable" Version="7.0.0" Condition="'$(TargetFramework)' == 'net7.0'"/>
+    <PackageReference Include="System.Collections.Immutable" Version="1.7.1" Condition="'$(TargetFramework)' != 'net7.0'" />
+    <PackageReference Include="System.Collections.Immutable" Version="7.0.0" Condition="'$(TargetFramework)' == 'net7.0'" />
 
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0" Condition="'$(TargetFramework)' != 'net7.0'"/>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" Condition="'$(TargetFramework)' == 'net7.0'"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0" Condition="'$(TargetFramework)' != 'net7.0'" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" Condition="'$(TargetFramework)' == 'net7.0'" />
 
   </ItemGroup>
 

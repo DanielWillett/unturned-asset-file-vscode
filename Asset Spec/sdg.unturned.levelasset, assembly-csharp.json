@@ -31,8 +31,11 @@
         },
         {
             "Key": "Dropship",
-            "Type": "MasterBundleReference",
-            "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Type":
+            {
+                "Type": "MasterBundleReference",
+                "BaseType": "UnityEngine.GameObject, UnityEngine.CoreModule"
+            },
             "DefaultValue": "core.masterbundle:Level/Dropship.prefab",
             "Description": "The object to use for the airdrop plane.",
             "Variable": "dropshipPrefab",
@@ -106,8 +109,11 @@
         },
         {
             "Key": "Death_Music",
-            "Type": "MasterBundleReference",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReference",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "Description": "Audio clip played after death.",
             "DefaultValue": "core.masterbundle:Music/Death.mp3",
             "Variable": "DeathMusicRef",
@@ -180,8 +186,11 @@
         },
         {
             "Key": "CloudOverride_Prefab",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.GameObject, UnityEngine.CoreModule"
+            },
             "Description": "Prefab to instantiate and attach to lighting.",
             "DefaultValue": null,
             "Variable": "CloudOverridePrefab",
@@ -317,8 +326,11 @@
             [
                 {
                     "Key": "Loop",
-                    "Type": "MasterBundleReference",
-                    "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+                    "Type":
+                    {
+                        "Type": "MasterBundleReference",
+                        "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+                    },
                     "DefaultValue": null,
                     "Description": "Looping audio clip played until loading finishes.",
                     "Variable": "loopRef",
@@ -327,8 +339,11 @@
                 },
                 {
                     "Key": "Outro",
-                    "Type": "MasterBundleReference",
-                    "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+                    "Type":
+                    {
+                        "Type": "MasterBundleReference",
+                        "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+                    },
                     "DefaultValue": null,
                     "Description": "Audio clip played once loading finishes.",
                     "Variable": "outroRef",

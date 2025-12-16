@@ -384,8 +384,11 @@
             [
                 {
                     "Key": "Prefab",
-                    "Type": "MasterBundleReference",
-                    "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
+                    "Type":
+                    {
+                        "Type": "MasterBundleReference",
+                        "BaseType": "UnityEngine.GameObject, UnityEngine.CoreModule"
+                    },
                     "Description": "Game object with a particle system. 'PlayOnAwake' should be disabled. For effects tied to the view it may be helpful to change the culling mode to \"Always Simulate\".",
                     "DefaultValue": null,
                     "Variable": "prefab",

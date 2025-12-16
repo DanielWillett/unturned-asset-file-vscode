@@ -11,8 +11,11 @@
     [
         {
             "Key": "ConsumeAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "Description": "The sound played when this item is drank from.",
             "DefaultValue": null,
             "Variable": "use",

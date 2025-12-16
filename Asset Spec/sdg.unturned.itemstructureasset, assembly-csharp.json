@@ -19,8 +19,11 @@
         },
         {
             "Key": "PlacementPreviewPrefab",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.GameObject, UnityEngine.CoreModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.GameObject, UnityEngine.CoreModule"
+            },
             "DefaultValue": null,
             "Description": "Overrides the placement preview model spawned when this item is held.",
             "Variable": "placementPreviewRef",
@@ -29,8 +32,11 @@
         },
         {
             "Key": "PlacementAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "Description": "The sound played when this structure is placed.",
             "DefaultValue": null,
             "Variable": "use",

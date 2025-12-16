@@ -11,8 +11,11 @@
     [
         {
             "Key": "UseAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "Description": "The sound played when the item is used.",
             "DefaultValue": null,
             "Variable": "use",

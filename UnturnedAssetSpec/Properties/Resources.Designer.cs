@@ -295,6 +295,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Audio Reference.
+        /// </summary>
+        internal static string Type_Name_AudioReference {
+            get {
+                return ResourceManager.GetString("Type_Name_AudioReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Boolean.
         /// </summary>
         internal static string Type_Name_Boolean {
@@ -318,6 +327,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_Character {
             get {
                 return ResourceManager.GetString("Type_Name_Character", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Content Reference.
+        /// </summary>
+        internal static string Type_Name_ContentReference {
+            get {
+                return ResourceManager.GetString("Type_Name_ContentReference", resourceCulture);
             }
         }
         
@@ -403,6 +421,33 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Masterbundle or Content Reference.
+        /// </summary>
+        internal static string Type_Name_MasterBundleOrContentReference {
+            get {
+                return ResourceManager.GetString("Type_Name_MasterBundleOrContentReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Masterbundle Reference.
+        /// </summary>
+        internal static string Type_Name_MasterBundleReference {
+            get {
+                return ResourceManager.GetString("Type_Name_MasterBundleReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Masterbundle Reference (Legacy).
+        /// </summary>
+        internal static string Type_Name_MasterBundleReferenceString {
+            get {
+                return ResourceManager.GetString("Type_Name_MasterBundleReferenceString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Regular Expression (RegEx).
         /// </summary>
         internal static string Type_Name_RegEx {
@@ -417,6 +462,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_String {
             get {
                 return ResourceManager.GetString("Type_Name_String", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Legacy Translation Token Reference.
+        /// </summary>
+        internal static string Type_Name_TranslationReference {
+            get {
+                return ResourceManager.GetString("Type_Name_TranslationReference", resourceCulture);
             }
         }
         

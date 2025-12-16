@@ -11,8 +11,11 @@
     [
         {
             "Key": "ShootAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "Description": "The sound played when this gun is shot.",
             "DefaultValue": null,
             "Variable": "shoot",
@@ -21,8 +24,11 @@
         },
         {
             "Key": "ReloadAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "Description": "The sound played when this gun is reloaded.",
             "DefaultValue": null,
             "Variable": "reload",
@@ -31,8 +37,11 @@
         },
         {
             "Key": "HammerAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "Description": "The sound played when this gun is hammered.",
             "DefaultValue": null,
             "Variable": "hammer",
@@ -64,8 +73,11 @@
         },
         {
             "Key": "AimAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "Description": "The sound played when the player aims down sights.",
             "DefaultValue": null,
             "Variable": "aim",
@@ -74,8 +86,11 @@
         },
         {
             "Key": "MinigunAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "DefaultValue": null,
             "Variable": "minigun",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
@@ -90,8 +105,11 @@
         },
         {
             "Key": "ChamberJammedAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "DefaultValue": null,
             "Variable": "chamberJammedSound",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
@@ -100,8 +118,11 @@
         },
         {
             "Key": "FireDelayAudioClip",
-            "Type": "MasterBundleReferenceString",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleReferenceString",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "Description": "The sound played when the player revs this minigun.",
             "DefaultValue": null,
             "Variable": "fireDelaySound",

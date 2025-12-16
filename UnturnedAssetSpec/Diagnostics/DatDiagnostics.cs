@@ -53,6 +53,11 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT107 = new DatDiagnostic("UNT107", DatDiagnosticSeverity.Hint);
 
+    /// <summary>
+    /// Use string format instead of object format for a bundle references.
+    /// </summary>
+    public static readonly DatDiagnostic UNT108 = new DatDiagnostic("UNT108", DatDiagnosticSeverity.Hint);
+
     /* Warnings */
 
     /// <summary>
