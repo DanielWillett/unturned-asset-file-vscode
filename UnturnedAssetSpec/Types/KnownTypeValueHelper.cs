@@ -450,6 +450,21 @@ public static class KnownTypeValueHelper
         return true;
     }
 
+    internal static string ToComponentString(Vector2 v2)
+    {
+        return $"({v2.X.ToString(CultureInfo.InvariantCulture)}, {v2.Y.ToString(CultureInfo.InvariantCulture)})";
+    }
+
+    internal static string ToComponentString(Vector3 v3)
+    {
+        return $"({v3.X.ToString(CultureInfo.InvariantCulture)}, {v3.Y.ToString(CultureInfo.InvariantCulture)}, {v3.Z.ToString(CultureInfo.InvariantCulture)})";
+    }
+
+    internal static string ToComponentString(Vector4 v4)
+    {
+        return $"({v4.X.ToString(CultureInfo.InvariantCulture)}, {v4.Y.ToString(CultureInfo.InvariantCulture)}, {v4.Z.ToString(CultureInfo.InvariantCulture)}, {v4.W.ToString(CultureInfo.InvariantCulture)})";
+    }
+
     public static bool TryParseVector2Components(ReadOnlySpan<char> str, out Vector2 value)
     {
         // stolen from nelson

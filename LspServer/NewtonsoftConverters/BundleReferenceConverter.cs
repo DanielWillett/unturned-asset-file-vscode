@@ -20,12 +20,12 @@ public sealed class BundleReferenceConverter : JsonConverter<BundleReference>
                     throw new JsonException("Unable to parse a bundle reference from a string.");
                 }
 
-                return new BundleReference(name, path, BundleReferenceMode.Unspecified);
+                return new BundleReference(name, path, BundleReferenceKind.Unspecified);
 
             case JsonToken.StartObject:
 
                 string? valName = null, valPath = null;
-                BundleReferenceMode type = BundleReferenceMode.Unspecified;
+                BundleReferenceKind type = BundleReferenceKind.Unspecified;
 
                 while (reader.Read() && reader.TokenType != JsonToken.EndObject)
                 {
@@ -76,37 +76,37 @@ public sealed class BundleReferenceConverter : JsonConverter<BundleReference>
                     switch (propType)
                     {
                         case 0: // Name
-                            if (type is not BundleReferenceMode.Unspecified and not BundleReferenceMode.ContentReference)
-                                type = BundleReferenceMode.Unspecified;
+                            if (type is not BundleReferenceKind.Unspecified and not BundleReferenceKind.ContentReference)
+                                type = BundleReferenceKind.Unspecified;
                             else
-                                type = BundleReferenceMode.ContentReference;
+                                type = BundleReferenceKind.ContentReference;
 
                             valName = (string?)reader.Value;
                             break;
 
                         case 1: // Path
-                            if (type is not BundleReferenceMode.Unspecified and not BundleReferenceMode.ContentReference)
-                                type = BundleReferenceMode.Unspecified;
+                            if (type is not BundleReferenceKind.Unspecified and not BundleReferenceKind.ContentReference)
+                                type = BundleReferenceKind.Unspecified;
                             else
-                                type = BundleReferenceMode.ContentReference;
+                                type = BundleReferenceKind.ContentReference;
 
                             valPath = (string?)reader.Value;
                             break;
 
                         case 2: // MasterBundle
-                            if (type is not BundleReferenceMode.Unspecified and not BundleReferenceMode.MasterBundleReference)
-                                type = BundleReferenceMode.Unspecified;
+                            if (type is not BundleReferenceKind.Unspecified and not BundleReferenceKind.MasterBundleReference)
+                                type = BundleReferenceKind.Unspecified;
                             else
-                                type = BundleReferenceMode.MasterBundleReference;
+                                type = BundleReferenceKind.MasterBundleReference;
 
                             valName = (string?)reader.Value;
                             break;
 
                         case 3: // AssetPath
-                            if (type is not BundleReferenceMode.Unspecified and not BundleReferenceMode.MasterBundleReference)
-                                type = BundleReferenceMode.Unspecified;
+                            if (type is not BundleReferenceKind.Unspecified and not BundleReferenceKind.MasterBundleReference)
+                                type = BundleReferenceKind.Unspecified;
                             else
-                                type = BundleReferenceMode.MasterBundleReference;
+                                type = BundleReferenceKind.MasterBundleReference;
 
                             valPath = (string?)reader.Value;
                             break;

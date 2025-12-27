@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -92,6 +93,13 @@ public struct TypeConverterParseArgs<T> : IDiagnosticProvider where T : IEquatab
     /// </summary>
     public FileRange ValueRange;
 
+    /// <summary>
+    /// The property being parsed.
+    /// </summary>
+    public DatProperty? Property;
+
+    DatProperty? IDiagnosticProvider.Property => Property;
+
 
     [SetsRequiredMembers]
     public TypeConverterParseArgs(IType<T> type)
@@ -134,6 +142,12 @@ public struct TypeConverterParseArgs<T> : IDiagnosticProvider where T : IEquatab
 /// </summary>
 public struct TypeConverterFormatArgs
 {
+    /// <summary>
+    /// The default value for formatting a value.
+    /// </summary>
+    // ReSharper disable once UnassignedReadonlyField
+    public static readonly TypeConverterFormatArgs Default;
+
     /// <summary>
     /// Used to re-use ToString conversions between multiple calls to <see cref="ITypeConverter{T}.TryFormat"/>.
     /// </summary>

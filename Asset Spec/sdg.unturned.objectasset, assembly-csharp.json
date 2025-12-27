@@ -2252,7 +2252,12 @@
         },
         {
             "Key": "LOD_Center",
-            "Type": "LegacyPosition",
+            "Type":
+            {
+                "Type": "Vector3",
+                "Kind": "Position",
+                "Mode": "String, Legacy, Object"
+            },
             "DefaultValue": "(0,0,0)",
             "Description": "Position offset for the 'interior' area from the mesh bounds.",
             "Priority": 16,
@@ -2279,7 +2284,12 @@
         },
         {
             "Key": "LOD_Size",
-            "Type": "LegacyScale",
+            "Type":
+            {
+                "Type": "Vector3",
+                "Kind": "Scale",
+                "Mode": "String, Legacy, Object"
+            },
             "DefaultValue": "(0,0,0)",
             "Description": "Size offset for the 'interior' area from the mesh bounds.",
             "Priority": 16,
@@ -2681,7 +2691,8 @@
                         "Value": true
                     }
                 }
-            ]
+            ],
+            "Version": "3.25.10.0"
         },
         {
             "Key": "Armor_FalloffRange",
@@ -2716,7 +2727,8 @@
                         "Value": true
                     }
                 }
-            ]
+            ],
+            "Version": "3.25.10.0"
         },
         {
             "Key": "Armor_FalloffMultiplier",
@@ -2751,7 +2763,8 @@
                         "Value": true
                     }
                 }
-            ]
+            ],
+            "Version": "3.25.10.0"
         }
     ],
     "BundleAssets":

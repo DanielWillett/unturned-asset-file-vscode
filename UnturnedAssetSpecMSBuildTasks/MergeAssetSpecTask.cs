@@ -2,12 +2,12 @@
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Threading;
 
 namespace UnturnedAssetSpecMSBuildTasks;
 
@@ -24,6 +24,8 @@ public class MergeAssetSpecTask : Task
     
     [Required]
     public string[] Blacklist { get; set; }
+
+    public int MaxRetries { get; set; } = 10;
     
     [Output]
     public string MergedFile { get; set; }
@@ -75,100 +77,116 @@ public class MergeAssetSpecTask : Task
         // hdr x file: [fn size:1B][file name:UTF-8][offset:8B][size:8B][\n]
 
         byte[] buffer = new byte[Math.Max(2048, headerSize)];
-        int headerIndex = 17;
-        long totalFileSize;
-        fixed (byte* ptr = buffer)
+
+        long totalFileSize = 0;
+        for (int @try = 0; @try < MaxRetries; ++@try)
         {
-            using FileStream fs = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 8192, FileOptions.RandomAccess);
-
-            // version
-            // buffer[0] = 0;
-            // buffer[1] = 0;
-            // buffer[2] = 0;
-            // buffer[3] = 0;
-
-            *(int*)(ptr + 4) = maxFileNameSize;
-            *(int*)(ptr + 8) = allFiles.Count;
-            *(ptr + 16) = (byte)'\n';
-
-            for (int i = 0; i < fileInfo.Length; i++)
+            try
             {
-                ref AssetFileInfo info = ref fileInfo[i];
-                int lPos = headerIndex;
-                ++headerIndex;
-                fixed (char* fnPtr = info.FileName)
+                int headerIndex = 17;
+                fixed (byte* ptr = buffer)
                 {
-                    int sz = Encoding.UTF8.GetBytes(fnPtr, info.FileName.Length, ptr + headerIndex, headerSize - headerIndex);
-                    if (sz > byte.MaxValue)
+                    using FileStream fs = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 8192, FileOptions.RandomAccess);
+
+                    // version
+                    // buffer[0] = 0;
+                    // buffer[1] = 0;
+                    // buffer[2] = 0;
+                    // buffer[3] = 0;
+
+                    *(int*)(ptr + 4) = maxFileNameSize;
+                    *(int*)(ptr + 8) = allFiles.Count;
+                    *(ptr + 16) = (byte)'\n';
+
+                    for (int i = 0; i < fileInfo.Length; i++)
                     {
-                        Log.LogError("File name \"{0}\" is longer than 255 bytes.", info.FileName);
-                        return false;
+                        ref AssetFileInfo info = ref fileInfo[i];
+                        int lPos = headerIndex;
+                        ++headerIndex;
+                        fixed (char* fnPtr = info.FileName)
+                        {
+                            int sz = Encoding.UTF8.GetBytes(fnPtr, info.FileName.Length, ptr + headerIndex, headerSize - headerIndex);
+                            if (sz > byte.MaxValue)
+                            {
+                                Log.LogError("File name \"{0}\" is longer than 255 bytes.", info.FileName);
+                                return false;
+                            }
+
+                            headerIndex += sz;
+                            *(ptr + lPos) = (byte)sz;
+                        }
+
+                        info.DataPos = headerIndex;
+                        headerIndex += 16;
+                        *(ptr + headerIndex) = (byte)'\n';
+                        ++headerIndex;
                     }
 
-                    headerIndex += sz;
-                    *(ptr + lPos) = (byte)sz;
+                    *(int*)(ptr + 12) = headerIndex;
+
+                    fs.Write(buffer, 0, headerIndex);
+
+                    long offset = headerIndex;
+                    for (int i = 0; i < fileInfo.Length; i++)
+                    {
+                        ref AssetFileInfo info = ref fileInfo[i];
+
+                        using FileStream mergedFileStream = new FileStream(info.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 2048, FileOptions.SequentialScan);
+
+                        using (JsonDocument document = JsonDocument.Parse(mergedFileStream, new JsonDocumentOptions
+                        {
+                            MaxDepth = 16,
+                            AllowTrailingCommas = false,
+                            CommentHandling = JsonCommentHandling.Skip
+                        }))
+                        using (Utf8JsonWriter writer = new Utf8JsonWriter(fs, new JsonWriterOptions
+                        {
+                            Indented = false,
+                            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                            SkipValidation = true
+                        }))
+                        {
+                            document.WriteTo(writer);
+                            writer.Flush();
+
+                            info.Length = writer.BytesCommitted;
+                        }
+
+                        info.Offset = offset;
+                        offset += info.Length;
+                    }
+
+                    totalFileSize = offset;
+
+                    for (int i = 0; i < fileInfo.Length; i++)
+                    {
+                        ref AssetFileInfo info = ref fileInfo[i];
+                        fs.Seek(info.DataPos, SeekOrigin.Begin);
+                        *(long*)ptr = info.Offset;
+                        *(long*)(ptr + 8) = info.Length;
+                        fs.Write(buffer, 0, 16);
+                    }
+
+                    fs.Seek(0, SeekOrigin.End);
+                    fs.Dispose();
                 }
-
-                info.DataPos = headerIndex;
-                headerIndex += 16;
-                *(ptr + headerIndex) = (byte)'\n';
-                ++headerIndex;
             }
-
-            *(int*)(ptr + 12) = headerIndex;
-
-            fs.Write(buffer, 0, headerIndex);
-
-            long offset = headerIndex;
-            for (int i = 0; i < fileInfo.Length; i++)
+            catch (IOException ex)
             {
-                ref AssetFileInfo info = ref fileInfo[i];
-
-                using FileStream mergedFileStream = new FileStream(info.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 2048, FileOptions.SequentialScan);
-
-                using (JsonDocument document = JsonDocument.Parse(mergedFileStream, new JsonDocumentOptions
+                if (@try == MaxRetries - 1)
                 {
-                    MaxDepth = 16,
-                    AllowTrailingCommas = false,
-                    CommentHandling = JsonCommentHandling.Skip
-                }))
-                using (Utf8JsonWriter writer = new Utf8JsonWriter(fs, new JsonWriterOptions
-                {
-                    Indented = false,
-                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    SkipValidation = true
-                }))
-                {
-                    document.WriteTo(writer);
-                    writer.Flush();
-
-                    info.Length = writer.BytesCommitted;
+                    throw;
                 }
-
-                info.Offset = offset;
-                offset += info.Length;
+                TimeSpan delay = TimeSpan.FromSeconds(new Random().NextDouble() * 2 + 0.5);
+                Log.LogWarning("Failed to write file ({0})... retrying in {1:F1}s.", ex.Message, delay.TotalSeconds);
+                Thread.Sleep(delay);
             }
-
-            totalFileSize = offset;
-
-            for (int i = 0; i < fileInfo.Length; i++)
-            {
-                ref AssetFileInfo info = ref fileInfo[i];
-                fs.Seek(info.DataPos, SeekOrigin.Begin);
-                *(long*)ptr = info.Offset;
-                *(long*)(ptr + 8) = info.Length;
-                fs.Write(buffer, 0, 16);
-            }
-
-            fs.Seek(0, SeekOrigin.End);
-            fs.Dispose();
         }
 
-        // GitHub doesn't let you download files > 1MB from the API
+        // GitHub may not let you download files > 1MB from the API
         if (totalFileSize > 1_000_000)
         {
-            Log.LogError("Combined file size ({0} B) is too large. Whatever will we do.", totalFileSize.ToString("N"));
-            return false;
+            Log.LogWarning("Combined file size ({0} B) is over 1MB.", totalFileSize.ToString("N"));
         }
 
         OutputFile = outputFilePath;

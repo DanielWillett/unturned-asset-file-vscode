@@ -50,6 +50,7 @@
 
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.5" />
 
+    <ProjectReference Include="../DanielWillett.MathMatrix/DanielWillett.MathMatrix.csproj" />
     <ProjectReference Include="../UnturnedAssetSpec/UnturnedAssetSpec.csproj" />
   </ItemGroup>
 

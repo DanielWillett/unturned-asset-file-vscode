@@ -1,10 +1,9 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.NewTypes;
-using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 

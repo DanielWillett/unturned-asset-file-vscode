@@ -453,7 +453,8 @@
             "Except": [ -1 ],
             "Description": "Ranged damage (guns) from greater than this distance finishes decreasing toward falloff multiplier. -1 indicates that falloff should be ignored.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Variable": "ArmorFalloffMaxRange"
+            "Variable": "ArmorFalloffMaxRange",
+            "Version": "3.25.10.0"
         },
         {
             "Key": "Armor_FalloffRange",
@@ -464,7 +465,8 @@
             "Except": [ -1 ],
             "Description": "Ranged damage (guns) from greater than this distance begins decreasing toward falloff multiplier.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Variable": "ArmorFalloffRange"
+            "Variable": "ArmorFalloffRange",
+            "Version": "3.25.10.0"
         },
         {
             "Key": "Armor_FalloffMultiplier",
@@ -475,7 +477,8 @@
             "Except": [ -1 ],
             "Description": "Percentage of incoming damage to apply past @Armor_FalloffMaxRange.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Variable": "ArmorFalloffMultiplier"
+            "Variable": "ArmorFalloffMultiplier",
+            "Version": "3.25.10.0"
         }
     ],
     "Localization":

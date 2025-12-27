@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
@@ -44,9 +45,9 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
     /// The value node being parsed.
     /// </summary>
     public required IAnyValueSourceNode? ValueNode;
-    
+
     /// <summary>
-    /// The parent of the node being parsed.
+    /// The parent of the node being parsed. If the property doesn't exist this will be a dictionary and value will be null.
     /// </summary>
     public required IParentSourceNode ParentNode;
 
@@ -77,6 +78,13 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
     public LegacyExpansionFilter KeyFilter;
 
     /// <summary>
+    /// The property being read for.
+    /// </summary>
+    public DatProperty? Property;
+
+    DatProperty? IDiagnosticProvider.Property => Property;
+
+    /// <summary>
     /// Creates <see cref="TypeParserArgs{TElementType}"/> used to parse sub-values, such as the elements in a list.
     /// </summary>
     /// <typeparam name="TElementType"></typeparam>
@@ -99,6 +107,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         args.DiagnosticSink = DiagnosticSink;
         args.ReferencedPropertySink = ReferencedPropertySink;
         args.KeyFilter = filter;
+        args.Property = Property;
     }
 
     /// <summary>
@@ -113,6 +122,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         parseArgs.ShouldIgnoreFailureDiagnostic = false;
         parseArgs.ValueRange = ValueNode?.Range ?? ParentNode.Range;
         parseArgs.TextAsString = text;
+        parseArgs.Property = Property;
     }
 
     /// <summary>
@@ -127,6 +137,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         parseArgs.ShouldIgnoreFailureDiagnostic = false;
         parseArgs.ValueRange = ValueNode?.Range ?? ParentNode.Range;
         parseArgs.TextAsString = text;
+        parseArgs.Property = Property;
     }
 
     /// <summary>
@@ -142,6 +153,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         parseArgs.ShouldIgnoreFailureDiagnostic = false;
         parseArgs.ValueRange = ValueNode?.Range ?? ParentNode.Range;
         parseArgs.TextAsString = text;
+        parseArgs.Property = Property;
     }
 
     /// <summary>
@@ -157,6 +169,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         parseArgs.ShouldIgnoreFailureDiagnostic = false;
         parseArgs.ValueRange = ValueNode?.Range ?? ParentNode.Range;
         parseArgs.TextAsString = text;
+        parseArgs.Property = Property;
     }
 
     public FileRange GetRangeAndRegisterDiagnostic()

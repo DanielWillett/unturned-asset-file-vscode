@@ -48,17 +48,17 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 {
     public static readonly MasterBundleReferenceSpecPropertyType AudioReference = new MasterBundleReferenceSpecPropertyType(
         new QualifiedType("UnityEngine.AudioClip, UnityEngine.AudioModule"),
-        BundleReferenceMode.AudioReference
+        BundleReferenceKind.AudioReference
     );
 
     public static readonly MasterBundleReferenceSpecPropertyType TranslationReference = new MasterBundleReferenceSpecPropertyType(
         QualifiedType.None,
-        BundleReferenceMode.TranslationReference
+        BundleReferenceKind.TranslationReference
     );
 
     static MasterBundleReferenceSpecPropertyType() { }
 
-    public BundleReferenceMode ReferenceType { get; }
+    public BundleReferenceKind ReferenceType { get; }
 
     public QualifiedType ElementType { get; }
 
@@ -96,32 +96,32 @@ public sealed class MasterBundleReferenceSpecPropertyType :
         return 76 ^ HashCode.Combine(ReferenceType, ElementType);
     }
 
-    public MasterBundleReferenceSpecPropertyType(QualifiedType elementType, BundleReferenceMode referenceType)
+    public MasterBundleReferenceSpecPropertyType(QualifiedType elementType, BundleReferenceKind referenceType)
     {
         ReferenceType = referenceType;
         Type = referenceType switch
         {
-            BundleReferenceMode.AudioReference => "AudioReference",
-            BundleReferenceMode.ContentReference => "ContentReference",
-            BundleReferenceMode.MasterBundleReferenceString => "MasterBundleReferenceString",
-            BundleReferenceMode.MasterBundleOrContentReference => "MasterBundleOrContentReference",
-            BundleReferenceMode.TranslationReference => "TranslationReference",
+            BundleReferenceKind.AudioReference => "AudioReference",
+            BundleReferenceKind.ContentReference => "ContentReference",
+            BundleReferenceKind.MasterBundleReferenceString => "MasterBundleReferenceString",
+            BundleReferenceKind.MasterBundleOrContentReference => "MasterBundleOrContentReference",
+            BundleReferenceKind.TranslationReference => "TranslationReference",
             _ => "MasterBundleReference"
         };
 
         DisplayName = referenceType switch
         {
-            BundleReferenceMode.AudioReference => "Audio Reference",
-            BundleReferenceMode.ContentReference => "Content Reference",
-            BundleReferenceMode.MasterBundleReferenceString => "Masterbundle Reference (Legacy)",
-            BundleReferenceMode.MasterBundleOrContentReference => "Masterbundle or Content Reference",
-            BundleReferenceMode.TranslationReference => "Legacy Translation Token Reference",
+            BundleReferenceKind.AudioReference => "Audio Reference",
+            BundleReferenceKind.ContentReference => "Content Reference",
+            BundleReferenceKind.MasterBundleReferenceString => "Masterbundle Reference (Legacy)",
+            BundleReferenceKind.MasterBundleOrContentReference => "Masterbundle or Content Reference",
+            BundleReferenceKind.TranslationReference => "Legacy Translation Token Reference",
             _ => "Masterbundle Reference"
         };
 
         ElementType = elementType;
         
-        if (elementType.Type == null || referenceType is BundleReferenceMode.AudioReference or BundleReferenceMode.TranslationReference)
+        if (elementType.Type == null || referenceType is BundleReferenceKind.AudioReference or BundleReferenceKind.TranslationReference)
             return;
 
         DisplayName += $" to {QualifiedType.ExtractTypeName(elementType.Type.AsSpan()).ToString()}";
@@ -138,7 +138,7 @@ public sealed class MasterBundleReferenceSpecPropertyType :
         if (parse.Node is IValueSourceNode stringValue)
         {
             string? name, path;
-            if (ReferenceType == BundleReferenceMode.TranslationReference)
+            if (ReferenceType == BundleReferenceKind.TranslationReference)
             {
                 if (!KnownTypeValueHelper.TryParseTranslationReference(stringValue.Value, out name, out path))
                 {
@@ -169,16 +169,16 @@ public sealed class MasterBundleReferenceSpecPropertyType :
                 //}
             }
 
-            BundleReferenceMode rType = ReferenceType;
-            if (rType is BundleReferenceMode.MasterBundleReference or BundleReferenceMode.MasterBundleOrContentReference)
-                rType = BundleReferenceMode.MasterBundleReferenceString;
+            BundleReferenceKind rType = ReferenceType;
+            if (rType is BundleReferenceKind.MasterBundleReference or BundleReferenceKind.MasterBundleOrContentReference)
+                rType = BundleReferenceKind.MasterBundleReferenceString;
 
             value = new BundleReference(name, path, rType);
             return true;
         }
 
         // todo: AudioReference can also reference OneShotAudioDefs (*.asset)
-        if (ReferenceType == BundleReferenceMode.TranslationReference && parse.HasDiagnostics)
+        if (ReferenceType == BundleReferenceKind.TranslationReference && parse.HasDiagnostics)
         {
             parse.Log(new DatDiagnosticMessage
             {
@@ -189,19 +189,19 @@ public sealed class MasterBundleReferenceSpecPropertyType :
         }
 
         if (parse.Node is not IDictionarySourceNode dictionary
-            || ReferenceType is not BundleReferenceMode.MasterBundleReference and not BundleReferenceMode.ContentReference and not BundleReferenceMode.MasterBundleOrContentReference)
+            || ReferenceType is not BundleReferenceKind.MasterBundleReference and not BundleReferenceKind.ContentReference and not BundleReferenceKind.MasterBundleOrContentReference)
         {
             return FailedToParse(in parse, out value);
         }
 
-        if (ReferenceType != BundleReferenceMode.MasterBundleOrContentReference)
+        if (ReferenceType != BundleReferenceKind.MasterBundleOrContentReference)
             return TryParseReferenceType(dictionary, in parse, out value, ReferenceType);
 
         SpecPropertyTypeParseContext parseCtx = parse.WithoutDiagnostics();
 
-        bool masterBundleRef = TryParseReferenceType(dictionary, in parse, out BundleReference masterBundleReference, BundleReferenceMode.MasterBundleReference);
+        bool masterBundleRef = TryParseReferenceType(dictionary, in parse, out BundleReference masterBundleReference, BundleReferenceKind.MasterBundleReference);
 
-        if (!TryParseReferenceType(dictionary, in parseCtx, out value, BundleReferenceMode.ContentReference))
+        if (!TryParseReferenceType(dictionary, in parseCtx, out value, BundleReferenceKind.ContentReference))
         {
             value = masterBundleReference;
             return masterBundleRef;
@@ -223,10 +223,10 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 
     }
 
-    private bool TryParseReferenceType(IDictionarySourceNode dictionary, in SpecPropertyTypeParseContext parse, out BundleReference value, BundleReferenceMode rType)
+    private bool TryParseReferenceType(IDictionarySourceNode dictionary, in SpecPropertyTypeParseContext parse, out BundleReference value, BundleReferenceKind rType)
     {
-        string nameProperty = ReferenceType == BundleReferenceMode.ContentReference ? "Name" : "MasterBundle";
-        string pathProperty = ReferenceType == BundleReferenceMode.ContentReference ? "Path" : "AssetPath";
+        string nameProperty = ReferenceType == BundleReferenceKind.ContentReference ? "Name" : "MasterBundle";
+        string pathProperty = ReferenceType == BundleReferenceKind.ContentReference ? "Path" : "AssetPath";
 
         dictionary.TryGetPropertyValue(nameProperty, out IValueSourceNode? nameNode);
 
@@ -251,7 +251,7 @@ public sealed class MasterBundleReferenceSpecPropertyType :
 /// <summary>
 /// Various different variations of a masterbundle name and path structure.
 /// </summary>
-public enum BundleReferenceMode
+public enum BundleReferenceKind
 {
     Unspecified,
 

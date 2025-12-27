@@ -210,7 +210,11 @@
         },
         {
             "Key": "AimAlignment_LocalOffset",
-            "Type": "Position",
+            "Type":
+            {
+                "Type": "Vector3",
+                "Kind": "Position"
+            },
             "DefaultValue": "(0, 0, 0)",
             "Description": "Position offset relative to the 'Aim' transform or the transform specified by @AimAlignment_Path.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#aimalignment-localoffset-vector3-0-0-0",

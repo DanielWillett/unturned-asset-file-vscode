@@ -123,6 +123,19 @@ public static class TypeConverters
         return TypeConverterCache<T>.Converter;
     }
 
+    /// <summary>
+    /// Checks whether or not <typeparamref name="TTo"/> can be converted as a number.
+    /// </summary>
+    /// <remarks>This includes all floating point types, all integer types including native integers, <see cref="bool"/>, <see cref="char"/>, and <see cref="GuidOrId"/>.</remarks>
+    public static bool IsNumericConvertible<TTo>() where TTo : IEquatable<TTo>
+    {
+        return typeof(TTo) == typeof(float) || typeof(TTo) == typeof(double) || typeof(TTo) == typeof(decimal)
+               || typeof(TTo) == typeof(bool) || typeof(TTo) == typeof(char)
+               || typeof(TTo) == typeof(sbyte) || typeof(TTo) == typeof(short) || typeof(TTo) == typeof(int) || typeof(TTo) == typeof(long) || typeof(TTo) == typeof(nint)
+               || typeof(TTo) == typeof(byte) || typeof(TTo) == typeof(ushort) || typeof(TTo) == typeof(uint) || typeof(TTo) == typeof(ulong) || typeof(TTo) == typeof(nuint)
+               || typeof(TTo) == typeof(GuidOrId);
+    }
+
     private static class TypeConverterCache<T> where T : IEquatable<T>
     {
         public static readonly ITypeConverter<T>? Converter;

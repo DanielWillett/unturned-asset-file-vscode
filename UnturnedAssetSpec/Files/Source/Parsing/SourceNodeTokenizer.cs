@@ -259,7 +259,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 #if NET7_0_OR_GREATER
         ReadOnlySpan<char> ends = [ '\r', '\n' ];
 #else
-        ReadOnlySpan<char> ends = stackalloc[] { '\r', '\n' };
+        ReadOnlySpan<char> ends = stackalloc char[] { '\r', '\n' };
 #endif
 
         int allCommentLength = _file.Slice(_index).IndexOfAny(ends);
@@ -312,7 +312,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 #if NET7_0_OR_GREATER
         ReadOnlySpan<char> ends = [ '\r', '\n' ];
 #else
-        ReadOnlySpan<char> ends = stackalloc[] { '\r', '\n' };
+        ReadOnlySpan<char> ends = stackalloc char[] { '\r', '\n' };
 #endif
 
         int allCommentLength = _file.Slice(_index).IndexOfAny(ends);
@@ -1150,7 +1150,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 #if NET7_0_OR_GREATER
         ReadOnlySpan<char> stops = [ '"', '\r', '\n', '\\' ];
 #else
-        ReadOnlySpan<char> stops = stackalloc[] { '"', '\r', '\n', '\\' };
+        ReadOnlySpan<char> stops = stackalloc char[] { '"', '\r', '\n', '\\' };
 #endif
 
         ReadOnlySpan<char> str = _file.Slice(firstChar);
@@ -1265,7 +1265,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 #if NET7_0_OR_GREATER
         ReadOnlySpan<char> stops = [ '"', '\r', '\n', '\\' ];
 #else
-        ReadOnlySpan<char> stops = stackalloc[] { '"', '\r', '\n', '\\' };
+        ReadOnlySpan<char> stops = stackalloc char[] { '"', '\r', '\n', '\\' };
 #endif
 
         ReadOnlySpan<char> str = _file.Slice(firstChar);
@@ -1461,7 +1461,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 #if NET7_0_OR_GREATER
         ReadOnlySpan<char> tokens = [ '\r', '\n', '[', ']', '{', '}' ];
 #else
-        ReadOnlySpan<char> tokens = stackalloc[] { '\r', '\n', '[', ']', '{', '}' };
+        ReadOnlySpan<char> tokens = stackalloc char[] { '\r', '\n', '[', ']', '{', '}' };
 #endif
 
         int index = _index + 1;

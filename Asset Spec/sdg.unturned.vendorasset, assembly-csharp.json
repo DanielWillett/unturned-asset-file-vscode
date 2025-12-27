@@ -161,26 +161,30 @@
                 {
                     "Key": "ID",
                     "Type":
-                    {
-                        "Type": "GuidOrId",
-                        "AssetType":
-                        [
+                    [
+                        {
+                            "And":
+                            [
+                                {
+                                    "Variable": "Type",
+                                    "Operation": "eq",
+                                    "Comparand": "Vehicle"
+                                }
+                            ],
+                            "Value":
                             {
-                                "And":
-                                [
-                                    {
-                                        "Variable": "Type",
-                                        "Operation": "eq",
-                                        "Comparand": "Vehicle"
-                                    }
-                                ],
-                                "Value": "SDG.Unturned.VehicleAsset, Assembly-CSharp"
-                            },
-                            {
-                                "Value": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                                "Type": "GuidOrId",
+                                "AssetType": "SDG.Unturned.VehicleAsset, Assembly-CSharp"
                             }
-                        ]
-                    },
+                        },
+                        {
+                            "Value":
+                            {
+                                "Type": "GuidOrId",
+                                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                            }
+                        }
+                    ],
                     "Description":
                     [
                         {

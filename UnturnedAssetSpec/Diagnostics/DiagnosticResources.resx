@@ -345,4 +345,7 @@
   <data name="UNT108_CodeFix_Annotation_Description" xml:space="preserve">
     <value>The string format of bundle references is more concise and easy to read.</value>
   </data>
+  <data name="UNT1007_Modern" xml:space="preserve">
+    <value>Property '{0}' requires a value for '{1}'.</value>
+  </data>
 </root>

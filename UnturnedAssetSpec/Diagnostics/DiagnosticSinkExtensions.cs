@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Text.RegularExpressions;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 // ReSharper disable InconsistentNaming
 
@@ -19,8 +20,13 @@ public static class DiagnosticSinkExtensions
     private static readonly Regex InvalidLineBreakTagsMatcher =
         new Regex(@"\<\s*br\s*\/\s*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    private static string NodePropertyName(ISourceNode node)
+    private static string NodePropertyName<TDiagnosticProvider>(ISourceNode node, ref TDiagnosticProvider provider) where TDiagnosticProvider : struct, IDiagnosticProvider
     {
+        if (node is IDictionarySourceNode { IsRootNode: true })
+        {
+            return provider.Property?.Key ?? "?";
+        }
+
         return node switch
         {
             IPropertySourceNode property
@@ -96,9 +102,9 @@ public static class DiagnosticSinkExtensions
         {
             string message = node switch
             {
-                IValueSourceNode v => string.Format(DiagnosticResources.UNT1003_Value, NodePropertyName(node), v.Value),
-                IListSourceNode    => string.Format(DiagnosticResources.UNT1003_List, NodePropertyName(node)),
-                _                  => string.Format(DiagnosticResources.UNT1003_Dictionary, NodePropertyName(node))
+                IValueSourceNode v => string.Format(DiagnosticResources.UNT1003_Value, NodePropertyName(node, ref provider), v.Value),
+                IListSourceNode    => string.Format(DiagnosticResources.UNT1003_List, NodePropertyName(node, ref provider)),
+                _                  => string.Format(DiagnosticResources.UNT1003_Dictionary, NodePropertyName(node, ref provider))
             };
 
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
@@ -139,7 +145,23 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT1007,
-                Message = string.Format(DiagnosticResources.UNT1007, NodePropertyName(node), requiredPropertyName),
+                Message = string.Format(DiagnosticResources.UNT1007, NodePropertyName(node, ref provider), requiredPropertyName),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a related property missing in a dictionary. 
+        /// </summary>
+        public void UNT1007_Modern<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            IDictionarySourceNode dictionary, string requiredPropertyName
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1007,
+                Message = string.Format(DiagnosticResources.UNT1007_Modern, NodePropertyName(dictionary, ref provider), requiredPropertyName),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -243,7 +265,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT1024,
-                Message = string.Format(DiagnosticResources.UNT1024_Less, NodePropertyName(parentNode), minimum),
+                Message = string.Format(DiagnosticResources.UNT1024_Less, NodePropertyName(parentNode, ref provider), minimum),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -259,7 +281,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT1024,
-                Message = string.Format(DiagnosticResources.UNT1024_More, NodePropertyName(parentNode), maximum),
+                Message = string.Format(DiagnosticResources.UNT1024_More, NodePropertyName(parentNode, ref provider), maximum),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -275,7 +297,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT1024,
-                Message = string.Format(DiagnosticResources.UNT1024_LessString, NodePropertyName(parentNode), minimum),
+                Message = string.Format(DiagnosticResources.UNT1024_LessString, NodePropertyName(parentNode, ref provider), minimum),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -291,7 +313,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT1024,
-                Message = string.Format(DiagnosticResources.UNT1024_MoreString, NodePropertyName(parentNode), maximum),
+                Message = string.Format(DiagnosticResources.UNT1024_MoreString, NodePropertyName(parentNode, ref provider), maximum),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -339,7 +361,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2003,
-                Message = string.Format(DiagnosticResources.UNT2003, NodePropertyName(node), node.Value),
+                Message = string.Format(DiagnosticResources.UNT2003, NodePropertyName(node, ref provider), node.Value),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -426,7 +448,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2004,
-                Message = string.Format(DiagnosticResources.UNT2004_ValueInsteadOfList, value.Value, type.DisplayName, NodePropertyName(value)),
+                Message = string.Format(DiagnosticResources.UNT2004_ValueInsteadOfList, value.Value, type.DisplayName, NodePropertyName(value, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -442,7 +464,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2004,
-                Message = string.Format(DiagnosticResources.UNT2004_ValueInsteadOfDictionary, value.Value, type.DisplayName, NodePropertyName(value)),
+                Message = string.Format(DiagnosticResources.UNT2004_ValueInsteadOfDictionary, value.Value, type.DisplayName, NodePropertyName(value, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -458,7 +480,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2004,
-                Message = string.Format(DiagnosticResources.UNT2004_ListInsteadOfValue, type.DisplayName, NodePropertyName(value)),
+                Message = string.Format(DiagnosticResources.UNT2004_ListInsteadOfValue, type.DisplayName, NodePropertyName(value, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -474,7 +496,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2004,
-                Message = string.Format(DiagnosticResources.UNT2004_DictionaryInsteadOfValue, type.DisplayName, NodePropertyName(value)),
+                Message = string.Format(DiagnosticResources.UNT2004_DictionaryInsteadOfValue, type.DisplayName, NodePropertyName(value, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -490,7 +512,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2004,
-                Message = string.Format(DiagnosticResources.UNT2004_ListInsteadOfDictionary, type.DisplayName, NodePropertyName(value)),
+                Message = string.Format(DiagnosticResources.UNT2004_ListInsteadOfDictionary, type.DisplayName, NodePropertyName(value, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -506,7 +528,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2004,
-                Message = string.Format(DiagnosticResources.UNT2004_DictionaryInsteadOfList, type.DisplayName, NodePropertyName(value)),
+                Message = string.Format(DiagnosticResources.UNT2004_DictionaryInsteadOfList, type.DisplayName, NodePropertyName(value, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -522,7 +544,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2004,
-                Message = string.Format(DiagnosticResources.UNT2004_NoValue, NodePropertyName(parentNode)),
+                Message = string.Format(DiagnosticResources.UNT2004_NoValue, NodePropertyName(parentNode, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -538,7 +560,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2004,
-                Message = string.Format(DiagnosticResources.UNT2004_NoList, NodePropertyName(parentNode)),
+                Message = string.Format(DiagnosticResources.UNT2004_NoList, NodePropertyName(parentNode, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -554,7 +576,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2004,
-                Message = string.Format(DiagnosticResources.UNT2004_NoDictionary, NodePropertyName(parentNode)),
+                Message = string.Format(DiagnosticResources.UNT2004_NoDictionary, NodePropertyName(parentNode, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -569,7 +591,7 @@ public static class DiagnosticSinkExtensions
             diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Diagnostic = DatDiagnostics.UNT2004,
-                Message = string.Format(DiagnosticResources.UNT2004_BundleReferenceStringOnly, type.DisplayName, NodePropertyName(parent)),
+                Message = string.Format(DiagnosticResources.UNT2004_BundleReferenceStringOnly, type.DisplayName, NodePropertyName(parent, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -608,5 +630,6 @@ public static class DiagnosticSinkExtensions
 
 public interface IDiagnosticProvider
 {
+    DatProperty? Property { get; }
     FileRange GetRangeAndRegisterDiagnostic();
 }

@@ -818,7 +818,13 @@
         },
         {
             "Key": "Explosion_Min_Force",
-            "Type": "ScaleOrLegacy",
+            "Type":
+            {
+                "Type": "Vector3",
+                "Kind": "Scale",
+                "Mode": "String, Legacy, Object"
+            },
+            "Maximum": "@Explosion_Max_Force",
             "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) 0,1,0)",
             "Description": "Minimum amount of force applied to this vehicle when it explodes.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-min-force-vector3-0-1024-0",
@@ -826,7 +832,13 @@
         },
         {
             "Key": "Explosion_Max_Force",
-            "Type": "ScaleOrLegacy",
+            "Type":
+            {
+                "Type": "Vector3",
+                "Kind": "Scale",
+                "Mode": "String, Legacy, Object"
+            },
+            "Minimum": "@Explosion_Min_Force",
             "DefaultValue": "=MUL(=MUL(1024 @Explosion_Force_Multiplier) 0,1,0)",
             "Description": "Maximum amount of force applied to this vehicle when it explodes.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-max-force-vector3-0-1024-0",
@@ -1442,7 +1454,12 @@
         },
         {
             "Key": "Center_Of_Mass",
-            "Type": "PositionOrLegacy",
+            "Type":
+            {
+                "Type": "Vector3",
+                "Kind": "Position",
+                "Mode": "String, Legacy, Object"
+            },
             "DefaultValue": "(0,0,0)",
             "Description": "Overrides this vehicle's center of mass.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#center-of-mass-vector3",
@@ -1897,7 +1914,8 @@
             "Except": [ -1 ],
             "Description": "Ranged damage (guns) from greater than this distance finishes decreasing toward falloff multiplier. -1 indicates that falloff should be ignored.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Variable": "ArmorFalloffMaxRange"
+            "Variable": "ArmorFalloffMaxRange",
+            "Version": "3.25.10.0"
         },
         {
             "Key": "Armor_FalloffRange",
@@ -1908,7 +1926,8 @@
             "Except": [ -1 ],
             "Description": "Ranged damage (guns) from greater than this distance begins decreasing toward falloff multiplier.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Variable": "ArmorFalloffRange"
+            "Variable": "ArmorFalloffRange",
+            "Version": "3.25.10.0"
         },
         {
             "Key": "Armor_FalloffMultiplier",
@@ -1919,7 +1938,8 @@
             "Except": [ -1 ],
             "Description": "Percentage of incoming damage to apply past @Armor_FalloffMaxRange.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Variable": "ArmorFalloffMultiplier"
+            "Variable": "ArmorFalloffMultiplier",
+            "Version": "3.25.10.0"
         }
     ],
     "Types":

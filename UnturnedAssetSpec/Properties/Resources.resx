@@ -126,11 +126,29 @@
   <data name="ArgumentException_CompositeFlagValue" xml:space="preserve">
     <value>Value list can not contain a value made up of other values.</value>
   </data>
+  <data name="FormatException_Expression_ExpectedFunctionName" xml:space="preserve">
+    <value>Expected function name at beginning of expression.</value>
+  </data>
+  <data name="FormatException_Expression_ExpectedFunctionStart" xml:space="preserve">
+    <value>Expected end of expression or open parenthesis after function name.</value>
+  </data>
+  <data name="FormatException_Expression_ExpectedNextArgument" xml:space="preserve">
+    <value>Expected end of expression or next argument after parameter closing.</value>
+  </data>
+  <data name="FormatException_Expression_ExpectedParenthesizedValueEnd" xml:space="preserve">
+    <value>Expected closing parenthesis at end of value.</value>
+  </data>
+  <data name="FormatException_Expression_MissingEndingParenthesis" xml:space="preserve">
+    <value>Parameter list not closed, expected ')'.</value>
+  </data>
   <data name="FormatException_IPv4Format_FailedToParse" xml:space="preserve">
     <value>Failed to parse IPv4Filter, expected a value in the format: "0.0.0.0[/0][:0[-0]]".</value>
   </data>
   <data name="InvalidOperationException_InvalidCountType" xml:space="preserve">
     <value>Invalid count type: '{0}'. Expected an integer type.</value>
+  </data>
+  <data name="InvalidOperationException_InvalidVectorType" xml:space="preserve">
+    <value>Invalid vector type: '{0}'. Annotate the type with a {1} to define a vector provider.</value>
   </data>
   <data name="JsonException_EnumMissingValue" xml:space="preserve">
     <value>Enum value "{0}" didn't define a value string.</value>
@@ -266,5 +284,26 @@
   </data>
   <data name="Type_Name_UInt64" xml:space="preserve">
     <value>Unsigned 64-Bit Integer</value>
+  </data>
+  <data name="Type_Name_Vector2_Unspecified" xml:space="preserve">
+    <value>2D Vector</value>
+  </data>
+  <data name="Type_Name_Vector3_Position" xml:space="preserve">
+    <value>3D Position</value>
+  </data>
+  <data name="Type_Name_Vector3_Rotation" xml:space="preserve">
+    <value>3D Euler Rotation</value>
+  </data>
+  <data name="Type_Name_Vector3_Scale" xml:space="preserve">
+    <value>3D Scale</value>
+  </data>
+  <data name="Type_Name_Vector3_Unspecified" xml:space="preserve">
+    <value>3D Vector</value>
+  </data>
+  <data name="Type_Name_Vector4_Quaternion" xml:space="preserve">
+    <value>Quaternion</value>
+  </data>
+  <data name="Type_Name_Vector4_Unspecified" xml:space="preserve">
+    <value>4D Vector</value>
   </data>
 </root>

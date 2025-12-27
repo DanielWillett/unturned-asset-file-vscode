@@ -160,6 +160,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; requires a value for &apos;{1}&apos;..
+        /// </summary>
+        public static string UNT1007_Modern {
+            get {
+                return ResourceManager.GetString("UNT1007_Modern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There is not a face with this index, valid indexes include 0 through {0}..
         /// </summary>
         public static string UNT1008_Beard {

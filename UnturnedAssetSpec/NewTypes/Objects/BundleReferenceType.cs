@@ -1,6 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.NewTypes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -54,9 +53,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </summary>
 public sealed class BundleReferenceType : BaseType<BundleReference, BundleReferenceType>, ITypeParser<BundleReference>, ITypeFactory
 {
-    private static readonly BundleReferenceType?[] DefaultInstances = new BundleReferenceType?[(int)BundleReferenceMode.TranslationReference];
+    private static readonly BundleReferenceType?[] DefaultInstances = new BundleReferenceType?[(int)BundleReferenceKind.TranslationReference];
 
-    private static BundleReferenceType GetInstance(BundleReferenceMode mode)
+    private static BundleReferenceType GetInstance(BundleReferenceKind mode)
     {
         ref BundleReferenceType? t = ref DefaultInstances[(int)mode - 1];
         BundleReferenceType? r = t;
@@ -79,7 +78,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
     ];
 
     /// <summary>
-    /// Type IDs of this type indexed by <see cref="BundleReferenceMode"/>.
+    /// Type IDs of this type indexed by <see cref="BundleReferenceKind"/>.
     /// </summary>
     public static readonly ImmutableArray<string> TypeIds = ImmutableArray.Create<string>
     (
@@ -92,35 +91,35 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
         "TranslationReference"
     );
 
-    public static ITypeFactory Factory => GetInstance(BundleReferenceMode.MasterBundleReference);
+    public static ITypeFactory Factory => GetInstance(BundleReferenceKind.MasterBundleReference);
 
     private readonly OneOrMore<QualifiedType> _baseTypes;
 
-    public BundleReferenceMode Mode { get; }
+    public BundleReferenceKind Kind { get; }
 
-    public override string Id => TypeIds[(int)Mode];
+    public override string Id => TypeIds[(int)Kind];
 
-    public override string DisplayName => DisplayNames[(int)Mode];
+    public override string DisplayName => DisplayNames[(int)Kind];
 
     public override ITypeParser<BundleReference> Parser => this;
 
-    public BundleReferenceType() : this(BundleReferenceMode.MasterBundleReference) { }
+    public BundleReferenceType() : this(BundleReferenceKind.MasterBundleReference) { }
 
-    public BundleReferenceType(BundleReferenceMode mode)
+    public BundleReferenceType(BundleReferenceKind kind)
     {
-        if (mode is <= BundleReferenceMode.Unspecified or > BundleReferenceMode.TranslationReference)
-            throw new ArgumentOutOfRangeException(nameof(mode));
+        if (kind is <= BundleReferenceKind.Unspecified or > BundleReferenceKind.TranslationReference)
+            throw new ArgumentOutOfRangeException(nameof(kind));
 
-        Mode = mode;
+        Kind = kind;
         _baseTypes = OneOrMore<QualifiedType>.Null;
     }
 
-    public BundleReferenceType(BundleReferenceMode mode, OneOrMore<QualifiedType> baseTypes)
+    public BundleReferenceType(BundleReferenceKind kind, OneOrMore<QualifiedType> baseTypes)
     {
-        if (mode is <= BundleReferenceMode.Unspecified or > BundleReferenceMode.TranslationReference)
-            throw new ArgumentOutOfRangeException(nameof(mode));
+        if (kind is <= BundleReferenceKind.Unspecified or > BundleReferenceKind.TranslationReference)
+            throw new ArgumentOutOfRangeException(nameof(kind));
 
-        Mode = mode;
+        Kind = kind;
         _baseTypes = baseTypes;
     }
 
@@ -140,7 +139,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
 
             case IValueSourceNode v:
                 string? name, path;
-                if (Mode == BundleReferenceMode.TranslationReference)
+                if (Kind == BundleReferenceKind.TranslationReference)
                 {
                     if (!KnownTypeValueHelper.TryParseTranslationReference(v.Value, out name, out path))
                     {
@@ -149,7 +148,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                     }
 
                     args.DiagnosticSink?.UNT1018(ref args);
-                    value = new BundleReference(name, path, BundleReferenceMode.TranslationReference);
+                    value = new BundleReference(name, path, BundleReferenceKind.TranslationReference);
                     return true;
                 }
 
@@ -159,28 +158,28 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                     return false;
                 }
 
-                BundleReferenceMode rType = Mode;
-                if (rType is BundleReferenceMode.MasterBundleReference or BundleReferenceMode.MasterBundleOrContentReference)
-                    rType = BundleReferenceMode.MasterBundleReferenceString;
+                BundleReferenceKind rType = Kind;
+                if (rType is BundleReferenceKind.MasterBundleReference or BundleReferenceKind.MasterBundleOrContentReference)
+                    rType = BundleReferenceKind.MasterBundleReferenceString;
 
                 value = new BundleReference(name, path, rType);
                 return true;
 
             case IDictionarySourceNode d:
-                if (Mode == BundleReferenceMode.TranslationReference)
+                if (Kind == BundleReferenceKind.TranslationReference)
                 {
                     args.DiagnosticSink?.UNT1018(ref args);
                 }
 
-                if (Mode is BundleReferenceMode.AudioReference or BundleReferenceMode.MasterBundleReferenceString)
+                if (Kind is BundleReferenceKind.AudioReference or BundleReferenceKind.MasterBundleReferenceString)
                 {
                     args.DiagnosticSink?.UNT2004_BundleReferenceStringOnly(ref args, args.Type, args.ParentNode);
                     return false;
                 }
 
-                if (Mode != BundleReferenceMode.MasterBundleOrContentReference)
+                if (Kind != BundleReferenceKind.MasterBundleOrContentReference)
                 {
-                    if (TryParseRefObject(d, ref args, out BundleReference br, Mode, diagnostics: true))
+                    if (TryParseRefObject(d, ref args, out BundleReference br, Kind, diagnostics: true))
                     {
                         value = br;
                         return true;
@@ -188,13 +187,13 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                 }
                 else
                 {
-                    if (TryParseRefObject(d, ref args, out BundleReference br, BundleReferenceMode.MasterBundleReference, diagnostics: false))
+                    if (TryParseRefObject(d, ref args, out BundleReference br, BundleReferenceKind.MasterBundleReference, diagnostics: false))
                     {
                         value = br;
                         return true;
                     }
 
-                    if (TryParseRefObject(d, ref args, out br, BundleReferenceMode.ContentReference, diagnostics: false))
+                    if (TryParseRefObject(d, ref args, out br, BundleReferenceKind.ContentReference, diagnostics: false))
                     {
                         args.DiagnosticSink?.UNT104(ref args);
                         value = br;
@@ -202,7 +201,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                     }
 
                     // reparse with diagnostics
-                    _ = TryParseRefObject(d, ref args, out br, BundleReferenceMode.MasterBundleReference, diagnostics: true);
+                    _ = TryParseRefObject(d, ref args, out br, BundleReferenceKind.MasterBundleReference, diagnostics: true);
                     return false;
                 }
 
@@ -216,19 +215,19 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
         IDictionarySourceNode dictionary,
         ref TypeParserArgs<BundleReference> args,
         out BundleReference value,
-        BundleReferenceMode rType,
+        BundleReferenceKind rType,
         bool diagnostics)
     {
-        string nameProperty = Mode switch
+        string nameProperty = Kind switch
         {
-            BundleReferenceMode.ContentReference => "Name",
-            BundleReferenceMode.TranslationReference => "Namespace",
+            BundleReferenceKind.ContentReference => "Name",
+            BundleReferenceKind.TranslationReference => "Namespace",
             _ => "MasterBundle"
         };
-        string pathProperty = Mode switch
+        string pathProperty = Kind switch
         {
-            BundleReferenceMode.ContentReference => "Path",
-            BundleReferenceMode.TranslationReference => "Token",
+            BundleReferenceKind.ContentReference => "Path",
+            BundleReferenceKind.TranslationReference => "Token",
             _ => "AssetPath"
         };
 
@@ -241,7 +240,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                 args.DiagnosticSink?.UNT1007(ref args, dictionary, pathProperty);
             }
             if (nameNode != null)
-                args.ReferencedPropertySink?.AcceptReferencedDiagnostic((IPropertySourceNode)nameNode.Parent);
+                args.ReferencedPropertySink?.AcceptReferencedProperty((IPropertySourceNode)nameNode.Parent);
             value = default;
             return false;
         }
@@ -255,9 +254,9 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
         value = new BundleReference(nameNode?.Value ?? string.Empty, pathNode.GetValueString(out _)!, rType);
 
         if (nameNode != null)
-            args.ReferencedPropertySink?.AcceptReferencedDiagnostic((IPropertySourceNode)nameNode.Parent);
+            args.ReferencedPropertySink?.AcceptReferencedProperty((IPropertySourceNode)nameNode.Parent);
 
-        args.ReferencedPropertySink?.AcceptReferencedDiagnostic(pathNode);
+        args.ReferencedPropertySink?.AcceptReferencedProperty(pathNode);
         
         if (diagnostics)
             args.DiagnosticSink?.UNT108(ref args);
@@ -279,7 +278,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
 
             if (KnownTypeValueHelper.TryParseMasterBundleReference(strValue.Value, out string name, out string path))
             {
-                value = new Optional<BundleReference>(new BundleReference(name, path, Mode));
+                value = new Optional<BundleReference>(new BundleReference(name, path, Kind));
                 return true;
             }
         }
@@ -295,13 +294,13 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
 
     IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
     {
-        BundleReferenceMode mode = BundleReferenceMode.Unspecified;
+        BundleReferenceKind mode = BundleReferenceKind.Unspecified;
         for (int i = 0; i < TypeIds.Length; ++i)
         {
             if (!typeId.Equals(TypeIds[i], StringComparison.Ordinal))
                 continue;
 
-            mode = (BundleReferenceMode)i;
+            mode = (BundleReferenceKind)i;
             break;
         }
 
@@ -310,7 +309,6 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
             return new BundleReferenceType(mode);
         }
 
-        // todo: support switches
         OneOrMore<QualifiedType> baseTypes;
         if (typeDefinition.TryGetProperty("BaseType"u8, out JsonElement element)
             && element.ValueKind != JsonValueKind.Null)
@@ -373,11 +371,11 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
 
     protected override bool Equals(BundleReferenceType other)
     {
-        return other.Mode == Mode && other._baseTypes.Equals(_baseTypes);
+        return other.Kind == Kind && other._baseTypes.Equals(_baseTypes);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(317512674, Mode, _baseTypes);
+        return HashCode.Combine(317512674, Kind, _baseTypes);
     }
 }

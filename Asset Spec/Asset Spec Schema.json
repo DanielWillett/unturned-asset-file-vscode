@@ -234,30 +234,14 @@
                         },
                         "AssetType":
                         {
-                            "anyOf":
-                            [
-                                {
-                                    "$ref": "#/$defs/fullyQualifiedType"
-                                },
-                                {
-                                    "$ref": "#/$defs/switch"
-                                }
-                            ],
+                            "$ref": "#/$defs/fullyQualifiedType",
                             "description": "Any references must have this type in their type hierarchy."
                         },
                         "AssetTypes":
                         {
                             "type": "array",
                             "items": {
-                                "anyOf":
-                                [
-                                    {
-                                        "$ref": "#/$defs/fullyQualifiedType"
-                                    },
-                                    {
-                                        "$ref": "#/$defs/switch"
-                                    }
-                                ]
+                                "$ref": "#/$defs/fullyQualifiedType"
                             },
                             "description": "Any references must have at least one of these types in their type hierarchy."
                         },
@@ -311,32 +295,190 @@
                         },
                         "BaseType":
                         {
-                            "anyOf":
-                            [
-                                {
-                                    "$ref": "#/$defs/fullyQualifiedType"
-                                },
-                                {
-                                    "$ref": "#/$defs/switch"
-                                }
-                            ],
+                            "$ref": "#/$defs/fullyQualifiedType",
                             "description": "Any objects being referenced must have this type in their type hierarchy."
                         },
                         "BaseTypes":
                         {
                             "type": "array",
                             "items": {
-                                "anyOf":
-                                [
-                                    {
-                                        "$ref": "#/$defs/fullyQualifiedType"
-                                    },
-                                    {
-                                        "$ref": "#/$defs/switch"
-                                    }
-                                ]
+                                "$ref": "#/$defs/fullyQualifiedType"
                             },
                             "description": "Any objects being referenced must have at least one of these types in their type hierarchy."
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "Vector2",
+                            "title": "A Vector2 (X, Y) or object."
+                        },
+                        "Mode":
+                        {
+                            "$ref": "#/$defs/vectorTypeOptions"
+                        },
+                        "Kind":
+                        {
+                            "type": [ "string", "null" ],
+                            "enum": [ "Unspecified" ],
+                            "description": "Special kind/unit describing the value of this vector."
+                        },
+                        "XKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"X\" property name for modern (and maybe legacy) parsing."
+                        },
+                        "YKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"Y\" property name for modern (and maybe legacy) parsing."
+                        },
+                        "LegacyXKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"X\" property name for legacy parsing. Defaults to \"XKey\"."
+                        },
+                        "LegacyYKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"Y\" property name for legacy parsing. Defaults to \"YKey\"."
+                        },
+                        "SkipLegacyCombineWithUnderscore":
+                        {
+                            "type": [ "boolean", "null" ],
+                            "description": "If true, the '_' placed between the base key and the defined legacy key will be excluded."
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "Vector3",
+                            "title": "A Vector3 (X, Y, Z) or object."
+                        },
+                        "Mode":
+                        {
+                            "$ref": "#/$defs/vectorTypeOptions"
+                        },
+                        "Kind":
+                        {
+                            "type": [ "string", "null" ],
+                            "enum": [ "Unspecified", "Position", "Rotation", "Scale" ],
+                            "description": "Special kind/unit describing the value of this vector."
+                        },
+                        "XKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"X\" property name for modern (and maybe legacy) parsing."
+                        },
+                        "YKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"Y\" property name for modern (and maybe legacy) parsing."
+                        },
+                        "ZKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"Z\" property name for modern (and maybe legacy) parsing."
+                        },
+                        "LegacyXKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"X\" property name for legacy parsing. Defaults to \"XKey\"."
+                        },
+                        "LegacyYKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"Y\" property name for legacy parsing. Defaults to \"YKey\"."
+                        },
+                        "LegacyZKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"Z\" property name for legacy parsing. Defaults to \"ZKey\"."
+                        },
+                        "SkipLegacyCombineWithUnderscore":
+                        {
+                            "type": [ "boolean", "null" ],
+                            "description": "If true, the '_' placed between the base key and the defined legacy key will be excluded."
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "Vector4",
+                            "title": "A Vector4 (X, Y, Z, W) or object."
+                        },
+                        "Mode":
+                        {
+                            "$ref": "#/$defs/vectorTypeOptions"
+                        },
+                        "Kind":
+                        {
+                            "type": [ "string", "null" ],
+                            "enum": [ "Unspecified", "Quaternion" ],
+                            "description": "Special kind/unit describing the value of this vector."
+                        },
+                        "XKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"X\" property name for modern (and maybe legacy) parsing."
+                        },
+                        "YKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"Y\" property name for modern (and maybe legacy) parsing."
+                        },
+                        "ZKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"Z\" property name for modern (and maybe legacy) parsing."
+                        },
+                        "WKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"W\" property name for modern (and maybe legacy) parsing."
+                        },
+                        "LegacyXKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"X\" property name for legacy parsing. Defaults to \"XKey\"."
+                        },
+                        "LegacyYKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"Y\" property name for legacy parsing. Defaults to \"YKey\"."
+                        },
+                        "LegacyZKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"Z\" property name for legacy parsing. Defaults to \"ZKey\"."
+                        },
+                        "LegacyWKey":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "Overrides the \"W\" property name for legacy parsing. Defaults to \"WKey\"."
+                        },
+                        "SkipLegacyCombineWithUnderscore":
+                        {
+                            "type": [ "boolean", "null" ],
+                            "description": "If true, the '_' placed between the base key and the defined legacy key will be excluded."
                         }
                     },
                     "required": [ "Type" ],
@@ -543,40 +685,12 @@
                     "title": "A UTC date and time (parsed as a DateTimeOffset)."
                 },
                 {
-                    "const": "Position",
-                    "title": "A Vector3 position (X, Y, Z) or object."
+                    "const": "Vector4",
+                    "title": "A Vector4 (X, Y, Z, W) or object."
                 },
                 {
-                    "const": "PositionOrLegacy",
-                    "title": "A Vector3 position (X, Y, Z), object, or Key_X, Key_Y, Key_Z properties."
-                },
-                {
-                    "const": "LegacyPosition",
-                    "title": "A Vector3 position Key_X, Key_Y, Key_Z properties."
-                },
-                {
-                    "const": "Scale",
-                    "title": "A Vector3 scale (X, Y, Z) or object."
-                },
-                {
-                    "const": "ScaleOrLegacy",
-                    "title": "A Vector3 scale (X, Y, Z), object, or Key_X, Key_Y, Key_Z properties."
-                },
-                {
-                    "const": "LegacyScale",
-                    "title": "A Vector3 scale Key_X, Key_Y, Key_Z properties."
-                },
-                {
-                    "const": "EulerRotation",
-                    "title": "A Vector3 euler rotation (X, Y, Z) or object."
-                },
-                {
-                    "const": "EulerRotationOrLegacy",
-                    "title": "A Vector3 euler rotation (X, Y, Z), object, or Key_X, Key_Y, Key_Z properties."
-                },
-                {
-                    "const": "LegacyEulerRotation",
-                    "title": "A Vector3 euler rotation Key_X, Key_Y, Key_Z properties."
+                    "const": "Vector3",
+                    "title": "A Vector3 (X, Y, Z) or object."
                 },
                 {
                     "const": "Vector2",
@@ -712,6 +826,21 @@
                 {
                     "$ref": "#/$defs/switch"
                 }
+            ]
+        },
+        "vectorTypeOptions":
+        {
+            "type": [ "string", "null" ],
+            "description": "The type of vector syntaxes to parse.",
+            "enum":
+            [
+                "String",
+                "Legacy",
+                "Object",
+                "String, Legacy",
+                "String, Object",
+                "Legacy, Object",
+                "String, Legacy, Object"
             ]
         },
         "datValue":
@@ -1526,7 +1655,15 @@
                         },
                         "Value":
                         {
-                            "$ref": "#/$defs/datValue"
+                            "anyOf":
+                            [
+                                {
+                                    "$ref": "#/$defs/datValue"
+                                },
+                                {
+                                    "$ref": "#/$defs/datPropertyType"
+                                }
+                            ]
                         }
                     },
                     "required":

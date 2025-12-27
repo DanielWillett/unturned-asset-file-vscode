@@ -37,7 +37,11 @@
         },
         {
             "Key": "Normal_Rotation_Offset",
-            "Type": "EulerRotation",
+            "Type":
+            {
+                "Type": "Vector3",
+                "Kind": "Rotation"
+            },
             "DefaultValue": "(0, 0, 0)",
             "Description": "The rotation offset of all foliage relative to the angle of the terrain.",
             "Variable": "normalRotationOffset",
@@ -99,7 +103,11 @@
         },
         {
             "Key": "Min_Rotation",
-            "Type": "EulerRotation",
+            "Type":
+            {
+                "Type": "Vector3",
+                "Kind": "Rotation"
+            },
             "DefaultValue": "(0, 0, 0)",
             "Maximum": "@Max_Rotation",
             "Description": "The minimum rotation offset from the terrain's rotaiton. A random rotation is chosen between @Min_Rotation and @Max_Rotation.",
@@ -109,7 +117,11 @@
         },
         {
             "Key": "Max_Rotation",
-            "Type": "EulerRotation",
+            "Type":
+            {
+                "Type": "Vector3",
+                "Kind": "Rotation"
+            },
             "DefaultValue": "(0, 0, 0)",
             "Minimum": "@Min_Rotation",
             "Description": "The maximum rotation offset from the terrain's rotaiton. A random rotation is chosen between @Min_Rotation and @Max_Rotation.",
@@ -132,7 +144,11 @@
                     "Value": "Float32"
                 },
                 {
-                    "Value": "Scale"
+                    "Value":
+                    {
+                        "Type": "Vector3",
+                        "Kind": "Scale"
+                    }
                 }
             ],
             "DefaultValue":
@@ -174,7 +190,11 @@
                     "Value": "Float32"
                 },
                 {
-                    "Value": "Scale"
+                    "Value":
+                    {
+                        "Type": "Vector3",
+                        "Kind": "Scale"
+                    }
                 }
             ],
             "DefaultValue":

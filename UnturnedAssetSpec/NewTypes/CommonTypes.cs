@@ -81,16 +81,9 @@ public static class CommonTypes
         knownTypes["DateTime"]                          = () => StringType.Instance;    // todo
         knownTypes["TimeSpan"]                          = () => StringType.Instance;    // todo
         knownTypes["DateTimeOffset"]                    = () => StringType.Instance;    // todo
-        knownTypes["Position"]                          = () => StringType.Instance;    // todo
-        knownTypes["PositionOrLegacy"]                  = () => StringType.Instance;    // todo
-        knownTypes["LegacyPosition"]                    = () => StringType.Instance;    // todo
-        knownTypes["Scale"]                             = () => StringType.Instance;    // todo
-        knownTypes["ScaleOrLegacy"]                     = () => StringType.Instance;    // todo
-        knownTypes["LegacyScale"]                       = () => StringType.Instance;    // todo
-        knownTypes["EulerRotation"]                     = () => StringType.Instance;    // todo
-        knownTypes["EulerRotationOrLegacy"]             = () => StringType.Instance;    // todo
-        knownTypes["LegacyEulerRotation"]               = () => StringType.Instance;    // todo
-        knownTypes["Vector2"]                           = () => StringType.Instance;    // todo
+        knownTypes["Vector4"]                           = () => Vector4Type.Instance;
+        knownTypes["Vector3"]                           = () => Vector3Type.Instance;
+        knownTypes["Vector2"]                           = () => Vector2Type.Instance;
         knownTypes["CommaDelimitedString"]              = () => StringType.Instance;    // todo
         knownTypes["List"]                              = () => StringType.Instance;    // todo
         knownTypes["Dictionary"]                        = () => StringType.Instance;    // todo

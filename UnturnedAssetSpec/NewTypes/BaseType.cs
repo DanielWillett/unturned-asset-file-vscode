@@ -1,12 +1,11 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.NewTypes;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 /// <summary>
 /// The base class for most typical implementations of <see cref="IType{TValue}"/>.

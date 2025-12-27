@@ -25,16 +25,16 @@ public readonly struct BundleReference : IEquatable<BundleReference>, IComparabl
     /// <summary>
     /// The type of reference this reference was created for.
     /// </summary>
-    public readonly BundleReferenceMode Type;
+    public readonly BundleReferenceKind Type;
 
-    public BundleReference(string name, string path, BundleReferenceMode type)
+    public BundleReference(string name, string path, BundleReferenceKind type)
     {
         Name = name;
         Path = path;
         Type = type;
     }
 
-    public static bool TryParse(string str, out BundleReference bundleReference, BundleReferenceMode type = BundleReferenceMode.MasterBundleReferenceString)
+    public static bool TryParse(string str, out BundleReference bundleReference, BundleReferenceKind type = BundleReferenceKind.MasterBundleReferenceString)
     {
         if (!KnownTypeValueHelper.TryParseMasterBundleReference(str, out string? name, out string? path) || name == null || path == null)
         {

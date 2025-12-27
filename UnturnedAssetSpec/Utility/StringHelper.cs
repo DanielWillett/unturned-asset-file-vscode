@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -6,6 +7,232 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 internal static class StringHelper
 {
+    /// <summary>
+    /// Find the next index of an unescaped character.
+    /// </summary>
+    /// <param name="span">The span of characters to search</param>
+    /// <param name="stops">List of all characters to stop on, INCLUDING '\'.</param>
+    /// <param name="useDepth">Whether or not to only return values at the current depth. Assumes the first character of <paramref name="span"/> is already within the depth required.</param>
+    /// <returns>The index of the next unescaped match, or -1 if none are found.</returns>
+    public static int NextUnescapedIndexOf(ReadOnlySpan<char> span, ReadOnlySpan<char> stops, out bool hadEscapeSequences, bool useDepth = false)
+    {
+        hadEscapeSequences = false;
+        int firstIndex = span.IndexOfAny(stops);
+        if (firstIndex < 0)
+            return -1;
+
+        int index = firstIndex;
+        int escCount = 0;
+        Span<int> depths = stackalloc int[stops.Length];
+        while (true)
+        {
+            char c = span[index];
+            switch (c)
+            {
+                case '\\':
+                    hadEscapeSequences = true;
+                    ++escCount;
+                    break;
+
+                default:
+                    if (escCount % 2 == 1)
+                    {
+                        escCount = 0;
+                        break;
+                    }
+
+                    if (!useDepth)
+                        return index;
+                    
+                    int depth = GetDepthChange(c);
+                    if (depth != 0)
+                    {
+                        int foundIndex = stops.IndexOf(c);
+                        depths[foundIndex] += depth;
+                        for (int i = 0; i < depths.Length; ++i)
+                        {
+                            if (depths[i] > 0)
+                                break;
+                        }
+
+                        return index;
+                    }
+
+                    break;
+            }
+
+            int nextIndex = span.Slice(index + 1).IndexOfAny(stops);
+            if (nextIndex >= 0)
+                index = nextIndex + index + 1;
+            else
+                return -1;
+        }
+    }
+
+    private static int GetDepthChange(char c)
+    {
+        return c switch
+        {
+            '(' or '[' or '{' or '<' => 1,
+            ')' or ']' or '}' or '>' => -1,
+            _ => 0
+        };
+    }
+
+    /// <summary>
+    /// Unescape text. Any forward slash will evaluate to the following character.
+    /// </summary>
+    public static string Unescape(ReadOnlySpan<char> text)
+    {
+        return Unescape(text, ReadOnlySpan<char>.Empty);
+    }
+
+    /// <summary>
+    /// Unescape text. Any forward slash will evaluate to the following character if that character is in <paramref name="validEscapedCharacters"/>.
+    /// </summary>
+    public static unsafe string Unescape(ReadOnlySpan<char> text, ReadOnlySpan<char> validEscapedCharacters)
+    {
+        if (text.IsEmpty)
+            return string.Empty;
+
+        int length = text.Length;
+
+        int firstSlash = text.IndexOf('\\');
+        if (firstSlash == -1 || firstSlash >= length)
+        {
+            return text.ToString();
+        }
+
+        char* newValue = stackalloc char[length];
+
+        int prevIndex = -1;
+        int slashCount = 0;
+        int writeIndex = 0;
+        while (true)
+        {
+            int nextSlash = prevIndex != length - 1
+                ? prevIndex == -1
+                    ? firstSlash
+                    : text.Slice(prevIndex + 1).IndexOf('\\')
+                : -1;
+            if (nextSlash >= 0)
+                nextSlash += prevIndex + 1;
+
+            if (nextSlash >= length)
+                nextSlash = -1;
+            if (nextSlash == prevIndex + 1)
+            {
+                ++slashCount;
+            }
+            else if (nextSlash == -1)
+            {
+                if (prevIndex + 1 >= length || slashCount == 0)
+                {
+                    for (int i = prevIndex + 1; i < length; ++i)
+                    {
+                        newValue[writeIndex] = text[i];
+                        ++writeIndex;
+                    }
+
+                    break;
+                }
+            }
+            else
+            {
+                slashCount = 1;
+            }
+
+            int max = nextSlash - slashCount + 1;
+            for (int i = prevIndex + 1; i < max; ++i)
+            {
+                newValue[writeIndex] = text[i];
+                ++writeIndex;
+            }
+
+            if (slashCount == 1)
+            {
+                if (nextSlash < length - 1)
+                {
+                    switch (text[nextSlash + 1])
+                    {
+                        case 'n':
+                            newValue[writeIndex] = '\n';
+                            ++writeIndex;
+                            break;
+
+                        case 'r':
+                            newValue[writeIndex] = '\r';
+                            ++writeIndex;
+                            break;
+
+                        case 't':
+                            newValue[writeIndex] = '\t';
+                            ++writeIndex;
+                            break;
+
+                        case 'u' when TryParseUnicodeSequence(text, nextSlash, out char unicodeCharacter):
+                            newValue[writeIndex] = unicodeCharacter;
+                            ++writeIndex;
+                            nextSlash += 4;
+                            break;
+
+                        default:
+                            char v = text[nextSlash + 1];
+                            if (!validEscapedCharacters.IsEmpty && validEscapedCharacters.IndexOf(v) < 0)
+                            {
+                                newValue[writeIndex] = '\\';
+                                ++writeIndex;
+                            }
+
+                            newValue[writeIndex] = v;
+                            ++writeIndex;
+                            break;
+                    }
+
+                    ++nextSlash;
+                }
+                else
+                {
+                    newValue[writeIndex] = '\\';
+                    ++writeIndex;
+                    break;
+                }
+
+                slashCount = 0;
+            }
+
+            if (nextSlash == -1)
+                break;
+
+            prevIndex = nextSlash;
+        }
+
+        return new string(newValue, 0, writeIndex);
+    }
+
+    private static bool TryParseUnicodeSequence(ReadOnlySpan<char> value, int slash, out char c)
+    {
+        if (value.Length - slash - 2 < 4)
+        {
+            c = '\0';
+            return false;
+        }
+
+#if NETSTANDARD2_1_OR_GREATER
+        ReadOnlySpan<char> num = value.Slice(slash + 2, 4);
+#else
+        string num = value.Slice(slash + 2, 4).ToString();
+#endif
+        if (!ushort.TryParse(num, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out ushort unicode))
+        {
+            c = '\0';
+            return false;
+        }
+
+        c = (char)unicode;
+        return true;
+    }
+
     public static bool ContainsWhitespace(string str)
     {
         for (int i = 0; i < str.Length; ++i)

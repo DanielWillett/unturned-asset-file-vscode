@@ -88,6 +88,51 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected function name at beginning of expression..
+        /// </summary>
+        internal static string FormatException_Expression_ExpectedFunctionName {
+            get {
+                return ResourceManager.GetString("FormatException_Expression_ExpectedFunctionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected end of expression or open parenthesis after function name..
+        /// </summary>
+        internal static string FormatException_Expression_ExpectedFunctionStart {
+            get {
+                return ResourceManager.GetString("FormatException_Expression_ExpectedFunctionStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected end of expression or next argument after parameter closing..
+        /// </summary>
+        internal static string FormatException_Expression_ExpectedNextArgument {
+            get {
+                return ResourceManager.GetString("FormatException_Expression_ExpectedNextArgument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected closing parenthesis at end of value..
+        /// </summary>
+        internal static string FormatException_Expression_ExpectedParenthesizedValueEnd {
+            get {
+                return ResourceManager.GetString("FormatException_Expression_ExpectedParenthesizedValueEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter list not closed, expected &apos;)&apos;..
+        /// </summary>
+        internal static string FormatException_Expression_MissingEndingParenthesis {
+            get {
+                return ResourceManager.GetString("FormatException_Expression_MissingEndingParenthesis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to parse IPv4Filter, expected a value in the format: &quot;0.0.0.0[/0][:0[-0]]&quot;..
         /// </summary>
         internal static string FormatException_IPv4Format_FailedToParse {
@@ -102,6 +147,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string InvalidOperationException_InvalidCountType {
             get {
                 return ResourceManager.GetString("InvalidOperationException_InvalidCountType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid vector type: &apos;{0}&apos;. Annotate the type with a {1} to define a vector provider..
+        /// </summary>
+        internal static string InvalidOperationException_InvalidVectorType {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_InvalidVectorType", resourceCulture);
             }
         }
         
@@ -507,6 +561,69 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_UInt8 {
             get {
                 return ResourceManager.GetString("Type_Name_UInt8", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 2D Vector.
+        /// </summary>
+        internal static string Type_Name_Vector2_Unspecified {
+            get {
+                return ResourceManager.GetString("Type_Name_Vector2_Unspecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 3D Position.
+        /// </summary>
+        internal static string Type_Name_Vector3_Position {
+            get {
+                return ResourceManager.GetString("Type_Name_Vector3_Position", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 3D Euler Rotation.
+        /// </summary>
+        internal static string Type_Name_Vector3_Rotation {
+            get {
+                return ResourceManager.GetString("Type_Name_Vector3_Rotation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 3D Scale.
+        /// </summary>
+        internal static string Type_Name_Vector3_Scale {
+            get {
+                return ResourceManager.GetString("Type_Name_Vector3_Scale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 3D Vector.
+        /// </summary>
+        internal static string Type_Name_Vector3_Unspecified {
+            get {
+                return ResourceManager.GetString("Type_Name_Vector3_Unspecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quaternion.
+        /// </summary>
+        internal static string Type_Name_Vector4_Quaternion {
+            get {
+                return ResourceManager.GetString("Type_Name_Vector4_Quaternion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 4D Vector.
+        /// </summary>
+        internal static string Type_Name_Vector4_Unspecified {
+            get {
+                return ResourceManager.GetString("Type_Name_Vector4_Unspecified", resourceCulture);
             }
         }
     }

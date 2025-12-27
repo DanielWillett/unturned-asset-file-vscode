@@ -266,7 +266,7 @@ internal class NodeWriteToTextWriterVisitor : OrderedNodeVisitor, IDisposable
 #if NET7_0_OR_GREATER
         ReadOnlySpan<char> escapables = [ '\\', '\n', '\t', '"' ];
 #else
-        ReadOnlySpan<char> escapables = stackalloc[] { '\\', '\n', '\t', '"' };
+        ReadOnlySpan<char> escapables = stackalloc char[] { '\\', '\n', '\t', '"' };
 #endif
         int firstIndex = span.IndexOfAny(escapables);
         if (firstIndex < 0)

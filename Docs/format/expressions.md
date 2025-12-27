@@ -30,7 +30,9 @@ The following functions are available:
 | ACOSR    | Arccosine (radians)                      | `ACOSR(number) -> number`        |
 | ACOSD    | Arccosine (degrees)                      | `ACOSD(number) -> number`        |
 | ATANR    | Arctangent (radians)                     | `ATANR(number) -> number`        |
+| ATANR    | Arctangent (radians) (x, y)              | `ATANR(number number) -> number` |
 | ATAND    | Arctangent (degrees)                     | `ATAND(number) -> number`        |
+| ATAND    | Arctangent (degrees) (x, y)              | `ATAND(number number) -> number` |
 | SQRT     | Square root                              | `SQRT(number) -> number`         |
 | ADD      | Add                                      | `ADD(number number) -> number`   |
 | SUB      | Subtract                                 | `SUB(number number) -> number`   |
@@ -39,9 +41,10 @@ The following functions are available:
 | MOD      | Modulo (remainder)                       | `MOD(number number) -> number`   |
 | MIN      | Minimum                                  | `MIN(number number) -> number`   |
 | MAX      | Maximum                                  | `MAX(number number) -> number`   |
-| AVG      | Average (mean)                           | `AVG(number number) -> number`   |
 | POW      | Exponent (arg1 ^ arg2)                   | `POW(number number) -> number`   |
+| CAT      | Concatenate (convert to string)          | `CAT(any) -> string`             |
 | CAT      | Concatenate (combine two strings)        | `CAT(any any) -> string`         |
+| CAT      | Concatenate (combine three strings)      | `CAT(any any any) -> string`     |
 | REP      | Replace (all "arg2" -> "arg3" in "arg1") | `REP(any any any) -> string`     |
 
 ## Format

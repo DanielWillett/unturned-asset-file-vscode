@@ -101,7 +101,7 @@ public sealed class TemplateProcessor
 #if NET7_0_OR_GREATER
         ReadOnlySpan<char> stops = [ '\\', '*' ];
 #else
-        ReadOnlySpan<char> stops = stackalloc[] { '\\', '*' };
+        ReadOnlySpan<char> stops = stackalloc char[] { '\\', '*' };
 #endif
 
         OneOrMore<ReadOnlyMemory<char>> segments = processor._segments;
@@ -181,7 +181,7 @@ public sealed class TemplateProcessor
 #if NET7_0_OR_GREATER
         ReadOnlySpan<char> stops = [ '\\', '*' ];
 #else
-        ReadOnlySpan<char> stops = stackalloc[] { '\\', '*' };
+        ReadOnlySpan<char> stops = stackalloc char[] { '\\', '*' };
 #endif
 
         int index = span.IndexOfAny(stops);

@@ -14,6 +14,7 @@ public interface IValue
     /// <summary>
     /// Whether or not this value represents a <see langword="null"/> value.
     /// </summary>
+    /// <remarks>It's still possible for a value to evaluate to <see langword="null"/> even if this is <see langword="false"/>.</remarks>
     bool IsNull { get; }
 
     /// <summary>

@@ -10,6 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 4)]
 [JsonConverter(typeof(Color32Converter))]
+[VectorTypeProvider(typeof(Color32VectorProvider))]
 public readonly struct Color32 : IEquatable<Color32>, IComparable<Color32>
 {
     [FieldOffset(0)]

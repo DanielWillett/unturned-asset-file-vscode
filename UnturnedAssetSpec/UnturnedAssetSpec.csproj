@@ -18,6 +18,7 @@
     <DefineConstants>$(DefineConstants);EMIT</DefineConstants>
 
     <StrongNameKeyPath>C:\Strong Name Keys\UnturnedAssetSpec\UnturnedAssetSpec.dll.snk</StrongNameKeyPath>
+    <GenerateDependencyFile>False</GenerateDependencyFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="exists($(StrongNameKeyPath))">
@@ -42,6 +43,10 @@
   </ItemGroup>
 
   <ItemGroup>
+
+    <ProjectReference Include="../DanielWillett.MathMatrix/DanielWillett.MathMatrix.csproj" />
+
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'" />
     <PackageReference Include="System.Text.Json" Version="4.7.1" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" Condition="$(DefineConstants.Contains('EMIT')) And '$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />

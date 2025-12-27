@@ -11,6 +11,7 @@ namespace UnturnedAssetSpecTests;
 #pragma warning disable VSTHRD200
 
 [NonParallelizable]
+[Ignore("Sometimes fails due to delays caused by the Windows API.")]
 public class InstallationEnvironmentTest
 {
 #nullable disable

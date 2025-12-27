@@ -1,18 +1,15 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.NewTypes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -440,7 +437,7 @@ public class ListType<TCountType, TElementType>
             if (args.ParentNode is IPropertySourceNode { Parent: IDictionarySourceNode dictionary }
                 && dictionary.TryGetProperty(singlePropertyName, out IPropertySourceNode? singularProperty))
             {
-                args.ReferencedPropertySink?.AcceptReferencedDiagnostic(singularProperty);
+                args.ReferencedPropertySink?.AcceptReferencedProperty(singularProperty);
 
                 args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, singularProperty.Value, args.ParentNode, _subType, LegacyExpansionFilter.Modern);
 
@@ -586,7 +583,7 @@ public class ListType<TCountType, TElementType>
                                 }
                                 else
                                 {
-                                    args.ReferencedPropertySink?.AcceptReferencedDiagnostic(property);
+                                    args.ReferencedPropertySink?.AcceptReferencedProperty(property);
                                     args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, property.Value, property, _subType, LegacyExpansionFilter.Modern);
 
                                     if (!_subType.Parser.TryParse(ref elementParseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
