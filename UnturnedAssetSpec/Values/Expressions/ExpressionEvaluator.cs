@@ -132,22 +132,50 @@ internal struct ExpressionEvaluator
 
         public void Accept<T>(T? value) where T : IEquatable<T>
         {
-            if (Evaluator->_root.Count == 1)
+            ReducerVisitor rv;
+            rv.ResultVisitor = ResultVisitor;
+            rv.WasSuccessful = false;
+            rv.Evaluator = Evaluator;
+            rv.ConcreteOnly = ConcreteOnly;
+            rv.EvalCtx = EvalCtx;
+
+            if (!Evaluator->_root.Function.ReduceToKnownTypes
+                || MathMatrix.IsValidMathExpressionInputType<T>()
+                || !MathMatrix.TryReduce(value!, ref rv))
             {
-                WasSuccessful = Evaluator->_func.Evaluate<T, TIdealOut, TResultVisitor>(value!, ref Unsafe.AsRef<TResultVisitor>(ResultVisitor));
-                return;
+                rv.Accept(value);
             }
 
-            Arg1Eval<T, TIdealOut, TResultVisitor> v;
-            v.ResultVisitor = ResultVisitor;
-            v.WasSuccessful = false;
-            v.Evaluator = Evaluator;
-            v.ConcreteOnly = ConcreteOnly;
-            v.EvalCtx = EvalCtx;
-            v.Arg0 = value;
-            Evaluator->_arg = 1;
-            Evaluator->EvaluateArgument(ref v, ConcreteOnly, in Unsafe.AsRef<FileEvaluationContext>(EvalCtx));
-            WasSuccessful = v.WasSuccessful;
+            WasSuccessful = rv.WasSuccessful;
+        }
+
+        private struct ReducerVisitor : IGenericVisitor
+        {
+            public TResultVisitor* ResultVisitor;
+            public ExpressionEvaluator* Evaluator;
+            public FileEvaluationContext* EvalCtx;
+            public bool WasSuccessful;
+            public bool ConcreteOnly;
+
+            public void Accept<T>(T? value) where T : IEquatable<T>
+            {
+                if (Evaluator->_root.Count == 1)
+                {
+                    WasSuccessful = Evaluator->_func.Evaluate<T, TIdealOut, TResultVisitor>(value!, ref Unsafe.AsRef<TResultVisitor>(ResultVisitor));
+                    return;
+                }
+
+                Arg1Eval<T, TIdealOut, TResultVisitor> v;
+                v.ResultVisitor = ResultVisitor;
+                v.WasSuccessful = false;
+                v.Evaluator = Evaluator;
+                v.ConcreteOnly = ConcreteOnly;
+                v.EvalCtx = EvalCtx;
+                v.Arg0 = value;
+                Evaluator->_arg = 1;
+                Evaluator->EvaluateArgument(ref v, ConcreteOnly, in Unsafe.AsRef<FileEvaluationContext>(EvalCtx));
+                WasSuccessful = v.WasSuccessful;
+            }
         }
     }
 
@@ -165,21 +193,51 @@ internal struct ExpressionEvaluator
 
         public void Accept<T>(T? value) where T : IEquatable<T>
         {
-            if (Evaluator->_root.Count == 2)
+            ReducerVisitor rv;
+            rv.ResultVisitor = ResultVisitor;
+            rv.WasSuccessful = false;
+            rv.Evaluator = Evaluator;
+            rv.ConcreteOnly = ConcreteOnly;
+            rv.EvalCtx = EvalCtx;
+            rv.Arg0 = Arg0;
+
+            if (!Evaluator->_root.Function.ReduceToKnownTypes
+                || MathMatrix.IsValidMathExpressionInputType<T>()
+                || !MathMatrix.TryReduce(value!, ref rv))
             {
-                WasSuccessful = Evaluator->_func.Evaluate<TArg0, T, TIdealOut, TResultVisitor>(Arg0!, value!, ref Unsafe.AsRef<TResultVisitor>(ResultVisitor));
-                return;
+                rv.Accept(value);
             }
 
-            Arg2Eval<TArg0, T, TIdealOut, TResultVisitor> v;
-            v.ResultVisitor = ResultVisitor;
-            v.WasSuccessful = false;
-            v.Evaluator = Evaluator;
-            v.Arg0 = Arg0;
-            v.Arg1 = value;
-            Evaluator->_arg = 2;
-            Evaluator->EvaluateArgument(ref v, ConcreteOnly, in Unsafe.AsRef<FileEvaluationContext>(EvalCtx));
-            WasSuccessful = v.WasSuccessful;
+            WasSuccessful = rv.WasSuccessful;
+        }
+
+        private struct ReducerVisitor : IGenericVisitor
+        {
+            public TArg0? Arg0;
+            public TResultVisitor* ResultVisitor;
+            public ExpressionEvaluator* Evaluator;
+            public FileEvaluationContext* EvalCtx;
+            public bool WasSuccessful;
+            public bool ConcreteOnly;
+
+            public void Accept<T>(T? value) where T : IEquatable<T>
+            {
+                if (Evaluator->_root.Count == 2)
+                {
+                    WasSuccessful = Evaluator->_func.Evaluate<TArg0, T, TIdealOut, TResultVisitor>(Arg0!, value!, ref Unsafe.AsRef<TResultVisitor>(ResultVisitor));
+                    return;
+                }
+
+                Arg2Eval<TArg0, T, TIdealOut, TResultVisitor> v;
+                v.ResultVisitor = ResultVisitor;
+                v.WasSuccessful = false;
+                v.Evaluator = Evaluator;
+                v.Arg0 = Arg0;
+                v.Arg1 = value;
+                Evaluator->_arg = 2;
+                Evaluator->EvaluateArgument(ref v, ConcreteOnly, in Unsafe.AsRef<FileEvaluationContext>(EvalCtx));
+                WasSuccessful = v.WasSuccessful;
+            }
         }
     }
 
@@ -197,13 +255,41 @@ internal struct ExpressionEvaluator
 
         public void Accept<T>(T? value) where T : IEquatable<T>
         {
-            if (Evaluator->_root.Count == 3)
+            ReducerVisitor rv;
+            rv.ResultVisitor = ResultVisitor;
+            rv.WasSuccessful = false;
+            rv.Evaluator = Evaluator;
+            rv.Arg0 = Arg0;
+            rv.Arg1 = Arg1;
+
+            if (!Evaluator->_root.Function.ReduceToKnownTypes
+                || MathMatrix.IsValidMathExpressionInputType<T>()
+                || !MathMatrix.TryReduce(value!, ref rv))
             {
-                WasSuccessful = Evaluator->_func.Evaluate<TArg0, TArg1, T, TIdealOut, TResultVisitor>(Arg0!, Arg1!, value!, ref Unsafe.AsRef<TResultVisitor>(ResultVisitor));
-                return;
+                rv.Accept(value);
             }
 
-            throw new FormatException($"Too many arguments supplied for function \"{Evaluator->_func.FunctionName}\".");
+            WasSuccessful = rv.WasSuccessful;
+        }
+
+        private struct ReducerVisitor : IGenericVisitor
+        {
+            public TArg0? Arg0;
+            public TArg1? Arg1;
+            public TResultVisitor* ResultVisitor;
+            public ExpressionEvaluator* Evaluator;
+            public bool WasSuccessful;
+
+            public void Accept<T>(T? value) where T : IEquatable<T>
+            {
+                if (Evaluator->_root.Count == 3)
+                {
+                    WasSuccessful = Evaluator->_func.Evaluate<TArg0, TArg1, T, TIdealOut, TResultVisitor>(Arg0!, Arg1!, value!, ref Unsafe.AsRef<TResultVisitor>(ResultVisitor));
+                    return;
+                }
+
+                throw new FormatException($"Too many arguments supplied for function \"{Evaluator->_func.FunctionName}\".");
+            }
         }
     }
 }

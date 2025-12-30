@@ -144,21 +144,27 @@ internal ref struct ExpressionNodeParser : IDisposable
                     break;
 
                 case ExpressionTokenType.CloseParams:
-                    _current.IsInParams = false;
-                    if (_stackSize > 0)
+                    bool wasInParams;
+                    do
                     {
-                        ExpressionNodeBuffer bufferState = _current;
-                        _current = Peek();
-                        Pop();
-                        _current.AssertNotFull();
-                        IExpressionNode node = bufferState.Build<TResult>(_current.Function, _current.Count, SimplifyConstantExpressions);
-                        _current[_current.Count] = node;
-                        ++_current.Count;
-                    }
-                    else
-                    {
-                        return _current.Build<TResult>(null, 0, SimplifyConstantExpressions);
-                    }
+                        wasInParams = _current.IsInParams;
+                        _current.IsInParams = false;
+                        if (_stackSize > 0)
+                        {
+                            ExpressionNodeBuffer bufferState = _current;
+                            _current = Peek();
+                            Pop();
+                            _current.AssertNotFull();
+                            IExpressionNode node = bufferState.Build<TResult>(_current.Function, _current.Count, SimplifyConstantExpressions);
+                            _current[_current.Count] = node;
+                            ++_current.Count;
+                        }
+                        else
+                        {
+                            return _current.Build<TResult>(null, 0, SimplifyConstantExpressions);
+                        }
+
+                    } while (!wasInParams);
                     break;
 
                 case ExpressionTokenType.Value:

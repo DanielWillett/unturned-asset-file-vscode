@@ -7,10 +7,97 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 [SkipLocalsInit]
 public static partial class MathMatrix
 {
+    /// <summary>
+    /// Re-interprets one type as another. Does the same thing as <see cref="Unsafe.As{TFrom,TTo}"/> but without creating an implicit local variable in the containing method.
+    /// </summary>
     public static TTo As<TFrom, TTo>(TFrom fromVal)
     {
         return Unsafe.As<TFrom, TTo>(ref fromVal);
     }
+
+    /// <summary>
+    /// Whether or not <typeparamref name="T"/> is a common input type for math functions in this class.
+    /// </summary>
+    public static bool IsValidMathExpressionInputType<T>()
+    {
+        if (typeof(T).IsPrimitive)
+        {
+            return typeof(T) != typeof(char) && typeof(T) != typeof(bool) && typeof(T) != typeof(IntPtr) && typeof(T) != typeof(UIntPtr);
+        }
+
+        return typeof(T) == typeof(decimal) || typeof(T) == typeof(string);
+    }
+
+    /// <summary>
+    /// Attempts to reduce <typeparamref name="T"/> into a common input type for math functions in this class.
+    /// If the type is already reduced (or is a vector type), the visitor will be invoked with the input type and value.
+    /// <para>
+    /// Reduces <see cref="char"/> (as a digit), <see cref="bool"/>, <see cref="IntPtr"/>, <see cref="UIntPtr"/>, and <see cref="GuidOrId"/> into smaller types.
+    /// </para>
+    /// </summary>
+    /// <remarks>See <see cref="IsValidMathExpressionInputType{T}"/> for the reduced types.</remarks>
+    /// <returns>Whether or not the value could be converted or stayed the same. If <see langword="false"/> is returned, the visitor was not invoked.</returns>
+    public static bool TryReduce<T, TVisitor>(T value, ref TVisitor visitor)
+        where T : IEquatable<T>
+        where TVisitor : IGenericVisitor
+    {
+        if (IsValidMathExpressionInputType<T>())
+        {
+            visitor.Accept(value);
+            return true;
+        }
+
+        if (typeof(T) == typeof(char))
+        {
+            int v = As<T, char>(value) - '0';
+            if (v is >= 0 and < 10)
+            {
+                visitor.Accept((byte)v);
+                return true;
+            }
+
+            return false;
+        }
+
+        if (typeof(T) == typeof(bool))
+        {
+            visitor.Accept(As<T, bool>(value) ? (byte)1 : (byte)0);
+            return true;
+        }
+
+        if (typeof(T) == typeof(IntPtr))
+        {
+            visitor.Accept(As<T, IntPtr>(value).ToInt64());
+            return true;
+        }
+
+        if (typeof(T) == typeof(UIntPtr))
+        {
+            visitor.Accept(As<T, UIntPtr>(value).ToUInt64());
+            return true;
+        }
+
+        if (typeof(T) == typeof(GuidOrId))
+        {
+            GuidOrId v = As<T, GuidOrId>(value);
+            if (!v.IsId)
+                return false;
+
+            visitor.Accept(v.Id);
+            return true;
+        }
+
+#if SUBSEQUENT_COMPILE
+        if (VectorTypes.TryGetProvider<T>() is { })
+        {
+            visitor.Accept(value);
+            return true;
+        }
+#endif
+
+        return false;
+    }
+
 
     private static void ConvertToNumber<TIdealOut, TVisitor>(string str, ref TVisitor visitor)
         where TVisitor : IGenericVisitor

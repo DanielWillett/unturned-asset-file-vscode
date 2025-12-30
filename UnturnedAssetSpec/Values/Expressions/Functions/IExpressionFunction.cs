@@ -15,6 +15,17 @@ public interface IExpressionFunction
     int ArgumentCountMask { get; }
 
     /// <summary>
+    /// Whether or not arguments for this function should be reduced to the given types:
+    /// <see cref="ulong"/>, <see cref="long"/>,
+    /// <see cref="uint"/>, <see cref="int"/>,
+    /// <see cref="ushort"/>, <see cref="short"/>,
+    /// <see cref="byte"/>, <see cref="sbyte"/>,
+    /// <see cref="float"/>, <see cref="double"/>,
+    /// <see cref="decimal"/>, and <see cref="string"/>.
+    /// </summary>
+    bool ReduceToKnownTypes { get; }
+
+    /// <summary>
     /// Gets the ideal argument type for the given <paramref name="argument"/>.
     /// </summary>
     IType? GetIdealArgumentType(int argument);

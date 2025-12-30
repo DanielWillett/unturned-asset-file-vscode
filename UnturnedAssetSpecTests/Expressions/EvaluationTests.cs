@@ -92,10 +92,11 @@ public class EvaluationTests
     [TestCase("MAX(=ADD(=MIN(4 3) 2) 1)", 5)]
     [TestCase("MIN(=ADD(=MIN(4 3) 2) =SUB(4 1))", 3)]
     [TestCase("MUL(=CAT(=ADD(4 3) =SUB(4 1)) -1)", -73)]
-    public void TestValueArg<TResult>(string constant, TResult expectedValue)
+    public void TestValueArg<TResult>(string expr, TResult expectedValue)
         where TResult : IEquatable<TResult>
     {
-        IValue<TResult> value = Values.FromExpression(TypeConverters.Get<TResult>().DefaultType, constant, simplifyConstantExpressions: false);
+        IType<TResult> type = TypeConverters.Get<TResult>().DefaultType;
+        IValue<TResult> value = Values.FromExpression(type, expr, simplifyConstantExpressions: false);
 
         Assert.That(value.TryGetConcreteValue(out Optional<TResult> result), Is.True);
         Assert.That(result.HasValue);
@@ -107,6 +108,28 @@ public class EvaluationTests
         {
             Assert.That(result.Value, Is.EqualTo(expectedValue));
         }
+
+        // perf-test
+
+        // const int c = 2_000_000;
+        // 
+        // Stopwatch sw = Stopwatch.StartNew();
+        // for (int i = 0; i < c; ++i)
+        // {
+        //     _ = Values.FromExpression(type, expr, simplifyConstantExpressions: false);
+        // }
+        // sw.Stop();
+        // Console.WriteLine("Expression: \"{0}\".", expr);
+        // Console.WriteLine($"Parse expression   : {sw.ElapsedTicks / (double)Stopwatch.Frequency * 1000d / c:F16} ms");
+        // 
+        // sw.Restart();
+        // for (int i = 0; i < c; ++i)
+        // {
+        //     value.TryGetConcreteValue(out _);
+        // }
+        // sw.Stop();
+        // 
+        // Console.WriteLine($"Evaluate expression: {sw.ElapsedTicks / (double)Stopwatch.Frequency * 1000d / c:F16} ms");
     }
 
     [Test]
@@ -120,13 +143,14 @@ public class EvaluationTests
     [TestCase("MIN(=ADD(=MIN(4 3) 2) =SUB(4 1))", 3)]
     [TestCase("MUL(=CAT(=ADD(4 3) =SUB(4 1)) -1)", -73)]
     [TestCase("=REP((unfair chair) ai x)", "unfxr chxr")]
-    public void Simplification<TResult>(string constant, TResult? expectedValue)
+    public void Simplification<TResult>(string expr, TResult? expectedValue)
         where TResult : IEquatable<TResult>
     {
         if (expectedValue is string { Length: 0 })
             expectedValue = default;
 
-        IValue<TResult> value = Values.FromExpression(TypeConverters.Get<TResult>().DefaultType, constant, simplifyConstantExpressions: true);
+        IType<TResult> type = TypeConverters.Get<TResult>().DefaultType;
+        IValue<TResult> value = Values.FromExpression(type, expr, simplifyConstantExpressions: true);
 
         Assert.That(value.TryGetConcreteValue(out Optional<TResult> result), Is.True);
         Assert.That(result.HasValue, Is.EqualTo(expectedValue != null));
@@ -141,5 +165,61 @@ public class EvaluationTests
 
         Assert.That(value, Is.Not.AssignableFrom<IFunctionExpressionNode>());
         Assert.That(value, Is.AssignableFrom<ConcreteValue<TResult>>().Or.AssignableFrom<NullValue<TResult>>());
+    }
+    
+    /// <summary>
+    /// Tests that a function returning an incompatible value, say a char in this case,
+    /// will be converted to a compatible value (a byte).
+    /// </summary>
+    [Test]
+    public void ReducingConversion()
+    {
+        TestConsumerFunction consume = new TestConsumerFunction();
+        TestProducerFunction producer = new TestProducerFunction();
+
+        ExpressionFunctions.RegisterFunction(consume);
+        ExpressionFunctions.RegisterFunction(producer);
+        try
+        {
+            IValue<int> value = Values.FromExpression(Int32Type.Instance, "=__CONSUME__(=__PRODUCE__)", simplifyConstantExpressions: false);
+
+            Assert.That(value.TryGetConcreteValue(out Optional<int> v), Is.True);
+            Assert.That(v.HasValue, Is.True);
+            Assert.That(v.Value, Is.EqualTo(1));
+        }
+        finally
+        {
+            ExpressionFunctions.DeregisterFunction(consume);
+            ExpressionFunctions.DeregisterFunction(producer);
+        }
+    }
+
+    private class TestConsumerFunction : ExpressionFunction
+    {
+        public override string FunctionName => "__CONSUME__";
+        public override int ArgumentCountMask => 1;
+        public override IType GetIdealArgumentType(int argument) => NumericAnyType.Instance;
+
+        public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
+        {
+            Assert.That(MathMatrix.IsValidMathExpressionInputType<TIn>());
+            Assert.That(typeof(TIn), Is.EqualTo(typeof(byte)));
+            Assert.That(MathMatrix.As<TIn, byte>(v), Is.EqualTo((byte)1));
+            visitor.Accept(1);
+            return true;
+        }
+    }
+
+    private class TestProducerFunction : ExpressionFunction
+    {
+        public override string FunctionName => "__PRODUCE__";
+        public override int ArgumentCountMask => 0;
+        public override IType GetIdealArgumentType(int argument) => NumericAnyType.Instance;
+
+        public override bool Evaluate<TOut, TVisitor>(ref TVisitor visitor)
+        {
+            visitor.Accept('1');
+            return true;
+        }
     }
 }

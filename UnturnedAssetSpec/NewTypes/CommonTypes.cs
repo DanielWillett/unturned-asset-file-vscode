@@ -3,6 +3,7 @@ using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -151,48 +152,14 @@ public static class CommonTypes
     /// Gets the default type from <typeparamref name="TValueType"/>, returning <see langword="null"/> if the type doesn't have a default type.
     /// </summary>
     /// <typeparam name="TValueType">Any common value type.</typeparam>
-    public static IType<TValueType> TryGetDefaultValueType<TValueType>() where TValueType : IEquatable<TValueType>
+    public static IType<TValueType>? TryGetDefaultValueType<TValueType>() where TValueType : IEquatable<TValueType>
     {
-        if (typeof(TValueType) == typeof(int))
-            return (IType<TValueType>)(object)Int32Type.Instance;
-        if (typeof(TValueType) == typeof(byte))
-            return (IType<TValueType>)(object)UInt8Type.Instance;
-        if (typeof(TValueType) == typeof(uint))
-            return (IType<TValueType>)(object)UInt32Type.Instance;
-        if (typeof(TValueType) == typeof(short))
-            return (IType<TValueType>)(object)Int16Type.Instance;
-        if (typeof(TValueType) == typeof(ushort))
-            return (IType<TValueType>)(object)UInt16Type.Instance;
-        if (typeof(TValueType) == typeof(sbyte))
-            return (IType<TValueType>)(object)Int8Type.Instance;
-        if (typeof(TValueType) == typeof(long))
-            return (IType<TValueType>)(object)Int64Type.Instance;
-        if (typeof(TValueType) == typeof(ulong))
-            return (IType<TValueType>)(object)UInt64Type.Instance;
-        if (typeof(TValueType) == typeof(float))
-            return (IType<TValueType>)(object)Float32Type.Instance;
-        if (typeof(TValueType) == typeof(double))
-            return (IType<TValueType>)(object)Float64Type.Instance;
-        if (typeof(TValueType) == typeof(decimal))
-            return (IType<TValueType>)(object)Float128Type.Instance;
-        if (typeof(TValueType) == typeof(char))
-            return (IType<TValueType>)(object)CharacterType.Instance;
-        if (typeof(TValueType) == typeof(bool))
-            return (IType<TValueType>)(object)BooleanType.Instance;
-        if (typeof(TValueType) == typeof(string))
-            return (IType<TValueType>)(object)StringType.Instance;
-        if (typeof(TValueType) == typeof(GuidOrId))
-            return (IType<TValueType>)(object)GuidOrIdType.Instance;
-        if (typeof(TValueType) == typeof(DateTime))
-            return (IType<TValueType>)(object)DateTimeType.Instance;
-        if (typeof(TValueType) == typeof(TimeSpan))
-            return (IType<TValueType>)(object)TimeSpanType.Instance;
-        if (typeof(TValueType) == typeof(DateTimeOffset))
-            return (IType<TValueType>)(object)DateTimeOffsetType.Instance;
-        if (typeof(TValueType) == typeof(IPv4Filter))
-            return (IType<TValueType>)(object)IPv4FilterType.Instance;
+        if (TypeConverters.TryGet<TValueType>() is { } tc)
+        {
+            return tc.DefaultType;
+        }
 
-        throw new InvalidOperationException(string.Format(Resources.InvalidOperationException_InvalidCountType, typeof(TValueType).Name));
+        return null;
     }
 
     /// <summary>
