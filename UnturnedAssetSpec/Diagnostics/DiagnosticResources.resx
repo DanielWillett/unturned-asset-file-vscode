@@ -348,4 +348,7 @@
   <data name="UNT1007_Modern" xml:space="preserve">
     <value>Property '{0}' requires a value for '{1}'.</value>
   </data>
+  <data name="UNT2004_AssetReferenceStringOnly" xml:space="preserve">
+    <value>Dictionary can not be converted to a value of type '{0}', which expects a GUID as a string only. Property '{1}' expects a value.</value>
+  </data>
 </root>

@@ -9,6 +9,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class IPv4FilterTypeConverter : ITypeConverter<IPv4Filter>
 {
+    public IType<IPv4Filter> DefaultType => IPv4FilterType.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<IPv4Filter> args, out IPv4Filter parsedValue)
     {
         return IPv4Filter.TryParse(text, out parsedValue);

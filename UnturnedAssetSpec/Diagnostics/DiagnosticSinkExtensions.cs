@@ -582,7 +582,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a dictionary value given for a BundleReference type that only supports string values.. 
+        /// Reports a dictionary value given for a BundleReference type that only supports string values.
         /// </summary>
         public void UNT2004_BundleReferenceStringOnly<TDiagnosticProvider>(
             ref TDiagnosticProvider provider, IType type, IParentSourceNode parent
@@ -592,6 +592,21 @@ public static class DiagnosticSinkExtensions
             {
                 Diagnostic = DatDiagnostics.UNT2004,
                 Message = string.Format(DiagnosticResources.UNT2004_BundleReferenceStringOnly, type.DisplayName, NodePropertyName(parent, ref provider)),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+        
+        /// <summary>
+        /// Reports a dictionary value given for an AssetReference type that only supports string values.
+        /// </summary>
+        public void UNT2004_AssetReferenceStringOnly<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, IType type, IParentSourceNode parent
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2004,
+                Message = string.Format(DiagnosticResources.UNT2004_AssetReferenceStringOnly, type.DisplayName, NodePropertyName(parent, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }

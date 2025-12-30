@@ -239,7 +239,7 @@
             "Key": "Shared_Skin_Lookup_ID",
             "Type":
             {
-                "Type": "GuidOrId",
+                "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.VehicleAsset, Assembly-CSharp"
             },
             "DefaultValue": "@GUID",
@@ -382,7 +382,7 @@
             "Key": "Default_Battery",
             "Type":
             {
-                "Type": "GuidOrId",
+                "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemVehicleRepairToolAsset, Assembly-CSharp"
             },
             "DefaultValue": "098b13be34a7411db7736b7f866ada69",
@@ -723,7 +723,7 @@
             "Key": "Explosion",
             "Type":
             {
-                "Type": "GuidOrId",
+                "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
             "DefaultValue": "00000000000000000000000000000000",

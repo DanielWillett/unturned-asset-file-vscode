@@ -1,15 +1,17 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class TimeSpanTypeConverter : ITypeConverter<TimeSpan>
 {
+    public IType<TimeSpan> DefaultType => TimeSpanType.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<TimeSpan> args, out TimeSpan parsedValue)
     {
         return TimeSpan.TryParse(

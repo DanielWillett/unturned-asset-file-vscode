@@ -40,6 +40,21 @@ public readonly struct Optional<T>(T value) : IEquatable<T>, IEquatable<Optional
         return HasValue ? Value : defaultValue;
     }
 
+    /// <summary>
+    /// Attempts to get the value, or <see langword="null"/> if <typeparamref name="T"/> is a reference type.
+    /// </summary>
+    public bool TryGetValueOrNull(out T? value)
+    {
+        if (HasValue)
+        {
+            value = Value;
+            return true;
+        }
+
+        value = default;
+        return value == null;
+    }
+
     /// <inheritdoc />
     public bool Equals(T? other)
     {

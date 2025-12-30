@@ -104,7 +104,7 @@
             "Key": "Explosion2",
             "Type":
             {
-                "Type": "GuidOrId",
+                "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
             "Description": "Effect to play upon detonation.",

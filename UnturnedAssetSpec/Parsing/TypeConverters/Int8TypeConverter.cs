@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
@@ -9,6 +10,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class Int8TypeConverter : ITypeConverter<sbyte>
 {
+    public IType<sbyte> DefaultType => Int8Type.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<sbyte> args, out sbyte parsedValue)
     {
         return sbyte.TryParse(args.StringOrSpan(text), NumberStyles.Any, CultureInfo.InvariantCulture, out parsedValue);
@@ -155,7 +158,7 @@ internal sealed class Int8TypeConverter : ITypeConverter<sbyte>
             return true;
         }
 
-        if (VectorConversionHelper.TryConvertToVector<long, TTo>(value, out TTo? parsedVector))
+        if (VectorTypes.TryConvertToVector<long, TTo>(value, out TTo? parsedVector))
         {
             result = parsedVector;
             return true;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using System;
 using System.Numerics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
@@ -10,6 +11,10 @@ internal sealed class BallisticGravityMultiplierCalculation : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.BallisticGravityMultiplierCalculation;
     public override int ArgumentCountMask => 1 << 2;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument is 0 or 1 or 2 ? Float32Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn1, TIn2, TIn3, TOut, TVisitor>(TIn1 v1, TIn2 v2, TIn3 v3, ref TVisitor visitor)
     {

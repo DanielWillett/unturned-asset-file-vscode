@@ -183,6 +183,7 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
 
     string IType.Id => TypeName.Type;
     IValue<DatEnumValue> IType<DatEnumValue>.CreateValue(Optional<DatEnumValue> value) => value.Value ?? Null;
+    IType<DatEnumValue> ITypeConverter<DatEnumValue>.DefaultType => this;
 }
 
 public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConverter<DatFlagEnumValue>
@@ -202,8 +203,6 @@ public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConver
 
     internal DatFlagEnumType(QualifiedType type, JsonElement element, DatFileType file) : base(type, element, file) { }
 
-
-    /// <inheritdoc />
     public bool TryReadValueFromJson(ref Utf8JsonReader reader, [NotNullWhen(true)] out IValue<DatFlagEnumValue>? value)
     {
         if (reader.TokenType == JsonTokenType.Null)
@@ -525,6 +524,7 @@ public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConver
     }
 
     IValue<DatFlagEnumValue> IType<DatFlagEnumValue>.CreateValue(Optional<DatFlagEnumValue> value) => value.Value ?? Null;
+    IType<DatFlagEnumValue> ITypeConverter<DatFlagEnumValue>.DefaultType => this;
 
     bool ITypeConverter<DatFlagEnumValue>.TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<DatFlagEnumValue> args, [MaybeNullWhen(false)] out DatFlagEnumValue parsedValue)
     {
@@ -698,6 +698,20 @@ public class DatEnumValue : IValue<DatEnumValue>, IEquatable<DatEnumValue>, IDat
     bool IValue<DatEnumValue>.TryEvaluateValue(out Optional<DatEnumValue> value, in FileEvaluationContext ctx)
     {
         value = new Optional<DatEnumValue>(this);
+        return true;
+    }
+
+    /// <inheritdoc />
+    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
+    {
+        visitor.Accept(new Optional<DatEnumValue>(this));
+        return true;
+    }
+
+    /// <inheritdoc />
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+    {
+        visitor.Accept(new Optional<DatEnumValue>(this));
         return true;
     }
 

@@ -25,8 +25,8 @@ public abstract class BaseType<TValue, TSelf>
     public virtual IValue<TValue> CreateValue(Optional<TValue> value)
     {
         return value.HasValue
-            ? new ConcreteValue<TValue>(value.Value, this)
-            : new ConcreteValue<TValue>(this);
+            ? Values.Values.Create(value.Value, this)
+            : Values.Values.Null(this);
     }
 
     public void Visit<TVisitor>(ref TVisitor visitor) where TVisitor : ITypeVisitor

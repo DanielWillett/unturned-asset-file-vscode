@@ -2,7 +2,7 @@
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 
-internal sealed class E : ExpressionFunction
+internal sealed class E : ExpressionFunction, IFunctionExpressionNode
 {
     public static readonly E Instance = new E();
     static E() { }
@@ -22,4 +22,9 @@ internal sealed class E : ExpressionFunction
         }
         return true;
     }
+
+    int IFunctionExpressionNode.Count => 0;
+    IExpressionFunction IFunctionExpressionNode.Function => this;
+    IExpressionNode IFunctionExpressionNode.this[int index] => throw new ArgumentOutOfRangeException(nameof(index));
+    bool IEquatable<IExpressionNode>.Equals(IExpressionNode? other) => other is E;
 }

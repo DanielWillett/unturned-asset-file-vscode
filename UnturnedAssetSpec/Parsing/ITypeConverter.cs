@@ -1,12 +1,12 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -16,6 +16,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 /// <remarks>Most type converters should be case-insensitive.</remarks>
 public interface ITypeConverter<T> where T : IEquatable<T>
 {
+    /// <summary>
+    /// The default type to use for parsing.
+    /// </summary>
+    IType<T> DefaultType { get; }
+
     /// <summary>
     /// Attempt to parse a value from it's <paramref name="text"/> span. This and <see cref="Format"/> should have a round-trip relationship.
     /// </summary>

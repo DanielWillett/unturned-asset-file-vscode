@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -41,7 +42,7 @@ public interface IPropertiesDataRef : IDataRefTarget
 /// <summary>
 /// References a special property of a target, such as the file name or if the target is included or not.
 /// </summary>
-public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<ISpecDynamicValue>
+public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<ISpecDynamicValue>, IDataRefExpressionNode
 {
     /// <summary>
     /// The target of this data-ref property.
@@ -91,7 +92,7 @@ public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<
         {
             return new PropertyDataRef("This");
         }
-        
+
         return new PropertyDataRef(optionalString ?? name.ToString());
     }
 
@@ -225,9 +226,9 @@ public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<
                         .Append('=')
                         .Append(property.Value);
                 } while (props.MoveNext());
-            }
 
-            bldr.Append('}');
+                bldr.Append('}');
+            }
         }
 
         if (StringHelper.ContainsWhitespace(bldr))
@@ -243,5 +244,12 @@ public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<
         writer.WriteStringValue(bldr.ToString());
     }
 
+    bool IEquatable<IExpressionNode>.Equals(IExpressionNode? other)
+    {
+        return other is DataRef dr && Equals(dr);
+    }
+
     public override string ToString() => Target + "." + PropertyName;
+
+    DataRef IDataRefExpressionNode.DataRef => this;
 }

@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
@@ -42,6 +43,40 @@ public static class VectorTypes
         return VectorTypeCache<TVector>.HasProvider
             ? VectorTypeCache<TVector>.Provider
             : VectorTypeCache<TVector>.CreateProvider();
+    }
+
+    /// <summary>
+    /// Attempts to convert a <see cref="IConvertible"/> type to any of the known vector types.
+    /// </summary>
+    /// <typeparam name="TFrom">The type being converted from.</typeparam>
+    /// <typeparam name="TTo">The vector type being converted to.</typeparam>
+    /// <param name="from">The value being converted from</param>
+    /// <param name="value">The converted vector, or <see langword="default"/> if the conversion was unsuccessful.</param>
+    /// <returns>Whether or not the conversion was successful.</returns>
+    public static bool TryConvertToVector<TFrom, TTo>(TFrom from, [MaybeNullWhen(false)] out TTo value)
+        where TTo : IEquatable<TTo>
+        where TFrom : IConvertible, IEquatable<TFrom>
+    {
+        if (!typeof(TTo).IsValueType)
+        {
+            value = default;
+            return false;
+        }
+
+        if (TryGetProvider<TTo>() is { } vectorProvider)
+        {
+            try
+            {
+                double comp = from.ToDouble(CultureInfo.InvariantCulture);
+                value = vectorProvider.Construct(comp);
+                return true;
+            }
+            catch (InvalidCastException) { }
+            catch (OverflowException) { }
+        }
+
+        value = default;
+        return false;
     }
 
     internal static bool TryParseFloatArg<T>(ref TypeParserArgs<T> args, out float value, IPropertySourceNode property) where T : IEquatable<T>

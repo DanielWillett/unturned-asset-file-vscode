@@ -1,4 +1,6 @@
-﻿namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 
 internal sealed class Concatenate : ExpressionFunction
 {
@@ -8,6 +10,10 @@ internal sealed class Concatenate : ExpressionFunction
     public override string FunctionName => ExpressionFunctions.Concatenate;
     public override int ArgumentCountMask => (1 << 0) | (1 << 1) | (1 << 2);
     public override bool ReduceToKnownTypes => false;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument is 0 or 1 ? StringType.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v1, ref TVisitor visitor)
     {

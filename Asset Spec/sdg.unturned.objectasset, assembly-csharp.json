@@ -602,7 +602,7 @@
             "Key": "Interactability_Effect",
             "Type":
             {
-                "Type": "GuidOrId",
+                "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
             "DefaultValue": "00000000000000000000000000000000",
@@ -923,7 +923,7 @@
             "Key": "Interactability_Finale",
             "Type":
             {
-                "Type": "GuidOrId",
+                "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
             "DefaultValue": "00000000000000000000000000000000",
@@ -1410,7 +1410,7 @@
             "Key": "Rubble_Effect",
             "Type":
             {
-                "Type": "GuidOrId",
+                "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
             "DefaultValue": "00000000000000000000000000000000",
@@ -1445,7 +1445,7 @@
             "Key": "Rubble_Finale",
             "Type":
             {
-                "Type": "GuidOrId",
+                "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
             "DefaultValue": "00000000000000000000000000000000",

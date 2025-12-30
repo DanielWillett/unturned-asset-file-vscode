@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
@@ -9,6 +10,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class DateTimeOffsetTypeConverter : ITypeConverter<DateTimeOffset>
 {
+    public IType<DateTimeOffset> DefaultType => DateTimeOffsetType.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<DateTimeOffset> args, out DateTimeOffset parsedValue)
     {
         bool s = DateTimeOffset.TryParse(

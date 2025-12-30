@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
@@ -9,6 +10,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class Float128TypeConverter : ITypeConverter<decimal>
 {
+    public IType<decimal> DefaultType => Float128Type.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<decimal> args, out decimal parsedValue)
     {
         return decimal.TryParse(args.StringOrSpan(text), NumberStyles.Any, CultureInfo.InvariantCulture, out parsedValue);
@@ -252,7 +255,7 @@ internal sealed class Float128TypeConverter : ITypeConverter<decimal>
             return true;
         }
 
-        if (VectorConversionHelper.TryConvertToVector<decimal, TTo>(value, out TTo? parsedVector))
+        if (VectorTypes.TryConvertToVector<decimal, TTo>(value, out TTo? parsedVector))
         {
             result = parsedVector;
             return true;

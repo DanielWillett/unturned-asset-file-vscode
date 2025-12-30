@@ -141,6 +141,9 @@
   <data name="FormatException_Expression_MissingEndingParenthesis" xml:space="preserve">
     <value>Parameter list not closed, expected ')'.</value>
   </data>
+  <data name="FormatException_Expression_NestedExpressionCanNotBeWrapped" xml:space="preserve">
+    <value>Nested expressions can not be wrapped in parenthesis, such as in "=(SQRT(1))".</value>
+  </data>
   <data name="FormatException_IPv4Format_FailedToParse" xml:space="preserve">
     <value>Failed to parse IPv4Filter, expected a value in the format: "0.0.0.0[/0][:0[-0]]".</value>
   </data>
@@ -213,6 +216,18 @@
   <data name="Log_UnableToReadFile" xml:space="preserve">
     <value>Unable to read file "{0}" from any of the available sources.</value>
   </data>
+  <data name="Type_Name_AssetReference" xml:space="preserve">
+    <value>Asset Reference</value>
+  </data>
+  <data name="Type_Name_AssetReferenceString" xml:space="preserve">
+    <value>Asset Reference (String)</value>
+  </data>
+  <data name="Type_Name_AssetReferenceString_Type" xml:space="preserve">
+    <value>Asset Reference (String) to {0}</value>
+  </data>
+  <data name="Type_Name_AssetReference_Type" xml:space="preserve">
+    <value>Asset Reference to {0}</value>
+  </data>
   <data name="Type_Name_AudioReference" xml:space="preserve">
     <value>Audio Reference</value>
   </data>
@@ -228,6 +243,12 @@
   <data name="Type_Name_ContentReference" xml:space="preserve">
     <value>Content Reference</value>
   </data>
+  <data name="Type_Name_DateTime" xml:space="preserve">
+    <value>Timestamp (UTC)</value>
+  </data>
+  <data name="Type_Name_DateTimeOffset" xml:space="preserve">
+    <value>Timestamp + Timezone</value>
+  </data>
   <data name="Type_Name_Flag" xml:space="preserve">
     <value>Flag</value>
   </data>
@@ -240,6 +261,12 @@
   <data name="Type_Name_Float128" xml:space="preserve">
     <value>Decimal</value>
   </data>
+  <data name="Type_Name_Guid" xml:space="preserve">
+    <value>GUID</value>
+  </data>
+  <data name="Type_Name_GuidOrId" xml:space="preserve">
+    <value>GUID or Unsigned 16-Bit Integer</value>
+  </data>
   <data name="Type_Name_Int8" xml:space="preserve">
     <value>Signed 8-Bit Integer</value>
   </data>
@@ -251,6 +278,9 @@
   </data>
   <data name="Type_Name_Int64" xml:space="preserve">
     <value>Signed 64-Bit Integer</value>
+  </data>
+  <data name="Type_Name_IPv4Filter" xml:space="preserve">
+    <value>IPv4 Filter</value>
   </data>
   <data name="Type_Name_List_Generic" xml:space="preserve">
     <value>List of {0}</value>
@@ -269,6 +299,9 @@
   </data>
   <data name="Type_Name_String" xml:space="preserve">
     <value>Text</value>
+  </data>
+  <data name="Type_Name_TimeSpan" xml:space="preserve">
+    <value>Time</value>
   </data>
   <data name="Type_Name_TranslationReference" xml:space="preserve">
     <value>Legacy Translation Token Reference</value>

@@ -11,6 +11,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class StringTypeConverter : ITypeConverter<string>
 {
+    public IType<string> DefaultType => StringType.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<string> args, [NotNullWhen(true)] out string? parsedValue)
     {
         parsedValue = args.GetString(text);
@@ -155,7 +157,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return ConvertR16(value, out result);
         }
 
-        if (VectorConversionHelper.TryConvertToVector<string, TTo>(value, out TTo? parsedVector))
+        if (VectorTypes.TryConvertToVector<string, TTo>(value, out TTo? parsedVector))
         {
             result = parsedVector;
             return true;

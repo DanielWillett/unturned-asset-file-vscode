@@ -4,11 +4,14 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class BooleanTypeConverter : ITypeConverter<bool>
 {
+    public IType<bool> DefaultType => BooleanType.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<bool> args, out bool parsedValue)
     {
         switch (text.Length)
@@ -219,7 +222,7 @@ internal sealed class BooleanTypeConverter : ITypeConverter<bool>
             return true;
         }
 
-        if (VectorConversionHelper.TryConvertToVector<bool, TTo>(value, out TTo? parsedVector))
+        if (VectorTypes.TryConvertToVector<bool, TTo>(value, out TTo? parsedVector))
         {
             result = parsedVector;
             return true;

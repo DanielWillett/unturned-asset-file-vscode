@@ -2,7 +2,7 @@
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 
-internal sealed class Tau : ExpressionFunction
+internal sealed class Tau : ExpressionFunction, IFunctionExpressionNode
 {
     public static readonly Tau Instance = new Tau();
     static Tau() { }
@@ -22,4 +22,9 @@ internal sealed class Tau : ExpressionFunction
         }
         return true;
     }
+
+    int IFunctionExpressionNode.Count => 0;
+    IExpressionFunction IFunctionExpressionNode.Function => this;
+    IExpressionNode IFunctionExpressionNode.this[int index] => throw new ArgumentOutOfRangeException(nameof(index));
+    bool IEquatable<IExpressionNode>.Equals(IExpressionNode? other) => other is Tau;
 }

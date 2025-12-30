@@ -133,6 +133,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Nested expressions can not be wrapped in parenthesis, such as in &quot;=(SQRT(1))&quot;..
+        /// </summary>
+        internal static string FormatException_Expression_NestedExpressionCanNotBeWrapped {
+            get {
+                return ResourceManager.GetString("FormatException_Expression_NestedExpressionCanNotBeWrapped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to parse IPv4Filter, expected a value in the format: &quot;0.0.0.0[/0][:0[-0]]&quot;..
         /// </summary>
         internal static string FormatException_IPv4Format_FailedToParse {
@@ -349,6 +358,42 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Asset Reference.
+        /// </summary>
+        internal static string Type_Name_AssetReference {
+            get {
+                return ResourceManager.GetString("Type_Name_AssetReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset Reference to {0}.
+        /// </summary>
+        internal static string Type_Name_AssetReference_Type {
+            get {
+                return ResourceManager.GetString("Type_Name_AssetReference_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset Reference (String).
+        /// </summary>
+        internal static string Type_Name_AssetReferenceString {
+            get {
+                return ResourceManager.GetString("Type_Name_AssetReferenceString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset Reference (String) to {0}.
+        /// </summary>
+        internal static string Type_Name_AssetReferenceString_Type {
+            get {
+                return ResourceManager.GetString("Type_Name_AssetReferenceString_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Audio Reference.
         /// </summary>
         internal static string Type_Name_AudioReference {
@@ -394,6 +439,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Timestamp (UTC).
+        /// </summary>
+        internal static string Type_Name_DateTime {
+            get {
+                return ResourceManager.GetString("Type_Name_DateTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timestamp + Timezone.
+        /// </summary>
+        internal static string Type_Name_DateTimeOffset {
+            get {
+                return ResourceManager.GetString("Type_Name_DateTimeOffset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Flag.
         /// </summary>
         internal static string Type_Name_Flag {
@@ -430,6 +493,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to GUID.
+        /// </summary>
+        internal static string Type_Name_Guid {
+            get {
+                return ResourceManager.GetString("Type_Name_Guid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GUID or Unsigned 16-Bit Integer.
+        /// </summary>
+        internal static string Type_Name_GuidOrId {
+            get {
+                return ResourceManager.GetString("Type_Name_GuidOrId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Signed 16-Bit Integer.
         /// </summary>
         internal static string Type_Name_Int16 {
@@ -462,6 +543,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_Int8 {
             get {
                 return ResourceManager.GetString("Type_Name_Int8", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IPv4 Filter.
+        /// </summary>
+        internal static string Type_Name_IPv4Filter {
+            get {
+                return ResourceManager.GetString("Type_Name_IPv4Filter", resourceCulture);
             }
         }
         
@@ -516,6 +606,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_String {
             get {
                 return ResourceManager.GetString("Type_Name_String", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time.
+        /// </summary>
+        internal static string Type_Name_TimeSpan {
+            get {
+                return ResourceManager.GetString("Type_Name_TimeSpan", resourceCulture);
             }
         }
         

@@ -12,6 +12,7 @@ public class TokenizerTests
     [TestCase("ABS 3)")]
     [TestCase("ABS(")]
     [TestCase("ABS(3")]
+    [TestCase("ABS(=(SQRT(4)))")]
     public void TestExpectedError(string value)
     {
         Assert.Throws<FormatException>(() =>
@@ -237,6 +238,41 @@ public class TokenizerTests
     }
 
     [Test]
+    public void ParseFunction1Arg_EmptyValue()
+    {
+        ExpressionTokenizer tokenizer = new ExpressionTokenizer("ABS(())");
+        try
+        {
+            Assert.That(tokenizer.MoveNext());
+
+            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo("ABS"));
+            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.FunctionName));
+
+            Assert.That(tokenizer.MoveNext());
+
+            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo("("));
+            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.OpenParams));
+
+            Assert.That(tokenizer.MoveNext());
+
+            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo(string.Empty));
+            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.Value));
+            Assert.That(tokenizer.Current.ValueType, Is.EqualTo(ExpressionValueType.Value));
+
+            Assert.That(tokenizer.MoveNext());
+
+            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo(")"));
+            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.CloseParams));
+
+            Assert.That(tokenizer.MoveNext(), Is.False);
+        }
+        finally
+        {
+            tokenizer.Dispose();
+        }
+    }
+
+    [Test]
     public void ParseFunction1Arg_DataRefExplicitParenthesis()
     {
         ExpressionTokenizer tokenizer = new ExpressionTokenizer("ABS(#(SDG.Unturned.ItemAsset, Assembly-CSharp::Type.IsLegacy))");
@@ -308,40 +344,6 @@ public class TokenizerTests
     }
 
     [Test]
-    public void ParseFunction1Arg_ExpressionExplicitParenthesis()
-    {
-        ExpressionTokenizer tokenizer = new ExpressionTokenizer("ABS(=(PI))");
-        try
-        {
-            Assert.That(tokenizer.MoveNext());
-
-            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo("ABS"));
-            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.FunctionName));
-
-            Assert.That(tokenizer.MoveNext());
-
-            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo("("));
-            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.OpenParams));
-
-            Assert.That(tokenizer.MoveNext());
-
-            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo("PI"));
-            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.FunctionName));
-
-            Assert.That(tokenizer.MoveNext());
-
-            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo(")"));
-            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.CloseParams));
-
-            Assert.That(tokenizer.MoveNext(), Is.False);
-        }
-        finally
-        {
-            tokenizer.Dispose();
-        }
-    }
-
-    [Test]
     public void ParseFunction1Arg_ExpressionExplicit()
     {
         ExpressionTokenizer tokenizer = new ExpressionTokenizer("ABS(=PI)");
@@ -394,6 +396,51 @@ public class TokenizerTests
             Assert.That(tokenizer.MoveNext());
 
             Assert.That(tokenizer.Current.GetContent(), Is.EqualTo("3"));
+            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.Value));
+
+            Assert.That(tokenizer.MoveNext());
+
+            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo(" "));
+            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.ArgumentSeparator));
+
+            Assert.That(tokenizer.MoveNext());
+
+            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo("Test"));
+            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.Value));
+            Assert.That(tokenizer.Current.ValueType, Is.EqualTo(ExpressionValueType.PropertyRef));
+
+            Assert.That(tokenizer.MoveNext());
+
+            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo(")"));
+            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.CloseParams));
+
+            Assert.That(tokenizer.MoveNext(), Is.False);
+        }
+        finally
+        {
+            tokenizer.Dispose();
+        }
+    }
+
+    [Test]
+    public void ParseFunctionParenthesizedValue()
+    {
+        ExpressionTokenizer tokenizer = new ExpressionTokenizer("ABS((a b) @Test)");
+        try
+        {
+            Assert.That(tokenizer.MoveNext());
+
+            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo("ABS"));
+            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.FunctionName));
+
+            Assert.That(tokenizer.MoveNext());
+
+            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo("("));
+            Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.OpenParams));
+
+            Assert.That(tokenizer.MoveNext());
+
+            Assert.That(tokenizer.Current.GetContent(), Is.EqualTo("a b"));
             Assert.That(tokenizer.Current.Type, Is.EqualTo(ExpressionTokenType.Value));
 
             Assert.That(tokenizer.MoveNext());

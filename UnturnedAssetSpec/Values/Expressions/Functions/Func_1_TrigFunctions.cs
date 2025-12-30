@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 
@@ -9,6 +10,10 @@ internal sealed class SineRad : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.SineRad;
     public override int ArgumentCountMask => 1 << 0;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument == 0 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {
@@ -23,6 +28,10 @@ internal sealed class CosineRad : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.CosineRad;
     public override int ArgumentCountMask => 1 << 0;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument == 0 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {
@@ -37,6 +46,10 @@ internal sealed class TangentRad : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.TangentRad;
     public override int ArgumentCountMask => 1 << 0;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument == 0 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {
@@ -51,6 +64,10 @@ internal sealed class SineDeg : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.SineDeg;
     public override int ArgumentCountMask => 1 << 0;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument == 0 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {
@@ -65,6 +82,10 @@ internal sealed class CosineDeg : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.CosineDeg;
     public override int ArgumentCountMask => 1 << 0;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument == 0 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {
@@ -79,6 +100,10 @@ internal sealed class TangentDeg : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.TangentDeg;
     public override int ArgumentCountMask => 1 << 0;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument == 0 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {
@@ -93,6 +118,10 @@ internal sealed class ArcSineRad : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.ArcSineRad;
     public override int ArgumentCountMask => 1 << 0;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument == 0 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {
@@ -107,6 +136,10 @@ internal sealed class ArcCosineRad : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.ArcCosineRad;
     public override int ArgumentCountMask => 1 << 0;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument == 0 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {
@@ -121,6 +154,10 @@ internal sealed class ArcTangentRad : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.ArcTangentRad;
     public override int ArgumentCountMask => (1 << 0) | (1 << 1);
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument is 0 or 1 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {
@@ -140,6 +177,10 @@ internal sealed class ArcSineDeg : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.ArcSineDeg;
     public override int ArgumentCountMask => 1 << 0;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument == 0 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {
@@ -154,6 +195,10 @@ internal sealed class ArcCosineDeg : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.ArcCosineDeg;
     public override int ArgumentCountMask => 1 << 0;
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument == 0 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {
@@ -168,6 +213,10 @@ internal sealed class ArcTangentDeg : ExpressionFunction
 
     public override string FunctionName => ExpressionFunctions.ArcTangentDeg;
     public override int ArgumentCountMask => (1 << 0) | (1 << 1);
+    public override IType? GetIdealArgumentType(int argument)
+    {
+        return argument is 0 or 1 ? Float64Type.Instance : null;
+    }
 
     public override bool Evaluate<TIn, TOut, TVisitor>(TIn v, ref TVisitor visitor)
     {

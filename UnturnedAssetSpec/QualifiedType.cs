@@ -18,8 +18,9 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
 
     public static readonly QualifiedType None = default;
     public static readonly QualifiedType AssetBaseType = new QualifiedType(TypeHierarchy.AssetBaseType);
-    internal static readonly QualifiedType ItemAssetType = new QualifiedType(TypeHierarchy.ItemAssetType);
+    public static readonly QualifiedType ObjectType = new QualifiedType(TypeHierarchy.ObjectType);
     public static readonly QualifiedType UseableBaseType = new QualifiedType(TypeHierarchy.UseableBaseType);
+    internal static readonly QualifiedType ItemAssetType = new QualifiedType(TypeHierarchy.ItemAssetType);
 
 #nullable disable
     /// <summary>

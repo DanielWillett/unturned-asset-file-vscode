@@ -3,15 +3,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.NewTypes.Objects;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 /// <summary>
 /// Base type for most vector/color types.
@@ -293,6 +291,8 @@ public abstract class BaseVectorType<TVector, TSelf> :
         result = Optional<TTo>.Null;
         return false;
     }
+
+    IType<TVector> ITypeConverter<TVector>.DefaultType => this;
 
     IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
     {

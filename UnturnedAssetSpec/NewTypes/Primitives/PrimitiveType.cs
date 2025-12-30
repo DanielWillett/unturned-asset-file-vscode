@@ -1,5 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -27,7 +28,7 @@ public abstract class PrimitiveType<TValue, TSelf>
     /// Singleton instance of the <see langword="null"/> value of this type.
     /// </summary>
     [field: MaybeNull]
-    public static IValue<TValue> Null => field ??= new NullValue<TValue>(Instance);
+    public static NullValue<TValue> Null => field ??= new NullValue<TValue>(Instance);
 
     public override ITypeParser<TValue> Parser => TypeParsers.Get<TValue>();
 
@@ -35,6 +36,14 @@ public abstract class PrimitiveType<TValue, TSelf>
 
     /// <inheritdoc cref="IEquatable{T}"/>
     protected override bool Equals(TSelf other) => true;
+
+    /// <inheritdoc />
+    public override IValue<TValue> CreateValue(Optional<TValue> value)
+    {
+        return value.HasValue
+            ? Values.Values.Create(value.Value, this)
+            : Null;
+    }
 
     /// <inheritdoc cref="ITypeFactory.CreateType"/>
     protected virtual IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context) => this;

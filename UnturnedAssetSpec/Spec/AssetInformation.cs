@@ -299,6 +299,7 @@ public class AssetInformation
 public class TypeHierarchy
 {
     public const string AssetBaseType = "SDG.Unturned.Asset, Assembly-CSharp";
+    public const string ObjectType = "System.Object, mscorlib";
     internal const string ItemAssetType = "SDG.Unturned.ItemAsset, Assembly-CSharp";
 
     public const string UseableBaseType = "SDG.Unturned.Useable, Assembly-CSharp";

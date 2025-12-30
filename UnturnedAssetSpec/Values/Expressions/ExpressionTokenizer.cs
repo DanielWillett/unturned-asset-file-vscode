@@ -11,14 +11,18 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 internal ref struct ExpressionTokenizer
 {
     private readonly ReadOnlySpan<char> _expr;
+    private readonly string? _exprString;
     private int _index;
     private int _depth;
 
     public ExpressionToken Current;
 
-    public ExpressionTokenizer(ReadOnlySpan<char> expr)
+    public ExpressionTokenizer(ReadOnlySpan<char> expr) : this(expr, null) { }
+    public ExpressionTokenizer(string expr) : this(expr.AsSpan(), expr) { }
+    public ExpressionTokenizer(ReadOnlySpan<char> expr, string? exprString)
     {
         _expr = expr;
+        _exprString = exprString;
         Reset();
     }
 
@@ -57,6 +61,7 @@ internal ref struct ExpressionTokenizer
                 ExpressionValueType valueType = ExpressionValueType.Value;
                 int valueStartIndex;
                 int valueLength;
+                int parenLength = 0;
                 if (remaining[0] is '(' or '@' or '=' or '#' or '%')
                 {
                     int pInd = -1;
@@ -75,6 +80,8 @@ internal ref struct ExpressionTokenizer
                         };
                         if (remaining[1] == '(')
                         {
+                            if (valueType == ExpressionValueType.Expression)
+                                throw new FormatException(Resources.FormatException_Expression_NestedExpressionCanNotBeWrapped);
                             pInd = 1;
                         }
                     }
@@ -100,6 +107,8 @@ internal ref struct ExpressionTokenizer
                         {
                             throw new FormatException(Resources.FormatException_Expression_ExpectedParenthesizedValueEnd);
                         }
+
+                        parenLength = 1;
                     }
                     else
                     {
@@ -155,7 +164,7 @@ internal ref struct ExpressionTokenizer
                 }
 
                 Current.ValueType = valueType;
-                _index += valueStartIndex + valueLength - 1;
+                _index += valueStartIndex + valueLength - 1 + parenLength;
                 return true;
 
             default:
@@ -175,6 +184,10 @@ internal ref struct ExpressionTokenizer
                 if (hadEscapeSequences)
                 {
                     Current.SetContent(ExpressionTokenType.FunctionName, StringHelper.Unescape(function));
+                }
+                else if (function.Length == _expr.Length && _exprString != null)
+                {
+                    Current.SetContent(ExpressionTokenType.FunctionName, _exprString);
                 }
                 else
                 {
@@ -250,12 +263,18 @@ internal ref struct ExpressionToken
     public ExpressionTokenType Type;
     public ExpressionValueType ValueType;
     public ReadOnlySpan<char> Content;
-    private string? _contentString;
+    public string? ContentAsString;
 
+    // used with TryParse overloads
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+    public ReadOnlySpan<char> ContentParsable => Content;
+#else
+    public string ContentParsable => GetContent();
+#endif
     public void SetContent(ExpressionTokenType type, ReadOnlySpan<char> content)
     {
         Content = content;
-        _contentString = null;
+        ContentAsString = null;
         Type = type;
         ValueType = ExpressionValueType.Expression;
     }
@@ -263,14 +282,14 @@ internal ref struct ExpressionToken
     public void SetContent(ExpressionTokenType type, string content)
     {
         Content = content;
-        _contentString = content;
+        ContentAsString = content;
         Type = type;
         ValueType = ExpressionValueType.Expression;
     }
 
     public string GetContent()
     {
-        return _contentString ??= Content.ToString();
+        return ContentAsString ??= Content.ToString();
     }
 }
 

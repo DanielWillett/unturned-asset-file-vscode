@@ -1,5 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
@@ -7,7 +8,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 /// <summary>
 /// A standardized reference to an existing property.
 /// </summary>
-public struct PropertyReference
+public struct PropertyReference : IEquatable<PropertyReference>
 {
     /// <summary>The context specifier for <see cref="SpecPropertyContext.Property"/>.</summary>
     public const string PropertyContext = "prop";
@@ -122,7 +123,7 @@ public struct PropertyReference
         if (typeIndex >= 0)
         {
             typeStr = noContext.Slice(0, typeIndex);
-            noType = data.Slice(typeIndex + 2);
+            noType = noContext.Slice(typeIndex + 2);
         }
 
         PropertyBreadcrumbs crumbs;
@@ -248,5 +249,38 @@ public struct PropertyReference
         }
 
         return data.Slice(firstIndex + 2);
+    }
+
+    /// <inheritdoc />
+    public bool Equals(PropertyReference other)
+    {
+        return other.Context == Context
+               && string.Equals(other.TypeName, TypeName, StringComparison.OrdinalIgnoreCase)
+               && string.Equals(other.PropertyName, PropertyName, StringComparison.OrdinalIgnoreCase)
+               && other.Breadcrumbs.Equals(in Breadcrumbs);
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return obj is PropertyReference r && Equals(r);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(
+            Context,
+            TypeName == null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(TypeName),
+            PropertyName == null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(PropertyName),
+            Breadcrumbs
+        );
+    }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        // todo
+        return PropertyName;
     }
 }

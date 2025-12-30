@@ -1165,13 +1165,13 @@ public static class SpecDynamicValue
         return -1;
     }
 
-    private static bool TryParsePropertyRef(ReadOnlySpan<char> value, string? optionalString, [NotNullWhen(true)] out ISpecDynamicValue? reference)
+    internal static bool TryParsePropertyRef(ReadOnlySpan<char> value, string? optionalString, [NotNullWhen(true)] out ISpecDynamicValue? reference)
     {
         reference = new PropertyRef(value, optionalString);
         return true;
     }
 
-    private static bool TryParseDataRef(ReadOnlySpan<char> value, string? optionalString, [NotNullWhen(true)] out ISpecDynamicValue? reference)
+    internal static bool TryParseDataRef(ReadOnlySpan<char> value, string? optionalString, [NotNullWhen(true)] out ISpecDynamicValue? reference)
     {
         int dot = IndexOfAtCurrentDepth(value, 0, '.', '(');
         if (dot < 0)

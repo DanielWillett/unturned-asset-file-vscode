@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
@@ -9,6 +10,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class Float64TypeConverter : ITypeConverter<double>
 {
+    public IType<double> DefaultType => Float64Type.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<double> args, out double parsedValue)
     {
         return double.TryParse(args.StringOrSpan(text), NumberStyles.Any, CultureInfo.InvariantCulture, out parsedValue);
@@ -251,7 +254,7 @@ internal sealed class Float64TypeConverter : ITypeConverter<double>
             return true;
         }
 
-        if (VectorConversionHelper.TryConvertToVector<double, TTo>(value, out TTo? parsedVector))
+        if (VectorTypes.TryConvertToVector<double, TTo>(value, out TTo? parsedVector))
         {
             result = parsedVector;
             return true;

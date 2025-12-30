@@ -4,11 +4,14 @@ using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class Float32TypeConverter : ITypeConverter<float>
 {
+    public IType<float> DefaultType => Float32Type.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<float> args, out float parsedValue)
     {
         return float.TryParse(args.StringOrSpan(text), NumberStyles.Any, CultureInfo.InvariantCulture, out parsedValue);
@@ -251,7 +254,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
             return true;
         }
 
-        if (VectorConversionHelper.TryConvertToVector<float, TTo>(value, out TTo? parsedVector))
+        if (VectorTypes.TryConvertToVector<float, TTo>(value, out TTo? parsedVector))
         {
             result = parsedVector;
             return true;

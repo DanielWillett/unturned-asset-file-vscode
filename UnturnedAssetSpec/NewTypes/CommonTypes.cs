@@ -1,6 +1,8 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -35,7 +37,8 @@ public static class CommonTypes
         knownTypes["List"]                              = () => ListType.Factory;
         knownTypes["Type"]                              = () => StringType.Instance;    // todo
         knownTypes["TypeOrEnum"]                        = () => StringType.Instance;    // todo
-        knownTypes["Guid"]                              = () => StringType.Instance;    // todo
+        knownTypes["Guid"]                              = () => GuidType.Instance;
+        knownTypes["GuidOrId"]                          = () => GuidOrIdType.Instance;
         knownTypes["Color32RGB"]                        = () => StringType.Instance;    // todo
         knownTypes["Color32RGBA"]                       = () => StringType.Instance;    // todo
         knownTypes["Color32RGBLegacy"]                  = () => StringType.Instance;    // todo
@@ -54,20 +57,19 @@ public static class CommonTypes
         knownTypes["ColorRGBStrictHex"]                 = () => StringType.Instance;    // todo
         knownTypes["ColorRGBAStrictHex"]                = () => StringType.Instance;    // todo
         knownTypes["ColorRGBAStrictHex"]                = () => StringType.Instance;    // todo
-        knownTypes["AssetReference"]                    = () => StringType.Instance;    // todo
+        knownTypes["AssetReference"]                    = () => AssetReferenceType.Factory;
         knownTypes["BcAssetReference"]                  = () => StringType.Instance;    // todo
-        knownTypes["AssetReferenceString"]              = () => StringType.Instance;    // todo
+        knownTypes["AssetReferenceString"]              = () => AssetReferenceType.Factory;
         knownTypes["BcAssetReferenceString"]            = () => StringType.Instance;    // todo
-        knownTypes["ContentReference"]                  = () => StringType.Instance;    // todo
-        knownTypes["AudioReference"]                    = () => StringType.Instance;    // todo
+        knownTypes["ContentReference"]                  = () => BundleReferenceType.Factory;
+        knownTypes["AudioReference"]                    = () => BundleReferenceType.Factory;
         knownTypes["MasterBundleReference"]             = () => BundleReferenceType.Factory;
-        knownTypes["MasterBundleOrContentReference"]    = () => StringType.Instance;    // todo
-        knownTypes["MasterBundleReferenceString"]       = () => StringType.Instance;    // todo
-        knownTypes["TranslationReference"]              = () => StringType.Instance;    // todo
+        knownTypes["MasterBundleOrContentReference"]    = () => BundleReferenceType.Factory;
+        knownTypes["MasterBundleReferenceString"]       = () => BundleReferenceType.Factory;
+        knownTypes["TranslationReference"]              = () => BundleReferenceType.Factory;
         knownTypes["FaceIndex"]                         = () => UInt8Type.Instance;     // todo
         knownTypes["BeardIndex"]                        = () => UInt8Type.Instance;     // todo
         knownTypes["HairIndex"]                         = () => UInt8Type.Instance;     // todo
-        knownTypes["GuidOrId"]                          = () => StringType.Instance;    // todo
         knownTypes["Id"]                                = () => UInt16Type.Instance;    // todo
         knownTypes["DefaultableId"]                     = () => Int32Type.Instance;     // todo
         knownTypes["NavId"]                             = () => UInt8Type.Instance;     // todo
@@ -78,9 +80,9 @@ public static class CommonTypes
         knownTypes["FlagId"]                            = () => Int16Type.Instance;     // todo
         knownTypes["BlueprintId"]                       = () => StringType.Instance;    // todo
         knownTypes["NPCAchievementId"]                  = () => StringType.Instance;    // todo
-        knownTypes["DateTime"]                          = () => StringType.Instance;    // todo
-        knownTypes["TimeSpan"]                          = () => StringType.Instance;    // todo
-        knownTypes["DateTimeOffset"]                    = () => StringType.Instance;    // todo
+        knownTypes["DateTime"]                          = () => DateTimeType.Instance;
+        knownTypes["TimeSpan"]                          = () => TimeSpanType.Instance;
+        knownTypes["DateTimeOffset"]                    = () => DateTimeOffsetType.Instance;
         knownTypes["Vector4"]                           = () => Vector4Type.Instance;
         knownTypes["Vector3"]                           = () => Vector3Type.Instance;
         knownTypes["Vector2"]                           = () => Vector2Type.Instance;
@@ -108,7 +110,7 @@ public static class CommonTypes
         knownTypes["PhysicsMaterial"]                   = () => StringType.Instance;    // todo
         knownTypes["PhysicsMaterialLegacy"]             = () => StringType.Instance;    // todo
         knownTypes["TypeReference"]                     = () => StringType.Instance;    // todo
-        knownTypes["IPv4Filter"]                        = () => StringType.Instance;    // todo
+        knownTypes["IPv4Filter"]                        = () => IPv4FilterType.Instance;
         knownTypes["Steam64ID"]                         = () => UInt64Type.Instance;    // todo
         knownTypes["Url"]                               = () => StringType.Instance;    // todo
         knownTypes["Path"]                              = () => StringType.Instance;    // todo
@@ -133,6 +135,8 @@ public static class CommonTypes
             return (IType<TCountType>)(object)Int16Type.Instance;
         if (typeof(TCountType) == typeof(ushort))
             return (IType<TCountType>)(object)UInt16Type.Instance;
+        if (typeof(TCountType) == typeof(GuidOrId))
+            return (IType<TCountType>)(object)GuidOrIdType.Instance;
         if (typeof(TCountType) == typeof(sbyte))
             return (IType<TCountType>)(object)Int8Type.Instance;
         if (typeof(TCountType) == typeof(long))
@@ -141,5 +145,199 @@ public static class CommonTypes
             return (IType<TCountType>)(object)UInt64Type.Instance;
         
         throw new InvalidOperationException(string.Format(Resources.InvalidOperationException_InvalidCountType, typeof(TCountType).Name));
+    }
+
+    /// <summary>
+    /// Gets the default type from <typeparamref name="TValueType"/>, returning <see langword="null"/> if the type doesn't have a default type.
+    /// </summary>
+    /// <typeparam name="TValueType">Any common value type.</typeparam>
+    public static IType<TValueType> TryGetDefaultValueType<TValueType>() where TValueType : IEquatable<TValueType>
+    {
+        if (typeof(TValueType) == typeof(int))
+            return (IType<TValueType>)(object)Int32Type.Instance;
+        if (typeof(TValueType) == typeof(byte))
+            return (IType<TValueType>)(object)UInt8Type.Instance;
+        if (typeof(TValueType) == typeof(uint))
+            return (IType<TValueType>)(object)UInt32Type.Instance;
+        if (typeof(TValueType) == typeof(short))
+            return (IType<TValueType>)(object)Int16Type.Instance;
+        if (typeof(TValueType) == typeof(ushort))
+            return (IType<TValueType>)(object)UInt16Type.Instance;
+        if (typeof(TValueType) == typeof(sbyte))
+            return (IType<TValueType>)(object)Int8Type.Instance;
+        if (typeof(TValueType) == typeof(long))
+            return (IType<TValueType>)(object)Int64Type.Instance;
+        if (typeof(TValueType) == typeof(ulong))
+            return (IType<TValueType>)(object)UInt64Type.Instance;
+        if (typeof(TValueType) == typeof(float))
+            return (IType<TValueType>)(object)Float32Type.Instance;
+        if (typeof(TValueType) == typeof(double))
+            return (IType<TValueType>)(object)Float64Type.Instance;
+        if (typeof(TValueType) == typeof(decimal))
+            return (IType<TValueType>)(object)Float128Type.Instance;
+        if (typeof(TValueType) == typeof(char))
+            return (IType<TValueType>)(object)CharacterType.Instance;
+        if (typeof(TValueType) == typeof(bool))
+            return (IType<TValueType>)(object)BooleanType.Instance;
+        if (typeof(TValueType) == typeof(string))
+            return (IType<TValueType>)(object)StringType.Instance;
+        if (typeof(TValueType) == typeof(GuidOrId))
+            return (IType<TValueType>)(object)GuidOrIdType.Instance;
+        if (typeof(TValueType) == typeof(DateTime))
+            return (IType<TValueType>)(object)DateTimeType.Instance;
+        if (typeof(TValueType) == typeof(TimeSpan))
+            return (IType<TValueType>)(object)TimeSpanType.Instance;
+        if (typeof(TValueType) == typeof(DateTimeOffset))
+            return (IType<TValueType>)(object)DateTimeOffsetType.Instance;
+        if (typeof(TValueType) == typeof(IPv4Filter))
+            return (IType<TValueType>)(object)IPv4FilterType.Instance;
+
+        throw new InvalidOperationException(string.Format(Resources.InvalidOperationException_InvalidCountType, typeof(TValueType).Name));
+    }
+
+    /// <summary>
+    /// Gets the type suffix of a value of the given type (i.e. 'ul', 'u', 'l', 'd', 'f', 'm', etc).
+    /// </summary>
+    public static string? GetTypeSuffix<TValue>() where TValue : IEquatable<TValue>
+    {
+        if (typeof(TValue) == typeof(ulong))
+            return "ul";
+        if (typeof(TValue) == typeof(long))
+            return "l";
+        if (typeof(TValue) == typeof(uint))
+            return "u";
+        if (typeof(TValue) == typeof(float))
+            return "f";
+        if (typeof(TValue) == typeof(double))
+            return "d";
+        if (typeof(TValue) == typeof(decimal))
+            return "m";
+
+        return null;
+    }
+
+    /// <summary>
+    /// Loads an integer value into a generic parameter if it's a compatible type.
+    /// </summary>
+    public static bool TryLoadInteger<TResult>(long i, [MaybeNullWhen(false)] out TResult result)
+    {
+        if (typeof(TResult) == typeof(int))
+        {
+            if (i is < int.MinValue or > int.MaxValue)
+            {
+                result = default;
+                return false;
+            }
+
+            result = SpecDynamicExpressionTreeValueHelpers.As<int, TResult>((int)i);
+        }
+        else if (typeof(TResult) == typeof(uint))
+        {
+            if (i is < 0 or > uint.MaxValue)
+            {
+                result = default;
+                return false;
+            }
+
+            result = SpecDynamicExpressionTreeValueHelpers.As<uint, TResult>((uint)i);
+        }
+        else if (typeof(TResult) == typeof(long))
+        {
+            result = SpecDynamicExpressionTreeValueHelpers.As<long, TResult>(i);
+        }
+        else if (typeof(TResult) == typeof(ushort))
+        {
+            if (i is < 0 or > ushort.MaxValue)
+            {
+                result = default;
+                return false;
+            }
+
+            result = SpecDynamicExpressionTreeValueHelpers.As<ushort, TResult>((ushort)i);
+        }
+        else if (typeof(TResult) == typeof(GuidOrId))
+        {
+            if (i is < 0 or > ushort.MaxValue)
+            {
+                result = default;
+                return false;
+            }
+
+            result = SpecDynamicExpressionTreeValueHelpers.As<GuidOrId, TResult>(new GuidOrId((ushort)i));
+        }
+        else if (typeof(TResult) == typeof(char))
+        {
+            if (i is < 0 or > 9)
+            {
+                result = default;
+                return false;
+            }
+
+            result = SpecDynamicExpressionTreeValueHelpers.As<char, TResult>((char)(i + '0'));
+        }
+        else if (typeof(TResult) == typeof(ulong))
+        {
+            if (i < 0)
+            {
+                result = default;
+                return false;
+            }
+
+            result = SpecDynamicExpressionTreeValueHelpers.As<ulong, TResult>((ulong)i);
+        }
+        else if (typeof(TResult) == typeof(short))
+        {
+            if (i is < short.MinValue or > short.MaxValue)
+            {
+                result = default;
+                return false;
+            }
+
+            result = SpecDynamicExpressionTreeValueHelpers.As<short, TResult>((short)i);
+        }
+        else if (typeof(TResult) == typeof(sbyte))
+        {
+            if (i is < sbyte.MinValue or > sbyte.MaxValue)
+            {
+                result = default;
+                return false;
+            }
+
+            result = SpecDynamicExpressionTreeValueHelpers.As<sbyte, TResult>((sbyte)i);
+        }
+        else if (typeof(TResult) == typeof(byte))
+        {
+            if (i is < 0 or > byte.MaxValue)
+            {
+                result = default;
+                return false;
+            }
+
+            result = SpecDynamicExpressionTreeValueHelpers.As<byte, TResult>((byte)i);
+        }
+        else if (typeof(TResult) == typeof(float))
+        {
+            result = SpecDynamicExpressionTreeValueHelpers.As<float, TResult>(i);
+        }
+        else if (typeof(TResult) == typeof(double))
+        {
+            result = SpecDynamicExpressionTreeValueHelpers.As<double, TResult>(i);
+        }
+        else if (typeof(TResult) == typeof(decimal))
+        {
+            result = SpecDynamicExpressionTreeValueHelpers.As<decimal, TResult>(i);
+        }
+        else if (typeof(TResult) == typeof(string))
+        {
+            result = SpecDynamicExpressionTreeValueHelpers.As<string, TResult>(i.ToString(CultureInfo.InvariantCulture));
+        }
+        else
+        {
+            result = default;
+            return false;
+        }
+
+
+        return true;
     }
 }

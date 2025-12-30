@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Runtime.CompilerServices;
@@ -8,6 +9,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class GuidTypeConverter : ITypeConverter<Guid>
 {
+    public IType<Guid> DefaultType => GuidType.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<Guid> args, out Guid parsedValue)
     {
         return Guid.TryParse(args.StringOrSpan(text), out parsedValue);

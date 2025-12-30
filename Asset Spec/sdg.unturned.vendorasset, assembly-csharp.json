@@ -83,7 +83,7 @@
                     "Key": "ID",
                     "Type":
                     {
-                        "Type": "GuidOrId",
+                        "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
                     },
                     "DefaultValue": "00000000000000000000000000000000",
@@ -173,14 +173,14 @@
                             ],
                             "Value":
                             {
-                                "Type": "GuidOrId",
+                                "Type": "LegacyAssetReferenceString",
                                 "AssetType": "SDG.Unturned.VehicleAsset, Assembly-CSharp"
                             }
                         },
                         {
                             "Value":
                             {
-                                "Type": "GuidOrId",
+                                "Type": "LegacyAssetReferenceString",
                                 "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
                             }
                         }

@@ -1,14 +1,17 @@
-﻿using System;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class Int64TypeConverter : ITypeConverter<long>
 {
+    public IType<long> DefaultType => Int64Type.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<long> args, out long parsedValue)
     {
         return long.TryParse(args.StringOrSpan(text), NumberStyles.Any, CultureInfo.InvariantCulture, out parsedValue);
@@ -155,7 +158,7 @@ internal sealed class Int64TypeConverter : ITypeConverter<long>
             return true;
         }
 
-        if (VectorConversionHelper.TryConvertToVector<long, TTo>(value, out TTo? parsedVector))
+        if (VectorTypes.TryConvertToVector<long, TTo>(value, out TTo? parsedVector))
         {
             result = parsedVector;
             return true;

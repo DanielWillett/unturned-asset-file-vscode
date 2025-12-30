@@ -1,6 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.NewTypes.Objects;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -45,7 +44,6 @@ public sealed class Vector2Type : BaseVectorType<Vector2, Vector2Type>
     public override string DisplayName => Resources.Type_Name_Vector2_Unspecified;
 
     public static ITypeFactory Factory => Instance;
-
 
     public Vector2Type() : this(Vector2Kind.Unspecified, VectorTypeOptions.Object | VectorTypeOptions.String) { }
 

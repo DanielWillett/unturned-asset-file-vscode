@@ -9,6 +9,7 @@ internal class FunctionExpressionNode2 : IFunctionExpressionNode
     public IExpressionNode Argument1 { get; }
     public IExpressionNode Argument2 { get; }
 
+    public int Count => 2;
     public IExpressionNode this[int index] => index switch
     {
         0 => Argument1,
@@ -21,5 +22,17 @@ internal class FunctionExpressionNode2 : IFunctionExpressionNode
         Function = function;
         Argument1 = arg1;
         Argument2 = arg2;
+    }
+
+    public bool Equals(IExpressionNode? other)
+    {
+        if ((object?)other == this)
+            return true;
+        if (other == null)
+            return false;
+        return other is IFunctionExpressionNode { Count: 2 } funcNode
+               && Function == funcNode.Function
+               && Argument1.Equals(funcNode[0])
+               && Argument2.Equals(funcNode[1]);
     }
 }

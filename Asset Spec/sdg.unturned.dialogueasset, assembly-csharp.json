@@ -103,7 +103,7 @@
                     "Key": "Prev",
                     "Type":
                     {
-                        "Type": "GuidOrId",
+                        "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.DialogueAsset, Assembly-CSharp"
                     },
                     "DefaultValue": "00000000000000000000000000000000",
@@ -204,7 +204,7 @@
                     "Key": "Dialogue",
                     "Type":
                     {
-                        "Type": "GuidOrId",
+                        "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.DialogueAsset, Assembly-CSharp"
                     },
                     "DefaultValue": "00000000000000000000000000000000",
@@ -217,7 +217,7 @@
                     "Key": "Quest",
                     "Type":
                     {
-                        "Type": "GuidOrId",
+                        "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.QuestAsset, Assembly-CSharp"
                     },
                     "DefaultValue": "00000000000000000000000000000000",
@@ -230,7 +230,7 @@
                     "Key": "Vendor",
                     "Type":
                     {
-                        "Type": "GuidOrId",
+                        "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.VendorAsset, Assembly-CSharp"
                     },
                     "DefaultValue": "00000000000000000000000000000000",

@@ -14,7 +14,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data;
 [JsonConverter(typeof(GuidOrIdConverter))]
 public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable<GuidOrId>, IEquatable<ushort>, IEquatable<Guid>
 {
-    public static readonly GuidOrId Empty = default;
+    public static readonly GuidOrId Empty = new GuidOrId(0);
 
     /// <summary>
     /// The GUID, if <see cref="IsId"/> is <see langword="false"/>.
@@ -127,7 +127,7 @@ public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable
     /// <summary>
     /// Convert a <see cref="string"/> to a <see cref="GuidOrId"/>.
     /// </summary>
-    /// <exception cref="FormatException"></exception>
+    /// <exception cref="FormatException"/>
     public static GuidOrId Parse(string str)
     {
         if (!TryParse(str, out GuidOrId id))
@@ -135,6 +135,43 @@ public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable
 
         return id;
     }
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+
+    /// <summary>
+    /// Convert a span of characters to a <see cref="GuidOrId"/>.
+    /// </summary>
+    public static bool TryParse(ReadOnlySpan<char> str, out GuidOrId id)
+    {
+        if (ushort.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out ushort shortId))
+        {
+            id = new GuidOrId(shortId);
+            return true;
+        }
+
+        if (Guid.TryParse(str, out Guid guid))
+        {
+            id = new GuidOrId(guid);
+            return true;
+        }
+
+        id = default;
+        return false;
+    }
+
+    /// <summary>
+    /// Convert a span of characters to a <see cref="GuidOrId"/>.
+    /// </summary>
+    /// <exception cref="FormatException"/>
+    public static GuidOrId Parse(ReadOnlySpan<char> str)
+    {
+        if (!TryParse(str, out GuidOrId id))
+            throw new FormatException("Failed to parse GuidOrId.");
+
+        return id;
+    }
+
+#endif
 
     /// <inheritdoc />
     public int CompareTo(GuidOrId other)

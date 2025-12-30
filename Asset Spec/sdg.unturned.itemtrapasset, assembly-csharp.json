@@ -120,7 +120,7 @@
             "Key": "Explosion2",
             "Type":
             {
-                "Type": "GuidOrId",
+                "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
             "DefaultValue": "00000000000000000000000000000000",

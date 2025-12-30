@@ -2,7 +2,7 @@
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 
-internal sealed class Pi : ExpressionFunction
+internal sealed class Pi : ExpressionFunction, IFunctionExpressionNode
 {
     public static readonly Pi Instance = new Pi();
     static Pi() { }
@@ -22,4 +22,9 @@ internal sealed class Pi : ExpressionFunction
         }
         return true;
     }
+
+    int IFunctionExpressionNode.Count => 0;
+    IExpressionFunction IFunctionExpressionNode.Function => this;
+    IExpressionNode IFunctionExpressionNode.this[int index] => throw new ArgumentOutOfRangeException(nameof(index));
+    bool IEquatable<IExpressionNode>.Equals(IExpressionNode? other) => other is Pi;
 }

@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
@@ -9,6 +10,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class Int16TypeConverter : ITypeConverter<short>
 {
+    public IType<short> DefaultType => Int16Type.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<short> args, out short parsedValue)
     {
         return short.TryParse(args.StringOrSpan(text), NumberStyles.Any, CultureInfo.InvariantCulture, out parsedValue);
@@ -155,7 +158,7 @@ internal sealed class Int16TypeConverter : ITypeConverter<short>
             return true;
         }
 
-        if (VectorConversionHelper.TryConvertToVector<long, TTo>(value, out TTo? parsedVector))
+        if (VectorTypes.TryConvertToVector<long, TTo>(value, out TTo? parsedVector))
         {
             result = parsedVector;
             return true;

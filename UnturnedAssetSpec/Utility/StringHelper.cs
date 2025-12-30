@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Globalization;
-using System.Runtime.CompilerServices;
+using System.IO;
 using System.Text;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -208,6 +208,89 @@ internal static class StringHelper
         }
 
         return new string(newValue, 0, writeIndex);
+    }
+
+    private static readonly char[] Escapables = [ '\n', '\r', '\t', '\\' ];
+
+    public static void EscapeValue(ref string value)
+    {
+        EscapeValue(ref value, Escapables);
+    }
+
+    public static void EscapeValue(ref string value
+#if !NETSTANDARD2_1_OR_GREATER && !NET5_0_OR_GREATER
+        , char[] escapables
+#else
+        , ReadOnlySpan<char> escapables
+#endif
+        , int startIndex = -1
+    )
+    {
+        int c = 0;
+        string s = value;
+        for (int i = Math.Max(0, startIndex); i < s.Length; ++i)
+        {
+#if !NETSTANDARD2_1_OR_GREATER && !NET5_0_OR_GREATER
+            if (Array.IndexOf(escapables, s[i]) >= 0)
+#else
+            if (escapables.IndexOf(s[i]) >= 0)
+#endif
+                ++c;
+        }
+
+        if (c <= 0)
+        {
+            return;
+        }
+
+        unsafe
+        {
+            char* newValue = stackalloc char[s.Length + c];
+
+            int prevIndex = -1;
+            int writeIndex = 0;
+            while (true)
+            {
+#if !NETSTANDARD2_1_OR_GREATER && !NET5_0_OR_GREATER
+                int index = s.IndexOfAny(escapables, prevIndex + 1);
+#else
+                int index = s.AsSpan(prevIndex + 1).IndexOfAny(escapables);
+                if (index >= 0)
+                    index += prevIndex + 1;
+#endif
+                if (index == -1)
+                {
+                    for (int i = prevIndex + 1; i < s.Length; ++i)
+                    {
+                        newValue[writeIndex] = s[i];
+                        ++writeIndex;
+                    }
+                    break;
+                }
+
+                for (int i = prevIndex + 1; i < index; ++i)
+                {
+                    newValue[writeIndex] = s[i];
+                    ++writeIndex;
+                }
+
+                char self = s[index];
+                newValue[writeIndex] = '\\';
+                newValue[writeIndex + 1] = self switch
+                {
+                    '\n' => 'n',
+                    '\r' => 'r',
+                    '\t' => 't',
+                    _ => self
+                };
+
+                writeIndex += 2;
+
+                prevIndex = index;
+            }
+
+            value = new string(newValue, 0, writeIndex);
+        }
     }
 
     private static bool TryParseUnicodeSequence(ReadOnlySpan<char> value, int slash, out char c)
@@ -672,7 +755,7 @@ internal static class StringHelper
     }
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
     public static void AppendSpan(StringBuilder sb, ReadOnlySpan<char> span)
     {
@@ -688,6 +771,48 @@ internal static class StringHelper
             {
                 sb.Append(ptr, span.Length);
             }
+        }
+#endif
+    }
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+    public static void WriteSpan(TextWriter writer, ReadOnlySpan<char> span)
+    {
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+        writer.Write(span);
+#else
+        switch (span.Length)
+        {
+            case 0:
+                return;
+
+            case 1:
+                writer.Write(span[0]);
+                return;
+
+            default:
+                if (span.Length < 256)
+                {
+                    char[] arr = System.Buffers.ArrayPool<char>.Shared.Rent(span.Length);
+                    try
+                    {
+                        span.CopyTo(arr.AsSpan());
+                        writer.Write(arr, 0, span.Length);
+                    }
+                    finally
+                    {
+                        System.Buffers.ArrayPool<char>.Shared.Return(arr);
+                    }
+                }
+                else
+                {
+                    string str = span.ToString();
+                    writer.Write(str);
+                }
+
+                return;
         }
 #endif
     }

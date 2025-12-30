@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Runtime.CompilerServices;
@@ -8,6 +9,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class CharacterTypeConverter : ITypeConverter<char>
 {
+    public IType<char> DefaultType => CharacterType.Instance;
+
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<char> args, out char parsedValue)
     {
         if (text.Length != 1)
@@ -177,7 +180,7 @@ internal sealed class CharacterTypeConverter : ITypeConverter<char>
             goto f;
         }
 
-        if (VectorConversionHelper.TryConvertToVector<long, TTo>(value, out TTo? parsedVector))
+        if (VectorTypes.TryConvertToVector<long, TTo>(value, out TTo? parsedVector))
         {
             result = parsedVector;
             return true;

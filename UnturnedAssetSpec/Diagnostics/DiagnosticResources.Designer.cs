@@ -574,6 +574,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dictionary can not be converted to a value of type &apos;{0}&apos;, which expects a GUID as a string only. Property &apos;{1}&apos; expects a value..
+        /// </summary>
+        public static string UNT2004_AssetReferenceStringOnly {
+            get {
+                return ResourceManager.GetString("UNT2004_AssetReferenceStringOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value &apos;{0}&apos; can not be converted to a value of type &apos;{1}&apos;. Single-character boolean values must be lowercase, try using &quot;{2}&quot; instead..
         /// </summary>
         public static string UNT2004_BooleanSingleCharCapitalized {

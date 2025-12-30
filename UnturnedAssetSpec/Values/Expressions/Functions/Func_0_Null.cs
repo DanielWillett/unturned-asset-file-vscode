@@ -1,6 +1,8 @@
-﻿namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
+﻿using System;
 
-internal sealed class Null : ExpressionFunction
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
+
+internal sealed class Null : ExpressionFunction, IFunctionExpressionNode
 {
     public static readonly Null Instance = new Null();
     static Null() { }
@@ -20,4 +22,9 @@ internal sealed class Null : ExpressionFunction
         }
         return true;
     }
+
+    int IFunctionExpressionNode.Count => 0;
+    IExpressionFunction IFunctionExpressionNode.Function => this;
+    IExpressionNode IFunctionExpressionNode.this[int index] => throw new ArgumentOutOfRangeException(nameof(index));
+    bool IEquatable<IExpressionNode>.Equals(IExpressionNode? other) => other is Null;
 }

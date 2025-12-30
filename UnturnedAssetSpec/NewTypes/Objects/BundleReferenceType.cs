@@ -55,14 +55,20 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
 {
     private static readonly BundleReferenceType?[] DefaultInstances = new BundleReferenceType?[(int)BundleReferenceKind.TranslationReference];
 
-    private static BundleReferenceType GetInstance(BundleReferenceKind mode)
+    /// <summary>
+    /// Gets the default instance of a certain kind of bundle reference.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"/>
+    public static BundleReferenceType GetInstance(BundleReferenceKind kind)
     {
-        ref BundleReferenceType? t = ref DefaultInstances[(int)mode - 1];
+        if (kind is <= BundleReferenceKind.Unspecified or > BundleReferenceKind.TranslationReference)
+            throw new ArgumentOutOfRangeException(nameof(kind));
+        ref BundleReferenceType? t = ref DefaultInstances[(int)kind - 1];
         BundleReferenceType? r = t;
         if (r != null)
             return r;
 
-        Interlocked.CompareExchange(ref t, new BundleReferenceType(mode), null);
+        Interlocked.CompareExchange(ref t, new BundleReferenceType(kind), null);
         return t;
     }
 
@@ -295,7 +301,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
     IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
     {
         BundleReferenceKind mode = BundleReferenceKind.Unspecified;
-        for (int i = 0; i < TypeIds.Length; ++i)
+        for (int i = 1; i < TypeIds.Length; ++i)
         {
             if (!typeId.Equals(TypeIds[i], StringComparison.Ordinal))
                 continue;
@@ -322,7 +328,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
             QualifiedType[] arr = new QualifiedType[len];
             for (int i = 0; i < len; ++i)
             {
-                arr[i] = new QualifiedType(element[i].GetString(), isCaseInsensitive: true);
+                arr[i] = new QualifiedType(element[i].GetString()!, isCaseInsensitive: true);
             }
 
             baseTypes = new OneOrMore<QualifiedType>(arr);

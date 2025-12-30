@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
@@ -9,6 +10,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class DateTimeTypeConverter : ITypeConverter<DateTime>
 {
+    public IType<DateTime> DefaultType => DateTimeType.Instance;
+
     private static string GetFormat(in DateTime dt)
     {
         return dt.Hour != 0 || dt.Minute != 0 || dt.Second != 0 ? "yyyy'-'MM'-'dd HH':'mm':'ss" : "yyyy'-'MM'-'dd";

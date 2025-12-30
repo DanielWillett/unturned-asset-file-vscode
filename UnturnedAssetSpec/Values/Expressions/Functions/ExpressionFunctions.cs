@@ -222,6 +222,7 @@ public static class ExpressionFunctions
         RegisterFunction(Expressions.ArcCosineDeg.Instance);
         RegisterFunction(Expressions.ArcTangentRad.Instance);
         RegisterFunction(Expressions.ArcTangentDeg.Instance);
+        RegisterFunction(Expressions.SquareRoot.Instance);
 
         RegisterFunction(Expressions.Add.Instance);
         RegisterFunction(Expressions.Subtract.Instance);

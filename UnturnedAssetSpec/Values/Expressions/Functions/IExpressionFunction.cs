@@ -1,9 +1,11 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 
@@ -11,6 +13,11 @@ public interface IExpressionFunction
 {
     string FunctionName { get; }
     int ArgumentCountMask { get; }
+
+    /// <summary>
+    /// Gets the ideal argument type for the given <paramref name="argument"/>.
+    /// </summary>
+    IType? GetIdealArgumentType(int argument);
 
     /// <summary>
     /// Evaluate the function with 0 arguments.
@@ -47,12 +54,31 @@ public interface IExpressionFunction
         where TVisitor : IGenericVisitor;
 }
 
+/// <summary>
+/// Returned by <see cref="IExpressionFunction.GetIdealArgumentType"/> to specify any numeric type
+/// (the 8 primitive integer types, 2 floating point types, and <see cref="Decimal"/>).
+/// </summary>
+internal class NumericAnyType : IType
+{
+    public static readonly NumericAnyType Instance = new NumericAnyType();
+
+    public string Id => "NumericAny";
+    public string DisplayName => "Intl_NumericAny";
+    void IType.Visit<TVisitor>(ref TVisitor visitor) { }
+    public void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue("NumericAny"u8);
+    }
+}
+
 public abstract class ExpressionFunction : IExpressionFunction
 {
     public abstract string FunctionName { get; }
     public abstract int ArgumentCountMask { get; }
 
     public virtual bool ReduceToKnownTypes => true;
+
+    public virtual IType? GetIdealArgumentType(int argument) => null;
 
     public virtual bool Evaluate<TOut, TVisitor>(ref TVisitor visitor)
         where TOut : IEquatable<TOut>

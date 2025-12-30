@@ -99,6 +99,11 @@ public static class TypeConverters
     public static ITypeConverter<Guid> Guid { get; } = new GuidTypeConverter();
 
     /// <summary>
+    /// The type converter for <see cref="System.GuidOrId"/> values.
+    /// </summary>
+    public static ITypeConverter<GuidOrId> GuidOrId { get; } = new GuidOrIdTypeConverter();
+
+    /// <summary>
     /// The type converter for <see cref="DanielWillett.UnturnedDataFileLspServer.Data.Types.IPv4Filter"/> values.
     /// </summary>
     public static ITypeConverter<IPv4Filter> IPv4Filter { get; } = new IPv4FilterTypeConverter();
@@ -177,6 +182,8 @@ public static class TypeConverters
                     Converter = (ITypeConverter<T>)Float128;
                 else if (typeof(T) == typeof(Guid))
                     Converter = (ITypeConverter<T>)Guid;
+                else if (typeof(T) == typeof(GuidOrId))
+                    Converter = (ITypeConverter<T>)GuidOrId;
                 else if (typeof(T) == typeof(DateTime))
                     Converter = (ITypeConverter<T>)DateTime;
                 else if (typeof(T) == typeof(DateTimeOffset))
