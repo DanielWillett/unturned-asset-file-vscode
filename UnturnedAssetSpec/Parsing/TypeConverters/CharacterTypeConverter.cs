@@ -191,7 +191,7 @@ internal sealed class CharacterTypeConverter : ITypeConverter<char>
         return false;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, char value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, char value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         Span<char> span = stackalloc char[1];
         span[0] = value;

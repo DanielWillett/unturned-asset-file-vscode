@@ -84,7 +84,7 @@ internal sealed class GuidTypeConverter : ITypeConverter<Guid>
         return false;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, Guid value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, Guid value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value);
     }

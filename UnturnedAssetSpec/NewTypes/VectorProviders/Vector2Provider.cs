@@ -152,6 +152,24 @@ internal class Vector2Provider : IVectorTypeProvider<Vector2>
         return 2;
     }
 
+    public int Compare(Vector2 left, Vector2 right)
+    {
+        const float tolerance = 0.0001f;
+
+        float sub = left.X - right.X;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = left.Y - right.Y;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+
+        return 0;
+    }
+
     public double GetComponent(Vector2 val, int index)
     {
         return index switch

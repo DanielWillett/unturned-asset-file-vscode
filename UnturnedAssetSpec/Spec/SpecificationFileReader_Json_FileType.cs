@@ -61,13 +61,13 @@ partial class SpecificationFileReader
         // DisplayName
         if (root.TryGetProperty("DisplayName"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
-            type.DisplayName = element.GetString()!;
-            if (type.DisplayName.Length == 0)
-                type.DisplayName = type.TypeName.GetFullTypeName();
+            type.DisplayNameIntl = element.GetString()!;
+            if (type.DisplayNameIntl.Length == 0)
+                type.DisplayNameIntl = type.TypeName.GetFullTypeName();
         }
         else
         {
-            type.DisplayName = type.TypeName.GetFullTypeName();
+            type.DisplayNameIntl = type.TypeName.GetFullTypeName();
         }
 
         // Docs

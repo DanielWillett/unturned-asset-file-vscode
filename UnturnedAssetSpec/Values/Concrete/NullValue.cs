@@ -29,9 +29,28 @@ public sealed class NullValue(IType type) : IValue
         return true;
     }
 
-    public void WriteToJson(Utf8JsonWriter writer)
+    /// <inheritdoc />
+    public void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
         writer.WriteNullValue();
+    }
+
+    /// <inheritdoc />
+    public bool Equals(IValue? other)
+    {
+        return other is { IsNull: true };
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return obj is NullValue n && n.Type.Equals(Type);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(1453913317, Type.GetType());
     }
 }
 
@@ -74,12 +93,28 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T>, IValueExpressionNod
         return true;
     }
 
-    public void WriteToJson(Utf8JsonWriter writer)
+    public void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
         writer.WriteNullValue();
     }
 
-    IType IValue.Type => Type;
+    /// <inheritdoc />
+    public bool Equals(IValue? other)
+    {
+        return other is { IsNull: true };
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return obj is NullValue<T> n && n.Type.Equals(Type);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(601500687, Type.GetType());
+    }
 
     bool IEquatable<IExpressionNode>.Equals(IExpressionNode? other)
     {
@@ -100,9 +135,8 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T>, IValueExpressionNod
                     return true;
 
                 EqualityVisitor visitor;
-                visitor.OtherValue = value;
                 visitor.IsNull = false;
-                value.Type.Visit(ref visitor);
+                value.VisitConcreteValue(ref visitor);
                 return visitor.IsNull;
 
             default:
@@ -111,26 +145,13 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T>, IValueExpressionNod
     }
 
 
-    private struct EqualityVisitor : ITypeVisitor
+    private struct EqualityVisitor : IValueVisitor
     {
-        public IValue OtherValue;
         public bool IsNull;
 
-        public void Accept<TOtherValue>(IType<TOtherValue> type)
+        public void Accept<TOtherValue>(Optional<TOtherValue> optVal)
             where TOtherValue : IEquatable<TOtherValue>
         {
-            if (OtherValue is not IValue<TOtherValue> strongValue)
-                return;
-
-            if (strongValue.IsNull)
-            {
-                IsNull = true;
-                return;
-            }
-
-            if (!strongValue.TryGetConcreteValue(out Optional<TOtherValue> optVal))
-                return;
-
             IsNull = !optVal.HasValue;
         }
     }

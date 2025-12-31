@@ -146,7 +146,7 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
         return TryConvertTo(obj.Value, out result);
     }
 
-    public void WriteJson(Utf8JsonWriter writer, DatEnumValue value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, DatEnumValue value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.Value);
     }
@@ -174,7 +174,7 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
         }
     }
 
-    private protected override void Visit<TVisitor>(ref TVisitor visitor)
+    public override void Visit<TVisitor>(ref TVisitor visitor)
     {
         visitor.Accept(this);
     }
@@ -548,7 +548,7 @@ public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConver
         return TryConvertTo(obj.Value, out result);
     }
 
-    public void WriteJson(Utf8JsonWriter writer, DatFlagEnumValue value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, DatFlagEnumValue value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.Value);
     }
@@ -687,7 +687,6 @@ public class DatEnumValue : IValue<DatEnumValue>, IEquatable<DatEnumValue>, IDat
     bool IValue.IsNull => false;
 
     IType<DatEnumValue> IValue<DatEnumValue>.Type => Owner;
-    IType IValue.Type => Owner;
 
     bool IValue<DatEnumValue>.TryGetConcreteValue(out Optional<DatEnumValue> value)
     {
@@ -727,12 +726,15 @@ public class DatEnumValue : IValue<DatEnumValue>, IEquatable<DatEnumValue>, IDat
 
     }
 
+    /// <inheritdoc />
+    public bool Equals(IValue? other) => Equals(other as DatEnumValue);
+
     public override string ToString()
     {
         return Value;
     }
 
-    public void WriteToJson(Utf8JsonWriter writer)
+    public void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
         writer.WriteStringValue(Value);
     }

@@ -155,6 +155,29 @@ internal class Vector3Provider : IVectorTypeProvider<Vector3>
         return 3;
     }
 
+    public int Compare(Vector3 left, Vector3 right)
+    {
+        const float tolerance = 0.0001f;
+
+        float sub = left.X - right.X;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = left.Y - right.Y;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = left.Z - right.Z;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+
+        return 0;
+    }
+
     public double GetComponent(Vector3 val, int index)
     {
         return index switch

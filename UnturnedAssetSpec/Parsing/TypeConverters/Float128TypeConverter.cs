@@ -265,7 +265,7 @@ internal sealed class Float128TypeConverter : ITypeConverter<decimal>
         return false;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, decimal value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, decimal value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteNumberValue(value);
     }

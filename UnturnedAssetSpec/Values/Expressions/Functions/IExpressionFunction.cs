@@ -69,17 +69,21 @@ public interface IExpressionFunction
 /// Returned by <see cref="IExpressionFunction.GetIdealArgumentType"/> to specify any numeric type
 /// (the 8 primitive integer types, 2 floating point types, and <see cref="Decimal"/>).
 /// </summary>
-internal class NumericAnyType : IType
+internal class NumericAnyType : BaseType<NumericAnyType>
 {
     public static readonly NumericAnyType Instance = new NumericAnyType();
 
-    public string Id => "NumericAny";
-    public string DisplayName => "Intl_NumericAny";
-    void IType.Visit<TVisitor>(ref TVisitor visitor) { }
-    public void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
+    public override string Id => "NumericAny";
+    public override string DisplayName => "Intl_NumericAny";
+    public override void Visit<TVisitor>(ref TVisitor visitor) { }
+
+    public override void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
         writer.WriteStringValue("NumericAny"u8);
     }
+
+    protected override bool Equals(NumericAnyType obj) => true;
+    public override int GetHashCode() => 24910275;
 }
 
 public abstract class ExpressionFunction : IExpressionFunction

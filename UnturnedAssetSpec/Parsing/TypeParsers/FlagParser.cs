@@ -36,9 +36,9 @@ internal sealed class FlagParser : ITypeParser<bool>
         return TypeParsers.Boolean.TryReadValueFromJson(in json, out value, valueType);
     }
 
-    public void WriteValueToJson(Utf8JsonWriter writer, bool value, IType<bool> valueType)
+    public void WriteValueToJson(Utf8JsonWriter writer, bool value, IType<bool> valueType, JsonSerializerOptions options)
     {
-        TypeParsers.Boolean.WriteValueToJson(writer, value, valueType);
+        TypeParsers.Boolean.WriteValueToJson(writer, value, valueType, options);
     }
 
     public override int GetHashCode() => 1959769108;

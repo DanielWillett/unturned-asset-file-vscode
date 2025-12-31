@@ -232,7 +232,7 @@ internal sealed class BooleanTypeConverter : ITypeConverter<bool>
         return false;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, bool value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, bool value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteBooleanValue(value);
     }

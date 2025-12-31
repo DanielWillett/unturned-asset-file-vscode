@@ -163,6 +163,11 @@ public interface IVectorTypeProvider<TVector>
     int Deconstruct(TVector val, Span<double> components);
 
     /// <summary>
+    /// Compares the components of one vector to another, starting from the first component and moving down the line as each component is equal.
+    /// </summary>
+    int Compare(TVector left, TVector right);
+
+    /// <summary>
     /// Gets the component at a given zero-based index.
     /// </summary>
     /// <returns>The value of the given component, or 0 if the component index is out of bounds.</returns>

@@ -664,6 +664,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Value Type.
+        /// </summary>
+        internal static string Type_Name_ValueType {
+            get {
+                return ResourceManager.GetString("Type_Name_ValueType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 2D Vector.
         /// </summary>
         internal static string Type_Name_Vector2_Unspecified {

@@ -59,7 +59,7 @@ public interface ITypeConverter<T> where T : IEquatable<T>
     /// <summary>
     /// Writes a value to a <see cref="Utf8JsonWriter"/>.
     /// </summary>
-    void WriteJson(Utf8JsonWriter writer, T value, ref TypeConverterFormatArgs args);
+    void WriteJson(Utf8JsonWriter writer, T value, ref TypeConverterFormatArgs args, JsonSerializerOptions options);
 
     /// <summary>
     /// Reads a value from a <see cref="JsonElement"/>.

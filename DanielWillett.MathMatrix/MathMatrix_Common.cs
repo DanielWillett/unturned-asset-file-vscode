@@ -77,6 +77,7 @@ public static partial class MathMatrix
             return true;
         }
 
+#if SUBSEQUENT_COMPILE
         if (typeof(T) == typeof(GuidOrId))
         {
             GuidOrId v = As<T, GuidOrId>(value);
@@ -87,7 +88,6 @@ public static partial class MathMatrix
             return true;
         }
 
-#if SUBSEQUENT_COMPILE
         if (VectorTypes.TryGetProvider<T>() is { })
         {
             visitor.Accept(value);
@@ -148,7 +148,11 @@ public static partial class MathMatrix
                 return;
             }
         }
-        else if (typeof(TIdealOut) == typeof(ushort) || typeof(TIdealOut) == typeof(GuidOrId))
+        else if (typeof(TIdealOut) == typeof(ushort)
+#if SUBSEQUENT_COMPILE
+                 || typeof(TIdealOut) == typeof(GuidOrId)
+#endif
+                 )
         {
             if (ushort.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out ushort u2))
             {

@@ -168,7 +168,7 @@ internal sealed class UInt64TypeConverter : ITypeConverter<ulong>
         return false;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, ulong value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, ulong value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteNumberValue(value);
     }

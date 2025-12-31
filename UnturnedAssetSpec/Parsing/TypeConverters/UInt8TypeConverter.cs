@@ -168,7 +168,7 @@ internal sealed class UInt8TypeConverter : ITypeConverter<byte>
         return false;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, byte value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, byte value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteNumberValue(value);
     }

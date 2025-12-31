@@ -192,7 +192,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
         return true;
     }
 
-    public virtual void WriteValueToJson(Utf8JsonWriter writer, TVector value, IType<TVector> valueType)
+    public virtual void WriteValueToJson(Utf8JsonWriter writer, TVector value, IType<TVector> valueType, JsonSerializerOptions options)
     {
         writer.WriteStringValue(ToString(value));
     }
@@ -299,9 +299,9 @@ public abstract class BaseVectorType<TVector, TSelf> :
         return CreateType(in typeDefinition, typeId, spec, owner, context);
     }
 
-    void ITypeConverter<TVector>.WriteJson(Utf8JsonWriter writer, TVector value, ref TypeConverterFormatArgs args)
+    void ITypeConverter<TVector>.WriteJson(Utf8JsonWriter writer, TVector value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
-        WriteValueToJson(writer, value, this);
+        WriteValueToJson(writer, value, this, options);
     }
 
     bool ITypeConverter<TVector>.TryReadJson(in JsonElement json, out Optional<TVector> value, ref TypeConverterParseArgs<TVector> args)

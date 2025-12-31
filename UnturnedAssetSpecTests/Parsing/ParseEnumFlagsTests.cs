@@ -12,7 +12,7 @@ public class ParseEnumFlagsTests
     public void SetUp()
     {
         _enumType = (DatFlagEnumType)DatType.CreateEnumType(new QualifiedType("SDG.Unturned.ERayMask, Assembly-CSharp", true), true, default, null);
-        _enumType.DisplayName = "Ray Mask";
+        _enumType.DisplayNameIntl = "Ray Mask";
 
         ImmutableArray<DatEnumValue>.Builder builder = ImmutableArray.CreateBuilder<DatEnumValue>(4);
 

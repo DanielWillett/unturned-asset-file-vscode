@@ -320,7 +320,7 @@ public class ListType<TCountType, TElementType>
         if (_args.LegacyDefaultElementTypeValue != null)
         {
             writer.WritePropertyName("LegacyDefaultElementTypeValue"u8);
-            _args.LegacyDefaultElementTypeValue.WriteToJson(writer);
+            _args.LegacyDefaultElementTypeValue.WriteToJson(writer, options);
         }
     }
 
@@ -361,7 +361,7 @@ public class ListType<TCountType, TElementType>
         }
     }
 
-    public void WriteValueToJson(Utf8JsonWriter writer, EquatableArray<TElementType> value, IType<EquatableArray<TElementType>> valueType)
+    public void WriteValueToJson(Utf8JsonWriter writer, EquatableArray<TElementType> value, IType<EquatableArray<TElementType>> valueType, JsonSerializerOptions options)
     {
         if (value.Array == null || value.Array.Length == 0)
         {
@@ -379,7 +379,7 @@ public class ListType<TCountType, TElementType>
             }
             else
             {
-                _subType.Parser.WriteValueToJson(writer, element, _subType);
+                _subType.Parser.WriteValueToJson(writer, element, _subType, options);
             }
         }
 

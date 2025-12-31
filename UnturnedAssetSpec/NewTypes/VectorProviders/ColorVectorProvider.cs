@@ -156,6 +156,34 @@ internal class ColorVectorProvider : IVectorTypeProvider<Color>
         return 4;
     }
 
+    public int Compare(Color left, Color right)
+    {
+        const float tolerance = 0.0038f;
+
+        float sub = left.R - right.R;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = left.G - right.G;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = left.B - right.B;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+        sub = left.A - right.A;
+        if (Math.Abs(sub) >= tolerance)
+        {
+            return sub > 0 ? 1 : -1;
+        }
+
+        return 0;
+    }
+
     public double GetComponent(Color val, int index)
     {
         return index switch

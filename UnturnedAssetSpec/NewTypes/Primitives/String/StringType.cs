@@ -147,9 +147,9 @@ public sealed class StringType : PrimitiveType<string, StringType>, ITypeParser<
         return TypeParsers.String.TryReadValueFromJson(in json, out value, valueType);
     }
 
-    public void WriteValueToJson(Utf8JsonWriter writer, string value, IType<string> valueType)
+    public void WriteValueToJson(Utf8JsonWriter writer, string value, IType<string> valueType, JsonSerializerOptions options)
     {
-        TypeParsers.String.WriteValueToJson(writer, value, valueType);
+        TypeParsers.String.WriteValueToJson(writer, value, valueType, options);
     }
 
     protected override IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)

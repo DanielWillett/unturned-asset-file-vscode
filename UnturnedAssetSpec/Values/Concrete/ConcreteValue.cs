@@ -1,11 +1,9 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
@@ -103,15 +101,17 @@ public sealed class ConcreteValue<TValue>
                     return IsNull;
                 if (!strongValue.TryGetConcreteValue(out Optional<TValue> optVal))
                     return false;
-                return !optVal.HasValue ? IsNull : optVal.Value.Equals(Value);
+                return optVal.HasValue ? !IsNull && optVal.Value.Equals(Value) : IsNull;
 
             case IValue value:
-                EqualityVisitor visitor;
-                visitor.OtherValue = value;
+                
+                EqualityVisitor<TValue> visitor;
                 visitor.IsNull = IsNull;
                 visitor.Value = Value;
                 visitor.IsEqual = false;
-                value.Type.Visit(ref visitor);
+                visitor.CaseInsensitive = false;
+                visitor.Success = false;
+                value.VisitConcreteValue(ref visitor);
                 return visitor.IsEqual;
 
             default:
@@ -119,72 +119,8 @@ public sealed class ConcreteValue<TValue>
         }
     }
 
-    private struct EqualityVisitor : ITypeVisitor, IGenericVisitor
-    {
-        public IValue OtherValue;
-        public bool IsEqual;
-        public bool IsNull;
-        public TValue? Value;
-
-        public void Accept<TOtherValue>(IType<TOtherValue> type)
-            where TOtherValue : IEquatable<TOtherValue>
-        {
-            if (OtherValue is not IValue<TOtherValue> strongValue)
-                return;
-
-            if (strongValue.IsNull)
-            {
-                IsEqual = IsNull;
-                return;
-            }
-
-            if (!strongValue.TryGetConcreteValue(out Optional<TOtherValue> optVal))
-                return;
-
-            if (!optVal.HasValue)
-            {
-                IsEqual = IsNull;
-                return;
-            }
-
-            if (IsNull)
-            {
-                IsEqual = false;
-                return;
-            }
-
-            if (MathMatrix.Equals(Value, optVal.Value, ref this))
-            {
-                return;
-            }
-
-            if (typeof(TOtherValue) == typeof(Guid))
-            {
-                if (typeof(TValue) == typeof(GuidOrId))
-                {
-                    IsEqual = Unsafe.As<TValue, GuidOrId>(ref Value!)
-                        .Equals(SpecDynamicExpressionTreeValueHelpers.As<TOtherValue, Guid>(optVal.Value));
-                }
-            }
-            else if (typeof(TOtherValue) == typeof(GuidOrId))
-            {
-                if (typeof(TValue) == typeof(Guid))
-                {
-                    IsEqual = SpecDynamicExpressionTreeValueHelpers.As<TOtherValue, GuidOrId>(optVal.Value)
-                        .Equals(Unsafe.As<TValue, Guid>(ref Value!));
-                }
-            }
-        }
-
-        public void Accept<T>(T? value)
-            where T : IEquatable<T>
-        {
-            if (typeof(T) != typeof(bool))
-                return;
-
-            IsEqual = Unsafe.As<T, bool>(ref value!);
-        }
-    }
+    /// <inheritdoc />
+    public bool Equals(IValue? other) => Equals(other as ConcreteValue<TValue>);
 
     /// <inheritdoc />
     public override bool Equals(object? obj)
@@ -199,7 +135,7 @@ public sealed class ConcreteValue<TValue>
     }
 
     /// <inheritdoc />
-    public void WriteToJson(Utf8JsonWriter writer)
+    public void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
         if (IsNull)
         {
@@ -207,15 +143,13 @@ public sealed class ConcreteValue<TValue>
         }
         else
         {
-            Type.Parser.WriteValueToJson(writer, _value, Type);
+            Type.Parser.WriteValueToJson(writer, _value, Type, options);
         }
     }
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return IsNull ? 0 : _value.GetHashCode();
+        return IsNull ? 1302072072 : HashCode.Combine(_value, 1302072072);
     }
-
-    IType IValue.Type => Type;
 }

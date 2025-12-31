@@ -318,6 +318,9 @@
   <data name="Type_Name_UInt64" xml:space="preserve">
     <value>Unsigned 64-Bit Integer</value>
   </data>
+  <data name="Type_Name_ValueType" xml:space="preserve">
+    <value>Value Type</value>
+  </data>
   <data name="Type_Name_Vector2_Unspecified" xml:space="preserve">
     <value>2D Vector</value>
   </data>

@@ -63,11 +63,10 @@ internal readonly struct ExpressionNodeFormatter
 
             case IValueExpressionNode value:
                 WriteValueVisitor visitor;
-                visitor.Value = value;
                 visitor.ValueString = null;
                 visitor.ValueSuffix = null;
                 // calls Accept below
-                value.Type.Visit(ref visitor);
+                value.VisitConcreteValue(ref visitor);
                 string? valueStr = visitor.ValueString;
                 if (valueStr == null && prefix is not false)
                 {
@@ -103,36 +102,27 @@ internal readonly struct ExpressionNodeFormatter
         }
     }
 
-    private struct WriteValueVisitor : ITypeVisitor
+    private struct WriteValueVisitor : IValueVisitor
     {
-        public IValue? Value;
         public string? ValueString;
         public string? ValueSuffix;
-        public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
+        public void Accept<TValue>(Optional<TValue> opt) where TValue : IEquatable<TValue>
         {
-            if (Value is IValue<TValue> strongValue
-                && strongValue.TryGetConcreteValue(out Optional<TValue> opt))
+            if (!opt.HasValue)
             {
-                if (!opt.HasValue)
-                {
-                    ValueString = null;
-                    return;
-                }
+                ValueString = null;
+                return;
+            }
 
-                if (TypeConverters.TryGet<TValue>() is { } converter)
-                {
-                    TypeConverterFormatArgs args = default;
-                    ValueString = converter.Format(opt.Value, ref args);
-                    ValueSuffix = CommonTypes.GetTypeSuffix<TValue>();
-                }
-                else
-                {
-                    ValueString = opt.Value.ToString();
-                }
+            if (TypeConverters.TryGet<TValue>() is { } converter)
+            {
+                TypeConverterFormatArgs args = default;
+                ValueString = converter.Format(opt.Value, ref args);
+                ValueSuffix = CommonTypes.GetTypeSuffix<TValue>();
             }
             else
             {
-                ValueString = Value?.ToString();
+                ValueString = opt.Value.ToString();
             }
         }
     }

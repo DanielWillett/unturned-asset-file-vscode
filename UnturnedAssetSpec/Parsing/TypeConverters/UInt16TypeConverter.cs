@@ -168,7 +168,7 @@ internal sealed class UInt16TypeConverter : ITypeConverter<ushort>
         return false;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, ushort value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, ushort value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteNumberValue(value);
     }

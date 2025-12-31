@@ -264,7 +264,7 @@ internal sealed class Float64TypeConverter : ITypeConverter<double>
         return false;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, double value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, double value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteNumberValue(value);
     }

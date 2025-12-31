@@ -32,7 +32,7 @@ public interface ITypeParser<T> where T : IEquatable<T>
     /// <summary>
     /// Write a value to a <see cref="Utf8JsonWriter"/>.
     /// </summary>
-    void WriteValueToJson(Utf8JsonWriter writer, T value, IType<T> valueType);
+    void WriteValueToJson(Utf8JsonWriter writer, T value, IType<T> valueType, JsonSerializerOptions options);
 }
 
 

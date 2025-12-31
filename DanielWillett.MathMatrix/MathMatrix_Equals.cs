@@ -77,7 +77,7 @@ partial class MathMatrix
 
         if (inValY == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(false);
             return true;
         }
 #if SUBSEQUENT_COMPILE
@@ -224,7 +224,7 @@ partial class MathMatrix
 
         if (inValY == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(false);
             return true;
         }
 #if SUBSEQUENT_COMPILE
@@ -368,7 +368,7 @@ partial class MathMatrix
 
         if (inValY == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(false);
             return true;
         }
 #if SUBSEQUENT_COMPILE
@@ -509,7 +509,7 @@ partial class MathMatrix
 
         if (inValY == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(false);
             return true;
         }
 #if SUBSEQUENT_COMPILE
@@ -649,7 +649,7 @@ partial class MathMatrix
 
         if (inValY == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(false);
             return true;
         }
 #if SUBSEQUENT_COMPILE
@@ -789,7 +789,7 @@ partial class MathMatrix
 
         if (inValY == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(false);
             return true;
         }
 
@@ -931,7 +931,7 @@ partial class MathMatrix
 
         if (inValY == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(false);
             return true;
         }
 
@@ -1073,7 +1073,7 @@ partial class MathMatrix
 
         if (inValY == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(false);
             return true;
         }
 
@@ -1215,7 +1215,7 @@ partial class MathMatrix
 
         if (inValY == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(false);
             return true;
         }
 
@@ -1351,7 +1351,7 @@ partial class MathMatrix
 
         if (inValY == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(false);
             return true;
         }
 
@@ -1484,7 +1484,7 @@ partial class MathMatrix
 
         if (inValY == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(false);
             return true;
         }
 
@@ -1621,7 +1621,12 @@ partial class MathMatrix
 
         if (inValX == null)
         {
-            visitor.Accept<string>(null);
+            visitor.Accept(inValY == null);
+            return true;
+        }
+        if (inValY == null)
+        {
+            visitor.Accept(false);
             return true;
         }
 

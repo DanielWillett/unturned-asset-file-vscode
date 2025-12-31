@@ -118,7 +118,7 @@ internal sealed class DateTimeTypeConverter : ITypeConverter<DateTime>
         return false;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, DateTime value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, DateTime value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value);
     }

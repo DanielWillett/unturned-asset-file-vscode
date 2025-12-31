@@ -164,11 +164,18 @@ internal static class JsonHelper
                 return true;
 
             case JsonTokenType.String:
-                if (TryGetGuid(ref reader, out Guid guid))
+                DateTime dt;
+                // dont change this to TryGetGuid
+                if (reader.TryGetGuid(out Guid guid))
                     obj = guid;
                 else if (reader.TryGetDateTimeOffset(out DateTimeOffset dto))
-                    obj = dto;
-                else if (reader.TryGetDateTime(out DateTime dt))
+                {
+                    if (dto.Offset == TimeSpan.Zero && reader.TryGetDateTime(out dt))
+                        obj = dt;
+                    else
+                        obj = dto;
+                }
+                else if (reader.TryGetDateTime(out dt))
                     obj = dt;
                 else
                 {
@@ -199,6 +206,10 @@ internal static class JsonHelper
                         if (!elementType.IsValueType)
                         {
                             listType = elementType;
+                        }
+                        else
+                        {
+                            hasNonNullDifferingTypeValue = true;
                         }
                     }
                     else if (element != null && !listType.IsInstanceOfType(element) || element == null && listType.IsValueType)

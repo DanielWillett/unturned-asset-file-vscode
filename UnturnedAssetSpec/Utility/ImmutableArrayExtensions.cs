@@ -43,6 +43,16 @@ public static class ImmutableArrayExtensions
     }
 
     /// <summary>
+    /// Re-interprets one array as another type without creating a new backing array. Only works on reference types.
+    /// </summary>
+    public static ImmutableArray<TTo> UnsafeConvert<TFrom, TTo>(this ImmutableArray<TFrom> old) where TTo : class where TFrom : class, TTo
+    {
+        TFrom[] oldArray = old.UnsafeThaw();
+        // ReSharper disable once CoVariantArrayConversion
+        return ((TTo[])oldArray).UnsafeFreeze();
+    }
+
+    /// <summary>
     /// Run a binary search on an <see cref="ImmutableArray{T}"/> searching each element for a transformation value.
     /// </summary>
     /// <typeparam name="TKey"></typeparam>

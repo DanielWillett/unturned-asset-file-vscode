@@ -186,7 +186,7 @@ internal sealed class GuidOrIdTypeConverter : ITypeConverter<GuidOrId>
         return false;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, GuidOrId value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, GuidOrId value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         if (value.IsId)
             writer.WriteNumberValue(value.Id);

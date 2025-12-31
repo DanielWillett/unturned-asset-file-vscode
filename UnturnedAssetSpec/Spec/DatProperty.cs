@@ -1,5 +1,4 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Immutable;
@@ -45,7 +44,7 @@ public sealed class DatProperty : IDatSpecificationObject
     /// <summary>
     /// Type of value this property stores.
     /// </summary>
-    public PropertyTypeOrSwitch Type { get; }
+    public IPropertyType Type { get; }
 
     /// <summary>
     /// List of available keys, if extra information is given for any.
@@ -109,7 +108,7 @@ public sealed class DatProperty : IDatSpecificationObject
     /// </summary>
     public IValue<bool>? Required { get; internal set; }
 
-    internal DatProperty(string key, PropertyTypeOrSwitch type, DatTypeWithProperties owner, JsonElement element)
+    internal DatProperty(string key, IPropertyType type, DatTypeWithProperties owner, JsonElement element)
     {
         Key = key;
         Owner = owner;
@@ -126,16 +125,14 @@ public sealed class DatProperty : IDatSpecificationObject
     /// <param name="element">The JSON element this property was read from.</param>
     /// <returns>The newly-created <see cref="DatProperty"/> instance.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static DatProperty Create(string key, PropertyTypeOrSwitch type, DatTypeWithProperties owner, JsonElement element)
+    public static DatProperty Create(string key, IPropertyType type, DatTypeWithProperties owner, JsonElement element)
     {
-        if (key == null)
-            throw new ArgumentNullException(nameof(key));
-        if (owner == null)
-            throw new ArgumentNullException(nameof(owner));
-        if (type.Type == null && type.TypeSwitch == null)
-            throw new ArgumentNullException(nameof(type));
-
-        return new DatProperty(key, type, owner, element);
+        return new DatProperty(
+            key   ?? throw new ArgumentNullException(nameof(key)),
+            type  ?? throw new ArgumentNullException(nameof(type)),
+            owner ?? throw new ArgumentNullException(nameof(owner)),
+            element
+        );
     }
 
     /// <summary>

@@ -433,7 +433,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
         return true;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, string value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, string value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value);
     }

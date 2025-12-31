@@ -293,9 +293,9 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
         return false;
     }
 
-    public void WriteValueToJson(Utf8JsonWriter writer, BundleReference value, IType<BundleReference> valueType)
+    public void WriteValueToJson(Utf8JsonWriter writer, BundleReference value, IType<BundleReference> valueType, JsonSerializerOptions options)
     {
-        TypeParsers.String.WriteValueToJson(writer, value.ToString(), StringType.Instance);
+        TypeParsers.String.WriteValueToJson(writer, value.ToString(), StringType.Instance, options);
     }
 
     IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)

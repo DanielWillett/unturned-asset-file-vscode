@@ -1,9 +1,9 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -11,7 +11,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <summary>
 /// Base interface for a parsable property type.
 /// </summary>
-public interface IType
+public interface IType : IPropertyType, IEquatable<IType?>
 {
     /// <summary>
     /// ID of the type which would be written in the Type field in JSON.

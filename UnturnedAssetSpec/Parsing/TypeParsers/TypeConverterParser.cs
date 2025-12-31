@@ -88,10 +88,10 @@ public class TypeConverterParser<T>(ITypeConverter<T> typeConverter)
     }
 
     /// <inheritdoc />
-    public void WriteValueToJson(Utf8JsonWriter writer, T value, IType<T> valueType)
+    public void WriteValueToJson(Utf8JsonWriter writer, T value, IType<T> valueType, JsonSerializerOptions options)
     {
         TypeConverterFormatArgs args = default;
-        _typeConverter.WriteJson(writer, value, ref args);
+        _typeConverter.WriteJson(writer, value, ref args, options);
     }
 
     /// <inheritdoc />

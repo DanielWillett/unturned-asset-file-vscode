@@ -9,7 +9,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <summary>
 /// A dynamic value that can be resolved at runtime.
 /// </summary>
-public interface IValue
+public interface IValue : IEquatable<IValue?>
 {
     /// <summary>
     /// Whether or not this value represents a <see langword="null"/> value.
@@ -18,14 +18,9 @@ public interface IValue
     bool IsNull { get; }
 
     /// <summary>
-    /// The type stored in this value.
-    /// </summary>
-    IType Type { get; }
-
-    /// <summary>
     /// Writes this value to a <see cref="Utf8JsonWriter"/> in a way that it can be recreated later.
     /// </summary>
-    void WriteToJson(Utf8JsonWriter writer);
+    void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options);
 
     /// <summary>
     /// Attempts to invoke <see cref="IValueVisitor.Accept"/> on the current value, but only when the value can be determined without context.
@@ -48,7 +43,7 @@ public interface IValue<TValue> : IValue where TValue : IEquatable<TValue>
     /// <summary>
     /// The type stored in this value.
     /// </summary>
-    new IType<TValue> Type { get; }
+    IType<TValue> Type { get; }
 
     /// <summary>
     /// Attempts to evaluate the value without any workspace context.

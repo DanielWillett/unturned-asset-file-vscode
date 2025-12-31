@@ -60,7 +60,7 @@ internal sealed class IPv4FilterTypeConverter : ITypeConverter<IPv4Filter>
         return false;
     }
 
-    public void WriteJson(Utf8JsonWriter writer, IPv4Filter value, ref TypeConverterFormatArgs args)
+    public void WriteJson(Utf8JsonWriter writer, IPv4Filter value, ref TypeConverterFormatArgs args, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.ToString());
     }

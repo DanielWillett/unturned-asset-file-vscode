@@ -12,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 /// </summary>
 /// <remarks>Create using <see cref="Values.FromExpression"/>.</remarks>
 /// <typeparam name="TResult">The resulting type from the expression.</typeparam>
-public class ExpressionValue<TResult> : IValue<TResult> where TResult : IEquatable<TResult>
+public class ExpressionValue<TResult> : IValue<TResult>, IEquatable<ExpressionValue<TResult>?> where TResult : IEquatable<TResult>
 {
     /// <inheritdoc />
     public IType<TResult> Type { get; }
@@ -42,7 +42,7 @@ public class ExpressionValue<TResult> : IValue<TResult> where TResult : IEquatab
     }
 
     /// <inheritdoc />
-    public void WriteToJson(Utf8JsonWriter writer)
+    public void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -73,7 +73,6 @@ public class ExpressionValue<TResult> : IValue<TResult> where TResult : IEquatab
     }
 
     bool IValue.IsNull => false;
-    IType IValue.Type => Type;
 
     private bool TryEvaluate(out Optional<TResult> value, bool isConcreteOnly, in FileEvaluationContext ctx)
     {
@@ -92,5 +91,32 @@ public class ExpressionValue<TResult> : IValue<TResult> where TResult : IEquatab
 
         value = Optional<TResult>.Null;
         return false;
+    }
+
+    /// <inheritdoc />
+    public bool Equals(ExpressionValue<TResult>? value)
+    {
+        if (value == null)
+            return false;
+
+        return value.Type.Equals(Type) && value.Root.Equals(Root);
+    }
+
+    /// <inheritdoc />
+    public bool Equals(IValue? other)
+    {
+        return Equals(other as ExpressionValue<TResult>);
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as ExpressionValue<TResult>);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(1513622216, Type, Root);
     }
 }

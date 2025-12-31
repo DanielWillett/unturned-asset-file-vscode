@@ -231,9 +231,9 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
         return TypeParsers.Guid.TryReadValueFromJson(in json, out value, valueType);
     }
 
-    public void WriteValueToJson(Utf8JsonWriter writer, Guid value, IType<Guid> valueType)
+    public void WriteValueToJson(Utf8JsonWriter writer, Guid value, IType<Guid> valueType, JsonSerializerOptions options)
     {
-        TypeParsers.Guid.WriteValueToJson(writer, value, valueType);
+        TypeParsers.Guid.WriteValueToJson(writer, value, valueType, options);
     }
 
     IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)

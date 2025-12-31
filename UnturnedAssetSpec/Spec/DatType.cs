@@ -48,8 +48,10 @@ public enum DatSpecificationType
 /// <summary>
 /// Contains information about the properties and behavior available for a .dat file type or custom type.
 /// </summary>
-public abstract class DatType : IType, IDatSpecificationObject
+public abstract class DatType : BaseType<DatType>, IDatSpecificationObject
 {
+    internal string DisplayNameIntl;
+
     /// <summary>
     /// The root object of this type, unless it was created at runtime (ex. during a unit test).
     /// </summary>
@@ -65,6 +67,9 @@ public abstract class DatType : IType, IDatSpecificationObject
     /// </summary>
     public QualifiedType TypeName { get; }
 
+    /// <inheritdoc />
+    public override string Id => TypeName.Type;
+
     /// <summary>
     /// The type of specification this type defines.
     /// </summary>
@@ -79,7 +84,7 @@ public abstract class DatType : IType, IDatSpecificationObject
     /// <summary>
     /// The display name of the object this type of file defines.
     /// </summary>
-    public string DisplayName { get; internal set; }
+    public override string DisplayName => DisplayNameIntl;
 
     /// <summary>
     /// URL to the SDG docs for this type of file.
@@ -102,7 +107,7 @@ public abstract class DatType : IType, IDatSpecificationObject
     private protected DatType(QualifiedType type, DatTypeWithProperties? baseType, JsonElement element)
     {
         TypeName = type;
-        DisplayName = type.Type;
+        DisplayNameIntl = type.Type;
         BaseType = baseType;
         DataRoot = element;
     }
@@ -165,21 +170,22 @@ public abstract class DatType : IType, IDatSpecificationObject
             : new DatFileType(typeName, baseType, element);
     }
 
-    string IType.Id => TypeName.Type;
     string IDatSpecificationObject.FullName => FullName;
-    void IType.Visit<TVisitor>(ref TVisitor visitor) => Visit(ref visitor);
 
-    void IType.WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
-    {
-        WriteToJson(writer, options);
-    }
-
-    private protected virtual void Visit<TVisitor>(ref TVisitor visitor) where TVisitor : ITypeVisitor { }
-
-    private protected virtual void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
+    public override void Visit<TVisitor>(ref TVisitor visitor) { }
+    public override void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
         writer.WriteStringValue(TypeName.Type);
     }
+
+    /// <inheritdoc />
+    protected override bool Equals(DatType other)
+    {
+        return (object)other == this;
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode() => TypeName.GetHashCode();
 }
 
 /// <summary>

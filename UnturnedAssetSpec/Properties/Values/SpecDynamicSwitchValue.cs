@@ -802,6 +802,7 @@ public enum SpecDynamicSwitchCaseOperation
     /// <summary>
     /// Defines one condition which, when <see langword="true"/>, will be resolved to a nested switch statement.
     /// </summary>
+    [Obsolete]
     When
 }
 

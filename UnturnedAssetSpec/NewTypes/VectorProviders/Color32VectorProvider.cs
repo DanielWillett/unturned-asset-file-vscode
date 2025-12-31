@@ -169,6 +169,20 @@ internal class Color32VectorProvider : IVectorTypeProvider<Color32>
         return 4;
     }
 
+    public int Compare(Color32 left, Color32 right)
+    {
+        int cmp = left.R - right.R;
+        if (cmp != 0)
+            return cmp;
+        cmp = left.G - right.G;
+        if (cmp != 0)
+            return cmp;
+        cmp = left.B - right.B;
+        if (cmp != 0)
+            return cmp;
+        return left.A - right.A;
+    }
+
     public double GetComponent(Color32 val, int index)
     {
         return index switch

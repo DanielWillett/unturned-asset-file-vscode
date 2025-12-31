@@ -1,11 +1,10 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
-using System;
-using System.Collections.Immutable;
-using System.Reflection;
-using System.Text.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
+using System;
+using System.Collections.Immutable;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -64,11 +63,11 @@ partial class SpecificationFileReader
         }
 
         // Types
-        PropertyTypeOrSwitch type = default;
+        IPropertyType type;
         if (!root.TryGetProperty("Type"u8, out element)
             || element.ValueKind is not JsonValueKind.String and not JsonValueKind.Object and not JsonValueKind.Array)
         {
-            if (overriding == null || overriding.Type.Type == null && overriding.Type.TypeSwitch == null)
+            if (overriding == null)
                 throw new JsonException(string.Format(Resources.JsonException_PropertyTypeMissing, $"{owner.FullName}.{key}"));
 
             type = overriding.Type;
@@ -188,7 +187,7 @@ partial class SpecificationFileReader
         }
     }
 
-    private PropertyTypeOrSwitch ReadTypeReference(in JsonElement root, IDatSpecificationObject owner, string key, bool allowSwitch = true)
+    private IPropertyType ReadTypeReference(in JsonElement root, IDatSpecificationObject owner, string key, bool allowSwitch = true)
     {
         string? type;
         bool isObject = root.ValueKind == JsonValueKind.Object;
@@ -210,7 +209,7 @@ partial class SpecificationFileReader
         else
         {
             if (allowSwitch)
-                return new PropertyTypeOrSwitch(ReadTypeSwitch(in root, owner, key));
+                return ReadTypeSwitch(in root, owner, key);
 
             throw new JsonException(string.Format(Resources.JsonException_PropertyTypeMissing, $"{owner.FullName}.{key}.Type[ ... ]"));
         }
@@ -222,12 +221,12 @@ partial class SpecificationFileReader
             {
                 if (qualType.Equals(file.TypeName))
                 {
-                    return new PropertyTypeOrSwitch(file);
+                    return file;
                 }
 
                 if (file.Types.TryGetValue(qualType, out DatType? newType))
                 {
-                    return new PropertyTypeOrSwitch(newType);
+                    return newType;
                 }
             }
 
@@ -236,7 +235,7 @@ partial class SpecificationFileReader
             {
                 ITypeFactory factory = (ITypeFactory?)Activator.CreateInstance(clrType, true)!;
                 IType newType = factory.CreateType(in root, type, this, owner, key);
-                return new PropertyTypeOrSwitch(newType);
+                return newType;
             }
         }
         
@@ -244,21 +243,15 @@ partial class SpecificationFileReader
         {
             ITypeFactory factory = factoryGetter();
             IType newType = factory.CreateType(in root, type, this, owner, key);
-            return new PropertyTypeOrSwitch(newType);
+            return newType;
         }
 
         throw new JsonException(string.Format(Resources.JsonException_PropertyTypeNotFound, type, $"{owner.FullName}.{key}.Type"));
     }
 
-    private static SpecDynamicSwitchValue ReadTypeSwitch(in JsonElement root, IDatSpecificationObject owner, string key)
-    {
-        int cases = root.GetArrayLength();
-        throw new NotImplementedException();
-    }
-
     public IType ReadType(in JsonElement root, IDatSpecificationObject readObject, string context = "")
     {
-        if (ReadTypeReference(in root, readObject, context, allowSwitch: false).Type is IType t)
+        if (ReadTypeReference(in root, readObject, context, allowSwitch: false) is IType t)
             return t;
 
         throw new JsonException(string.Format(Resources.JsonException_PropertyTypeNotFound, "", context.Length == 0 ? readObject.FullName : $"{readObject.FullName}.{context}"));
@@ -273,5 +266,32 @@ partial class SpecificationFileReader
         }
 
         throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, valueType.Id, context.Length == 0 ? readObject.FullName : $"{readObject.FullName}.{context}"));
+    }
+
+    private TypeSwitch ReadTypeSwitch(in JsonElement root, IDatSpecificationObject owner, string key)
+    {
+        int cases = root.GetArrayLength();
+        if (cases <= 0)
+        {
+            throw new JsonException(string.Format(Resources.JsonException_PropertyTypeMissing, $"{owner.FullName}.{key}.Type[]"));
+        }
+
+        JsonElement typeElement = default;
+        IType<IType> switchType = (IType<IType>)TypeSwitch.ValueTypeFactory.CreateType(in typeElement, TypeSwitch.ValueTypeId, this, owner, key);
+
+        ImmutableArray<ISwitchCase<IType>>.Builder caseArrayBuilder = ImmutableArray.CreateBuilder<ISwitchCase<IType>>(cases);
+
+        for (int i = 0; i < cases; ++i)
+        {
+            JsonElement caseObj = root[i];
+            if (SwitchCase.TryReadSwitchCase(switchType, in caseObj) is not { } sw)
+            {
+                throw new JsonException(string.Format(Resources.JsonException_PropertyTypeNotFound, $"{owner.FullName}.{key}.Type[{i}]"));
+            }
+
+            caseArrayBuilder.Add(sw);
+        }
+
+        return new TypeSwitch(switchType, caseArrayBuilder.MoveToImmutable());
     }
 }
