@@ -7,23 +7,23 @@ using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
-internal sealed class FlagParser : ITypeParser<bool>
+internal sealed class BooleanOrFlagParser : ITypeParser<bool>
 {
     public bool TryParse(ref TypeParserArgs<bool> args, in FileEvaluationContext ctx, out Optional<bool> value)
     {
         if (args.ValueNode is IValueSourceNode v)
         {
             args.CreateTypeConverterParseArgs(out TypeConverterParseArgs<bool> parseArgs, v.Value);
-            if (TypeConverters.Boolean.TryParse(v.Value.AsSpan(), ref parseArgs, out bool parsedValue) && !parsedValue)
+            if (TypeConverters.Boolean.TryParse(v.Value.AsSpan(), ref parseArgs, out bool parsedValue))
             {
-                // false value included for flag
-                args.DiagnosticSink?.UNT2003(ref args, v);
+                value = parsedValue;
+                return true;
             }
         }
 
         if (args is { ShouldIgnoreFailureDiagnostic: false, ValueNode: not null })
         {
-            // value included for flag
+            // value included for flag (except for boolean values)
             args.DiagnosticSink?.UNT1003(ref args, args.ValueNode);
         }
 
@@ -41,6 +41,6 @@ internal sealed class FlagParser : ITypeParser<bool>
         TypeParsers.Boolean.WriteValueToJson(writer, value, valueType, options);
     }
 
-    public override int GetHashCode() => 1959769108;
-    public override bool Equals(object? obj) => obj is FlagParser;
+    public override int GetHashCode() => 2105882869;
+    public override bool Equals(object? obj) => obj is BooleanOrFlagParser;
 }

@@ -12,6 +12,11 @@ public static class TypeParsers
     /// The type parser for flag properties, meaning properties that do not require a value.
     /// </summary>
     public static ITypeParser<bool> Flag { get; } = new FlagParser();
+    
+    /// <summary>
+    /// The type parser for <see cref="BooleanOrFlagType"/> properties, meaning properties that do not require a value, but can supply a boolean value.
+    /// </summary>
+    public static ITypeParser<bool> BooleanOrFlag { get; } = new BooleanOrFlagParser();
 
     /// <summary>
     /// The type parser for <see cref="bool"/> values.

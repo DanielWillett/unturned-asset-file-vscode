@@ -1,4 +1,6 @@
-﻿namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 /// <summary>
 /// A boolean/flag property with the following truth table:
@@ -33,6 +35,8 @@ public sealed class BooleanOrFlagType : PrimitiveType<bool, BooleanOrFlagType>
     public override string Id => TypeId;
 
     public override string DisplayName => Properties.Resources.Type_Name_BooleanOrFlag;
+
+    public override ITypeParser<bool> Parser => TypeParsers.BooleanOrFlag;
 
     public override int GetHashCode() => 2025699832;
 }
