@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 #if NET5_0_OR_GREATER
@@ -12,6 +13,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 #endif
 internal class Vector4Provider : IVectorTypeProvider<Vector4>
 {
+    public ITypeConverter<Vector4> Converter => Vector4Type.Instance;
+
     public int Size => 4;
 
     public Vector4 Multiply(Vector4 val1, Vector4 val2)

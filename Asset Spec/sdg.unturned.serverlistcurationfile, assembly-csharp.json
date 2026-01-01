@@ -61,6 +61,7 @@
             "Type": "DanielWillett.UnturnedDataFileLspServer.Data.Types.ServerListCurationLabel, UnturnedAssetSpec",
             "DisplayName": "Curated Server List Label",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#labels-list-of-dictionaries",
+            "ListReferenceProperty": "Name",
             "Properties":
             [
                 {
@@ -372,7 +373,7 @@
                     "Key": "Label",
                     "Type": "String",
                     "MinimumExclusive": 0,
-                    "ListReference": "(SDG.Unturned.ServerListCurationFile, Assembly-CSharp::Labels).Name!",
+                    "ListReference": "SDG.Unturned.ServerListCurationFile, Assembly-CSharp::Labels!",
                     "Description": "The label to apply to this server if this rule matches it.",
                     "Required":
                     {
@@ -386,7 +387,7 @@
                 {
                     "Key": "Description",
                     "Type": "String",
-                    "ListReference": "(SDG.Unturned.ServerListCurationFile, Assembly-CSharp::Labels).Name!",
+                    "ListReference": "SDG.Unturned.ServerListCurationFile, Assembly-CSharp::Labels!",
                     "Description": "The human-readable description of what this rule does. Not localizable.",
                     "DefaultValue": "=CAT((Default description for rule at index ) #(Self.TemplateGroups[0]))",
                     "Variable": "description"
@@ -394,7 +395,7 @@
                 {
                     "Key": "Inverted",
                     "Type": "Boolean",
-                    "ListReference": "(SDG.Unturned.ServerListCurationFile, Assembly-CSharp::Labels).Name!",
+                    "ListReference": "SDG.Unturned.ServerListCurationFile, Assembly-CSharp::Labels!",
                     "Description": "Whether or not to negate if this rule matches. (Ex. match all servers that don't use this IP range).",
                     "DefaultValue": false,
                     "Variable": "inverted"

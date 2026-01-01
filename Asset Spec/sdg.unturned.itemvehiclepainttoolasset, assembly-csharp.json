@@ -11,7 +11,7 @@
     [
         {
             "Key": "PaintColor",
-            "Type": "Color32RGB",
+            "Type": "Color32",
             "Description": "Vehicle's color will be replaced with this when used.",
             "DefaultValue": null,
             "Variable": "PaintColor",

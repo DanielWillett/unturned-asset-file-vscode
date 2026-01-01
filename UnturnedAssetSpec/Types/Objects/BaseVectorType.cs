@@ -34,7 +34,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
 
     protected abstract bool TryParseFromDictionary(ref TypeParserArgs<TVector> args, IDictionarySourceNode dict, out TVector value);
 
-    protected abstract bool TryParseFromString(ReadOnlySpan<char> text, out TVector value);
+    protected abstract bool TryParseFromString(ReadOnlySpan<char> text, out TVector value, ISourceNode? property, ref TypeConverterParseArgs<TVector> args);
 
     protected virtual bool TryFormat(Span<char> output, TVector value, out int size, ref TypeConverterFormatArgs args)
     {
@@ -134,10 +134,14 @@ public abstract class BaseVectorType<TVector, TSelf> :
                     break;
                 }
 
-                if (!TryParseFromString(v.Value, out parsed))
+                args.CreateTypeConverterParseArgs(out TypeConverterParseArgs<TVector> parseArgs, v.Value);
+                if (!TryParseFromString(v.Value, out parsed, args.ReferenceNode, ref parseArgs))
                 {
                     sendNullMsg = false;
-                    args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
+                    if (!args.ShouldIgnoreFailureDiagnostic)
+                    {
+                        args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
+                    }
                     if ((Options & VectorTypeOptions.Legacy) != 0)
                         goto case null;
 
@@ -181,8 +185,17 @@ public abstract class BaseVectorType<TVector, TSelf> :
             return true;
         }
 
-        if (json.ValueKind != JsonValueKind.String
-            || !TryParseFromString(json.GetString()!, out TVector v))
+        if (json.ValueKind == JsonValueKind.Number
+            && json.TryGetDouble(out double dbl)
+            && VectorTypes.TryGetProvider<TVector>() is { } vectorProvider)
+        {
+            value = vectorProvider.Construct(dbl);
+            return true;
+        }
+
+        TypeConverterParseArgs<TVector> args = default;
+        args.Type = valueType;
+        if (json.ValueKind != JsonValueKind.String || !TryParseFromString(json.GetString()!, out TVector v, null, ref args))
         {
             value = Optional<TVector>.Null;
             return false;
@@ -205,7 +218,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
         }
     }
 
-    protected VectorTypeOptions GetOptions(in JsonElement typeDefinition, IDatSpecificationObject owner, string context)
+    protected static VectorTypeOptions ReadOptions(in JsonElement typeDefinition, IDatSpecificationObject owner, string context)
     {
         if (typeDefinition.ValueKind != JsonValueKind.Object)
         {
@@ -233,7 +246,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
 
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<TVector> args, [MaybeNullWhen(false)] out TVector parsedValue)
     {
-        return TryParseFromString(text, out parsedValue);
+        return TryParseFromString(text, out parsedValue, null, ref args);
     }
 
     string ITypeConverter<TVector>.Format(TVector value, ref TypeConverterFormatArgs args)

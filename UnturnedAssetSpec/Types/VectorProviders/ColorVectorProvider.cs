@@ -1,10 +1,12 @@
-﻿using System;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 internal class ColorVectorProvider : IVectorTypeProvider<Color>
 {
+    public ITypeConverter<Color> Converter => ColorType.Instance;
     public int Size => 4;
 
     public Color Multiply(Color val1, Color val2)

@@ -23,7 +23,7 @@
         },
         {
             "Key": "LoadPaintColor",
-            "Type": "Color32RGB",
+            "Type": "Color32",
             "DefaultValue": null,
             "Description": "If set, overrides the default random paint color when loading a vehicle from a save file. Used to preserve colors of vehicles in existing saves.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-redirector-asset.html#loadpaintcolor-color",
@@ -39,7 +39,7 @@
         },
         {
             "Key": "SpawnPaintColor",
-            "Type": "Color32RGB",
+            "Type": "Color32",
             "DefaultValue": null,
             "Description": "If set, overrides the default random paint color when spawning a new vehicle. Optionally used to preserve colors of vehicles in spawn tables.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-redirector-asset.html#spawnpaintcolor-color",

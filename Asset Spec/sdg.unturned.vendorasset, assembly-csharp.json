@@ -425,7 +425,7 @@
                 },
                 {
                     "Key": "PaintColor",
-                    "Type": "Color32RGB",
+                    "Type": "Color32",
                     "DefaultValue": null,
                     "Required":
                     {

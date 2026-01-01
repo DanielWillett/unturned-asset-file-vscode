@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -9,6 +10,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public interface IVectorTypeProvider<TVector>
     where TVector : IEquatable<TVector>
 {
+    /// <summary>
+    /// The default type converter for this vector type.
+    /// </summary>
+    ITypeConverter<TVector> Converter { get; }
+
     /// <value>
     /// The number of components in this vector type.
     /// </value>

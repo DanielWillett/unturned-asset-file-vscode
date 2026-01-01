@@ -2691,7 +2691,7 @@
                 },
                 {
                     "Key": "PaintColor",
-                    "Type": "Color32RGB",
+                    "Type": "Color32",
                     "DefaultValue": null,
                     "Description": "The optional color of the vehicle.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#vehicle",

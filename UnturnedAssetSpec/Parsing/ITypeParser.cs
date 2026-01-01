@@ -84,6 +84,8 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
 
     DatProperty? IDiagnosticProvider.Property => Property;
 
+    internal ISourceNode ReferenceNode => (ISourceNode?)ValueNode ?? ParentNode;
+
     /// <summary>
     /// Creates <see cref="TypeParserArgs{TElementType}"/> used to parse sub-values, such as the elements in a list.
     /// </summary>

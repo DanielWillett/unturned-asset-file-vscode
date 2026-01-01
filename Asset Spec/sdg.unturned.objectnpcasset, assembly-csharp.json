@@ -424,7 +424,12 @@
         },
         {
             "Key": "Color_Skin",
-            "Type": "ColorRGBStrictHex",
+            "Type":
+            {
+                "Type": "Color",
+                "Mode": "String",
+                "StrictHex": true
+            },
             "DefaultValue": "ffffff",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The NPC's skin color.",
@@ -433,7 +438,12 @@
         },
         {
             "Key": "Color_Hair",
-            "Type": "ColorRGBStrictHex",
+            "Type":
+            {
+                "Type": "Color",
+                "Mode": "String",
+                "StrictHex": true
+            },
             "DefaultValue": "ffffff",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The NPC's hair color.",
@@ -442,7 +452,7 @@
         },
         {
             "Key": "Color_Beard",
-            "Type": "Color32RGB",
+            "Type": "Color32",
             "DefaultValue": "@Color_Hair",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The NPC's beard color.",

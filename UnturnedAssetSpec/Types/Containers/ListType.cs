@@ -9,6 +9,7 @@ using System;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -190,10 +191,14 @@ public sealed class ListType : ITypeFactory
                     );
             }
 
-            IValue<TElementType>? defaultValue = null;
+            IValue? defaultValue = null, includedDefaultValue = null;
             if (Json.TryGetProperty("LegacyDefaultElementTypeValue"u8, out element))
             {
                 defaultValue = Spec.ReadValue(in element, SubType, Owner, Context.Length == 0 ? "LegacyDefaultElementTypeValue" : $"{Context}.LegacyDefaultElementTypeValue");
+            }
+            if (Json.TryGetProperty("LegacyIncludedDefaultElementTypeValue"u8, out element))
+            {
+                includedDefaultValue = Spec.ReadValue(in element, SubType, Owner, Context.Length == 0 ? "LegacyIncludedDefaultElementTypeValue" : $"{Context}.LegacyIncludedDefaultElementTypeValue");
             }
 
             string? legacySingleKey = null, legacySingularKey = null;
@@ -212,6 +217,7 @@ public sealed class ListType : ITypeFactory
                 MinimumCount = minValue,
                 MaximumCount = maxValue,
                 LegacyDefaultElementTypeValue = defaultValue,
+                LegacyIncludedDefaultElementTypeValue = includedDefaultValue,
                 LegacySingleKey = legacySingleKey,
                 LegacySingularKey = legacySingularKey,
                 SkipUnderscoreInLegacyKey = skipUnderscoreInLegacyKey
@@ -230,7 +236,8 @@ public sealed class ListType : ITypeFactory
 ///     <item><c><see cref="ListMode"/> Mode</c> - What kinds of lists to parse (bitwise flag). Defaults to <see cref="ListMode.ModernList"/>.</item>
 ///     <item><c><typeparamref name="TCountType"/> MinimumCount</c> - Minimum number of items (inclusive).</item>
 ///     <item><c><typeparamref name="TCountType"/> MaximumCount</c> - Maximum number of items (inclusive).</item>
-///     <item><c><see cref="IValue{TElementType}"/> LegacyDefaultElementTypeValue</c> - Default value for undefined legacy elements or elements without values.</item>
+///     <item><c><see cref="IValue{TElementType}"/> LegacyDefaultElementTypeValue</c> - Default value for undefined legacy elements.</item>
+///     <item><c><see cref="IValue{TElementType}"/> LegacyIncludedDefaultElementTypeValue</c> - Default value for legacy elements without values. Defaults to <c>LegacyDefaultElementTypeValue</c>.</item>
 ///     <item><c><see cref="string"/> LegacySingleKey</c> - Key for the single property when <see cref="ListMode.LegacySingle"/> is included. Defaults to <c>LegacySingularKey</c>.</item>
 ///     <item><c><see cref="string"/> LegacySingularKey</c> - Base key for elements in legacy lists. For example, 'Condition', for Conditions, Condition_0, etc.</item>
 ///     <item><c><see cref="string"/> SkipUnderscoreInLegacyKey</c> - Indicates that the '_' should not be used to separate <c>LegacySingularKey</c> and the index. Defaults to <see langword="false"/>.</item>
@@ -321,6 +328,12 @@ public class ListType<TCountType, TElementType>
         {
             writer.WritePropertyName("LegacyDefaultElementTypeValue"u8);
             _args.LegacyDefaultElementTypeValue.WriteToJson(writer, options);
+        }
+
+        if (_args.LegacyIncludedDefaultElementTypeValue != null)
+        {
+            writer.WritePropertyName("LegacyIncludedDefaultElementTypeValue"u8);
+            _args.LegacyIncludedDefaultElementTypeValue.WriteToJson(writer, options);
         }
     }
 
@@ -575,7 +588,7 @@ public class ListType<TCountType, TElementType>
                             for (int i = 0; i < count; ++i)
                             {
                                 string newKey = CreateLegacyKey(singularPropertyName, i);
-                                bool needsDefault = false;
+                                bool needsDefault = false, wasIncluded = false;
                                 if (!dictionary.TryGetProperty(newKey, out IPropertySourceNode? property))
                                 {
                                     args.DiagnosticSink?.UNT1007(ref args, valueNode, newKey);
@@ -583,6 +596,7 @@ public class ListType<TCountType, TElementType>
                                 }
                                 else
                                 {
+                                    wasIncluded = true;
                                     args.ReferencedPropertySink?.AcceptReferencedProperty(property);
                                     args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, property.Value, property, _subType, LegacyExpansionFilter.Modern);
 
@@ -602,12 +616,20 @@ public class ListType<TCountType, TElementType>
                                     }
                                 }
 
-                                if (needsDefault
-                                    && _args.LegacyDefaultElementTypeValue != null
-                                    && _args.LegacyDefaultElementTypeValue.TryEvaluateValue(out Optional<TElementType> elementValue, in ctx))
-                                {
-                                    array[i] = elementValue.Value;
-                                }
+                                if (!needsDefault)
+                                    continue;
+
+                                IValue? defaultValue = wasIncluded
+                                    ? _args.LegacyIncludedDefaultElementTypeValue ?? _args.LegacyDefaultElementTypeValue
+                                    : _args.LegacyDefaultElementTypeValue;
+
+                                if (defaultValue == null)
+                                    continue;
+
+                                DefaultValueVisitor v;
+                                v.Array = array;
+                                v.Index = i;
+                                defaultValue.VisitValue(ref v, in ctx);
                             }
 
                             value = new EquatableArray<TElementType>(array!);
@@ -647,6 +669,35 @@ public class ListType<TCountType, TElementType>
         }
 
         return false;
+    }
+
+    private struct DefaultValueVisitor : IValueVisitor
+    {
+        public TElementType?[] Array;
+        public int Index;
+
+        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        {
+            if (!value.HasValue)
+                return;
+
+            if (typeof(TValue) == typeof(TElementType))
+            {
+                Array[Index] = Unsafe.As<TValue, TElementType>(ref Unsafe.AsRef(in value.Value));
+                return;
+            }
+
+            ConvertVisitor<TElementType> converter;
+            converter.IsNull = false;
+            converter.WasSuccessful = false;
+            converter.Result = default;
+            converter.Accept(value.Value);
+
+            if (!converter.WasSuccessful)
+                return;
+
+            Array[Index] = converter.Result;
+        }
     }
 
     private string CreateLegacyKey(string baseKey, int i)
@@ -735,7 +786,12 @@ public readonly struct ListTypeArgs<TCountType, TElementType>
     /// <summary>
     /// The default value for missing legacy list elements.
     /// </summary>
-    public IValue<TElementType>? LegacyDefaultElementTypeValue { get; init; }
+    public IValue? LegacyDefaultElementTypeValue { get; init; }
+
+    /// <summary>
+    /// The default value for legacy list elements missing a value.
+    /// </summary>
+    public IValue? LegacyIncludedDefaultElementTypeValue { get; init; }
 
     public bool Equals(in ListTypeArgs<TCountType, TElementType> other)
     {
@@ -745,13 +801,14 @@ public readonly struct ListTypeArgs<TCountType, TElementType>
                && MinimumCount.Equals(other.MinimumCount)
                && MaximumCount.Equals(other.MaximumCount)
                && SkipUnderscoreInLegacyKey == other.SkipUnderscoreInLegacyKey
-               && Equals(LegacyDefaultElementTypeValue, other.LegacyDefaultElementTypeValue)
+               && (LegacyDefaultElementTypeValue?.Equals(other.LegacyDefaultElementTypeValue) ?? other.LegacyDefaultElementTypeValue == null)
+               && (LegacyIncludedDefaultElementTypeValue?.Equals(other.LegacyIncludedDefaultElementTypeValue) ?? other.LegacyIncludedDefaultElementTypeValue == null)
                ;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Mode, LegacySingularKey, LegacySingleKey, MinimumCount, MaximumCount, SkipUnderscoreInLegacyKey, LegacyDefaultElementTypeValue);
+        return HashCode.Combine(Mode, LegacySingularKey, LegacySingleKey, MinimumCount, MaximumCount, SkipUnderscoreInLegacyKey, LegacyDefaultElementTypeValue, LegacyIncludedDefaultElementTypeValue);
     }
 }
 

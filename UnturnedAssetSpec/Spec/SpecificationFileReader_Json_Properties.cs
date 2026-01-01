@@ -106,9 +106,19 @@ partial class SpecificationFileReader
         }
 
         // todo: KeyCondition
-        SpecDynamicSwitchCaseOrCondition keyCondition = default;
+        IValue<bool>? keyCondition = null;
 
-        if (root.TryGetProperty("Aliases"u8, out element) || element.ValueKind != JsonValueKind.Null)
+        if (root.TryGetProperty("KeyCondition"u8, out element))
+        {
+            if (!Conditions.TryReadComplexOrBasicConditionFromJson(in element, out keyCondition))
+            {
+                throw new JsonException(
+                    string.Format(Resources.JsonException_FailedToParseValue, "complex/basic condition", $"{owner.FullName}.{key}.KeyCondition")
+                );
+            }
+        }
+
+        if (root.TryGetProperty("Aliases"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
             int aliasCount = element.GetArrayLength();
 
@@ -119,6 +129,7 @@ partial class SpecificationFileReader
             {
                 JsonElement aliasObj = element[i];
                 string? alias = null;
+                IValue<bool>? aliasCondition = null;
                 LegacyExpansionFilter aliasFilter = LegacyExpansionFilter.Either;
                 switch (aliasObj.ValueKind)
                 {
@@ -142,8 +153,15 @@ partial class SpecificationFileReader
                             }
                         }
 
-                        // todo: Condition
-                        
+                        if (aliasObj.TryGetProperty("Condition"u8, out aliasElement))
+                        {
+                            if (!Conditions.TryReadComplexOrBasicConditionFromJson(in aliasElement, out aliasCondition))
+                            {
+                                throw new JsonException(
+                                    string.Format(Resources.JsonException_FailedToParseValue, "Complex or Basic Condition", $"{owner.FullName}.{key}.Aliases[{i}].Condition")
+                                );
+                            }
+                        }
                         break;
                 }
 
@@ -158,16 +176,16 @@ partial class SpecificationFileReader
                     ? TemplateProcessor.CreateForKey(ref alias)
                     : TemplateProcessor.None;
 
-                b.Add(new DatPropertyKey(alias, aliasFilter, keyCondition, processor));
+                b.Add(new DatPropertyKey(alias, aliasFilter, aliasCondition, processor));
             }
 
-            property.Keys = b.MoveToImmutableOrCopy();
+            property.Keys = b.MoveToImmutable();
         }
-        else if (filter != LegacyExpansionFilter.Either)
+        else if (filter != LegacyExpansionFilter.Either || keyCondition != null)
         {
             ImmutableArray<DatPropertyKey>.Builder b = ImmutableArray.CreateBuilder<DatPropertyKey>(1);
-            b.Add(new DatPropertyKey(key, filter, default, keyTemplateProcessor));
-            property.Keys = b.MoveToImmutableOrCopy();
+            b.Add(new DatPropertyKey(key, filter, keyCondition, keyTemplateProcessor));
+            property.Keys = b.MoveToImmutable();
         }
         else
         {
@@ -178,13 +196,67 @@ partial class SpecificationFileReader
         if (isTemplate && root.TryGetProperty("TemplateGroups"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
             int templateCt = element.GetArrayLength();
-            ImmutableArray<TemplateGroup>.Builder b = ImmutableArray.CreateBuilder<TemplateGroup>(templateCt + 1);
+            ImmutableArray<TemplateGroup>.Builder b = ImmutableArray.CreateBuilder<TemplateGroup>(templateCt);
 
+            for (int i = 0; i < templateCt; ++i)
+            {
+                JsonElement item = element[i];
+                if (!TemplateGroup.TryReadFromJson(i, in item, out TemplateGroup? group))
+                {
+                    throw new JsonException(
+                        string.Format(Resources.JsonException_FailedToParseValue, "Template Group", $"{owner.FullName}.{key}.TemplateGroups[{i}]")
+                    );
+                }
+
+                b.Add(group);
+            }
+
+            b.Sort((a, b) => a.Group.CompareTo(b.Group));
+            property.TemplateGroups = b.MoveToImmutable();
         }
         else
         {
             property.TemplateGroups = isTemplate ? ImmutableArray<TemplateGroup>.Empty : default;
         }
+
+        if (root.TryGetProperty("FileCrossRef"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.CrossReferenceTarget = Values.Values.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty, null);
+            if (property.CrossReferenceTarget == null)
+            {
+                throw new JsonException(
+                    string.Format(Resources.JsonException_FailedToParseValue, "Property Reference", $"{owner.FullName}.{key}.FileCrossRef")
+                );
+            }
+        }
+
+        if (root.TryGetProperty("CountForTemplateGroup"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            string templateGroupId = element.GetString();
+            if (string.IsNullOrEmpty(templateGroupId))
+            {
+                throw new JsonException(
+                    string.Format(Resources.JsonException_FailedToParseValue, "Template Group Name", $"{owner.FullName}.{key}.CountForTemplateGroup")
+                );
+            }
+
+            property.CountForTemplateGroup = templateGroupId;
+        }
+
+        if (root.TryGetProperty("ListReference"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.AvailableValuesTarget = Values.Values.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty | ValueReadOptions.AllowExclamationSuffix, null);
+            if (property.AvailableValuesTarget == null)
+            {
+                throw new JsonException(
+                    string.Format(Resources.JsonException_FailedToParseValue, "Property Reference", $"{owner.FullName}.{key}.FileCrossRef")
+                );
+            }
+
+            property.AvailableValuesTargetIsRequired = element.ValueKind == JsonValueKind.String && element.GetString().EndsWith("!");
+        }
+
+        // todo
     }
 
     private IPropertyType ReadTypeReference(in JsonElement root, IDatSpecificationObject owner, string key, bool allowSwitch = true)
@@ -204,14 +276,14 @@ partial class SpecificationFileReader
         {
             type = root.GetString();
             if (string.IsNullOrEmpty(type))
-                throw new JsonException(string.Format(Resources.JsonException_PropertyTypeMissing, $"{owner.FullName}.{key}.Type"));
+                throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type", $"{owner.FullName}.{key}.Type"));
         }
         else
         {
             if (allowSwitch)
                 return ReadTypeSwitch(in root, owner, key);
 
-            throw new JsonException(string.Format(Resources.JsonException_PropertyTypeMissing, $"{owner.FullName}.{key}.Type[ ... ]"));
+            throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type (No Switches)", $"{owner.FullName}.{key}.Type[ ... ]"));
         }
 
         if (type.IndexOf(',') >= 0)
@@ -254,18 +326,17 @@ partial class SpecificationFileReader
         if (ReadTypeReference(in root, readObject, context, allowSwitch: false) is IType t)
             return t;
 
-        throw new JsonException(string.Format(Resources.JsonException_PropertyTypeNotFound, "", context.Length == 0 ? readObject.FullName : $"{readObject.FullName}.{context}"));
+        throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type", context.Length == 0 ? readObject.FullName : $"{readObject.FullName}.{context}"));
     }
 
-    public IValue<T> ReadValue<T>(in JsonElement root, IType<T> valueType, IDatSpecificationObject readObject, string context = "") where T : IEquatable<T>
+    public IValue ReadValue(in JsonElement root, IPropertyType valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default)
     {
-        // todo: support switch, refs, etc
-        if (valueType.Parser.TryReadValueFromJson(in root, out Optional<T> value, valueType))
+        if (Values.Values.TryReadValueFromJson(in root, options, valueType) is { } value)
         {
-            return valueType.CreateValue(value);
+            return value;
         }
 
-        throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, valueType.Id, context.Length == 0 ? readObject.FullName : $"{readObject.FullName}.{context}"));
+        throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, valueType, context.Length == 0 ? readObject.FullName : $"{readObject.FullName}.{context}"));
     }
 
     private TypeSwitch ReadTypeSwitch(in JsonElement root, IDatSpecificationObject owner, string key)
@@ -273,7 +344,7 @@ partial class SpecificationFileReader
         int cases = root.GetArrayLength();
         if (cases <= 0)
         {
-            throw new JsonException(string.Format(Resources.JsonException_PropertyTypeMissing, $"{owner.FullName}.{key}.Type[]"));
+            throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type", $"{owner.FullName}.{key}.Type[]"));
         }
 
         JsonElement typeElement = default;
@@ -286,7 +357,7 @@ partial class SpecificationFileReader
             JsonElement caseObj = root[i];
             if (SwitchCase.TryReadSwitchCase(switchType, in caseObj) is not { } sw)
             {
-                throw new JsonException(string.Format(Resources.JsonException_PropertyTypeNotFound, $"{owner.FullName}.{key}.Type[{i}]"));
+                throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type", $"{owner.FullName}.{key}.Type[{i}]"));
             }
 
             caseArrayBuilder.Add(sw);

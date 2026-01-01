@@ -10,9 +10,13 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <summary>
 /// A <see langword="null"/> value of any type.
 /// </summary>
-public sealed class NullValue(IType type) : IValue
+public sealed class NullValue : IValue
 {
-    public IType Type { get; } = type;
+    public static readonly NullValue Instance = new NullValue();
+
+    static NullValue() { }
+    private NullValue() { }
+
     public bool IsNull => true;
 
     /// <inheritdoc />
@@ -44,13 +48,13 @@ public sealed class NullValue(IType type) : IValue
     /// <inheritdoc />
     public override bool Equals(object? obj)
     {
-        return obj is NullValue n && n.Type.Equals(Type);
+        return obj is NullValue;
     }
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return HashCode.Combine(1453913317, Type.GetType());
+        return 1453913317;
     }
 }
 
@@ -113,7 +117,7 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T>, IValueExpressionNod
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return HashCode.Combine(601500687, Type.GetType());
+        return HashCode.Combine(601500687, Type);
     }
 
     bool IEquatable<IExpressionNode>.Equals(IExpressionNode? other)

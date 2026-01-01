@@ -1,10 +1,12 @@
-﻿using System;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 internal class Color32VectorProvider : IVectorTypeProvider<Color32>
 {
+    public ITypeConverter<Color32> Converter => Color32Type.Instance;
     public int Size => 4;
 
     private static byte Clamp(double db)

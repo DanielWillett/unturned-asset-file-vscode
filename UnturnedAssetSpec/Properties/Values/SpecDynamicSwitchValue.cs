@@ -145,7 +145,7 @@ public class SpecDynamicSwitchValue :
          *     case false and 1: // can not match
          *          DefaultValue = new Vector3(0, 0, 0);
          *     default:
-         *          DefaultValue = new Vector4(0, 0, 0);
+         *          DefaultValue = new Vector4(0, 0, 0, 0);
          * }
          */
 

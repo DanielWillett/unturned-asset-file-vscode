@@ -185,6 +185,11 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT1025 = new DatDiagnostic("UNT1025", DatDiagnosticSeverity.Warning);
 
+    /// <summary>
+    /// A color supplied an alpha value when it doesn't support it.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1026 = new DatDiagnostic("UNT1026", DatDiagnosticSeverity.Warning);
+
     /* Errors */
 
     /// <summary>

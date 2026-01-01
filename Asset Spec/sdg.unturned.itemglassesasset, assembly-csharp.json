@@ -20,7 +20,11 @@
         },
         {
             "Key": "Nightvision_Color",
-            "Type": "Color32RGBLegacy",
+            "Type":
+            {
+                "Type": "Color32",
+                "Mode": "String, Legacy, Object"
+            },
             "DefaultValue":
             [
                 {

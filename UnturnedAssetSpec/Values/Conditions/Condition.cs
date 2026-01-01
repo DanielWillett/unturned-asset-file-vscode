@@ -3,6 +3,8 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
@@ -10,10 +12,19 @@ using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
+internal interface ICondition : IValue<bool>
+{
+    /// <summary>
+    /// Creates a condition that evaluates to the exact opposite (NOT) of this condition and invokes a visitor with the result.
+    /// </summary>
+    void GetOpposite<TVisitor>(ref TVisitor visitor)
+        where TVisitor : Conditions.IConditionVisitor;
+}
+
 /// <summary>
 /// A condition between an <see cref="IValue"/> and any type of value.
 /// </summary>
-public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>, IValue<bool>
+public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>, ICondition
     where TComparand : IEquatable<TComparand>
 {
     /// <summary>
@@ -54,7 +65,36 @@ public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>
                && Comparand.Equals(other.Comparand);
     }
 
+    /// <summary>
+    /// Creates a condition that evaluates to the exact opposite (NOT) of this condition.
+    /// </summary>
+    public Condition<TComparand> GetOpposite()
+    {
+        if (IsInverted)
+        {
+            return new Condition<TComparand>(Variable, Operation, Comparand);
+        }
 
+        IConditionOperation? inverse = Operation.Inverse;
+        if (inverse != null)
+        {
+            return new Condition<TComparand>(Variable, inverse, Comparand);
+        }
+
+        return new Condition<TComparand>(Variable, Operation, Comparand, isInverted: true);
+    }
+
+    /// <summary>
+    /// Creates a condition that evaluates to the exact opposite (NOT) of this condition and invokes a visitor with the result.
+    /// </summary>
+    public void GetOpposite<TVisitor>(ref TVisitor visitor)
+        where TVisitor : Conditions.IConditionVisitor
+    {
+        Condition<TComparand> opposite = GetOpposite();
+        visitor.Accept(in opposite);
+    }
+
+    /// <inheritdoc />
     public void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
         if (Operation == null || Variable == null)
@@ -242,17 +282,40 @@ public static class Conditions
     /// <summary>
     /// Attempt to read a condition from a JSON object and return it as a boolean value.
     /// </summary>
-    public static IValue<bool>? TryReadConditionFromJson(in JsonElement root)
+    /// <remarks>Some values returned may not be a <see cref="Condition{TComparand}"/> object. For example, a boolean token results in a <see cref="BooleanType"/> value.</remarks>
+    public static bool TryReadConditionFromJson(in JsonElement root, [NotNullWhen(true)] out IValue<bool>? condition)
     {
+        switch (root.ValueKind)
+        {
+            case JsonValueKind.True:
+                condition = Values.True;
+                return true;
+
+            case JsonValueKind.False:
+                condition = Values.False;
+                return true;
+
+            case JsonValueKind.Null:
+                condition = Values.Null(BooleanType.Instance);
+                return true;
+        }
+
         BoxConditionVisitor visitor;
         visitor.Condition = null;
-        return TryReadConditionFromJson(in root, ref visitor) ? visitor.Condition : null;
+        if (!TryReadConditionFromJson(in root, ref visitor))
+        {
+            condition = null;
+            return false;
+        }
+
+        condition = visitor.Condition!;
+        return true;
     }
 
     private struct BoxConditionVisitor : IConditionVisitor
     {
-        public IValue<bool>? Condition;
-        public void Accept<TComparand>(Condition<TComparand> condition) where TComparand : IEquatable<TComparand>
+        public ICondition? Condition;
+        public void Accept<TComparand>(in Condition<TComparand> condition) where TComparand : IEquatable<TComparand>
         {
             Condition = condition;
         }
@@ -306,7 +369,7 @@ public static class Conditions
         {
             valueVisitor.Visitor = visitorPtr;
             valueVisitor.Element = elementPtr;
-            variable = Values.TryReadValueFromJson(element, SpecDynamicValueContext.AssumeProperty | SpecDynamicValueContext.Default, ref valueVisitor, valueType: null);
+            variable = Values.TryReadValueFromJson(element, ValueReadOptions.AssumeProperty | ValueReadOptions.Default, ref valueVisitor, valueType: null);
             if (variable == null)
                 return false;
             
@@ -328,7 +391,7 @@ public static class Conditions
         fixed (TVisitor* visitorPtr = &visitor)
         {
             v.Visitor = visitorPtr;
-            IValue? comparand = Values.TryReadValueFromJson(element, SpecDynamicValueContext.Optional, ref v, null);
+            IValue? comparand = Values.TryReadValueFromJson(element, ValueReadOptions.AssumeValue, ref v, null);
             if (comparand == null)
                 return false;
 
@@ -388,6 +451,71 @@ public static class Conditions
     }
 
     /// <summary>
+    /// Attempts to read either a <see cref="Condition{TComparand}"/> or a <see cref="ComplexConditionalValue"/> from a JSON object.
+    /// </summary>
+    /// <returns>Whether or not the value could be read.</returns>
+    public static bool TryReadComplexOrBasicConditionFromJson(in JsonElement root, [NotNullWhen(true)] out IValue<bool>? condition)
+    {
+        condition = null;
+        if (TryReadConditionFromJson(in root, out IValue<bool>? cond))
+        {
+            condition = cond;
+            return true;
+        }
+
+        if (root.ValueKind != JsonValueKind.Object)
+        {
+            return false;
+        }
+
+        if (root.TryGetProperty("Case"u8, out JsonElement element))
+        {
+            if (!TryReadConditionFromJson(in element, out cond))
+                return false;
+
+            condition = new ComplexConditionalValue(ImmutableArray.Create(cond), SpecDynamicSwitchCaseOperation.Or);
+            return true;
+        }
+
+        bool isAnd = root.TryGetProperty("And"u8, out element);
+
+        if (!isAnd && !root.TryGetProperty("Or"u8, out element))
+            return false;
+
+        int cases = element.GetArrayLength();
+        if (cases <= 0)
+            return false;
+
+        ImmutableArray<IValue<bool>>.Builder bldr = ImmutableArray.CreateBuilder<IValue<bool>>(cases);
+        for (int i = 0; i < cases; ++i)
+        {
+            JsonElement item = element[i];
+            if (!TryReadConditionFromJson(in item, out cond))
+                return false;
+
+            bldr.Add(cond);
+        }
+
+        condition = new ComplexConditionalValue(
+            bldr.MoveToImmutable(),
+            isAnd ? SpecDynamicSwitchCaseOperation.And : SpecDynamicSwitchCaseOperation.Or
+        );
+        return true;
+    }
+
+    /// <summary>
+    /// Creates a condition that evaluates to the exact opposite (NOT) of this condition.
+    /// </summary>
+    internal static ICondition GetOpposite(this ICondition condition)
+    {
+        BoxConditionVisitor box;
+        box.Condition = null;
+        condition.GetOpposite(ref box);
+        return box.Condition!;
+    }
+
+
+    /// <summary>
     /// A visitor that accepts the result of <see cref="Conditions.TryReadConditionFromJson{TVisitor}"/>.
     /// </summary>
     public interface IConditionVisitor
@@ -395,6 +523,6 @@ public static class Conditions
         /// <summary>
         /// Invoked by <see cref="Conditions.TryReadConditionFromJson{TVisitor}"/> to accept the parsed condition.
         /// </summary>
-        void Accept<TComparand>(Condition<TComparand> condition) where TComparand : IEquatable<TComparand>;
+        void Accept<TComparand>(in Condition<TComparand> condition) where TComparand : IEquatable<TComparand>;
     }
 }

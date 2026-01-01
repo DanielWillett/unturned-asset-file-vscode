@@ -894,7 +894,7 @@ public class SpecPropertyConverter : JsonConverter<SpecProperty?>
             if (name == null)
                 throw new JsonException($"Failed to read SpecProperty.TemplateGroups[{index}], missing \"{TemplateGroupsNameProperty.ToString()}\".");
             
-            array = array.Add(new TemplateGroup(array.Length + 1, name, useValueOf));
+            array = array.Add(useValueOf == null ? new TemplateGroup(array.Length + 1, name) : new TemplateGroup(array.Length + 1, name, useValueOf));
             ++index;
         }
 

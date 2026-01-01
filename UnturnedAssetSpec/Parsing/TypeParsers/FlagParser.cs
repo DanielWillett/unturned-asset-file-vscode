@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 

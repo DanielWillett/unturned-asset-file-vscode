@@ -3,7 +3,11 @@ using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -40,24 +44,8 @@ public static class CommonTypes
         knownTypes["TypeOrEnum"]                        = () => StringType.Instance;    // todo
         knownTypes["Guid"]                              = () => GuidType.Instance;
         knownTypes["GuidOrId"]                          = () => GuidOrIdType.Instance;
-        knownTypes["Color32RGB"]                        = () => StringType.Instance;    // todo
-        knownTypes["Color32RGBA"]                       = () => StringType.Instance;    // todo
-        knownTypes["Color32RGBLegacy"]                  = () => StringType.Instance;    // todo
-        knownTypes["Color32RGBALegacy"]                 = () => StringType.Instance;    // todo
-        knownTypes["Color32RGBString"]                  = () => StringType.Instance;    // todo
-        knownTypes["Color32RGBAString"]                 = () => StringType.Instance;    // todo
-        knownTypes["Color32RGBStrictHex"]               = () => StringType.Instance;    // todo
-        knownTypes["Color32RGBAStrictHex"]              = () => StringType.Instance;    // todo
-        knownTypes["Color32RGBAStrictHex"]              = () => StringType.Instance;    // todo
-        knownTypes["ColorRGB"]                          = () => StringType.Instance;    // todo
-        knownTypes["ColorRGBA"]                         = () => StringType.Instance;    // todo
-        knownTypes["ColorRGBLegacy"]                    = () => StringType.Instance;    // todo
-        knownTypes["ColorRGBALegacy"]                   = () => StringType.Instance;    // todo
-        knownTypes["ColorRGBString"]                    = () => StringType.Instance;    // todo
-        knownTypes["ColorRGBAString"]                   = () => StringType.Instance;    // todo
-        knownTypes["ColorRGBStrictHex"]                 = () => StringType.Instance;    // todo
-        knownTypes["ColorRGBAStrictHex"]                = () => StringType.Instance;    // todo
-        knownTypes["ColorRGBAStrictHex"]                = () => StringType.Instance;    // todo
+        knownTypes["Color32"]                           = () => Color32Type.Instance;
+        knownTypes["Color"]                             = () => ColorType.Instance;
         knownTypes["AssetReference"]                    = () => AssetReferenceType.Factory;
         knownTypes["BcAssetReference"]                  = () => StringType.Instance;    // todo
         knownTypes["AssetReferenceString"]              = () => AssetReferenceType.Factory;
@@ -304,6 +292,49 @@ public static class CommonTypes
             return false;
         }
 
+
+        return true;
+    }
+
+    /// <summary>
+    /// Attempts to read a value of the given <paramref name="type"/> from a JSON <paramref name="element"/>.
+    /// </summary>
+    /// <returns>Whether or not the value was successfully parsed.</returns>
+    public static bool TryReadFromJson<TValue>(this IType<TValue> type, in JsonElement element, [NotNullWhen(true)] out IValue<TValue>? value)
+        where TValue : IEquatable<TValue>
+
+    {
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            if (typeof(TValue) == typeof(bool) && Conditions.TryReadComplexOrBasicConditionFromJson(in element, out IValue<bool>? condition))
+            {
+                value = Unsafe.As<IValue<bool>, IValue<TValue>>(ref condition);
+                return true;
+            }
+        }
+
+        if (type.Parser.TryReadValueFromJson(in element, out Optional<TValue> optionalValue, type))
+        {
+            value = type.CreateValue(optionalValue);
+        }
+        else if (TypeConverters.TryGet<TValue>() is { } typeConverter)
+        {
+            TypeConverterParseArgs<TValue> args = default;
+            args.Type = type;
+
+            if (!typeConverter.TryReadJson(in element, out optionalValue, ref args))
+            {
+                value = null;
+                return false;
+            }
+
+            value = type.CreateValue(optionalValue);
+        }
+        else
+        {
+            value = null;
+            return false;
+        }
 
         return true;
     }

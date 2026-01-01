@@ -108,6 +108,26 @@ public sealed class DatProperty : IDatSpecificationObject
     /// </summary>
     public IValue<bool>? Required { get; internal set; }
 
+    /// <summary>
+    /// Designates a property that selects the cross-ref file for any properties starting with <c>$cr$::</c>.
+    /// </summary>
+    public IValue? CrossReferenceTarget { get; internal set; }
+
+    /// <summary>
+    /// Reference to a set of values from a list. Example: 'Blueprints.Id'.
+    /// </summary>
+    public IValue? AvailableValuesTarget { get; internal set; }
+
+    /// <summary>
+    /// When <see cref="AvailableValuesTarget"/> is set, indicates that it's an error to not reference a value from that target.
+    /// </summary>
+    public bool AvailableValuesTargetIsRequired { get; internal set; }
+
+    /// <summary>
+    /// Name of the template group that this property defines a count for.
+    /// </summary>
+    public string? CountForTemplateGroup { get; internal set; }
+
     internal DatProperty(string key, IPropertyType type, DatTypeWithProperties owner, JsonElement element)
     {
         Key = key;
@@ -178,14 +198,14 @@ public sealed class DatPropertyKey
     /// <summary>
     /// Condition that has to be met for this key to be useable.
     /// </summary>
-    public SpecDynamicSwitchCaseOrCondition Condition { get; }
+    public IValue<bool>? Condition { get; }
 
     /// <summary>
     /// If this property is a template, the processor for that template.
     /// </summary>
     public TemplateProcessor? TemplateProcessor { get; }
 
-    internal DatPropertyKey(string key, LegacyExpansionFilter filter, SpecDynamicSwitchCaseOrCondition condition, TemplateProcessor? templateProcessor)
+    internal DatPropertyKey(string key, LegacyExpansionFilter filter, IValue<bool>? condition, TemplateProcessor? templateProcessor)
     {
         Key = key;
         Filter = filter;

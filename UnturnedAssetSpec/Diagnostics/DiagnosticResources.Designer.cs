@@ -457,6 +457,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; only supports the red, green, and blue components, not alpha..
+        /// </summary>
+        public static string UNT1026 {
+            get {
+                return ResourceManager.GetString("UNT1026", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type {0} is unknown and may not be assignable to &apos;{1}&apos;..
         /// </summary>
         public static string UNT103 {
@@ -669,6 +678,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         public static string UNT2004_Regex {
             get {
                 return ResourceManager.GetString("UNT2004_Regex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value &apos;{0}&apos; can not be converted to a value of type &apos;{1}&apos;. Property &apos;{2}&apos; is parsed in a more strict format and should be exactly {3} characters. For example: &quot;{4}&quot;..
+        /// </summary>
+        public static string UNT2004_StrictColor {
+            get {
+                return ResourceManager.GetString("UNT2004_StrictColor", resourceCulture);
             }
         }
         

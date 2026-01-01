@@ -1,6 +1,6 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
-using System;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -16,7 +16,7 @@ public interface IDatSpecificationReadContext
     IType ReadType(in JsonElement root, IDatSpecificationObject readObject, string context = "");
 
     /// <summary>
-    /// Reads a property reference from a JSON object or string.
+    /// Reads a property value from a JSON object or string.
     /// </summary>
-    IValue<T> ReadValue<T>(in JsonElement root, IType<T> valueType, IDatSpecificationObject readObject, string context = "") where T : IEquatable<T>;
+    IValue ReadValue(in JsonElement root, IPropertyType valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default);
 }

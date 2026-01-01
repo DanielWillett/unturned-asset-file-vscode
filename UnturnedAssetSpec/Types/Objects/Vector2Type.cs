@@ -73,7 +73,7 @@ public sealed class Vector2Type : BaseVectorType<Vector2, Vector2Type>
         return KnownTypeValueHelper.ToComponentString(vector);
     }
 
-    protected override bool TryParseFromString(ReadOnlySpan<char> text, out Vector2 value)
+    protected override bool TryParseFromString(ReadOnlySpan<char> text, out Vector2 value, ISourceNode? property, ref TypeConverterParseArgs<Vector2> args)
     {
         return KnownTypeValueHelper.TryParseVector2Components(text, out value);
     }
@@ -102,6 +102,14 @@ public sealed class Vector2Type : BaseVectorType<Vector2, Vector2Type>
             return false;
         }
 
+        if (args.ReferencedPropertySink != null)
+        {
+            if (xProperty != null)
+                args.ReferencedPropertySink.AcceptReferencedProperty(xProperty);
+            if (yProperty != null)
+                args.ReferencedPropertySink.AcceptReferencedProperty(yProperty);
+        }
+
         hadOneComp = true;
         if (xProperty == null || yProperty == null)
         {
@@ -118,8 +126,8 @@ public sealed class Vector2Type : BaseVectorType<Vector2, Vector2Type>
             return false;
         }
 
-        return VectorTypes.TryParseFloatArg(ref args, out value.X, xProperty)
-               & VectorTypes.TryParseFloatArg(ref args, out value.Y, yProperty);
+        return VectorTypes.TryParseArg(ref args, out value.X, xProperty)
+               & VectorTypes.TryParseArg(ref args, out value.Y, yProperty);
     }
 
     protected override bool TryParseFromDictionary(ref TypeParserArgs<Vector2> args, IDictionarySourceNode dictionary, out Vector2 value)
@@ -148,7 +156,7 @@ public sealed class Vector2Type : BaseVectorType<Vector2, Vector2Type>
             return false;
         }
 
-        return VectorTypes.TryParseFloatArg(ref args, out value.X, xProperty) & VectorTypes.TryParseFloatArg(ref args, out value.Y, yProperty);
+        return VectorTypes.TryParseArg(ref args, out value.X, xProperty) & VectorTypes.TryParseArg(ref args, out value.Y, yProperty);
     }
 
 
@@ -179,23 +187,7 @@ public sealed class Vector2Type : BaseVectorType<Vector2, Vector2Type>
             }
         }
 
-        VectorTypeOptions mode = VectorTypeOptions.Default;
-
-        if (typeDefinition.TryGetProperty("Mode"u8, out element)
-            && element.ValueKind != JsonValueKind.Null)
-        {
-            if (!Enum.TryParse(element.GetString()!, ignoreCase: true, out mode))
-            {
-                throw new JsonException(
-                    string.Format(
-                        Resources.JsonException_FailedToParseEnum,
-                        nameof(VectorTypeOptions),
-                        element.GetString(),
-                        context.Length != 0 ? $"{owner.FullName}.{context}.Mode" : $"{owner.FullName}.Mode"
-                    )
-                );
-            }
-        }
+        VectorTypeOptions mode = ReadOptions(in typeDefinition, owner, context);
 
         string? xKey = null, yKey = null, legacyXKey = null, legacyYKey = null;
         bool skipUnderscore = false;

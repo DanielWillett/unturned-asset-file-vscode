@@ -351,4 +351,10 @@
   <data name="UNT2004_AssetReferenceStringOnly" xml:space="preserve">
     <value>Dictionary can not be converted to a value of type '{0}', which expects a GUID as a string only. Property '{1}' expects a value.</value>
   </data>
+  <data name="UNT1026" xml:space="preserve">
+    <value>Property "{0}" only supports the red, green, and blue components, not alpha.</value>
+  </data>
+  <data name="UNT2004_StrictColor" xml:space="preserve">
+    <value>Value '{0}' can not be converted to a value of type '{1}'. Property '{2}' is parsed in a more strict format and should be exactly {3} characters. For example: "{4}".</value>
+  </data>
 </root>

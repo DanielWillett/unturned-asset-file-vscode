@@ -48,6 +48,11 @@ public interface IConditionOperation : IEquatable<IConditionOperation?>
     bool IsNonInequality { get; }
 
     /// <summary>
+    /// An operation that does the exact opposite (NOT) of this operation.
+    /// </summary>
+    IConditionOperation? Inverse { get; }
+
+    /// <summary>
     /// Whether or not this operation evaluates to <see langword="true"/> when at least one of the value or comparand is <see langword="null"/>.
     /// </summary>
     bool EvaluateNullValues(bool valueIsNull, bool comparandIsNull);
@@ -78,6 +83,7 @@ internal abstract class ConditionOperation<TSelf> : IConditionOperation
     public virtual bool IsInequality => false;
     public virtual bool IsNonEquality => false;
     public virtual bool IsNonInequality => false;
+    public virtual IConditionOperation? Inverse => null;
 
     public bool EvaluateNullValues(bool valueIsNull, bool comparandIsNull)
     {

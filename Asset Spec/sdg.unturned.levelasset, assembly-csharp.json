@@ -448,7 +448,7 @@
             [
                 {
                     "Key": "Color",
-                    "Type": "Color32RGB",
+                    "Type": "Color32",
                     "DefaultValue": "000000",
                     "Required": true,
                     "Description": "Actual base color/albedo of terrain material. Players will be kicked from multiplayer servers if their customized skin color is too similar to the value of this property.",

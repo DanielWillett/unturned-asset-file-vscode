@@ -430,6 +430,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Color (0-1).
+        /// </summary>
+        internal static string Type_Name_Color {
+            get {
+                return ResourceManager.GetString("Type_Name_Color", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color (0-255).
+        /// </summary>
+        internal static string Type_Name_Color32 {
+            get {
+                return ResourceManager.GetString("Type_Name_Color32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Content Reference.
         /// </summary>
         internal static string Type_Name_ContentReference {

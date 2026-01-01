@@ -196,7 +196,15 @@ public static class TypeConverters
             }
 
             if (typeof(T) == typeof(string))
+            {
                 Converter = (ITypeConverter<T>)String;
+                return;
+            }
+
+            if (VectorTypes.TryGetProvider<T>() is { } vectorProvider)
+            {
+                Converter = vectorProvider.Converter;
+            }
         }
     }
 }

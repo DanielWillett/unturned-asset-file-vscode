@@ -29,6 +29,8 @@ public class ComplexConditionalSwitchCase : ISwitchCase
     /// <inheritdoc />
     public IValue Value { get; }
 
+    protected virtual bool WriteValueToJson => true;
+
     public ComplexConditionalSwitchCase(ImmutableArray<IValue<bool>> conditions, SpecDynamicSwitchCaseOperation operation, IValue value)
     {
         if (operation is not SpecDynamicSwitchCaseOperation.And and not SpecDynamicSwitchCaseOperation.Or)
@@ -69,8 +71,11 @@ public class ComplexConditionalSwitchCase : ISwitchCase
             }
         }
 
-        writer.WritePropertyName("Value"u8);
-        Value.WriteToJson(writer, options);
+        if (WriteValueToJson)
+        {
+            writer.WritePropertyName("Value"u8);
+            Value.WriteToJson(writer, options);
+        }
 
         writer.WriteEndObject();
     }
@@ -128,7 +133,7 @@ public class ComplexConditionalSwitchCase : ISwitchCase
     }
 
     /// <inheritdoc />
-    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
+    public virtual bool VisitConcreteValue<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
     {
         if (!TryCheckConditionsConcrete(out bool v) || !v)
             return false;
@@ -137,7 +142,7 @@ public class ComplexConditionalSwitchCase : ISwitchCase
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+    public virtual bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
     {
         if (!TryCheckConditions(in ctx, out bool v) || !v)
             return false;
@@ -215,7 +220,7 @@ public class ComplexConditionalSwitchCase<TResult> : ComplexConditionalSwitchCas
     }
 
     /// <inheritdoc />
-    public bool TryGetConcreteValue(out Optional<TResult> value)
+    public virtual bool TryGetConcreteValue(out Optional<TResult> value)
     {
         if (!TryCheckConditionsConcrete(out bool v) || !v)
         {
@@ -227,7 +232,7 @@ public class ComplexConditionalSwitchCase<TResult> : ComplexConditionalSwitchCas
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<TResult> value, in FileEvaluationContext ctx)
+    public virtual bool TryEvaluateValue(out Optional<TResult> value, in FileEvaluationContext ctx)
     {
         if (!TryCheckConditions(in ctx, out bool v) || !v)
         {
@@ -248,5 +253,62 @@ public class ComplexConditionalSwitchCase<TResult> : ComplexConditionalSwitchCas
     public override int GetHashCode()
     {
         return HashCode.Combine(Type, base.GetHashCode());
+    }
+}
+
+/// <summary>
+/// A version of <see cref="ComplexConditionalSwitchCase{TResult}"/> that evaluates to <see langword="true"/> if the conditions match, otherwise <see langword="false"/>.
+/// </summary>
+public class ComplexConditionalValue : ComplexConditionalSwitchCase<bool>
+{
+    protected override bool WriteValueToJson => false;
+
+    public ComplexConditionalValue(ImmutableArray<IValue<bool>> conditions, SpecDynamicSwitchCaseOperation operation)
+        : base(conditions, operation, Values.True) { }
+
+    /// <inheritdoc />
+    public override bool TryEvaluateValue(out Optional<bool> value, in FileEvaluationContext ctx)
+    {
+        if (!TryCheckConditions(in ctx, out bool doesPassConditions))
+        {
+            value = Optional<bool>.Null;
+            return false;
+        }
+
+        value = doesPassConditions;
+        return true;
+    }
+
+    /// <inheritdoc />
+    public override bool TryGetConcreteValue(out Optional<bool> value)
+    {
+        if (!TryCheckConditionsConcrete(out bool doesPassConditions))
+        {
+            value = Optional<bool>.Null;
+            return false;
+        }
+
+        value = doesPassConditions;
+        return true;
+    }
+
+    /// <inheritdoc />
+    public override bool VisitConcreteValue<TVisitor>(ref TVisitor visitor)
+    {
+        if (!TryCheckConditionsConcrete(out bool doesPassConditions))
+            return false;
+
+        visitor.Accept(new Optional<bool>(doesPassConditions));
+        return true;
+    }
+
+    /// <inheritdoc />
+    public override bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    {
+        if (!TryCheckConditions(in ctx, out bool doesPassConditions))
+            return false;
+
+        visitor.Accept(new Optional<bool>(doesPassConditions));
+        return true;
     }
 }

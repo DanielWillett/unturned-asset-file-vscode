@@ -20,9 +20,9 @@ public static class DiagnosticSinkExtensions
     private static readonly Regex InvalidLineBreakTagsMatcher =
         new Regex(@"\<\s*br\s*\/\s*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    private static string NodePropertyName<TDiagnosticProvider>(ISourceNode node, ref TDiagnosticProvider provider) where TDiagnosticProvider : struct, IDiagnosticProvider
+    private static string NodePropertyName<TDiagnosticProvider>(ISourceNode? node, ref TDiagnosticProvider provider) where TDiagnosticProvider : struct, IDiagnosticProvider
     {
-        if (node is IDictionarySourceNode { IsRootNode: true })
+        if (node is null or IDictionarySourceNode { IsRootNode: true })
         {
             return provider.Property?.Key ?? "?";
         }
@@ -38,8 +38,7 @@ public static class DiagnosticSinkExtensions
             IAnyValueSourceNode { Parent: IPropertySourceNode prop }
                 => PropertyBreadcrumbs.FromNode(prop).ToString(false, prop.Key),
 
-            _
-                => node.ToString()!
+            _   => node.ToString()!
         };
     }
     
@@ -162,6 +161,21 @@ public static class DiagnosticSinkExtensions
             {
                 Diagnostic = DatDiagnostics.UNT1007,
                 Message = string.Format(DiagnosticResources.UNT1007_Modern, NodePropertyName(dictionary, ref provider), requiredPropertyName),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a legacy color with a value outside the range 0-1. 
+        /// </summary>
+        public void UNT1012<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1012,
+                Message = DiagnosticResources.UNT1012,
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -348,6 +362,22 @@ public static class DiagnosticSinkExtensions
                 diagnosticSink.UNT1024_LessString(ref provider, parentNode, minCount);
             else if (length < maxCount)
                 diagnosticSink.UNT1024_MoreString(ref provider, parentNode, maxCount);
+        }
+
+        /// <summary>
+        /// Reports an extra 'A' property on a color that doesn't support alpha. 
+        /// </summary>
+        public void UNT1026<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            ISourceNode? property
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1026,
+                Message = string.Format(DiagnosticResources.UNT1026, NodePropertyName(property, ref provider)),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
         }
 
         /// <summary>
@@ -607,6 +637,21 @@ public static class DiagnosticSinkExtensions
             {
                 Diagnostic = DatDiagnostics.UNT2004,
                 Message = string.Format(DiagnosticResources.UNT2004_AssetReferenceStringOnly, type.DisplayName, NodePropertyName(parent, ref provider)),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+        
+        /// <summary>
+        /// Reports a color that parsed correctly but wouldn't parse correctly in-game under strict rules (<c>Palette.hex(<see cref="string"/>)</c>.
+        /// </summary>
+        public void UNT2004_StrictColor<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, string original, IType type, ISourceNode? property, bool allowAlpha, string example
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2004,
+                Message = string.Format(DiagnosticResources.UNT2004_StrictColor, original, type.DisplayName, NodePropertyName(property, ref provider), allowAlpha ? 9 : 7, example),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }

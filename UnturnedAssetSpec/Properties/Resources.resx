@@ -240,6 +240,12 @@
   <data name="Type_Name_Character" xml:space="preserve">
     <value>Character</value>
   </data>
+  <data name="Type_Name_Color" xml:space="preserve">
+    <value>Color (0-1)</value>
+  </data>
+  <data name="Type_Name_Color32" xml:space="preserve">
+    <value>Color (0-255)</value>
+  </data>
   <data name="Type_Name_ContentReference" xml:space="preserve">
     <value>Content Reference</value>
   </data>

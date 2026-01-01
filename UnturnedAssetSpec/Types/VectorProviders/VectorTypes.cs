@@ -7,6 +7,7 @@ using System.Numerics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -79,7 +80,9 @@ public static class VectorTypes
         return false;
     }
 
-    internal static bool TryParseFloatArg<T>(ref TypeParserArgs<T> args, out float value, IPropertySourceNode property) where T : IEquatable<T>
+    internal static bool TryParseArg<TVector, TArg>(ref TypeParserArgs<TVector> args, [MaybeNullWhen(false)] out TArg value, IPropertySourceNode property)
+        where TVector : IEquatable<TVector>
+        where TArg : IEquatable<TArg>
     {
         switch (property.Value)
         {
@@ -96,7 +99,10 @@ public static class VectorTypes
                 break;
 
             case IValueSourceNode v:
-                if (float.TryParse(v.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                ITypeConverter<TArg> typeConverter = TypeConverters.Get<TArg>();
+                TypeConverterParseArgs<TArg> parseArgs = default;
+                parseArgs.Type = typeConverter.DefaultType;
+                if (typeConverter.TryParse(v.Value, ref parseArgs, out value))
                     return true;
 
                 args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, Float32Type.Instance);
@@ -104,7 +110,7 @@ public static class VectorTypes
 
         }
 
-        value = 0f;
+        value = default;
         return false;
     }
 

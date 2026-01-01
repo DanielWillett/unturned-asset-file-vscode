@@ -65,7 +65,7 @@ public sealed class Vector4Type : BaseVectorType<Vector4, Vector4Type>
 
     public Vector4Type(Vector4Kind kind, VectorTypeOptions options) : base(options)
     {
-        if (kind is < Vector4Kind.Unspecified or >= Vector4Kind.Quaternion)
+        if (kind is < Vector4Kind.Unspecified or > Vector4Kind.Quaternion)
             throw new ArgumentOutOfRangeException(nameof(kind));
 
         Kind = kind;
@@ -74,7 +74,7 @@ public sealed class Vector4Type : BaseVectorType<Vector4, Vector4Type>
     public Vector4Type(Vector4Kind kind, VectorTypeOptions options, string? xKey, string? yKey, string? zKey, string? wKey, string? legacyXKey = null, string? legacyYKey = null, string? legacyZKey = null, string? legacyWKey = null, bool skipLegacyCombineWithUnderscore = false)
         : this(kind, options)
     {
-        if (kind is < Vector4Kind.Unspecified or >= Vector4Kind.Quaternion)
+        if (kind is < Vector4Kind.Unspecified or > Vector4Kind.Quaternion)
             throw new ArgumentOutOfRangeException(nameof(kind));
 
         _xKey = xKey;
@@ -93,7 +93,7 @@ public sealed class Vector4Type : BaseVectorType<Vector4, Vector4Type>
         return KnownTypeValueHelper.ToComponentString(vector);
     }
 
-    protected override bool TryParseFromString(ReadOnlySpan<char> text, out Vector4 value)
+    protected override bool TryParseFromString(ReadOnlySpan<char> text, out Vector4 value, ISourceNode? property, ref TypeConverterParseArgs<Vector4> args)
     {
         return KnownTypeValueHelper.TryParseVector4Components(text, out value);
     }
@@ -130,6 +130,18 @@ public sealed class Vector4Type : BaseVectorType<Vector4, Vector4Type>
             return false;
         }
 
+        if (args.ReferencedPropertySink != null)
+        {
+            if (xProperty != null)
+                args.ReferencedPropertySink.AcceptReferencedProperty(xProperty);
+            if (yProperty != null)
+                args.ReferencedPropertySink.AcceptReferencedProperty(yProperty);
+            if (zProperty != null)
+                args.ReferencedPropertySink.AcceptReferencedProperty(zProperty);
+            if (wProperty != null)
+                args.ReferencedPropertySink.AcceptReferencedProperty(wProperty);
+        }
+
         hadOneComp = true;
 
         if (xProperty == null || yProperty == null || zProperty == null || wProperty == null)
@@ -155,10 +167,10 @@ public sealed class Vector4Type : BaseVectorType<Vector4, Vector4Type>
             return false;
         }
 
-        return VectorTypes.TryParseFloatArg(ref args, out value.X, xProperty)
-               & VectorTypes.TryParseFloatArg(ref args, out value.Y, yProperty)
-               & VectorTypes.TryParseFloatArg(ref args, out value.Z, zProperty)
-               & VectorTypes.TryParseFloatArg(ref args, out value.W, wProperty);
+        return VectorTypes.TryParseArg(ref args, out value.X, xProperty)
+               & VectorTypes.TryParseArg(ref args, out value.Y, yProperty)
+               & VectorTypes.TryParseArg(ref args, out value.Z, zProperty)
+               & VectorTypes.TryParseArg(ref args, out value.W, wProperty);
     }
 
     protected override bool TryParseFromDictionary(ref TypeParserArgs<Vector4> args, IDictionarySourceNode dictionary, out Vector4 value)
@@ -201,10 +213,10 @@ public sealed class Vector4Type : BaseVectorType<Vector4, Vector4Type>
         }
 
 
-        return VectorTypes.TryParseFloatArg(ref args, out value.X, xProperty)
-               & VectorTypes.TryParseFloatArg(ref args, out value.Y, yProperty)
-               & VectorTypes.TryParseFloatArg(ref args, out value.Z, zProperty)
-               & VectorTypes.TryParseFloatArg(ref args, out value.W, wProperty);
+        return VectorTypes.TryParseArg(ref args, out value.X, xProperty)
+               & VectorTypes.TryParseArg(ref args, out value.Y, yProperty)
+               & VectorTypes.TryParseArg(ref args, out value.Z, zProperty)
+               & VectorTypes.TryParseArg(ref args, out value.W, wProperty);
     }
 
 
@@ -235,23 +247,7 @@ public sealed class Vector4Type : BaseVectorType<Vector4, Vector4Type>
             }
         }
 
-        VectorTypeOptions mode = VectorTypeOptions.Default;
-
-        if (typeDefinition.TryGetProperty("Mode"u8, out element)
-            && element.ValueKind != JsonValueKind.Null)
-        {
-            if (!Enum.TryParse(element.GetString()!, ignoreCase: true, out mode))
-            {
-                throw new JsonException(
-                    string.Format(
-                        Resources.JsonException_FailedToParseEnum,
-                        nameof(VectorTypeOptions),
-                        element.GetString(),
-                        context.Length != 0 ? $"{owner.FullName}.{context}.Mode" : $"{owner.FullName}.Mode"
-                    )
-                );
-            }
-        }
+        VectorTypeOptions mode = ReadOptions(in typeDefinition, owner, context);
 
         string? xKey = null, yKey = null, zKey = null, wKey = null, legacyXKey = null, legacyYKey = null, legacyZKey = null, legacyWKey = null;
         bool skipUnderscore = false;

@@ -1,7 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using System;
-using System.Diagnostics.CodeAnalysis;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -109,6 +108,22 @@ public struct PropertyReference : IEquatable<PropertyReference>
 
         throw new NotImplementedException();
 
+    }
+
+    /// <summary>
+    /// Parses a property reference from a standardized property-ref string. The @ symbol should not be included.
+    /// </summary>
+    public static PropertyReference Parse(ReadOnlySpan<char> data, PropertyResolutionContext mode = PropertyResolutionContext.Modern)
+    {
+        return Parse(data, null, mode);
+    }
+
+    /// <summary>
+    /// Parses a property reference from a standardized property-ref string. The @ symbol should not be included.
+    /// </summary>
+    public static PropertyReference Parse(string data, PropertyResolutionContext mode = PropertyResolutionContext.Modern)
+    {
+        return Parse(data, data, mode);
     }
 
     /// <summary>

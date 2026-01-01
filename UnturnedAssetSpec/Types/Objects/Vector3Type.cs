@@ -63,7 +63,7 @@ public sealed class Vector3Type : BaseVectorType<Vector3, Vector3Type>
 
     public Vector3Type(Vector3Kind kind, VectorTypeOptions options) : base(options)
     {
-        if (kind is < Vector3Kind.Unspecified or >= Vector3Kind.Scale)
+        if (kind is < Vector3Kind.Unspecified or > Vector3Kind.Scale)
             throw new ArgumentOutOfRangeException(nameof(kind));
 
         Kind = kind;
@@ -89,7 +89,7 @@ public sealed class Vector3Type : BaseVectorType<Vector3, Vector3Type>
         return KnownTypeValueHelper.ToComponentString(vector);
     }
 
-    protected override bool TryParseFromString(ReadOnlySpan<char> text, out Vector3 value)
+    protected override bool TryParseFromString(ReadOnlySpan<char> text, out Vector3 value, ISourceNode? property, ref TypeConverterParseArgs<Vector3> args)
     {
         return KnownTypeValueHelper.TryParseVector3Components(text, out value);
     }
@@ -122,6 +122,16 @@ public sealed class Vector3Type : BaseVectorType<Vector3, Vector3Type>
             return false;
         }
 
+        if (args.ReferencedPropertySink != null)
+        {
+            if (xProperty != null)
+                args.ReferencedPropertySink.AcceptReferencedProperty(xProperty);
+            if (yProperty != null)
+                args.ReferencedPropertySink.AcceptReferencedProperty(yProperty);
+            if (zProperty != null)
+                args.ReferencedPropertySink.AcceptReferencedProperty(zProperty);
+        }
+
         hadOneComp = true;
 
         if (xProperty == null || yProperty == null || zProperty == null)
@@ -143,9 +153,9 @@ public sealed class Vector3Type : BaseVectorType<Vector3, Vector3Type>
             return false;
         }
 
-        return VectorTypes.TryParseFloatArg(ref args, out value.X, xProperty)
-               & VectorTypes.TryParseFloatArg(ref args, out value.Y, yProperty)
-               & VectorTypes.TryParseFloatArg(ref args, out value.Z, zProperty);
+        return VectorTypes.TryParseArg(ref args, out value.X, xProperty)
+               & VectorTypes.TryParseArg(ref args, out value.Y, yProperty)
+               & VectorTypes.TryParseArg(ref args, out value.Z, zProperty);
     }
 
     protected override bool TryParseFromDictionary(ref TypeParserArgs<Vector3> args, IDictionarySourceNode dictionary, out Vector3 value)
@@ -182,9 +192,9 @@ public sealed class Vector3Type : BaseVectorType<Vector3, Vector3Type>
         }
 
 
-        return VectorTypes.TryParseFloatArg(ref args, out value.X, xProperty)
-               & VectorTypes.TryParseFloatArg(ref args, out value.Y, yProperty)
-               & VectorTypes.TryParseFloatArg(ref args, out value.Z, zProperty);
+        return VectorTypes.TryParseArg(ref args, out value.X, xProperty)
+               & VectorTypes.TryParseArg(ref args, out value.Y, yProperty)
+               & VectorTypes.TryParseArg(ref args, out value.Z, zProperty);
     }
 
 
@@ -215,23 +225,7 @@ public sealed class Vector3Type : BaseVectorType<Vector3, Vector3Type>
             }
         }
 
-        VectorTypeOptions mode = VectorTypeOptions.Default;
-
-        if (typeDefinition.TryGetProperty("Mode"u8, out element)
-            && element.ValueKind != JsonValueKind.Null)
-        {
-            if (!Enum.TryParse(element.GetString()!, ignoreCase: true, out mode))
-            {
-                throw new JsonException(
-                    string.Format(
-                        Resources.JsonException_FailedToParseEnum,
-                        nameof(VectorTypeOptions),
-                        element.GetString(),
-                        context.Length != 0 ? $"{owner.FullName}.{context}.Mode" : $"{owner.FullName}.Mode"
-                    )
-                );
-            }
-        }
+        VectorTypeOptions mode = ReadOptions(in typeDefinition, owner, context);
 
         string? xKey = null, yKey = null, zKey = null, legacyXKey = null, legacyYKey = null, legacyZKey = null;
         bool skipUnderscore = false;

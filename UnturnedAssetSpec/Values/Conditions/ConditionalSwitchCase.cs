@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
@@ -9,7 +10,25 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <summary>
 /// A weakly-typed switch-case that defines a 'When' property that has to be met before checking cases.
 /// </summary>
-public class ConditionalSwitchCase<TComparand> : ISwitchCase
+/// <remarks>Implemented by <see cref="ConditionalSwitchCase{TComparand}"/>.</remarks>
+public interface IConditionalSwitchCase : ISwitchCase
+{
+    /// <summary>
+    /// The condition that must be met for this case to apply.
+    /// </summary>
+    IValue<bool> Condition { get; }
+
+    /// <summary>
+    /// Invokes a visitor that allows the caller to get an unboxed version of the condition.
+    /// </summary>
+    void VisitCondition<TVisitor>(ref TVisitor visitor)
+        where TVisitor : Conditions.IConditionVisitor;
+}
+
+/// <summary>
+/// A weakly-typed switch-case that defines a 'When' property that has to be met before checking cases.
+/// </summary>
+public class ConditionalSwitchCase<TComparand> : IConditionalSwitchCase
     where TComparand : IEquatable<TComparand>
 {
     private readonly Condition<TComparand> _condition;
@@ -120,7 +139,13 @@ public class ConditionalSwitchCase<TComparand> : ISwitchCase
         return $"{_condition.ToString()} ? {Value}";
     }
 
+    [field: MaybeNull]
+    IValue<bool> IConditionalSwitchCase.Condition => field ??= _condition;
     bool IValue.IsNull => Value.IsNull;
+    void IConditionalSwitchCase.VisitCondition<TVisitor>(ref TVisitor visitor)
+    {
+        visitor.Accept(in _condition);
+    }
 }
 
 /// <summary>
