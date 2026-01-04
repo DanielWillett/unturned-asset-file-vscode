@@ -54,7 +54,8 @@
                     "Config_HardDifficulty.txt",
                     "Config.txt",
                     "Level.hierarchy",
-                    "Visibility.config"
+                    "Visibility.config",
+                    "Curse_Words.txt"
                 ],
                 "icon":
                 {

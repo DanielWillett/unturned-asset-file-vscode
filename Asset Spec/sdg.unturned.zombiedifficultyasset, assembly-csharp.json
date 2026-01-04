@@ -277,7 +277,6 @@
             [
                 {
                     "Key": "Speciality_Health_Override_Mode",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Speciality_Health_Override_Mode",

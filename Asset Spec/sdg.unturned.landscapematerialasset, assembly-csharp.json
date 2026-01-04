@@ -91,7 +91,6 @@
             [
                 {
                     "Key": "Auto_Min_Angle_Begin",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Slope",
@@ -101,7 +100,6 @@
                 },
                 {
                     "Key": "Auto_Min_Angle_End",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Slope",
@@ -111,7 +109,6 @@
                 },
                 {
                     "Key": "Auto_Max_Angle_Begin",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Slope",
@@ -121,7 +118,6 @@
                 },
                 {
                     "Key": "Auto_Max_Angle_End",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Slope",
@@ -134,7 +130,6 @@
             [
                 {
                     "Key": "Auto_Min_Angle_Begin",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Slope",
@@ -144,7 +139,6 @@
                 },
                 {
                     "Key": "Auto_Min_Angle_End",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Slope",
@@ -154,7 +148,6 @@
                 },
                 {
                     "Key": "Auto_Max_Angle_Begin",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Slope",
@@ -164,7 +157,6 @@
                 },
                 {
                     "Key": "Auto_Max_Angle_End",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Slope",
@@ -248,7 +240,6 @@
             [
                 {
                     "Key": "Auto_Ray_Radius",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Foundation",
@@ -258,7 +249,6 @@
                 },
                 {
                     "Key": "Auto_Ray_Length",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Foundation",
@@ -268,7 +258,6 @@
                 },
                 {
                     "Key": "Auto_Ray_Mask",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Foundation",
@@ -281,7 +270,6 @@
             [
                 {
                     "Key": "Auto_Ray_Radius",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Foundation",
@@ -291,7 +279,6 @@
                 },
                 {
                     "Key": "Auto_Ray_Length",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Foundation",
@@ -301,7 +288,6 @@
                 },
                 {
                     "Key": "Auto_Ray_Mask",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Use_Auto_Foundation",

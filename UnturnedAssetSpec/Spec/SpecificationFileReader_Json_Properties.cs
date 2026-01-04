@@ -104,8 +104,6 @@ partial class SpecificationFileReader
                 );
             }
         }
-
-        // todo: KeyCondition
         IValue<bool>? keyCondition = null;
 
         if (root.TryGetProperty("KeyCondition"u8, out element))
@@ -118,74 +116,41 @@ partial class SpecificationFileReader
             }
         }
 
+        JsonElement singleAliasElement;
         if (root.TryGetProperty("Aliases"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
             int aliasCount = element.GetArrayLength();
+            DatPropertyKey? singleAlias = null;
+            if (root.TryGetProperty("Alias"u8, out singleAliasElement) && singleAliasElement.ValueKind != JsonValueKind.Null)
+            {
+                singleAlias = ReadAlias(in singleAliasElement, isTemplate, owner, key, -1);
+            }
 
-            ImmutableArray<DatPropertyKey>.Builder b = ImmutableArray.CreateBuilder<DatPropertyKey>(aliasCount + 1);
+            ImmutableArray<DatPropertyKey>.Builder b = ImmutableArray.CreateBuilder<DatPropertyKey>(aliasCount + 1 + (singleAlias != null ? 1 : 0));
             b.Add(new DatPropertyKey(key, filter, keyCondition, keyTemplateProcessor));
 
             for (int i = 0; i < aliasCount; ++i)
             {
                 JsonElement aliasObj = element[i];
-                string? alias = null;
-                IValue<bool>? aliasCondition = null;
-                LegacyExpansionFilter aliasFilter = LegacyExpansionFilter.Either;
-                switch (aliasObj.ValueKind)
-                {
-                    case JsonValueKind.String:
-                        alias = aliasObj.GetString()!;
-                        break;
-
-                    default:
-                        if (aliasObj.TryGetProperty("Alias"u8, out JsonElement aliasElement))
-                        {
-                            alias = aliasElement.GetString();
-                        }
-                        
-                        if (aliasObj.TryGetProperty("LegacyExpansionFilter"u8, out aliasElement))
-                        {
-                            if (!Enum.TryParse(aliasElement.GetString(), out filter))
-                            {
-                                throw new JsonException(
-                                    string.Format(Resources.JsonException_FailedToParseEnum, nameof(LegacyExpansionFilter), aliasElement.GetString(), $"{owner.FullName}.{key}.Aliases[{i}].LegacyExpansionFilter")
-                                );
-                            }
-                        }
-
-                        if (aliasObj.TryGetProperty("Condition"u8, out aliasElement))
-                        {
-                            if (!Conditions.TryReadComplexOrBasicConditionFromJson(in aliasElement, out aliasCondition))
-                            {
-                                throw new JsonException(
-                                    string.Format(Resources.JsonException_FailedToParseValue, "Complex or Basic Condition", $"{owner.FullName}.{key}.Aliases[{i}].Condition")
-                                );
-                            }
-                        }
-                        break;
-                }
-
-                if (string.IsNullOrEmpty(alias))
-                {
-                    throw new JsonException(
-                        string.Format(Resources.JsonException_PropertyKeyMissing, $"{owner.FullName}.{key}.Aliases[{i}]")
-                    );
-                }
-
-                TemplateProcessor processor = isTemplate
-                    ? TemplateProcessor.CreateForKey(ref alias)
-                    : TemplateProcessor.None;
-
-                b.Add(new DatPropertyKey(alias, aliasFilter, aliasCondition, processor));
+                b.Add(ReadAlias(in aliasObj, isTemplate, owner, key, i));
             }
+
+            if (singleAlias != null)
+                b.Add(singleAlias);
 
             property.Keys = b.MoveToImmutable();
         }
+        else if (root.TryGetProperty("Alias"u8, out singleAliasElement) && singleAliasElement.ValueKind != JsonValueKind.Null)
+        {
+            DatPropertyKey singleAlias = ReadAlias(in singleAliasElement, isTemplate, owner, key, -1);
+            property.Keys = ImmutableArray.Create(
+                new DatPropertyKey(key, filter, keyCondition, keyTemplateProcessor),
+                singleAlias
+            );
+        }
         else if (filter != LegacyExpansionFilter.Either || keyCondition != null)
         {
-            ImmutableArray<DatPropertyKey>.Builder b = ImmutableArray.CreateBuilder<DatPropertyKey>(1);
-            b.Add(new DatPropertyKey(key, filter, keyCondition, keyTemplateProcessor));
-            property.Keys = b.MoveToImmutable();
+            property.Keys = ImmutableArray.Create(new DatPropertyKey(key, filter, keyCondition, keyTemplateProcessor));
         }
         else
         {
@@ -221,7 +186,7 @@ partial class SpecificationFileReader
 
         if (root.TryGetProperty("FileCrossRef"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
-            property.CrossReferenceTarget = Values.Values.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty, null);
+            property.CrossReferenceTarget = Value.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty, null);
             if (property.CrossReferenceTarget == null)
             {
                 throw new JsonException(
@@ -232,7 +197,7 @@ partial class SpecificationFileReader
 
         if (root.TryGetProperty("CountForTemplateGroup"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
-            string templateGroupId = element.GetString();
+            string templateGroupId = element.GetString()!;
             if (string.IsNullOrEmpty(templateGroupId))
             {
                 throw new JsonException(
@@ -245,7 +210,7 @@ partial class SpecificationFileReader
 
         if (root.TryGetProperty("ListReference"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
-            property.AvailableValuesTarget = Values.Values.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty | ValueReadOptions.AllowExclamationSuffix, null);
+            property.AvailableValuesTarget = Value.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty | ValueReadOptions.AllowExclamationSuffix, null);
             if (property.AvailableValuesTarget == null)
             {
                 throw new JsonException(
@@ -253,10 +218,70 @@ partial class SpecificationFileReader
                 );
             }
 
-            property.AvailableValuesTargetIsRequired = element.ValueKind == JsonValueKind.String && element.GetString().EndsWith("!");
+            property.AvailableValuesTargetIsRequired = element.ValueKind == JsonValueKind.String && element.GetString()!.EndsWith("!");
         }
 
         // todo
+    }
+
+    private static DatPropertyKey ReadAlias(in JsonElement aliasObj, bool isTemplate, IDatSpecificationObject owner, string key, int i)
+    {
+        string? alias = null;
+        IValue<bool>? aliasCondition = null;
+        LegacyExpansionFilter aliasFilter = LegacyExpansionFilter.Either;
+        switch (aliasObj.ValueKind)
+        {
+            case JsonValueKind.String:
+                alias = aliasObj.GetString()!;
+                break;
+
+            default:
+                if (aliasObj.TryGetProperty("Alias"u8, out JsonElement aliasElement))
+                {
+                    alias = aliasElement.GetString();
+                }
+
+                if (aliasObj.TryGetProperty("LegacyExpansionFilter"u8, out aliasElement))
+                {
+                    if (!Enum.TryParse(aliasElement.GetString(), out aliasFilter))
+                    {
+                        throw new JsonException(
+                            string.Format(
+                                Resources.JsonException_FailedToParseEnum,
+                                nameof(LegacyExpansionFilter),
+                                aliasElement.GetString(),
+                                i == -1 ? $"{owner.FullName}.{key}.Alias.LegacyExpansionFilter" : $"{owner.FullName}.{key}.Aliases[{i}].LegacyExpansionFilter")
+                        );
+                    }
+                }
+
+                if (aliasObj.TryGetProperty("Condition"u8, out aliasElement))
+                {
+                    if (!Conditions.TryReadComplexOrBasicConditionFromJson(in aliasElement, out aliasCondition))
+                    {
+                        throw new JsonException(
+                            string.Format(
+                                Resources.JsonException_FailedToParseValue,
+                                "Complex or Basic Condition",
+                                i == -1 ? $"{owner.FullName}.{key}.Alias.Condition" : $"{owner.FullName}.{key}.Aliases[{i}].Condition")
+                        );
+                    }
+                }
+                break;
+        }
+
+        if (string.IsNullOrEmpty(alias))
+        {
+            throw new JsonException(
+                string.Format(Resources.JsonException_PropertyKeyMissing, $"{owner.FullName}.{key}.Aliases[{i}]")
+            );
+        }
+
+        TemplateProcessor processor = isTemplate
+            ? TemplateProcessor.CreateForKey(ref alias)
+            : TemplateProcessor.None;
+
+        return new DatPropertyKey(alias, aliasFilter, aliasCondition, processor);
     }
 
     private IPropertyType ReadTypeReference(in JsonElement root, IDatSpecificationObject owner, string key, bool allowSwitch = true)
@@ -331,7 +356,7 @@ partial class SpecificationFileReader
 
     public IValue ReadValue(in JsonElement root, IPropertyType valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default)
     {
-        if (Values.Values.TryReadValueFromJson(in root, options, valueType) is { } value)
+        if (Value.TryReadValueFromJson(in root, options, valueType) is { } value)
         {
             return value;
         }

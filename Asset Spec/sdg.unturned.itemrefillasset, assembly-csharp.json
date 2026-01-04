@@ -236,7 +236,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Use",
+            "Key": "Use",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when this item is drank from.",
             "Variable": "use",

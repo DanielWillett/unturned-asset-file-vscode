@@ -65,7 +65,7 @@
                         "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
                     },
                     "Variable": "item",
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The item with a currency value.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/currency-asset.html#asset-setup"
                 },

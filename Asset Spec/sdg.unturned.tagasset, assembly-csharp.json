@@ -77,7 +77,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Icon",
+            "Key": "Icon",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "RedirectableAssetKey": "IconPath",
             "Variable": "Icon",

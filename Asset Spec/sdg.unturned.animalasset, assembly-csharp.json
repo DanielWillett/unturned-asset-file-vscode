@@ -317,7 +317,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Animal_Client",
+            "Key": "Animal_Client",
             "Description": "The model loaded on remote clients connected to a server.",
             "Required": true,
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
@@ -362,7 +362,7 @@
             "Variable": "client"
         },
         {
-            "AssetName": "Animal_Server",
+            "Key": "Animal_Server",
             "Description": "The model loaded on local clients hosting a server or singleplayer.",
             "Required": true,
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
@@ -407,21 +407,21 @@
             "Variable": "server"
         },
         {
-            "AssetName": "Animal_Dedicated",
+            "Key": "Animal_Dedicated",
             "Description": "The model loaded on dedicated servers.",
             "Required": true,
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "dedicated"
         },
         {
-            "AssetName": "Ragdoll",
+            "Key": "Ragdoll",
             "Description": "The model loaded on clients when the animal is killed.",
             "Required": true,
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "ragdoll"
         },
         {
-            "AssetName": "Roar_*",
+            "Key": "Roar_*",
             "Template": true,
             "TemplateGroups": [ "animal-roars" ],
             "Description": "Randomly selected roar sound.",
@@ -430,7 +430,7 @@
             "Variable": "roars"
         },
         {
-            "AssetName": "Panic_*",
+            "Key": "Panic_*",
             "Template": true,
             "TemplateGroups": [ "animal-panics" ],
             "Description": "Randomly selected panic sound.",

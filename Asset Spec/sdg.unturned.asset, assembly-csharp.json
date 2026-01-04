@@ -313,7 +313,7 @@
                     "Casing": "Currency",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#currency",
                     "Description": "Applies conditional logic to the total amount of a type of currency a player has on them.",
-                    "CorrespondingType": "SDG.Unturned.NPCObjectKillsCondition, Assembly-CSharp"
+                    "CorrespondingType": "SDG.Unturned.NPCCurrencyCondition, Assembly-CSharp"
                 },
                 {
                     "Value": "KILLS_TREE",
@@ -370,6 +370,7 @@
             "Type": "SDG.Unturned.ENPCLogicType, Assembly-CSharp",
             "DisplayName": "Logic Operation",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
+            "StringParseableType": "DanielWillett.UnturnedDataFileLspServer.Data.Parsing.ENPCLogicTypeConverter, UnturnedAssetSpec",
             "Values":
             [
                 {
@@ -383,42 +384,42 @@
                     "Casing": "Less_Than",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Description": "Checks if some property is less than a given value.",
-                    "Operator": "<"
+                    "Abbreviation": "<"
                 },
                 {
                     "Value": "LESS_THAN_OR_EQUAL_TO",
                     "Casing": "Less_Than_Or_Equal_To",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Description": "Checks if some property is less than or equal to a given value.",
-                    "Operator": "<="
+                    "Abbreviation": "≤"
                 },
                 {
                     "Value": "EQUAL",
                     "Casing": "Equal",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Description": "Checks if some property is equal to a given value.",
-                    "Operator": "=="
+                    "Abbreviation": "="
                 },
                 {
                     "Value": "NOT_EQUAL",
                     "Casing": "Not_Equal",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Description": "Checks if some property is different than a given value.",
-                    "Operator": "!="
+                    "Abbreviation": "≠"
                 },
                 {
                     "Value": "GREATER_THAN_OR_EQUAL_TO",
                     "Casing": "Greater_Than_Or_Equal_To",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Description": "Checks if some property is greater than or equal to a given value.",
-                    "Operator": ">="
+                    "Abbreviation": "≥"
                 },
                 {
                     "Value": "GREATER_THAN",
                     "Casing": "Greater_Than",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Description": "Checks if some property is greater than a given value.",
-                    "Operator": ">"
+                    "Abbreviation": ">"
                 }
             ]
         },
@@ -1012,7 +1013,7 @@
                         "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.QuestAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The GUID or ID of the quest to check.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#quest",
                     "Required": true,
@@ -1087,7 +1088,7 @@
                         "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The GUID or ID of the quest to check.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#item",
                     "Required": true,
@@ -1104,9 +1105,8 @@
                 },
                 {
                     "Key": "Logic",
+                    "RequireOverride": true,
                     "Type": "SDG.Unturned.ENPCLogicType, Assembly-CSharp",
-                    "Description": "Defines how to compare some property with a given value.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "DefaultValue":
                     [
                         {
@@ -1136,8 +1136,7 @@
                                 "Comparand": "GREATER_THAN_OR_EQUAL_TO"
                             }
                         }
-                    ],
-                    "Variable": "logicType"
+                    ]
                 }
             ]
         },
@@ -1542,6 +1541,12 @@
                     "Variable": "holiday"
                 },
                 {
+                    "Key": "Logic",
+                    "RequireOverride": true,
+                    "Type": "SDG.Unturned.ENPCLogicType, Assembly-CSharp",
+                    "DefaultValue": "EQUAL"
+                },
+                {
                     "Key": "Reset",
                     "HideInherited": true
                 }
@@ -1610,7 +1615,7 @@
                         "Type": "AssetReferenceString",
                         "AssetType": "SDG.Unturned.ObjectAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The object that needs to be destroyed.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-object",
                     "Required": true,
@@ -1644,7 +1649,7 @@
                         "Type": "AssetReferenceString",
                         "AssetType": "SDG.Unturned.ItemCurrencyAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The currency type to count.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#currency",
                     "Required": true,
@@ -1693,7 +1698,7 @@
                         "Type": "AssetReferenceString",
                         "AssetType": "SDG.Unturned.ResourceAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The resource that needs to be destroyed.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#kills-tree",
                     "Required": true,
@@ -1719,7 +1724,7 @@
                         "Type": "AssetReferenceString",
                         "AssetType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The weather type to look for.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-status",
                     "Required": true,
@@ -1754,7 +1759,7 @@
                         "Type": "AssetReferenceString",
                         "AssetType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The weather type to look for.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html#weather-blend-alpha",
                     "Required": true,
@@ -2397,7 +2402,7 @@
                         "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.QuestAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The quest to give the player.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#quest",
                     "Required": true,
@@ -2419,7 +2424,7 @@
                         "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The item to give the player.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#item",
                     "Required": true,
@@ -2674,7 +2679,7 @@
                         "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.VehicleAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The achievement to be given to the player.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#vehicle",
                     "Required": true,
@@ -2732,6 +2737,39 @@
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mod-hooks.html#npc-global-event-hook",
                     "Required": true,
                     "Variable": "id"
+                },
+                {
+                    "Key": "InstigatorOnly",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Description": "This event will only be replicated to the player who triggered the interaction. Takes priority over @Replicate.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/latest/npcs/rewards.html#event",
+                    "Variable": "ReplicationMode",
+                    "Version": "3.25.10.0"
+                },
+                {
+                    "Key": "Replicate",
+                    "Type": "Boolean",
+                    "DefaultValue":
+                    [
+                        {
+                            "Case":
+                            {
+                                "Variable": "InstigatorOnly",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
+                            "Value": false
+                        },
+                        {
+                            "Value": true
+                        }
+                    ],
+                    "Description": "Whether or not the event is triggered on clients as well as the server.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/latest/npcs/rewards.html#event",
+                    "Variable": "ShouldReplicate",
+                    "ExclusiveWith": [ "InstigatorOnly" ],
+                    "Version": "3.25.10.0"
                 }
             ]
         },
@@ -2805,7 +2843,7 @@
                         "Type": "AssetReferenceString",
                         "AssetType": "SDG.Unturned.ItemCurrencyAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "Currency type to give the player.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#currency",
                     "Required": true,
@@ -2965,7 +3003,7 @@
                         "Type": "AssetReferenceString",
                         "AssetTypes": [ "SDG.Unturned.NPCRewardsAsset, Assembly-CSharp", "SDG.Unturned.SpawnAsset, Assembly-CSharp" ]
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "A refernce to a reward list asset or a spawn table containing reward lists.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#rewards-list-asset",
                     "Variable": "assetRef",
@@ -3025,7 +3063,7 @@
                         "Type": "AssetReferenceString",
                         "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The effect to spawn.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
                     "Variable": "AssetRef",
@@ -3079,6 +3117,15 @@
                     "Description": "Overrides the default relevant distance of 128m when in multiplayer.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
                     "Variable": "OverrideRelevantDistance"
+                },
+                {
+                    "Key": "OnlyRelevantToInstigator",
+                    "Type": "Boolean",
+                    "DefaultValue": false,
+                    "Description": "Whether or not only the player triggering this reward will see the effect. Takes priority over @RelevantDistance.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
+                    "Variable": "IsOnlyRelevantToInstigator",
+                    "Version": "3.25.10.0"
                 }
             ]
         },
@@ -3111,7 +3158,7 @@
                         "Type": "BcAssetReference",
                         "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "Spawn table ID overriding which items to drop.",
                     "Variable": "CargoSpawnTableRef",
                     "Required":
@@ -3201,7 +3248,6 @@
                     [
                         {
                             "Key": "CooldownId",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "CooldownId",
@@ -3483,7 +3529,7 @@
                         "Type": "BcAssetReference",
                         "AssetTypes": [ "SDG.Unturned.ItemAsset, Assembly-CSharp", "SDG.Unturned.SpawnAsset, Assembly-CSharp" ]
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Required": true,
                     "Description": "The item or spawn table to spawn in. Legacy IDs will be interpreted as items.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",

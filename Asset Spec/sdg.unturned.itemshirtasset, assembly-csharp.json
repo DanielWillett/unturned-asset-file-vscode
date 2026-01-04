@@ -50,26 +50,26 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Shirt",
+            "Key": "Shirt",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Variable": "shirt",
             "Description": "Albedo texture for the shirt displayed on the player model.",
             "Required": true
         },
         {
-            "AssetName": "Emission",
+            "Key": "Emission",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Variable": "emission",
             "Description": "Emission texture for the shirt displayed on the player model."
         },
         {
-            "AssetName": "Metallic",
+            "Key": "Metallic",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Variable": "metallic",
             "Description": "Metallic texture for the shirt displayed on the player model."
         },
         {
-            "AssetName": "Character_Mesh_1P_Override_0",
+            "Key": "Character_Mesh_1P_Override_0",
             "Aliases": [ "Character_Mesh_Override_0" ],
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "characterMeshOverride1pLODs",
@@ -78,7 +78,7 @@
             "Required": "@Has_1P_Character_Mesh_Override"
         },
         {
-            "AssetName": "Character_Mesh_3P_Override_*",
+            "Key": "Character_Mesh_3P_Override_*",
             "Aliases": [ "Character_Mesh_Override_*" ],
             "Template": true,
             "TemplateGroups": [ "shirt-3p-character-mesh-overrides" ],
@@ -89,7 +89,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html"
         },
         {
-            "AssetName": "Character_Material_Override",
+            "Key": "Character_Material_Override",
             "Type": "UnityEngine.Material, UnityEngine.CoreModule",
             "Variable": "characterMaterialOverride",
             "Description": "First-person character mesh replacement.",

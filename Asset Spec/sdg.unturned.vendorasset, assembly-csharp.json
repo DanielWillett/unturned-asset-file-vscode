@@ -64,7 +64,7 @@
                 "Type": "AssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemCurrencyAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "GUID of the currency asset to use as currency instead of experience points.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/vendor-asset.html#other-properties",
             "Variable": "currency"
@@ -86,7 +86,7 @@
                         "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "GUID or ID of the item to buy from the player.",
                     "Variable": "TargetAssetGuid",
                     "Required": true

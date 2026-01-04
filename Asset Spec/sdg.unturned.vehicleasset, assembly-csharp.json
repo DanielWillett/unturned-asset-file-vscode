@@ -133,7 +133,7 @@
                     "Value": "47258d0dcad14cb8be26e24c1ef3449e"
                 },
                 {
-                    "Value": "00000000000000000000000000000000"
+                    "Value": "00000000-0000-0000-0000-000000000000"
                 }
             ],
             "Description": "References a physics profile asset Allows for increased control over vehicle settings in bulk.",
@@ -209,7 +209,6 @@
             [
                 {
                     "Key": "$bndl$::Clip",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Has_Clip_Prefab",
@@ -726,7 +725,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect to play when this vehicle is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosion-doc-data-guid-or-uint16",
             "Variable": "ExplosionEffectGuid"
@@ -747,7 +746,7 @@
                         {
                             "Variable": "Explosion",
                             "Operation": "neq",
-                            "Comparand": "00000000000000000000000000000000"
+                            "Comparand": "00000000-0000-0000-0000-000000000000"
                         }
                     ],
                     "Value": true
@@ -776,7 +775,7 @@
                         {
                             "Variable": "Explosion",
                             "Operation": "neq",
-                            "Comparand": "00000000000000000000000000000000"
+                            "Comparand": "00000000-0000-0000-0000-000000000000"
                         }
                     ],
                     "Value": true
@@ -1229,7 +1228,7 @@
             [
                 {
                     "Key": "Engine",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -1442,7 +1441,6 @@
             [
                 {
                     "Key": "Center_Of_Mass",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Override_Center_Of_Mass",
@@ -1623,7 +1621,11 @@
             "Type":
             {
                 "Type": "List",
-                "ElementType": "Color32RGBString"
+                "ElementType":
+                {
+                    "Type": "Color32",
+                    "Mode": "String"
+                }
             },
             "DefaultValue": null,
             "Version": "3.24.4.0",
@@ -1634,7 +1636,6 @@
             [
                 {
                     "Key": "DefaultPaintColor_Mode",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "DefaultPaintColor_Mode",
@@ -1642,10 +1643,7 @@
                         "Comparand": "List"
                     }
                 },
-                {
-                    "Key": "DefaultPaintColor_Configuration",
-                    "Value": "*"
-                }
+                "DefaultPaintColor_Configuration"
             ],
             "Required":
             {
@@ -1691,7 +1689,6 @@
             [
                 {
                     "Key": "DefaultPaintColor_Mode",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "DefaultPaintColor_Mode",
@@ -1699,10 +1696,7 @@
                         "Comparand": "RandomHueOrGrayscale"
                     }
                 },
-                {
-                    "Key": "DefaultPaintColors",
-                    "Value": "*"
-                }
+                "DefaultPaintColors"
             ],
             "Required":
             {
@@ -1790,7 +1784,6 @@
             [
                 {
                     "Key": "ForwardGearRatios",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "ForwardGearRatios",
@@ -2118,7 +2111,6 @@
                     [
                         {
                             "Key": "WheelIndices",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "WheelIndices",
@@ -2369,23 +2361,17 @@
                     [
                         {
                             "Key": "ModelRadius",
-                            "Value": "*",
                             "Condition":
                             {
-                                "And":
-                                [
-                                    {
-                                        "Variable": "ModelRadius",
-                                        "Operation": "gt",
-                                        "Comparand": 0
-                                    },
-                                    {
-                                        "Variable": "CopyColliderRpmIndex",
-                                        "Operation": "gte",
-                                        "Comparand": 0
-                                    }
-                                ],
-                                "Value": null
+                                "Variable": "CopyColliderRpmIndex",
+                                "Operation": "gte",
+                                "Comparand": 0
+                            },
+                            "RequirementCondition":
+                            {
+                                "Variable": "ModelRadius",
+                                "Operation": "gt",
+                                "Comparand": 0
                             }
                         }
                     ]
@@ -2404,23 +2390,17 @@
                     [
                         {
                             "Key": "CrawlerTrackTilingMaterials",
-                            "Value": "*",
                             "Condition":
                             {
-                                "And":
-                                [
-                                    {
-                                        "Variable": "CrawlerTrackTilingMaterials",
-                                        "Operation": "value-included",
-                                        "Comparand": null
-                                    },
-                                    {
-                                        "Variable": "CopyCrawlerTrackSpeedIndex",
-                                        "Operation": "gte",
-                                        "Comparand": 0
-                                    }
-                                ],
-                                "Value": null
+                                "Variable": "CopyCrawlerTrackSpeedIndex",
+                                "Operation": "gte",
+                                "Comparand": 0
+                            },
+                            "RequirementCondition":
+                            {
+                                "Variable": "CrawlerTrackTilingMaterials",
+                                "Operation": "value-included",
+                                "Comparand": null
                             }
                         }
                     ]
@@ -2610,14 +2590,14 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Vehicle",
+            "Key": "Vehicle",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "clientModel",
             "Description": "The prefab of the vehicle loaded on clients and sometimes servers.",
             "Required": true
         },
         {
-            "AssetName": "Clip",
+            "Key": "Clip",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "legacyServerModel",
             "Description": "The prefab of the vehicle loaded on the dedicated server. Usually new vehicles should only include a @Vehicle prefab.",
@@ -2630,7 +2610,7 @@
             }
         },
         {
-            "AssetName": "Ignition",
+            "Key": "Ignition",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#ignitionaudioclip-master-bundle-pointer",
             "RedirectableAssetKey": "IgnitionAudioClip",
@@ -2638,7 +2618,7 @@
             "Variable": "ignition"
         },
         {
-            "AssetName": "Albedo_Base",
+            "Key": "Albedo_Base",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Description": "Skin albedo base texture.",
             "Variable": "albedoBase",
@@ -2646,7 +2626,6 @@
             [
                 {
                     "Key": "ID",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "ID",
@@ -2657,7 +2636,7 @@
             ]
         },
         {
-            "AssetName": "Metallic_Base",
+            "Key": "Metallic_Base",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Description": "Skin metallic base texture.",
             "Variable": "metallicBase",
@@ -2665,7 +2644,6 @@
             [
                 {
                     "Key": "ID",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "ID",
@@ -2676,7 +2654,7 @@
             ]
         },
         {
-            "AssetName": "Emission_Base",
+            "Key": "Emission_Base",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Description": "Skin emission base texture.",
             "Variable": "emissionBase",
@@ -2684,7 +2662,6 @@
             [
                 {
                     "Key": "ID",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "ID",

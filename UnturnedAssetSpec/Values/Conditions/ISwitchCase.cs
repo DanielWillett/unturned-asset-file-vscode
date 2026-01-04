@@ -1,8 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
@@ -78,8 +76,9 @@ internal static class SwitchCase
         }
         else if (root.TryGetProperty("Value"u8, out element))
         {
-            value = Values.TryReadValueFromJson(in element, ValueReadOptions.Default, switchType);
-            
+            value = Value.TryReadValueFromJson(in element, ValueReadOptions.Default, switchType);
+            if (value == null)
+                return null;
         }
         else
         {

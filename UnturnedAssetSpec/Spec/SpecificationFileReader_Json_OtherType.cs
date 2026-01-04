@@ -59,13 +59,24 @@ partial class SpecificationFileReader
             return existing;
         }
 
+        string displayName;
+        if (!root.TryGetProperty("DisplayName"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            displayName = typeName.GetTypeName();
+        }
+        else
+        {
+            displayName = element.GetString()!;
+        }
+
         DatType parsedType;
         if (root.TryGetProperty("Values"u8, out JsonElement enumValues))
         {
             AssertValueKind(in enumValues, fileType, JsonValueKind.Array);
-            bool isFlags = root.TryGetProperty("IsFlags"u8, out element) && element.GetBoolean();
+            bool isFlags = root.TryGetProperty("IsFlags"u8, out element) && element.ValueKind != JsonValueKind.Null && element.GetBoolean();
 
             DatEnumType enumType = DatType.CreateEnumType(typeName, isFlags, root, file);
+            enumType.DisplayNameIntl = displayName;
 
             typeDictionary[typeName] = parsedType = enumType;
 
@@ -95,7 +106,7 @@ partial class SpecificationFileReader
                 }
             }
 
-            enumType.Values = values.MoveToImmutableOrCopy();
+            enumType.Values = values.MoveToImmutable();
         }
         else
         {
@@ -114,6 +125,7 @@ partial class SpecificationFileReader
             }
 
             DatCustomType customType = DatType.CreateCustomType(typeName, root, parentType, file);
+            customType.DisplayNameIntl = displayName;
 
             typeDictionary[typeName] = parsedType = customType;
 
@@ -124,6 +136,8 @@ partial class SpecificationFileReader
             // OverridableProperties
             if (root.TryGetProperty("OverridableProperties"u8, out element) && element.ValueKind != JsonValueKind.Null)
                 customType.OverridableProperties = element.GetBoolean();
+
+            // todo: properties, localization
         }
 
 
@@ -189,6 +203,10 @@ partial class SpecificationFileReader
         // Description
         if (root.TryGetProperty("Description"u8, out element))
             parsedValue.Description = element.GetString();
+
+        // Abbreviation
+        if (root.TryGetProperty("Abbreviation"u8, out element))
+            parsedValue.Abbreviation = element.GetString();
 
         // Deprecated
         if (root.TryGetProperty("Deprecated"u8, out element) && element.ValueKind != JsonValueKind.Null)

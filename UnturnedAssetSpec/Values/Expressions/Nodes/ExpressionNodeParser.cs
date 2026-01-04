@@ -184,11 +184,6 @@ internal ref struct ExpressionNodeParser : IDisposable
     }
 
 #pragma warning disable CS8500
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
-    private static ReadOnlySpan<char> AsParsable(ReadOnlySpan<char> c) => c;
-#else
-    private static string AsParsable(ReadOnlySpan<char> c) => c.ToString();
-#endif
 
     private unsafe IExpressionNode CreateValue(ref ExpressionToken token)
     {
@@ -262,7 +257,7 @@ internal ref struct ExpressionNodeParser : IDisposable
 
             if (converter.TryParse(span, ref args, out TValue? value))
             {
-                Value = Values.Create(value, type);
+                Value = Values.Value.Create(value, type);
             }
         }
     }
@@ -273,10 +268,10 @@ internal ref struct ExpressionNodeParser : IDisposable
         if (!numericAny)
         {
             if (spanTrimmed.Equals("true", StringComparison.OrdinalIgnoreCase))
-                return Values.True;
+                return Value.True;
 
             if (spanTrimmed.Equals("false", StringComparison.OrdinalIgnoreCase))
-                return Values.False;
+                return Value.False;
         }
         
         ulong u8;
@@ -286,32 +281,32 @@ internal ref struct ExpressionNodeParser : IDisposable
             spanTrimmed = spanTrimmed[2..];
             if (spanTrimmed.EndsWith("ul", StringComparison.OrdinalIgnoreCase))
             {
-                if (ulong.TryParse(AsParsable(spanTrimmed[..^2]), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out u8))
+                if (ulong.TryParse(StringHelper.AsParsable(spanTrimmed[..^2]), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out u8))
                     return new ConcreteValue<ulong>(u8, UInt64Type.Instance);
 
                 throw new FormatException($"Unable to parse hexadecimal UInt64: \"{spanTrimmed.ToString()}\".");
             }
             if (spanTrimmed.EndsWith("l", StringComparison.OrdinalIgnoreCase))
             {
-                if (long.TryParse(AsParsable(spanTrimmed[..^1]), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out i8))
+                if (long.TryParse(StringHelper.AsParsable(spanTrimmed[..^1]), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out i8))
                     return new ConcreteValue<long>(i8, Int64Type.Instance);
 
                 throw new FormatException($"Unable to parse hexadecimal Int64: \"{spanTrimmed.ToString()}\".");
             }
             if (spanTrimmed.EndsWith("u", StringComparison.OrdinalIgnoreCase))
             {
-                if (uint.TryParse(AsParsable(spanTrimmed[..^1]), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint u4))
+                if (uint.TryParse(StringHelper.AsParsable(spanTrimmed[..^1]), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint u4))
                     return new ConcreteValue<uint>(u4, UInt32Type.Instance);
 
                 throw new FormatException($"Unable to parse hexadecimal UInt32: \"{spanTrimmed.ToString()}\".");
             }
-            if (ulong.TryParse(AsParsable(spanTrimmed), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out u8))
+            if (ulong.TryParse(StringHelper.AsParsable(spanTrimmed), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out u8))
             {
                 return u8 <= uint.MaxValue
                     ? new ConcreteValue<uint>((uint)u8, UInt32Type.Instance)
                     : new ConcreteValue<ulong>(u8, UInt64Type.Instance);
             }
-            if (long.TryParse(AsParsable(spanTrimmed), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out i8))
+            if (long.TryParse(StringHelper.AsParsable(spanTrimmed), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out i8))
             {
                 return i8 is >= int.MinValue and <= int.MaxValue
                     ? new ConcreteValue<int>((int)i8, Int32Type.Instance)
@@ -371,42 +366,42 @@ internal ref struct ExpressionNodeParser : IDisposable
 
             if (spanTrimmed.EndsWith("ul", StringComparison.OrdinalIgnoreCase))
             {
-                if (ulong.TryParse(AsParsable(spanTrimmed[..^2]), NumberStyles.Number & ~NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out u8))
+                if (ulong.TryParse(StringHelper.AsParsable(spanTrimmed[..^2]), NumberStyles.Number & ~NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out u8))
                     return new ConcreteValue<ulong>(u8, UInt64Type.Instance);
 
                 throw new FormatException($"Unable to parse UInt64: \"{spanTrimmed.ToString()}\".");
             }
             if (spanTrimmed.EndsWith("l", StringComparison.OrdinalIgnoreCase))
             {
-                if (long.TryParse(AsParsable(spanTrimmed[..^1]), NumberStyles.Number & ~NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out i8))
+                if (long.TryParse(StringHelper.AsParsable(spanTrimmed[..^1]), NumberStyles.Number & ~NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out i8))
                     return new ConcreteValue<long>(i8, Int64Type.Instance);
 
                 throw new FormatException($"Unable to parse Int64: \"{spanTrimmed.ToString()}\".");
             }
             if (spanTrimmed.EndsWith("u", StringComparison.OrdinalIgnoreCase))
             {
-                if (uint.TryParse(AsParsable(spanTrimmed[..^1]), NumberStyles.Number & ~NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out uint u4))
+                if (uint.TryParse(StringHelper.AsParsable(spanTrimmed[..^1]), NumberStyles.Number & ~NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out uint u4))
                     return new ConcreteValue<uint>(u4, UInt32Type.Instance);
 
                 throw new FormatException($"Unable to parse UInt32: \"{spanTrimmed.ToString()}\".");
             }
             if (spanTrimmed.EndsWith("f", StringComparison.OrdinalIgnoreCase))
             {
-                if (float.TryParse(AsParsable(spanTrimmed[..^1]), NumberStyles.Number, CultureInfo.InvariantCulture, out float r4))
+                if (float.TryParse(StringHelper.AsParsable(spanTrimmed[..^1]), NumberStyles.Number, CultureInfo.InvariantCulture, out float r4))
                     return new ConcreteValue<float>(r4, Float32Type.Instance);
 
                 throw new FormatException($"Unable to parse Float32: \"{spanTrimmed.ToString()}\".");
             }
             if (spanTrimmed.EndsWith("d", StringComparison.OrdinalIgnoreCase))
             {
-                if (double.TryParse(AsParsable(spanTrimmed[..^1]), NumberStyles.Number, CultureInfo.InvariantCulture, out r8))
+                if (double.TryParse(StringHelper.AsParsable(spanTrimmed[..^1]), NumberStyles.Number, CultureInfo.InvariantCulture, out r8))
                     return new ConcreteValue<double>(r8, Float64Type.Instance);
 
                 throw new FormatException($"Unable to parse Float64: \"{spanTrimmed.ToString()}\".");
             }
             if (spanTrimmed.EndsWith("m", StringComparison.OrdinalIgnoreCase))
             {
-                if (decimal.TryParse(AsParsable(spanTrimmed[..^1]), NumberStyles.Number, CultureInfo.InvariantCulture, out decimal r16))
+                if (decimal.TryParse(StringHelper.AsParsable(spanTrimmed[..^1]), NumberStyles.Number, CultureInfo.InvariantCulture, out decimal r16))
                     return new ConcreteValue<decimal>(r16, Float128Type.Instance);
 
                 throw new FormatException($"Unable to parse Decimal: \"{spanTrimmed.ToString()}\".");
@@ -512,7 +507,7 @@ internal ref struct ExpressionNodeParser : IDisposable
                 v.Accept(value);
                 if (v.WasSuccessful)
                 {
-                    Node = v.IsNull ? Values.Null(type) : Values.Create(v.Result!, type);
+                    Node = v.IsNull ? Value.Null(type) : Value.Create(v.Result!, type);
                 }
             }
             else
@@ -521,7 +516,7 @@ internal ref struct ExpressionNodeParser : IDisposable
                 if (type == null)
                     return;
 
-                Node = value == null ? Values.Null(type) : Values.Create(value, type);
+                Node = value == null ? Value.Null(type) : Value.Create(value, type);
             }
         }
 

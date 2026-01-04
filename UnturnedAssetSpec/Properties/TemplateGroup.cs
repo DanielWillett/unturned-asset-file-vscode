@@ -102,7 +102,7 @@ public class TemplateGroup : IEquatable<TemplateGroup>
         switch (root.ValueKind)
         {
             case JsonValueKind.String:
-                string str = root.GetString();
+                string? str = root.GetString();
                 if (string.IsNullOrEmpty(str))
                     return false;
 

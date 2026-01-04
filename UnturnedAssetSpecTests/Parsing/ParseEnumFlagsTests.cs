@@ -11,7 +11,9 @@ public class ParseEnumFlagsTests
     [SetUp]
     public void SetUp()
     {
-        _enumType = (DatFlagEnumType)DatType.CreateEnumType(new QualifiedType("SDG.Unturned.ERayMask, Assembly-CSharp", true), true, default, null);
+        DatFileType file = new DatFileType(new QualifiedType("SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp"), null, default);
+
+        _enumType = (DatFlagEnumType)DatType.CreateEnumType(new QualifiedType("SDG.Unturned.ERayMask, Assembly-CSharp", true), true, default, file);
         _enumType.DisplayNameIntl = "Ray Mask";
 
         ImmutableArray<DatEnumValue>.Builder builder = ImmutableArray.CreateBuilder<DatEnumValue>(4);

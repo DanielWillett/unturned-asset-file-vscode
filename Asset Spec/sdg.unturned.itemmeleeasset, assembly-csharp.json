@@ -138,7 +138,12 @@
         },
         {
             "Key": "SpotLight_Color",
-            "Type": "ColorRGBLegacy",
+            "Type":
+            {
+                "Type": "Color",
+                "ModernIs32Bit": true,
+                "Mode": "String, Legacy, Object"
+            },
             "DefaultValue": "f5df93",
             "Description": "Color of the flashlight's beam.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-color-color-f5df93",
@@ -202,7 +207,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Use",
+            "Key": "Use",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when this melee weapon is used.",
             "Variable": "use",

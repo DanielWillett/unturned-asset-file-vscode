@@ -41,7 +41,7 @@ public abstract class PrimitiveType<TValue, TSelf>
     public override IValue<TValue> CreateValue(Optional<TValue> value)
     {
         return value.HasValue
-            ? Values.Values.Create(value.Value, this)
+            ? Value.Create(value.Value, this)
             : Null;
     }
 

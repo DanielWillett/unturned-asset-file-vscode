@@ -11,7 +11,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <summary>
 /// A concrete/constant value that isn't dynamic in any way.
 /// </summary>
-/// <remarks>Create using <see cref="Values.Create"/>.</remarks>
+/// <remarks>Create using <see cref="Values.Value.Value.Value.Create"/>.</remarks>
 /// <typeparam name="TValue">The type of value.</typeparam>
 public sealed class ConcreteValue<TValue>
     : IValue<TValue>,

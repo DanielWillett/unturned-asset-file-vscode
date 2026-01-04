@@ -64,21 +64,21 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Cast",
+            "Key": "Cast",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when the fishing rod is casted.",
             "Variable": "cast",
             "Required": true
         },
         {
-            "AssetName": "Reel",
+            "Key": "Reel",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when reeling the fishing rod in.",
             "Variable": "reel",
             "Required": true
         },
         {
-            "AssetName": "Tug",
+            "Key": "Tug",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when tugging on the fishing rod.",
             "Variable": "tug",

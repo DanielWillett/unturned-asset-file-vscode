@@ -53,6 +53,8 @@
     "BeardCount": 16,
     "HairCount": 23,
     "EmissiveFaces": [ 14 ],
+    "LegacyParsedLocalizationFiles": [ "Curse_Words.txt" ],
+    "KeyOnlyLocalizationFiles": [ "Curse_Words.txt" ],
     "FaceTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Faces/Face%20{0}.png",
     "EmissiveFaceTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Faces/Face%20{0}/Texture.png",
     "BeardTextureTemplate": "https://raw.githubusercontent.com/DanielWillett/UnturnedUIAssets/refs/heads/main/Customization/Beards/Beard%20{0}.png",

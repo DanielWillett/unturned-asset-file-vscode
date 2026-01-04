@@ -1,7 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text.Json;
 
@@ -9,7 +8,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 partial class SpecificationFileReader
 {
-    public DatFileType ReadFileType(JsonDocument doc, QualifiedType fileType, Dictionary<QualifiedType, DatFileType> fileTypes)
+    public DatFileType ReadFileType(JsonDocument doc, QualifiedType fileType, ImmutableDictionary<QualifiedType, DatFileType>.Builder fileTypes)
     {
         JsonElement root = doc.RootElement;
 
@@ -49,7 +48,10 @@ partial class SpecificationFileReader
 
             // VanillaIdLimit
             if (root.TryGetProperty("VanillaIdLimit"u8, out element) && element.ValueKind != JsonValueKind.Null)
-                assetType.VanillaIdLimit = element.GetUInt16();
+            {
+                ushort id = element.GetUInt16();
+                assetType.VanillaIdLimit = id == 0 ? null : id;
+            }
             else
                 assetType.VanillaIdLimit = null;
             

@@ -131,13 +131,9 @@
                     "DefaultValue": null,
                     "ExclusiveWith":
                     [
-                        {
-                            "Key": "Regex",
-                            "Value": "*"
-                        },
+                        "Regex",
                         {
                             "Key": "Type",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Type",
@@ -172,13 +168,9 @@
                     "DefaultValue": null,
                     "ExclusiveWith":
                     [
-                        {
-                            "Key": "Regexes",
-                            "Value": "*"
-                        },
+                        "Regexes",
                         {
                             "Key": "Type",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Type",
@@ -217,13 +209,9 @@
                     "DefaultValue": null,
                     "ExclusiveWith":
                     [
-                        {
-                            "Key": "Filter",
-                            "Value": "*"
-                        },
+                        "Filter",
                         {
                             "Key": "Type",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Type",
@@ -258,13 +246,9 @@
                     "DefaultValue": null,
                     "ExclusiveWith":
                     [
-                        {
-                            "Key": "Filters",
-                            "Value": "*"
-                        },
+                        "Filters",
                         {
                             "Key": "Type",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Type",
@@ -307,13 +291,9 @@
                     "DefaultValue": null,
                     "ExclusiveWith":
                     [
-                        {
-                            "Key": "Value",
-                            "Value": "*"
-                        },
+                        "Value",
                         {
                             "Key": "Type",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Type",
@@ -352,13 +332,9 @@
                     "DefaultValue": null,
                     "ExclusiveWith":
                     [
-                        {
-                            "Key": "Values",
-                            "Value": "*"
-                        },
+                        "Values",
                         {
                             "Key": "Type",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Type",

@@ -33,7 +33,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Mask",
+            "Key": "Mask",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The model that appears on the player's third-person model.",
             "Required": true

@@ -75,13 +75,13 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Shoot",
+            "Key": "Shoot",
             "Description": "The sound played when the gun this item is attached to shoots. Optional.",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Variable": "shoot"
         },
         {
-            "AssetName": "Barrel",
+            "Key": "Barrel",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The model that appears on the gun when the item is attached.",
             "Variable": "barrel",

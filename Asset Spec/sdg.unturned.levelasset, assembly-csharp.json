@@ -90,7 +90,7 @@
                 "AssetType": "SDG.Unturned.WeatherAssetBase, Assembly-CSharp"
             },
             "Description": "This weather will always be active on this level. Weather scheduling is ignored.",
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Variable": "perpetualWeatherRef",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
             "ExclusiveWith": [ "Weather_Types" ]

@@ -56,7 +56,6 @@
             [
                 {
                     "Key": "Explosion",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Build",
@@ -115,7 +114,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetTypes": [ "SDG.Unturned.EffectAsset, Assembly-CSharp", "SDG.Unturned.VehicleAsset, Assembly-CSharp" ]
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect played when this barricade is destroyed. If @Build is 'Vehicle', this is the vehicle that will be spawned.",
             "Variable": "explosionGuid",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
@@ -124,7 +123,6 @@
             [
                 {
                     "Key": "Build",
-                    "Value": "*",
                     "Condition":
                     {
                         "And":
@@ -145,7 +143,6 @@
                 },
                 {
                     "Key": "Build",
-                    "Value": "*",
                     "Condition":
                     {
                         "And":
@@ -379,7 +376,7 @@
             [
                 {
                     "Key": "Build",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -462,7 +459,7 @@
             [
                 {
                     "Key": "Build",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -761,27 +758,27 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Clip",
+            "Key": "Clip",
             "Description": "The barricade object loaded on dedicated servers. This object should not contain renderers usually.",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "barricade",
             "Required": "@Has_Clip_Prefab"
         },
         {
-            "AssetName": "Barricade",
+            "Key": "Barricade",
             "Description": "The barricade object loaded in-game and on dedicated servers if @Has_Clip_Prefab is false.",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "barricade",
             "Required": true
         },
         {
-            "AssetName": "Nav",
+            "Key": "Nav",
             "Description": "The collider used for zombie and animal navigation.",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "nav"
         },
         {
-            "AssetName": "Use",
+            "Key": "Use",
             "RedirectableAssetKey": "PlacementAudioClip",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when this barricade is placed.",

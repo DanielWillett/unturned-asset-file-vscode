@@ -20,28 +20,28 @@
     "BundleAssets":
     [
         {
-            "AssetName": "System_Area",
+            "Key": "System_Area",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "systemArea",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html#unity-prefabs",
             "Description": "Instantiated multiple times to cover a larger area. Mythical shirts and pants attach them to character bones, and mythical vehicle skins attach them to several points on the surface. As such, this shouldn't rely on any specific orientation. Layer should be set to Enemy."
         },
         {
-            "AssetName": "System_Hook",
+            "Key": "System_Hook",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "systemHook",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html#unity-prefabs",
             "Description": "Attached to a cosmetic item's \"Effect\" prefab. Layer should be set to Enemy."
         },
         {
-            "AssetName": "System_First",
+            "Key": "System_First",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "systemFirst",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html#unity-prefabs",
             "Description": "Attached to first-person weapon skin. Particles should be smaller than usual, and try to avoid the up direction to reduce blocking the player's aim. First-person particles are typically half the size, but use the same emission shape size as third-person. Layer should be set to Viewmodel."
         },
         {
-            "AssetName": "System_Third",
+            "Key": "System_Third",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "systemThird",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html#unity-prefabs",

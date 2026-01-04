@@ -15,7 +15,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Shirt for the NPC to wear.",
             "Variable": "shirtGuid",
@@ -28,7 +28,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Pants for the NPC to wear.",
             "Variable": "pantsGuid",
@@ -41,7 +41,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Hat for the NPC to wear.",
             "Variable": "hatGuid",
@@ -54,7 +54,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Backpack for the NPC to wear.",
             "Variable": "backpackGuid",
@@ -67,7 +67,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Vest for the NPC to wear.",
             "Variable": "vestGuid",
@@ -80,7 +80,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Mask for the NPC to wear.",
             "Variable": "maskGuid",
@@ -93,7 +93,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Glasses for the NPC to wear.",
             "Variable": "glassesGuid",
@@ -114,7 +114,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Shirt for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "shirtGuid",
@@ -134,7 +134,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Pants for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "pantsGuid",
@@ -154,7 +154,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Hat for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "hatGuid",
@@ -174,7 +174,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Backpack for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "backpackGuid",
@@ -194,7 +194,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Vest for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "vestGuid",
@@ -214,7 +214,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Mask for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "maskGuid",
@@ -234,7 +234,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Glasses for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "glassesGuid",
@@ -262,7 +262,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemShirtAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Shirt for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "shirtGuid",
@@ -282,7 +282,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemPantsAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Pants for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "pantsGuid",
@@ -302,7 +302,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemHatAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Hat for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "hatGuid",
@@ -322,7 +322,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemBackpackAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Backpack for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "backpackGuid",
@@ -342,7 +342,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemVestAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Vest for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "vestGuid",
@@ -362,7 +362,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemMaskAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Mask for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "maskGuid",
@@ -382,7 +382,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemGlassesAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Glasses for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "glassesGuid",
@@ -476,7 +476,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "The weapon that's carried on the NPC's back.",
             "Variable": "primaryWeaponGuid",
@@ -489,7 +489,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "The weapon that's carried on the NPC's hip.",
             "Variable": "secondaryWeaponGuid",
@@ -502,7 +502,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "Another item the NPC can carry.",
             "Variable": "tertiaryWeaponGuid",
@@ -525,7 +525,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.DialogueAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "The dialogue to use when first interacting with the NPC.",
             "Variable": "dialogueGuid",

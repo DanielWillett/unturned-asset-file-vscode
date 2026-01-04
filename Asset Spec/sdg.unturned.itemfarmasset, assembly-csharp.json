@@ -35,7 +35,6 @@
             [
                 {
                     "Key": "Grow_SpawnTable",
-                    "Value": "*",
                     "Condition":
                     {
                         "And":
@@ -63,7 +62,6 @@
             [
                 {
                     "Key": "Grow",
-                    "Value": "*",
                     "Condition":
                     {
                         "And":

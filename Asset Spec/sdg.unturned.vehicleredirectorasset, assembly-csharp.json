@@ -15,7 +15,7 @@
                 "Type": "AssetReferenceString",
                 "AssetType": "SDG.Unturned.VehicleAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Required": true,
             "Description": "Actual vehicle to use when attempting to load or spawn this asset.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-redirector-asset.html#targetvehicle-asset-pointer",

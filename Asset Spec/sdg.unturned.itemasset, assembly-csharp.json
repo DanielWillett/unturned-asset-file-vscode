@@ -831,7 +831,7 @@
                 "Type": "AssetReference",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Variable": "_deletedAtZeroQualityEffectRef",
             "Description": "If this item should be destroyed when it reaches 0% quality.",
             "InclusiveWith":
@@ -1433,7 +1433,6 @@
                     [
                         {
                             "Key": "Tool",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Tool",
@@ -1514,7 +1513,6 @@
                     [
                         {
                             "Key": "Outputs",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Outputs",
@@ -1537,7 +1535,6 @@
                     [
                         {
                             "Key": "Outputs",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Outputs",
@@ -1559,7 +1556,6 @@
                     [
                         {
                             "Key": "Outputs",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Outputs",
@@ -1584,7 +1580,7 @@
                             "Alias": "Build"
                         }
                     ],
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "Reference to an effect that will be spawned when this blueprint is crafted.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#effect-asset-pointer-to-doc-assets-effect",
                     "Variable": "effectAssetRef"
@@ -2033,7 +2029,7 @@
                             "Value": "732ee6ffeb18418985cf4f9fde33dd11"
                         },
                         {
-                            "Value": "00000000000000000000000000000000"
+                            "Value": "00000000-0000-0000-0000-000000000000"
                         }
                     ],
                     "Description": "Determines which category this blueprint falls under.",
@@ -2070,7 +2066,6 @@
                     [
                         {
                             "Key": "RequiresNearbyCraftingTags",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "RequiresNearbyCraftingTags",
@@ -2856,7 +2851,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Equip",
+            "Key": "Equip",
             "RedirectableAssetKey": "EquipAudioClip",
             "Description": "Sound played when the item is equipped.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#equip-audio-clip",
@@ -2871,7 +2866,7 @@
             "Variable": "equip"
         },
         {
-            "AssetName": "Animations",
+            "Key": "Animations",
             "Description": "Contains all animations relavent to the item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#animations-prefab",
             "InclusiveWith":
@@ -3101,7 +3096,7 @@
             ]
         },
         {
-            "AssetName": "Item",
+            "Key": "Item",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The object used for the dropped item, as well as the held item unless @EquipablePrefab is set. This is not required for shirts or pants.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#item-prefab",
@@ -3130,19 +3125,19 @@
             ]
         },
         {
-            "AssetName": "Albedo_Base",
+            "Key": "Albedo_Base",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Description": "Skin albedo base texture.",
             "Variable": "albedoBase"
         },
         {
-            "AssetName": "Metallic_Base",
+            "Key": "Metallic_Base",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Description": "Skin metallic base texture.",
             "Variable": "metallicBase"
         },
         {
-            "AssetName": "Emission_Base",
+            "Key": "Emission_Base",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Description": "Skin emission base texture.",
             "Variable": "emissionBase"

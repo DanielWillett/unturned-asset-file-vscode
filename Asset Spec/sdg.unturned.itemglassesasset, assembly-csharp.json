@@ -61,7 +61,6 @@
             [
                 {
                     "Key": "Vision",
-                    "Value": "*",
                     "Condition":
                     {
                         "And":
@@ -121,7 +120,6 @@
             [
                 {
                     "Key": "Vision",
-                    "Value": "*",
                     "Condition":
                     {
                         "And":
@@ -154,7 +152,6 @@
             [
                 {
                     "Key": "Vision",
-                    "Value": "*",
                     "Condition":
                     {
                         "And":
@@ -188,7 +185,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Glasses",
+            "Key": "Glasses",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The model for the glasses equipped on the player model.",
             "Variable": "glasses",

@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 /// <summary>
 /// An expression value, which is read from any value starting with an equals sign.
 /// </summary>
-/// <remarks>Create using <see cref="Values.FromExpression"/>.</remarks>
+/// <remarks>Create using <see cref="Value.FromExpression"/>.</remarks>
 /// <typeparam name="TResult">The resulting type from the expression.</typeparam>
 public class ExpressionValue<TResult> : IValue<TResult>, IEquatable<ExpressionValue<TResult>?> where TResult : IEquatable<TResult>
 {

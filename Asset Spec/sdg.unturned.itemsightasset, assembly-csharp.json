@@ -62,7 +62,6 @@
             [
                 {
                     "Key": "Vision",
-                    "Value": "*",
                     "Condition":
                     {
                         "And":
@@ -122,7 +121,6 @@
             [
                 {
                     "Key": "Vision",
-                    "Value": "*",
                     "Condition":
                     {
                         "And":
@@ -193,7 +191,6 @@
             [
                 {
                     "Key": "AimAlignment_Path",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "AimAlignment_Owner",
@@ -336,7 +333,7 @@
                 },
                 {
                     "Key": "Color",
-                    "Type": "Color32RGB",
+                    "Type": "Color32",
                     "DefaultValue": "000000",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#color-color-black",
                     "Description": "The color of the horizontal line and text.",
@@ -348,7 +345,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Sight",
+            "Key": "Sight",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The model that appears on the gun when the item is attached.",
             "Variable": "sight",

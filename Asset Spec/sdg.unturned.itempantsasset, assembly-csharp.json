@@ -23,20 +23,20 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Pants",
+            "Key": "Pants",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Variable": "pants",
             "Description": "Albedo texture for the pants displayed on the player model.",
             "Required": true
         },
         {
-            "AssetName": "Emission",
+            "Key": "Emission",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Variable": "emission",
             "Description": "Emission texture for the pants displayed on the player model."
         },
         {
-            "AssetName": "Metallic",
+            "Key": "Metallic",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Variable": "metallic",
             "Description": "Metallic texture for the pants displayed on the player model."

@@ -71,8 +71,8 @@ public abstract class BaseType<TValue, TSelf>
     public virtual IValue<TValue> CreateValue(Optional<TValue> value)
     {
         return value.HasValue
-            ? Values.Values.Create(value.Value, this)
-            : Values.Values.Null(this);
+            ? Value.Create(value.Value, this)
+            : Value.Null(this);
     }
 
     public override void Visit<TVisitor>(ref TVisitor visitor)

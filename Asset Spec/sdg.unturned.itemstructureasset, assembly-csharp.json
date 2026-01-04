@@ -81,7 +81,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect played when this structure is destroyed.",
             "Variable": "explosionGuid",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties",
@@ -115,7 +115,7 @@
             [
                 {
                     "Key": "Construct",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -243,7 +243,7 @@
             [
                 {
                     "Key": "Construct",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -318,27 +318,27 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Clip",
+            "Key": "Clip",
             "Description": "The structure object loaded on dedicated servers. This object should not contain renderers usually.",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "structure",
             "Required": "@Has_Clip_Prefab"
         },
         {
-            "AssetName": "Structure",
+            "Key": "Structure",
             "Description": "The structure object loaded in-game and on dedicated servers if @Has_Clip_Prefab is false.",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "structure",
             "Required": true
         },
         {
-            "AssetName": "Nav",
+            "Key": "Nav",
             "Description": "The collider used for zombie and animal navigation.",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "nav"
         },
         {
-            "AssetName": "Use",
+            "Key": "Use",
             "RedirectableAssetKey": "PlacementAudioClip",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when this structure is placed.",

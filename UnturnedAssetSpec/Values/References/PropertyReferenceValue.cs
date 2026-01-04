@@ -5,6 +5,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -57,7 +58,8 @@ public class PropertyReferenceValue : IValue
     /// <inheritdoc />
     public virtual bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
     {
-        // todo
+        IPropertyReferenceValue value = _pRef.CreateValue((DatProperty)(object)ctx.Self, ctx.Information);
+        // todo: visitor.Accept(value);
         return false;
     }
 

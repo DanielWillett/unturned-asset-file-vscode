@@ -84,13 +84,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-vanillaphysicsmaterial",
             "Priority": 5,
             "Variable": "UnityPhysicsMaterial",
-            "ExclusiveWith":
-            [
-                {
-                    "Key": "PhysicsMaterial",
-                    "Value": "*"
-                }
-            ]
+            "ExclusiveWith": [ "PhysicsMaterial" ]
         },
         {
             "Key": "PhysicsMaterial",
@@ -110,13 +104,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-physicsmaterial",
             "Priority": 5,
             "Variable": "UnityPhysicsMaterial",
-            "ExclusiveWith":
-            [
-                {
-                    "Key": "VanillaPhysicsMaterial",
-                    "Value": "*"
-                }
-            ]
+            "ExclusiveWith": [ "VanillaPhysicsMaterial" ]
         }
     ],
     "Localization":
@@ -132,7 +120,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Texture",
+            "Key": "Texture",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "RedirectableAssetKey": "TexturePath",
             "Description": "The diffuse texture used on the surface of the road.",

@@ -223,14 +223,14 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Skin_Primary",
+            "Key": "Skin_Primary",
             "Type": "UnityEngine.Material, UnityEngine.CoreModule",
             "Description": "The material to apply to the skinned item or vehicle.",
             "Variable": "primarySkin",
             "Required": true
         },
         {
-            "AssetName": "Skin_Secondary_*",
+            "Key": "Skin_Secondary_*",
             "Template": true,
             "TemplateGroups":
             [
@@ -245,13 +245,13 @@
             "Required": true
         },
         {
-            "AssetName": "Skin_Attachment",
+            "Key": "Skin_Attachment",
             "Type": "UnityEngine.Material, UnityEngine.CoreModule",
             "Description": "The material to apply to attachments with custom base textures.",
             "Variable": "attachmentSkin"
         },
         {
-            "AssetName": "Skin_Tertiary",
+            "Key": "Skin_Tertiary",
             "Type": "UnityEngine.Material, UnityEngine.CoreModule",
             "Description": "The material to apply to attachments without custom base textures.",
             "Variable": "tertiarySkin",
@@ -263,7 +263,7 @@
             }
         },
         {
-            "AssetName": "Override_Mesh_*",
+            "Key": "Override_Mesh_*",
             "Template": true,
             "TemplateGroups": [ "skin-meshes" ],
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",

@@ -11,7 +11,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Grip",
+            "Key": "Grip",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The model that appears on the gun when the item is attached.",
             "Variable": "grip",

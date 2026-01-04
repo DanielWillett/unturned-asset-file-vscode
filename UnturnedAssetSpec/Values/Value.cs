@@ -17,7 +17,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <summary>
 /// Utilities for working with the <see cref="IValue"/> system.
 /// </summary>
-public static class Values
+public static class Value
 {
     /// <summary>
     /// A <see langword="null"/> value of a given <paramref name="type"/>.
@@ -688,12 +688,12 @@ public static class Values
     }
 
     /// <summary>
-    /// A visitor that accepts the result of <see cref="Values.TryReadValueFromJson{TVisitor}"/>.
+    /// A visitor that accepts the result of <see cref="Value.TryReadValueFromJson{TVisitor}"/>.
     /// </summary>
     public interface IReadValueVisitor
     {
         /// <summary>
-        /// Invoked by <see cref="Values.TryReadValueFromJson{TVisitor}"/> to accept the parsed value as a strongly typed value.
+        /// Invoked by <see cref="Value.TryReadValueFromJson{TVisitor}"/> to accept the parsed value as a strongly typed value.
         /// </summary>
         void Accept<TValue>(IValue<TValue> value) where TValue : IEquatable<TValue>;
     }

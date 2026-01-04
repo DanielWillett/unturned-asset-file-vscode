@@ -1,0 +1,730 @@
+// udat-type: DanielWillett.UnturnedDataFileLspServer.Data.Spec.Orderfile, UnturnedAssetSpec
+
+// Format:
+//   Each type has a list of property names. An '_' indicates a blank line.
+//
+//   An empty line indicates the end of that block of properties.
+//
+//   When creating a child type (AnimalAsset : Asset), you have to reference other properties with
+//   an '@' symbol to specify where the following properties will be inserted after.
+//   If the referenced base property is at the end of a block, the block will be inserted before the property.
+//   There can not be more than one property reference in a block of properties.
+//
+//   Any types not specified will fall back to the default order.
+//   
+// Example:
+//   "SDG.Unturned.Asset, Assembly-CSharp"
+//   [
+//       GUID
+//       ID
+//   ]
+//   "SDG.Unturned.ItemAsset, Assembly-CSharp"
+//   [
+//       // insert Rarity, Construct directly below GUID
+//       @GUID
+//       Rarity
+//       Construct
+//
+//       // insert Useable below ID with an empty line
+//       @ID
+//       _
+//       Useable
+//   ]
+//   "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+//   [
+//       // insert Sight above Useable
+//       Sight 12345
+//       @Useable
+//   ]
+//
+// results in the following order:
+// _________________
+// | GUID          |
+// | Rarity        |
+// | Construct     |
+// | ID            |
+// |               |
+// | Sight         |
+// | Useable       |
+// ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+
+// Base asset
+"SDG.Unturned.Asset, Assembly-CSharp"
+[
+    GUID
+    Type
+    ID
+    _
+    Ignore_TexRW
+    Ignore_NPOT
+    _
+    Bypass_ID_Limit
+    Bundle_Path_Include_Filename
+    Asset_Bundle_Version
+    Master_Bundle_Override
+    Bundle_Override_Path
+    Exclude_From_Master_Bundle
+    Enable_Shader_Consolidation
+    Disable_Shader_Consolidation
+    _
+    Keep_Localization_Loaded
+]
+
+// Base Foliage asset
+"SDG.Framework.Foliage.FoliageInfoAsset, Assembly-CSharp"
+[
+    @ID
+    Density
+    Min_Normal_Position_Offset
+    Max_Normal_Position_Offset
+    Normal_Rotation_Offset
+    Normal_Rotation_Alignment
+    Min_Weight
+    Max_Weight
+    Min_Angle
+    Max_Angle
+    Min_Rotation
+    Max_Rotation
+    Uniform_Scale
+    Min_Scale
+    Max_Scale
+]
+
+// Instanced Mesh Foliage asset
+"SDG.Framework.Foliage.FoliageInstancedMeshInfoAsset, Assembly-CSharp"
+[
+    @Max_Scale
+    Mesh
+    Material
+    Cast_Shadows
+    Tile_Dither
+    Draw_Distance
+    Is_Clutter
+    Christmas_Redirect
+    Halloween_Redirect
+]
+
+// Object Foliage asset
+"SDG.Framework.Foliage.FoliageObjectInfoAsset, Assembly-CSharp"
+[
+    @Max_Scale
+    Object
+    Obstruction_Radius
+]
+
+// Resource Foliage asset
+"SDG.Framework.Foliage.FoliageResourceInfoAsset, Assembly-CSharp"
+[
+    @Max_Scale
+    Object
+    Obstruction_Radius
+    Legacy_Rotation_and_Scale
+]
+
+// Foliage Collection asset
+"SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp"
+[
+    @ID
+    Foliage
+]
+
+// Airdrop asset
+"SDG.Unturned.AirdropAsset, Assembly-CSharp"
+[
+    @Max_Scale
+    Landed_Barricade
+    Carepackage_Prefab
+]
+
+// Animal asset
+"$local$::SDG.Unturned.AnimalAsset, Assembly-CSharp"
+[
+    Name
+]
+"SDG.Unturned.AnimalAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    Speed_Run
+    Speed_Walk
+    _
+    Should_Prevent_Move_During_Startle
+    Should_Play_Anims_On_Dedicated_Server
+    _
+    Behaviour
+    _
+    Health
+    Regen
+    Damage
+    Armor_FalloffRange
+    Armor_FalloffMaxRange
+    Armor_FalloffMultiplier
+    Horizontal_Attack_Range
+    Vertical_Attack_Range
+    Horizontal_Vehicle_Attack_Range
+    _
+    Meat
+    Pelt
+    Reward_ID
+    Reward_XP
+    Reward_Min
+    Reward_Max
+    _
+    Panics
+    Roars
+    _
+    Attack_Interval
+    Attack_Anim_Variants
+    Glance_Anim_Variants
+    Startle_Anim_Variants
+    Eat_Anim_Variants
+]
+
+// Crafting Blueprint List asset
+"SDG.Unturned.CraftingAsset, Assembly-CSharp"
+[
+    @ID
+    Blueprints
+]
+
+// Crafting Blacklist Rule asset
+"SDG.Unturned.CraftingBlacklistAsset, Assembly-CSharp"
+[
+    @ID
+    Input_Items
+    Output_Items
+    Blueprints
+    Allow_Core_Blueprints
+]
+
+// Dialogue asset
+"SDG.Unturned.DialogueAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    Messages
+    _
+    Responses
+]
+
+// Effect asset
+"SDG.Unturned.EffectAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    Lifetime
+    Lifetime_Spread
+    _
+    Gore
+    Splatter
+    Splatters
+    Splatter_Liquid
+    Splatter_Temperature
+    Splatter_Lifetime
+    Splatter_Lifetime_Spread
+    _
+    CameraShake_Radius
+    CameraShake_MagnitudeDegrees
+    _
+    Spawn_On_Dedicated_Server
+    Relevant_Distance
+    Randomize_Rotation
+    _
+    Preload
+    Splatter_Preload
+    _
+    OneShotAudio
+    Blast
+    _
+    Is_Music
+    Static
+]
+
+/* === NPC CONDITIONS === */
+
+// Base condition
+"$local$::SDG.Unturned.INPCCondition, Assembly-CSharp"
+[
+    "" // the 'Condition_*' localization key, empty since there's nothing appended after it.
+]
+"SDG.Unturned.INPCCondition, Assembly-CSharp"
+[
+    TextId
+    Type
+    Logic
+    UI_Requirements
+    Reset
+]
+// Condtion type EXPERIENCE
+"SDG.Unturned.NPCExperienceCondition, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Condtion type REPUTATION
+"SDG.Unturned.NPCReputationCondition, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Condtion type FLAG_BOOL
+"SDG.Unturned.NPCBoolFlagCondition, Assembly-CSharp"
+[
+    @Type
+    ID
+    Value
+
+    @Logic
+    Allow_Unset
+]
+// Condtion type FLAG_SHORT
+"SDG.Unturned.NPCShortFlagCondition, Assembly-CSharp"
+[
+    @Type
+    ID
+    Value
+    
+    @Logic
+    Allow_Unset
+]
+// Condtion type QUEST
+"SDG.Unturned.NPCQuestCondition, Assembly-CSharp"
+[
+    @Type
+    ID
+    Status
+    
+    @Logic
+    Ignore_NPC
+]
+// Condtion type SKILLSET
+"SDG.Unturned.NPCSkillsetCondition, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Condtion type ITEM
+"SDG.Unturned.NPCItemCondition, Assembly-CSharp"
+[
+    @Type
+    ID
+    Amount
+]
+// Condtion type KILLS_ZOMBIE
+"SDG.Unturned.NPCZombieKillsCondition, Assembly-CSharp"
+[
+    @Type
+    ID
+    Value
+    
+    @Logic
+    Zombie
+    Radius
+    MinRadius
+    Spawn_Quantity
+    Spawn
+    Nav
+    LevelTableOverride
+]
+// Condtion type KILLS_HORDE
+"SDG.Unturned.NPCHordeKillsCondition, Assembly-CSharp"
+[
+    @Type
+    ID
+    Value
+    
+    @Logic
+    Nav
+]
+// Condtion type KILLS_ANIMAL
+"SDG.Unturned.NPCAnimalKillsCondition, Assembly-CSharp"
+[
+    @Type
+    ID
+    Value
+    
+    @Logic
+    Animal
+]
+// Condtion type COMPARE_FLAGS
+"SDG.Unturned.NPCCompareFlagsCondition, Assembly-CSharp"
+[
+    @Type
+    A_ID
+    B_ID
+    
+    @Logic
+    Allow_A_Unset
+    Allow_B_Unset
+]
+// Condtion type TIME_OF_DAY
+"SDG.Unturned.NPCTimeOfDayCondition, Assembly-CSharp"
+[
+    @Type
+    Second
+]
+// Condtion type PLAYER_LIFE_HEALTH
+"SDG.Unturned.NPCPlayerLifeHealthCondition, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Condtion type PLAYER_LIFE_FOOD
+"SDG.Unturned.NPCPlayerLifeFoodCondition, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Condtion type PLAYER_LIFE_WATER
+"SDG.Unturned.NPCPlayerLifeWaterCondition, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Condtion type PLAYER_LIFE_VIRUS
+"SDG.Unturned.NPCPlayerLifeVirusCondition, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Condtion type HOLIDAY
+"SDG.Unturned.NPCHolidayCondition, Assembly-CSharp"
+[
+    @Logic
+    Value
+]
+// Condtion type KILLS_PLAYER
+"SDG.Unturned.NPCPlayerKillsCondition, Assembly-CSharp"
+[
+    @Type
+    ID
+    Value
+]
+// Condtion type KILLS_OBJECT
+"SDG.Unturned.NPCObjectKillsCondition, Assembly-CSharp"
+[
+    @Type
+    ID
+    Value
+    Nav
+    Object
+]
+// Condtion type CURRENCY
+"SDG.Unturned.NPCCurrencyCondition, Assembly-CSharp"
+[
+    @Type
+    GUID
+    Value
+]
+// Condtion type KILLS_TREE
+"SDG.Unturned.NPCTreeKillsCondition, Assembly-CSharp"
+[
+    @Type
+    ID
+    Tree
+    Value
+]
+// Condtion type WEATHER_STATUS
+"SDG.Unturned.NPCWeatherStatusCondition, Assembly-CSharp"
+[
+    @Type
+    GUID
+    Value
+]
+// Condtion type WEATHER_BLEND_ALPHA
+"SDG.Unturned.NPCWeatherBlendAlphaCondition, Assembly-CSharp"
+[
+    @Type
+    GUID
+    Value
+]
+// Condtion type IS_FULL_MOON
+"SDG.Unturned.NPCIsFullMoonCondition, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Condtion type DATE_COUNTER
+"SDG.Unturned.NPCDateCounterCondition, Assembly-CSharp"
+[
+    @Type
+    Value
+    Divisor
+]
+// Condtion type PLAYER_LIFE_STAMINA
+"SDG.Unturned.NPCPlayerLifeStaminaCondition, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Condtion type VOLUME_OVERLAP
+"SDG.Unturned.NPCVolumeOverlapCondition, Assembly-CSharp"
+[
+    @Type
+    VolumeID
+    PlayerCount
+]
+
+/* === NPC REWARDS === */
+
+// Base condition
+"$local$::SDG.Unturned.INPCReward, Assembly-CSharp"
+[
+    "" // the 'Reward_*' localization key, empty since there's nothing appended after it.
+]
+"SDG.Unturned.INPCReward, Assembly-CSharp"
+[
+    TextId
+    Type
+    GrantDelaySeconds
+    GrantDelayApplyWhenInterrupted
+]
+// Reward type EXPERIENCE
+"SDG.Unturned.NPCExperienceReward, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Reward type REPUTATION
+"SDG.Unturned.NPCReputationReward, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Reward type FLAG_BOOL
+"SDG.Unturned.NPCBoolFlagReward, Assembly-CSharp"
+[
+    @Type
+    ID
+    Value
+]
+// Reward type FLAG_SHORT
+"SDG.Unturned.NPCShortFlagReward, Assembly-CSharp"
+[
+    @Type
+    ID
+    Value
+    Modification
+]
+// Reward type FLAG_SHORT_RANDOM
+"SDG.Unturned.NPCRandomShortFlagReward, Assembly-CSharp"
+[
+    @Type
+    ID
+    Min_Value
+    Max_Value
+    Modification
+]
+// Reward type QUEST
+"SDG.Unturned.NPCQuestReward, Assembly-CSharp"
+[
+    @Type
+    ID
+]
+// Reward type ITEM
+"SDG.Unturned.NPCItemReward, Assembly-CSharp"
+[
+    @Type
+    ID
+    Amount
+    Ammo
+    Sight
+    Tactical
+    Grip
+    Barrel
+    Magazine
+    Origin
+    Auto_Equip
+]
+// Reward type ITEM_RANDOM
+"SDG.Unturned.NPCRandomItemReward, Assembly-CSharp"
+[
+    @Type
+    ID
+    Amount
+    Origin
+    Auto_Equip
+]
+// Reward type ACHIEVEMENT
+"SDG.Unturned.NPCAchievementReward, Assembly-CSharp"
+[
+    @Type
+    ID
+]
+// Reward type VEHICLE
+"SDG.Unturned.NPCVehicleReward, Assembly-CSharp"
+[
+    @Type
+    ID
+    Spawnpoint
+    PaintColor
+]
+// Reward type TELEPORT
+"SDG.Unturned.NPCTeleportReward, Assembly-CSharp"
+[
+    @Type
+    Spawnpoint
+]
+// Reward type EVENT
+"SDG.Unturned.NPCEventReward, Assembly-CSharp"
+[
+    @Type
+    ID
+    Replicate
+    InstigatorOnly
+]
+// Reward type FLAG_MATH
+"SDG.Unturned.NPCFlagMathReward, Assembly-CSharp"
+[
+    @Type
+    A_ID
+    B_ID
+    B_Value
+    Operation
+    TextFormat
+]
+// Reward type HINT
+"SDG.Unturned.NPCHintReward, Assembly-CSharp"
+[
+    @Type
+    Text
+    Duration
+]
+// Reward type PLAYER_SPAWNPOINT
+"SDG.Unturned.NPCPlayerSpawnpointReward, Assembly-CSharp"
+[
+    @Type
+    ID
+]
+// Reward type PLAYER_LIFE_HEALTH
+"SDG.Unturned.NPCPlayerLifeHealthReward, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Reward type PLAYER_LIFE_FOOD
+"SDG.Unturned.NPCPlayerLifeFoodReward, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Reward type PLAYER_LIFE_WATER
+"SDG.Unturned.NPCPlayerLifeWaterReward, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Reward type PLAYER_LIFE_VIRUS
+"SDG.Unturned.NPCPlayerLifeVirusReward, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Reward type REWARDS_LIST_ASSET
+"SDG.Unturned.NPCRewardsListAssetReward, Assembly-CSharp"
+[
+    @Type
+    GUID
+]
+// Reward type CUTSCENE_MODE
+"SDG.Unturned.NPCCutsceneModeReward, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Reward type PLAYER_LIFE_STAMINA
+"SDG.Unturned.NPCPlayerLifeStaminaReward, Assembly-CSharp"
+[
+    @Type
+    Value
+]
+// Reward type EFFECT
+"SDG.Unturned.NPCEffectReward, Assembly-CSharp"
+[
+    @Type
+    GUID
+    Spawnpoint
+    RelevantDistance
+    IsReliable
+    AtPlayerPosition
+    OnlyRelevantToInstigator
+]
+// Reward type AIRDROP
+"SDG.Unturned.NPCAirdropReward, Assembly-CSharp"
+[
+    @Type
+    Cargo
+    Spawnpoint
+    Use_Random_Airdrop_Node
+]
+// Reward type ZOMBIE
+"SDG.Unturned.NPCZombieReward, Assembly-CSharp"
+[
+    @Type
+    Zombie
+    SpawnQuantity
+    Spawnpoint
+    CooldownId
+    CooldownDuration
+    LevelTableOverride
+]
+// Reward type REMOVE_ZOMBIES
+"SDG.Unturned.NPCRemoveZombieReward, Assembly-CSharp"
+[
+    @Type
+    Zombie
+    Nav
+    LevelTable
+]
+
+// Loadout items from Level asset
+"SDG.Unturned.LevelAsset+DefaultLoadoutItem, Assembly-CSharp"
+[
+    Asset
+    Amount
+    Origin
+]
+
+// Server Configuration menu URL link
+"SDG.Unturned.BrowserConfigData+Link, Assembly-CSharp"
+[
+    Message
+    URL
+]
+
+// Crafting Blacklist Rule Blacklisted Blueprint
+"SDG.Unturned.CraftingBlacklistAsset+BlacklistedBlueprint, Assembly-CSharp"
+[
+    BlueprintName
+    Blueprint
+    Item
+]
+
+// Dialogue Message
+"$local$::SDG.Unturned.DialogueMessage, Assembly-CSharp"
+[
+    Page_*
+]
+"SDG.Unturned.DialogueMessage, Assembly-CSharp"
+[
+    Pages
+    Responses
+    Prev
+    FaceOverride
+    Conditions
+    Rewards
+]
+// Dialogue Response
+"$local$::SDG.Unturned.DialogueResponse, Assembly-CSharp"
+[
+    ""
+]
+"SDG.Unturned.DialogueResponse, Assembly-CSharp"
+[
+    Dialogue
+    Quest
+    Vendor
+    Messages
+    Conditions
+    Rewards
+]

@@ -133,14 +133,12 @@
             "Type":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Uniform_Scale",
-                            "Operation": "eq",
-                            "Comparand": true
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Uniform_Scale",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
                     "Value": "Float32"
                 },
                 {
@@ -154,14 +152,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Uniform_Scale",
-                            "Operation": "eq",
-                            "Comparand": true
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Uniform_Scale",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
                     "Value": 0
                 },
                 {
@@ -179,14 +175,12 @@
             "Type":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Uniform_Scale",
-                            "Operation": "eq",
-                            "Comparand": true
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Uniform_Scale",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
                     "Value": "Float32"
                 },
                 {
@@ -200,14 +194,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Uniform_Scale",
-                            "Operation": "eq",
-                            "Comparand": true
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Uniform_Scale",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
                     "Value": 0
                 },
                 {

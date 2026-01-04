@@ -264,7 +264,7 @@ public class ComplexConditionalValue : ComplexConditionalSwitchCase<bool>
     protected override bool WriteValueToJson => false;
 
     public ComplexConditionalValue(ImmutableArray<IValue<bool>> conditions, SpecDynamicSwitchCaseOperation operation)
-        : base(conditions, operation, Values.True) { }
+        : base(conditions, operation, Values.Value.True) { }
 
     /// <inheritdoc />
     public override bool TryEvaluateValue(out Optional<bool> value, in FileEvaluationContext ctx)

@@ -36,7 +36,8 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
     private ImmutableArray<string> _actionButtons;
     private Dictionary<QualifiedType, JsonDocument>? _assetFiles;
     private QualifiedType _currentType;
-    private Dictionary<QualifiedType, DatFileType>? _types;
+    private ImmutableDictionary<QualifiedType, DatFileType>? _types;
+    private ImmutableDictionary<string, DatFileType>? _localizationFiles;
 
     public bool AllowInternet { get; }
 
@@ -87,6 +88,8 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
                 _logger.LogWarning(Resources.Log_FailedToReadCommitHashFromRepo);
             }
         }
+
+        Task generateLocalizationFiles = Task.Run(() => GenerateLocalizationFiles(token), token);
 
         ISpecificationFileProvider[] providers = _fileProviderFactory(this);
         try
@@ -175,7 +178,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
                 types.Enqueue(baseType);
             }
 
-            Dictionary<QualifiedType, DatFileType> resolvedTypes;
+            ImmutableDictionary<QualifiedType, DatFileType>.Builder resolvedTypes;
 
             _assetFiles = new Dictionary<QualifiedType, JsonDocument>(_readInformation.ParentTypes.Count);
             List<QualifiedType> typeReadOrder = new List<QualifiedType>(_readInformation.ParentTypes.Count);
@@ -212,7 +215,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 
                 _currentType = QualifiedType.None;
 
-                resolvedTypes = new Dictionary<QualifiedType, DatFileType>();
+                resolvedTypes = ImmutableDictionary.CreateBuilder<QualifiedType, DatFileType>();
 
                 foreach (QualifiedType type in typeReadOrder)
                 {
@@ -233,12 +236,91 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
                 _assetFiles = null;
             }
 
-            _types = resolvedTypes;
+            _types = resolvedTypes.ToImmutable();
         }
         finally
         {
             Array.ForEach(providers, p => (p as IDisposable)?.Dispose());
         }
+
+        await generateLocalizationFiles;
+    }
+
+    private async Task GenerateLocalizationFiles(CancellationToken token)
+    {
+        if (_installDir == null || !_installDir.TryGetInstallDirectory(out GameInstallDir installDirectory))
+            return;
+
+        string folder = Path.Combine(installDirectory.BaseFolder, "Localization", "English");
+
+        ImmutableDictionary<string, DatFileType>.Builder localizationFiles = ImmutableDictionary.CreateBuilder<string, DatFileType>(StringComparer.Ordinal);
+
+        foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
+        {
+            string ext = Path.GetExtension(file);
+            if (!string.Equals(ext, ".txt", StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(ext, ".dat", StringComparison.OrdinalIgnoreCase)
+                || file.Length <= folder.Length + 1)
+            {
+                continue;
+            }
+
+            string id = file.Substring(folder.Length + 1);
+            if (string.IsNullOrEmpty(id))
+                continue;
+
+            DatFileType fileType = DatFileType.CreateFileType(id, false, default, null);
+            fileType.IsKeyOnlyLocalizationFile = _readInformation != null && Array.IndexOf(_readInformation.KeyOnlyLocalizationFiles!, id) >= 0;
+
+            ImmutableArray<DatProperty>.Builder propertiesBuilder = ImmutableArray.CreateBuilder<DatProperty>();
+
+            if (_readInformation != null && Array.IndexOf(_readInformation.LegacyParsedLocalizationFiles!, id) >= 0)
+            {
+                if (!fileType.IsKeyOnlyLocalizationFile)
+                {
+                    using StreamReader sr = new StreamReader(file, Encoding.UTF8);
+                    while (await sr.ReadLineAsync() is { } line)
+                    {
+                        if (line.Length == 0 || line[0] == '#')
+                            continue;
+
+                        line = line.TrimStart();
+
+                        int index = line.IndexOf(' ');
+                        
+                        int firstValueIndex = index + 1;
+                        while (firstValueIndex < line.Length && line[firstValueIndex] == ' ')
+                            ++firstValueIndex;
+
+                        propertiesBuilder.Add(index < 0
+                            ? DatProperty.CreateLocalizationKey(line, null, fileType)
+                            : DatProperty.CreateLocalizationKey(line.Substring(0, index), firstValueIndex < line.Length ? line.Substring(firstValueIndex) : null, fileType));
+                    }
+                }
+            }
+            else
+            {
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER
+                string text = await File.ReadAllTextAsync(file, token);
+#else
+                string text = File.ReadAllText(file);
+#endif
+                using StaticSourceFile sourceFile = StaticSourceFile.FromOtherFile(string.Empty, text.AsMemory(), null, SourceNodeTokenizerOptions.Lazy);
+                
+                foreach (IPropertySourceNode property in sourceFile.SourceFile.Properties)
+                {
+                    propertiesBuilder.Add(property.Value is not IValueSourceNode val
+                        ? DatProperty.CreateLocalizationKey(property.Key, null, fileType)
+                        : DatProperty.CreateLocalizationKey(property.Key, val.Value, fileType));
+                }
+            }
+
+            fileType.Properties = propertiesBuilder.MoveToImmutableOrCopy();
+
+            localizationFiles.Add(id, fileType);
+        }
+
+        _localizationFiles = localizationFiles.ToImmutable();
     }
 
     private static async Task<string> ReadAllTextAsync(Stream stream, CancellationToken token)

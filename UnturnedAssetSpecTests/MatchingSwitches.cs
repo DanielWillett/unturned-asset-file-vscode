@@ -22,10 +22,10 @@ public class MatchingSwitches
                             DanielWillett.UnturnedDataFileLspServer.Data.Values.Operations.Equals.Instance, true, false)
                     ),
                     SpecDynamicSwitchCaseOperation.Or,
-                    Values.Type(Float32Type.Instance)
+                    Value.Type(Float32Type.Instance)
                 ),
                 new DefaultSwitchCase<IType>(
-                    Values.Type(new Vector3Type(Vector3Kind.Scale, VectorTypeOptions.Default))
+                    Value.Type(new Vector3Type(Vector3Kind.Scale, VectorTypeOptions.Default))
                 )
             )
         );

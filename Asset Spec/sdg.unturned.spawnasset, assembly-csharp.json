@@ -57,7 +57,7 @@
                     {
                         "Type": "AssetReferenceString"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description":
                     [
                         {
@@ -113,7 +113,6 @@
                     [
                         {
                             "Key": "Guid",
-                            "Value": "*",
                             "Condition":
                             {
                                 "And":
@@ -178,7 +177,7 @@
                             {
                                 "Variable": "Guid",
                                 "Operation": "eq",
-                                "Comparand": "00000000000000000000000000000000"
+                                "Comparand": "00000000-0000-0000-0000-000000000000"
                             },
                             {
                                 "Variable": "LegacySpawnId",
@@ -192,7 +191,6 @@
                     [
                         {
                             "Key": "LegacyAssetId",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "#This.Key",
@@ -266,7 +264,7 @@
                             {
                                 "Variable": "Guid",
                                 "Operation": "eq",
-                                "Comparand": "00000000000000000000000000000000"
+                                "Comparand": "00000000-0000-0000-0000-000000000000"
                             }
                         ],
                         "Value": true

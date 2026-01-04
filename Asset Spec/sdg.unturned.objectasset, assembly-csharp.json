@@ -102,7 +102,7 @@
             [
                 {
                     "Key": "Type",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -151,7 +151,6 @@
             [
                 {
                     "Key": "Interactability",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Interactability",
@@ -184,7 +183,7 @@
             [
                 {
                     "Key": "Interactability",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -249,7 +248,7 @@
             [
                 {
                     "Key": "Interactability",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -303,7 +302,7 @@
             [
                 {
                     "Key": "Interactability",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -380,7 +379,7 @@
             [
                 {
                     "Key": "Interactability",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -483,7 +482,6 @@
                 },
                 {
                     "Key": "Interactability_Reward_ID",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Interactability",
@@ -556,7 +554,7 @@
             [
                 {
                     "Key": "Interactability",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -588,7 +586,6 @@
                 },
                 {
                     "Key": "Interactability_Drops",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Interactability",
@@ -605,7 +602,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect to play when this object is interacted with or a section of rubble is destroyed.",
             "Docs":
             [
@@ -657,7 +654,7 @@
             [
                 {
                     "Key": "Interactability",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -690,7 +687,7 @@
                 "Type": "AssetReferenceString",
                 "AssetType": "SDG.Unturned.DialogueAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Dialogue asset to open when this dialogue object is interacted with.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Priority": 11,
@@ -803,7 +800,7 @@
             [
                 {
                     "Key": "Interactability",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -863,7 +860,7 @@
             [
                 {
                     "Key": "Interactability",
-                    "Value": "*",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
                         "Or":
@@ -926,7 +923,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect to play when this all rubble sections are destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
             "Priority": 11,
@@ -1360,13 +1357,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Health",
@@ -1398,13 +1389,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Effect",
@@ -1413,7 +1398,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect to play when a section of rubble is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
             "Priority": 11,
@@ -1433,13 +1418,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Finale",
@@ -1448,7 +1427,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect to play when this all rubble sections are destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
             "Priority": 11,
@@ -1468,13 +1447,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Reward_ID",
@@ -1503,13 +1476,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Blade_ID",
@@ -1534,13 +1501,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Reward_Probability",
@@ -1567,13 +1528,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Rewards_Min",
@@ -1599,13 +1554,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Rewards_Max",
@@ -1632,13 +1581,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Reward_XP",
@@ -1663,13 +1606,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Invulnerable",
@@ -1694,13 +1631,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Proof_Explosion",
@@ -1725,13 +1656,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Can_Zombies_Damage",
@@ -1756,13 +1681,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Zombie_Damage_Multiplier",
@@ -1789,10 +1708,7 @@
             ],
             "InclusiveWith":
             [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                },
+                "Rubble",
                 {
                     "Key": "Rubble_Can_Zombies_Damage",
                     "Value": true
@@ -1823,13 +1739,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_All_Sections_Destroyed_Alert_Radius",
@@ -1855,13 +1765,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Respawn_All_Sections_Simultaneously",
@@ -1887,13 +1791,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Nav_Mode",
@@ -1918,13 +1816,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Rubble_Editor",
@@ -1949,13 +1841,7 @@
                     "Value": "RUBBLE"
                 }
             ],
-            "InclusiveWith":
-            [
-                {
-                    "Key": "Rubble",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "Rubble" ]
         },
         {
             "Key": "Has_Clip_Prefab",
@@ -2240,7 +2126,6 @@
             [
                 {
                     "Key": "LOD",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "LOD",
@@ -2321,7 +2206,7 @@
                 "Type": "AssetReferenceString",
                 "AssetType": "SDG.Framework.Foliage.FoliageInfoCollectionAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The collection of foliage that can be baked onto this object's surface.",
             "Priority": 15,
             "Variable": "foliage",
@@ -2425,7 +2310,7 @@
                 "Type": "AssetReferenceString",
                 "AssetType": "SDG.Unturned.MaterialPaletteAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "A default material palette that should be used to randomize the material of this object.",
             "Priority": 15,
             "Variable": "materialPalette",
@@ -2480,7 +2365,7 @@
                 "AssetType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
                 "PreventSelfReference": true
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The object to replace this object with during the 'Christmas' holiday.",
             "Priority": 14,
             "Variable": "christmasRedirect",
@@ -2494,7 +2379,7 @@
                 "AssetType": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
                 "PreventSelfReference": true
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The object to replace this object with during the 'Halloween' holiday.",
             "Priority": 14,
             "Variable": "halloweenRedirect",
@@ -2672,7 +2557,6 @@
             [
                 {
                     "Key": "Armor_FalloffMaxRange",
-                    "Value": "*",
                     "Condition":
                     {
                         "Or":
@@ -2708,7 +2592,6 @@
             [
                 {
                     "Key": "Armor_FalloffRange",
-                    "Value": "*",
                     "Condition":
                     {
                         "Or":
@@ -2744,7 +2627,6 @@
             [
                 {
                     "Key": "Armor_FalloffMultiplier",
-                    "Value": "*",
                     "Condition":
                     {
                         "Or":
@@ -2770,7 +2652,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Decal",
+            "Key": "Decal",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Description": "Main texture for the decal.",
             "Required":
@@ -2788,7 +2670,7 @@
             ]
         },
         {
-            "AssetName": "Clip",
+            "Key": "Clip",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab only loaded on the dedicated server. Should have collision but not renderers.",
             "Deprecated": true,
@@ -2832,7 +2714,7 @@
             ]
         },
         {
-            "AssetName": "Object",
+            "Key": "Object",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab loaded on the client, and on the dedicated server unless @Has_Clip_Prefab is true.",
             "Required":
@@ -2866,7 +2748,7 @@
             ]
         },
         {
-            "AssetName": "Editor",
+            "Key": "Editor",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab loaded on the client, and on the dedicated server unless @Has_Clip_Prefab is true.",
             "Required":
@@ -2909,7 +2791,7 @@
             ]
         },
         {
-            "AssetName": "Skybox",
+            "Key": "Skybox",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab loaded on clients that is visible when the object is very far away.",
             "Variable": "skyboxGameObject",
@@ -2926,7 +2808,7 @@
             ]
         },
         {
-            "AssetName": "Nav",
+            "Key": "Nav",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab used by NPCs to navigate around the object.",
             "Variable": "navGameObject",
@@ -2949,7 +2831,7 @@
             ]
         },
         {
-            "AssetName": "Slots",
+            "Key": "Slots",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab used to indicate where doors, windows, etc. should be able to be placed at.",
             "Variable": "slotsGameObject",
@@ -2966,7 +2848,7 @@
             ]
         },
         {
-            "AssetName": "Triggers",
+            "Key": "Triggers",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab used to add hard-coded triggers such as kill triggers to the object.",
             "Variable": "slotsGameObject",

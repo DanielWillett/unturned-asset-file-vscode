@@ -117,7 +117,7 @@
                             "Comparand": "Mask"
                         }
                     ],
-                    "Value": "@SDG.Unturned.ItemGearAsset::Beard"
+                    "Value": "@SDG.Unturned.ItemGearAsset, Assembly-CSharp::Beard"
                 },
                 {
                     "Value": true
@@ -152,7 +152,7 @@
                             "Comparand": "Mask"
                         }
                     ],
-                    "Value": "@SDG.Unturned.ItemGearAsset::Hair"
+                    "Value": "@SDG.Unturned.ItemGearAsset, Assembly-CSharp::Hair"
                 },
                 {
                     "Value": true
@@ -181,7 +181,6 @@
             [
                 {
                     "Key": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
-                    "Value": "*",
                     "Condition":
                     {
                         "Or":
@@ -244,7 +243,6 @@
             [
                 {
                     "Key": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
-                    "Value": "*",
                     "Condition":
                     {
                         "Or":
@@ -318,7 +316,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "CosmeticPreviewOverride",
+            "Key": "CosmeticPreviewOverride",
             "InclusiveWith":
             [
                 {

@@ -272,12 +272,12 @@ public static class Conditions
     /// <summary>
     /// A condition that always evaluates to <see langword="true"/>.
     /// </summary>
-    public static Condition<bool> True { get; } = new Condition<bool>(Values.True, Operations.Equals.Instance, new Optional<bool>(true));
+    public static Condition<bool> True { get; } = new Condition<bool>(Value.True, Operations.Equals.Instance, new Optional<bool>(true));
 
     /// <summary>
     /// A condition that always evaluates to <see langword="false"/>.
     /// </summary>
-    public static Condition<bool> False { get; } = new Condition<bool>(Values.True, Operations.Equals.Instance, new Optional<bool>(false));
+    public static Condition<bool> False { get; } = new Condition<bool>(Value.True, Operations.Equals.Instance, new Optional<bool>(false));
 
     /// <summary>
     /// Attempt to read a condition from a JSON object and return it as a boolean value.
@@ -288,15 +288,15 @@ public static class Conditions
         switch (root.ValueKind)
         {
             case JsonValueKind.True:
-                condition = Values.True;
+                condition = Value.True;
                 return true;
 
             case JsonValueKind.False:
-                condition = Values.False;
+                condition = Value.False;
                 return true;
 
             case JsonValueKind.Null:
-                condition = Values.Null(BooleanType.Instance);
+                condition = Value.Null(BooleanType.Instance);
                 return true;
         }
 
@@ -369,7 +369,7 @@ public static class Conditions
         {
             valueVisitor.Visitor = visitorPtr;
             valueVisitor.Element = elementPtr;
-            variable = Values.TryReadValueFromJson(element, ValueReadOptions.AssumeProperty | ValueReadOptions.Default, ref valueVisitor, valueType: null);
+            variable = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeProperty | ValueReadOptions.Default, ref valueVisitor, valueType: null);
             if (variable == null)
                 return false;
             
@@ -391,7 +391,7 @@ public static class Conditions
         fixed (TVisitor* visitorPtr = &visitor)
         {
             v.Visitor = visitorPtr;
-            IValue? comparand = Values.TryReadValueFromJson(element, ValueReadOptions.AssumeValue, ref v, null);
+            IValue? comparand = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeValue, ref v, null);
             if (comparand == null)
                 return false;
 
@@ -402,7 +402,7 @@ public static class Conditions
         }
     }
 
-    private unsafe struct ValueVisitor<TVisitor> : Values.IReadValueVisitor
+    private unsafe struct ValueVisitor<TVisitor> : Value.IReadValueVisitor
         where TVisitor : IConditionVisitor
     {
         public TVisitor* Visitor;
@@ -427,7 +427,7 @@ public static class Conditions
         }
     }
 
-    private unsafe struct ComparandVisitor<TVisitor> : Values.IReadValueVisitor, IValueVisitor
+    private unsafe struct ComparandVisitor<TVisitor> : Value.IReadValueVisitor, IValueVisitor
         where TVisitor : IConditionVisitor
     {
         public TVisitor* Visitor;
@@ -470,7 +470,7 @@ public static class Conditions
 
         if (root.TryGetProperty("Case"u8, out JsonElement element))
         {
-            if (!TryReadConditionFromJson(in element, out cond))
+            if (!TryReadComplexOrBasicConditionFromJson(in element, out cond))
                 return false;
 
             condition = new ComplexConditionalValue(ImmutableArray.Create(cond), SpecDynamicSwitchCaseOperation.Or);
@@ -490,7 +490,7 @@ public static class Conditions
         for (int i = 0; i < cases; ++i)
         {
             JsonElement item = element[i];
-            if (!TryReadConditionFromJson(in item, out cond))
+            if (!TryReadComplexOrBasicConditionFromJson(in item, out cond))
                 return false;
 
             bldr.Add(cond);

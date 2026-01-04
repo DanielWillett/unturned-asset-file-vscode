@@ -20,13 +20,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
             "Description": "List of unity 'Physic Material' names this material represents. Each value must be unique to this asset.",
             "Variable": "physicMaterialNames",
-            "ExclusiveWith":
-            [
-                {
-                    "Key": "UnityName",
-                    "Value": "*"
-                }
-            ]
+            "ExclusiveWith": [ "UnityName" ]
         },
         {
             "Key": "UnityName",
@@ -41,13 +35,7 @@
                 "Operation": "excluded",
                 "Comparand": null
             },
-            "ExclusiveWith":
-            [
-                {
-                    "Key": "UnityNames",
-                    "Value": "*"
-                }
-            ]
+            "ExclusiveWith": [ "UnityName" ]
         },
         {
             "Key": "Fallback",
@@ -56,7 +44,7 @@
                 "Type": "AssetReference",
                 "AssetType": "SDG.Unturned.PhysicsMaterialAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
             "Description": "Base physics material which will be used for any properties that haven't been explicitly set.",
             "Variable": "fallbackRef"
@@ -68,7 +56,7 @@
                 "Type": "AssetReference",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The effect used for bullet impacts that hit a surface with this material. Currently experimental.",
             "Variable": "bulletImpactEffect",
             "Experimental": true
@@ -80,7 +68,7 @@
                 "Type": "AssetReference",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
             "Description": "Effect to spawn underneath tires while driving on surfaces with this material.",
             "Variable": "tireMotionEffect"

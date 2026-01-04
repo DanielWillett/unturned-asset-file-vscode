@@ -106,7 +106,7 @@
                         "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.DialogueAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The GUID or short ID of the previous dialogue page of message #(Self.TemplateGroups[0]). The player will be returned to this dialogue if no responses are available.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
                     "Variable": "prevGuid"
@@ -207,7 +207,7 @@
                         "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.DialogueAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The dialogue to open after the player selects response @dialogue-responses.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
                     "Variable": "dialogueGuid",
@@ -220,7 +220,7 @@
                         "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.QuestAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The quest to start after the player selects response @dialogue-responses.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
                     "Variable": "questGuid",
@@ -233,7 +233,7 @@
                         "Type": "LegacyAssetReferenceString",
                         "AssetType": "SDG.Unturned.VendorAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "00000000000000000000000000000000",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
                     "Description": "The vendor (shop) to open after the player selects response @dialogue-responses.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
                     "Variable": "vendorGuid",

@@ -81,7 +81,6 @@
                     [
                         {
                             "Key": "Blueprint",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "BlueprintName",
@@ -91,7 +90,6 @@
                         },
                         {
                             "Key": "BlueprintName",
-                            "Value": "*",
                             "Condition":
                             {
                                 "Variable": "Blueprint",

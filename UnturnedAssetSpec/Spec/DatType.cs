@@ -225,6 +225,16 @@ public class DatFileType : DatTypeWithProperties
     /// <inheritdoc />
     public override DatFileType Owner => this;
 
+    /// <summary>
+    /// Whether or not this <see cref="DatFileType"/> was generated from the Localization .dat files.
+    /// </summary>
+    public bool IsLocalizationFile { get; internal set; }
+
+    /// <summary>
+    /// Whether or not this localization file should only allow keys (such as the <c>Curse_Words.txt</c> file).
+    /// </summary>
+    public bool IsKeyOnlyLocalizationFile { get; internal set; }
+
     private protected override string FullName => TypeName.GetFullTypeName();
 
     /// <inheritdoc cref="DatType.BaseType" />

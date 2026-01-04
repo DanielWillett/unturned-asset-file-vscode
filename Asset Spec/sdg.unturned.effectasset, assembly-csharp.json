@@ -139,7 +139,19 @@
             "IncludedDefaultValue": 0,
             "Description": "Number of splatter effects to cache and pool on startup. Note that @Preload has to be > 0 to preload splatters.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#splatters",
-            "Variable": "splatterPreload"
+            "Variable": "splatterPreload",
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Preload",
+                    "Condition":
+                    {
+                        "Variable": "Preload",
+                        "Operation": "neq",
+                        "Comparand": 0
+                    }
+                }
+            ]
         },
         {
             "Key": "Blast",
@@ -148,7 +160,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The blast-mark effect to spawn when the effect is spawned. This is only displayed if the player has blast-marks enabled and has the deferred render mode selected.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/effect-asset.html#general-data",
             "Variable": "blastmarkEffectGuid"
@@ -244,14 +256,14 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Effect",
+            "Key": "Effect",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The effect to spawn. UI effects should contain a Canvas component. May be null for audio-only effects.",
             "Required": false,
             "Variable": "effect"
         },
         {
-            "AssetName": "Splatter_*",
+            "Key": "Splatter_*",
             "Template": true,
             "TemplateGroups": [ "effect-splatters" ],
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",

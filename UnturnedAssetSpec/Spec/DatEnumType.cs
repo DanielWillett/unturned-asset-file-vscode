@@ -613,6 +613,11 @@ public class DatEnumValue : IValue<DatEnumValue>, IEquatable<DatEnumValue>, IDat
     public string? Description { get; internal set; }
 
     /// <summary>
+    /// A shorter name of abbreviation for the enum value.
+    /// </summary>
+    public string? Abbreviation { get; internal set; }
+
+    /// <summary>
     /// URL to the SDG docs for this enum value.
     /// </summary>
     public string? Docs { get; internal set; }

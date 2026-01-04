@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -815,5 +816,96 @@ internal static class StringHelper
                 return;
         }
 #endif
+    }
+
+    /// <summary>
+    /// Used with TryParse methods to return a span on newer platforms and a string on older platforms.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+    internal static ReadOnlySpan<char> AsParsable(ReadOnlySpan<char> c) => c;
+#else
+    internal static string AsParsable(ReadOnlySpan<char> c) => c.ToString();
+#endif
+
+    /// <summary>
+    /// Gets the highest formatting argument index ({n}) in the given string.
+    /// </summary>
+    public static int GetHighestFormattingArgument(ReadOnlySpan<char> str)
+    {
+        int i = str.IndexOf('{');
+        if (i < 0)
+            return -1;
+
+        bool inFmt = false;
+        int lastNumberStartIndex = -1;
+        bool inFmtSpecifier = false;
+
+        int maxValue = -1;
+
+        for (; i < str.Length; ++i)
+        {
+            char c = str[i];
+            int fmt;
+            switch (c)
+            {
+                case '{':
+                    if (i + 1 < str.Length && str[i + 1] == '{')
+                    {
+                        ++i;
+                        continue;
+                    }
+
+                    inFmt = true;
+                    break;
+
+                case '}':
+                    if (!inFmt)
+                        continue;
+
+                    if (!inFmtSpecifier)
+                    {
+                        if (lastNumberStartIndex != -1
+                            && int.TryParse(AsParsable(str.Slice(lastNumberStartIndex, i - lastNumberStartIndex)), NumberStyles.Number, CultureInfo.InvariantCulture, out fmt))
+                        {
+                            maxValue = Math.Max(fmt, maxValue);
+                        }
+                    }
+                    inFmtSpecifier = false;
+                    inFmt = false;
+                    lastNumberStartIndex = -1;
+                    int nextIndex = str.Slice(i + 1).IndexOf('{');
+                    if (nextIndex < 0)
+                        return maxValue;
+
+                    i += nextIndex;
+                    break;
+                
+                case ':':
+                    if (!inFmt)
+                        continue;
+                    inFmtSpecifier = true;
+                    if (lastNumberStartIndex != -1
+                        && int.TryParse(AsParsable(str.Slice(lastNumberStartIndex, i - lastNumberStartIndex)), NumberStyles.Number, CultureInfo.InvariantCulture, out fmt))
+                    {
+                        maxValue = Math.Max(fmt, maxValue);
+                    }
+                    lastNumberStartIndex = -1;
+                    break;
+
+                default:
+                    if (!inFmt || inFmtSpecifier)
+                        continue;
+
+                    if (lastNumberStartIndex == -1 && char.IsDigit(c))
+                    {
+                        lastNumberStartIndex = i;
+                    }
+
+                    break;
+            }
+        }
+
+        return maxValue;
     }
 }

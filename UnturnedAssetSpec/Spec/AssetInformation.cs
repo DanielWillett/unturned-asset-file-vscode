@@ -43,6 +43,15 @@ public class AssetInformation
 
 #nullable restore
 
+    /// <summary>
+    /// List of files in the <c>Localization/English</c> directory that are parsed using the legacy (line-by-line) format.
+    /// </summary>
+    public string?[]? LegacyParsedLocalizationFiles { get; set; }
+
+    /// <summary>
+    /// List of files in the <c>Localization/English</c> directory that do not allow values.
+    /// </summary>
+    public string?[]? KeyOnlyLocalizationFiles { get; set; }
     public AssetBundleVersionInfo?[]? AssetBundleVersions { get; set; }
     public SkillsetInfo?[]? Skillsets { get; set; }
     public SpecialityInfo?[]? Specialities { get; set; }

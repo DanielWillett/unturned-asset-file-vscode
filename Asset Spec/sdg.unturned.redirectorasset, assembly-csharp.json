@@ -26,7 +26,6 @@
             [
                 {
                     "Key": "ID",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "ID",
@@ -43,8 +42,8 @@
                 "Type": "AssetReferenceString",
                 "AssetType": "SDG.Unturned.Asset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
-            "Except": [ "00000000000000000000000000000000" ],
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
+            "Except": [ "00000000-0000-0000-0000-000000000000" ],
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/redirector-asset.html#targetasset-guid",
             "Description": "The asset that is being redirected to."

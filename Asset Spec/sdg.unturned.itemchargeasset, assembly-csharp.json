@@ -110,7 +110,7 @@
             "Description": "Effect to play upon detonation.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/charge-asset.html#charge-asset-properties",
             "Variable": "DetonationEffectGuid",
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Priority": 3
         }
     ]

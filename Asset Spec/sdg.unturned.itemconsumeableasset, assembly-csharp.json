@@ -264,7 +264,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect to play when consuming this item, also causing the item to explode, instantly killing the player. The explosion strength is decided by the @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) and damage properties.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
             "Variable": "ExplosionEffectGuid",
@@ -323,7 +323,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Use",
+            "Key": "Use",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "RedirectableAssetKey": "ConsumeAudioClip",
             "Description": "The sound played when the item is used.",

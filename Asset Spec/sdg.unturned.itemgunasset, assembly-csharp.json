@@ -132,7 +132,6 @@
             [
                 {
                     "Key": "Fire_Delay_Seconds",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Fire_Delay_Seconds",
@@ -222,7 +221,7 @@
                 "Type": "Id",
                 "AssetType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The magazine that naturally spawns on this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-uint16-0",
             "Priority": 15,
@@ -248,7 +247,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Required": true,
             "Description": "The magazine that naturally spawns on this gun for magazine replacement #(Self.TemplateGroups[0])'s map.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
@@ -385,7 +384,6 @@
             [
                 {
                     "Key": "Magazine_Calibers",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Magazine_Calibers",
@@ -1032,7 +1030,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The GUID or ID of the effect to play after shooting. This is emitted from this weapon's \"Barrel\" hook.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#muzzle-doc-data-guid-or-uint16",
             "Priority": 13,
@@ -1045,7 +1043,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The GUID or ID of the effect that should be used for explosions caused by projectiles.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#explosion-doc-data-guid-or-uint16",
             "Priority": 13,
@@ -1059,7 +1057,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "IncludedDefaultValue": "00000000000000000000000000000000",
+            "IncludedDefaultValue": "00000000-0000-0000-0000-000000000000",
             "DefaultValue":
             [
                 {
@@ -1090,7 +1088,7 @@
                     "Value": "f380a6a6f41f422c9f5b9ac13e3b13e8"
                 },
                 {
-                    "Value": "00000000000000000000000000000000"
+                    "Value": "00000000-0000-0000-0000-000000000000"
                 }
             ],
             "Description": "The GUID or ID of the effect to play after shooting, emitted from the this weapon's \"Eject\" hook.",
@@ -1101,7 +1099,6 @@
             [
                 {
                     "Key": "$bndl$::Projectile",
-                    "Value": "*",
                     "Condition":
                     {
                         "Or":
@@ -1416,7 +1413,6 @@
             [
                 {
                     "Key": "RechamberAfterShotCount",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "RechamberAfterShotCount",
@@ -1602,21 +1598,21 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Shoot",
+            "Key": "Shoot",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when this gun is shot.",
             "Variable": "shoot",
             "RedirectableAssetKey": "ShootAudioClip"
         },
         {
-            "AssetName": "Reload",
+            "Key": "Reload",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when this gun is reloaded.",
             "Variable": "reload",
             "RedirectableAssetKey": "ReloadAudioClip"
         },
         {
-            "AssetName": "Hammer",
+            "Key": "Hammer",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when this gun is hammered.",
             "Variable": "hammer",
@@ -1646,14 +1642,14 @@
             ]
         },
         {
-            "AssetName": "Aim",
+            "Key": "Aim",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when the player aims down sights.",
             "Variable": "aim",
             "RedirectableAssetKey": "AimAudioClip"
         },
         {
-            "AssetName": "Minigun",
+            "Key": "Minigun",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when the player revs this minigun.",
             "Variable": "minigun",
@@ -1667,7 +1663,7 @@
             ]
         },
         {
-            "AssetName": "ChamberJammed",
+            "Key": "ChamberJammed",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when this gun jams.",
             "Variable": "chamberJammedSound",
@@ -1675,7 +1671,7 @@
             "InclusiveWith": [ "Can_Ever_Jam" ]
         },
         {
-            "AssetName": "FireDelay",
+            "Key": "FireDelay",
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when this the player first starts the fire delay.",
             "Variable": "chamberJammedSound",
@@ -1684,7 +1680,6 @@
             [
                 {
                     "Key": "Fire_Delay_Seconds",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Fire_Delay_Seconds",
@@ -1695,7 +1690,7 @@
             ]
         },
         {
-            "AssetName": "Projectile",
+            "Key": "Projectile",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The projectile object spawned for physics-based guns. Whether or not this is present decides if the gun uses the ballistic or physics projectile system.",
             "Variable": "projectile"

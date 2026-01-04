@@ -56,7 +56,7 @@
                 "AssetTypes": [ "SDG.Unturned.ItemAsset, Assembly-CSharp", "SDG.Unturned.SpawnAsset, Assembly-CSharp" ],
                 "SupportsThis": true
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The item or spawn to give when salvaging this item at less than full health. Defaults to a random supply from the first blueprint on this asset that outputs only this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
             "Variable": "SalvageItemRef"
@@ -103,7 +103,7 @@
                 "AssetTypes": [ "SDG.Unturned.ItemAsset, Assembly-CSharp", "SDG.Unturned.SpawnAsset, Assembly-CSharp" ],
                 "SupportsThis": true
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The item or spawn to drop when this item is destroyed (not counting salvaging).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
             "Variable": "ItemDroppedOnDestroyRef"

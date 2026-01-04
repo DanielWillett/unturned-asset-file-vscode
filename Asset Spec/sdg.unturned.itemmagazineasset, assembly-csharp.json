@@ -174,7 +174,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "GUID or legacy ID of the explosion set off by when a bullet lands if the @Explosive flag is present, or when a projectile explodes, overriding the explosion effect set in the gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#explosion-doc-data-guid-or-uint16-0",
             "Variable": "explosionEffectGuid",
@@ -198,7 +198,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "GUID or legacy ID of the effect used for the bullet tracer. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#tracer-doc-data-guid-or-uint16-0",
             "Variable": "tracerEffectGuid",
@@ -211,7 +211,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "GUID or legacy ID of the effect used for the bullet impact. Doesn't have any effect when used in a projectile gun. The default bullet impact effect is fetched from the impacted physics material.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#impact-doc-data-guid-or-uint16-0",
             "Variable": "ImpactEffectGuid",
@@ -258,14 +258,14 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Magazine",
+            "Key": "Magazine",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "The model that appears on the gun when the item is attached.",
             "Variable": "magazine",
             "Required": true
         },
         {
-            "AssetName": "Projectile",
+            "Key": "Projectile",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Overrides Projectile prefab. Note that the gun this magazine is attached to must launch projectiles.",
             "Variable": "ProjectilePrefabOverride",

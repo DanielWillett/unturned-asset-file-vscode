@@ -31,13 +31,7 @@
             "Description": "Automatically render a card texture on startup and apply the texture to the @($bndl$::Skybox) model ('Model_0').",
             "Priority": 5,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
-            "InclusiveWith":
-            [
-                {
-                    "Key": "$bndl$::Skybox",
-                    "Value": "*"
-                }
-            ]
+            "InclusiveWith": [ "$bndl$::Skybox" ]
         },
         {
             "Key": "Health",
@@ -160,7 +154,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Effect to play when this resource is destroyed.",
             "Variable": "explosionGuid",
@@ -178,13 +172,7 @@
             "Description": "ID of an item that should be dropped when the resource is destroyed. Before multipliers, this item is dropped in bunches of 3 to 7. This is also the item that is given to the player when this resource is foraged.",
             "Variable": "log",
             "Priority": 8,
-            "ExclusiveWith":
-            [
-                {
-                    "Key": "Reward_ID",
-                    "Value": "*"
-                }
-            ]
+            "ExclusiveWith": [ "Reward_ID" ]
         },
         {
             "Key": "Stick",
@@ -200,10 +188,7 @@
             "Priority": 8,
             "ExclusiveWith":
             [
-                {
-                    "Key": "Reward_ID",
-                    "Value": "*"
-                },
+                "Reward_ID",
                 {
                     "Key": "Forage",
                     "Value": true
@@ -222,17 +207,7 @@
             "Description": "ID of an item spawn table to pull items from that should be dropped when this resource is destroyed or foraged.",
             "Variable": "rewardID",
             "Priority": 8,
-            "ExclusiveWith":
-            [
-                {
-                    "Key": "Log",
-                    "Value": "*"
-                },
-                {
-                    "Key": "Stick",
-                    "Value": "*"
-                }
-            ]
+            "ExclusiveWith": [ "Log", "Stick" ]
         },
         {
             "Key": "Reward_XP",
@@ -264,7 +239,6 @@
             [
                 {
                     "Key": "Reward_ID",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Reward_ID",
@@ -296,7 +270,6 @@
             [
                 {
                     "Key": "Reward_ID",
-                    "Value": "*",
                     "Condition":
                     {
                         "Variable": "Reward_ID",
@@ -408,7 +381,7 @@
                 "Type": "AssetReferenceString",
                 "AssetType": "SDG.Unturned.ResourceAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The resource to replace this resource with during the 'Christmas' holiday.",
             "Priority": 4,
             "Variable": "christmasRedirect",
@@ -421,7 +394,7 @@
                 "Type": "AssetReferenceString",
                 "AssetType": "SDG.Unturned.ResourceAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The resource to replace this resource with during the 'Halloween' holiday.",
             "Priority": 4,
             "Variable": "halloweenRedirect",
@@ -520,7 +493,7 @@
     "BundleAssets":
     [
         {
-            "AssetName": "Resource_Clip",
+            "Key": "Resource_Clip",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab of the resource (visible when this resource is alive) only loaded on the dedicated server. Should have collision but not renderers.",
             "Deprecated": true,
@@ -540,7 +513,7 @@
             ]
         },
         {
-            "AssetName": "Stump_Clip",
+            "Key": "Stump_Clip",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab of the stump (visible when this resource is not alive) only loaded on the dedicated server. Should have collision but not renderers.",
             "Deprecated": true,
@@ -560,7 +533,7 @@
             ]
         },
         {
-            "AssetName": "Resource",
+            "Key": "Resource",
             "Aliases": [ "Resource_Old" ],
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab of the resource loaded on the client (and dedicated server if @Has_Clip_Prefab is false), which is visible when this resource is alive.",
@@ -568,7 +541,7 @@
             "Variable": "modelGameObject"
         },
         {
-            "AssetName": "Stump",
+            "Key": "Stump",
             "Aliases": [ "Stump_Old" ],
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab of the stump loaded on the client (and dedicated server if @Has_Clip_Prefab is false), which is visible when this resource is not alive.",
@@ -576,14 +549,14 @@
             "Variable": "stumpGameObject"
         },
         {
-            "AssetName": "Skybox",
+            "Key": "Skybox",
             "Aliases": [ "Skybox_Old" ],
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab of the model loaded on clients when this resource is very far away and alive.",
             "Variable": "skyboxGameObject"
         },
         {
-            "AssetName": "Debris",
+            "Key": "Debris",
             "Aliases": [ "Debris_Old" ],
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Description": "Prefab of the resource that falls on the client when this resource is destroyed.",

@@ -123,7 +123,7 @@
                 "Type": "LegacyAssetReferenceString",
                 "AssetType": "SDG.Unturned.EffectAsset, Assembly-CSharp"
             },
-            "DefaultValue": "00000000000000000000000000000000",
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect spawned when the trap explodes.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html#trap-asset-properties",
             "Variable": "trapDetonationEffectGuid",

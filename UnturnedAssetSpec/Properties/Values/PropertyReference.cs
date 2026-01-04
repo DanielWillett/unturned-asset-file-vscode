@@ -1,13 +1,16 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 /// <summary>
 /// A standardized reference to an existing property.
 /// </summary>
-public struct PropertyReference : IEquatable<PropertyReference>
+public readonly struct PropertyReference : IEquatable<PropertyReference>
 {
     /// <summary>The context specifier for <see cref="SpecPropertyContext.Property"/>.</summary>
     public const string PropertyContext = "prop";
@@ -64,7 +67,7 @@ public struct PropertyReference : IEquatable<PropertyReference>
     /// <summary>
     /// Whether or not this property is cross-referencing another file.
     /// </summary>
-    public readonly bool IsCrossReference => Context
+    public bool IsCrossReference => Context
         is >= SpecPropertyContext.CrossReferenceUnspecified
         and <= SpecPropertyContext.CrossReferenceLocalization;
 
@@ -87,27 +90,17 @@ public struct PropertyReference : IEquatable<PropertyReference>
     /// Creates a <see cref="ISpecDynamicValue"/> referencing this property.
     /// </summary>
     /// <param name="database">The asset database to be associated with this property reference value.</param>
-    public readonly IPropertyReferenceValue CreateValue(IAssetSpecDatabase? database)
+    public IPropertyReferenceValue CreateValue(DatProperty owner, IAssetSpecDatabase database)
     {
         PropertyBreadcrumbs breadcrumbs = Breadcrumbs;
-        if (database is { IsInitialized: true })
+        if (IsCrossReference)
         {
-            if (IsCrossReference)
-            {
-
-            }
-            else
-            {
-                return new LocalPropertyReference(this, database);
-            }
+            throw new NotImplementedException();
         }
         else
         {
-
+            return new LocalPropertyReference(in this, owner, database);
         }
-
-        throw new NotImplementedException();
-
     }
 
     /// <summary>
@@ -264,6 +257,24 @@ public struct PropertyReference : IEquatable<PropertyReference>
         }
 
         return data.Slice(firstIndex + 2);
+    }
+
+#if !NETSTANDARD2_1_OR_GREATER && !NET5_0_OR_GREATER
+    private static readonly char[] Escapables = [ '(', ')', '\\' ];
+#endif
+
+    public void WriteToJson(Utf8JsonWriter writer)
+    {
+        string str = ToString();
+
+#if !NETSTANDARD2_1_OR_GREATER && !NET5_0_OR_GREATER
+        StringHelper.EscapeValue(ref str, Escapables);
+#else
+        ReadOnlySpan<char> escapables = [ '(', ')', '\\' ];
+        StringHelper.EscapeValue(ref str, escapables);
+#endif
+
+        writer.WriteStringValue(StringHelper.ContainsWhitespace(str) ? $"@({str})" : $"@{str}");
     }
 
     /// <inheritdoc />
