@@ -13,8 +13,7 @@
             "Key": "Bypass_ID_Limit",
             "Type": "Flag",
             "DefaultValue": false,
-            "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle.",
-            "Priority": 97
+            "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle."
         },
         {
             "Key": "Conditions",
@@ -29,8 +28,7 @@
             "Description": "Conditions that must be met for this quest to be able to be turned in.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
             "Variable": "conditionsList",
-            "CountForTemplateGroup": "quest-conditions",
-            "Priority": 3
+            "CountForTemplateGroup": "quest-conditions"
         },
         {
             "Key": "Rewards",
@@ -45,8 +43,7 @@
             "Description": "Rewards granted when a player turns in this quest.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
             "Variable": "rewardsList",
-            "CountForTemplateGroup": "quest-rewards",
-            "Priority": 2
+            "CountForTemplateGroup": "quest-rewards"
         },
         {
             "Key": "AbandonmentRewards",
@@ -61,8 +58,7 @@
             "Description": "Rewards granted when a player abandons the quest without completing it.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
             "Variable": "abandonmentRewardsList",
-            "CountForTemplateGroup": "quest-abandon-rewards",
-            "Priority": 1
+            "CountForTemplateGroup": "quest-abandon-rewards"
         }
     ],
     "Localization":

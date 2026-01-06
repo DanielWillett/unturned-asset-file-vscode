@@ -766,11 +766,14 @@ public static class KnownTypeValueHelper
 
         ReadOnlySpan<char> itemString = input;
         int index = input.IndexOf('x');
+        if (index < 0)
+            index = input.IndexOf('X');
         if (index >= 0)
         {
             itemString = input.Slice(0, index);
             if (index == input.Length - 1)
             {
+                amount = 0;
                 return false;
             }
 
@@ -781,23 +784,16 @@ public static class KnownTypeValueHelper
             if (!int.TryParse(number.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out amount))
 #endif
             {
+                amount = 0;
                 return false;
             }
 
             amount = Math.Max(amount, 1);
         }
-        else
-        {
-            index = input.IndexOf('X');
-            if (index >= 0)
-            {
-                return false;
-            }
-        }
 
         if (TryParseGuidOrId(itemString, itemString.Length == input.Length ? stringInput : null, out assetRef, "ITEM"))
         {
-            return true;
+            return index < 0 || input[index] == 'x';
         }
 
         if (!itemString.Trim().Equals("this".AsSpan(), StringComparison.InvariantCultureIgnoreCase))
@@ -806,7 +802,7 @@ public static class KnownTypeValueHelper
         }
 
         assetRef = assetContext;
-        return true;
+        return index < 0 || input[index] == 'x';
     }
 
     public static bool TryParseStrictHex(ReadOnlySpan<char> value, out Color32 color, bool alpha)

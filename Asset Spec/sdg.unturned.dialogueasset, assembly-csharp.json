@@ -13,8 +13,7 @@
             "Key": "Bypass_ID_Limit",
             "Type": "Flag",
             "DefaultValue": false,
-            "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle.",
-            "Priority": 97
+            "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle."
         },
         {
             "Key": "Messages",
@@ -33,8 +32,7 @@
             "TemplateGroups": [ "dialogue-messages" ],
             "Description": "A message presented by the NPC. Messages are the entry-point of a dialogue, where the first message that passes it's condition check is shown to the player.",
             "Variable": "pages",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
-            "Priority": -1
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages"
         },
         {
             "Key": "Responses",
@@ -52,8 +50,7 @@
             "TemplateGroups": [ "dialogue-responses" ],
             "Description": "A response to the NPC's message. Messages can reference responses by index to indicate which responses are shown per message.",
             "Variable": "pages",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
-            "Priority": -1
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses"
         }
     ],
     "Types":

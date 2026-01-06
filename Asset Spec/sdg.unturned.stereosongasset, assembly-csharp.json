@@ -46,7 +46,6 @@
             ],
             "Description": "The localizable title of this song.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/stereo-song-asset.html#asset-properties-reference",
-            "Priority": 5,
             "Deprecated":
             {
                 "Variable": "#Self.ValueType",
@@ -63,7 +62,6 @@
             "DefaultValue": null,
             "Description": "The audio clip to play.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/stereo-song-asset.html#asset-properties-reference",
-            "Priority": 4,
             "Variable": "songMbRef",
             "Required": true
         },
@@ -73,7 +71,6 @@
             "DefaultValue": null,
             "Description": "An external link for the song, usually used as credit.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/stereo-song-asset.html#asset-properties-reference",
-            "Priority": 2,
             "Variable": "linkURL"
         },
         {
@@ -82,7 +79,6 @@
             "DefaultValue": false,
             "Description": "Whether or not this song should restart when it's finished playing.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/stereo-song-asset.html#asset-properties-reference",
-            "Priority": 3,
             "Variable": "isLoop"
         }
     ]

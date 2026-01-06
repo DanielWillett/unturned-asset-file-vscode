@@ -13,8 +13,7 @@
             "Key": "Bypass_ID_Limit",
             "Type": "Flag",
             "DefaultValue": false,
-            "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle.",
-            "Priority": 97
+            "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle."
         },
         {
             "Key": "Pro",
@@ -22,8 +21,7 @@
             "DefaultValue": false,
             "Description": "Indicates an item on the Steam Marketplace.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#pro-flag",
-            "Variable": "isPro",
-            "Priority": -1
+            "Variable": "isPro"
         },
         {
             "Key": "Instantiated_Item_Name_Override",
@@ -31,8 +29,7 @@
             "DefaultValue": "@ID",
             "Description": "The GameObject name of the item when held or spawned in-game. By default this is the @ID of the item but may be changed for sharing animations.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#instantiated-item-name-override-string",
-            "Variable": "instantiatedItemName",
-            "Priority": -1
+            "Variable": "instantiatedItemName"
         },
         {
             "Key": "Type",
@@ -40,8 +37,7 @@
             "Required": true,
             "Description": "The type of item to create.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#type-doc-data-eitemtype",
-            "Variable": "type",
-            "Priority": 99
+            "Variable": "type"
         },
         {
             "Key": "Rarity",
@@ -49,8 +45,7 @@
             "DefaultValue": "COMMON",
             "Description": "Indicates how rare the item is, which influences it's name's color.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#rarity-doc-data-eitemrarity-common",
-            "Variable": "rarity",
-            "Priority": 2
+            "Variable": "rarity"
         },
         {
             "Key": "Econ_Icon_Use_Id",
@@ -65,8 +60,7 @@
             "DefaultValue": false,
             "Description": "Instructs the item icon generator to use the item's ID to lookup an icon instead of it's @GUID or special path.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#pro-flag",
-            "Variable": "econIconUseId",
-            "Priority": -1
+            "Variable": "econIconUseId"
         },
         {
             "Key": "Size_X",
@@ -101,8 +95,7 @@
             ],
             "Description": "Overrides the orthoganal size of the camera that captures the item icon. This is half of the vertical height of the camera's view.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#size-z-float32-1",
-            "Variable": "iconCameraOrthographicSize",
-            "Priority": -1
+            "Variable": "iconCameraOrthographicSize"
         },
         {
             "Key": "Use_Auto_Icon_Measurements",
@@ -127,8 +120,7 @@
             ],
             "Description": "Overrides the orthoganal size of the camera that captures the economy icon. This is half of the vertical height of the camera's view.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#size2-z-float32-1",
-            "Variable": "econIconCameraOrthographicSize",
-            "Priority": -1
+            "Variable": "econIconCameraOrthographicSize"
         },
         {
             "Key": "Shared_Skin_Lookup_ID",
@@ -140,8 +132,7 @@
             "DefaultValue": "@ID",
             "Description": "The item who's skins can be used for this item. Usually this is the same ID as the current item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#shared-skin-lookup-id-uint16",
-            "Variable": "sharedSkinLookupID",
-            "Priority": -1
+            "Variable": "sharedSkinLookupID"
         },
         {
             "Key": "Shared_Skin_Apply_Visuals",
@@ -149,8 +140,7 @@
             "DefaultValue": true,
             "Description": "Should visuals (such as the item skin) be applied when @Shared_Skin_Lookup_ID is a different item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#shared-skin-apply-visuals-bool-true",
-            "Variable": "SharedSkinShouldApplyVisuals",
-            "Priority": -1
+            "Variable": "SharedSkinShouldApplyVisuals"
         },
         {
             "Key": "Amount",
@@ -210,8 +200,7 @@
             "ExclusiveWith": [ "Backward" ],
             "Description": "Which of the player's bone the item will be attached to.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#equipablemodelparent-eequipablemodelparent",
-            "Variable": "EquipableModelParent",
-            "Priority": -1
+            "Variable": "EquipableModelParent"
         },
         {
             "Key": "Backward",
@@ -229,8 +218,7 @@
             "DefaultValue": true,
             "Description": "If the model of the item should be mirrored for left handed characters.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#left-handed-characters-mirror-equipable-bool-true",
-            "Variable": "shouldLeftHandedCharactersMirrorEquippedItem",
-            "Priority": -1
+            "Variable": "shouldLeftHandedCharactersMirrorEquippedItem"
         },
         {
             "Key": "Use_Auto_Stat_Descriptions",
@@ -278,8 +266,7 @@
             "DefaultValue": true,
             "Description": "If first-person animations should procedurally be given extra inertia to improve low-quality animations.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#procedurally-animate-inertia-bool-true",
-            "Variable": "shouldProcedurallyAnimateInertia",
-            "Priority": -1
+            "Variable": "shouldProcedurallyAnimateInertia"
         },
         {
             "Key": "Useable",
@@ -289,8 +276,7 @@
             "DefaultValue": null,
             "Description": "The type of Useable object to create when this item is equipped.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#useable-doc-item-asset-intro-euseabletype-none",
-            "Variable": "useable",
-            "Priority": 95
+            "Variable": "useable"
         },
         {
             "Key": "Can_Player_Equip",
@@ -298,14 +284,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Useable",
-                            "Operation": "neq",
-                            "Comparand": null
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Useable",
+                        "Operation": "neq",
+                        "Comparand": "null"
+                    },
                     "Value": true
                 },
                 {
@@ -392,25 +376,21 @@
                     "Cases":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Name",
-                                    "Operation": "contains-i",
-                                    "Comparand": "Seed"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Name",
+                                "Operation": "contains-i",
+                                "Comparand": "Seed"
+                            },
                             "Value": "core.masterbundle:Sounds/Inventory/Seeds.asset"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Name",
-                                    "Operation": "contains-i",
-                                    "Comparand": "Metal"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Name",
+                                "Operation": "contains-i",
+                                "Comparand": "Metal"
+                            },
                             "Value": "core.masterbundle:Sounds/Inventory/SmallMetal.asset"
                         },
                         {
@@ -497,14 +477,12 @@
                     ]
                 },
                 {
-                    "Or":
-                    [
-                        {
-                            "Variable": "Type",
-                            "Operation": "assignable-to",
-                            "Comparand": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Type",
+                        "Operation": "assignable-to",
+                        "Comparand": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp"
+                    },
                     "Value": "core.masterbundle:Sounds/Inventory/SmallGunAttachment.asset"
                 },
                 {
@@ -584,14 +562,12 @@
                             "Value": "core.masterbundle:Sounds/Inventory/LightGrab.asset"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Name",
-                                    "Operation": "contains-i",
-                                    "Comparand": "Bow"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Name",
+                                "Operation": "contains-i",
+                                "Comparand": "Bow"
+                            },
                             "Value": "core.masterbundle:Sounds/Inventory/RoughGrab.asset"
                         },
                         {
@@ -625,14 +601,12 @@
                     "Cases":
                     [
                         {
-                            "Or":
-                            [
-                                {
-                                    "Variable": "Name",
-                                    "Operation": "contains-i",
-                                    "Comparand": "Metal"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Name",
+                                "Operation": "contains-i",
+                                "Comparand": "Metal"
+                            },
                             "Value": "core.masterbundle:Sounds/Inventory/SmallMetal.asset"
                         },
                         {
@@ -711,14 +685,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Slot",
-                            "Operation": "eq",
-                            "Comparand": "PRIMARY"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Slot",
+                        "Operation": "eq",
+                        "Comparand": "PRIMARY"
+                    },
                     "Value": false
                 },
                 {
@@ -769,14 +741,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Actions",
-                            "Operation": "included",
-                            "Comparand": null
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Actions",
+                        "Operation": "included",
+                        "Comparand": null
+                    },
                     "Value": false
                 },
                 {
@@ -1132,23 +1102,7 @@
                 {
                     "Key": "AllowEmpty",
                     "Type": "Boolean",
-                    "DefaultValue": 
-                    [
-                        {
-                            "And":
-                            [
-                                {
-                                    "Variable": "CountEmptyAsOne",
-                                    "Operation": "eq",
-                                    "Comparand": true
-                                }
-                            ],
-                            "Value": true
-                        },
-                        {
-                            "Value": false
-                        }
-                    ],
+                    "DefaultValue": "@CountEmptyAsOne",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#allowempty-bool-false",
                     "Description": "Items with a zero amount like empty magazines are treated as having an amount of 1.",
                     "Variable": "ShouldIncludeEmptyAmount"
@@ -1167,14 +1121,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "SDG.Unturned.Blueprint, Assembly-CSharp::Operation",
-                                    "Operation": "eq",
-                                    "Comparand": "FillTargetItem"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "SDG.Unturned.Blueprint, Assembly-CSharp::Operation",
+                                "Operation": "eq",
+                                "Comparand": "FillTargetItem"
+                            },
                             "Value": "LowestAmount"
                         },
                         {
@@ -1297,25 +1249,21 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "AMMO"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "AMMO"
+                            },
                             "Value": "FillTargetItem"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "REPAIR"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "REPAIR"
+                            },
                             "Value": "RepairTargetItem"
                         },
                         {
@@ -1470,14 +1418,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#Self.IsLegacy",
-                                    "Operation": "eq",
-                                    "Comparand": true
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#Self.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
                             "Value":
                             [
                                 {
@@ -1619,14 +1565,12 @@
                     "Type": 
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#Self.IsLegacy",
-                                    "Operation": "eq",
-                                    "Comparand": true
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#Self.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
                             "Value": "SDG.Unturned.EBlueprintSkill, Assembly-CSharp"
                         },
                         {
@@ -1636,14 +1580,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#Self.IsLegacy",
-                                    "Operation": "eq",
-                                    "Comparand": true
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#Self.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
                             "Value": "NONE"
                         },
                         {
@@ -1677,14 +1619,12 @@
                     "Type":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#Self.IsLegacy",
-                                    "Operation": "eq",
-                                    "Comparand": true
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#Self.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
                             "Value": "Flag"
                         },
                         {
@@ -1694,14 +1634,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#Self.IsLegacy",
-                                    "Operation": "eq",
-                                    "Comparand": true
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#Self.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
                             "Value": false
                         },
                         {
@@ -1919,113 +1857,93 @@
                             "Value": "7ed29f9101ae4523a3b2e389414b7bd9"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "TOOL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "TOOL"
+                            },
                             "Value": "ad1804b6945145f3b308738b0b8ea447"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "APPAREL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "APPAREL"
+                            },
                             "Value": "ebe755533bdd42d1871c3ac66b89530f"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "SUPPLY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "SUPPLY"
+                            },
                             "Value": "d089feb7e43f40c5a7dfcefc36998cfb"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "GEAR"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "GEAR"
+                            },
                             "Value": "cdb2df24b76d4c6e9d8411c940d8337f"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "AMMO"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "AMMO"
+                            },
                             "Value": "d739926736374e5ba34b4ac6ffbb5c8f"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "BARRICADE"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "BARRICADE"
+                            },
                             "Value": "31a59b5fec3f4ec5b2887b1ce4acb029"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "STRUCTURE"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "STRUCTURE"
+                            },
                             "Value": "71d9e182c18b4aad8e87778e4f621995"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "UTILITIES"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "UTILITIES"
+                            },
                             "Value": "bfac6026305f4737a95fd275ebff65a6"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "FURNITURE"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "FURNITURE"
+                            },
                             "Value": "b0c6cc0a8b4346be89aef697ecdb8e46"
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Type",
-                                    "Operation": "eq",
-                                    "Comparand": "REPAIR"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Type",
+                                "Operation": "eq",
+                                "Comparand": "REPAIR"
+                            },
                             "Value": "732ee6ffeb18418985cf4f9fde33dd11"
                         },
                         {
@@ -2123,13 +2041,26 @@
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-name-string",
                     "Description": "The @(SDG.Unturned.Blueprint, Assembly-CSharp::Name) of the blueprint this action references.",
                     "Variable": "blueprintName",
-                    "Required": true
+                    "Required":
+                    {
+                        "Variable": "#This.IsLegacy",
+                        "Operation": "eq",
+                        "Comparand": false
+                    },
+                    "DefaultValue": null,
+                    "KeyLegacyExpansionFilter": "Modern"
                 },
                 {
                     "Key": "BlueprintOwner",
                     "Type":
                     {
                         "Type": "AssetReference"
+                    },
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Alias":
+                    {
+                        "Alias": "Source",
+                        "LegacyExpansionFilter": "Legacy"
                     },
                     "DefaultValue": "@SDG.Unturned.Asset, Assembly-CSharp::GUID",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-source-uint16",
@@ -2140,6 +2071,7 @@
                     "Key": "BlueprintLink",
                     "Type": "Boolean",
                     "DefaultValue": false,
+                    "KeyLegacyExpansionFilter": "Modern",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-link-flag",
                     "Description": "Pressing this action will take the user to the crafting menu instead of instantly crafting the item.",
                     "Variable": "isLink"
@@ -2147,6 +2079,12 @@
                 {
                     "Key": "CommonTextId",
                     "Type": "ActionKey",
+                    "KeyLegacyExpansionFilter": "Modern",
+                    "Alias":
+                    {
+                        "Alias": "Key",
+                        "LegacyExpansionFilter": "Legacy"
+                    },
                     "DefaultValue": null,
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-key-string",
                     "Description": "The key of a pre-existing button name in the PlayerDashboardInventory.dat localization file.",
@@ -2156,6 +2094,7 @@
                 {
                     "Key": "TextId",
                     "Type": "LocalizableTargetString",
+                    "KeyLegacyExpansionFilter": "Modern",
                     "DefaultValue": null,
                     "Required":
                     {
@@ -2171,8 +2110,7 @@
                                 "Operation": "eq",
                                 "Comparand": ""
                             }
-                        ],
-                        "Value": true
+                        ]
                     },
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#doc-item-asset-actions-action-text",
                     "Description": "Name of the button in the context menu for this action.",
@@ -2183,6 +2121,7 @@
                 {
                     "Key": "TooltipId",
                     "Type": "LocalizableTargetString",
+                    "KeyLegacyExpansionFilter": "Modern",
                     "DefaultValue": null,
                     "Required":
                     {
@@ -2198,14 +2137,116 @@
                                 "Operation": "eq",
                                 "Comparand": ""
                             }
-                        ],
-                        "Value": true
+                        ]
                     },
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-tooltip-string",
                     "Description": "Text displayed when hovering over the button in the context menu for this action.",
                     "Variable": "tooltip",
                     "ExclusiveWith": [ "CommonTextId" ],
                     "InclusiveWith": [ "TextId" ]
+                },
+                {
+                    "Key": "Blueprints",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType": "SDG.Unturned.ActionBlueprint, Assembly-CSharp",
+                        "Mode": "LegacyList",
+                        "MinimumCount": 1,
+                        "CountType": "UInt8"
+                    },
+                    "DefaultValue":
+                    [
+                        {
+                            "Case":
+                            {
+                                "Variable": "#This.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
+                            "Value":
+                            [
+                                {
+                                    "$udat-type": "SDG.Unturned.ActionBlueprint, Assembly-CSharp",
+                                    "Index": 0,
+                                    "Name": null,
+                                    "Link": false
+                                }
+                            ]
+                        },
+                        {
+                            "Value":
+                            [
+                                {
+                                    "$udat-type": "SDG.Unturned.ActionBlueprint, Assembly-CSharp",
+                                    "Name": "@BlueprintName",
+                                    "Link": "@BlueprintLink"
+                                }
+                            ]
+                        }
+                    ],
+                    "KeyLegacyExpansionFilter": "Legacy",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprints-uint8-0",
+                    "Variable": "blueprints"
+                }
+            ]
+        },
+        {
+            "DisplayName": "Action Blueprint",
+            "Type": "SDG.Unturned.ActionBlueprint, Assembly-CSharp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprints-uint8-0",
+            "Properties":
+            [
+                {
+                    "Key": "Index",
+                    "Type": "UInt8",
+                    "ValueTemplateGroupReference": "(SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).TemplateGroups[0]",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-index-uint8-0",
+                    "KeyLegacyExpansionFilter": "Legacy",
+                    "Deprecated": true,
+                    "DefaultValue":
+                    [
+                        {
+                            "Case":
+                            {
+                                "Variable": "Name",
+                                "Operation": "value-included",
+                                "Comparand": null
+                            },
+                            "Value": -1
+                        },
+                        {
+                            "Value": 0
+                        }
+                    ],
+                    "Description": "Index of a blueprint that this action should perform. Better to use @Name instead.",
+                    "Variable": "Index",
+                    "ExclusiveWith": [ "Name" ]
+                },
+                {
+                    "Key": "Name",
+                    "Type": "String",
+                    "ValueTemplateGroupReference": "(SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).Value{Property=Name}",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-name-string",
+                    "KeyLegacyExpansionFilter": "Legacy",
+                    "DefaultValue": null,
+                    "Description": "Index of a blueprint that this action should perform. Better to use @Name instead.",
+                    "Variable": "BlueprintName",
+                    "Required":
+                    {
+                        "Variable": "Index",
+                        "Operation": "lt",
+                        "Comparand": 0
+                    }
+                },
+                {
+                    "Key": "Link",
+                    "Type": "Flag",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-link-flag",
+                    "KeyLegacyExpansionFilter": "Legacy",
+                    "DefaultValue": false,
+                    "Description": "Indicates that this action should redirect to the associated blueprint listing in the crafting menu, rather than immediately craft the item.",
+                    "Variable": "isLink"
                 }
             ]
         },
@@ -3102,27 +3143,21 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#item-prefab",
             "Variable": "item",
             "Required":
-            [
-                {
-                    "Or":
-                    [
-                        {
-                            "Variable": "Type",
-                            "Operation": "eq",
-                            "Comparand": "Shirt"
-                        },
-                        {
-                            "Variable": "Type",
-                            "Operation": "eq",
-                            "Comparand": "Pants"
-                        }
-                    ],
-                    "Value": false
-                },
-                {
-                    "Value": true
-                }
-            ]
+            {
+                "And":
+                [
+                    {
+                        "Variable": "Type",
+                        "Operation": "neq",
+                        "Comparand": "Shirt"
+                    },
+                    {
+                        "Variable": "Type",
+                        "Operation": "neq",
+                        "Comparand": "Pants"
+                    }
+                ]
+            }
         },
         {
             "Key": "Albedo_Base",

@@ -16,7 +16,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/cloud-asset.html#cloud-asset-properties",
             "Variable": "gravity",
             "DefaultValue": 0,
-            "Priority": 2,
             "Required": true
         }
     ]

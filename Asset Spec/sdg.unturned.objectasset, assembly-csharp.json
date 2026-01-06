@@ -14,8 +14,7 @@
             "Required": true,
             "Description": "The type of object to create.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-assets",
-            "Variable": "type",
-            "Priority": 99
+            "Variable": "type"
         },
         {
             "Key": "Decal_X",
@@ -23,7 +22,6 @@
             "DefaultValue": 1.0,
             "Description": "Override the scale of the decal, on the X-axis.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#decals",
-            "Priority": 8,
             "InclusiveWith":
             [
                 {
@@ -38,7 +36,6 @@
             "DefaultValue": 1.0,
             "Description": "Override the scale of the decal, on the Y-axis.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#decals",
-            "Priority": 8,
             "InclusiveWith":
             [
                 {
@@ -54,7 +51,6 @@
             "IncludedDefaultValue": 0.0,
             "Description": "Multiplier for the LOD's switching distance.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#decals",
-            "Priority": 7,
             "InclusiveWith":
             [
                 {
@@ -69,7 +65,6 @@
             "DefaultValue": false,
             "Description": "This flag should be set if the decal has a transparent texture. A different prefab is loaded for transparent decals.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#decals",
-            "Priority": 7,
             "InclusiveWith":
             [
                 {
@@ -85,7 +80,6 @@
             "Except": [ "NONE" ],
             "Description": "How this object can be interacted with.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 12,
             "Variable": "interactability",
             "ExclusiveWith":
             [
@@ -134,7 +128,6 @@
             "DefaultValue": false,
             "Description": "Disables the ability for players to interact with this via a button prompt.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 11,
             "Variable": "interactabilityRemote",
             "ExclusiveWith":
             [
@@ -166,7 +159,6 @@
             "DefaultValue": 0.0,
             "Description": "The cooldown (in seconds) before the object can be interacted with again.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 11,
             "Variable": "interactabilityDelay",
             "ExclusiveWith":
             [
@@ -226,7 +218,6 @@
                     "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables"
                 }
             ],
-            "Priority": 11,
             "Variable":
             [
                 {
@@ -285,7 +276,6 @@
             "DefaultValue": "DOOR",
             "Description": "Hint used when the player looks at this object. Can be set to 'Custom' to use the @Interact localization property.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 11,
             "Variable": "interactabilityHint",
             "ExclusiveWith":
             [
@@ -334,7 +324,6 @@
             "DefaultValue": 0,
             "Description": "Total number of lines to display on a note when it's interacted with.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 11,
             "Variable": "interactabilityText",
             "ExclusiveWith":
             [
@@ -362,7 +351,6 @@
             "DefaultValue": "NONE",
             "Description": "Behavior of objects that require being powered.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 11,
             "Variable": "interactabilityPower",
             "ExclusiveWith":
             [
@@ -406,7 +394,6 @@
             "DefaultValue": "NONE",
             "Description": "Determines how this interactable object should appear in the level editor.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 11,
             "Variable": "interactabilityEditor",
             "ExclusiveWith":
             [
@@ -433,7 +420,6 @@
             "DefaultValue": "NONE",
             "Description": "Controls how this object's on/off state affects the 'Nav' game object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 11,
             "Variable": "interactabilityNav",
             "ExclusiveWith":
             [
@@ -460,7 +446,6 @@
             "DefaultValue": 0,
             "Description": "Number of options for item drops from this dropper object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 11,
             "Variable": "interactabilityDrops",
             "InclusiveWith":
             [
@@ -503,7 +488,6 @@
             "DefaultValue": 0,
             "Description": "An option for item drops from this dropper object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 11,
             "Variable": "interactabilityDrops"
         },
         {
@@ -532,7 +516,6 @@
                     "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables"
                 }
             ],
-            "Priority": 11,
             "Variable":
             [
                 {
@@ -621,7 +604,6 @@
                     "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables"
                 }
             ],
-            "Priority": 11,
             "Variable":
             [
                 {
@@ -690,7 +672,6 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Dialogue asset to open when this dialogue object is interacted with.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 11,
             "Variable": "interactabilityDialogueRef",
             "Required":
             {
@@ -723,7 +704,6 @@
             "DefaultValue": "Root",
             "Description": "Transform path relative to object root with Animation component.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 10,
             "Variable": "interactabilityChildPathOverride",
             "ExclusiveWith":
             [
@@ -750,7 +730,6 @@
             "DefaultValue": "Auto",
             "Description": "Whether or not to create a material instance for the \"Toggle\" object, which prevents emission state from being shared between all instances of this object but excludes the material from level batching.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 10,
             "Variable": "iobsEmissiveMaterialMode",
             "ExclusiveWith":
             [
@@ -783,7 +762,6 @@
             "DefaultValue": null,
             "Description": "Conditions that must be met to succesfully interact with this object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#conditions-and-rewards",
-            "Priority": 9,
             "Variable": "interactabilityConditionsList",
             "ExclusiveWith":
             [
@@ -843,7 +821,6 @@
             "DefaultValue": null,
             "Description": "Units of fuel or water that is stored in this object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Priority": 11,
             "Variable": "interactabilityResource",
             "ExclusiveWith":
             [
@@ -895,7 +872,6 @@
             },
             "Description": "Total amount of health each section of rubble has.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleHealth",
             "ExclusiveWith":
             [
@@ -926,7 +902,6 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect to play when this all rubble sections are destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleFinaleGuid",
             "ExclusiveWith":
             [
@@ -953,7 +928,6 @@
             "DefaultValue": 0,
             "Description": "An arbitrary ID that weapons must also define to be able to damage this object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleBladeID",
             "ExclusiveWith":
             [
@@ -982,7 +956,6 @@
             "Maximum": 1.0,
             "Description": "The chance (0-1) of the player receiving a reward when they destroy a section of rubble.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleRewardProbability",
             "ExclusiveWith":
             [
@@ -1010,7 +983,6 @@
             "Maximum": "@Interactability_Rewards_Max",
             "Description": "Minimum amount of item drops to reward when a section of rubble is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleRewardsMin",
             "ExclusiveWith":
             [
@@ -1038,7 +1010,6 @@
             "Minimum": "@Interactability_Rewards_Min",
             "Description": "Maximum amount of item drops to reward when a section of rubble is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleRewardsMax",
             "ExclusiveWith":
             [
@@ -1065,7 +1036,6 @@
             "DefaultValue": 0,
             "Description": "Amount of experience to reward when a section of rubble is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleRewardXP",
             "ExclusiveWith":
             [
@@ -1092,7 +1062,6 @@
             "DefaultValue": false,
             "Description": "Indicates that rubble sections can only be damaged by weapons that have the @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Invulnerable) flag.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleIsVulnerable",
             "ExclusiveWith":
             [
@@ -1119,7 +1088,6 @@
             "DefaultValue": false,
             "Description": "Indicates that rubble sections cannot be damaged by area-of-effect explosions.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleProofExplosion",
             "ExclusiveWith":
             [
@@ -1146,7 +1114,6 @@
             "DefaultValue": false,
             "Description": "Indicates that zombies can attack rubble sections when they get stuck on them.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleCanZombiesDamage",
             "ExclusiveWith":
             [
@@ -1173,7 +1140,6 @@
             "DefaultValue": 1.0,
             "Description": "Damage multiplier for damage done to rubble sections by zombies.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleZombieDamageMultiplier",
             "ExclusiveWith":
             [
@@ -1205,7 +1171,6 @@
             "MinimumExclusive": 0.0,
             "Description": "Radius (in meters) around a rubble section to alert zombies when it's destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleSectionDestroyedAlertRadius",
             "ExclusiveWith":
             [
@@ -1233,7 +1198,6 @@
             "MinimumExclusive": 0.0,
             "Description": "Radius (in meters) around a rubble object to alert zombies when all sections are destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleAllSectionsDestroyedAlertRadius",
             "ExclusiveWith":
             [
@@ -1260,7 +1224,6 @@
             "DefaultValue": false,
             "Description": "Whether or not all other sections will respawn when any one section respawns.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleRespawnAllSectionsSimultaneously",
             "Version": "3.25.8.2",
             "ExclusiveWith":
@@ -1288,7 +1251,6 @@
             "DefaultValue": "Unaffected",
             "Description": "Controls how rubble affects the 'Nav' prefab.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleNavMode",
             "ExclusiveWith":
             [
@@ -1316,7 +1278,6 @@
             "Except": [ "NONE" ],
             "Description": "Type of rubble to define.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 12,
             "Variable": "rubble",
             "ExclusiveWith":
             [
@@ -1340,7 +1301,6 @@
             "DefaultValue": 0.0,
             "Description": "Delay (in seconds) before a destroyed rubble section respawns.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleReset",
             "ExclusiveWith":
             [
@@ -1372,7 +1332,6 @@
             },
             "Description": "Total amount of health each section of rubble has.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleHealth",
             "ExclusiveWith":
             [
@@ -1401,7 +1360,6 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect to play when a section of rubble is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleEffectGuid",
             "ExclusiveWith":
             [
@@ -1430,7 +1388,6 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect to play when this all rubble sections are destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleFinaleGuid",
             "ExclusiveWith":
             [
@@ -1459,7 +1416,6 @@
             "DefaultValue": 0,
             "Description": "Spawn table to use for drops when a section of rubble is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleRewardID",
             "ExclusiveWith":
             [
@@ -1484,7 +1440,6 @@
             "DefaultValue": 0,
             "Description": "An arbitrary ID that weapons must also define to be able to damage this object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleBladeID",
             "ExclusiveWith":
             [
@@ -1511,7 +1466,6 @@
             "Maximum": 1.0,
             "Description": "The chance (0-1) of the player receiving a reward when they destroy a section of rubble.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleRewardProbability",
             "ExclusiveWith":
             [
@@ -1537,7 +1491,6 @@
             "Maximum": "@Rubble_Rewards_Max",
             "Description": "Minimum amount of item drops to reward when a section of rubble is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleRewardsMin",
             "ExclusiveWith":
             [
@@ -1564,7 +1517,6 @@
             "Maximum": 100,
             "Description": "Maximum amount of item drops to reward when a section of rubble is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleRewardsMax",
             "ExclusiveWith":
             [
@@ -1589,7 +1541,6 @@
             "DefaultValue": 0,
             "Description": "Amount of experience to reward when a section of rubble is destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleRewardXP",
             "ExclusiveWith":
             [
@@ -1614,7 +1565,6 @@
             "DefaultValue": false,
             "Description": "Indicates that rubble sections can only be damaged by weapons that have the @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Invulnerable) flag.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleIsVulnerable",
             "ExclusiveWith":
             [
@@ -1639,7 +1589,6 @@
             "DefaultValue": false,
             "Description": "Indicates that rubble sections cannot be damaged by area-of-effect explosions.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleProofExplosion",
             "ExclusiveWith":
             [
@@ -1664,7 +1613,6 @@
             "DefaultValue": false,
             "Description": "Indicates that zombies can attack rubble sections when they get stuck on them.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleCanZombiesDamage",
             "ExclusiveWith":
             [
@@ -1689,7 +1637,6 @@
             "DefaultValue": 1.0,
             "Description": "Damage multiplier for damage done to rubble sections by zombies.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleZombieDamageMultiplier",
             "ExclusiveWith":
             [
@@ -1722,7 +1669,6 @@
             "MinimumExclusive": 0.0,
             "Description": "Radius (in meters) around a rubble section to alert zombies when it's destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleSectionDestroyedAlertRadius",
             "ExclusiveWith":
             [
@@ -1748,7 +1694,6 @@
             "MinimumExclusive": 0.0,
             "Description": "Radius (in meters) around a rubble object to alert zombies when all sections are destroyed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleAllSectionsDestroyedAlertRadius",
             "ExclusiveWith":
             [
@@ -1773,7 +1718,6 @@
             "DefaultValue": false,
             "Description": "Whether or not all other sections will respawn when any one section respawns.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleRespawnAllSectionsSimultaneously",
             "Version": "3.25.8.2",
             "ExclusiveWith":
@@ -1799,7 +1743,6 @@
             "DefaultValue": "Unaffected",
             "Description": "Controls how rubble affects the 'Nav' prefab.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "RubbleNavMode",
             "ExclusiveWith":
             [
@@ -1824,7 +1767,6 @@
             "DefaultValue": "ALIVE",
             "Description": "Determines how this destructible object should appear in the level editor.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble",
-            "Priority": 11,
             "Variable": "rubbleEditor",
             "ExclusiveWith":
             [
@@ -1849,7 +1791,6 @@
             "DefaultValue": true,
             "Description": "Whether or not this object defines a separate prefab to be loaded on the server. This is not required and should be set to false in most cases.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
-            "Priority": 18,
             "ExclusiveWith":
             [
                 {
@@ -1867,7 +1808,6 @@
             "Type": "Boolean",
             "DefaultValue": true,
             "Description": "Whether or not this object defines a separate prefab to be loaded in the editor.",
-            "Priority": 18,
             "ExclusiveWith":
             [
                 {
@@ -1885,7 +1825,6 @@
             "Type": "Flag",
             "DefaultValue": true,
             "Description": "Indicates that this object should not leave a footprint when baking terrain materials.",
-            "Priority": 15,
             "Variable": "isSnowshoe",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -1928,7 +1867,6 @@
             "IncludedDefaultValue": "NONE",
             "Description": "Overrides the material used for this object when rendering the level chart.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
-            "Priority": 15,
             "Variable": "chart",
             "ExclusiveWith":
             [
@@ -1948,7 +1886,6 @@
             "DefaultValue": false,
             "Deprecated": true,
             "Description": "Indicates that fuel can be siphoned from this object. Use @Interactability with the 'Fuel' type instead.",
-            "Priority": 12,
             "Variable": "isFuel",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -1969,7 +1906,6 @@
             "DefaultValue": false,
             "Deprecated": true,
             "Description": "Indicates that water can be siphoned from this object. Use @Interactability with the 'Fuel' type instead.",
-            "Priority": 12,
             "Variable": "isRefill",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -1989,7 +1925,6 @@
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Indicates that vehicles should not take damage when colliding with this object.",
-            "Priority": 15,
             "Variable": "isSoft",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -2009,7 +1944,6 @@
             "Type": "Boolean",
             "DefaultValue": true,
             "Description": "Whether or not players should take fall damage when landing on this object.",
-            "Priority": 15,
             "Variable": "causesFallDamage",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -2043,7 +1977,6 @@
                 }
             ],
             "Description": "Indicates that this object's collision should never be disabled in singleplayer.",
-            "Priority": 15,
             "Variable": "isCollisionImportant",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -2067,7 +2000,6 @@
             "Type": "Boolean",
             "DefaultValue": false,
             "Description": "Indicates that this object can not be hidden by culling volumes.",
-            "Priority": 15,
             "Variable": "shouldExcludeFromCullingVolumes",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interior-culling",
             "ExclusiveWith":
@@ -2087,7 +2019,6 @@
             "Type": "SDG.Unturned.EObjectLOD, Assembly-CSharp",
             "DefaultValue": "NONE",
             "Description": "Determines how the 'interior' area is calculated for interior culling.",
-            "Priority": 16,
             "Variable": "lod",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interior-culling",
             "ExclusiveWith":
@@ -2108,7 +2039,6 @@
             "DefaultValue": 1.0,
             "Minimum": 0.01,
             "Description": "Multiplier for how far away objects within the 'interior' can be seen. This value is multiplied by 64 meters.",
-            "Priority": 16,
             "Variable": "lodBias",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interior-culling",
             "ExclusiveWith":
@@ -2145,7 +2075,6 @@
             },
             "DefaultValue": "(0,0,0)",
             "Description": "Position offset for the 'interior' area from the mesh bounds.",
-            "Priority": 16,
             "Variable": "cullingVolumeLocalPositionOffset",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interior-culling",
             "ExclusiveWith":
@@ -2177,7 +2106,6 @@
             },
             "DefaultValue": "(0,0,0)",
             "Description": "Size offset for the 'interior' area from the mesh bounds.",
-            "Priority": 16,
             "Variable": "cullingVolumeSizeOffset",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interior-culling",
             "ExclusiveWith":
@@ -2208,7 +2136,6 @@
             },
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The collection of foliage that can be baked onto this object's surface.",
-            "Priority": 15,
             "Variable": "foliage",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -2228,7 +2155,6 @@
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Adds functionality to this object that changes the render queue position depending on whether or not the object is underwater. This fixes some transparency rendering issues when viewing the object through water.",
-            "Priority": 15,
             "Variable": "useWaterHeightTransparentSort",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -2248,7 +2174,6 @@
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Adds functionality to this object that enables a game object named 'Light' at night and disables it during the day.",
-            "Priority": 15,
             "Variable": "shouldAddNightLightScript",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -2268,7 +2193,6 @@
             "Type": "Boolean",
             "DefaultValue": false,
             "Description": "Whether or not kill volumes should be added to any game objects named 'Kill' in this object's prefab. If the @Trigger prefab exists, the volumes will be added to children in that prefab instead of @Object.",
-            "Priority": 15,
             "Variable": "shouldAddKillTriggers",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -2288,7 +2212,6 @@
             "Type": "Boolean",
             "DefaultValue": false,
             "Description": "Indicates that structures can be built on this object.",
-            "Priority": 15,
             "Variable": "allowStructures",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -2312,7 +2235,6 @@
             },
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "A default material palette that should be used to randomize the material of this object.",
-            "Priority": 15,
             "Variable": "materialPalette",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -2333,7 +2255,6 @@
             "DefaultValue": "LOW",
             "Except": [ "OFF" ],
             "Description": "The minimum value of the Landmarks setting required for this object to be visible.",
-            "Priority": 15,
             "Variable": "landmarkQuality",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -2353,7 +2274,6 @@
             "Type": "SDG.Unturned.ENPCHoliday, Assembly-CSharp",
             "DefaultValue": "NONE",
             "Description": "When set, the only holiday during which this object will be visible.",
-            "Priority": 14,
             "Variable": "holidayRestriction",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
         },
@@ -2367,7 +2287,6 @@
             },
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The object to replace this object with during the 'Christmas' holiday.",
-            "Priority": 14,
             "Variable": "christmasRedirect",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
         },
@@ -2381,7 +2300,6 @@
             },
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The object to replace this object with during the 'Halloween' holiday.",
-            "Priority": 14,
             "Variable": "halloweenRedirect",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
         },
@@ -2390,7 +2308,6 @@
             "Type": "Boolean",
             "DefaultValue": false,
             "Description": "Whether or not this object is visible when the player has the Blood Spatters setting disabled.",
-            "Priority": 15,
             "Variable": "isGore",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
         },
@@ -2420,7 +2337,6 @@
                 }
             ],
             "Description": "Whether or not this object is excluded from the level batching process.",
-            "Priority": 15,
             "Variable": "shouldExcludeFromLevelBatching",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
             "ExclusiveWith":
@@ -2456,7 +2372,6 @@
                 }
             ],
             "Description": "Whether or not this object is visible on the baked satellite map.",
-            "Priority": 15,
             "Variable": "ShouldExcludeFromSatelliteCapture",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
         },
@@ -2486,7 +2401,6 @@
                 }
             ],
             "Description": "Whether or not this object collides with zombies in-game.",
-            "Priority": 15,
             "Variable": "ShouldLoadNavOnServer",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
         },
@@ -2516,7 +2430,6 @@
                 }
             ],
             "Description": "Whether or not this object has collision when baking NPC navigation.",
-            "Priority": 15,
             "Variable": "ShouldLoadNavInEditor",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties"
         },
@@ -2532,7 +2445,6 @@
             "DefaultValue": null,
             "Description": "Conditions that must be met for this object to be visible.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#conditions-and-rewards",
-            "Priority": 13,
             "Variable": "visibilityConditionsList"
         },
         {
@@ -2541,7 +2453,6 @@
             "DefaultValue": false,
             "Description": "Whether or not this object is visible when the player has the Load Clutter setting disabled.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-properties",
-            "Priority": 15,
             "Variable": "IsClutter"
         },
         {

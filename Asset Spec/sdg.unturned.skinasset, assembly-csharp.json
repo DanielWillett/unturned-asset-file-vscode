@@ -13,16 +13,14 @@
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Allows IDs to be less than 2000 if this isn't the vanilla bundle.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
-            "Priority": 97
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties"
         },
         {
             "Key": "Pattern",
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Indicates that the material should be instantiated for each skin, allowing special properties to be different depending on the situation (like LightingTime and item base textures).",
-            "Variable": "isPattern",
-            "Priority": 6
+            "Variable": "isPattern"
         },
         {
             "Key": "LightingTime",
@@ -31,7 +29,6 @@
             "IncludedDefaultValue": "DAWN",
             "Description": "Sets '_SunColor', '_RaysColor', '_SkyColor', '_EquatorColor', and '_GroundColor' on the skin's material to the current map's color settings for the given time of day.",
             "Variable": "lightingTime",
-            "Priority": 5,
             "InclusiveWith": [ "Pattern" ]
         },
         {
@@ -39,64 +36,56 @@
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Indicates that this skin can be applied to paintable sight attachments.",
-            "Variable": "hasSight",
-            "Priority": 20
+            "Variable": "hasSight"
         },
         {
             "Key": "Tactical",
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Indicates that this skin can be applied to paintable tactical attachments.",
-            "Variable": "hasTactical",
-            "Priority": 20
+            "Variable": "hasTactical"
         },
         {
             "Key": "Grip",
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Indicates that this skin can be applied to paintable grip attachments.",
-            "Variable": "hasGrip",
-            "Priority": 19
+            "Variable": "hasGrip"
         },
         {
             "Key": "Barrel",
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Indicates that this skin can be applied to paintable barrel attachments.",
-            "Variable": "hasBarrel",
-            "Priority": 18
+            "Variable": "hasBarrel"
         },
         {
             "Key": "Magazine",
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Indicates that this skin can be applied to paintable magazines.",
-            "Variable": "hasMagazine",
-            "Priority": 18
+            "Variable": "hasMagazine"
         },
         {
             "Key": "Hide_Magazine",
             "Type": "Boolean",
             "DefaultValue": false,
             "Description": "Whether or not the magazine should be hidden when this skin is applied to a gun.",
-            "Variable": "ShouldHideMagazine",
-            "Priority": 17
+            "Variable": "ShouldHideMagazine"
         },
         {
             "Key": "Ragdoll_Effect",
             "Type": "SDG.Unturned.ERagdollEffect, Assembly-CSharp",
             "DefaultValue": "NONE",
             "Description": "The material to use for a solid statue ragdoll, if any.",
-            "Variable": "ragdollEffect",
-            "Priority": 3
+            "Variable": "ragdollEffect"
         },
         {
             "Key": "SpecialAudioOverrideDef",
             "Type": "AudioReference",
             "DefaultValue": null,
             "Description": "Overrides the impact sound to play when this skin is applied to a melee weapon.",
-            "Variable": "specialAudioOverride",
-            "Priority": 1
+            "Variable": "specialAudioOverride"
         },
         {
             "Key": "Secondary_Skins",
@@ -104,7 +93,6 @@
             "DefaultValue": 0,
             "Description": "The number of attachment skin material overrides available in the bundle.",
             "Variable": "secondarySkins",
-            "Priority": 10,
             "CountForTemplateGroup": "skin-secondary"
         },
         {
@@ -120,8 +108,7 @@
             "TemplateGroupUniqueValue": true,
             "DefaultValue": 0,
             "Description": "The item ID of an attachment for which this skin provides a custom material for. The material should be named 'Skin_Secondary_#' where # would be the value of this property.",
-            "Variable": "secondarySkins",
-            "Priority": 9
+            "Variable": "secondarySkins"
         },
         {
             "Key": "Override_Meshes",
@@ -129,7 +116,6 @@
             "DefaultValue": 0,
             "Description": "The number of mesh overrides defined in the bundle, which will replace the meshes (in order of LOD levels) on the item or vehicle this skin is applied to.",
             "Variable": "overrideMeshes",
-            "Priority": 8,
             "CountForTemplateGroup": "skin-meshes"
         }
     ],

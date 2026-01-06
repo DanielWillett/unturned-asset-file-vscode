@@ -15,8 +15,7 @@
             "Description": "Whether or not the gun's muzzle flash will be hidden while this item is attached.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#braked-flag",
             "Variable": "isBraked",
-            "DefaultValue": false,
-            "Priority": 2
+            "DefaultValue": false
         },
         {
             "Key": "Silenced",
@@ -24,8 +23,7 @@
             "Description": "Prevents zombies and animals from being alerted when the gun shoots.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#silenced-flag",
             "Variable": "isSilenced",
-            "DefaultValue": false,
-            "Priority": 2
+            "DefaultValue": false
         },
         {
             "Key": "Volume",
@@ -33,8 +31,7 @@
             "Description": "A volume multiplier on the attached gun's fire sound.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#volume-float32-1",
             "Variable": "volume",
-            "DefaultValue": 1.0,
-            "Priority": 2
+            "DefaultValue": 1.0
         },
         {
             "Key": "Durability",
@@ -43,8 +40,7 @@
             "Description": "The amount of durability (out of 100) lost when firing the attached gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barrel-asset.html#durability-uint8-0",
             "Variable": "durability",
-            "DefaultValue": 0,
-            "Priority": 2
+            "DefaultValue": 0
         },
         {
             "Key": "Gunshot_Rolloff_Distance_Multiplier",
@@ -55,21 +51,18 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Silenced",
-                            "Operation": "eq",
-                            "Comparand": true
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Silenced",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
                     "Value": 0.5
                 },
                 {
                     "Value": 1
                 }
-            ],
-            "Priority": 2
+            ]
         }
     ],
     "BundleAssets":

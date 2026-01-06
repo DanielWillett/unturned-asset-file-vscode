@@ -18,8 +18,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Shirt for the NPC to wear.",
-            "Variable": "shirtGuid",
-            "Priority": 21
+            "Variable": "shirtGuid"
         },
         {
             "Key": "Pants",
@@ -31,8 +30,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Pants for the NPC to wear.",
-            "Variable": "pantsGuid",
-            "Priority": 21
+            "Variable": "pantsGuid"
         },
         {
             "Key": "Hat",
@@ -44,8 +42,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Hat for the NPC to wear.",
-            "Variable": "hatGuid",
-            "Priority": 21
+            "Variable": "hatGuid"
         },
         {
             "Key": "Backpack",
@@ -57,8 +54,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Backpack for the NPC to wear.",
-            "Variable": "backpackGuid",
-            "Priority": 21
+            "Variable": "backpackGuid"
         },
         {
             "Key": "Vest",
@@ -70,8 +66,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Vest for the NPC to wear.",
-            "Variable": "vestGuid",
-            "Priority": 21
+            "Variable": "vestGuid"
         },
         {
             "Key": "Mask",
@@ -83,8 +78,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Mask for the NPC to wear.",
-            "Variable": "maskGuid",
-            "Priority": 21
+            "Variable": "maskGuid"
         },
         {
             "Key": "Glasses",
@@ -96,16 +90,14 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#clothing",
             "Description": "Glasses for the NPC to wear.",
-            "Variable": "glassesGuid",
-            "Priority": 21
+            "Variable": "glassesGuid"
         },
         {
             "Key": "Has_Halloween_Outfit",
             "Type": "Boolean",
             "DefaultValue": false,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
-            "Description": "Whether or not this NPC defines a set of clothes to wear during the 'Halloween' holiday.",
-            "Priority": 19
+            "Description": "Whether or not this NPC defines a set of clothes to wear during the 'Halloween' holiday."
         },
         {
             "Key": "Halloween_Shirt",
@@ -118,7 +110,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Shirt for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "shirtGuid",
-            "Priority": 18,
             "InclusiveWith":
             [
                 {
@@ -138,7 +129,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Pants for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "pantsGuid",
-            "Priority": 18,
             "InclusiveWith":
             [
                 {
@@ -158,7 +148,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Hat for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "hatGuid",
-            "Priority": 18,
             "InclusiveWith":
             [
                 {
@@ -178,7 +167,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Backpack for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "backpackGuid",
-            "Priority": 18,
             "InclusiveWith":
             [
                 {
@@ -198,7 +186,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Vest for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "vestGuid",
-            "Priority": 18,
             "InclusiveWith":
             [
                 {
@@ -218,7 +205,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Mask for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "maskGuid",
-            "Priority": 18,
             "InclusiveWith":
             [
                 {
@@ -238,7 +224,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Glasses for the NPC to wear during the 'Halloween' holiday.",
             "Variable": "glassesGuid",
-            "Priority": 18,
             "InclusiveWith":
             [
                 {
@@ -252,8 +237,7 @@
             "Type": "Boolean",
             "DefaultValue": false,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
-            "Description": "Whether or not this NPC defines a set of clothes to wear during the 'Christmas' holiday.",
-            "Priority": 20
+            "Description": "Whether or not this NPC defines a set of clothes to wear during the 'Christmas' holiday."
         },
         {
             "Key": "Christmas_Shirt",
@@ -266,7 +250,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Shirt for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "shirtGuid",
-            "Priority": 19,
             "InclusiveWith":
             [
                 {
@@ -286,7 +269,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Pants for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "pantsGuid",
-            "Priority": 19,
             "InclusiveWith":
             [
                 {
@@ -306,7 +288,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Hat for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "hatGuid",
-            "Priority": 19,
             "InclusiveWith":
             [
                 {
@@ -326,7 +307,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Backpack for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "backpackGuid",
-            "Priority": 19,
             "InclusiveWith":
             [
                 {
@@ -346,7 +326,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Vest for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "vestGuid",
-            "Priority": 19,
             "InclusiveWith":
             [
                 {
@@ -366,7 +345,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Mask for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "maskGuid",
-            "Priority": 19,
             "InclusiveWith":
             [
                 {
@@ -386,7 +364,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#holiday-outfits",
             "Description": "Glasses for the NPC to wear during the 'Christmas' holiday.",
             "Variable": "glassesGuid",
-            "Priority": 19,
             "InclusiveWith":
             [
                 {
@@ -401,8 +378,7 @@
             "DefaultValue": 0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The default face the NPC displays.",
-            "Variable": "face",
-            "Priority": 25
+            "Variable": "face"
         },
         {
             "Key": "Hair",
@@ -410,8 +386,7 @@
             "DefaultValue": 0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The default hair the NPC displays.",
-            "Variable": "hair",
-            "Priority": 25
+            "Variable": "hair"
         },
         {
             "Key": "Beard",
@@ -419,8 +394,7 @@
             "DefaultValue": 0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The default beard the NPC displays.",
-            "Variable": "beard",
-            "Priority": 25
+            "Variable": "beard"
         },
         {
             "Key": "Color_Skin",
@@ -433,8 +407,7 @@
             "DefaultValue": "ffffff",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The NPC's skin color.",
-            "Variable": "skin",
-            "Priority": 24
+            "Variable": "skin"
         },
         {
             "Key": "Color_Hair",
@@ -447,8 +420,7 @@
             "DefaultValue": "ffffff",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The NPC's hair color.",
-            "Variable": "color",
-            "Priority": 24
+            "Variable": "color"
         },
         {
             "Key": "Color_Beard",
@@ -457,7 +429,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "The NPC's beard color.",
             "Variable": "BeardColor",
-            "Priority": 24,
             "Version": "3.25.10.0"
         },
         {
@@ -466,8 +437,7 @@
             "DefaultValue": false,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#appearance",
             "Description": "Indicates that the NPC is left-handed.",
-            "Variable": "IsLeftHanded",
-            "Priority": 25
+            "Variable": "IsLeftHanded"
         },
         {
             "Key": "Primary",
@@ -479,8 +449,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "The weapon that's carried on the NPC's back.",
-            "Variable": "primaryWeaponGuid",
-            "Priority": 23
+            "Variable": "primaryWeaponGuid"
         },
         {
             "Key": "Secondary",
@@ -492,8 +461,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "The weapon that's carried on the NPC's hip.",
-            "Variable": "secondaryWeaponGuid",
-            "Priority": 23
+            "Variable": "secondaryWeaponGuid"
         },
         {
             "Key": "Tertiary",
@@ -505,8 +473,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "Another item the NPC can carry.",
-            "Variable": "tertiaryWeaponGuid",
-            "Priority": 23
+            "Variable": "tertiaryWeaponGuid"
         },
         {
             "Key": "Equipped",
@@ -515,8 +482,7 @@
             "Except": [ "ANY" ],
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "The item in the specified slot will be held in the character's hands, rather than carried.",
-            "Variable": "equipped",
-            "Priority": 22
+            "Variable": "equipped"
         },
         {
             "Key": "Dialogue",
@@ -528,8 +494,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "The dialogue to use when first interacting with the NPC.",
-            "Variable": "dialogueGuid",
-            "Priority": 22
+            "Variable": "dialogueGuid"
         },
         {
             "Key": "Pose",
@@ -537,8 +502,7 @@
             "DefaultValue": "STAND",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "The idle animation used for the NPC.",
-            "Variable": "pose",
-            "Priority": 22
+            "Variable": "pose"
         },
         {
             "Key": "Pose_Lean",
@@ -548,8 +512,7 @@
             "DefaultValue": 0.0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "How far the NPC leans left or right, as a number from -1 to 1. Positive numbers learn to the NPC's left, while negative numbers lean to the NPC's right.",
-            "Variable": "poseLean",
-            "Priority": 22
+            "Variable": "poseLean"
         },
         {
             "Key": "Pose_Pitch",
@@ -559,8 +522,7 @@
             "DefaultValue": 90.0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "How far the NPC leans forward or backward, in degrees. Numbers greater than 90 lean forward, while numbers less than 90 lean backward.",
-            "Variable": "posePitch",
-            "Priority": 22
+            "Variable": "posePitch"
         },
         {
             "Key": "Pose_Head_Offset",
@@ -585,8 +547,7 @@
             "IncludedDefaultValue": 0.0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#pose",
             "Description": "Offset of the NPC's head from their body, in meters. Positive numbers offset it forward, while negative numbers offset it backward.",
-            "Variable": "poseHeadOffset",
-            "Priority": 22
+            "Variable": "poseHeadOffset"
         },
         {
             "Key": "PlayerKnowsNameFlagID",
@@ -594,8 +555,7 @@
             "DefaultValue": 0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#npc-character-assets",
             "Description": "The flag that must be set to true using a Flag_Bool reward for the player to be able to see the NPC's name. If the condition isn't met their name will display as '???'.",
-            "Variable": "playerKnowsNameFlagId",
-            "Priority": 25
+            "Variable": "playerKnowsNameFlagId"
         }
     ],
     "Localization":

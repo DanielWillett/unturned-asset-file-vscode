@@ -15,7 +15,6 @@
             "Required": true,
             "Description": "The localizable name of this curated list.",
             "Variable": "Name",
-            "Priority": 10,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#name-string"
         },
         {
@@ -24,7 +23,6 @@
             "SpecialTypes": [ "image/png", "image/jpeg" ],
             "Description": "Defines a public URL to the image for this curation list. Must be a PNG or JPEG/JPG file.",
             "Variable": "IconUrl",
-            "Priority": 8,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#iconurl-string"
         },
         {
@@ -36,7 +34,6 @@
             },
             "Description": "Defines a list of labels that can be applied by rules.",
             "Variable": "labels",
-            "Priority": 6,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#labels-list-of-dictionaries",
             "CountForTemplateGroup": "server-list-curation-labels"
         },
@@ -49,7 +46,6 @@
             },
             "Description": "Defines a list of rules that are applied to each discovered server in order.",
             "Variable": "rules",
-            "Priority": 4,
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#rules-list-of-dictionaries",
             "CountForTemplateGroup": "server-list-curation-rules"

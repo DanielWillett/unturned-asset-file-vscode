@@ -16,8 +16,7 @@
             "Required": true,
             "Description": "Maximum units of fuel that can be stored in the oil pump.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/oil-pump-asset.html#oil-pump-asset-properties",
-            "Variable": "fuelCapacity",
-            "Priority": 5
+            "Variable": "fuelCapacity"
         }
     ]
 }

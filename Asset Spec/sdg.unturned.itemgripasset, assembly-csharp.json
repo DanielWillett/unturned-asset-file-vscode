@@ -7,7 +7,6 @@
     "Category": "ITEM",
     "VanillaIdLimit": 2000,
     "RequireId": true,
-    "Properties": [ ],
     "BundleAssets":
     [
         {

@@ -18,8 +18,7 @@
             },
             "DefaultValue": null,
             "Variable": "use",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Priority": 3
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties"
         },
         {
             "Key": "Randomize_Consume_Audio_Pitch",
@@ -27,8 +26,7 @@
             "DefaultValue": true,
             "Description": "Whether or not to randomize the pitch of the 'Use' sound.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "ShouldRandomizeUseAudioPitch",
-            "Priority": 3
+            "Variable": "ShouldRandomizeUseAudioPitch"
         },
         {
             "Key": "Health",
@@ -36,8 +34,7 @@
             "DefaultValue": 0,
             "Description": "Amount of health restored.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "health",
-            "Priority": 4
+            "Variable": "health"
         },
         {
             "Key": "Food",
@@ -45,8 +42,7 @@
             "DefaultValue": 0,
             "Description": "Amount of food restored. If the amount of food to restore is larger than the amount of water to restore, then food constrains water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "food",
-            "Priority": 4
+            "Variable": "food"
         },
         {
             "Key": "Water",
@@ -54,8 +50,7 @@
             "DefaultValue": 0,
             "Description": "Amount of water restored. If the amount of water to restore is larger than the amount of food to restore, then water constrains food.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "water",
-            "Priority": 4
+            "Variable": "water"
         },
         {
             "Key": "Virus",
@@ -63,8 +58,7 @@
             "DefaultValue": 0,
             "Description": "Amount of immunity depleted.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "virus",
-            "Priority": 4
+            "Variable": "virus"
         },
         {
             "Key": "Disinfectant",
@@ -72,8 +66,7 @@
             "DefaultValue": 0,
             "Description": "Amount of immunity restored.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "disinfectant",
-            "Priority": 4
+            "Variable": "disinfectant"
         },
         {
             "Key": "Energy",
@@ -81,8 +74,7 @@
             "DefaultValue": 0,
             "Description": "Amount of stamina restored.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "energy",
-            "Priority": 4
+            "Variable": "energy"
         },
         {
             "Key": "Vision",
@@ -90,8 +82,7 @@
             "DefaultValue": 0,
             "Description": "Length of hallucinations, in seconds. The length does not stack when consuming multiple hallucinogenics. Instead, the timer is reset to the longer value.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "vision",
-            "Priority": 4
+            "Variable": "vision"
         },
         {
             "Key": "Oxygen",
@@ -99,8 +90,7 @@
             "DefaultValue": 0,
             "Description": "Amount of oxygen restored or depleted. Can be negative.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "oxygen",
-            "Priority": 4
+            "Variable": "oxygen"
         },
         {
             "Key": "Warmth",
@@ -108,8 +98,7 @@
             "DefaultValue": 0,
             "Description": "Amount of warmth added.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "warmth",
-            "Priority": 4
+            "Variable": "warmth"
         },
         {
             "Key": "Experience",
@@ -117,8 +106,7 @@
             "DefaultValue": 0,
             "Description": "Amount of experience added or removed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "experience",
-            "Priority": 4
+            "Variable": "experience"
         },
         {
             "Key": "Bleeding",
@@ -151,8 +139,7 @@
                 {
                     "Value": "None"
                 }
-            ],
-            "Priority": 4
+            ]
         },
         {
             "Key": "Broken",
@@ -185,8 +172,7 @@
                 {
                     "Value": "None"
                 }
-            ],
-            "Priority": 4
+            ]
         },
         {
             "Key": "Aid",
@@ -194,8 +180,7 @@
             "DefaultValue": false,
             "Description": "Specifies that this item can be used on other players.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "hasAid",
-            "Priority": 4
+            "Variable": "hasAid"
         },
         {
             "Key": "Should_Delete_After_Use",
@@ -203,8 +188,7 @@
             "DefaultValue": true,
             "Description": "If this item should be deleted after being consumed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "shouldDeleteAfterUse",
-            "Priority": 4
+            "Variable": "shouldDeleteAfterUse"
         },
         {
             "Key": "Quest_Rewards",
@@ -219,8 +203,7 @@
             "Description": "Rewards applied when consuming this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#rewards",
             "Variable": "questRewardsList",
-            "CountForTemplateGroup": "consumable-rewards",
-            "Priority": 3
+            "CountForTemplateGroup": "consumable-rewards"
         },
         {
             "Key": "Item_Reward_Spawn_ID",
@@ -232,8 +215,7 @@
             "DefaultValue": 0,
             "Description": "Spawn table used to reward items when consuming this item. A random amount of items between @Min_Item_Rewards and @Max_Item_Rewards will be given.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "itemRewards",
-            "Priority": 3
+            "Variable": "itemRewards"
         },
         {
             "Key": "Min_Item_Rewards",
@@ -244,7 +226,6 @@
             "Description": "Minimum number of items from @Item_Reward_Spawn_ID to award when consuming this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
             "Variable": "itemRewards",
-            "Priority": 3,
             "InclusiveWith": [ "Max_Item_Rewards" ]
         },
         {
@@ -254,8 +235,7 @@
             "Minimum": "@Min_Item_Rewards",
             "Description": "Minimum number of items from @Item_Reward_Spawn_ID to award when consuming this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "itemRewards",
-            "Priority": 3
+            "Variable": "itemRewards"
         },
         {
             "Key": "Explosion",
@@ -267,8 +247,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect to play when consuming this item, also causing the item to explode, instantly killing the player. The explosion strength is decided by the @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) and damage properties.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#consumeable-asset-properties",
-            "Variable": "ExplosionEffectGuid",
-            "Priority": 4
+            "Variable": "ExplosionEffectGuid"
         }
     ],
     "Types":

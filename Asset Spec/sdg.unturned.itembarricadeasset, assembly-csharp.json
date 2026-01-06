@@ -15,7 +15,6 @@
             "Description": "Whether or not this barricade defines a 'Clip' prefab in Unity.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
             "DefaultValue": true,
-            "Priority": 2,
             "Variable": "hasClipPrefab"
         },
         {
@@ -28,8 +27,7 @@
             "Description": "Overrides the placement preview model spawned when this item is held.",
             "DefaultValue": null,
             "Variable": "placementPreviewRef",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Priority": 2
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
         },
         {
             "Key": "PlacementAudioClip",
@@ -41,8 +39,7 @@
             "Description": "The sound played when this barricade is placed.",
             "DefaultValue": null,
             "Variable": "use",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Priority": 2
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
         },
         {
             "Key": "Build",
@@ -51,7 +48,6 @@
             "Required": true,
             "Variable": "build",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Priority": 95,
             "InclusiveWith":
             [
                 {
@@ -73,8 +69,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
             "DefaultValue": 0,
             "Required": true,
-            "MinimumExclusive": 0,
-            "Priority": 2
+            "MinimumExclusive": 0
         },
         {
             "Key": "Range",
@@ -84,8 +79,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
             "DefaultValue": 0,
             "Required": true,
-            "Minimum": 0,
-            "Priority": 2
+            "Minimum": 0
         },
         {
             "Key": "Radius",
@@ -95,8 +89,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
             "DefaultValue": 0,
             "Required": true,
-            "Minimum": 0,
-            "Priority": 2
+            "Minimum": 0
         },
         {
             "Key": "Offset",
@@ -104,8 +97,7 @@
             "Description": "Distance above the ground this barricade will be placed.",
             "Variable": "offset",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "DefaultValue": 0,
-            "Priority": 2
+            "DefaultValue": 0
         },
         {
             "Key": "Explosion",
@@ -118,7 +110,6 @@
             "Description": "Effect played when this barricade is destroyed. If @Build is 'Vehicle', this is the vehicle that will be spawned.",
             "Variable": "explosionGuid",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Priority": 1,
             "ExclusiveWith":
             [
                 {
@@ -169,8 +160,7 @@
             "DefaultValue": true,
             "Description": "If this barricade is damagable.",
             "Variable": "canBeDamaged",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties",
-            "Priority": 1
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html#barricade-asset-properties"
         },
         {
             "Key": "Eligible_For_Pooling",
@@ -178,7 +168,7 @@
             "DefaultValue":
             [
                 {
-                    "And":
+                    "Case":
                     {
                         "Variable": "Build",
                         "Operation": "eq",
@@ -217,14 +207,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Build",
-                            "Operation": "eq",
-                            "Comparand": "CHARGE"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Build",
+                        "Operation": "eq",
+                        "Comparand": "CHARGE"
+                    },
                     "Value": true
                 },
                 {
@@ -299,14 +287,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Build",
-                            "Operation": "eq",
-                            "Comparand": "CHARGE"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Build",
+                        "Operation": "eq",
+                        "Comparand": "CHARGE"
+                    },
                     "Value": true
                 },
                 {
@@ -323,14 +309,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Build",
-                            "Operation": "eq",
-                            "Comparand": "CHARGE"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Build",
+                        "Operation": "eq",
+                        "Comparand": "CHARGE"
+                    },
                     "Value": true
                 },
                 {
@@ -401,8 +385,7 @@
                                 "Operation": "eq",
                                 "Comparand": "HATCH"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -431,14 +414,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "#This.AssetName",
-                            "Operation": "contains",
-                            "Comparand": "Metal"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "#This.AssetName",
+                        "Operation": "contains",
+                        "Comparand": "Metal"
+                    },
                     "Value": "HIGH"
                 },
                 {
@@ -479,8 +460,7 @@
                                 "Operation": "eq",
                                 "Comparand": "CAMPFIRE"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]

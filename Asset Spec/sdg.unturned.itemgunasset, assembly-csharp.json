@@ -19,8 +19,7 @@
             "Description": "The sound played when this gun is shot.",
             "DefaultValue": null,
             "Variable": "shoot",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
-            "Priority": 2
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips"
         },
         {
             "Key": "ReloadAudioClip",
@@ -32,8 +31,7 @@
             "Description": "The sound played when this gun is reloaded.",
             "DefaultValue": null,
             "Variable": "reload",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
-            "Priority": 2
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips"
         },
         {
             "Key": "HammerAudioClip",
@@ -46,7 +44,6 @@
             "DefaultValue": null,
             "Variable": "hammer",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
-            "Priority": 2,
             "ExclusiveWith":
             [
                 {
@@ -81,8 +78,7 @@
             "Description": "The sound played when the player aims down sights.",
             "DefaultValue": null,
             "Variable": "aim",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
-            "Priority": 2
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips"
         },
         {
             "Key": "MinigunAudioClip",
@@ -94,7 +90,6 @@
             "DefaultValue": null,
             "Variable": "minigun",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
-            "Priority": 2,
             "InclusiveWith":
             [
                 {
@@ -113,7 +108,6 @@
             "DefaultValue": null,
             "Variable": "chamberJammedSound",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
-            "Priority": 2,
             "InclusiveWith": [ "Can_Ever_Jam" ]
         },
         {
@@ -127,7 +121,6 @@
             "DefaultValue": null,
             "Variable": "fireDelaySound",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#audio-clips",
-            "Priority": 2,
             "InclusiveWith":
             [
                 {
@@ -148,7 +141,6 @@
             "Description": "Amount of ammo this item will naturally spawn with. A random value between @Ammo_Min and @Ammo_Max will be chosen.",
             "Maximum": "@Ammo_Max",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ammo-min-uint8-0",
-            "Priority": 10,
             "Variable": "ammoMin",
             "InclusiveWith": [ "Ammo_Max" ]
         },
@@ -159,7 +151,6 @@
             "Description": "Amount of ammo this item will naturally spawn with. A random value between @Ammo_Min and @Ammo_Max will be chosen.",
             "Minimum": "@Ammo_Min",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ammo-max-uint8-0",
-            "Priority": 10,
             "Variable": "ammoMax"
         },
         {
@@ -172,7 +163,6 @@
             "DefaultValue": 0,
             "Description": "The sight attachment that naturally spawns on this gun. Usually this is the iron sights.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#sight-uint16-0",
-            "Priority": 15,
             "Variable": "sightID"
         },
         {
@@ -185,7 +175,6 @@
             "DefaultValue": 0,
             "Description": "The tactical attachment that naturally spawns on this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#tactical-uint16-0",
-            "Priority": 15,
             "Variable": "tacticalID"
         },
         {
@@ -198,7 +187,6 @@
             "DefaultValue": 0,
             "Description": "The grip attachment that naturally spawns on this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#grip-uint16-0",
-            "Priority": 15,
             "Variable": "gripID"
         },
         {
@@ -211,7 +199,6 @@
             "DefaultValue": 0,
             "Description": "The barrel attachment that naturally spawns on this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#barrel-uint16-0",
-            "Priority": 15,
             "Variable": "barrelID"
         },
         {
@@ -224,7 +211,6 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The magazine that naturally spawns on this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-uint16-0",
-            "Priority": 15,
             "Variable": "defaultMagazineGuid"
         },
         {
@@ -234,7 +220,6 @@
             "DefaultValue": 0,
             "Description": "List of replacements that allow guns to use different values for @Magazine for certain maps.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
-            "Priority": 3,
             "Variable": "magazineReplacements",
             "CountForTemplateGroup": "gun-magazine-replacements"
         },
@@ -251,7 +236,6 @@
             "Required": true,
             "Description": "The magazine that naturally spawns on this gun for magazine replacement #(Self.TemplateGroups[0])'s map.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
-            "Priority": 3,
             "Variable": "magazineReplacements"
         },
         {
@@ -263,7 +247,6 @@
             "Required": true,
             "Description": "The map for which magazine replacement #(Self.TemplateGroups[0]) is active on.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
-            "Priority": 3,
             "Variable": "magazineReplacements"
         },
         {
@@ -272,7 +255,6 @@
             "DefaultValue": 0.0,
             "Description": "Multiplier of the reload animation length before the magazine is despawned. This does not affect the actual animation speed, but the cooldown before the player can perform other actions (such as shooting) again.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#unplace-float32-0",
-            "Priority": 8,
             "Variable": "unplace"
         },
         {
@@ -281,7 +263,6 @@
             "DefaultValue": 1.0,
             "Description": "Multiplier of the reload animation length before the magazine is respawned. This does not affect the actual animation speed, but the cooldown before the player can perform other actions (such as shooting) again.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#replace-float32-1",
-            "Priority": 8,
             "Variable": "replace"
         },
         {
@@ -290,7 +271,6 @@
             "DefaultValue": 0.25,
             "Description": "Time in seconds after firing it takes to rechamber the gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#rechamberaftershotdelay-float32-0-25",
-            "Priority": 8,
             "Variable": "RechamberAfterShotDelay"
         },
         {
@@ -299,7 +279,6 @@
             "DefaultValue": 0.45,
             "Description": "Time in seconds after hammering it takes to eject bullet casings.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ejectafterhammerdelay-float32-0-45",
-            "Priority": 8,
             "Variable": "EjectAfterHammerDelay"
         },
         {
@@ -308,7 +287,6 @@
             "DefaultValue": 0.5,
             "Description": "Time in seconds after reloading to eject bullet casings.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ejectafterreloaddelay-float32-0-5",
-            "Priority": 8,
             "Variable": "EjectAfterReloadDelay"
         },
         {
@@ -317,7 +295,6 @@
             "DefaultValue": false,
             "Description": "Allows the player to change the sight attachment.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#hook-sight-flag",
-            "Priority": 14,
             "Variable": "hasSight"
         },
         {
@@ -326,7 +303,6 @@
             "DefaultValue": false,
             "Description": "Allows the player to change the tactical attachment.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#hook-tactical-flag",
-            "Priority": 14,
             "Variable": "hasTactical"
         },
         {
@@ -335,7 +311,6 @@
             "DefaultValue": false,
             "Description": "Allows the player to change the grip attachment.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#hook-grip-flag",
-            "Priority": 14,
             "Variable": "hasGrip"
         },
         {
@@ -344,7 +319,6 @@
             "DefaultValue": false,
             "Description": "Allows the player to change the barrel attachment.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#hook-barrel-flag",
-            "Priority": 14,
             "Variable": "hasBarrel"
         },
         {
@@ -354,7 +328,6 @@
             "DefaultValue": 0,
             "Description": "Arbitrary IDs that must be also be present in magazines for them to be attachable to this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-calibers-int32",
-            "Priority": 7,
             "Variable": "magazineCalibers",
             "CountForTemplateGroup": "gun-magazine-calibers"
         },
@@ -367,7 +340,6 @@
             "Required": true,
             "Description": "An arbitrary ID that must be also be present in magazines for them to be attachable to this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-caliber-uint16",
-            "Priority": 7,
             "Variable": "magazineCalibers"
         },
         {
@@ -377,7 +349,6 @@
             "DefaultValue": "@Magazine_Calibers",
             "Description": "Arbitrary IDs that must be also be present in attachments for them to be attachable to this gun. Defaults to @Magazine_Calibers.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#attachment-calibers-int32",
-            "Priority": 7,
             "Variable": "attachmentCalibers",
             "CountForTemplateGroup": "gun-attachment-calibers",
             "InclusiveWith":
@@ -402,7 +373,6 @@
             "Required": true,
             "Description": "An arbitrary ID that must be also be present in attachments for them to be attachable to this gun. Magazine calibers must also be specified to use this property.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#attachment-caliber-uint16",
-            "Priority": 7,
             "Variable": "attachmentCalibers"
         },
         {
@@ -412,7 +382,6 @@
             "Deprecated": true,
             "Description": "The attachment and magazine caliber for this gun. Use @Magazine_Calibers and @Attachment_Calibers instead.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-caliber-uint16",
-            "Priority": 7,
             "Variable": "magazineCalibers"
         },
         {
@@ -421,7 +390,6 @@
             "DefaultValue": 0,
             "Description": "Number of ticks in-between each shot. There are 50 ticks in a second.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#firerate-uint8-0",
-            "Priority": 14,
             "Variable": "firerate"
         },
         {
@@ -431,7 +399,6 @@
             "Required": true,
             "Description": "Action mechanism of this gun, changing how it fires and reloads.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#action-eaction",
-            "Priority": 14,
             "Variable": "action"
         },
         {
@@ -441,7 +408,6 @@
             "Deprecated": true,
             "Description": "The attached magazine attachment is deleted when fully depleted. Use @Should_Delete_Empty_Magazines instead.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#delete-empty-magazines-flag",
-            "Priority": 7,
             "Variable": "shouldDeleteEmptyMagazines"
         },
         {
@@ -486,7 +452,6 @@
             ],
             "Description": "Whether or not the attached magazine attachment is deleted when fully depleted.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#should-delete-empty-magazines-bool",
-            "Priority": 7,
             "Variable": "shouldDeleteEmptyMagazines"
         },
         {
@@ -495,7 +460,6 @@
             "DefaultValue": false,
             "Description": "Whether or not attachments must specify at least one non-zero caliber ID to be compatible.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#requires-nonzero-attachment-caliber-bool-false",
-            "Priority": 7,
             "Variable": "requiresNonZeroAttachmentCaliber"
         },
         {
@@ -505,7 +469,6 @@
             "Minimum": 0,
             "Description": "When a value greater than 0 is provided, the weapon has a burst firing mode. A number of shots equal to this value is fired when using this mode.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#bursts-int32-0",
-            "Priority": 14,
             "Variable": "bursts"
         },
         {
@@ -514,7 +477,6 @@
             "DefaultValue": false,
             "Description": "The weapon has a safety firing mode.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#safety-flag",
-            "Priority": 14,
             "Variable": "hasSafety"
         },
         {
@@ -523,7 +485,6 @@
             "DefaultValue": false,
             "Description": "The weapon has a semi-automatic firing mode.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#semi-flag",
-            "Priority": 14,
             "Variable": "hasSemi"
         },
         {
@@ -532,7 +493,6 @@
             "DefaultValue": false,
             "Description": "The weapon has an automatic firing mode.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#auto-flag",
-            "Priority": 14,
             "Variable": "hasAuto"
         },
         {
@@ -541,7 +501,6 @@
             "DefaultValue": false,
             "Description": "This weapon should be treated as a vehicular turret. This flag affects the player's first-person viewmodel while the weapon is held.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#turret-flag",
-            "Priority": 14,
             "Variable": "isTurret"
         },
         {
@@ -550,7 +509,6 @@
             "DefaultValue": "OffscreenWhileAiming",
             "Description": "Controls how first-person arms are moved for turrets operated from the driver's seat.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#driverturretviewmodelmode-edriverturretviewmodelmode",
-            "Priority": 3,
             "Variable": "driverTurretViewmodelMode"
         },
         {
@@ -559,7 +517,6 @@
             "DefaultValue": 0.0,
             "Description": "Multiplier on the bullet spread while aiming down sights. This is multiplied by value of @Spread_Angle_Degrees.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-aim-float32-0",
-            "Priority": 12,
             "Variable": "spreadAim"
         },
         {
@@ -571,7 +528,6 @@
             "Maximum": 180,
             "Description": "Bullet angle of deviation away from the aiming direction in degrees.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-angle-degrees-float32-0",
-            "Priority": 12,
             "Variable": "baseSpreadAngleRadians",
             "Version": "3.22.20.0",
             "ExclusiveWith": [ "Spread_Hip" ]
@@ -584,7 +540,6 @@
             "Minimum": 0,
             "Description": "Bullet spread from the crosshair. Use @Spread_Angle_Degrees instead.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-hip-float32",
-            "Priority": 12,
             "Variable": "spreadHip",
             "ExclusiveWith": [ "Spread_Angle_Degrees" ]
         },
@@ -595,7 +550,6 @@
             "Minimum": 0,
             "Description": "Multiplier on the bullet spread while sprinting.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-sprint-float32-1-25",
-            "Priority": 12,
             "Variable": "spreadSprint"
         },
         {
@@ -605,7 +559,6 @@
             "Minimum": 0,
             "Description": "Multiplier on the bullet spread while crouched.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-crouch-float32-0-85",
-            "Priority": 12,
             "Variable": "spreadCrouch"
         },
         {
@@ -615,7 +568,6 @@
             "Minimum": 0,
             "Description": "Multiplier on the bullet spread while prone.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-prone-float32-0-7",
-            "Priority": 12,
             "Variable": "spreadProne"
         },
         {
@@ -625,7 +577,6 @@
             "Minimum": 0,
             "Description": "Multiplier on the bullet spread while swimming.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-swimming-float32-1-1",
-            "Priority": 12,
             "Variable": "spreadSwimming"
         },
         {
@@ -635,7 +586,6 @@
             "Minimum": 0,
             "Description": "Multiplier on the bullet spread while jumping and/or falling.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#spread-midair-float32-1-5",
-            "Priority": 12,
             "Variable": "spreadMidair"
         },
         {
@@ -645,7 +595,6 @@
             "Maximum": "@Recoil_Max_X",
             "Description": "Minimum horizontal camera recoil in degrees.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-min-x-float32-0",
-            "Priority": 12,
             "Variable": "recoilMin_x",
             "InclusiveWith": [ "Recoil_Max_X" ]
         },
@@ -656,7 +605,6 @@
             "Maximum": "@Recoil_Max_Y",
             "Description": "Minimum vertical camera recoil in degrees.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-min-y-float32-0",
-            "Priority": 12,
             "Variable": "recoilMin_y",
             "InclusiveWith": [ "Recoil_Max_Y" ]
         },
@@ -667,7 +615,6 @@
             "Minimum": "@Recoil_Min_X",
             "Description": "Maximum horizontal camera recoil in degrees.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-max-x-float32-0",
-            "Priority": 12,
             "Variable": "recoilMax_x"
         },
         {
@@ -677,7 +624,6 @@
             "Minimum": "@Recoil_Min_Y",
             "Description": "Maximum vertical camera recoil in degrees.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-max-y-float32-0",
-            "Priority": 12,
             "Variable": "recoilMax_y"
         },
         {
@@ -687,7 +633,6 @@
             "DefaultValue": 1,
             "Description": "Multiplier on recoil magnitude while aiming down sights.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#aiming-recoil-multiplier-float32-1",
-            "Priority": 12,
             "Variable": "aimingRecoilMultiplier"
         },
         {
@@ -697,7 +642,6 @@
             "Minimum": 0,
             "Description": "Multiplier on camera degrees to be counter-animated horizontally over the next 250 milliseconds.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recover-x-float32-0",
-            "Priority": 12,
             "Variable": "recover_x"
         },
         {
@@ -707,7 +651,6 @@
             "Minimum": 0,
             "Description": "Multiplier on camera degrees to be counter-animated vertically over the next 250 milliseconds.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recover-y-float32-0",
-            "Priority": 12,
             "Variable": "recover_y"
         },
         {
@@ -717,7 +660,6 @@
             "Minimum": 0,
             "Description": "Multiplier on camera recoil while sprinting.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-sprint-float32-1-25",
-            "Priority": 12,
             "Variable": "recoilSprint",
             "InclusiveWith":
             [
@@ -734,7 +676,6 @@
             "Minimum": 0,
             "Description": "Multiplier on camera recoil while crouched.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-crouch-float32-0-85",
-            "Priority": 12,
             "Variable": "recoilCrouch"
         },
         {
@@ -744,7 +685,6 @@
             "Minimum": 0,
             "Description": "Multiplier on camera recoil while prone.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-prone-float32-0-7",
-            "Priority": 12,
             "Variable": "recoilProne"
         },
         {
@@ -754,7 +694,6 @@
             "Minimum": 0,
             "Description": "Multiplier on camera recoil while swimming.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-swimming-float32-1-1",
-            "Priority": 12,
             "Variable": "recoilSwimming"
         },
         {
@@ -764,7 +703,6 @@
             "Minimum": 0,
             "Description": "Multiplier on camera recoil while jumping and/or falling.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#recoil-midair-float32-1-0",
-            "Priority": 12,
             "Variable": "recoilSwimming"
         },
         {
@@ -774,7 +712,6 @@
             "Maximum": "@Shake_Max_X",
             "Description": "Minimum X-axis model shake caused from firing the weapon.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-min-x-float32-0",
-            "Priority": 12,
             "Variable": "shakeMin_x"
         },
         {
@@ -784,7 +721,6 @@
             "Maximum": "@Shake_Max_Y",
             "Description": "Minimum Y-axis model shake caused from firing the weapon.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-min-y-float32-0",
-            "Priority": 12,
             "Variable": "shakeMin_y"
         },
         {
@@ -794,7 +730,6 @@
             "Maximum": "@Shake_Max_Z",
             "Description": "Minimum Z-axis model shake caused from firing the weapon.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-min-z-float32-0",
-            "Priority": 12,
             "Variable": "shakeMin_z"
         },
         {
@@ -804,7 +739,6 @@
             "Minimum": "@Shake_Min_X",
             "Description": "Maximum X-axis model shake caused from firing the weapon.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-max-x-float32-0",
-            "Priority": 12,
             "Variable": "shakeMax_x"
         },
         {
@@ -814,7 +748,6 @@
             "Minimum": "@Shake_Min_Y",
             "Description": "Maximum Y-axis model shake caused from firing the weapon.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-max-y-float32-0",
-            "Priority": 12,
             "Variable": "shakeMax_y"
         },
         {
@@ -824,7 +757,6 @@
             "Minimum": "@Shake_Min_Z",
             "Description": "Maximum Z-axis model shake caused from firing the weapon.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shake-max-z-float32-0",
-            "Priority": 12,
             "Variable": "shakeMax_z"
         },
         {
@@ -834,7 +766,6 @@
             "DefaultValue": "=CEIL(=DIV(@(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) @Ballistic_Travel))",
             "Description": "Lifespan of ballistic projectiles in ticks. The higher this number is, the smoother the arc taken by the bullet will be, but the longer it will take to land. Only one of @Ballistic_Steps and @Ballistic_Travel should be specified.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ballistic-steps-uint8",
-            "Priority": 10,
             "Variable": "ballisticSteps",
             "ExclusiveWith": [ "Ballistic_Travel", "$bndl$::Projectile" ]
         },
@@ -866,7 +797,6 @@
             "MinimumExclusive": "=MAX(0.1 =DIV(@(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) 253))",
             "Description": "Travel speed of ballistic projectiles in meters per ballistic step. Only one of @Ballistic_Steps and @Ballistic_Travel should be specified.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ballistic-travel-float32",
-            "Priority": 10,
             "Variable": "ballisticTravel",
             "ExclusiveWith": [ "Ballistic_Steps", "$bndl$::Projectile" ]
         },
@@ -907,7 +837,6 @@
             ],
             "Description": "Multiplier for gravity's acceleration.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#bullet-gravity-multiplier-float32-4",
-            "Priority": 10,
             "Variable": "bulletGravityMultiplier",
             "ExclusiveWith": [ "Ballistic_Drop", "$bndl$::Projectile" ],
             "Version": "3.23.7.0"
@@ -917,7 +846,6 @@
             "Type": "Float32",
             "Description": "Use @Bullet_Gravity_Multiplier instead.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ballistic-drop-float32",
-            "Priority": 10,
             "Variable": "bulletGravityMultiplier",
             "Deprecated": true,
             "ExclusiveWith": [ "Bullet_Gravity_Multiplier", "$bndl$::Projectile" ]
@@ -927,7 +855,6 @@
             "Type": "Float32",
             "Description": "The amount of force that should be applied to the physics projectile, measured in Newtons.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ballistic-force-float32-0-002",
-            "Priority": 10,
             "DefaultValue": 0.002,
             "IncludedDefaultValue": 0,
             "Variable": "ballisticForce",
@@ -940,7 +867,6 @@
             "Maximum": "@Damage_Falloff_Max_Range",
             "Description": "Percentage (0-1) of @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) where damage begins decreasing towards @Damage_Falloff_Multiplier.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#damage-falloff-range-float32-1",
-            "Priority": 9,
             "DefaultValue": 1.0,
             "Variable": "damageFalloffRange",
             "InclusiveWith": [ "Damage_Falloff_Multiplier" ],
@@ -953,7 +879,6 @@
             "Maximum": 1,
             "Description": "Percentage (0-1) of @(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Range) where damage stops decreasing towards @Damage_Falloff_Multiplier.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#damage-falloff-max-range-float32-1",
-            "Priority": 9,
             "DefaultValue": 1.0,
             "Variable": "damageFalloffMaxRange",
             "InclusiveWith": [ "Damage_Falloff_Range", "Damage_Falloff_Multiplier" ],
@@ -966,7 +891,6 @@
             "Maximum": 1,
             "Description": "Percentage (0-1) of damage to apply at maximum range (past @Damage_Falloff_Max_Range).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#damage-falloff-multiplier-float32-1",
-            "Priority": 9,
             "DefaultValue": 1.0,
             "Variable": "damageFalloffMultiplier",
             "InclusiveWith": [ "Damage_Falloff_Range" ],
@@ -978,7 +902,6 @@
             "MinimumExclusive": 0.0,
             "Description": "Lifespan of physics projectiles in seconds, after which the projectile despawns.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#projectile-lifespan-float32-30",
-            "Priority": 10,
             "DefaultValue": 30.0,
             "Variable": "projectileLifespan",
             "InclusiveWith": [ "$bndl$::Projectile" ]
@@ -989,7 +912,6 @@
             "DefaultValue": false,
             "Description": "Explosions from projectiles penetrate through buildables when this flag is set.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#projectile-penetrate-buildables-flag",
-            "Priority": 10,
             "Variable": "projectilePenetrateBuildables",
             "InclusiveWith": [ "$bndl$::Projectile" ]
         },
@@ -999,7 +921,6 @@
             "DefaultValue": "=MUL(@(SDG.Unturned.ItemWeaponAsset, Assembly-CSharp::Player_Damage) 0.1)",
             "Description": "Players caught within the projectile explosion are launched at this speed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#projectile-explosion-launch-speed-float32",
-            "Priority": 10,
             "Variable": "projectileExplosionLaunchSpeed",
             "InclusiveWith": [ "$bndl$::Projectile" ]
         },
@@ -1010,7 +931,6 @@
             "Minimum": 1,
             "Description": "Multiplier on time it takes to finish reloading this weapon (based on the animation length).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#reload-time-float32-1",
-            "Priority": 8,
             "Variable": "reloadTime"
         },
         {
@@ -1020,7 +940,6 @@
             "Minimum": 1,
             "Description": "Multiplier on the time it takes to pull back the hammer on this weapon (based on the animation length).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#hammer-time-float32-1",
-            "Priority": 8,
             "Variable": "hammerTime"
         },
         {
@@ -1033,7 +952,6 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The GUID or ID of the effect to play after shooting. This is emitted from this weapon's \"Barrel\" hook.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#muzzle-doc-data-guid-or-uint16",
-            "Priority": 13,
             "Variable": "muzzleGuid"
         },
         {
@@ -1046,7 +964,6 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The GUID or ID of the effect that should be used for explosions caused by projectiles.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#explosion-doc-data-guid-or-uint16",
-            "Priority": 13,
             "Variable": "projectileExplosionEffectGuid",
             "InclusiveWith": [ "$bndl$::Projectile" ]
         },
@@ -1093,7 +1010,6 @@
             ],
             "Description": "The GUID or ID of the effect to play after shooting, emitted from the this weapon's \"Eject\" hook.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#shell-doc-data-guid-or-uint16",
-            "Priority": 13,
             "Variable": "shellGuid",
             "ExclusiveWith":
             [
@@ -1127,7 +1043,6 @@
             "IncludedDefaultValue": 0.0,
             "Description": "The radius (in meters) of the alert generated by this weapon when fired. Zombies and Animals caught within this radius are alerted.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#alert-radius-float32-48",
-            "Priority": 11,
             "Variable": "alertRadius"
         },
         {
@@ -1138,7 +1053,6 @@
             "IncludedDefaultValue": 0.0,
             "Description": "The maximum distance displayed when using a \"Rangefinder\" tactical attachment on this weapon.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#range-rangefinder-float32",
-            "Priority": 10,
             "Variable": "rangeRangefinder"
         },
         {
@@ -1147,7 +1061,6 @@
             "DefaultValue": false,
             "Description": "Whether or not ammunition is not depleted from the magazine attachment.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#infinite-ammo-bool-false",
-            "Priority": 6,
             "Variable": "infiniteAmmo"
         },
         {
@@ -1156,7 +1069,6 @@
             "DefaultValue": 1,
             "Description": "Number of ammunition consumed per shot.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ammo-per-shot-uint8-1",
-            "Priority": 6,
             "Variable": "ammoPerShot"
         },
         {
@@ -1166,7 +1078,6 @@
             "DefaultValue": 0.0,
             "Description": "Number of seconds before the weapon is actually fired after the player shoots.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#fire-delay-seconds-int32-0",
-            "Priority": 8,
             "Variable": "fireDelay"
         },
         {
@@ -1175,7 +1086,6 @@
             "DefaultValue": true,
             "Description": "Whether or not the magazine can be removed, replaced, or reloaded.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#allow-magazine-change-bool-true",
-            "Priority": 14,
             "Variable": "allowMagazineChange"
         },
         {
@@ -1184,7 +1094,6 @@
             "DefaultValue": false,
             "Description": "Whether or not the player can aim down sights while sprinting.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#can-aim-during-sprint-bool-false",
-            "Priority": 12,
             "Variable": "canAimDuringSprint"
         },
         {
@@ -1209,7 +1118,6 @@
             ],
             "Description": "Multiplier on the player's movement speed while aiming down sights.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#aiming-movement-speed-multiplier-float32",
-            "Priority": 12,
             "Variable": "aimingMovementSpeedMultiplier"
         },
         {
@@ -1234,7 +1142,6 @@
             ],
             "Description": "Whether or not the gun is unable to shoot unless the player is aiming.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#must-aim-to-shoot-bool",
-            "Priority": 12,
             "Variable": "MustAimToShoot",
             "ExclusiveWith":
             [
@@ -1250,7 +1157,6 @@
             "DefaultValue": false,
             "Description": "Whether or not the gun should stop aiming after the player shoots once.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#stop-aiming-after-shooting-bool-false",
-            "Priority": 12,
             "Variable": "ShouldForceStopAimingAfterShooting"
         },
         {
@@ -1259,7 +1165,6 @@
             "DefaultValue": false,
             "Description": "This gun can jam occasionally once it's quality drops below =MUL(@Jam_Quality_Threshold 100)%.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#can-ever-jam-flag",
-            "Priority": 5,
             "Variable": "canEverJam"
         },
         {
@@ -1270,7 +1175,6 @@
             "DefaultValue": 0.4,
             "Description": "The quality level (0-1) at which this weapon begin to jam. As the quality goes below this value, the chance of a jam occuring will go up.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#jam-quality-threshold-float32-0-4",
-            "Priority": 5,
             "Variable": "jamQualityThreshold",
             "InclusiveWith": [ "Can_Ever_Jam" ]
         },
@@ -1282,7 +1186,6 @@
             "DefaultValue": 0.1,
             "Description": "The chance (0-1) of this weapon jamming at 0% quality. The chance of jamming starts at 0% when quality is greater than @Jam_Quality_Threshold and linearly interpolates towards this value as quality approaches 0%.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#jam-max-chance-float32-0-1",
-            "Priority": 5,
             "Variable": "jamMaxChance",
             "InclusiveWith": [ "Can_Ever_Jam" ]
         },
@@ -1292,7 +1195,6 @@
             "DefaultValue": "UnjamChamber",
             "Description": "Name of an animation clip to play when unjamming the weapon.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#unjam-chamber-anim-string-unjamchamber",
-            "Priority": 5,
             "Variable": "unjamChamberAnimName",
             "InclusiveWith": [ "Can_Ever_Jam" ]
         },
@@ -1330,7 +1232,6 @@
             ],
             "Description": "Maximum distance the gunshot is audible from, including the rolloff distance. Roll-off uses a custom curve.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#gunshot-rolloff-distance-float32",
-            "Priority": 10,
             "Variable": "gunshotRolloffDistance"
         },
         {
@@ -1346,8 +1247,7 @@
             "Description": "Rewards applied when the player fires a shot.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#npc-rewards",
             "Variable": "shootQuestRewards",
-            "CountForTemplateGroup": "gun-shoot-rewards",
-            "Priority": 4
+            "CountForTemplateGroup": "gun-shoot-rewards"
         },
         {
             "Key": "Aim_In_Duration",
@@ -1356,7 +1256,6 @@
             "DefaultValue": 0.2,
             "Description": "Number of seconds it takes to fully aim down sights.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#aim-in-duration-float32-0-2",
-            "Priority": 8,
             "Variable": "aimInDuration"
         },
         {
@@ -1365,7 +1264,6 @@
             "DefaultValue": true,
             "Description": "When true, the length of the \"Aim_Start\" and \"Aim_Stop\" animations are scaled to match @Aim_In_Duration (with modifiers).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#scale-aim-animation-speed-bool-true",
-            "Priority": 8,
             "Variable": "shouldScaleAimAnimations"
         },
         {
@@ -1397,7 +1295,6 @@
             ],
             "Description": "Number of shots that have to be shot before hammering this gun is required. The count will reset to 0 each time.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#rechamberaftershotcount-int32",
-            "Priority": 14,
             "Variable": "RechamberAfterShotCount"
         },
         {
@@ -1407,7 +1304,6 @@
             "DefaultValue": 1,
             "Description": "Number of bullet casings to emit after this gun is hammered. This property applies to rechambering due to reaching @RechamberAfterShotCount shots.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#casingejectcountafterrechamberingaftershooting-int32-1",
-            "Priority": 14,
             "Variable": "CasingEjectCountAfterRechamberingAfterShooting",
             "InclusiveWith":
             [
@@ -1445,7 +1341,6 @@
             ],
             "Description": "Number of bullet casings to emit after this gun is hammered. This property applies to rechambering due to reloading.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#casingejectcountafterreload-int32",
-            "Priority": 14,
             "Variable": "CasingEjectCountAfterReload"
         },
         {
@@ -1474,7 +1369,6 @@
                 }
             ],
             "Description": "Determines whether or not particles should be emitted when a shot is fired.",
-            "Priority": 14,
             "Variable": "EjectCasingAfterShooting",
             "Version": "3.25.8.0",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#ejectcasingaftershooting-bool"
@@ -1485,7 +1379,6 @@
             "DefaultValue": "IfAmmoWasEmpty",
             "Description": "Determines whether or not this gun will be hammered when attaching or replacing a magazine.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#rechamberaftermagazineattached-erechambergunafterreloadmode-ifammowasempty",
-            "Priority": 14,
             "Variable": "RechamberAfterMagazineAttached"
         },
         {
@@ -1494,7 +1387,6 @@
             "DefaultValue": "Always",
             "Description": "Determines whether or not this gun will be hammered when removing a magazine (without replacing it).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#rechamberaftermagazinedetached-erechambergunafterreloadmode-always",
-            "Priority": 14,
             "Variable": "RechamberAfterMagazineDetached"
         }
     ],

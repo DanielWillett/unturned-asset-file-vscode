@@ -15,7 +15,6 @@
             "DefaultValue": 0,
             "Description": "Maximum units of fuel that can be stored in the fuel canister.",
             "Variable": "fuel",
-            "Priority": 4,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fuel-asset.html#fuel-asset-properties",
             "Required": true
         },
@@ -25,7 +24,6 @@
             "DefaultValue": false,
             "Description": "Whether or not this item should be removed from the player's inventory after adding fuel to target.",
             "Variable": "shouldDeleteAfterFillingTarget",
-            "Priority": 3,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fuel-asset.html#fuel-asset-properties"
         },
         {
@@ -34,7 +32,6 @@
             "DefaultValue": false,
             "Description": "Whether or not this item will always spawn filled to its full capacity.",
             "Variable": "shouldAlwaysSpawnFull",
-            "Priority": 3,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fuel-asset.html#fuel-asset-properties"
         }
     ],

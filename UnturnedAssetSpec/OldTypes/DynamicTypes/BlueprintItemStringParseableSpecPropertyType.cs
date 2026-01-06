@@ -57,6 +57,10 @@ public abstract class BlueprintItemStringParseableSpecPropertyType :
 
         if (!KnownTypeValueHelper.TryParseItemString(strValue.Value.AsSpan(), strValue.Value, out GuidOrId assetRef, out int amount, id))
         {
+            if (!assetRef.IsNull && amount > 0)
+            {
+                // todo: error used capital X instead of lowercase X
+            }
             return FailedToParse(in parse, out value, strValue);
         }
 

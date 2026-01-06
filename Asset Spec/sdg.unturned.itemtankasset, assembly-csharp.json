@@ -16,8 +16,7 @@
             "Required": true,
             "Description": "Maximum units of liquid that can be stored in the tank. One unit of water is the equivalent of one usage of a water canister.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tank-asset.html#tank-asset-properties",
-            "Variable": "resource",
-            "Priority": 5
+            "Variable": "resource"
         },
         {
             "Key": "Source",
@@ -26,8 +25,7 @@
             "Required": true,
             "Description": "The type of liquid stored in this tank.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tank-asset.html#tank-asset-properties",
-            "Variable": "source",
-            "Priority": 6
+            "Variable": "source"
         }
     ],
     "Types":

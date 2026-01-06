@@ -14,22 +14,19 @@
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Allows IDs to be less than 50 if this isn't the vanilla bundle.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
-            "Priority": 97
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties"
         },
         {
             "Key": "Has_Clip_Prefab",
             "Type": "Boolean",
             "DefaultValue": true,
-            "Description": "Whether or not this resource defines separate prefabs (@($bndl$::Resource_Clip), @($bndl$::Stump_Clip)) to be loaded on the server. This is not required and should be set to false in most cases.",
-            "Priority": 5
+            "Description": "Whether or not this resource defines separate prefabs (@($bndl$::Resource_Clip), @($bndl$::Stump_Clip)) to be loaded on the server. This is not required and should be set to false in most cases."
         },
         {
             "Key": "Auto_Skybox",
             "Type": "Boolean",
             "DefaultValue": true,
             "Description": "Automatically render a card texture on startup and apply the texture to the @($bndl$::Skybox) model ('Model_0').",
-            "Priority": 5,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "InclusiveWith": [ "$bndl$::Skybox" ]
         },
@@ -41,8 +38,7 @@
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "The total health of this resource.",
-            "Variable": "health",
-            "Priority": 9
+            "Variable": "health"
         },
         {
             "Key": "RandomAngleDeviation_Min",
@@ -52,8 +48,7 @@
             "DefaultValue": -5.0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Minimum angle in degrees away from the up direction, where 0 is upright.",
-            "Variable": "MinRandomAngleDeviation",
-            "Priority": 6
+            "Variable": "MinRandomAngleDeviation"
         },
         {
             "Key": "RandomAngleDeviation_Max",
@@ -63,8 +58,7 @@
             "DefaultValue": 5.0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Maximum angle in degrees away from the up direction, where 0 is upright.",
-            "Variable": "MaxRandomAngleDeviation",
-            "Priority": 6
+            "Variable": "MaxRandomAngleDeviation"
         },
         {
             "Key": "Scale",
@@ -90,8 +84,7 @@
             ],
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "The tree's in-game scale is a random number between 1.1 and the result of 1.1 + (Scale * 2).",
-            "Variable": "scale",
-            "Priority": 6
+            "Variable": "scale"
         },
         {
             "Key": "RandomUniformScale_Min",
@@ -100,8 +93,7 @@
             "DefaultValue": 1.1,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Minimum scale. The same randomized value is used for all axes (uniform).",
-            "Variable": "MinRandomUniformScale",
-            "Priority": 6
+            "Variable": "MinRandomUniformScale"
         },
         {
             "Key": "RandomUniformScale_Max",
@@ -126,8 +118,7 @@
             ],
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Maximum scale. The same randomized value is used for all axes (uniform).",
-            "Variable": "MaxRandomUniformScale",
-            "Priority": 6
+            "Variable": "MaxRandomUniformScale"
         },
         {
             "Key": "Vertical_Offset",
@@ -135,8 +126,7 @@
             "DefaultValue": -0.75,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "A vertical offset above or below wherever this resource is placed, in meters.",
-            "Variable": "verticalOffset",
-            "Priority": 6
+            "Variable": "verticalOffset"
         },
         {
             "Key": "Debris_Vertical_Offset",
@@ -144,8 +134,7 @@
             "DefaultValue": 1.0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Distance along tree's local up axis to offset debris spawn position.",
-            "Variable": "DebrisVerticalOffset",
-            "Priority": 6
+            "Variable": "DebrisVerticalOffset"
         },
         {
             "Key": "Explosion",
@@ -157,8 +146,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Effect to play when this resource is destroyed.",
-            "Variable": "explosionGuid",
-            "Priority": 7
+            "Variable": "explosionGuid"
         },
         {
             "Key": "Log",
@@ -171,7 +159,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "ID of an item that should be dropped when the resource is destroyed. Before multipliers, this item is dropped in bunches of 3 to 7. This is also the item that is given to the player when this resource is foraged.",
             "Variable": "log",
-            "Priority": 8,
             "ExclusiveWith": [ "Reward_ID" ]
         },
         {
@@ -185,7 +172,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "ID of an item that should be dropped when the resource is destroyed. Before multipliers, this item is dropped in bunches of 2 to 5.",
             "Variable": "stick",
-            "Priority": 8,
             "ExclusiveWith":
             [
                 "Reward_ID",
@@ -206,7 +192,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "ID of an item spawn table to pull items from that should be dropped when this resource is destroyed or foraged.",
             "Variable": "rewardID",
-            "Priority": 8,
             "ExclusiveWith": [ "Log", "Stick" ]
         },
         {
@@ -216,7 +201,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Amount of experience to reward when the resource is destroyed.",
             "Variable": "rewardXP",
-            "Priority": 8,
             "ExclusiveWith":
             [
                 {
@@ -234,7 +218,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Minimum amount of item drops to reward.",
             "Variable": "rewardMin",
-            "Priority": 8,
             "InclusiveWith":
             [
                 {
@@ -265,7 +248,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Maximum amount of item drops to reward.",
             "Variable": "rewardMax",
-            "Priority": 8,
             "InclusiveWith":
             [
                 {
@@ -292,7 +274,6 @@
             "DefaultValue": 0,
             "Description": "An arbitrary ID that weapons must also define to be able to damage this resource.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
-            "Priority": 7,
             "Variable": "bladeID"
         },
         {
@@ -301,8 +282,7 @@
             "DefaultValue": false,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Whether or not this resource can be damaged by punching.",
-            "Variable": "vulnerableToFists",
-            "Priority": 7
+            "Variable": "vulnerableToFists"
         },
         {
             "Key": "Vulnerable_To_All_Melee_Weapons",
@@ -310,8 +290,7 @@
             "DefaultValue": false,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Whether or not this resource can be damaged by melee weapons that don't share a blade ID with this resource.",
-            "Variable": "vulnerableToAllMeleeWeapons",
-            "Priority": 7
+            "Variable": "vulnerableToAllMeleeWeapons"
         },
         {
             "Key": "Ignore_Collision_Between_Stump_And_Debris",
@@ -319,8 +298,7 @@
             "DefaultValue": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Whether or not the @($bndl$::Stump) and @($bndl$::Debris) prefabs should be able to pass through each other.",
-            "Variable": "ShouldIgnoreCollisionBetweenStumpAndDebris",
-            "Priority": 5
+            "Variable": "ShouldIgnoreCollisionBetweenStumpAndDebris"
         },
         {
             "Key": "Reset",
@@ -328,8 +306,7 @@
             "DefaultValue": 0.0,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Number of seconds after this resource is destroyed when it respawn.",
-            "Variable": "reset",
-            "Priority": 9
+            "Variable": "reset"
         },
         {
             "Key": "Forage",
@@ -337,8 +314,7 @@
             "DefaultValue": false,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Whether or not this resource can be interacted with to collect rewards.",
-            "Variable": "isForage",
-            "Priority": 9
+            "Variable": "isForage"
         },
         {
             "Key": "Forage_Reward_Experience",
@@ -347,7 +323,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Amount of experience to reward when the resource is foraged from.",
             "Variable": "forageRewardExperience",
-            "Priority": 8,
             "InclusiveWith":
             [
                 {
@@ -362,15 +337,13 @@
             "DefaultValue": false,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "Indicates that this resource does not have debris that should appear when it has been destroyed. This also affects item and explosion effect spawn positions.",
-            "Variable": "hasDebris",
-            "Priority": 5
+            "Variable": "hasDebris"
         },
         {
             "Key": "Holiday_Restriction",
             "Type": "SDG.Unturned.ENPCHoliday, Assembly-CSharp",
             "DefaultValue": "NONE",
             "Description": "When set, the only holiday during which this resource will be visible.",
-            "Priority": 4,
             "Variable": "holidayRestriction",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties"
         },
@@ -383,7 +356,6 @@
             },
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The resource to replace this resource with during the 'Christmas' holiday.",
-            "Priority": 4,
             "Variable": "christmasRedirect",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties"
         },
@@ -396,7 +368,6 @@
             },
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "The resource to replace this resource with during the 'Halloween' holiday.",
-            "Priority": 4,
             "Variable": "halloweenRedirect",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties"
         },
@@ -406,7 +377,6 @@
             "DefaultValue": "NONE",
             "Description": "Overrides the material used for this resource when rendering the level chart.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
-            "Priority": 9,
             "Variable": "chart"
         },
         {
@@ -414,7 +384,6 @@
             "Type": "Boolean",
             "DefaultValue": false,
             "Description": "Whether or not this resource is excluded from the level batching process.",
-            "Priority": 5,
             "Variable": "shouldExcludeFromLevelBatching",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties"
         },

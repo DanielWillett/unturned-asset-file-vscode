@@ -16,8 +16,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/library-asset.html#library-asset-properties",
             "Variable": "capacity",
             "DefaultValue": 0,
-            "Required": true,
-            "Priority": 3
+            "Required": true
         },
         {
             "Key": "Tax",
@@ -26,8 +25,7 @@
             "Maximum": 100,
             "Variable": "rewards",
             "Description": "Percentage (0-100) of the deposit that is lost when depositing XP. There is no tax when withdrawing XP.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/library-asset.html#library-asset-properties",
-            "Priority": 3
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/library-asset.html#library-asset-properties"
         }
     ]
 }

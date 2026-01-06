@@ -16,8 +16,7 @@
             "DefaultValue": 1,
             "Description": "Number of pellets from each bullet/shell.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#pellets-uint8-1",
-            "Variable": "pellets",
-            "Priority": 10
+            "Variable": "pellets"
         },
         {
             "Key": "Stuck",
@@ -25,8 +24,7 @@
             "DefaultValue": 0,
             "Description": "The amount of quality that should be lost after the projectile hits something.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#stuck-uint8-0",
-            "Variable": "stuck",
-            "Priority": 7
+            "Variable": "stuck"
         },
         {
             "Key": "Projectile_Damage_Multiplier",
@@ -34,8 +32,7 @@
             "DefaultValue": 1.0,
             "Description": "Multiplier on the damage dealt by explosive projectiles fired from weapons. Doesn't have any effect when used in a ballistic gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#projectile-damage-multiplier-float32-1",
-            "Variable": "projectileDamageMultiplier",
-            "Priority": 6
+            "Variable": "projectileDamageMultiplier"
         },
         {
             "Key": "Projectile_Blast_Radius_Multiplier",
@@ -43,8 +40,7 @@
             "DefaultValue": 1.0,
             "Description": "Multiplier on the blast radius of explosive projectiles fired from weapons. Doesn't have any effect when used in a ballistic gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#projectile-blast-radius-multiplier-float32-1",
-            "Variable": "projectileBlastRadiusMultiplier",
-            "Priority": 6
+            "Variable": "projectileBlastRadiusMultiplier"
         },
         {
             "Key": "Projectile_Launch_Force_Multiplier",
@@ -52,8 +48,7 @@
             "DefaultValue": 1.0,
             "Description": "Multiplier on the player launch force of explosive projectiles fired from weapons. Doesn't have any effect when used in a ballistic gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#projectile-launch-force-multiplier-float32-1",
-            "Variable": "projectileLaunchForceMultiplier",
-            "Priority": 6
+            "Variable": "projectileLaunchForceMultiplier"
         },
         {
             "Key": "Range",
@@ -62,7 +57,6 @@
             "Description": "Range (in meters) of the explosion set off when a bullet lands if the @Explosive flag is present. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#pellets-uint8-1",
             "Variable": "range",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ]
         },
         {
@@ -72,7 +66,6 @@
             "Description": "Damage dealt to players from the explosion set off when a bullet lands if the @Explosive flag is present. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#player-damage-float32-0",
             "Variable": "playerDamage",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ]
         },
         {
@@ -82,7 +75,6 @@
             "Description": "Damage dealt to zombies from the explosion set off when a bullet lands if the @Explosive flag is present. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#zombie-damage-float32-0",
             "Variable": "zombieDamage",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ]
         },
         {
@@ -92,7 +84,6 @@
             "Description": "Damage dealt to animals from the explosion set off when a bullet lands if the @Explosive flag is present. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#animal-damage-float32-0",
             "Variable": "animalDamage",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ]
         },
         {
@@ -102,7 +93,6 @@
             "Description": "Damage dealt to barricades from the explosion set off when a bullet lands if the @Explosive flag is present. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#barricade-damage-float32-0",
             "Variable": "barricadeDamage",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ]
         },
         {
@@ -112,7 +102,6 @@
             "Description": "Damage dealt to structures from the explosion set off when a bullet lands if the @Explosive flag is present. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#structure-damage-float32-0",
             "Variable": "structureDamage",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ]
         },
         {
@@ -122,7 +111,6 @@
             "Description": "Damage dealt to vehicles from the explosion set off when a bullet lands if the @Explosive flag is present. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#vehicle-damage-float32-0",
             "Variable": "vehicleDamage",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ]
         },
         {
@@ -132,7 +120,6 @@
             "Description": "Damage dealt to resources from the explosion set off when a bullet lands if the @Explosive flag is present. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#resource-damage-float32-0",
             "Variable": "resourceDamage",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ]
         },
         {
@@ -142,7 +129,6 @@
             "Description": "Player launch speed of the explosion set off when a bullet lands if the @Explosive flag is present. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#explosion-launch-speed-float32",
             "Variable": "explosionLaunchSpeed",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ]
         },
         {
@@ -152,7 +138,6 @@
             "Description": "Whether or not per-surface effects like blood splatter are created. Defaults to true, but can be disabled particularly if a performance issue (e.g., an explosive many-pellet shotgun shell).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#explosion-plays-impact-effects-bool-true",
             "Variable": "ExplosionPlaysImpactEffects",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ],
             "Version": "3.25.10.0"
         },
@@ -163,7 +148,6 @@
             "Description": "Whether or not explosion damage passes through buildable items.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#explosion-plays-impact-effects-bool-true",
             "Variable": "ExplosionPenetratesBuildables",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ],
             "Version": "3.25.10.0"
         },
@@ -177,8 +161,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "GUID or legacy ID of the explosion set off by when a bullet lands if the @Explosive flag is present, or when a projectile explodes, overriding the explosion effect set in the gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#explosion-doc-data-guid-or-uint16-0",
-            "Variable": "explosionEffectGuid",
-            "Priority": 4
+            "Variable": "explosionEffectGuid"
         },
         {
             "Key": "Object_Damage",
@@ -188,7 +171,6 @@
             "Description": "Damage dealt to objects from the explosion set off when a bullet lands if the @Explosive flag is present. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#object-damage-float32",
             "Variable": "objectDamage",
-            "Priority": 3,
             "InclusiveWith": [ "Explosive" ]
         },
         {
@@ -201,8 +183,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "GUID or legacy ID of the effect used for the bullet tracer. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#tracer-doc-data-guid-or-uint16-0",
-            "Variable": "tracerEffectGuid",
-            "Priority": 8
+            "Variable": "tracerEffectGuid"
         },
         {
             "Key": "Impact",
@@ -214,8 +195,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "GUID or legacy ID of the effect used for the bullet impact. Doesn't have any effect when used in a projectile gun. The default bullet impact effect is fetched from the impacted physics material.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#impact-doc-data-guid-or-uint16-0",
-            "Variable": "ImpactEffectGuid",
-            "Priority": 8
+            "Variable": "ImpactEffectGuid"
         },
         {
             "Key": "Speed",
@@ -224,8 +204,7 @@
             "DefaultValue": 1.0,
             "Description": "Reload and hammer speed multiplier.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#speed-float32-1",
-            "Variable": "speed",
-            "Priority": 7
+            "Variable": "speed"
         },
         {
             "Key": "Explosive",
@@ -233,8 +212,7 @@
             "DefaultValue": false,
             "Description": "This magazine's bullets will create an explosion when they land. Doesn't have any effect when used in a projectile gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#explosive-flag",
-            "Variable": "isExplosive",
-            "Priority": 5
+            "Variable": "isExplosive"
         },
         {
             "Key": "Spawn_Explosion_On_Dedicated_Server",
@@ -242,8 +220,7 @@
             "DefaultValue": false,
             "Description": "This magazine's @Explosion effect will be spawned on dedicated servers.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#spawn-explosion-on-dedicated-server-flag",
-            "Variable": "spawnExplosionOnDedicatedServer",
-            "Priority": 2
+            "Variable": "spawnExplosionOnDedicatedServer"
         },
         {
             "Key": "Should_Fill_After_Detach",
@@ -251,8 +228,7 @@
             "DefaultValue": false,
             "Description": "Whether or not this magazine should be refilled when removed from a gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html#should-fill-after-detach-bool-false",
-            "Variable": "shouldFillAfterDetach",
-            "Priority": 7
+            "Variable": "shouldFillAfterDetach"
         }
     ],
     "BundleAssets":

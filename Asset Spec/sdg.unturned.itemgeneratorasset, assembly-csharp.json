@@ -16,8 +16,7 @@
             "Required": true,
             "Description": "Maximum units of fuel that can be stored in the generator.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/generator-asset.html#item-asset-properties",
-            "Variable": "capacity",
-            "Priority": 5
+            "Variable": "capacity"
         },
         {
             "Key": "Wirerange",
@@ -28,8 +27,7 @@
             "Required": true,
             "Description": "The radius around the generator (in meters) that is provided electricity.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/generator-asset.html#item-asset-properties",
-            "Variable": "wirerange",
-            "Priority": 5
+            "Variable": "wirerange"
         },
         {
             "Key": "Burn",
@@ -39,8 +37,7 @@
             "Required": true,
             "Description": "The amount of time it takes (in seconds) to burn one unit of fuel.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/generator-asset.html#item-asset-properties",
-            "Variable": "burn",
-            "Priority": 5
+            "Variable": "burn"
         }
     ]
 }

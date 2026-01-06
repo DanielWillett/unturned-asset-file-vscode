@@ -15,8 +15,7 @@
             "DefaultValue": false,
             "Description": "The compass HUD will be visible while this item is in the player's inventory.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/map-asset.html#map-asset-properties",
-            "Variable": "enablesCompass",
-            "Priority": 3
+            "Variable": "enablesCompass"
         },
         {
             "Key": "Enables_Chart",
@@ -24,8 +23,7 @@
             "DefaultValue": false,
             "Description": "The chart map will be available while this item is in the player's inventory.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/map-asset.html#map-asset-properties",
-            "Variable": "enablesChart",
-            "Priority": 3
+            "Variable": "enablesChart"
         },
         {
             "Key": "Enables_Map",
@@ -33,8 +31,7 @@
             "DefaultValue": false,
             "Description": "The satellite map will be available while this item is in the player's inventory.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/map-asset.html#map-asset-properties",
-            "Variable": "enablesMap",
-            "Priority": 3
+            "Variable": "enablesMap"
         }
     ]
 }

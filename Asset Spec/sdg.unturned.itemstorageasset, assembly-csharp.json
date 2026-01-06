@@ -16,8 +16,7 @@
             "Minimum": 1,
             "Description": "Number of columns (horizontal storage space).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
-            "Variable": "storage_x",
-            "Priority": 6
+            "Variable": "storage_x"
         },
         {
             "Key": "Storage_Y",
@@ -26,8 +25,7 @@
             "Minimum": 1,
             "Description": "Number of rows (vertical storage space).",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
-            "Variable": "storage_y",
-            "Priority": 6
+            "Variable": "storage_y"
         },
         {
             "Key": "Display",
@@ -35,8 +33,7 @@
             "DefaultValue": false,
             "Description": "The first item in this storage will be visibly displayed.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
-            "Variable": "isDisplay",
-            "Priority": 5
+            "Variable": "isDisplay"
         },
         {
             "Key": "Should_Close_When_Outside_Range",
@@ -44,8 +41,7 @@
             "DefaultValue": false,
             "Description": "Whether or not the storage should automatically close when the player is outside of the interaction range.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
-            "Variable": "shouldCloseWhenOutsideRange",
-            "Priority": 4
+            "Variable": "shouldCloseWhenOutsideRange"
         },
         {
             "Key": "Default_Contained_Items",
@@ -58,7 +54,6 @@
             "Description": "Default items to add to the storage when it's placed..",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
             "Variable": "DefaultContainedItems",
-            "Priority": 3,
             "Version": "3.25.10.0"
         }
     ]

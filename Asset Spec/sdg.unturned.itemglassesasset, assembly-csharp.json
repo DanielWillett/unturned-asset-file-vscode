@@ -15,8 +15,80 @@
             "DefaultValue": "NONE",
             "Description": "Keeps the player's beard from being hidden while this item is equipped.",
             "Variable": "SDG.Unturned.ItemClothingAsset, Assembly-CSharp::beardVisible",
-            "Priority": 6,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/glasses-asset.html#glasses-asset-properties"
+        },
+        {
+            "Key": "SpotLight_Enabled",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not this flashlight emits light when enabled.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-enabled-bool-true",
+            "Variable": "lightConfig",
+            "InclusiveWith":
+            {
+                "Key": "Vision",
+                "Value": "HEADLAMP"
+            }
+        },
+        {
+            "Key": "SpotLight_Range",
+            "Type": "Float32",
+            "DefaultValue": 64.0,
+            "Description": "Range of the flashlight's beam, measured in meters.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-range-float32-64",
+            "Variable": "lightConfig",
+            "InclusiveWith":
+            {
+                "Key": "Vision",
+                "Value": "HEADLAMP"
+            }
+        },
+        {
+            "Key": "SpotLight_Angle",
+            "Type": "Float32",
+            "DefaultValue": 90.0,
+            "Minimum": 0.0,
+            "Maximum": 360.0,
+            "Description": "Angle of the flashlight's beam, measured in degrees.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-angle-float32-90",
+            "Variable": "lightConfig",
+            "InclusiveWith":
+            {
+                "Key": "Vision",
+                "Value": "HEADLAMP"
+            }
+        },
+        {
+            "Key": "SpotLight_Intensity",
+            "Type": "Float32",
+            "DefaultValue": 1.3,
+            "MinimumExclusive": 0.0,
+            "Description": "Intensity of the flashlight's beam.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-intensity-float32-1-3",
+            "Variable": "lightConfig",
+            "InclusiveWith":
+            {
+                "Key": "Vision",
+                "Value": "HEADLAMP"
+            }
+        },
+        {
+            "Key": "SpotLight_Color",
+            "Type":
+            {
+                "Type": "Color",
+                "ModernIs32Bit": true,
+                "Mode": "String, Legacy, Object"
+            },
+            "DefaultValue": "f5df93",
+            "Description": "Color of the flashlight's beam.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-color-color-f5df93",
+            "Variable": "lightConfig",
+            "InclusiveWith":
+            {
+                "Key": "Vision",
+                "Value": "HEADLAMP"
+            }
         },
         {
             "Key": "Nightvision_Color",
@@ -28,25 +100,21 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Vision",
-                            "Operation": "eq",
-                            "Comparand": "CIVILIAN"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Vision",
+                        "Operation": "eq",
+                        "Comparand": "CIVILIAN"
+                    },
                     "Value": "666666"
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Vision",
-                            "Operation": "eq",
-                            "Comparand": "MILITARY"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Vision",
+                        "Operation": "eq",
+                        "Comparand": "MILITARY"
+                    },
                     "Value": "147850"
                 },
                 {
@@ -55,7 +123,6 @@
             ],
             "Description": "Overrides the default color when using night vision. Note that when @Vision is 'Civilian' the color will be grayscaled using the red channel.",
             "Variable": "nightvisionColor",
-            "Priority": 5,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/glasses-asset.html#glasses-asset-properties",
             "ExclusiveWith": 
             [
@@ -75,8 +142,7 @@
                                 "Operation": "neq",
                                 "Comparand": "MILITARY"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -87,25 +153,21 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Vision",
-                            "Operation": "eq",
-                            "Comparand": "CIVILIAN"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Vision",
+                        "Operation": "eq",
+                        "Comparand": "CIVILIAN"
+                    },
                     "Value": 0.5
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Vision",
-                            "Operation": "eq",
-                            "Comparand": "MILITARY"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Vision",
+                        "Operation": "eq",
+                        "Comparand": "MILITARY"
+                    },
                     "Value": 0.25
                 },
                 {
@@ -114,7 +176,6 @@
             ],
             "Description": "Overrides the default fog intensity.",
             "Variable": "nightvisionFogIntensity",
-            "Priority": 5,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/glasses-asset.html#glasses-asset-properties",
             "ExclusiveWith": 
             [
@@ -134,8 +195,7 @@
                                 "Operation": "neq",
                                 "Comparand": "MILITARY"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -146,7 +206,6 @@
             "DefaultValue": false,
             "Description": "Whether or not the night vision works when the player is in third person.",
             "Variable": "isNightvisionAllowedInThirdPerson",
-            "Priority": 5,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/glasses-asset.html#glasses-asset-properties",
             "ExclusiveWith": 
             [
@@ -178,7 +237,6 @@
             "DefaultValue": false,
             "Description": "Blackens the player's screen while this item is equipped.",
             "Variable": "isBlindfold",
-            "Priority": 6,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/glasses-asset.html#glasses-asset-properties"
         }
     ],

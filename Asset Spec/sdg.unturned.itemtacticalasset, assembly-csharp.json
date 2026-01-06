@@ -15,8 +15,7 @@
             "DefaultValue": false,
             "Description": "This tactical has a toggleable laser.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#laser-flag",
-            "Variable": "isLaser",
-            "Priority": 12
+            "Variable": "isLaser"
         },
         {
             "Key": "Light",
@@ -24,8 +23,7 @@
             "DefaultValue": false,
             "Description": "This tactical has a toggleable flashlight.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#light-flag",
-            "Variable": "isLight",
-            "Priority": 12
+            "Variable": "isLight"
         },
         {
             "Key": "SpotLight_Enabled",
@@ -33,7 +31,6 @@
             "DefaultValue": true,
             "Description": "Whether or not the tactical light emits light when enabled.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-enabled-bool-true",
-            "Priority": 8,
             "Variable": "lightConfig",
             "InclusiveWith": [ "Light" ]
         },
@@ -43,7 +40,6 @@
             "DefaultValue": 64.0,
             "Description": "Range of the tactical light's beam, measured in meters.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-range-float32-64",
-            "Priority": 8,
             "Variable": "lightConfig",
             "InclusiveWith": [ "Light" ]
         },
@@ -55,7 +51,6 @@
             "Maximum": 360.0,
             "Description": "Angle of the tactical light's beam, measured in degrees.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-angle-float32-90",
-            "Priority": 8,
             "Variable": "lightConfig",
             "InclusiveWith": [ "Light" ]
         },
@@ -66,7 +61,6 @@
             "MinimumExclusive": 0.0,
             "Description": "Intensity of the tactical light's beam.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-intensity-float32-1-3",
-            "Priority": 8,
             "Variable": "lightConfig",
             "InclusiveWith": [ "Light" ]
         },
@@ -81,7 +75,6 @@
             "DefaultValue": "f5df93",
             "Description": "Color of the tactical light's beam.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/data/struct/playerspotlightconfig.html#spotlight-color-color-f5df93",
-            "Priority": 8,
             "Variable": "lightConfig",
             "InclusiveWith": [ "Light" ]
         },
@@ -91,8 +84,7 @@
             "DefaultValue": false,
             "Description": "This tactical has a toggleable rangefinder.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#rangefinder-flag",
-            "Variable": "isRangefinder",
-            "Priority": 12
+            "Variable": "isRangefinder"
         },
         {
             "Key": "Melee",
@@ -100,8 +92,7 @@
             "DefaultValue": false,
             "Description": "This tactical has the ability to perform a 'jab' attack when equipped.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-flag",
-            "Variable": "isMelee",
-            "Priority": 11
+            "Variable": "isMelee"
         },
         {
             "Key": "Melee_Player_Damage",
@@ -110,7 +101,6 @@
             "Description": "Amount of damage that should be dealt to player entities, prior to modifiers such as limb multipliers.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -120,7 +110,6 @@
             "Description": "Multiplier on damage targeted against a player's legs.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -130,7 +119,6 @@
             "Description": "Multiplier on damage targeted against a player's arms.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -140,7 +128,6 @@
             "Description": "Multiplier on damage targeted against a player's torso.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -150,7 +137,6 @@
             "Description": "Multiplier on damage targeted against a player's head.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -160,7 +146,6 @@
             "Description": "Determines the effect the weapon has in relation to the Bleeding status effect.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -170,7 +155,6 @@
             "Description": "Determines the effect the weapon has in relation to the Broken Bones status effect.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -180,7 +164,6 @@
             "Description": "Amount of damage that should be dealt to zombie entities, prior to modifiers such as limb multipliers.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -190,7 +173,6 @@
             "Description": "Multiplier on damage targeted against a zombie's legs.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -200,27 +182,24 @@
             "Description": "Multiplier on damage targeted against a zombie's arms.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
-            "Key": "Zombie_Spine_Multiplier",
+            "Key": "Melee_Zombie_Spine_Multiplier",
             "Type": "Float32",
             "DefaultValue": 0.6,
             "Description": "Multiplier on damage targeted against a zombie's torso.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
-            "Key": "Zombie_Skull_Multiplier",
+            "Key": "Melee_Zombie_Skull_Multiplier",
             "Type": "Float32",
             "DefaultValue": 1.1,
             "Description": "Multiplier on damage targeted against a zombie's head.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -230,7 +209,6 @@
             "Description": "Amount of damage that should be dealt to animal entities, prior to modifiers such as limb multipliers.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -240,7 +218,6 @@
             "Description": "Multiplier on damage targeted against a animal's legs.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -250,7 +227,6 @@
             "Description": "Multiplier on damage targeted against a animal's torso.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -260,7 +236,6 @@
             "Description": "Multiplier on damage targeted against a animal's head.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -270,7 +245,6 @@
             "Description": "Specified if a zombie should always be stunned when targeted by the weapon.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "ExclusiveWith": [ "Melee_Stun_Zombie_Never" ],
             "InclusiveWith": [ "Melee" ]
         },
@@ -281,7 +255,6 @@
             "Description": "Specified if a zombie should never be stunned when targeted by the weapon.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "ExclusiveWith": [ "Melee_Stun_Zombie_Always" ],
             "InclusiveWith": [ "Melee" ]
         },
@@ -292,7 +265,6 @@
             "Description": "Scales force applied to zombie ragdoll.",
             "Variable": "MeleeProperties",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#melee-specific-property-descriptions",
-            "Priority": 10,
             "InclusiveWith": [ "Melee" ]
         },
         {
@@ -307,7 +279,6 @@
             "Description": "The color of the tactical laser.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html#laser-color-color-ff0000",
             "Variable": "laserColor",
-            "Priority": 9,
             "InclusiveWith": [ "Laser" ]
         }
     ],

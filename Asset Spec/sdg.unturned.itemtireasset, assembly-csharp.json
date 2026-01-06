@@ -16,7 +16,6 @@
             "Description": "Whether to add tires to the vehicle or remove them from the vehicle.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tire-asset.html#tire-asset-properties",
             "Variable": "mode",
-            "Priority": 8,
             "Required": true
         }
     ],

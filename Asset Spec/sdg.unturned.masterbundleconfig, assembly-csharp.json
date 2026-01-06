@@ -21,8 +21,7 @@
             "Type": "Path",
             "Required": true,
             "Description": "Defines the path in Unity to the master bundle's folder.",
-            "Variable": "assetPrefix",
-            "Priority": 1
+            "Variable": "assetPrefix"
         },
         {
             "Key": "Master_Bundle_Version",

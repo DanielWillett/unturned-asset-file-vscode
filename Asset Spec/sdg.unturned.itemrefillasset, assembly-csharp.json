@@ -19,8 +19,7 @@
             "Description": "The sound played when this item is drank from.",
             "DefaultValue": null,
             "Variable": "use",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Priority": 2
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties"
         },
         {
             "Key": "Water",
@@ -31,8 +30,7 @@
             "Maximum": 100.0,
             "Description": "The amount of water restored when drinking clean water. Use @Clean_Water instead.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "cleanWater",
-            "Priority": 10
+            "Variable": "cleanWater"
         },
         {
             "Key": "Clean_Health",
@@ -42,8 +40,7 @@
             "Maximum": 100.0,
             "Description": "The amount of health restored when drinking clean water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "cleanHealth",
-            "Priority": 8
+            "Variable": "cleanHealth"
         },
         {
             "Key": "Salty_Health",
@@ -53,8 +50,7 @@
             "Maximum": 100.0,
             "Description": "The amount of health restored when drinking salty water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "saltyHealth",
-            "Priority": 8
+            "Variable": "saltyHealth"
         },
         {
             "Key": "Dirty_Health",
@@ -64,8 +60,7 @@
             "Maximum": 100.0,
             "Description": "The amount of health restored when drinking dirty water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "dirtyHealth",
-            "Priority": 8
+            "Variable": "dirtyHealth"
         },
         {
             "Key": "Clean_Food",
@@ -75,8 +70,7 @@
             "Maximum": 100.0,
             "Description": "The amount of food restored when drinking clean water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "cleanFood",
-            "Priority": 7
+            "Variable": "cleanFood"
         },
         {
             "Key": "Salty_Food",
@@ -86,8 +80,7 @@
             "Maximum": 100.0,
             "Description": "The amount of food restored when drinking salty water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "saltyFood",
-            "Priority": 7
+            "Variable": "saltyFood"
         },
         {
             "Key": "Dirty_Food",
@@ -97,8 +90,7 @@
             "Maximum": 100.0,
             "Description": "The amount of food restored when drinking dirty water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "dirtyFood",
-            "Priority": 7
+            "Variable": "dirtyFood"
         },
         {
             "Key": "Clean_Water",
@@ -108,8 +100,7 @@
             "Maximum": 100.0,
             "Description": "The amount of water restored when drinking clean water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "cleanWater",
-            "Priority": 10
+            "Variable": "cleanWater"
         },
         {
             "Key": "Salty_Water",
@@ -119,8 +110,7 @@
             "Maximum": 100.0,
             "Description": "The amount of water restored when drinking salty water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "saltyWater",
-            "Priority": 10
+            "Variable": "saltyWater"
         },
         {
             "Key": "Dirty_Water",
@@ -130,8 +120,7 @@
             "Maximum": 100.0,
             "Description": "The amount of water restored when drinking dirty water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "dirtyWater",
-            "Priority": 10
+            "Variable": "dirtyWater"
         },
         {
             "Key": "Clean_Virus",
@@ -141,8 +130,7 @@
             "Maximum": 100.0,
             "Description": "The amount of virus restored when drinking clean water. Negative values infect.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "cleanVirus",
-            "Priority": 9
+            "Variable": "cleanVirus"
         },
         {
             "Key": "Salty_Virus",
@@ -152,8 +140,7 @@
             "Maximum": 100.0,
             "Description": "The amount of virus restored when drinking salty water. Negative values infect.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "saltyVirus",
-            "Priority": 9
+            "Variable": "saltyVirus"
         },
         {
             "Key": "Dirty_Virus",
@@ -163,8 +150,7 @@
             "Maximum": 100.0,
             "Description": "The amount of virus restored when drinking dirty water. Negative values infect.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "dirtyVirus",
-            "Priority": 9
+            "Variable": "dirtyVirus"
         },
         {
             "Key": "Clean_Stamina",
@@ -174,8 +160,7 @@
             "Maximum": 100.0,
             "Description": "The amount of stamina restored when drinking clean water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "cleanStamina",
-            "Priority": 6
+            "Variable": "cleanStamina"
         },
         {
             "Key": "Salty_Stamina",
@@ -185,8 +170,7 @@
             "Maximum": 100.0,
             "Description": "The amount of stamina restored when drinking salty water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "saltyStamina",
-            "Priority": 6
+            "Variable": "saltyStamina"
         },
         {
             "Key": "Dirty_Stamina",
@@ -196,8 +180,7 @@
             "Maximum": 100.0,
             "Description": "The amount of stamina restored when drinking dirty water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "dirtyStamina",
-            "Priority": 6
+            "Variable": "dirtyStamina"
         },
         {
             "Key": "Clean_Oxygen",
@@ -207,8 +190,7 @@
             "Maximum": 100.0,
             "Description": "The amount of oxygen restored when drinking clean water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "cleanOxygen",
-            "Priority": 5
+            "Variable": "cleanOxygen"
         },
         {
             "Key": "Salty_Oxygen",
@@ -218,8 +200,7 @@
             "Maximum": 100.0,
             "Description": "The amount of oxygen restored when drinking salty water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "saltyOxygen",
-            "Priority": 5
+            "Variable": "saltyOxygen"
         },
         {
             "Key": "Dirty_Oxygen",
@@ -229,8 +210,7 @@
             "Maximum": 100.0,
             "Description": "The amount of oxygen restored when drinking dirty water.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/refill-asset.html#refill-asset-properties",
-            "Variable": "dirtyOxygen",
-            "Priority": 5
+            "Variable": "dirtyOxygen"
         }
     ],
     "BundleAssets":

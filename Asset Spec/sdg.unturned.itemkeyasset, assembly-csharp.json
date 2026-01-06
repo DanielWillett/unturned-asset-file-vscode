@@ -15,8 +15,7 @@
             "Description": "Adds UI elements for using this Steam Economy item on another Steam Economy item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/key-asset.html#key-asset-properties",
             "Variable": "exchangeWithTargetItem",
-            "DefaultValue": false,
-            "Priority": 3
+            "DefaultValue": false
         }
     ]
 }

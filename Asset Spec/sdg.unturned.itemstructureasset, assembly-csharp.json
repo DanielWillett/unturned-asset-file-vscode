@@ -14,8 +14,7 @@
             "Type": "Boolean",
             "Description": "Whether or not this structure defines a 'Clip' prefab in Unity.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties",
-            "DefaultValue": true,
-            "Priority": 2
+            "DefaultValue": true
         },
         {
             "Key": "PlacementPreviewPrefab",
@@ -27,8 +26,7 @@
             "DefaultValue": null,
             "Description": "Overrides the placement preview model spawned when this item is held.",
             "Variable": "placementPreviewRef",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties",
-            "Priority": 2
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties"
         },
         {
             "Key": "PlacementAudioClip",
@@ -40,8 +38,7 @@
             "Description": "The sound played when this structure is placed.",
             "DefaultValue": null,
             "Variable": "use",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties",
-            "Priority": 2
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties"
         },
         {
             "Key": "Construct",
@@ -49,8 +46,7 @@
             "Required": true,
             "Description": "The type of structure to construct,",
             "Variable": "construct",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties",
-            "Priority": 95
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties"
         },
         {
             "Key": "Health",
@@ -60,8 +56,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties",
             "DefaultValue": 0,
             "Required": true,
-            "MinimumExclusive": 0,
-            "Priority": 2
+            "MinimumExclusive": 0
         },
         {
             "Key": "Range",
@@ -71,8 +66,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties",
             "DefaultValue": 0.0,
             "Required": true,
-            "Minimum": 0.0,
-            "Priority": 2
+            "Minimum": 0.0
         },
         {
             "Key": "Explosion",
@@ -84,8 +78,7 @@
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
             "Description": "Effect played when this structure is destroyed.",
             "Variable": "explosionGuid",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties",
-            "Priority": 1
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties"
         },
         {
             "Key": "Can_Be_Damaged",
@@ -93,8 +86,7 @@
             "DefaultValue": true,
             "Description": "If this structure is damagable.",
             "Variable": "canBeDamaged",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties",
-            "Priority": 1
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html#structure-asset-properties"
         },
         {
             "Key": "Eligible_For_Pooling",
@@ -130,8 +122,7 @@
                                 "Operation": "eq",
                                 "Comparand": "RAMPART"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -258,8 +249,7 @@
                                 "Operation": "eq",
                                 "Comparand": "FLOOR_POLY"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]

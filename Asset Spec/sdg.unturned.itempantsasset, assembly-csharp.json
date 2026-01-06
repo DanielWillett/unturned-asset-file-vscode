@@ -7,19 +7,6 @@
     "Category": "ITEM",
     "VanillaIdLimit": 2000,
     "RequireId": true,
-    "Properties":
-    [
-        {
-            "Key": "Zoom",
-            "Type": "Float32",
-            "Description": "Multiplicative amount of zoom.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/pants-asset.html#pants-asset-properties",
-            "Variable": "zoom",
-            "Minimum": 1.0,
-            "DefaultValue": 1.0,
-            "Priority": 3
-        }
-    ],
     "BundleAssets":
     [
         {

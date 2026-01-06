@@ -16,8 +16,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/optic-asset.html#sight-asset-properties",
             "Variable": "zoom",
             "Minimum": 1.0,
-            "DefaultValue": 1.0,
-            "Priority": 3
+            "DefaultValue": 1.0
         }
     ]
 }

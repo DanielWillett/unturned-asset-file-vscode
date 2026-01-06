@@ -19,8 +19,7 @@
             "Description": "The icon for this curation list.",
             "DefaultValue": null,
             "Variable": "Icon",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/server-browser-curation-asset.html#server-browser-curation-assets",
-            "Priority": 8
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/server-browser-curation-asset.html#server-browser-curation-assets"
         },
         {
             "Key": "",

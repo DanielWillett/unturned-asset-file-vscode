@@ -15,8 +15,7 @@
             "DefaultValue": "NEUTRAL",
             "Description": "The sentry's targeting aggression.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "sentryMode",
-            "Priority": 16
+            "Variable": "sentryMode"
         },
         {
             "Key": "Requires_Power",
@@ -24,8 +23,7 @@
             "DefaultValue": true,
             "Description": "Whether or not the sentry requires power from a generator.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "requiresPower",
-            "Priority": 13
+            "Variable": "requiresPower"
         },
         {
             "Key": "Infinite_Ammo",
@@ -33,8 +31,7 @@
             "DefaultValue": false,
             "Description": "Whether or not the magazine attachments in the stored gun should be depleted during use.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "infiniteAmmo",
-            "Priority": 12
+            "Variable": "infiniteAmmo"
         },
         {
             "Key": "Infinite_Quality",
@@ -42,8 +39,7 @@
             "DefaultValue": false,
             "Description": "Whether or not the stored gun should degrade during use.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "infiniteQuality",
-            "Priority": 12
+            "Variable": "infiniteQuality"
         },
         {
             "Key": "AmmoConsumptionProbability",
@@ -53,8 +49,7 @@
             "Maximum": 1.0,
             "Description": "Percentage (0-1) chance that ammo will be consumed after shooting.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "AmmoConsumptionProbability",
-            "Priority": 11
+            "Variable": "AmmoConsumptionProbability"
         },
         {
             "Key": "QualityConsumptionProbability",
@@ -64,8 +59,7 @@
             "Maximum": 1.0,
             "Description": "Percentage (0-1) chance that the gun's quality will degrade after shooting.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "QualityConsumptionProbability",
-            "Priority": 11
+            "Variable": "QualityConsumptionProbability"
         },
         {
             "Key": "Detection_Radius",
@@ -74,8 +68,7 @@
             "DefaultValue": 48.0,
             "Description": "Radius (in meters) in which targets can be initially detected.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "detectionRadius",
-            "Priority": 15
+            "Variable": "detectionRadius"
         },
         {
             "Key": "Target_Loss_Radius",
@@ -84,8 +77,7 @@
             "DefaultValue": "=MUL(@Detection_Radius 1.2)",
             "Description": "Radius (in meters) for continuing to track targets after they have left the initial detection radius.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "targetLossRadius",
-            "Priority": 15
+            "Variable": "targetLossRadius"
         },
         {
             "Key": "Target_Players",
@@ -93,8 +85,7 @@
             "DefaultValue": true,
             "Description": "Whether or not to target players.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "CanTargetPlayers",
-            "Priority": 14
+            "Variable": "CanTargetPlayers"
         },
         {
             "Key": "Target_Zombies",
@@ -102,8 +93,7 @@
             "DefaultValue": true,
             "Description": "Whether or not to target zombies.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "CanTargetZombies",
-            "Priority": 14
+            "Variable": "CanTargetZombies"
         },
         {
             "Key": "Target_Animals",
@@ -111,8 +101,7 @@
             "DefaultValue": true,
             "Description": "Whether or not to target animals.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "CanTargetAnimals",
-            "Priority": 14
+            "Variable": "CanTargetAnimals"
         },
         {
             "Key": "Target_Vehicles",
@@ -121,7 +110,6 @@
             "Description": "Whether or not to target vehicles.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
             "Variable": "CanTargetVehicles",
-            "Priority": 14,
             "InclusiveWith":
             [
                 {
@@ -137,7 +125,6 @@
             "Description": "Whether or not the sentry targets players and vehicles in PvE mode.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
             "Variable": "BypassesPvEMode",
-            "Priority": 13,
             "Version": "3.25.10.0"
         },
         {
@@ -147,7 +134,6 @@
             "Description": "Whether or not the sentry immediately focuses on an attacking player.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
             "Variable": "CanReactToAttacks",
-            "Priority": 13,
             "Version": "3.25.10.0"
         },
         {
@@ -157,7 +143,6 @@
             "Description": "Yaw range in degrees between far left and far right sweep positions.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
             "Variable": "SweepHalfYaw",
-            "Priority": 12,
             "Version": "3.25.10.0"
         },
         {
@@ -168,7 +153,6 @@
             "Description": "Duration in seconds for the sentry to complete a sweep from left to right and back.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
             "Variable": "SweepPeriod",
-            "Priority": 12,
             "Version": "3.25.10.0"
         },
         {
@@ -181,8 +165,7 @@
             "DefaultValue": "ab5f0056b54545c8a051159659da8bea",
             "Description": "The audio effect played when a target is detected.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "targetAcquiredEffect",
-            "Priority": 10
+            "Variable": "targetAcquiredEffect"
         },
         {
             "Key": "Target_Lost_Effect",
@@ -194,8 +177,7 @@
             "DefaultValue": "288b98b718084699ba3653c592e57803",
             "Description": "The audio effect played when a target is no longer detected.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html#sentry-asset-properties",
-            "Variable": "targetLostEffect",
-            "Priority": 10
+            "Variable": "targetLostEffect"
         }
     ],
     "Types":

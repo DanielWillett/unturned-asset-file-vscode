@@ -16,8 +16,7 @@
             "Except": [ "HEADLAMP" ],
             "Description": "Set a unique lighting vision effect to use.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#vision-elightingvision-none",
-            "Variable": "vision",
-            "Priority": 7
+            "Variable": "vision"
         },
         {
             "Key": "Nightvision_Color",
@@ -29,25 +28,22 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Vision",
-                            "Operation": "eq",
-                            "Comparand": "CIVILIAN"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Vision",
+                        "Operation": "eq",
+                        "Comparand": "CIVILIAN"
+                    },
                     "Value": "666666"
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Vision",
-                            "Operation": "eq",
-                            "Comparand": "MILITARY"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Vision",
+                        "Operation": "eq",
+                        "Comparand": "MILITARY"
+                    }
+                    ,
                     "Value": "147850"
                 },
                 {
@@ -56,28 +52,27 @@
             ],
             "Description": "Overrides the default color when using night vision.",
             "Variable": "nightvisionColor",
-            "Priority": 6,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#nightvision-color-color",
-            "ExclusiveWith": 
+            "InclusiveWith":
             [
                 {
                     "Key": "Vision",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
-                        "And":
+                        "Or":
                         [
                             {
                                 "Variable": "Vision",
-                                "Operation": "neq",
+                                "Operation": "eq",
                                 "Comparand": "CIVILIAN"
                             },
                             {
                                 "Variable": "Vision",
-                                "Operation": "neq",
+                                "Operation": "eq",
                                 "Comparand": "MILITARY"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -88,25 +83,21 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Vision",
-                            "Operation": "eq",
-                            "Comparand": "CIVILIAN"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Vision",
+                        "Operation": "eq",
+                        "Comparand": "CIVILIAN"
+                    },
                     "Value": 0.5
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Vision",
-                            "Operation": "eq",
-                            "Comparand": "MILITARY"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Vision",
+                        "Operation": "eq",
+                        "Comparand": "MILITARY"
+                    },
                     "Value": 0.25
                 },
                 {
@@ -115,28 +106,27 @@
             ],
             "Description": "Overrides the default fog intensity.",
             "Variable": "nightvisionFogIntensity",
-            "Priority": 6,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#nightvision-fog-intensity-float32",
-            "ExclusiveWith": 
+            "InclusiveWith":
             [
                 {
                     "Key": "Vision",
+                    "ConditionIsRequirement": true,
                     "Condition":
                     {
-                        "And":
+                        "Or":
                         [
                             {
                                 "Variable": "Vision",
-                                "Operation": "neq",
+                                "Operation": "eq",
                                 "Comparand": "CIVILIAN"
                             },
                             {
                                 "Variable": "Vision",
-                                "Operation": "neq",
+                                "Operation": "eq",
                                 "Comparand": "MILITARY"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -148,8 +138,7 @@
             "DefaultValue": 1.0,
             "Description": "Multiplicative amount of zoom.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#zoom-float32-1",
-            "Variable": "zoom",
-            "Priority": 10
+            "Variable": "zoom"
         },
         {
             "Key": "ThirdPerson_Zoom",
@@ -158,8 +147,7 @@
             "DefaultValue": 1.25,
             "Description": "Zoom factor while in the third-person perspective.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#thirdperson-zoom-float32-1-25",
-            "Variable": "thirdPersonZoomFactor",
-            "Priority": 10
+            "Variable": "thirdPersonZoomFactor"
         },
         {
             "Key": "Zoom_Using_Eyes",
@@ -167,8 +155,7 @@
             "DefaultValue": false,
             "Description": "Whether the main camera field of view should zoom without a scope overlay.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#zoom-using-eyes-bool-false",
-            "Variable": "shouldZoomUsingEyes",
-            "Priority": 10
+            "Variable": "shouldZoomUsingEyes"
         },
         {
             "Key": "Offset_Scope_Overlay_By_One_Texel",
@@ -176,8 +163,7 @@
             "DefaultValue": false,
             "Description": "Whether or not to scale the scope texture up slightly to center the pixel that is usually offset to the left.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#offset-scope-overlay-by-one-texel-bool-false",
-            "Variable": "shouldOffsetScopeOverlayByOneTexel",
-            "Priority": 9
+            "Variable": "shouldOffsetScopeOverlayByOneTexel"
         },
         {
             "Key": "AimAlignment_Owner",
@@ -186,7 +172,6 @@
             "Description": "Controls where to find @AimAlignment_Path.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#aimalignment-owner-eaimalignmenttransformowner-sight",
             "Variable": "AimAlignmentTransformOwner",
-            "Priority": 5,
             "InclusiveWith":
             [
                 {
@@ -206,8 +191,7 @@
             "DefaultValue": "Model_0/Aim",
             "Description": "While aiming down sights, the camera's position is aligned with this transform. Relative to @AimAlignment_Owner.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#aimalignment-owner-eaimalignmenttransformowner-sight",
-            "Variable": "AimAlignmentTransformOwner",
-            "Priority": 5
+            "Variable": "AimAlignmentTransformOwner"
         },
         {
             "Key": "AimAlignment_LocalOffset",
@@ -219,8 +203,7 @@
             "DefaultValue": "(0, 0, 0)",
             "Description": "Position offset relative to the 'Aim' transform or the transform specified by @AimAlignment_Path.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#aimalignment-localoffset-vector3-0-0-0",
-            "Variable": "AimAlignmentLocalOffset",
-            "Priority": 5
+            "Variable": "AimAlignmentLocalOffset"
         },
         {
             "Key": "Holographic",
@@ -228,8 +211,7 @@
             "DefaultValue": false,
             "Description": "This sight follows the true aiming direction regardless of viewmodel animation.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#holographic-flag",
-            "Variable": "isHolographic",
-            "Priority": 11
+            "Variable": "isHolographic"
         },
         {
             "Key": "DistanceMarkers",
@@ -241,8 +223,7 @@
             "DefaultValue": null,
             "Description": "List of accurate distance markers on the sight that account for the gun's bullet drop.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#distancemarkers-list-of-distancemarker",
-            "Variable": "distanceMarkers",
-            "Priority": 4
+            "Variable": "distanceMarkers"
         }
     ],
     "Types":

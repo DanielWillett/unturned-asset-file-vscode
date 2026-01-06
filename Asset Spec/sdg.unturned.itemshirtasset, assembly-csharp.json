@@ -15,8 +15,7 @@
             "Description": "Whether or not to load a first-person character mesh replacement.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html",
             "Variable": "characterMeshOverride1pLODs",
-            "DefaultValue": false,
-            "Priority": 3
+            "DefaultValue": false
         },
         {
             "Key": "Character_Mesh_3P_Override_LODs",
@@ -25,7 +24,6 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html",
             "Variable": "characterMeshOverride3pLODs",
             "DefaultValue": 0,
-            "Priority": 3,
             "CountForTemplateGroup": "shirt-3p-character-mesh-overrides"
         },
         {
@@ -34,8 +32,7 @@
             "Description": "Whether or not to load a replacement material for the first-person and third-person character mesh.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html",
             "Variable": "characterMaterialOverride",
-            "DefaultValue": false,
-            "Priority": 3
+            "DefaultValue": false
         },
         {
             "Key": "Ignore_Hand",
@@ -43,8 +40,7 @@
             "Description": "This shirt should ignore the player's left-handed setting.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/shirt-asset.html#shirt-asset-properties",
             "Variable": "ignoreHand",
-            "DefaultValue": false,
-            "Priority": 4
+            "DefaultValue": false
         }
     ],
     "BundleAssets":

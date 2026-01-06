@@ -18,8 +18,7 @@
             "Description": "The diffuse texture used on the surface of the road.",
             "DefaultValue": null,
             "Variable": "RoadTexture",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-texturepath",
-            "Priority": 4
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-texturepath"
         },
         {
             "Key": "Width",
@@ -29,8 +28,7 @@
             "Required": true,
             "Description": "The total horizontal size of the road in meters before it starts to taper off. Note that legacy road width was measured from the center, which would be half this value.",
             "Variable": "Width",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-width",
-            "Priority": 8
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-width"
         },
         {
             "Key": "Depth",
@@ -40,8 +38,7 @@
             "Required": true,
             "Description": "The total height of the road model in meters. Note that legacy road depth was measured from the center, which would be half this value.",
             "Variable": "Depth",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-depth",
-            "Priority": 7
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-depth"
         },
         {
             "Key": "OffsetAlongNormal",
@@ -49,8 +46,7 @@
             "DefaultValue": 0.0,
             "Description": "Distance along the terrain surface normal to move each road vertex. This is the same as the vertical offset legacy road property.",
             "Variable": "OffsetAlongNormal",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-offsetalongnormal",
-            "Priority": 6
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-offsetalongnormal"
         },
         {
             "Key": "RepeatDistanceScale",
@@ -58,8 +54,7 @@
             "DefaultValue": 1.0,
             "Description": "Multiplier for how far along the road before texture repeats.",
             "Variable": "OffsetAlongNormal",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-repeatdistancescale",
-            "Priority": 6
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-repeatdistancescale"
         },
         {
             "Key": "Chart",
@@ -67,7 +62,6 @@
             "DefaultValue": "NONE",
             "Description": "Overrides the material used for this road when rendering the level chart.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-chart",
-            "Priority": 9,
             "Variable": "chart"
         },
         {
@@ -82,7 +76,6 @@
             },
             "Description": "Name of a built-in physics material that will be used for the surface of this road. Use @PhysicsMaterial instead for custom materials.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-vanillaphysicsmaterial",
-            "Priority": 5,
             "Variable": "UnityPhysicsMaterial",
             "ExclusiveWith": [ "PhysicsMaterial" ]
         },
@@ -102,7 +95,6 @@
             },
             "Description": "Reference to a Physic Material that will be used for the surface of this road. Use @VanillaPhysicsMaterial instead for built-in materials.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-physicsmaterial",
-            "Priority": 5,
             "Variable": "UnityPhysicsMaterial",
             "ExclusiveWith": [ "VanillaPhysicsMaterial" ]
         }

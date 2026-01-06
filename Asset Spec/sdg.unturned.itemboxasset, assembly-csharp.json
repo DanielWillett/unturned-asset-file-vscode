@@ -16,8 +16,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
             "Variable": "generate",
             "DefaultValue": 0,
-            "Required": true,
-            "Priority": 3
+            "Required": true
         },
         {
             "Key": "Destroy",
@@ -26,8 +25,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
             "Variable": "generate",
             "DefaultValue": 0,
-            "Required": true,
-            "Priority": 3
+            "Required": true
         },
         {
             "Key": "Drops",
@@ -37,7 +35,6 @@
             "Description": "Corresponds to the total number of items in the box, so that the correct number of UI elements are displayed when showing box contents.",
             "Variable": "drops",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
-            "Priority": 3,
             "CountForTemplateGroup": "item-box-drops"
         },
         {
@@ -49,8 +46,7 @@
             "Required": true,
             "Description": "The itemdefid of an item in the box, which is visually displayed as a UI element when showing box contents.",
             "Variable": "drops",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
-            "Priority": 3
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties"
         },
         {
             "Key": "Item_Origin",
@@ -58,8 +54,7 @@
             "DefaultValue": "Unbox",
             "Description": "The localization key to use for for the unbox/unwrap menu button.",
             "Variable": "itemOrigin",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
-            "Priority": 3
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties"
         },
         {
             "Key": "Probability_Model",
@@ -67,8 +62,7 @@
             "DefaultValue": "Original",
             "Description": "UI elements regarding unbox probability chances are added depending on the specified enumerator.",
             "Variable": "probabilityModel",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
-            "Priority": 3
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties"
         },
         {
             "Key": "Contains_Bonus_Items",
@@ -76,8 +70,7 @@
             "DefaultValue": false,
             "Description": "When true, adds a UI element regarding bonus items.",
             "Variable": "containsBonusItems",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
-            "Priority": 3
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties"
         }
     ],
     "Types":

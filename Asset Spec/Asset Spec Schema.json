@@ -9,7 +9,6 @@
         "QualifiedType":
         {
             "type": "string",
-            "description": "Fully qualified type name.",
             "pattern": "[^\\s]+, [^\\s]+"
         },
         "QualifiedTypeOrNull":
@@ -20,15 +19,13 @@
                     "$ref": "#/$defs/QualifiedType"
                 },
                 {
-                    "type": "null",
-                    "description": "Fully qualified type name."
+                    "type": "null"
                 }
             ]
         },
         "Version":
         {
             "type": [ "string", "null" ],
-            "description": "Unturned game version.",
             "pattern": "\\d+\\.\\d+\\.\\d+\\.\\d+"
         },
         "EAssetType":
@@ -76,7 +73,7 @@
                     "description": "Any asset assignable to SDG.Unturned.SpawnAsset."
                 },
                 {
-                    "const": "SPAWN",
+                    "const": "NPC",
                     "description": "Any asset assignable to SDG.Unturned.DialogueAsset, SDG.Unturned.QuestAsset, or SDG.Unturned.VendorAsset."
                 }
             ],
@@ -225,17 +222,14 @@
                             "description": "The type of object to create."
                         }
                     },
-                    "required": [ "$udat-type" ],
-                    "description": "An object definition of a given type."
+                    "required": [ "$udat-type" ]
                 },
                 {
                     "type": "string",
-                    "const": "00000000-0000-0000-0000-000000000000",
-                    "description": "An empty GUID."
+                    "const": "00000000-0000-0000-0000-000000000000"
                 },
                 {
                     "type": [ "string", "number", "integer", "null", "boolean", "array" ],
-                    "description": "A literal value.",
                     "items":
                     {
                         "$ref": "#/$defs/Value"
@@ -245,88 +239,75 @@
         },
         "StringValue":
         {
-            "type": [ "string", "null" ],
-            "description": "A literal string value."
+            "type": [ "string", "null" ]
         },
         "BooleanValueAllowConditionals":
         {
             "anyOf":
             [
                 {
-                    "$ref": "#/$defs/ComplexOrBasicCondition",
-                    "description": "A condition that evaluates to a boolean value."
+                    "$ref": "#/$defs/ComplexOrBasicCondition"
                 },
                 {
                     "type": "string",
                     "pattern": "^[#@=].+"
                 }
-            ],
-            "description": "A literal boolean value, property/data reference, expression, or complex conditional."
+            ]
         },
         "IntegerValue":
         {
-            "type": [ "integer", "null" ],
-            "description": "A literal integer value."
+            "type": [ "integer", "null" ]
         },
         "ValueAllowConditionals":
         {
             "anyOf":
             [
                 {
-                    "$ref": "#/$defs/ValueSwitch",
-                    "description": "A value switch."
+                    "$ref": "#/$defs/ValueSwitch"
                 },
                 {
-                    "$ref": "#/$defs/ComplexOrBasicCondition",
-                    "description": "A condition that evaluates to a boolean value."
+                    "$ref": "#/$defs/ComplexOrBasicCondition"
                 },
                 {
                     "$ref": "#/$defs/Value"
                 }
-            ],
-            "description": "A literal value, switch statement, or complex conditional."
+            ]
         },
         "StringValueAllowConditionals":
         {
             "anyOf":
             [
                 {
-                    "$ref": "#/$defs/ValueSwitch",
-                    "description": "A value switch."
+                    "$ref": "#/$defs/ValueSwitch"
                 },
                 {
                     "$ref": "#/$defs/StringValue"
                 }
-            ],
-            "description": "A literal string value or switch statement."
+            ]
         },
         "IntegerValueAllowConditionals":
         {
             "anyOf":
             [
                 {
-                    "$ref": "#/$defs/ValueSwitch",
-                    "description": "A value switch."
+                    "$ref": "#/$defs/ValueSwitch"
                 },
                 {
                     "$ref": "#/$defs/IntegerValue"
                 }
-            ],
-            "description": "A literal integer value or switch statement."
+            ]
         },
         "VersionValueAllowConditionals":
         {
             "anyOf":
             [
                 {
-                    "$ref": "#/$defs/ValueSwitch",
-                    "description": "A value switch."
+                    "$ref": "#/$defs/ValueSwitch"
                 },
                 {
                     "$ref": "#/$defs/Version"
                 }
-            ],
-            "description": "A literal version value or switch statement."
+            ]
         },
         "TypeSwitch":
         {

@@ -15,8 +15,7 @@
             "Description": "Globally unique identifier for this asset.",
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header",
-            "CanBeInMetadata": true,
-            "Priority": 100
+            "CanBeInMetadata": true
         },
         {
             "Key": "Type",
@@ -26,8 +25,7 @@
             "Description": "Type of Asset to create.",
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header",
-            "CanBeInMetadata": true,
-            "Priority": 99
+            "CanBeInMetadata": true
         },
         {
             "Key": "ID",
@@ -35,8 +33,7 @@
             "Variable": "id",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#body",
             "Description": "Short ID unique to this asset's category.",
-            "DefaultValue": 0,
-            "Priority": 98
+            "DefaultValue": 0
         },
         {
             "Key": "Ignore_NPOT",
@@ -44,8 +41,7 @@
             "Variable": "ignoreNPOT",
             "Description": "Should texture non-power-of-two warnings be ignored?",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-validation.html#asset-validation",
-            "DefaultValue": false,
-            "Priority": -2
+            "DefaultValue": false
         },
         {
             "Key": "Ignore_TexRW",
@@ -53,32 +49,28 @@
             "Variable": "ignoreTextureReadable",
             "Description": "Should read/write texture warnings be ignored?",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-validation.html#asset-validation",
-            "DefaultValue": false,
-            "Priority": -2
+            "DefaultValue": false
         },
         {
             "Key": "Master_Bundle_Override",
             "Type": "MasterBundleName",
             "Description": "Override which .masterbundle file this asset uses.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
-            "DefaultValue": null,
-            "Priority": -2
+            "DefaultValue": null
         },
         {
             "Key": "Exclude_From_Master_Bundle",
             "Type": "Flag",
             "Description": "Indicates that this asset should skip loading from a master bundle and look for a legacy bundle instead.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
-            "DefaultValue": false,
-            "Priority": -2
+            "DefaultValue": false
         },
         {
             "Key": "Bundle_Override_Path",
             "Type": "LegacyBundleName",
             "Description": "Override which .unity3d file this asset uses.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
-            "DefaultValue": null,
-            "Priority": -2
+            "DefaultValue": null
         },
         {
             "Key": "Bundle_Path_Include_Filename",
@@ -86,7 +78,6 @@
             "Description": "Includes the file name in the bundle path, so if you have an asset that isn't in it's own folder, use this property for the correct bundle path.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
             "DefaultValue": false,
-            "Priority": -2,
             "ExclusiveWith": [ "Bundle_Override_Path" ]
         },
         {
@@ -94,8 +85,7 @@
             "Type": "AssetBundleVersion",
             "Description": "Defines which asset bundle version to use for this asset's legacy bundle.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#file-setup",
-            "DefaultValue": 1,
-            "Priority": -2
+            "DefaultValue": 1
         },
         {
             "Key": "Enable_Shader_Consolidation",
@@ -124,8 +114,7 @@
                 {
                     "Value": false
                 }
-            ],
-            "Priority": -2
+            ]
         },
         {
             "Key": "Disable_Shader_Consolidation",
@@ -154,8 +143,7 @@
                 {
                     "Value": true
                 }
-            ],
-            "Priority": -2
+            ]
         },
         {
             "Key": "Keep_Localization_Loaded",
@@ -163,7 +151,6 @@
             "DefaultValue": false,
             "Description": "Whether or not to keep localization data loaded for this asset. This is used to make sure NPC hints are translated on the client and not shown in the server's language.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#hint",
-            "Priority": -3,
             "Version": "3.25.10.0"
         }
     ],
@@ -1110,14 +1097,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Reset",
-                                    "Operation": "eq",
-                                    "Comparand": true
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Reset",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
                             "Value": "GREATER_THAN_OR_EQUAL_TO"
                         },
                         {
@@ -3533,7 +3518,6 @@
                     "Required": true,
                     "Description": "The item or spawn table to spawn in. Legacy IDs will be interpreted as items.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
-                    "Priority": 3,
                     "Variable": "assetRef"
                 },
                 {
@@ -3543,8 +3527,7 @@
                     "Minimum": 1,
                     "Description": "The total amount of @Asset items to give. If @Asset is a spawn table, it will be resolved once and the same item will be given this many times.",
                     "Variable": "amount",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
-                    "Priority": 2
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties"
                 },
                 {
                     "Key": "Origin",
@@ -3552,8 +3535,7 @@
                     "DefaultValue": "WORLD",
                     "Description": "The origin of the item, which influences the state (attachments, water/fuel level, etc.) of the item when it's spawned in.",
                     "Variable": "origin",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",
-                    "Priority": 1
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties"
                 }
             ]
         },

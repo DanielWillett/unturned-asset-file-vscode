@@ -240,6 +240,680 @@
     Static
 ]
 
+// base Item asset
+"$local$::SDG.Unturned.ItemAsset, Assembly-CSharp"
+[
+    Name
+    Description
+]
+"SDG.Unturned.ItemAsset, Assembly-CSharp"
+[
+    @Type
+    Rarity
+    Useable
+    Slot
+
+    @ID
+    _
+    Size_X
+    Size_Y
+    Size_Z
+    Size2_Z
+    Use_Auto_Icon_Measurements
+    _
+    Amount
+    Count_Min
+    Count_Max
+    _
+    Delete_Empty
+    Should_Delete_At_Zero_Amount
+    _
+    Quality_Min
+    Quality_Max
+    _
+    Override_Show_Quality
+    Should_Delete_At_Zero_Quality
+    Deleted_At_Zero_Quality_Effect
+    Deleted_At_Zero_Quality_Rewards
+    Econ_Icon_Use_Id
+    _
+    Left_Handed_Characters_Mirror_Equipable
+    Instantiated_Item_Name_Override
+    Procedurally_Animate_Inertia
+    Destroy_Item_Colliders
+    EquipableModelParent
+    _
+    Shared_Skin_Lookup_ID
+    Shared_Skin_Apply_Visuals
+    _
+    Use_Auto_Stat_Descriptions
+    Description_Excludes
+    Description_Includes
+    _
+    Backward
+    Pro
+    _
+    Can_Player_Equip
+    Can_Use_Underwater
+    Should_Drop_On_Death
+    Allow_Manual_Drop
+    Equipable_Movement_Speed_Multiplier
+    _
+    Blueprints
+    _
+    Add_Default_Actions
+    Actions
+    _
+    EquipablePrefab
+    _
+    EquipAudioClip
+    InspectAudioDef
+    InventoryAudio
+
+    @Exclude_From_Master_Bundle
+    Bypass_Hash_Verification
+]
+
+// Arrest_End item asset
+"SDG.Unturned.ItemArrestEndAsset, Assembly-CSharp"
+[
+    Recover
+    @Backward
+]
+
+// Arrest_Start item asset
+"SDG.Unturned.ItemArrestStartAsset, Assembly-CSharp"
+[
+    Strength
+    @Backward
+]
+
+// Arrest_Start item asset
+"SDG.Unturned.ItemArrestStartAsset, Assembly-CSharp"
+[
+    Strength
+    @Backward
+]
+
+// Base clothing item asset
+"SDG.Unturned.ItemClothingAsset, Assembly-CSharp"
+[
+    Proof_Water
+    Proof_Fire
+    Proof_Radiation
+    _
+    Hair_Visible
+    Beard_Visible
+    Visible_On_Ragdoll
+    Destroy_Clothing_Colliders
+    Mirror_Left_Handed_Model
+    Priority_Over_Cosmetic
+    _
+    Armor
+    Armor_Explosion
+    Movement_Speed_Multiplier
+    Falling_Damage_Multiplier
+    Prevents_Falling_Broken_Bones
+    _
+    @Backward
+
+    @EquipablePrefab
+    Skin_Override
+
+    @InventoryAudio
+    WearAudio
+]
+
+// Base storage clothing item asset
+"SDG.Unturned.ItemBagAsset, Assembly-CSharp"
+[
+    @Use_Auto_Icon_Measurements
+    _
+    Width
+    Height
+]
+
+// Base headgear clothing item asset
+"SDG.Unturned.ItemGearAsset, Assembly-CSharp"
+[
+    @Hair_Visible
+    Hair
+
+    @Beard_Visible
+    Beard
+
+    @Skin_Override
+    Hair_Override
+    Beard_Override
+]
+
+// Backpack item asset
+"SDG.Unturned.ItemBackpackAsset, Assembly-CSharp"
+[
+]
+
+// Glasses item asset
+"SDG.Unturned.ItemGlassesAsset, Assembly-CSharp"
+[
+    _
+    Blindfold
+    Vision
+    Nightvision_Fog_Intensity
+    Nightvision_Allowed_In_ThirdPerson
+    Nightvision_Color
+    SpotLight_Angle
+    SpotLight_Intensity
+    SpotLight_Range
+    SpotLight_Color
+    @Priority_Over_Cosmetic
+]
+
+// Hat item asset
+"SDG.Unturned.ItemHatAsset, Assembly-CSharp"
+[
+]
+
+// Mask item asset
+"SDG.Unturned.ItemMaskAsset, Assembly-CSharp"
+[
+    @Priority_Over_Cosmetic
+    _
+    Earpiece
+
+    @Armor_Explosion
+    FilterDegradationRateMultiplier
+]
+
+// Pants item asset
+"SDG.Unturned.ItemPantsAsset, Assembly-CSharp"
+[
+]
+
+// Shirt item asset
+"SDG.Unturned.ItemShirtAsset, Assembly-CSharp"
+[
+    @Shared_Skin_Apply_Visuals
+    _
+    Has_1P_Character_Mesh_Override
+    Character_Mesh_3P_Override_LODs
+    Has_Character_Material_Override
+
+    @Backward
+    Ignore_Hand
+]
+
+// Vest item asset
+"SDG.Unturned.ItemVestAsset, Assembly-CSharp"
+[
+    @Skin_Override
+    Has_Fallback_Shirt
+    Fallback_Shirt
+]
+
+// base attachment item asset
+"SDG.Unturned.ItemCaliberAsset, Assembly-CSharp"
+[
+    @Should_Delete_At_Zero_Amount
+    _
+    Calibers
+    _
+    Firerate
+    Recoil_X
+    Recoil_Y
+    Ballistic_Drop
+    _
+    Ballistic_Damage_Multiplier
+    Aim_Duration_Multiplier
+    Aiming_Recoil_Multiplier
+    Aiming_Movement_Speed_Multiplier
+    _
+    Damage
+    Spread
+    Sway
+    Shake
+    _
+    Bipod
+    Paintable
+    Invulnerable
+    
+    @Destroy_Item_Colliders
+    Destroy_Attachment_Colliders
+
+    @Instantiated_Item_Name_Override
+    Instantiated_Attachment_Name_Override
+]
+
+// Barrel attachment item asset
+"SDG.Unturned.ItemBarrelAsset, Assembly-CSharp"
+[
+    @Calibers
+    _
+    Braked
+    Silenced
+    Volume
+    Gunshot_Rolloff_Distance_Multiplier
+    Durability
+]
+
+// Grip attachment item asset
+"SDG.Unturned.ItemGripAsset, Assembly-CSharp"
+[
+]
+
+// Magazine attachment item asset
+"SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
+[
+    @Calibers
+    _
+    Pellets
+    _
+    Tracer
+    Impact
+    Speed
+    _
+    Stuck
+    Should_Fill_After_Detach
+    Spawn_Explosion_On_Dedicated_Server
+    _
+    Range
+    Player_Damage
+    Zombie_Damage
+    Animal_Damage
+    Barricade_Damage
+    Structure_Damage
+    Vehicle_Damage
+    Resource_Damage
+    Object_Damage
+    Explosion
+    Explosive
+    @Bipod
+    _
+    Explosion_Launch_Speed
+    Explosion_Plays_Impact_Effects
+    Explosion_Penetrate_Buildables
+    _
+    Projectile_Blast_Radius_Multiplier
+    Projectile_Launch_Force_Multiplier
+    Projectile_Damage_Multiplier
+]
+
+// Sight attachment item asset
+"SDG.Unturned.ItemSightAsset, Assembly-CSharp"
+[
+    @Spread
+    Zoom
+    ThirdPerson_Zoom
+    Zoom_Using_Eyes
+
+    Vision
+    Nightvision_Color
+    Nightvision_Fog_Intensity
+    Holographic
+    _
+    @Bipod
+
+    @Invulnerable
+    _
+    Offset_Scope_Overlay_By_One_Texel
+    AimAlignment_Owner
+    AimAlignment_Path
+    AimAlignment_LocalOffset
+    _
+    DistanceMarkers
+]
+
+// Tactical attachment item asset
+"SDG.Unturned.ItemTacticalAsset, Assembly-CSharp"
+[
+    @Calibers
+    _
+    Melee
+    Melee_Animal_Damage
+    Melee_Animal_Leg_Multiplier
+    Melee_Animal_Spine_Multiplier
+    Melee_Animal_Skull_Multiplier
+    Melee_Player_Damage
+    Melee_Player_Leg_Multiplier
+    Melee_Player_Arm_Multiplier
+    Melee_Player_Spine_Multiplier
+    Melee_Player_Skull_Multiplier
+    Melee_Player_Damage_Bleeding
+    Melee_Player_Damage_Bones
+    Melee_Zombie_Damage
+    Melee_Zombie_Leg_Multiplier
+    Melee_Zombie_Arm_Multiplier
+    Melee_Zombie_Spine_Multiplier
+    Melee_Zombie_Skull_Multiplier
+    Melee_Zombie_Ragdoll_Force_Multiplier
+    Melee_Stun_Zombie_Always
+    Melee_Stun_Zombie_Never
+
+    Laser
+    Laser_Color
+    Light
+    Rangefinder
+    SpotLight_Enabled
+    SpotLight_Range
+    SpotLight_Angle
+    SpotLight_Intensity
+    SpotLight_Color
+    @Bipod
+]
+
+// base Barricade/Structure item asset
+"SDG.Unturned.ItemPlaceableAsset, Assembly-CSharp"
+[
+    @Can_Player_Equip
+    Can_Zombies_Target
+
+    @Actions
+    _
+    Items_Recovered_On_Salvage
+    Min_Items_Recovered_On_Salvage
+    Max_Items_Recovered_On_Salvage
+    SalvageItem
+    Items_Dropped_On_Destroy
+    Min_Items_Dropped_On_Destroy
+    Max_Items_Dropped_On_Destroy
+    Item_Dropped_On_Destroy
+    _
+    PlaceableProvidesCraftingTags
+
+    @InventoryAudio
+    _
+    ExplosionEffect_CopyModelPosition
+    ExplosionEffect_CopyModelRotation
+    _
+    Armor_FalloffMaxRange
+    Armor_FalloffRange
+    Armor_FalloffMultiplier
+]
+
+// Barricade item asset 
+"SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp"
+[
+    Has_Clip_Prefab
+    @Delete_Empty
+
+    @EquipablePrefab
+    PlacementPreviewPrefab
+
+    @InventoryAudio
+    PlacementAudioClip
+
+    @Useable
+    Build
+
+    @Quality_Max
+    _
+    Salvage_Duration_Multiplier
+    _
+    Health
+    Range
+    Radius
+    Offset
+    _
+    Locked
+    _
+    Explosion
+    Bypass_Claim
+    Vulnerable
+    Can_Be_Damaged
+    Eligible_For_Pooling
+    Unrepairable
+    Proof_Explosion
+    Unsalvageable
+    Unpickupable
+    Unsaveable
+    Bypass_Pickup_Ownership
+    CanVehicleHookWhileAttached
+    Allow_Placement_On_Vehicle
+    Allow_Placement_Inside_Clip_Volumes
+    Allow_Collision_While_Animating
+    Use_Water_Height_Transparent_Sort
+
+    RequiresHeatSourceCraftingTagConversion
+    @PlaceableProvidesCraftingTags
+
+    @Actions
+    _
+    Armor_Tier
+]
+
+// Structure asset 
+"SDG.Unturned.ItemStructureAsset, Assembly-CSharp"
+[
+    Has_Clip_Prefab
+    @Delete_Empty
+
+    @EquipablePrefab
+    PlacementPreviewPrefab
+
+    @InventoryAudio
+    PlacementAudioClip
+
+    @Useable
+    Construct
+
+    @Quality_Max
+    _
+    Salvage_Duration_Multiplier
+    _
+    Health
+    Range
+    Foliage_Cut_Radius
+    Terrain_Test_Height
+    _
+    Explosion
+    Vulnerable
+    Can_Be_Damaged
+    Requires_Pillars
+    Eligible_For_Pooling
+    Unrepairable
+    Proof_Explosion
+    Unsalvageable
+    Unpickupable
+    Unsaveable
+
+    @Actions
+    _
+    Armor_Tier
+]
+
+// Beacon barricade item asset
+"SDG.Unturned.ItemBeaconAsset, Assembly-CSharp"
+[
+    @Armor_Tier
+    _
+    Wave
+    Rewards
+    Reward_ID
+    _
+    Enable_Participant_Scaling
+]
+
+// Charge barricade item asset
+"SDG.Unturned.ItemChargeAsset, Assembly-CSharp"
+[
+    @Locked
+    _
+    Player_Damage
+    Zombie_Damage
+    Animal_Damage
+    Barricade_Damage
+    Structure_Damage
+    Vehicle_Damage
+    Resource_Damage
+    Object_Damage
+    _
+    Range2
+    Explosion2
+    Explosion_Launch_Speed
+]
+
+// Farm (plant) barricade item asset
+"SDG.Unturned.ItemFarmAsset, Assembly-CSharp"
+[
+    @Locked
+    _
+    Growth
+    Grow
+    Grow_SpawnTable
+    Harvest_Reward_Experience
+    Harvest_Rewards
+    _
+    Ignore_Soil_Restrictions
+    Rain_Affects_Growth
+    Affected_By_Agriculture_Skill
+]
+
+// Generator barricade item asset
+"SDG.Unturned.ItemGeneratorAsset, Assembly-CSharp"
+[
+    @Locked
+    _
+    Capacity
+    Wirerange
+    Burn
+]
+
+// Library barricade item asset
+"SDG.Unturned.ItemLibraryAsset, Assembly-CSharp"
+[
+    @Locked
+    _
+    Capacity
+    Tax
+]
+
+// Library barricade item asset
+"SDG.Unturned.ItemLibraryAsset, Assembly-CSharp"
+[
+    @Locked
+    _
+    Capacity
+    Tax
+]
+
+// Oil_Pump barricade item asset
+"SDG.Unturned.ItemOilPumpAsset, Assembly-CSharp"
+[
+    @Actions
+    _
+    Fuel_Capacity
+]
+
+// Storage barricade item asset
+"SDG.Unturned.ItemStorageAsset, Assembly-CSharp"
+[
+    Storage_X
+    Storage_Y
+    Display
+    @Locked
+
+    @Locked
+    _
+    Default_Contained_Items
+
+    @Actions
+    _
+    Should_Close_When_Outside_Range
+]
+
+// Sentry storage barricade item asset
+"SDG.Unturned.ItemSentryAsset, Assembly-CSharp"
+[
+    @Locked
+    _
+    Mode
+    Requires_Power
+    React_To_Attacks
+    Target_Players
+    Target_Zombies
+    Target_Animals
+    Target_Vehicles
+    Sentry_Bypasses_PvE
+    _
+    Detection_Radius
+    Target_Loss_Radius
+    _
+    Sweep_Yaw
+    Sweep_Period
+    _
+    AmmoConsumptionProbability
+    QualityConsumptionProbability
+    Infinite_Ammo
+    Infinite_Quality
+
+    Target_Acquired_Effect
+    Target_Lost_Effect
+    _
+    @Explosion
+]
+
+// Tank barricade item asset
+"SDG.Unturned.ItemTankAsset, Assembly-CSharp"
+[
+    @Locked
+    _
+    Source
+    Resource
+]
+
+// Trap barricade item asset
+"SDG.Unturned.ItemTrapAsset, Assembly-CSharp"
+[
+    @Locked
+    _
+    Player_Damage
+    Zombie_Damage
+    Animal_Damage
+    Barricade_Damage
+    Structure_Damage
+    Vehicle_Damage
+    Resource_Damage
+    Object_Damage
+    Damage_Tires
+    _
+    Broken
+    Requires_Power
+    _
+    Range2
+    Explosion2
+    Explosion_Launch_Speed
+    _
+    Explosive
+]
+
+// Box (marketplace) item asset
+"SDG.Unturned.ItemBoxAsset, Assembly-CSharp"
+[
+    @Use_Auto_Icon_Measurements
+    _
+    Item_Origin
+    Generate
+    Destroy
+    _
+    Probability_Model
+    Contains_Bonus_Items
+    _
+    Drops
+]
+
+// Cloud (Parachute) item asset
+"SDG.Unturned.ItemCloudAsset, Assembly-CSharp"
+[
+    @Use_Auto_Icon_Measurements
+    _
+    Gravity
+]
+
+// base Weapon item asset
+"SDG.Unturned.ItemWeaponAsset, Assembly-CSharp"
+[
+    // todo
+]
+
 /* === NPC CONDITIONS === */
 
 // Base condition
@@ -727,4 +1401,90 @@
     Messages
     Conditions
     Rewards
+]
+
+/* === BLUEPRINTS/ACTIONS === */
+// Blueprints.InputItems
+"SDG.Unturned.BlueprintSupply, Assembly-CSharp"
+[
+    ID
+    Amount
+    Critical
+    Prioritization
+    CountingMethod
+    CountEmptyAsOne
+    AllowFull
+    AllowEmpty
+    AllowMaxQuality
+    Delete
+]
+// Blueprints.OutputItems
+"SDG.Unturned.BlueprintOutput, Assembly-CSharp"
+[
+    ID
+    Amount
+    Origin
+]
+// Blueprints
+"SDG.Unturned.Blueprint, Assembly-CSharp"
+[
+    Name
+    Map
+    CategoryTag
+    Type
+    Operation
+    InputItems
+    InputItems_Critical
+    Tool
+    Tool_Critical
+    Product
+    Products
+    Origin
+    OutputItems
+    Skill
+    Skill_Level
+    StateTransfer
+    StateTransfer_DeleteAttachments
+    RequiresHeat
+    RequiresNearbyCraftingTags
+    RequiresStaticTags
+    Effect
+    Searchable
+    VisibleWithUnmetConditions
+    Conditions
+    Rewards
+]
+// Actions
+"$local$::SDG.Unturned.Action, Assembly-CSharp"
+[
+    Text
+    Tooltip
+]
+"SDG.Unturned.Action, Assembly-CSharp"
+[
+    Type
+    BlueprintOwner
+    BlueprintName
+    Blueprints
+    CommonTextId
+    TextId
+    TooltipId
+]
+// legacy-only, Action_#_Blueprints
+"SDG.Unturned.ActionBlueprint, Assembly-CSharp"
+[
+    Name
+    Index
+    Link
+]
+
+// Scope distance markers
+"SDG.Unturned.ItemSightAsset+DistanceMarker, Assembly-CSharp"
+[
+    Distance
+    LineOffset
+    LineWidth
+    Color
+    HasLabel
+    Side
 ]

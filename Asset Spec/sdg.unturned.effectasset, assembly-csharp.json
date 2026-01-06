@@ -13,8 +13,7 @@
             "Key": "Bypass_ID_Limit",
             "Type": "Flag",
             "DefaultValue": false,
-            "Description": "Allows IDs to be less than 200 if this isn't the vanilla bundle.",
-            "Priority": 97
+            "Description": "Allows IDs to be less than 200 if this isn't the vanilla bundle."
         },
         {
             "Key": "OneShotAudio",

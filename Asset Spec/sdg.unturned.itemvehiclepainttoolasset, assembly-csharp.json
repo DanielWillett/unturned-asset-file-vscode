@@ -15,8 +15,7 @@
             "Description": "Vehicle's color will be replaced with this when used.",
             "DefaultValue": null,
             "Variable": "PaintColor",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vehicle-paint-tool-asset.html#vehicle-paint-tool-asset-properties",
-            "Priority": 2
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vehicle-paint-tool-asset.html#vehicle-paint-tool-asset-properties"
         }
     ]
 }

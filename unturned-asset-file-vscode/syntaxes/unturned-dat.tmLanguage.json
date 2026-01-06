@@ -196,12 +196,40 @@
 					"match": "[0-9a-fA-F]{8}(?:-{0,1}[0-9a-fA-F]{4}){3}-{0,1}[0-9a-fA-F]{12}(?!\\s*[^\\s])"
 				},
 				{
+					"name": "keyword.operator.multiply",
+					"match": "([0-9a-fA-F]{8}(?:-{0,1}[0-9a-fA-F]{4}){3}-{0,1}[0-9a-fA-F]{12})(?:\\s*x\\s*(\\d+))(?!\\s*[^\\s])",
+					"captures": {
+						"1": {
+							"name": "constant.numeric"
+						},
+						"2": {
+							"name": "constant.numeric"
+						}
+					}
+				},
+				{
 					"name": "constant.numeric",
 					"match": "-{0,1}(?:[\\.\\,]{0,1}\\d{1,3})+(?!\\s*[^\\s])"
 				},
 				{
 					"name": "keyword.boolean",
 					"match": "(?:[tT][rR][uU][eE]|[fF][aA][lL][sS][eE])(?!\\s*[^\\s])"
+				},
+				{
+					"name": "variable.language.this",
+					"match": "(?:[tT][hH][iI][sS])(?!\\s*[^\\s])"
+				},
+				{
+					"name": "keyword.operator.multiply",
+					"match": "([tT][hH][iI][sS])(?:\\s*x\\s*(\\d+))(?!\\s*[^\\s])",
+					"captures": {
+						"1": {
+							"name": "variable.language.this"
+						},
+						"2": {
+							"name": "constant.numeric"
+						}
+					}
 				},
 				{
 					"name": "string.other",

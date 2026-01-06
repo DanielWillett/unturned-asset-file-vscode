@@ -20,7 +20,6 @@
             "Description": "Spawn table used to reward items when a fish is caught.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
             "Variable": "rewardID",
-            "Priority": 3,
             "Required": true
         },
         {
@@ -31,7 +30,6 @@
             "Description": "Experience to give when a fish is caught. A random value is chosen between @Reward_Experience_Min and @Reward_Experience_Max.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
             "Variable": "rewardExperienceMin",
-            "Priority": 3,
             "InclusiveWith": [ "Reward_Experience_Min" ]
         },
         {
@@ -41,8 +39,7 @@
             "Minimum": "@Reward_Experience_Min",
             "Description": "Experience to give when a fish is caught. A random value is chosen between @Reward_Experience_Min and @Reward_Experience_Max.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
-            "Variable": "rewardExperienceMax",
-            "Priority": 3
+            "Variable": "rewardExperienceMax"
         },
         {
             "Key": "Quest_Rewards",
@@ -57,8 +54,7 @@
             "Description": "Rewards applied when catching a fish.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
             "Variable": "rewardsList",
-            "CountForTemplateGroup": "fisher-rewards",
-            "Priority": 2
+            "CountForTemplateGroup": "fisher-rewards"
         }
     ],
     "BundleAssets":

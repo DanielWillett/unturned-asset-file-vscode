@@ -14,7 +14,6 @@
             "DefaultValue": "ffffff",
             "Description": "The preferred text color of the name when displayed in the UI.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html#tag-properties",
-            "Priority": 5,
             "Variable": "NameColor"
         },
         {
@@ -23,7 +22,6 @@
             "DefaultValue": true,
             "Description": "Whether or not the game should look for an icon in the asset bundle for this asset.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html#tag-properties",
-            "Priority": 4,
             "Variable": "Icon"
         },
         {
@@ -36,7 +34,6 @@
             "DefaultValue": null,
             "Description": "Whether or not the game should look for an icon in the asset bundle for this asset.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html#tag-properties",
-            "Priority": 2,
             "Variable": "Icon",
             "ExclusiveWith":
             [
@@ -52,7 +49,6 @@
             "DefaultValue": true,
             "Description": "Whether or not the game should tint the icon with the user's UI color preference.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html#tag-properties",
-            "Priority": 3,
             "Variable": "Icon",
             "ExclusiveWith":
             [
