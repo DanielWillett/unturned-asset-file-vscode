@@ -730,15 +730,15 @@
                                     "title": "A backwards-compatible GUID or ID referencing another asset. Can only be parsed as a string."
                                 },
                                 {
-                                    "const": "GuidOrId",
+                                    "const": "LegacyAssetReferenceString",
                                     "title": "An asset GUID or short ID, where ElementType is the category or asset type."
                                 },
                                 {
-                                    "const": "Id",
+                                    "const": "LegacyAssetReference",
                                     "title": "A short/legacy ID to an asset."
                                 },
                                 {
-                                    "const": "DefaultableId",
+                                    "const": "DefaultableLegacyAssetReference",
                                     "title": "A short/legacy ID to an asset that can be left as a negative number to indicate the default value."
                                 }
                             ]
@@ -1145,6 +1145,38 @@
                     "additionalProperties": false
                 },
                 {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "TypeReference",
+                            "title": "A reference to a CLR (C#) type in an assembly-qualified name format (defaulting to Assembly-CSharp)."
+                        },
+                        "BaseType":
+                        {
+                            "$ref": "#/$defs/QualifiedType",
+                            "description": "Any references must have this type in their type hierarchy."
+                        },
+                        "BaseTypes":
+                        {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/$defs/QualifiedType"
+                            },
+                            "description": "Any references must have at least one of these types in their type hierarchy."
+                        },
+                        "Mode":
+                        {
+                            "type": [ "string", "null" ],
+                            "description": "The type of TypeReference to parse.",
+                            "enum": [ "String", "Object" ]
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
                     "const": "Flag",
                     "title": "A flag which does not have a value."
                 },
@@ -1213,16 +1245,20 @@
                     "title": "A single UTF-16 character."
                 },
                 {
-                    "const": "Type",
-                    "title": "A type that exists in the base game."
-                },
-                {
                     "const": "TypeOrEnum",
                     "title": "A type that exists in the base game, or an enum value, which is defined in ElementType."
                 },
                 {
                     "const": "Guid",
-                    "title": "A Globally Unique Identifier (also called a UUID)."
+                    "title": "A Globally Unique Identifier (also called a UUID). This is not an asset reference, just a value."
+                },
+                {
+                    "const": "GuidOrId",
+                    "title": "A Globally Unique Identifier (also called a UUID) or UInt16. This is not an asset reference, just a value."
+                },
+                {
+                    "const": "QualifiedType",
+                    "title": "The assembly-qualified name of a CLR type. To specify expected base types, use \"TypeReferenceType\" instead."
                 },
                 {
                     "const": "Color32",
@@ -1403,10 +1439,6 @@
                 {
                     "const": "PhysicsMaterialLegacy",
                     "title": "A physics material name or legacy SDG.Unturned.EPhysicsMaterial."
-                },
-                {
-                    "const": "TypeReference",
-                    "title": "A TypeReference<> taking an assembly-qualified type name."
                 },
                 {
                     "const": "IPv4Filter",
@@ -1613,6 +1645,11 @@
                 {
                     "type": [ "boolean", "null" ],
                     "description": "Behaves similar to Java's @Override when true, throwing an error if there is no parent property with the same key."
+                },
+                "PreventOverride":
+                {
+                    "type": [ "boolean", "null" ],
+                    "description": "Behaves similar to C#'s new keyword when true, ensuring that the property is treated as a separate property from it's base property."
                 },
                 "KeyLegacyExpansionFilter":
                 {

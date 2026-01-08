@@ -157,7 +157,7 @@
             "Key": "Sight",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemSightAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,
@@ -169,7 +169,7 @@
             "Key": "Tactical",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemTacticalAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,
@@ -181,7 +181,7 @@
             "Key": "Grip",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemGripAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,
@@ -193,7 +193,7 @@
             "Key": "Barrel",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,
@@ -205,7 +205,7 @@
             "Key": "Magazine",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
             },
             "DefaultValue": "00000000-0000-0000-0000-000000000000",
@@ -215,39 +215,24 @@
         },
         {
             "Key": "Magazine_Replacements",
-            "Type": "Int32",
-            "Minimum": 0,
-            "DefaultValue": 0,
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.MagazineReplacement, Assembly-CSharp",
+                "CountType": "Int32",
+                "Mode": "LegacyList",
+                "LegacyDefaultElementTypeValue":
+                {
+                    "$udat-type": "SDG.Unturned.MagazineReplacement, Assembly-CSharp",
+                    "ID": "00000000-0000-0000-0000-000000000000",
+                    "Map": null
+                }
+            },
+            "DefaultValue": [ ],
             "Description": "List of replacements that allow guns to use different values for @Magazine for certain maps.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
             "Variable": "magazineReplacements",
             "CountForTemplateGroup": "gun-magazine-replacements"
-        },
-        {
-            "Key": "Magazine_Replacement_*_ID",
-            "Template": true,
-            "TemplateGroups": [ "gun-magazine-replacements" ],
-            "Type":
-            {
-                "Type": "LegacyAssetReferenceString",
-                "AssetType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
-            },
-            "DefaultValue": "00000000-0000-0000-0000-000000000000",
-            "Required": true,
-            "Description": "The magazine that naturally spawns on this gun for magazine replacement #(Self.TemplateGroups[0])'s map.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
-            "Variable": "magazineReplacements"
-        },
-        {
-            "Key": "Magazine_Replacement_*_Map",
-            "Template": true,
-            "TemplateGroups": [ "gun-magazine-replacements" ],
-            "Type": "MapName",
-            "DefaultValue": null,
-            "Required": true,
-            "Description": "The map for which magazine replacement #(Self.TemplateGroups[0]) is active on.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
-            "Variable": "magazineReplacements"
         },
         {
             "Key": "Unplace",
@@ -323,29 +308,30 @@
         },
         {
             "Key": "Magazine_Calibers",
-            "Type": "Int32",
-            "Minimum": 1,
-            "DefaultValue": 0,
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "CaliberId",
+                "CountType": "Int32",
+                "MinimumCount": 1,
+                "Mode": "LegacyList"
+            },
+            "DefaultValue": [ "@Caliber" ],
             "Description": "Arbitrary IDs that must be also be present in magazines for them to be attachable to this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-calibers-int32",
             "Variable": "magazineCalibers",
             "CountForTemplateGroup": "gun-magazine-calibers"
         },
         {
-            "Key": "Magazine_Caliber_*",
-            "Template": true,
-            "TemplateGroups": [ "gun-magazine-calibers" ],
-            "Type": "CaliberId",
-            "DefaultValue": 0,
-            "Required": true,
-            "Description": "An arbitrary ID that must be also be present in magazines for them to be attachable to this gun.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-caliber-uint16",
-            "Variable": "magazineCalibers"
-        },
-        {
             "Key": "Attachment_Calibers",
-            "Type": "Int32",
-            "Minimum": 1,
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "CaliberId",
+                "CountType": "Int32",
+                "MinimumCount": 1,
+                "Mode": "LegacyList"
+            },
             "DefaultValue": "@Magazine_Calibers",
             "Description": "Arbitrary IDs that must be also be present in attachments for them to be attachable to this gun. Defaults to @Magazine_Calibers.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#attachment-calibers-int32",
@@ -365,24 +351,24 @@
             ]
         },
         {
-            "Key": "Attachment_Caliber_*",
-            "Template": true,
-            "TemplateGroups": [ "gun-attachment-calibers" ],
-            "Type": "CaliberId",
-            "DefaultValue": "@Magazine_Calibers",
-            "Required": true,
-            "Description": "An arbitrary ID that must be also be present in attachments for them to be attachable to this gun. Magazine calibers must also be specified to use this property.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#attachment-caliber-uint16",
-            "Variable": "attachmentCalibers"
-        },
-        {
             "Key": "Caliber",
             "Type": "CaliberId",
             "DefaultValue": 0,
-            "Deprecated": true,
-            "Description": "The attachment and magazine caliber for this gun. Use @Magazine_Calibers and @Attachment_Calibers instead.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-caliber-uint16",
-            "Variable": "magazineCalibers"
+            "Description": "The attachment and magazine caliber for this gun.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#caliber-uint16-0",
+            "Variable": "magazineCalibers",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Magazine_Calibers",
+                    "Condition":
+                    {
+                        "Variable": "Magazine_Calibers",
+                        "Operation": "gt",
+                        "Comparand": 0
+                    }
+                }
+            ]
         },
         {
             "Key": "Firerate",
@@ -816,14 +802,12 @@
                     "Cases":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "Ballistic_Drop",
-                                    "Operation": "lt",
-                                    "Comparand": 0.00001
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "Ballistic_Drop",
+                                "Operation": "lt",
+                                "Comparand": 0.00001
+                            },
                             "Value": 0.0
                         },
                         {
@@ -994,14 +978,12 @@
                     "Value": "0dc9bf936ce0409585fe9525287c7a7d"
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Action",
-                            "Operation": "neq",
-                            "Comparand": "Rail"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Action",
+                        "Operation": "neq",
+                        "Comparand": "Rail"
+                    },
                     "Value": "f380a6a6f41f422c9f5b9ac13e3b13e8"
                 },
                 {
@@ -1029,8 +1011,7 @@
                                 "Operation": "lte",
                                 "Comparand": 0
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -1102,14 +1083,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Can_Aim_During_Sprint",
-                            "Operation": "eq",
-                            "Comparand": true
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Can_Aim_During_Sprint",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
                     "Value": 1.0
                 },
                 {
@@ -1126,14 +1105,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Action",
-                            "Operation": "eq",
-                            "Comparand": "Minigun"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Action",
+                        "Operation": "eq",
+                        "Comparand": "Minigun"
+                    },
                     "Value": true
                 },
                 {
@@ -1205,25 +1182,21 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Action",
-                            "Operation": "eq",
-                            "Comparand": "Rocket"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Action",
+                        "Operation": "eq",
+                        "Comparand": "Rocket"
+                    },
                     "Value": 64
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Action",
-                            "Operation": "eq",
-                            "Comparand": "String"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Action",
+                        "Operation": "eq",
+                        "Comparand": "String"
+                    },
                     "Value": 16
                 },
                 {
@@ -1325,14 +1298,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Action",
-                            "Operation": "eq",
-                            "Comparand": "Break"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Action",
+                        "Operation": "eq",
+                        "Comparand": "Break"
+                    },
                     "Value": "@Ammo_Max"
                 },
                 {
@@ -1483,6 +1454,36 @@
                     "Value": "Always",
                     "Description": "Regardless of ammo, will play \"Hammer\" animation after reloading.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#erechambergunafterreloadmode-enumeration"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.MagazineReplacement, Assembly-CSharp",
+            "DisplayName": "Gun Magazine Replacement",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
+            "Properties":
+            [
+                {
+                    "Key": "ID",
+                    "Type":
+                    {
+                        "Type": "LegacyAssetReferenceString",
+                        "AssetType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
+                    },
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacement-id-uint16-0",
+                    "Description": "The GUID or ID of the magazine that should be used as an alternative default on a given map.",
+                    "DefaultValue": "00000000-0000-0000-0000-000000000000",
+                    "Required": true,
+                    "Variable": "guid"
+                },
+                {
+                    "Key": "Map",
+                    "Type": "MapName",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacement-map-string",
+                    "Description": "The name of the map on which this magazine will be used as the default.",
+                    "DefaultValue": null,
+                    "Required": true,
+                    "Variable": "map"
                 }
             ]
         }

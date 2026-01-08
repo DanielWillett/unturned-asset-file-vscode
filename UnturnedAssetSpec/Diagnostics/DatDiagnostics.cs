@@ -16,6 +16,32 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT003 = new DatDiagnostic("UNT003", DatDiagnosticSeverity.Error);
 
+    /* Project diagnostics */
+
+    // Warnings
+
+    /// <summary>
+    /// Emitted when a project file references a property by an improper casing.
+    /// </summary>
+    public static readonly DatDiagnostic UPROJ1001 = new DatDiagnostic("UPROJ1001", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// Emitted when a project file references a type by an improper casing.
+    /// </summary>
+    public static readonly DatDiagnostic UPROJ1002 = new DatDiagnostic("UPROJ1002", DatDiagnosticSeverity.Warning);
+
+    // Errors
+
+    /// <summary>
+    /// Emitted when a project file references a property that doesn't exist.
+    /// </summary>
+    public static readonly DatDiagnostic UPROJ2001 = new DatDiagnostic("UPROJ2001", DatDiagnosticSeverity.Error);
+
+    /// <summary>
+    /// Emitted when a project file references a type that doesn't exist.
+    /// </summary>
+    public static readonly DatDiagnostic UPROJ2002 = new DatDiagnostic("UPROJ2002", DatDiagnosticSeverity.Error);
+
     /* Suggestions */
 
     /// <summary>

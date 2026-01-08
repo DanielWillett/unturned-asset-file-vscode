@@ -25,11 +25,26 @@ public readonly struct AssetCategoryValue : IEquatable<AssetCategoryValue>, ICom
     public static readonly AssetCategoryValue Spawn = new AssetCategoryValue(9);
     public static readonly AssetCategoryValue NPC = new AssetCategoryValue(10);
 
-    public int Index { get; }
+    private readonly byte _index;
 
-    public ref readonly EnumSpecTypeValue Enum => ref AssetCategory.TypeOf.Values[Index];
+    /// <summary>
+    /// The index of this category within the <see cref="AssetCategory"/> (EAssetType) enum.
+    /// </summary>
+    public int Index => _index;
 
+    /// <summary>
+    /// Information about the asset category enum entry referenced by this value.
+    /// </summary>
+    public ref readonly EnumSpecTypeValue Enum => ref AssetCategory.TypeOf.Values[_index];
+
+    /// <summary>
+    /// The exact string value of this category.
+    /// </summary>
     public string Value => Enum.Value;
+
+    /// <summary>
+    /// The preferred casing of this category.
+    /// </summary>
     public string Casing => Enum.Casing;
 
     /// <summary>
@@ -41,7 +56,7 @@ public readonly struct AssetCategoryValue : IEquatable<AssetCategoryValue>, ICom
         if (index < 0 || index >= AssetCategory.TypeOf.Values.Length)
             throw new ArgumentOutOfRangeException(nameof(index));
 
-        Index = index;
+        _index = (byte)index;
     }
 
     /// <summary>
@@ -53,32 +68,44 @@ public readonly struct AssetCategoryValue : IEquatable<AssetCategoryValue>, ICom
         if (!AssetCategory.TryParse(str, out int index))
             throw new ArgumentOutOfRangeException(nameof(str));
 
-        Index = index;
+        _index = (byte)index;
     }
 
+    /// <inheritdoc />
     public int CompareTo(AssetCategoryValue other)
     {
-        return Index.CompareTo(other.Index);
+        return _index.CompareTo(other._index);
     }
 
+    /// <inheritdoc />
     public bool Equals(AssetCategoryValue other)
     {
-        return Index == other.Index;
+        return _index == other._index;
     }
 
+    /// <inheritdoc />
     public override string ToString() => Value;
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return obj is AssetCategoryValue v && Equals(v);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
-        return Index;
+        return _index;
     }
 
+    /// <summary>
+    /// Checks whether or not two <see cref="AssetCategoryValue"/> values reference the same category.
+    /// </summary>
     public static bool operator ==(AssetCategoryValue left, AssetCategoryValue right) => left.Equals(right);
+
+    /// <summary>
+    /// Checks whether or not two <see cref="AssetCategoryValue"/> values reference different categories.
+    /// </summary>
     public static bool operator !=(AssetCategoryValue left, AssetCategoryValue right) => !left.Equals(right);
 }
 

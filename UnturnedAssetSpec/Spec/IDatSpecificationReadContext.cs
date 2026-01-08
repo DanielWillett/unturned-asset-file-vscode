@@ -11,6 +11,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 public interface IDatSpecificationReadContext
 {
     /// <summary>
+    /// Pre-read asset information from the Assets.json file.
+    /// </summary>
+    AssetInformation Information { get; }
+
+    /// <summary>
     /// Reads a type from a JSON object or string.
     /// </summary>
     IType ReadType(in JsonElement root, IDatSpecificationObject readObject, string context = "");

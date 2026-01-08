@@ -136,7 +136,11 @@
         {
             "Key": "Dawn",
             "Type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
-            "DefaultValue": null,
+            "DefaultValue":
+            {
+                "$udat-type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
+                "Brightness_Multiplier": 1.0
+            },
             "Description": "Time of Day Properties during the 'Dawn' time.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#time-of-day-properties",
             "Variable": "timeValues"
@@ -144,7 +148,11 @@
         {
             "Key": "Midday",
             "Type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
-            "DefaultValue": null,
+            "DefaultValue":
+            {
+                "$udat-type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
+                "Brightness_Multiplier": 1.0
+            },
             "Description": "Time of Day Properties during the 'Midday' time.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#time-of-day-properties",
             "Variable": "timeValues"
@@ -152,7 +160,11 @@
         {
             "Key": "Dusk",
             "Type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
-            "DefaultValue": null,
+            "DefaultValue":
+            {
+                "$udat-type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
+                "Brightness_Multiplier": 1.0
+            },
             "Description": "Time of Day Properties during the 'Dusk' time.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#time-of-day-properties",
             "Variable": "timeValues"
@@ -160,7 +172,11 @@
         {
             "Key": "Midnight",
             "Type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
-            "DefaultValue": null,
+            "DefaultValue":
+            {
+                "$udat-type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
+                "Brightness_Multiplier": 1.0
+            },
             "Description": "Time of Day Properties during the 'Midnight' time.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#time-of-day-properties",
             "Variable": "timeValues"
@@ -184,17 +200,40 @@
             "Type": "SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp",
             "DisplayName": "Weather Time Configuration",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#time-of-day-properties",
-            "DefaultValue":
-            {
-                "Brightness_Multiplier": 1.0
-            },
             "Properties":
             [
                 {
                     "Key": "Fog_Color",
                     "Type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
                     "Description": "Color of the distance-based fog. Optionally overrides the skybox color.",
-                    "DefaultValue": null,
+                    "DefaultValue":
+                    {
+                        "$udat-type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
+                        "R": 0,
+                        "G": 0,
+                        "B": 0
+                    },
+                    "IncludedDefaultValue":
+                    [
+                        {
+                            "Case":
+                            {
+                                "Variable": "#Self.ValueType",
+                                "Operation": "neq",
+                                "Comparand": "Dictionary"
+                            },
+                            "Value":
+                            {
+                                "$udat-type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
+                                "R": 0,
+                                "G": 0,
+                                "B": 0
+                            }
+                        },
+                        {
+                            "Value": { "$udat-type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp" }
+                        }
+                    ],
                     "InclusiveWith":
                     [
                         {
@@ -222,7 +261,34 @@
                     "Key": "Cloud_Color",
                     "Type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
                     "Description": "Color of the inner body of cloud.",
-                    "DefaultValue": null,
+                    "DefaultValue":
+                    {
+                        "$udat-type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
+                        "R": 0,
+                        "G": 0,
+                        "B": 0
+                    },
+                    "IncludedDefaultValue":
+                    [
+                        {
+                            "Case":
+                            {
+                                "Variable": "#Self.ValueType",
+                                "Operation": "neq",
+                                "Comparand": "Dictionary"
+                            },
+                            "Value":
+                            {
+                                "$udat-type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
+                                "R": 0,
+                                "G": 0,
+                                "B": 0
+                            }
+                        },
+                        {
+                            "Value": { "$udat-type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp" }
+                        }
+                    ],
                     "InclusiveWith":
                     [
                         {
@@ -235,7 +301,34 @@
                     "Key": "Cloud_Rim_Color",
                     "Type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
                     "Description": "Color of the outer edge of cloud. More visible than @Cloud_Color.",
-                    "DefaultValue": null,
+                    "DefaultValue":
+                    {
+                        "$udat-type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
+                        "R": 0,
+                        "G": 0,
+                        "B": 0
+                    },
+                    "IncludedDefaultValue":
+                    [
+                        {
+                            "Case":
+                            {
+                                "Variable": "#Self.ValueType",
+                                "Operation": "neq",
+                                "Comparand": "Dictionary"
+                            },
+                            "Value":
+                            {
+                                "$udat-type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
+                                "R": 0,
+                                "G": 0,
+                                "B": 0
+                            }
+                        },
+                        {
+                            "Value": { "$udat-type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp" }
+                        }
+                    ],
                     "InclusiveWith":
                     [
                         {
@@ -257,12 +350,6 @@
             "Type": "SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp",
             "DisplayName": "Weather Color Configuration",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#color-properties",
-            "DefaultValue":
-            {
-                "R": 0,
-                "G": 0,
-                "B": 0
-            },
             "Properties":
             [
                 {

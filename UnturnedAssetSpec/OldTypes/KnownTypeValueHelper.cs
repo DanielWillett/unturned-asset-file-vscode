@@ -694,7 +694,18 @@ public static class KnownTypeValueHelper
         return TryParseGuidOrId(span.AsSpan(), span, out guidOrId);
     }
 
-    public static bool TryParseGuidOrId(ReadOnlySpan<char> span, string? stringValue, out GuidOrId guidOrId, string assetCategory = "NONE")
+    public static bool TryParseGuidOrId(ReadOnlySpan<char> span, AssetCategoryValue assetCategory, out GuidOrId guidOrId)
+    {
+        return TryParseGuidOrId(span, null, out guidOrId, assetCategory);
+    }
+
+    public static bool TryParseGuidOrId(string span, AssetCategoryValue assetCategory, out GuidOrId guidOrId)
+    {
+        return TryParseGuidOrId(span.AsSpan(), span, out guidOrId, assetCategory);
+    }
+
+    // ReSharper disable once UnusedParameter.Local
+    private static bool TryParseGuidOrId(ReadOnlySpan<char> span, string? stringValue, out GuidOrId guidOrId, AssetCategoryValue assetCategory = default)
     {
         if (span.Length == 1 && span[0] == '0')
         {
@@ -710,12 +721,12 @@ public static class KnownTypeValueHelper
         int index = span.IndexOf(':');
         if (index > 0)
         {
-            if (!AssetCategory.TryParse(span.Slice(0, index), out EnumSpecTypeValue category))
+            if (!AssetCategory.TryParse(span.Slice(0, index), out int category))
             {
                 return false;
             }
 
-            if (category == AssetCategory.None)
+            if (category == 0)
             {
                 guidOrId = GuidOrId.Empty;
                 return true;
@@ -723,14 +734,13 @@ public static class KnownTypeValueHelper
 
             if (index < span.Length - 1 && ushort.TryParse(span.Slice(index + 1).ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort id))
             {
-                guidOrId = id == 0 ? GuidOrId.Empty : new GuidOrId(id, category);
+                guidOrId = id == 0 ? GuidOrId.Empty : new GuidOrId(id, new AssetCategoryValue(category));
                 return true;
             }
         }
         else
         {
-            if (AssetCategory.TryParse(assetCategory, out EnumSpecTypeValue category)
-                && category != AssetCategory.None
+            if (assetCategory.Index != 0
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
                 && ushort.TryParse(span, NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort id)
 #else
@@ -738,7 +748,7 @@ public static class KnownTypeValueHelper
 #endif
                 )
             {
-                guidOrId = id == 0 ? GuidOrId.Empty : new GuidOrId(id, category);
+                guidOrId = id == 0 ? GuidOrId.Empty : new GuidOrId(id, assetCategory);
                 return true;
             }
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
@@ -791,7 +801,7 @@ public static class KnownTypeValueHelper
             amount = Math.Max(amount, 1);
         }
 
-        if (TryParseGuidOrId(itemString, itemString.Length == input.Length ? stringInput : null, out assetRef, "ITEM"))
+        if (TryParseGuidOrId(itemString, itemString.Length == input.Length ? stringInput : null, out assetRef, AssetCategoryValue.Item))
         {
             return index < 0 || input[index] == 'x';
         }

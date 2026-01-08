@@ -109,9 +109,19 @@ public static class TypeParsers
     public static ITypeParser<Guid> Guid { get; } = new TypeConverterParser<Guid>(TypeConverters.Guid);
 
     /// <summary>
-    /// The type parser for <see cref="DanielWillett.UnturnedDataFileLspServer.Data.Types.IPv4Filter"/> values.
+    /// The type parser for <see cref="Data.GuidOrId"/> values.
+    /// </summary>
+    public static ITypeParser<GuidOrId> GuidOrId { get; } = new TypeConverterParser<GuidOrId>(TypeConverters.GuidOrId);
+
+    /// <summary>
+    /// The type parser for <see cref="Data.Types.IPv4Filter"/> values.
     /// </summary>
     public static ITypeParser<IPv4Filter> IPv4Filter { get; } = new TypeConverterParser<IPv4Filter>(TypeConverters.IPv4Filter);
+
+    /// <summary>
+    /// The type parser for <see cref="Data.QualifiedType"/> values.
+    /// </summary>
+    public static ITypeParser<QualifiedType> QualifiedType { get; } = new TypeConverterParser<QualifiedType>(TypeConverters.QualifiedType);
 
     /// <summary>
     /// Gets the type parser for the given type.
@@ -173,6 +183,8 @@ public static class TypeParsers
                     Parser = (ITypeParser<T>)TimeSpan;
                 else if (typeof(T) == typeof(IPv4Filter))
                     Parser = (ITypeParser<T>)IPv4Filter;
+                else if (typeof(T) == typeof(QualifiedType))
+                    Parser = (ITypeParser<T>)QualifiedType;
                 else goto err;
                 return;
             }

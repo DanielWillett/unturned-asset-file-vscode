@@ -592,6 +592,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dictionary can not be converted to a value of type &apos;{0}&apos;, which expects a GUID, ID, or TYPE:ID as a string only. Property &apos;{1}&apos; expects a value..
+        /// </summary>
+        public static string UNT2004_BackwardsCompatibleAssetReferenceStringOnly {
+            get {
+                return ResourceManager.GetString("UNT2004_BackwardsCompatibleAssetReferenceStringOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value &apos;{0}&apos; can not be converted to a value of type &apos;{1}&apos;. Single-character boolean values must be lowercase, try using &quot;{2}&quot; instead..
         /// </summary>
         public static string UNT2004_BooleanSingleCharCapitalized {
@@ -624,6 +633,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         public static string UNT2004_DictionaryInsteadOfValue {
             get {
                 return ResourceManager.GetString("UNT2004_DictionaryInsteadOfValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dictionary can not be converted to a value of type &apos;{0}&apos;, which expects an ID as a string only. Property &apos;{1}&apos; expects a value..
+        /// </summary>
+        public static string UNT2004_LegacyAssetReferenceStringOnly {
+            get {
+                return ResourceManager.GetString("UNT2004_LegacyAssetReferenceStringOnly", resourceCulture);
             }
         }
         
@@ -687,6 +705,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         public static string UNT2004_StrictColor {
             get {
                 return ResourceManager.GetString("UNT2004_StrictColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dictionary can not be converted to a value of type &apos;{0}&apos;, which expects a type name as a string only. Property &apos;{1}&apos; expects a value..
+        /// </summary>
+        public static string UNT2004_TypeReferenceStringOnly {
+            get {
+                return ResourceManager.GetString("UNT2004_TypeReferenceStringOnly", resourceCulture);
             }
         }
         
@@ -777,6 +804,42 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         public static string UNT2013_Modern {
             get {
                 return ResourceManager.GetString("UNT2013_Modern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; should use the following casing: &quot;{1}&quot;..
+        /// </summary>
+        public static string UPROJ1001 {
+            get {
+                return ResourceManager.GetString("UPROJ1001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type &apos;{0}&apos; should use the following casing: &quot;{1}&quot;..
+        /// </summary>
+        public static string UPROJ1002 {
+            get {
+                return ResourceManager.GetString("UPROJ1002", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; doesn&apos;t exist. Double-check the spelling of the property name. Template properties should be referred to using &apos;#&apos; in place of the numbers..
+        /// </summary>
+        public static string UPROJ2001 {
+            get {
+                return ResourceManager.GetString("UPROJ2001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type &apos;{0}&apos; doesn&apos;t exist. Double-check the spelling of the type name and that it is a fully-qualified type name..
+        /// </summary>
+        public static string UPROJ2002 {
+            get {
+                return ResourceManager.GetString("UPROJ2002", resourceCulture);
             }
         }
     }

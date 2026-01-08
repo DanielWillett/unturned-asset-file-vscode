@@ -68,14 +68,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Scale",
-                            "Operation": "value-included",
-                            "Comparand": null
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Scale",
+                        "Operation": "value-included",
+                        "Comparand": null
+                    },
                     "Value": 0.0
                 },
                 {
@@ -84,7 +82,8 @@
             ],
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "Description": "The tree's in-game scale is a random number between 1.1 and the result of 1.1 + (Scale * 2).",
-            "Variable": "scale"
+            "Variable": "scale",
+            "ExclusiveWith": [ "RandomUniformScale_Min", "RandomUniformScale_Max" ]
         },
         {
             "Key": "RandomUniformScale_Min",
@@ -102,14 +101,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Scale",
-                            "Operation": "value-included",
-                            "Comparand": null
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Scale",
+                        "Operation": "value-included",
+                        "Comparand": null
+                    },
                     "Value": "=ADD(1.1 =MUL(@Scale 2.0))"
                 },
                 {
@@ -152,7 +149,7 @@
             "Key": "Log",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,
@@ -165,7 +162,7 @@
             "Key": "Stick",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,
@@ -185,7 +182,7 @@
             "Key": "Reward_ID",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,

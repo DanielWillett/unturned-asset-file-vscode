@@ -1,4 +1,4 @@
-// udat-type: DanielWillett.UnturnedDataFileLspServer.Data.Spec.Orderfile, UnturnedAssetSpec
+// udat-type: DanielWillett.UnturnedDataFileLspServer.Data.Types.Orderfile, UnturnedAssetSpec
 
 // Format:
 //   Each type has a list of property names. An '_' indicates a blank line.
@@ -11,6 +11,8 @@
 //   There can not be more than one property reference in a block of properties.
 //
 //   Any types not specified will fall back to the default order.
+//   
+//   Lines starting with a '$' are imports for all properties from another type
 //   
 // Example:
 //   "SDG.Unturned.Asset, Assembly-CSharp"
@@ -47,6 +49,23 @@
 // | Sight         |
 // | Useable       |
 // ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+
+// MasterBundle.dat
+"SDG.Unturned.MasterBundleConfig, Assembly-CSharp"
+[
+    Asset_Bundle_Name
+    Asset_Prefix
+    Asset_Bundle_Version
+]
+"SDG.Unturned.ServerListCurationFile, Assembly-CSharp"
+[
+    Name
+    IconURL
+    _
+    Labels
+    _
+    Rules
+]
 
 // Base asset
 "SDG.Unturned.Asset, Assembly-CSharp"
@@ -245,10 +264,13 @@
 [
     Name
     Description
+    _
+    Deleted_At_Zero_Quality_Rewards
 ]
 "SDG.Unturned.ItemAsset, Assembly-CSharp"
 [
     @Type
+    Type
     Rarity
     Useable
     Slot
@@ -624,8 +646,8 @@
     ExplosionEffect_CopyModelPosition
     ExplosionEffect_CopyModelRotation
     _
-    Armor_FalloffMaxRange
     Armor_FalloffRange
+    Armor_FalloffMaxRange
     Armor_FalloffMultiplier
 ]
 
@@ -786,15 +808,6 @@
     Tax
 ]
 
-// Library barricade item asset
-"SDG.Unturned.ItemLibraryAsset, Assembly-CSharp"
-[
-    @Locked
-    _
-    Capacity
-    Tax
-]
-
 // Oil_Pump barricade item asset
 "SDG.Unturned.ItemOilPumpAsset, Assembly-CSharp"
 [
@@ -908,10 +921,1293 @@
     Gravity
 ]
 
-// base Weapon item asset
+// base weapon item asset
 "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp"
 [
-    // todo
+    @Quality_Max
+    _
+    Range
+    _
+    BladeIDs
+    _
+    Player_Damage
+    Player_Leg_Multiplier
+    Player_Arm_Multiplier
+    Player_Spine_Multiplier
+    Player_Skull_Multiplier
+    Player_Damage_Bleeding
+    Player_Damage_Bones
+    Player_Damage_Food
+    Player_Damage_Water
+    Player_Damage_Virus
+    Player_Damage_Hallucination
+    Bypass_Allowed_To_Damage_Player
+    _
+    Zombie_Damage
+    Zombie_Leg_Multiplier
+    Zombie_Arm_Multiplier
+    Zombie_Spine_Multiplier
+    Zombie_Skull_Multiplier
+    Stun_Zombie_Always
+    Stun_Zombie_Never
+    Zombie_Ragdoll_Force_Multiplier
+    _
+    Animal_Damage
+    Animal_Leg_Multiplier
+    Animal_Spine_Multiplier
+    Animal_Skull_Multiplier
+    _
+    Barricade_Damage
+    Structure_Damage
+    Vehicle_Damage
+    Resource_Damage
+    Object_Damage
+    _
+    Invulnerable
+    Allow_Flesh_Fx
+    _
+    Durability
+    Wear
+]
+
+// base food/water/medical item asset
+// inherits from ItemWeaponAsset (wtf nelson)
+"$local$::SDG.Unturned.ItemConsumeableAsset, Assembly-CSharp"
+[
+    @Description
+    _
+    Quest_Rewards
+]
+"SDG.Unturned.ItemConsumeableAsset, Assembly-CSharp"
+[
+    @BladeIDs
+    _
+    Should_Delete_After_Use
+    _
+    Aid
+    Bleeding
+    Broken
+    Bleeding_Modifier
+    Bones_Modifier
+    Health
+    Food
+    Water
+    Virus
+    Disinfectant
+    Energy
+    Vision
+    Oxygen
+    Warmth
+    Experience
+
+    @Wear
+    _
+    Item_Reward_Spawn_ID
+    Min_Item_Rewards
+    Max_Item_Rewards
+
+    @EquipAudioClip
+    ConsumeAudioClip
+
+    @InventoryAudio
+    _
+    Quest_Rewards
+]
+
+// Food consumable item asset
+"SDG.Unturned.ItemFoodAsset, Assembly-CSharp"
+[
+]
+
+// Water consumable item asset
+"SDG.Unturned.ItemWaterAsset, Assembly-CSharp"
+[
+]
+
+// Medical consumable item asset
+"SDG.Unturned.ItemMedicalAsset, Assembly-CSharp"
+[
+]
+
+// Medical consumable item asset
+"SDG.Unturned.ItemMedicalAsset, Assembly-CSharp"
+[
+]
+
+// Gun weapon item asset
+"$local$::SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+[
+    @Description
+    _
+    Shoot_Quest_Rewards
+]
+"SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+[
+    @Quality_Max
+    _
+    Sight
+    Tactical
+    Grip
+    Barrel
+    Magazine
+    Magazine_Replacements
+    _
+    Hook_Sight
+    Hook_Tactical
+    Hook_Grip
+    Hook_Barrel
+    _
+    Ammo_Min
+    Ammo_Max
+    _
+    Ammo_Per_Shot
+    _
+    Safety
+    Semi
+    Auto
+    Bursts
+    _
+    Caliber
+    Attachment_Calibers
+    Requires_NonZero_Attachment_Caliber
+    _
+    Magazine_Calibers
+    
+    @Range
+    Range_Rangefinder
+    Alert_Radius
+    Explosion
+    Firerate
+    Unplace
+    Replace
+    RechamberAfterShotDelay
+    RechamberAfterShotCount
+    RechamberAfterMagazineAttached
+    RechamberAfterMagazineDetached
+    CasingEjectCountAfterRechamberingAfterShooting
+    CasingEjectCountAfterReload
+    EjectCasingAfterShooting
+    EjectAfterHammerDelay
+    EjectAfterReloadDelay
+    Fire_Delay_Seconds
+    Action
+    Must_Aim_To_Shoot
+    Stop_Aiming_After_Shooting
+    _
+    Delete_Empty_Magazines
+    Should_Delete_Empty_Magazines
+    _
+    Damage_Falloff_Range
+    Damage_Falloff_Max_Range
+    Damage_Falloff_Multiplier
+    _
+    Aiming_Movement_Speed_Multiplier
+
+    @Durability
+    _
+    Aim_In_Duration
+    Scale_Aim_Animation_Speed
+    Spread_Aim
+    Spread_Hip
+    Spread_Sprint
+    Spread_Crouch
+    Spread_Prone
+    Spread_Swimming
+    Spread_Midair
+    Spread_Angle_Degrees
+    _
+    Ballistic_Steps
+    Ballistic_Travel
+    Ballistic_Force
+    Ballistic_Drop
+    Bullet_Gravity_Multiplier
+    _
+    Gunshot_Rolloff_Distance
+    _
+    Projectile_Lifespan
+    Projectile_Penetrate_Buildables
+    Projectile_Explosion_Launch_Speed
+    _
+    Recoil_Min_X
+    Recoil_Min_Y
+    Recoil_Max_X
+    Recoil_Max_Y
+    _
+    Recoil_Sprint
+    Recoil_Crouch
+    Recoil_Prone
+    Recoil_Swimming
+    Recoil_Midair
+    Aiming_Recoil_Multiplier
+    _
+    Recover_X
+    Recover_Y
+    _
+    Shake_Min_X
+    Shake_Min_Y
+    Shake_Min_Z
+    Shake_Max_X
+    Shake_Max_Y
+    Shake_Max_Z
+    _
+    Muzzle
+    Shell
+    _
+    Reload_Time
+    Hammer_Time
+    Turret
+    DriverTurretViewmodelMode
+    _
+    Can_Ever_Jam
+    Jam_Quality_Threshold
+    Jam_Max_Chance
+    Unjam_Chamber_Anim
+
+    @Can_Player_Equip
+    Can_Aim_During_Sprint
+    Infinite_Ammo
+    Allow_Magazine_Change
+
+    @Actions
+    _
+    Shoot_Quest_Rewards
+    
+    @EquipAudioClip
+    ShootAudioClip
+    ReloadAudioClip
+    HammerAudioClip
+    AimAudioClip
+    MinigunAudioClip
+    ChamberJammedAudioClip
+    FireDelayAudioClip
+]
+
+// Melee weapon item asset
+"$local$::SDG.Unturned.ItemMeleeAsset, Assembly-CSharp"
+[
+    @Description
+    _
+    Weak_Attack_Quest_Rewards
+    _
+    Strong_Attack_Quest_Rewards
+]
+"SDG.Unturned.ItemMeleeAsset, Assembly-CSharp"
+[
+    @Range
+    Alert_Radius
+    Strength
+    Weak
+    Strong
+    Stamina
+
+    @Invulnerable
+    _
+    Light
+    SpotLight_Enabled
+    SpotLight_Range
+    SpotLight_Angle
+    SpotLight_Intensity
+    SpotLight_Color
+
+    @Actions
+    _
+    Repair
+    Repeated
+    _
+    Weak_Attack_Quest_Rewards
+    Strong_Attack_Quest_Rewards
+
+    @EquipAudioClip
+    AttackAudioClip
+
+    @InspectAudioDef
+    ImpactAudioDef
+]
+
+// Throwable weapon item asset
+"SDG.Unturned.ItemThrowableAsset, Assembly-CSharp"
+[
+    @Range
+    Explosion
+    Explosion_Launch_Speed
+    _
+    Weak_Throw_Force
+    Strong_Throw_Force
+    Boost_Throw_Force_Multiplier
+    _
+    Flash
+    Explosive
+    Explode_On_Impact
+    Explode_On_Impact_Destroy_On_Client
+    Sticky
+    Fuse_Length
+]
+
+// Detonator item asset
+"SDG.Unturned.ItemDetonatorAsset, Assembly-CSharp"
+[
+]
+
+// (gasmask) Filter item asset
+"SDG.Unturned.ItemFilterAsset, Assembly-CSharp"
+[
+]
+
+// Fisher (rod) item asset
+"$local$::SDG.Unturned.ItemFisherAsset, Assembly-CSharp"
+[
+    @Description
+    _
+    Quest_Rewards
+]
+"SDG.Unturned.ItemFisherAsset, Assembly-CSharp"
+[
+    @EquipableModelParent
+    _
+    Reward_ID
+    Reward_Experience_Min
+    Reward_Experience_Max
+
+    @Actions
+    _
+    Quest_Rewards
+]
+
+// Fuel (canister) item asset
+"SDG.Unturned.ItemFuelAsset, Assembly-CSharp"
+[
+    @Quality_Max
+    _
+    Fuel
+    _
+    Always_Spawn_Full
+    Delete_After_Filling_Target
+]
+
+// Grower (fertilizer) item asset
+"SDG.Unturned.ItemGrowerAsset, Assembly-CSharp"
+[
+]
+
+// Key (marketplace) item asset
+"SDG.Unturned.ItemKeyAsset, Assembly-CSharp"
+[
+    @Use_Auto_Icon_Measurements
+    _
+    Exchange_With_Target_Item
+]
+
+// Map item asset
+"SDG.Unturned.ItemMapAsset, Assembly-CSharp"
+[
+    @Use_Auto_Icon_Measurements
+    _
+    Enables_Map
+    Enables_Chart
+    Enables_Compass
+]
+
+// Optic (binoculars) item asset
+"SDG.Unturned.ItemOpticAsset, Assembly-CSharp"
+[
+    @Use_Auto_Icon_Measurements
+    _
+    Zoom
+]
+
+// Refill (water canister) item asset
+"SDG.Unturned.ItemRefillAsset, Assembly-CSharp"
+[
+    @Use_Auto_Icon_Measurements
+    _
+    Water
+    Clean_Health
+    Clean_Food
+    Clean_Water
+    Clean_Virus
+    Clean_Stamina
+    Clean_Oxygen
+    Salty_Health
+    Salty_Food
+    Salty_Water
+    Salty_Virus
+    Salty_Stamina
+    Salty_Oxygen
+    Dirty_Health
+    Dirty_Food
+    Dirty_Water
+    Dirty_Virus
+    Dirty_Stamina
+    Dirty_Oxygen
+
+    @EquipAudioClip
+    ConsumeAudioClip
+]
+
+// Supply item asset
+"SDG.Unturned.ItemSupplyAsset, Assembly-CSharp"
+[
+]
+
+// Tool item asset
+"SDG.Unturned.ItemToolAsset, Assembly-CSharp"
+[
+    @EquipAudioClip
+    UseAudioClip
+]
+
+// Vehicle_Lockpick_Tool tool item asset
+"SDG.Unturned.ItemVehicleLockpickToolAsset, Assembly-CSharp"
+[
+    @Use_Auto_Icon_Measurements
+    _
+    FailureEffect
+    FailureProbability
+]
+
+// Vehicle_Paint_Tool tool item asset
+"SDG.Unturned.ItemVehiclePaintToolAsset, Assembly-CSharp"
+[
+    @Use_Auto_Icon_Measurements
+    _
+    PaintColor
+]
+
+// Vehicle_Repair_Tool tool item asset
+"SDG.Unturned.ItemVehicleRepairToolAsset, Assembly-CSharp"
+[
+]
+
+// Tire vehicle repair tool item asset
+"SDG.Unturned.ItemTireAsset, Assembly-CSharp"
+[
+    @Use_Auto_Icon_Measurements
+    _
+    Mode
+]
+
+// Currency asset (not actually an item asset)
+"SDG.Unturned.ItemCurrencyAsset, Assembly-CSharp"
+[
+    @ID
+    ValueFormat
+    DefaultConditionFormat
+    Entries
+]
+
+// Terrain/Landscape Material asset
+"SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp"
+[
+    @ID
+    Texture
+    Mask
+    Physics_Material
+    Foliage
+    Christmas_Redirect
+    Halloween_Redirect
+    AprilFools_Redirect
+    Use_Auto_Slope
+    Auto_Min_Angle_Begin
+    Auto_Min_Angle_End
+    Auto_Max_Angle_Begin
+    Auto_Max_Angle_End
+    Use_Auto_Foundation
+    Auto_Ray_Radius
+    Auto_Ray_Length
+    Auto_Ray_Mask
+]
+
+// Level asset
+"SDG.Unturned.LevelAsset, Assembly-CSharp"
+[
+    @ID
+    Default_Game_Mode
+    Supported_Game_Modes
+    Min_Stealth_Radius
+    Fall_Damage_Speed_Threshold
+    Enable_Admin_Faster_Salvage_Duration
+    Allow_Building_In_Safezone_In_Singleplayer
+    Should_Animate_Background_Image
+    UnderwaterFogDensity
+    ZombieDifficultyAssetPrioritization
+    Has_Clouds
+    CloudOverride_Prefab
+    CloudOverride_ParticleSystems
+    Dropship
+    Airdrop
+    Crafting_Blacklists
+    Global_Weather_Mask
+    Perpetual_Weather_Asset
+    Weather_Types
+    Skills
+    Skillset_Loadouts
+    Loading_Screen_Music
+    Death_Music
+    TerrainColors
+]
+
+// Material Palette asset
+"SDG.Unturned.LevelAsset, Assembly-CSharp"
+[
+    @ID
+    Materials
+]
+
+// Material Palette asset
+"SDG.Unturned.LevelAsset, Assembly-CSharp"
+[
+    @ID
+    Materials
+]
+
+// Mythic asset
+"$local$::SDG.Unturned.MythicAsset, Assembly-CSharp"
+[
+    Particle_Tag_Name
+]
+"SDG.Unturned.MythicAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    Body_Cosmetics_Use_System_Area
+]
+
+// Condition/Reward list asset
+"$local$::SDG.Unturned.NPCRewardsAsset, Assembly-CSharp"
+[
+    Conditions
+    _
+    Rewards
+]
+"SDG.Unturned.NPCRewardsAsset, Assembly-CSharp"
+[
+    @ID
+    Conditions
+    _
+    Rewards
+]
+
+// Small/Medium/Large/Decal level object asset
+"$local$::SDG.Unturned.ObjectAsset, Assembly-CSharp"
+[
+    Name
+    Interact
+    _
+    Dialogue_Name
+    _
+    Conditions
+    _
+    Interactability_Text_Line_#
+    _
+    Interactability_Conditions
+    _
+    Interactability_Rewards
+]
+"SDG.Unturned.ObjectAsset, Assembly-CSharp"
+[
+    @Type
+    Type
+
+    @ID
+    _
+    Decal_X
+    Decal_Y
+    Decal_LOD_Bias
+    Decal_Alpha
+    _
+    Conditions
+    _
+    Snowshoe
+    Soft
+    Causes_Fall_Damage
+    Chart
+    Fuel
+    Refill
+    _
+    Interactability
+    Interactability_Delay
+    Interactability_Reset
+    Interactability_Resource
+    Interactability_Dialogue
+    Interactability_Hint
+    Interactability_Text_Lines
+    Interactability_Power
+    Interactability_Emissive_Material_Mode
+    Interactability_Editor
+    Interactability_Health
+    Interactability_Invulnerable
+    Interactability_Proof_Explosion
+    Interactability_Nav
+    Interactability_Nav_Mode
+    Interactability_Remote
+    Interactability_Drops
+    Interactability_Blade_ID
+    Interactability_Reward_ID
+    Interactability_Reward_XP
+    Interactability_Rewards_Min
+    Interactability_Rewards_Max
+    Interactability_Reward_Probability
+    Interactability_Effect
+    Interactability_Finale
+    Interactability_Can_Zombies_Damage
+    Interactability_Zombie_Damage_Multiplier
+    Interactability_Section_Destroyed_Alert_Radius
+    Interactability_All_Sections_Destroyed_Alert_Radius
+    Interactability_Respawn_All_Sections_Simultaneously
+    Interactability_Animation_Component_Path
+    Interactability_Conditions
+    Interactability_Rewards
+    _
+    Rubble
+    Rubble_Reset
+    Rubble_Editor
+    Rubble_Health
+    Rubble_Invulnerable
+    Rubble_Proof_Explosion
+    Rubble_Nav_Mode
+    Rubble_Blade_ID
+    Rubble_Reward_ID
+    Rubble_Reward_XP
+    Rubble_Rewards_Min
+    Rubble_Rewards_Max
+    Rubble_Reward_Probability
+    Rubble_Effect
+    Rubble_Finale
+    Rubble_Can_Zombies_Damage
+    Rubble_Zombie_Damage_Multiplier
+    Rubble_Section_Destroyed_Alert_Radius
+    Rubble_All_Sections_Destroyed_Alert_Radius
+    Rubble_Respawn_All_Sections_Simultaneously
+    _
+    Armor_FalloffRange
+    Armor_FalloffMaxRange
+    Armor_FalloffMultiplier
+    _
+    Holiday_Restriction
+    _
+    Foliage
+    Is_Gore
+    Allow_Structures
+    Add_Night_Light_Script
+    Add_Kill_Triggers
+    _
+    Christmas_Redirect
+    Halloween_Redirect
+    _
+    LOD
+    LOD_Bias
+    LOD_Center
+    LOD_Size
+    Collision_Important
+    Load_Nav_On_Server
+    Load_Nav_In_Editor
+    Material_Palette
+    Landmark_Quality
+    Exclude_From_Level_Batching
+    Exclude_From_Culling_Volumes
+    Exclude_From_Satellite_Capture
+    Use_Water_Height_Transparent_Sort
+    Has_Clip_Prefab
+    Has_Editor_Prefab
+    _
+    Is_Clutter
+]
+
+// NPC object asset
+"SDG.Unturned.ObjectNPCAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    Shirt
+    Pants
+    Hat
+    Backpack
+    Vest
+    Mask
+    Glasses
+    _
+    Has_Halloween_Outfit
+    Halloween_Shirt
+    Halloween_Pants
+    Halloween_Hat
+    Halloween_Backpack
+    Halloween_Vest
+    Halloween_Mask
+    Halloween_Glasses
+    _
+    Has_Christmas_Outfit
+    Christmas_Shirt
+    Christmas_Pants
+    Christmas_Hat
+    Christmas_Backpack
+    Christmas_Vest
+    Christmas_Mask
+    Christmas_Glasses
+    _
+    Face
+    Hair
+    Beard
+    Color_Skin
+    Color_Hair
+    Color_Beard
+    Backward
+    _
+    Primary
+    Secondary
+    Tertiary
+    Equipped
+    _
+    Pose
+    Pose_Lean
+    Pose_Pitch
+    Pose_Head_Offset
+    _
+    PlayerKnowsNameFlagID
+    Dialogue
+]
+
+// Outfit (marketplace) asset
+"SDG.Unturned.OutfitAsset, Assembly-CSharp"
+[
+    @ID
+    Items
+]
+
+// base Physics Material asset
+"SDG.Unturned.PhysicsMaterialAssetBase, Assembly-CSharp"
+[
+    @ID
+    AudioDefs
+]
+
+// Physics Material asset
+"SDG.Unturned.PhysicsMaterialAsset, Assembly-CSharp"
+[
+    @ID
+    UnityNames
+    UnityName
+    Fallback
+
+    @AudioDefs
+    WipDoNotUseTemp_BulletImpactEffect
+    TireMotionEffect
+    Character_Friction_Mode
+    Character_Acceleration_Multiplier
+    Character_Deceleration_Multiplier
+    Character_Max_Speed_Multiplier
+    IsArable
+    HasOil
+]
+
+// Physics Material Extension asset
+"SDG.Unturned.PhysicsMaterialExtensionAsset, Assembly-CSharp"
+[
+    @ID
+    Base
+]
+
+// Quest asset
+"$local$::SDG.Unturned.QuestAsset, Assembly-CSharp"
+[
+    Name
+    Description
+    _
+    Conditions
+    _
+    Rewards
+    _
+    AbandonmentRewards
+]
+"SDG.Unturned.QuestAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    Conditions
+    _
+    Rewards
+    _
+    AbandonmentRewards
+]
+
+// Redirector asset
+"SDG.Unturned.RedirectorAsset, Assembly-CSharp"
+[
+    @ID
+    AssetCategory
+    _
+    TargetAsset
+]
+
+// Resource asset
+"$local$::SDG.Unturned.ResourceAsset, Assembly-CSharp"
+[
+    Name
+    _
+    Interact
+]
+"SDG.Unturned.ResourceAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    Health
+    Radius
+    Scale
+    RandomUniformScale_Min
+    RandomUniformScale_Max
+    RandomAngleDeviation_Min
+    RandomAngleDeviation_Max
+    _
+    Armor_FalloffRange
+    Armor_FalloffMaxRange
+    Armor_FalloffMultiplier
+    _
+    Explosion
+    Log
+    Stick
+    Reward_ID
+    Reward_XP
+    Reward_Min
+    Reward_Max
+    Forage
+    Forage_Reward_Experience
+    _
+    BladeID
+    Vulnerable_To_Fists
+    Vulnerable_To_All_Melee_Weapons
+    _
+    No_Debris
+    Reset
+    _
+    Chart
+    Auto_Skybox
+    _
+    Christmas_Redirect
+    Halloween_Redirect
+    _
+    Vertical_Offset
+    Debris_Vertical_Offset
+    Ignore_Collision_Between_Stump_And_Debris
+    _
+    Holiday_Restriction
+    Exclude_From_Level_Batching
+    Has_Clip_Prefab
+]
+
+// Road asset
+"$local$::SDG.Unturned.RoadAsset, Assembly-CSharp"
+[
+    Name
+]
+"SDG.Unturned.RoadAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    Width
+    Depth
+    OffsetAlongNormal
+    RepeatDistanceScale
+    _
+    Chart
+    _
+    TexturePath
+    _
+    PhysicsMaterial
+    VanillaPhysicsMaterial
+]
+
+// Server List Curation asset
+"$local$::SDG.Unturned.ServerListCurationAsset, Assembly-CSharp"
+[
+    Labels
+]
+"SDG.Unturned.ServerListCurationAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    $SDG.Unturned.ServerListCurationFile, Assembly-CSharp
+
+    @IconURL
+    IconAssetPath
+]
+
+// Skin asset
+"SDG.Unturned.SkinAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    Sight
+    Tactical
+    Grip
+    Barrel
+    Magazine
+    Hide_Magazine
+    _
+    Pattern
+    LightingTime
+    _
+    Ragdoll_Effect
+    _
+    Secondary_Skins
+    _
+    Override_Meshes
+    _
+    SpecialAudioOverrideDef
+]
+
+// Spawn asset
+"SDG.Unturned.SpawnAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    Roots
+    _
+    Tables
+]
+
+// Stereo Song asset
+"$local$::SDG.Unturned.StereoSongAsset, Assembly-CSharp"
+[
+    // 'Title' is actually 'Name', it's named Title due to 
+    //  sharing a property with the non-localized Title property
+    Title
+]
+"SDG.Unturned.StereoSongAsset, Assembly-CSharp"
+[
+    @ID
+    Title
+    Song
+    Link_URL
+    Is_Loop
+]
+
+// Tag asset
+"$local$::SDG.Unturned.TagAsset, Assembly-CSharp"
+[
+    Name
+]
+"SDG.Unturned.TagAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    NameColor
+    _
+    HasIcon
+    IconPath
+    ShouldTintIcon
+]
+
+// Vehicle asset
+"$local$::SDG.Unturned.VehicleAsset, Assembly-CSharp"
+[
+    Name
+]
+"SDG.Unturned.VehicleAsset, Assembly-CSharp"
+[
+    @Type
+    Rarity
+
+    @ID
+    _
+    Speed_Min
+    Speed_Max
+    Valid_Speed_Horizontal
+    Valid_Speed_Up
+    Valid_Speed_Down
+    Valid_Hit_Distance_Multiplier
+    _
+    Num_Steering_Tires
+    _
+    Steer_Min
+    Steer_Max
+    Steering_Angle_Max
+    Steering_Angle_FullSpeed_Factor
+    Steering_Angle_Turn_Speed
+    _
+    CrawlerTrackSteering_Torque
+    CrawlerTrackSteering_SidewaysFrictionMultiplier
+    CrawlerTrackSteering_MaxSpeedScale
+    _
+    Brake
+    Lift
+    Air_Turn_Responsiveness
+    _
+    Fuel_Min
+    Fuel_Max
+    Fuel
+    _
+    Health_Min
+    Health_Max
+    Health
+    _
+    Exit
+    _
+    Cam_Follow_Distance
+    Cam_Driver_Offset
+    Cam_Passenger_Offset
+    Bumper_Multiplier
+    Bumper_SpeedDamageThreshold
+    Bumper_PlayerDamage
+    Bumper_ZombieDamage
+    Bumper_AnimalDamage
+    Bumper_ObjectDamage
+    Bumper_ResourceDamage
+    Bumper_SelfDamageMultiplier
+    Passenger_Explosion_Armor
+    Child_Explosion_Armor_Multiplier
+    _
+    Armor_FalloffRange
+    Armor_FalloffMaxRange
+    Armor_FalloffMultiplier
+    _
+    LockMouse
+    Engine
+    Train_Track_Offset
+    Train_Wheel_Offset
+    Train_Car_Length
+    Sleds
+    Bicycle
+    Bicycle_Anim_Speed
+    Stamina_Boost
+    Stamina_Powered
+    Battery_Powered
+    Zip
+    Crawler
+    Traction
+    Reclined
+    _
+    Has_Horn
+    _
+    Air_Turn_Responsiveness
+    Air_Steer_Min
+    Air_Steer_Max
+    _
+    Pitch_Idle
+    Pitch_Drive
+    _
+    Supports_Mobile_Buildables
+    Buildable_Placement_Rule
+    _
+    Trunk_Storage_X
+    Trunk_Storage_Y
+    _
+    Drops_Table_ID
+    Drops_Min
+    Drops_Max
+    _
+    Physics_Profile
+    _
+    Explosion
+    Explosion_Min_Force
+    Explosion_Max_Force
+    ShouldExplosionCauseDamage
+    ShouldExplosionBurnMaterials
+    Invulnerable
+    Tires_Invulnerable
+    Explosions_Invulnerable
+    Environment_Invulnerable
+    Bumper_Invulnerable
+    _
+    Override_Center_Of_Mass
+    Center_Of_Mass
+    Wheel_Collider_Mass_Override
+    _
+    Fuel_Burn_Rate
+    _
+    Tire_ID
+    _
+    Default_Battery
+    Battery_Burn_Rate
+    Battery_Charge_Rate
+    _
+    Cannot_Spawn_With_Battery
+    Battery_Spawn_Charge_Multiplier
+    _
+    BatteryMode_Driving
+    BatteryMode_Empty
+    BatteryMode_Headlights
+    BatteryMode_Sirens
+    _
+    Can_Be_Locked
+    Can_Steal_Battery
+    Can_Repair_While_Seated
+    Should_Spawn_Seat_Capsules
+    _
+    Size2_Z
+    Shared_Skin_Name
+    Shared_Skin_Lookup_ID
+    _
+    Turrets
+    _
+    IgnitionAudioClip
+    HornAudioClip
+    Has_Clip_Prefab
+    _
+    Carjack_Force_Multiplier
+    Explosion_Force_Multiplier
+    Engine_Force_Multiplier
+    _
+    IsPaintable
+    PaintableSections
+    _
+    AdditionalTransparentSections
+    _
+    DefaultPaintColor_Mode
+    DefaultPaintColors
+    DefaultPaintColor_Configuration 
+    _
+    ExplosionBurnMaterialSections
+    _
+    CrawlerTrackTilingMaterials
+    _
+    WheelConfigurations
+    _
+    WheelBalancing_ForceMultiplier
+    WheelBalancing_UprightExponent
+    Steering_LeaningForceMultiplier
+    Steering_LeaningForce_ScaleWithSpeed
+    Steering_LeaningForce_SpeedExponent
+    RollAngularVelocityDamping
+    _
+    ReverseGearRatio
+    ForwardGearRatios
+    GearShift_UpThresholdRPM
+    GearShift_DownThresholdRPM
+    GearShift_Duration
+    GearShift_Interval
+    GearShift_VisibleInHUD
+    EngineIdleRPM
+    EngineMaxRPM
+    EngineRPM_IncreaseRate
+    EngineRPM_DecreaseRate
+    EngineMaxTorque
+    _
+    EngineSound_Type
+    EngineSound
+    
+    @Exclude_From_Master_Bundle
+    Bypass_Hash_Verification
+]
+
+// Vehicle physics profile asset
+"SDG.Unturned.VehiclePhysicsProfileAsset, Assembly-CSharp"
+[
+    @ID
+    Root_Mass
+    Root_Mass_Multiplier
+    Root_Drag_Multiplier
+    Root_Angular_Drag_Multiplier
+	Wheel_Mass
+    Wheel_Mass_Multiplier
+	Wheel_Damping_Rate
+	Wheel_Suspension_Force
+	Wheel_Suspension_Damper
+	Wheel_Stiffness_Traction_Multiplier
+	Wheel_Friction_Sideways
+	Wheel_Friction_Forward
+	Motor_Torque_Multiplier
+	Motor_Torque_Clamp_Multiplier
+	Brake_Torque_Multiplier
+	Brake_Torque_Traction_Multiplier
+	Wheel_Drive_Model
+	Wheel_Brake_Model
+    Carjack_Force_Multiplier
+]
+
+// Vehicle redirector asset
+"SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    TargetVehicle
+    LoadPaintColor
+    SpawnPaintColor
+]
+
+// Vendor (NPC shop) asset
+"$local$::SDG.Unturned.VendorAsset, Assembly-CSharp"
+[
+    Name
+    Description
+    _
+    Buying
+    _
+    Selling
+]
+"SDG.Unturned.VendorAsset, Assembly-CSharp"
+[
+    @ID
+    _
+    Buying
+    _
+    Selling
+    _
+    Disable_Sorting
+    _
+    Currency
+    _
+    FaceOverride
+]
+
+// base Weather asset
+"SDG.Unturned.WeatherAssetBase, Assembly-CSharp"
+[
+    @ID
+    Component_Type
+    Volume_Mask
+    Has_Lightning
+	Min_Lightning_Interval
+	Max_Lightning_Interval
+	Lightning_Target_Radius
+	Fade_In_Duration
+	Fade_Out_Duration
+    Ambient_Audio_Clip
+]
+
+// custom Weather asset
+"SDG.Unturned.WeatherAsset, Assembly-CSharp"
+[
+    @Fade_Out_Duration
+    Override_Fog
+    Override_Atmospheric_Fog
+    Override_Cloud_Colors
+    Shadow_Strength_Multiplier
+    Fog_Blend_Exponent
+    Cloud_Blend_Exponent
+    Wind_Main
+    Health_Per_Second
+    Stamina_Per_Second
+    Food_Per_Second
+    Water_Per_Second
+    Virus_Per_Second
+    Dawn
+    Midday
+    Dusk
+    Midnight
+    Effects
+]
+
+// Zombie difficulty asset
+"SDG.Unturned.ZombieDifficultyAsset, Assembly-CSharp"
+[
+    @ID
+    Crawler_Chance
+    Sprinter_Chance
+    Flanker_Chance
+    Burner_Chance
+    Acid_Chance
+    Spirit_Chance
+    Boss_Electric_Chance
+    Boss_Wind_Chance
+    Boss_Fire_Chance
+    Boss_Kuwait_Chance
+    Boss_Elver_Stomper_Chance
+    DL_Red_Volatile_Chance
+    DL_Blue_Volatile_Chance
+    Mega_Stun_Threshold
+    Normal_Stun_Threshold
+    Allow_Horde_Beacon
+    Speciality_Health_Override_Mode
+    Speciality_Health_Overrides
 ]
 
 /* === NPC CONDITIONS === */
@@ -1377,7 +2673,11 @@
 // Dialogue Message
 "$local$::SDG.Unturned.DialogueMessage, Assembly-CSharp"
 [
-    Page_*
+    Page_#
+    _
+    Conditions
+    _
+    Rewards
 ]
 "SDG.Unturned.DialogueMessage, Assembly-CSharp"
 [
@@ -1392,6 +2692,10 @@
 "$local$::SDG.Unturned.DialogueResponse, Assembly-CSharp"
 [
     ""
+    _
+    Conditions
+    _
+    Rewards
 ]
 "SDG.Unturned.DialogueResponse, Assembly-CSharp"
 [
@@ -1426,6 +2730,12 @@
     Origin
 ]
 // Blueprints
+"$local$::SDG.Unturned.Blueprint, Assembly-CSharp"
+[
+    Conditions
+    _
+    Rewards
+]
 "SDG.Unturned.Blueprint, Assembly-CSharp"
 [
     Name
@@ -1487,4 +2797,223 @@
     Color
     HasLabel
     Side
+]
+
+// Currency item entry
+"SDG.Unturned.ItemCurrencyAsset+Entry, Assembly-CSharp"
+[
+    Item
+    Value
+    Is_Visible_In_Vendor_Menu
+]
+
+// Gun magazine replacement
+"SDG.Unturned.MagazineReplacement, Assembly-CSharp"
+[
+    Map
+    ID
+]
+
+/** === LEVELS === */
+// scheduled weather
+"SDG.Unturned.LevelAsset+SchedulableWeather, Assembly-CSharp"
+[
+    Asset
+    Min_Frequency
+    Max_Frequency
+    Min_Duration
+    Max_Duration
+]
+// music
+"SDG.Unturned.LevelAsset+LoadingScreenMusic, Assembly-CSharp"
+[
+    Loop
+    Loop_Volume
+    Outro
+    Outro_Volume
+]
+// skill rule
+"SDG.Unturned.LevelAsset+SkillRule, Assembly-CSharp"
+[
+    Id
+    Default_Level
+    Max_Unlockable_Level
+    Cost_Multiplier
+    Base_Cost
+    Per_Level_Cost_Increase
+]
+// terrain color rule
+"SDG.Unturned.LevelAsset+TerrainColorRule, Assembly-CSharp"
+[
+    Color
+    HueThreshold
+    SaturationThreshold
+    ValueThreshold
+]
+// cloud particle system
+"SDG.Unturned.LevelAsset+CloudOverrideParticleSystemsPath, Assembly-CSharp"
+[
+    Path
+    RateOverTimeScale
+    WarmupTime
+    MaterialColorPropertyNames
+]
+
+/* === SERVER BROWSER CURATION === */
+// Server curation label
+"$local$::DanielWillett.UnturnedDataFileLspServer.Data.Types.ServerListCurationLabel, UnturnedAssetSpec"
+[
+    Text
+]
+"DanielWillett.UnturnedDataFileLspServer.Data.Types.ServerListCurationLabel, UnturnedAssetSpec"
+[
+    Name
+    Text
+]
+// Server curation rule
+"SDG.Unturned.ServerListCurationRule, Assembly-CSharp"
+[
+    Action
+    Description
+    Label
+    Type
+    Value
+    Values
+    Regex
+    Regexes
+    Filter
+    Filters
+]
+
+/* === VEHICLES === */
+// Turret definition
+"SDG.Unturned.TurretInfo, Assembly-CSharp"
+[
+    Seat_Index
+    Item_ID
+    Yaw_Min
+    Yaw_Max
+    Pitch_Min
+    Pitch_Max
+    Ignore_Aim_Camera
+]
+// Paintable vehicle section
+"SDG.Unturned.PaintableVehicleSection, Assembly-CSharp"
+[
+    Path
+    MaterialIndex
+    AllMaterials
+]
+// Crawler (tank) track configuration
+"SDG.Unturned.CrawlerTrackTilingMaterial, Assembly-CSharp"
+[
+    Path
+    MaterialIndex
+    WheelIndices
+    RepeatDistance
+    UV_Direction
+]
+// Vehicle randomized paint color configuration (RandomHueOrGrayscale)
+"SDG.Unturned.VehicleRandomPaintColorConfiguration, Assembly-CSharp"
+[
+    MinSaturation
+    MaxSaturation
+    MinValue
+    MaxValue
+    GrayscaleChance
+]
+// Wheel configuration
+"SDG.Unturned.VehicleWheelConfiguration, Assembly-CSharp"
+[
+    WheelColliderPath
+    SteeringMode
+    SteeringAngleMultiplier
+    IsModelSteered
+    IsColliderSteered
+    IsColliderPowered
+    ModelPath
+    ModelRadius
+    ModelUseColliderPose
+    ModelSuspensionOffset
+    ModelSuspensionSpeed
+    MotionEffects
+    CrawlerTrackForwardMode
+    CanExplode
+    CopyCrawlerTrackSpeedIndex
+    CopyColliderRpmIndex
+]
+// RPM sound configuration
+"SDG.Unturned.RpmEngineSoundConfiguration, Assembly-CSharp"
+[
+    IdlePitch
+    IdleVolume
+    MaxPitch
+    MaxVolume
+]
+
+/* === VENDORS === */
+// Procurement
+"$local$::SDG.Unturned.VendorBuying, Assembly-CSharp"
+[
+    Description
+    Conditions
+    Rewards
+]
+"SDG.Unturned.VendorBuying, Assembly-CSharp"
+[
+    ID
+    Cost
+    Conditions
+    Rewards
+]
+// Listing
+"$local$::SDG.Unturned.VendorSellingBase, Assembly-CSharp"
+[
+    Description
+    Conditions
+    Rewards
+]
+"SDG.Unturned.VendorSellingBase, Assembly-CSharp"
+[
+    Type
+    ID
+    Sight
+    Tactical
+    Grip
+    Barrel
+    Magazine
+    Ammo
+    Spawnpoint
+    Cost
+    PaintColor
+    Conditions
+    Rewards
+]
+
+/* === CUSTOM WEATHER === */
+// Time value color
+"SDG.Unturned.WeatherAsset+WeatherColor, Assembly-CSharp"
+[
+    Level_Enum
+    R
+    G
+    B
+]
+// Time values
+"SDG.Unturned.WeatherAsset+TimeValues, Assembly-CSharp"
+[
+    Fog_Color
+    Fog_Density
+    Cloud_Color
+    Cloud_Rim_Color
+    Brightness_Multiplier
+]
+// Effect
+"SDG.Unturned.WeatherAsset+Effect, Assembly-CSharp"
+[
+    Prefab
+    Emission_Exponent
+    Pitch
+    Translate_With_View
+    Rotate_Yaw_With_Wind
 ]

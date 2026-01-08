@@ -16,7 +16,7 @@
                 "ElementType": "PhysicsMaterial",
                 "MinimumCount": 1
             },
-            "DefaultValue": "@UnityName",
+            "DefaultValue": [ "@UnityName" ],
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
             "Description": "List of unity 'Physic Material' names this material represents. Each value must be unique to this asset.",
             "Variable": "physicMaterialNames",

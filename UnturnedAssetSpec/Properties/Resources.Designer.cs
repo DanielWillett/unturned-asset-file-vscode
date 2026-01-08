@@ -403,6 +403,60 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Asset Reference (Backwards-Compatible).
+        /// </summary>
+        internal static string Type_Name_BackwardsCompatibleAssetReferenceBcAssetReference {
+            get {
+                return ResourceManager.GetString("Type_Name_BackwardsCompatibleAssetReferenceBcAssetReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset Reference to {0} (Backwards-Compatible).
+        /// </summary>
+        internal static string Type_Name_BackwardsCompatibleAssetReferenceBcAssetReference_Type {
+            get {
+                return ResourceManager.GetString("Type_Name_BackwardsCompatibleAssetReferenceBcAssetReference_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset Reference (String, Backwards-Compatible).
+        /// </summary>
+        internal static string Type_Name_BackwardsCompatibleAssetReferenceBcAssetReferenceString {
+            get {
+                return ResourceManager.GetString("Type_Name_BackwardsCompatibleAssetReferenceBcAssetReferenceString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset Reference (String) to {0} (Backwards-Compatible).
+        /// </summary>
+        internal static string Type_Name_BackwardsCompatibleAssetReferenceBcAssetReferenceString_Type {
+            get {
+                return ResourceManager.GetString("Type_Name_BackwardsCompatibleAssetReferenceBcAssetReferenceString_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset Reference (GUID or ID).
+        /// </summary>
+        internal static string Type_Name_BackwardsCompatibleAssetReferenceGuidOrLegacyId {
+            get {
+                return ResourceManager.GetString("Type_Name_BackwardsCompatibleAssetReferenceGuidOrLegacyId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset Reference to {0} (GUID or ID).
+        /// </summary>
+        internal static string Type_Name_BackwardsCompatibleAssetReferenceGuidOrLegacyId_Type {
+            get {
+                return ResourceManager.GetString("Type_Name_BackwardsCompatibleAssetReferenceGuidOrLegacyId_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Boolean.
         /// </summary>
         internal static string Type_Name_Boolean {
@@ -574,6 +628,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Legacy Asset Reference.
+        /// </summary>
+        internal static string Type_Name_LegacyAssetReference {
+            get {
+                return ResourceManager.GetString("Type_Name_LegacyAssetReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Legacy Asset Reference to {0}.
+        /// </summary>
+        internal static string Type_Name_LegacyAssetReference_Type {
+            get {
+                return ResourceManager.GetString("Type_Name_LegacyAssetReference_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to List of {0}.
         /// </summary>
         internal static string Type_Name_List_Generic {
@@ -610,6 +682,33 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Orderfile.
+        /// </summary>
+        internal static string Type_Name_Orderfile {
+            get {
+                return ResourceManager.GetString("Type_Name_Orderfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Orderfile Property Reference.
+        /// </summary>
+        internal static string Type_Name_OrderfilePropertyReference {
+            get {
+                return ResourceManager.GetString("Type_Name_OrderfilePropertyReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Assembly-Qualified C# Type Name.
+        /// </summary>
+        internal static string Type_Name_QualifiedType {
+            get {
+                return ResourceManager.GetString("Type_Name_QualifiedType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Regular Expression (RegEx).
         /// </summary>
         internal static string Type_Name_RegEx {
@@ -642,6 +741,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_TranslationReference {
             get {
                 return ResourceManager.GetString("Type_Name_TranslationReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type Reference.
+        /// </summary>
+        internal static string Type_Name_TypeReference {
+            get {
+                return ResourceManager.GetString("Type_Name_TypeReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type Reference of {0}.
+        /// </summary>
+        internal static string Type_Name_TypeReference_Type {
+            get {
+                return ResourceManager.GetString("Type_Name_TypeReference_Type", resourceCulture);
             }
         }
         

@@ -231,6 +231,24 @@
   <data name="Type_Name_AudioReference" xml:space="preserve">
     <value>Audio Reference</value>
   </data>
+  <data name="Type_Name_BackwardsCompatibleAssetReferenceBcAssetReference" xml:space="preserve">
+    <value>Asset Reference (Backwards-Compatible)</value>
+  </data>
+  <data name="Type_Name_BackwardsCompatibleAssetReferenceBcAssetReferenceString" xml:space="preserve">
+    <value>Asset Reference (String, Backwards-Compatible)</value>
+  </data>
+  <data name="Type_Name_BackwardsCompatibleAssetReferenceBcAssetReferenceString_Type" xml:space="preserve">
+    <value>Asset Reference (String) to {0} (Backwards-Compatible)</value>
+  </data>
+  <data name="Type_Name_BackwardsCompatibleAssetReferenceBcAssetReference_Type" xml:space="preserve">
+    <value>Asset Reference to {0} (Backwards-Compatible)</value>
+  </data>
+  <data name="Type_Name_BackwardsCompatibleAssetReferenceGuidOrLegacyId" xml:space="preserve">
+    <value>Asset Reference (GUID or ID)</value>
+  </data>
+  <data name="Type_Name_BackwardsCompatibleAssetReferenceGuidOrLegacyId_Type" xml:space="preserve">
+    <value>Asset Reference to {0} (GUID or ID)</value>
+  </data>
   <data name="Type_Name_Boolean" xml:space="preserve">
     <value>Boolean</value>
   </data>
@@ -288,6 +306,12 @@
   <data name="Type_Name_IPv4Filter" xml:space="preserve">
     <value>IPv4 Filter</value>
   </data>
+  <data name="Type_Name_LegacyAssetReference" xml:space="preserve">
+    <value>Legacy Asset Reference</value>
+  </data>
+  <data name="Type_Name_LegacyAssetReference_Type" xml:space="preserve">
+    <value>Legacy Asset Reference to {0}</value>
+  </data>
   <data name="Type_Name_List_Generic" xml:space="preserve">
     <value>List of {0}</value>
   </data>
@@ -300,6 +324,15 @@
   <data name="Type_Name_MasterBundleReferenceString" xml:space="preserve">
     <value>Masterbundle Reference (Legacy)</value>
   </data>
+  <data name="Type_Name_Orderfile" xml:space="preserve">
+    <value>Orderfile</value>
+  </data>
+  <data name="Type_Name_OrderfilePropertyReference" xml:space="preserve">
+    <value>Orderfile Property Reference</value>
+  </data>
+  <data name="Type_Name_QualifiedType" xml:space="preserve">
+    <value>Assembly-Qualified C# Type Name</value>
+  </data>
   <data name="Type_Name_RegEx" xml:space="preserve">
     <value>Regular Expression (RegEx)</value>
   </data>
@@ -311,6 +344,12 @@
   </data>
   <data name="Type_Name_TranslationReference" xml:space="preserve">
     <value>Legacy Translation Token Reference</value>
+  </data>
+  <data name="Type_Name_TypeReference" xml:space="preserve">
+    <value>Type Reference</value>
+  </data>
+  <data name="Type_Name_TypeReference_Type" xml:space="preserve">
+    <value>Type Reference of {0}</value>
   </data>
   <data name="Type_Name_UInt8" xml:space="preserve">
     <value>Unsigned 8-Bit Integer</value>

@@ -35,6 +35,7 @@
             "Key": "Type",
             "Type": "SDG.Unturned.EItemType, Assembly-CSharp",
             "Required": true,
+            "PreventOverride": true,
             "Description": "The type of item to create.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#type-doc-data-eitemtype",
             "Variable": "type"
@@ -126,7 +127,7 @@
             "Key": "Shared_Skin_Lookup_ID",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
             },
             "DefaultValue": "@ID",
@@ -1360,7 +1361,7 @@
                     "Key": "Tool",
                     "Type":
                     {
-                        "Type": "Id",
+                        "Type": "LegacyAssetReference",
                         "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
                     },
                     "DefaultValue": 0,
@@ -1447,7 +1448,7 @@
                     "Key": "Product",
                     "Type":
                     {
-                        "Type": "Id",
+                        "Type": "LegacyAssetReference",
                         "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
                     },
                     "DefaultValue": "@ID",

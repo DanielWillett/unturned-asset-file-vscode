@@ -83,6 +83,11 @@ public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<
             return ThisDataRef.Instance;
         }
 
+        if (name.Equals("Index".AsSpan(), StringComparison.Ordinal))
+        {
+            return IndexDataRef.Instance;
+        }
+
         if (name.Equals("\\Self".AsSpan(), StringComparison.Ordinal))
         {
             return new PropertyDataRef("Self");
@@ -91,6 +96,11 @@ public abstract class DataRef : IDataRefTarget, IEquatable<DataRef>, IEquatable<
         if (name.Equals("\\This".AsSpan(), StringComparison.Ordinal))
         {
             return new PropertyDataRef("This");
+        }
+
+        if (name.Equals("\\Index".AsSpan(), StringComparison.Ordinal))
+        {
+            return new PropertyDataRef("Index");
         }
 
         return new PropertyDataRef(optionalString ?? name.ToString());

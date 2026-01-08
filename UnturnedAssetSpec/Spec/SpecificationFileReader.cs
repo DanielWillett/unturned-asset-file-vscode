@@ -45,6 +45,8 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
     
     private bool IsCacheUpToDate { get; set; }
 
+    public AssetInformation Information => _readInformation ?? throw new InvalidOperationException("Not yet read.");
+
     public SpecificationFileReader(
         bool allowInternet,
         ILoggerFactory loggerFactory,

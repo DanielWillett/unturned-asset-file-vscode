@@ -13,7 +13,7 @@
             "Key": "Recover",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemArrestStartAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,

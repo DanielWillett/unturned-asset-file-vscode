@@ -59,6 +59,7 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
     IStringParseableSpecPropertyType
 {
     private readonly IAssetSpecDatabase _database;
+    private readonly AssetCategoryValue _category;
     public OneOrMore<QualifiedType> OtherElementTypes { get; }
     public bool CanParseDictionary { get; }
     public bool SupportsThis { get; }
@@ -104,16 +105,19 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
         if (elementType.Type == null || elementType == QualifiedType.AssetBaseType)
         {
             ElementType = QualifiedType.AssetBaseType;
+            _category = AssetCategoryValue.None;
         }
         else if (AssetCategory.TryParse(elementType.Type, out EnumSpecTypeValue category))
         {
             ElementType = new QualifiedType(category.Value);
+            _category = new AssetCategoryValue(category.Index);
             DisplayName = $"{category.Casing} Asset Reference (Backwards-Compatible)";
         }
         else
         {
             specialTypes = specialTypes.Add(elementType);
             ElementType = QualifiedType.AssetBaseType;
+            _category = AssetCategoryValue.None;
         }
 
         OtherElementTypes = specialTypes
@@ -168,7 +172,9 @@ public class BackwardsCompatibleAssetReferenceSpecPropertyType :
 
     public bool TryParse(ReadOnlySpan<char> span, string? stringValue, out GuidOrId guidOrId)
     {
-        return KnownTypeValueHelper.TryParseGuidOrId(span, stringValue, out guidOrId, ElementType.Type);
+        return stringValue != null
+            ? KnownTypeValueHelper.TryParseGuidOrId(stringValue, _category, out guidOrId)
+            : KnownTypeValueHelper.TryParseGuidOrId(span, _category, out guidOrId);
     }
 
     private bool? _isTypeValid;

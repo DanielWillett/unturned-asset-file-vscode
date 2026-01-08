@@ -71,7 +71,7 @@
             "Key": "Meat",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,
@@ -84,7 +84,7 @@
             "Key": "Pelt",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,
@@ -97,7 +97,7 @@
             "Key": "Reward_ID",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,

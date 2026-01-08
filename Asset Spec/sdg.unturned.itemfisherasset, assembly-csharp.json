@@ -13,7 +13,7 @@
             "Key": "Reward_ID",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,

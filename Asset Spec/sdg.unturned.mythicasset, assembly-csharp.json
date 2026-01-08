@@ -14,6 +14,14 @@
             "Type": "Flag",
             "DefaultValue": false,
             "Description": "Allows IDs to be less than 500 if this isn't the vanilla bundle."
+        },
+        {
+            "Key": "Body_Cosmetics_Use_System_Area",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "If true, vest and backpack spawn @($bndl$::System_Area) instead of @($bndl$::System_Hook).",
+            "Variable": "ShouldBodyCosmeticsUseAreaPrefab",
+            "Version": "3.25.2.0"
         }
     ],
     "BundleAssets":

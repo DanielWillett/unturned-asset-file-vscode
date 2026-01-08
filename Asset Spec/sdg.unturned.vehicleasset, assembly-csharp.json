@@ -21,25 +21,21 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "HELICOPTER"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Engine",
+                        "Operation": "eq",
+                        "Comparand": "HELICOPTER"
+                    },
                     "Value": 0.03
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "BLIMP"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Engine",
+                        "Operation": "eq",
+                        "Comparand": "BLIMP"
+                    },
                     "Value": 0.1
                 },
                 {
@@ -89,47 +85,39 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "CAR"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Engine",
+                        "Operation": "eq",
+                        "Comparand": "CAR"
+                    },
                     "Value": "6b91a94f01b6472eaca31d9420ec2367"
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "PLANE"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Engine",
+                        "Operation": "eq",
+                        "Comparand": "PLANE"
+                    },
                     "Value": "93a47d6d40454335b4784e803628ac54"
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "HELICOPTER"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Engine",
+                        "Operation": "eq",
+                        "Comparand": "HELICOPTER"
+                    },
                     "Value": "bb9f9f0204c4462ca7d976b87d1336d4"
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "BOAT"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Engine",
+                        "Operation": "eq",
+                        "Comparand": "BOAT"
+                    },
                     "Value": "47258d0dcad14cb8be26e24c1ef3449e"
                 },
                 {
@@ -151,34 +139,36 @@
         },
         {
             "Key": "Num_Steering_Tires",
-            "Type": "Int32",
-            "Minimum": 0,
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "Int32",
+                "Mode": "LegacyList",
+                "LegacySingularKey": "Steering_Tire",
+                "LegacyDefaultElementTypeValue": "#Index"
+            },
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Crawler",
-                            "Operation": "eq",
-                            "Comparand": true
-                        }
-                    ],
-                    "Value": 0
+                    "Case":
+                    {
+                        "Variable": "Crawler",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
+                    "Value": [ ]
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "CAR"
-                        }
-                    ],
-                    "Value": 2
+                    "Case":
+                    {
+                        "Variable": "Engine",
+                        "Operation": "eq",
+                        "Comparand": "CAR"
+                    },
+                    "Value": [ 0, 1 ]
                 },
                 {
-                    "Value": 1
+                    "Value": [ 0 ]
                 }
             ],
             "Description": "Total number of tires that should turn when steering. Replaced by the @WheelConfigurations property.",
@@ -186,18 +176,6 @@
             "Deprecated": true,
             "Variable": "numSteeringTires",
             "CountForTemplateGroup": "vehicle-steering-tires"
-        },
-        {
-            "Key": "Steering_Tire_*",
-            "Template": true,
-            "TemplateGroups": [ "vehicle-steering-tires" ],
-            "Type": "Int32",
-            "Minimum": 0,
-            "DefaultValue": "#Self.TemplateGroups[0]",
-            "Description": "Set a wheel object as a steering tire, which will visibly turn when steering. Replaced by the @WheelConfigurations property.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#steering-tire-int32",
-            "Deprecated": true,
-            "Variable": "steeringTireIndices"
         },
         {
             "Key": "Has_Clip_Prefab",
@@ -395,14 +373,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "CAR"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Engine",
+                        "Operation": "eq",
+                        "Comparand": "CAR"
+                    },
                     "Value": 2.05
                 },
                 {
@@ -443,14 +419,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "$bndl$::Horn",
-                            "Operation": "value-included",
-                            "Comparand": null
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "$bndl$::Horn",
+                        "Operation": "value-included",
+                        "Comparand": null
+                    },
                     "Value": true
                 },
                 {
@@ -483,14 +457,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Steer_Max",
-                            "Operation": "value-included",
-                            "Comparand": null
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Steer_Max",
+                        "Operation": "value-included",
+                        "Comparand": null
+                    },
                     "Value": "=MUL(@Steer_Max 0.75)"
                 },
                 {
@@ -508,14 +480,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Steering_Angle_Max",
-                            "Operation": "value-included",
-                            "Comparand": null
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Steering_Angle_Max",
+                        "Operation": "value-included",
+                        "Comparand": null
+                    },
                     "Value": "=DIV(@Steer_Max 0.75)"
                 },
                 {
@@ -533,14 +503,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Steer_Min",
-                            "Operation": "value-included",
-                            "Comparand": null
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Steer_Min",
+                        "Operation": "value-included",
+                        "Comparand": null
+                    },
                     "Value": "=DIV(@Steer_Min @Steering_Angle_Max)"
                 },
                 {
@@ -558,14 +526,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Steering_Angle_FullSpeed_Factor",
-                            "Operation": "value-included",
-                            "Comparand": null
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Steering_Angle_FullSpeed_Factor",
+                        "Operation": "value-included",
+                        "Comparand": null
+                    },
                     "Value": "=MUL(@Steering_Angle_Max @Steering_Angle_FullSpeed_Factor)"
                 },
                 {
@@ -973,14 +939,12 @@
                     "Value": "=MUL(@Speed_Max 1.953125)"
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "TRAIN"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Engine",
+                        "Operation": "eq",
+                        "Comparand": "TRAIN"
+                    },
                     "Value": "=MUL(@Speed_Max 1.25)"
                 },
                 {
@@ -997,37 +961,33 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "CAR"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Engine",
+                        "Operation": "eq",
+                        "Comparand": "CAR"
+                    },
                     "Value": 12.5
                 },
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "BOAT"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Engine",
+                        "Operation": "eq",
+                        "Comparand": "BOAT"
+                    },
                     "Value": 3.25
                 },
                 {
                     "Value": 100
                 }
             ],
-            "Description": "Maximum distance (in m) this vehicle can move forward in a single tick without being rubber-banded. Vehicles are simulated at 12.5 ticks per second.",
+            "Description": "Maximum distance (in m) this vehicle can move vertically upwards in a single tick without being rubber-banded. Vehicles are simulated at 12.5 ticks per second.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#valid-speed-up-float32",
             "Variable": "validSpeedUp"
         },
         {
-            "Key": "Valid_Speed_Up",
+            "Key": "Valid_Speed_Down",
             "Type": "Float32",
             "DefaultValue":
             [
@@ -1051,7 +1011,7 @@
                     "Value": 100
                 }
             ],
-            "Description": "Maximum distance (in m) this vehicle can move backwards in a single tick without being rubber-banded. Vehicles are simulated at 12.5 ticks per second.",
+            "Description": "Maximum distance (in m) this vehicle can move vertically downwards in a single tick without being rubber-banded. Vehicles are simulated at 12.5 ticks per second.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#valid-speed-down-float32",
             "Variable": "validSpeedDown"
         },
@@ -1064,101 +1024,18 @@
         },
         {
             "Key": "Turrets",
-            "Type": "UInt8",
-            "DefaultValue": 0,
+            "Type":
+            {
+                "Type": "List",
+                "CountType": "UInt8",
+                "ElementType": "SDG.Unturned.TurretInfo, Assembly-CSharp",
+                "Mode": "LegacyList"
+            },
+            "DefaultValue": [ ],
             "Description": "The number of seats designated as turrets.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turrets-uint8-0",
             "Variable": "turrets",
             "CountForTemplateGroup": "vehicle-turrets"
-        },
-        {
-            "Key": "Turret_*_Seat_Index",
-            "Type": "UInt8",
-            "Template": true,
-            "TemplateGroupUniqueValue": true,
-            "TemplateGroups": [ "vehicle-turrets" ],
-            "DefaultValue": 0,
-            "Required": true,
-            "Description": "The zero-based index of the seat to mount turret #(Self.TemplateGroups[0]) to.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-seat-index-uint8-0",
-            "Variable": "TurretInfo.seatIndex"
-        },
-        {
-            "Key": "Turret_*_Item_ID",
-            "Type":
-            {
-                "Type": "Id",
-                "AssetType": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
-            },
-            "Template": true,
-            "TemplateGroups": [ "vehicle-turrets" ],
-            "DefaultValue": 0,
-            "Required": true,
-            "Description": "The gun asset to use for turret #(Self.TemplateGroups[0]).",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-item-id-uint16-0",
-            "Variable": "TurretInfo.itemID"
-        },
-        {
-            "Key": "Turret_*_Yaw_Min",
-            "Type": "Float32",
-            "MinimumExclusive": -360,
-            "Maximum": 360,
-            "Template": true,
-            "TemplateGroups": [ "vehicle-turrets" ],
-            "DefaultValue": 0.0,
-            "Required": true,
-            "Description": "Maximum allowed rotation of the turret through the azimuth, in degrees. If this is set to 360, it can rotate rightward forever.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-yaw-min-float32-0",
-            "Variable": "TurretInfo.yawMin"
-        },
-        {
-            "Key": "Turret_*_Yaw_Max",
-            "Type": "Float32",
-            "Minimum": -360,
-            "MaximumExclusive": 360,
-            "Template": true,
-            "TemplateGroups": [ "vehicle-turrets" ],
-            "DefaultValue": 0.0,
-            "Required": true,
-            "Description": "Minimum allowed rotation of turret #(Self.TemplateGroups[0]) through the azimuth, in degrees. If this is set to -360, it can rotate leftward forever.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-yaw-max-float32-0",
-            "Variable": "TurretInfo.yawMax"
-        },
-        {
-            "Key": "Turret_*_Pitch_Min",
-            "Type": "Float32",
-            "Minimum": 0,
-            "Maximum": 180,
-            "Template": true,
-            "TemplateGroups": [ "vehicle-turrets" ],
-            "DefaultValue": 0.0,
-            "Required": true,
-            "Description": "Minimum allowed rotation of the turret through the elevation, in degrees.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-pitch-min-float32-0",
-            "Variable": "TurretInfo.pitchMin"
-        },
-        {
-            "Key": "Turret_*_Pitch_Max",
-            "Type": "Float32",
-            "Minimum": 0,
-            "Maximum": 180,
-            "Template": true,
-            "TemplateGroups": [ "vehicle-turrets" ],
-            "DefaultValue": 0.0,
-            "Required": true,
-            "Description": "Maximum allowed rotation of the turret through the elevation, in degrees.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-pitch-max-float32-0",
-            "Variable": "TurretInfo.pitchMax"
-        },
-        {
-            "Key": "Turret_*_Ignore_Aim_Camera",
-            "Type": "Flag",
-            "Template": true,
-            "TemplateGroups": [ "vehicle-turrets" ],
-            "DefaultValue": false,
-            "Description": "Normally, the player's camera is positioned at the \"Aim\" GameObject. Including this flag will disable this feature.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-ignore-aim-camera-flag",
-            "Variable": "TurretInfo.useAimCamera"
         },
         {
             "Key": "Invulnerable",
@@ -1243,8 +1120,7 @@
                                 "Operation": "eq",
                                 "Comparand": "BLIMP"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -1332,14 +1208,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Supports_Mobile_Buildables",
-                            "Operation": "eq",
-                            "Comparand": true
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Supports_Mobile_Buildables",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
                     "Value": "AlwaysAllow"
                 },
                 {
@@ -1394,7 +1268,7 @@
             "Key": "Drops_Table_ID",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
             },
             "DefaultValue": 962,
@@ -1405,6 +1279,7 @@
         {
             "Key": "Drops_Min",
             "Type": "UInt8",
+            "Maximum": "@Drops_Max",
             "DefaultValue": 3,
             "Description": "Minimum amount of item drops to spawn from @Drops_Table_ID when this vehicle explodes.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#drops-min-uint8-3",
@@ -1413,6 +1288,7 @@
         {
             "Key": "Drops_Max",
             "Type": "UInt8",
+            "Minimum": "@Drops_Min",
             "DefaultValue": 7,
             "Description": "Maximum amount of item drops to spawn from @Drops_Table_ID when this vehicle explodes.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#drops-max-uint8-7",
@@ -1422,7 +1298,7 @@
             "Key": "Tire_ID",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemTireAsset, Assembly-CSharp"
             },
             "DefaultValue": 1451,
@@ -1574,14 +1450,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "PaintableSections",
-                            "Operation": "neq",
-                            "Comparand": null
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "PaintableSections",
+                        "Operation": "neq",
+                        "Comparand": null
+                    },
                     "Value": true
                 },
                 {
@@ -1658,14 +1532,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "#DefaultPaintColors.ValueType",
-                            "Operation": "eq",
-                            "Comparand": "List"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "#DefaultPaintColors.ValueType",
+                        "Operation": "eq",
+                        "Comparand": "List"
+                    },
                     "Value": "List"
                 },
                 {
@@ -2028,6 +1900,88 @@
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-paintablevehiclesection-allmaterials",
                     "Variable": "allMaterials",
                     "Version": "3.24.7.0"
+                }
+            ]
+        },
+        {
+            "Type": "SDG.Unturned.TurretInfo, Assembly-CSharp",
+            "DisplayName": "Vehicle Turret Info",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turrets-uint8-0",
+            "Properties":
+            [
+                {
+                    "Key": "Seat_Index",
+                    "Type": "UInt8",
+                    "DefaultValue": 0,
+                    "Required": true,
+                    "Description": "The zero-based index of the seat to mount turret #(Self.TemplateGroups[0]) to.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-seat-index-uint8-0",
+                    "Variable": "seatIndex"
+                },
+                {
+                    "Key": "Item_ID",
+                    "Type":
+                    {
+                        "Type": "LegacyAssetReference",
+                        "AssetType": "SDG.Unturned.ItemGunAsset, Assembly-CSharp"
+                    },
+                    "DefaultValue": 0,
+                    "Required": true,
+                    "Description": "The gun asset to use for turret #(Self.TemplateGroups[0]).",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-item-id-uint16-0",
+                    "Variable": "itemID"
+                },
+                {
+                    "Key": "Yaw_Min",
+                    "Type": "Float32",
+                    "MinimumExclusive": -360,
+                    "Maximum": "@Yaw_Max",
+                    "DefaultValue": 0.0,
+                    "Required": true,
+                    "Description": "Maximum allowed rotation of the turret through the azimuth, in degrees. If this is set to 360, it can rotate rightward forever.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-yaw-min-float32-0",
+                    "Variable": "yawMin"
+                },
+                {
+                    "Key": "Yaw_Max",
+                    "Type": "Float32",
+                    "Minimum": "@Yaw_Min",
+                    "MaximumExclusive": 360,
+                    "DefaultValue": 0.0,
+                    "Required": true,
+                    "Description": "Minimum allowed rotation of turret #(Self.TemplateGroups[0]) through the azimuth, in degrees. If this is set to -360, it can rotate leftward forever.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-yaw-max-float32-0",
+                    "Variable": "yawMax"
+                },
+                {
+                    "Key": "Pitch_Min",
+                    "Type": "Float32",
+                    "Minimum": 0,
+                    "Maximum": "@Pitch_Max",
+                    "DefaultValue": 0.0,
+                    "Required": true,
+                    "Description": "Minimum allowed rotation of the turret through the elevation, in degrees.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-pitch-min-float32-0",
+                    "Variable": "pitchMin"
+                },
+                {
+                    "Key": "Pitch_Max",
+                    "Type": "Float32",
+                    "Minimum": "@Pitch_Min",
+                    "Maximum": 180,
+                    "DefaultValue": 0.0,
+                    "Required": true,
+                    "Description": "Maximum allowed rotation of the turret through the elevation, in degrees.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-pitch-max-float32-0",
+                    "Variable": "pitchMax"
+                },
+                {
+                    "Key": "Ignore_Aim_Camera",
+                    "Type": "Flag",
+                    "DefaultValue": false,
+                    "Description": "Normally, the player's camera is positioned at the \"Aim\" GameObject. Including this flag will disable this feature.",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-ignore-aim-camera-flag",
+                    "Variable": "useAimCamera"
                 }
             ]
         },
@@ -2440,7 +2394,7 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
+                            "Case":
                             {
                                 "Variable": "ModelUseColliderPose",
                                 "Operation": "eq",
@@ -2472,14 +2426,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "IsColliderSteered",
-                                    "Operation": "value-included",
-                                    "Comparand": null
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "IsColliderSteered",
+                                "Operation": "value-included",
+                                "Comparand": null
+                            },
                             "Value": "SteeringAngle"
                         },
                         {

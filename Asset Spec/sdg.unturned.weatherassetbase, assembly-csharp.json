@@ -39,19 +39,20 @@
         },
         {
             "Key": "Component_Type",
-            "Type": "Type",
-            "ElementType": "SDG.Unturned.WeatherComponentBase, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "TypeReference",
+                "BaseType": "SDG.Unturned.WeatherComponentBase, Assembly-CSharp"
+            },
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "#This",
-                            "Operation": "is-type",
-                            "Comparand": "SDG.Unturned.WeatherAsset, Assembly-CSharp"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "#This",
+                        "Operation": "is-type",
+                        "Comparand": "SDG.Unturned.WeatherAsset, Assembly-CSharp"
+                    },
                     "Value": "SDG.Unturned.CustomWeatherComponent, Assembly-CSharp"
                 },
                 {
@@ -67,9 +68,9 @@
                     "Value": "SDG.Unturned.WeatherComponentBase, Assembly-CSharp",
                     "Condition":
                     {
-                            "Variable": "#This",
-                            "Operation": "is-type",
-                            "Comparand": "SDG.Unturned.WeatherAsset, Assembly-CSharp"
+                        "Variable": "#This",
+                        "Operation": "is-type",
+                        "Comparand": "SDG.Unturned.WeatherAsset, Assembly-CSharp"
                     }
                 }
             ]

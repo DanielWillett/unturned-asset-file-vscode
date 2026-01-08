@@ -89,26 +89,23 @@
         },
         {
             "Key": "Secondary_Skins",
-            "Type": "UInt16",
-            "DefaultValue": 0,
-            "Description": "The number of attachment skin material overrides available in the bundle.",
-            "Variable": "secondarySkins",
-            "CountForTemplateGroup": "skin-secondary"
-        },
-        {
-            "Key": "Secondary_*",
             "Type":
             {
-                "Type": "Id",
-                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                "Type": "List",
+                "CountType": "UInt16",
+                "ElementType":
+                {
+                    "Type": "LegacyAssetReference",
+                    "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                },
+                "LegacySingularKey": "Secondary",
+                "Mode": "LegacyList"
             },
-            "Template": true,
-            "TemplateGroups": [ "skin-secondary" ],
-            "Required": true,
             "TemplateGroupUniqueValue": true,
             "DefaultValue": 0,
-            "Description": "The item ID of an attachment for which this skin provides a custom material for. The material should be named 'Skin_Secondary_#' where # would be the value of this property.",
-            "Variable": "secondarySkins"
+            "Description": "The item IDs of attachments for which this skin provides a custom material for. The material should be named 'Skin_Secondary_#' where # would be the value of this property.",
+            "Variable": "secondarySkins",
+            "CountForTemplateGroup": "skin-secondary"
         },
         {
             "Key": "Override_Meshes",

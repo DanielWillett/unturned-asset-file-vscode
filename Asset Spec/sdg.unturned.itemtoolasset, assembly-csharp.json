@@ -29,7 +29,8 @@
             "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
             "Description": "The sound played when the item is used.",
             "Variable": "use",
-            "Required": true
+            "Required": true,
+            "RedirectableAssetKey": "UseAudioClip"
         }
     ]
 }

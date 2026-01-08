@@ -1,13 +1,13 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
-using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -40,16 +40,18 @@ public static class CommonTypes
         knownTypes["BooleanOrFlag"]                     = () => BooleanOrFlagType.Instance;
         knownTypes["Character"]                         = () => CharacterType.Instance;
         knownTypes["List"]                              = () => ListType.Factory;
-        knownTypes["Type"]                              = () => StringType.Instance;    // todo
+        knownTypes["Type"]                              = () => TypeReferenceType.Factory;
+        knownTypes["QualifiedType"]                     = () => QualifiedTypeType.Instance;
         knownTypes["TypeOrEnum"]                        = () => StringType.Instance;    // todo
         knownTypes["Guid"]                              = () => GuidType.Instance;
         knownTypes["GuidOrId"]                          = () => GuidOrIdType.Instance;
         knownTypes["Color32"]                           = () => Color32Type.Instance;
         knownTypes["Color"]                             = () => ColorType.Instance;
         knownTypes["AssetReference"]                    = () => AssetReferenceType.Factory;
-        knownTypes["BcAssetReference"]                  = () => StringType.Instance;    // todo
         knownTypes["AssetReferenceString"]              = () => AssetReferenceType.Factory;
-        knownTypes["BcAssetReferenceString"]            = () => StringType.Instance;    // todo
+        knownTypes["BcAssetReference"]                  = () => BackwardsCompatibleAssetReferenceType.Factory;
+        knownTypes["BcAssetReferenceString"]            = () => BackwardsCompatibleAssetReferenceType.Factory;
+        knownTypes["LegacyAssetReferenceString"]        = () => BackwardsCompatibleAssetReferenceType.Factory;
         knownTypes["ContentReference"]                  = () => BundleReferenceType.Factory;
         knownTypes["AudioReference"]                    = () => BundleReferenceType.Factory;
         knownTypes["MasterBundleReference"]             = () => BundleReferenceType.Factory;
@@ -59,8 +61,8 @@ public static class CommonTypes
         knownTypes["FaceIndex"]                         = () => UInt8Type.Instance;     // todo
         knownTypes["BeardIndex"]                        = () => UInt8Type.Instance;     // todo
         knownTypes["HairIndex"]                         = () => UInt8Type.Instance;     // todo
-        knownTypes["Id"]                                = () => UInt16Type.Instance;    // todo
-        knownTypes["DefaultableId"]                     = () => Int32Type.Instance;     // todo
+        knownTypes["LegacyAssetReference"]              = () => LegacyAssetReferenceType.Factory;
+        knownTypes["DefaultableLegacyAssetReference"]   = () => LegacyAssetReferenceType.Factory;
         knownTypes["NavId"]                             = () => UInt8Type.Instance;     // todo
         knownTypes["SpawnpointId"]                      = () => StringType.Instance;    // todo
         knownTypes["OverlapVolumeId"]                   = () => StringType.Instance;    // todo
@@ -76,9 +78,7 @@ public static class CommonTypes
         knownTypes["Vector3"]                           = () => Vector3Type.Instance;
         knownTypes["Vector2"]                           = () => Vector2Type.Instance;
         knownTypes["CommaDelimitedString"]              = () => StringType.Instance;    // todo
-        knownTypes["List"]                              = () => StringType.Instance;    // todo
         knownTypes["Dictionary"]                        = () => StringType.Instance;    // todo
-        knownTypes["ListOrSingle"]                      = () => StringType.Instance;    // todo
         knownTypes["MasterBundleName"]                  = () => StringType.Instance;    // todo
         knownTypes["LegacyBundleName"]                  = () => StringType.Instance;    // todo
         knownTypes["AssetBundleVersion"]                = () => Int32Type.Instance;     // todo
@@ -98,7 +98,7 @@ public static class CommonTypes
         knownTypes["BladeId"]                           = () => UInt8Type.Instance;     // todo
         knownTypes["PhysicsMaterial"]                   = () => StringType.Instance;    // todo
         knownTypes["PhysicsMaterialLegacy"]             = () => StringType.Instance;    // todo
-        knownTypes["TypeReference"]                     = () => StringType.Instance;    // todo
+        knownTypes["TypeReference"]                     = () => TypeReferenceType.Factory;
         knownTypes["IPv4Filter"]                        = () => IPv4FilterType.Instance;
         knownTypes["Steam64ID"]                         = () => UInt64Type.Instance;    // todo
         knownTypes["Url"]                               = () => StringType.Instance;    // todo

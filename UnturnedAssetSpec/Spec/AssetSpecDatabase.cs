@@ -5,6 +5,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -71,6 +72,17 @@ public interface IAssetSpecDatabase
     /// List of asset files by their type.
     /// </summary>
     IReadOnlyDictionary<QualifiedType, AssetSpecType> Types { get; }
+
+
+    /// <summary>
+    /// List of file type definitionas by their type name.
+    /// </summary>
+    ImmutableDictionary<QualifiedType, DatFileType> FileTypes { get; }
+    
+    /// <summary>
+    /// List of custom and file type definitionas by their type name.
+    /// </summary>
+    ImmutableDictionary<QualifiedType, DatType> AllTypes { get; }
     
     /// <summary>
     /// Initialize the database.
@@ -129,6 +141,10 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     public IReadOnlyList<string> ValidActionButtons { get; set; }
 
     public IReadOnlyDictionary<QualifiedType, AssetSpecType> Types { get; private set; } = new Dictionary<QualifiedType, AssetSpecType>(0);
+
+    /// <inheritdoc />
+    public ImmutableDictionary<QualifiedType, DatFileType> FileTypes => throw new NotImplementedException();
+    public ImmutableDictionary<QualifiedType, DatType> AllTypes => throw new NotImplementedException();
 
     public AssetInformation Information { get; private set; } = new AssetInformation
     {
@@ -1453,6 +1469,9 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         {
             _db = db;
             Types = types;
+            FileTypes = null;
+            Types = null;
+            throw new NotImplementedException();
         }
 
         public bool IsInitialized => false;
@@ -1476,6 +1495,9 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         public AssetInformation Information => _db.Information;
         public IReadOnlyList<string> ValidActionButtons => _db.ValidActionButtons;
         public IReadOnlyDictionary<QualifiedType, AssetSpecType> Types { get; }
+        public ImmutableDictionary<QualifiedType, DatFileType> FileTypes { get; }
+        public ImmutableDictionary<QualifiedType, DatType> AllTypes { get; }
+
         public Task InitializeAsync(CancellationToken token = default) => _db.InitializeAsync(token);
         public void LogMessage(string message) => _db.Log(message);
         public Task OnInitialize(Func<IAssetSpecDatabase, Task> action) => _db.OnInitialize(action);

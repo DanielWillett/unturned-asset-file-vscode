@@ -162,7 +162,7 @@
             {
                 "Type": "List",
                 "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                "LegacySingularKey": "Weak_Attack_Quest_Reward",
+                "CountType": "Int32",
                 "Mode": "LegacyList, ModernList"
             },
             "DefaultValue": null,
@@ -177,7 +177,6 @@
             {
                 "Type": "List",
                 "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                "LegacySingularKey": "Strong_Attack_Quest_Reward",
                 "Mode": "LegacyList, ModernList"
             },
             "DefaultValue": null,

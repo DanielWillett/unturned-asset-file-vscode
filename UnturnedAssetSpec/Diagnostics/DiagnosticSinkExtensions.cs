@@ -62,6 +62,22 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
+        /// Reports a type reference that doesn't derive from it's expected base type. 
+        /// </summary>
+        public void UNT103<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            string typeName, string baseTypes
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT103,
+                Message = string.Format(DiagnosticResources.UNT103, typeName, baseTypes),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
         /// Reports the usage of a ContentReference when a MasterBundleReference could've been used instead. 
         /// </summary>
         public void UNT104<TDiagnosticProvider>(
@@ -181,6 +197,22 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
+        /// Reports an invalid enum value. 
+        /// </summary>
+        public void UNT1014<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            string enumValue
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1014,
+                Message = string.Format(DiagnosticResources.UNT1014, enumValue),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
         /// Reports an unsupported TranslationReference. 
         /// </summary>
         public void UNT1018<TDiagnosticProvider>(
@@ -269,7 +301,22 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a list or dictionary that has too few entries. 
+        /// Reports a type reference not using an assembly-qualified name.
+        /// </summary>
+        public void UNT1023<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1023,
+                Message = DiagnosticResources.UNT1023,
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a list or dictionary that has too few entries.
         /// </summary>
         public void UNT1024_Less<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -285,7 +332,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a list or dictionary that has too many entries. 
+        /// Reports a list or dictionary that has too many entries.
         /// </summary>
         public void UNT1024_More<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -301,7 +348,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a string that has too few characters. 
+        /// Reports a string that has too few characters.
         /// </summary>
         public void UNT1024_LessString<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -317,7 +364,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a string that has too many characters. 
+        /// Reports a string that has too many characters.
         /// </summary>
         public void UNT1024_MoreString<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -365,7 +412,23 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports an extra 'A' property on a color that doesn't support alpha. 
+        /// Reports an unrecognized property.
+        /// </summary>
+        public void UNT1025<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            string property
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1025,
+                Message = string.Format(DiagnosticResources.UNT1025, property),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports an extra 'A' property on a color that doesn't support alpha.
         /// </summary>
         public void UNT1026<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -642,6 +705,51 @@ public static class DiagnosticSinkExtensions
         }
         
         /// <summary>
+        /// Reports a dictionary value given for a BackwardsCompatibleAssetReference type that only supports string values.
+        /// </summary>
+        public void UNT2004_BackwardsCompatibleAssetReferenceStringOnly<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, IType type, IParentSourceNode parent
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2004,
+                Message = string.Format(DiagnosticResources.UNT2004_BackwardsCompatibleAssetReferenceStringOnly, type.DisplayName, NodePropertyName(parent, ref provider)),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+        
+        /// <summary>
+        /// Reports a dictionary value given for a LegacyAssetReference type that only supports string values.
+        /// </summary>
+        public void UNT2004_LegacyAssetReferenceStringOnly<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, IType type, IParentSourceNode parent
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2004,
+                Message = string.Format(DiagnosticResources.UNT2004_LegacyAssetReferenceStringOnly, type.DisplayName, NodePropertyName(parent, ref provider)),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a dictionary value given for an TypeReference type that only supports string values.
+        /// </summary>
+        public void UNT2004_TypeReferenceStringOnly<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, IType type, IParentSourceNode parent
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2004,
+                Message = string.Format(DiagnosticResources.UNT2004_TypeReferenceStringOnly, type.DisplayName, NodePropertyName(parent, ref provider)),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
         /// Reports a color that parsed correctly but wouldn't parse correctly in-game under strict rules (<c>Palette.hex(<see cref="string"/>)</c>.
         /// </summary>
         public void UNT2004_StrictColor<TDiagnosticProvider>(
@@ -685,6 +793,72 @@ public static class DiagnosticSinkExtensions
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
+
+
+        /// <summary>
+        /// Reports a property in a project file that has incorrect casing.
+        /// </summary>
+        public void UPROJ1001<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            string property, string correctCasing
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UPROJ1001,
+                Message = string.Format(DiagnosticResources.UPROJ1001, property, correctCasing),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a type in a project file that has incorrect casing.
+        /// </summary>
+        public void UPROJ1002<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            string typeName, string correctCasing
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UPROJ1002,
+                Message = string.Format(DiagnosticResources.UPROJ1002, typeName, correctCasing),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports an unrecognized property in a project file.
+        /// </summary>
+        public void UPROJ2001<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            string property
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UPROJ2001,
+                Message = string.Format(DiagnosticResources.UPROJ2001, property),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports an unrecognized type in a project file.
+        /// </summary>
+        public void UPROJ2002<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            string property
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UPROJ2002,
+                Message = string.Format(DiagnosticResources.UPROJ2002, property),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
     }
 }
 

@@ -30,6 +30,12 @@ public enum DatSpecificationType
     Custom,
 
     /// <summary>
+    /// A data structure which is defined in a specification and can be used within .dat files.
+    /// </summary>
+    /// <remarks>Of type <see cref="DatCustomAssetType"/>.</remarks>
+    CustomAsset,
+
+    /// <summary>
     /// A set of allowed values which are defined in a specification and can be used within .dat files.
     /// </summary>
     /// <remarks>Of type <see cref="DatEnumType"/>.</remarks>
@@ -92,6 +98,11 @@ public abstract class DatType : BaseType<DatType>, IDatSpecificationObject
     public string? Docs { get; internal set; }
 
     /// <summary>
+    /// Whether or not this file type is a project file for this library as opposed to a file read by Unturned.
+    /// </summary>
+    public bool IsProjectFile { get; internal set; }
+
+    /// <summary>
     /// Pre-defined fully-qualified C# type name used to parse values of this type.
     /// </summary>
     /// <remarks>This type should implement <see cref="ITypeConverter{T}"/> for the correct type.</remarks>
@@ -141,14 +152,16 @@ public abstract class DatType : BaseType<DatType>, IDatSpecificationObject
     /// <param name="element">The JSON element this type was read from.</param>
     /// <param name="baseType">The base type of this custom type.</param>
     /// <param name="file">The file this type is defined in.</param>
-    /// <returns>The newly-created <see cref="DatCustomType"/> instance.</returns>
+    /// <returns>The newly-created <see cref="DatCustomType"/> or <see cref="DatCustomAssetType"/> instance.</returns>
     /// <exception cref="ArgumentNullException"/>
     public static DatCustomType CreateCustomType(QualifiedType typeName, JsonElement element, DatTypeWithProperties? baseType, DatFileType file)
     {
         if (string.IsNullOrEmpty(typeName.Type))
             throw new ArgumentNullException(nameof(typeName));
 
-        return new DatCustomType(typeName, baseType, element, file);
+        return file is DatAssetFileType assetFileType
+            ? new DatCustomAssetType(typeName, baseType, element, assetFileType)
+            : new DatCustomType(typeName, baseType, element, file);
     }
 
     /// <summary>
@@ -215,6 +228,28 @@ public abstract class DatTypeWithProperties : DatType
 }
 
 /// <summary>
+/// Base interface for any <see cref="DatType"/> implementations that have localization properties.
+/// </summary>
+public interface IDatTypeWithLocalizationProperties
+{
+    /// <summary>
+    /// List of all available properties that can be stored in the localization file for this type of asset.
+    /// </summary>
+    ImmutableArray<DatProperty> LocalizationProperties { get; }
+}
+
+/// <summary>
+/// Base interface for any <see cref="DatType"/> implementations that have bundle assets.
+/// </summary>
+public interface IDatTypeWithBundleAssets
+{
+    /// <summary>
+    /// List of all available Unity objects that can be in the bundle for this asset.
+    /// </summary>
+    ImmutableArray<DatBundleAsset> BundleAssets { get; }
+}
+
+/// <summary>
 /// A subclass of <see cref="DatType"/> which is created for non-asset types.
 /// </summary>
 public class DatFileType : DatTypeWithProperties
@@ -256,7 +291,7 @@ public class DatFileType : DatTypeWithProperties
 /// <summary>
 /// A subclass of <see cref="DatType"/> which is only created for Asset types, including the base type, "SDG.Unturned.Asset".
 /// </summary>
-public class DatAssetFileType : DatFileType
+public class DatAssetFileType : DatFileType, IDatTypeWithLocalizationProperties, IDatTypeWithBundleAssets
 {
     /// <inheritdoc />
     public override DatSpecificationType Type => DatSpecificationType.AssetFile;
@@ -276,14 +311,10 @@ public class DatAssetFileType : DatFileType
     /// </summary>
     public bool RequireId { get; internal set; }
 
-    /// <summary>
-    /// List of all available properties that can be stored in the localization file for this type of asset.
-    /// </summary>
+    /// <inheritdoc />
     public ImmutableArray<DatProperty> LocalizationProperties { get; internal set; }
 
-    /// <summary>
-    /// List of all available Unity objects that can be in the bundle for this asset.
-    /// </summary>
+    /// <inheritdoc />
     public ImmutableArray<DatBundleAsset> BundleAssets { get; internal set; }
 
     internal DatAssetFileType(QualifiedType type, DatFileType? baseType, JsonElement element) : base(type, baseType, element)

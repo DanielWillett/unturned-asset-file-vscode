@@ -10,8 +10,11 @@
     [
         {
             "Key": "Default_Game_Mode",
-            "Type": "TypeReference",
-            "ElementType": "SDG.Unturned.GameMode, Assembly-CSharp",
+            "Type":
+            {
+                "Type": "TypeReference",
+                "BaseType": "SDG.Unturned.GameMode, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Description": "The default gamemode to use when loading this map.",
             "Variable": "defaultGameMode"
@@ -21,8 +24,11 @@
             "Type":
             {
                 "Type": "List",
-                "ElementType": "TypeReference",
-                "SpecialTypes": [ "SDG.Unturned.GameMode, Assembly-CSharp" ]
+                "ElementType":
+                {
+                    "Type": "TypeReference",
+                    "BaseType": "SDG.Unturned.GameMode, Assembly-CSharp"
+                }
             },
             "DefaultValue": null,
             "Description": "List of gamemodes supported by this map. Doesn't appear to be used by the game.",

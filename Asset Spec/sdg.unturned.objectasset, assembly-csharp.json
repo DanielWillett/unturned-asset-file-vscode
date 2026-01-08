@@ -12,6 +12,7 @@
             "Key": "Type",
             "Type": "SDG.Unturned.EObjectType, Assembly-CSharp",
             "Required": true,
+            "PreventOverride": true,
             "Description": "The type of object to create.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-assets",
             "Variable": "type"
@@ -116,8 +117,7 @@
                                 "Operation": "eq",
                                 "Comparand": "SMALL"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -190,8 +190,7 @@
                                 "Operation": "eq",
                                 "Comparand": "DROPPER"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -204,14 +203,12 @@
             "Docs":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Interactability",
-                            "Operation": "eq",
-                            "Comparand": "RUBBLE"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Interactability",
+                        "Operation": "eq",
+                        "Comparand": "RUBBLE"
+                    },
                     "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble"
                 },
                 {
@@ -221,14 +218,12 @@
             "Variable":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Interactability",
-                            "Operation": "eq",
-                            "Comparand": "RUBBLE"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Interactability",
+                        "Operation": "eq",
+                        "Comparand": "RUBBLE"
+                    },
                     "Value": "rubbleReset"
                 },
                 {
@@ -264,8 +259,7 @@
                                 "Operation": "eq",
                                 "Comparand": "RUBBLE"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -312,8 +306,7 @@
                                 "Operation": "eq",
                                 "Comparand": "NOTE"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -382,8 +375,7 @@
                                 "Operation": "eq",
                                 "Comparand": "DROPPER"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -442,9 +434,20 @@
         },
         {
             "Key": "Interactability_Drops",
-            "Type": "UInt8",
-            "DefaultValue": 0,
-            "Description": "Number of options for item drops from this dropper object.",
+            "Type":
+            {
+                "Type": "List",
+                "CountType": "UInt8",
+                "ElementType":
+                {
+                    "Type": "LegacyAssetReference",
+                    "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
+                },
+                "Mode": "LegacyList",
+                "LegacyDefaultElementTypeValue": 0
+            },
+            "DefaultValue": [ ],
+            "Description": "Options for item drops from this dropper object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Variable": "interactabilityDrops",
             "InclusiveWith":
@@ -477,24 +480,10 @@
             ]
         },
         {
-            "Key": "Interactability_Drop_*",
-            "Template": true,
-            "TemplateGroups": [ "object-interactability-drops" ],
-            "Type":
-            {
-                "Type": "Id",
-                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
-            },
-            "DefaultValue": 0,
-            "Description": "An option for item drops from this dropper object.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
-            "Variable": "interactabilityDrops"
-        },
-        {
             "Key": "Interactability_Reward_ID",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,
@@ -502,14 +491,12 @@
             "Docs":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Interactability",
-                            "Operation": "eq",
-                            "Comparand": "RUBBLE"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Interactability",
+                        "Operation": "eq",
+                        "Comparand": "RUBBLE"
+                    },
                     "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble"
                 },
                 {
@@ -519,14 +506,12 @@
             "Variable":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Interactability",
-                            "Operation": "eq",
-                            "Comparand": "RUBBLE"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Interactability",
+                        "Operation": "eq",
+                        "Comparand": "RUBBLE"
+                    },
                     "Value": "rubbleRewardID"
                 },
                 {
@@ -552,8 +537,7 @@
                                 "Operation": "eq",
                                 "Comparand": "RUBBLE"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ],
@@ -590,14 +574,12 @@
             "Docs":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Interactability",
-                            "Operation": "eq",
-                            "Comparand": "RUBBLE"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Interactability",
+                        "Operation": "eq",
+                        "Comparand": "RUBBLE"
+                    },
                     "Value": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#rubble"
                 },
                 {
@@ -607,14 +589,12 @@
             "Variable":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Interactability",
-                            "Operation": "eq",
-                            "Comparand": "RUBBLE"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Interactability",
+                        "Operation": "eq",
+                        "Comparand": "RUBBLE"
+                    },
                     "Value": "rubbleEffectGuid"
                 },
                 {
@@ -656,8 +636,7 @@
                                 "Operation": "eq",
                                 "Comparand": "RUBBLE"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]
@@ -756,7 +735,6 @@
             {
                 "Type": "List",
                 "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                "LegacySingularKey": "Interactability_Condition",
                 "Mode": "LegacyList, ModernList"
             },
             "DefaultValue": null,
@@ -808,12 +786,69 @@
                                 "Operation": "eq",
                                 "Comparand": "NOTE"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ],
             "CountForTemplateGroup": "object-interact-conditions"
+        },
+        {
+            "Key": "Interactability_Rewards",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.INPCREward, Assembly-CSharp",
+                "Mode": "LegacyList, ModernList"
+            },
+            "DefaultValue": null,
+            "Description": "Rewards granted after succesfully interacting with this object.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#conditions-and-rewards",
+            "Variable": "interactabilityConditionsList",
+            "ExclusiveWith":
+            [
+                {
+                    "Key": "Type",
+                    "Value": "DECAL"
+                },
+                {
+                    "Key": "Type",
+                    "Value": "NPC"
+                }
+            ],
+            "InclusiveWith":
+            [
+                {
+                    "Key": "Interactability",
+                    "ConditionIsRequirement": true,
+                    "Condition":
+                    {
+                        "Or":
+                        [
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "BINARY_STATE"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "DROPPER"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "QUEST"
+                            },
+                            {
+                                "Variable": "Interactability",
+                                "Operation": "eq",
+                                "Comparand": "NOTE"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "CountForTemplateGroup": "object-interact-rewards"
         },
         {
             "Key": "Interactability_Resource",
@@ -852,8 +887,7 @@
                                 "Operation": "eq",
                                 "Comparand": "FUEL"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ],
@@ -1410,7 +1444,7 @@
             "Key": "Rubble_Reward_ID",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,
@@ -1964,7 +1998,7 @@
             "DefaultValue":
             [
                 {
-                    "And": 
+                    "Case":
                     {
                         "Variable": "Type",
                         "Operation": "eq",
@@ -2357,14 +2391,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Holiday_Restriction",
-                            "Operation": "neq",
-                            "Comparand": "NONE"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Holiday_Restriction",
+                        "Operation": "eq",
+                        "Comparand": "NONE"
+                    },
                     "Value": true
                 },
                 {
@@ -2482,8 +2514,7 @@
                                 "Operation": "eq",
                                 "Comparand": "RUBBLE"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ],
@@ -2517,8 +2548,7 @@
                                 "Operation": "eq",
                                 "Comparand": "RUBBLE"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ],
@@ -2552,8 +2582,7 @@
                                 "Operation": "eq",
                                 "Comparand": "RUBBLE"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ],
@@ -2604,8 +2633,7 @@
                         "Operation": "neq",
                         "Comparand": "DECAL"
                     }
-                ],
-                "Value": true
+                ]
             },
             "Variable": "legacyServerModel",
             "ExclusiveWith":
@@ -2642,8 +2670,7 @@
                         "Operation": "neq",
                         "Comparand": "DECAL"
                     }
-                ],
-                "Value": true
+                ]
             },
             "Variable": "clientModel",
             "ExclusiveWith":
@@ -2681,8 +2708,7 @@
                         "Operation": "neq",
                         "Comparand": "DECAL"
                     }
-                ],
-                "Value": true
+                ]
             },
             "Variable": "editorModel",
             "ExclusiveWith":
@@ -2790,14 +2816,12 @@
             "Docs":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Type",
-                            "Operation": "eq",
-                            "Comparand": "NPC"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Type",
+                        "Operation": "eq",
+                        "Comparand": "NPC"
+                    },
                     "Value": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html#localization"
                 },
                 {

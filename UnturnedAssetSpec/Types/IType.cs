@@ -64,6 +64,17 @@ public interface IType<TValue> : IType where TValue : IEquatable<TValue>
     IValue<TValue> CreateValue(Optional<TValue> value);
 }
 
+/// <summary>
+/// Allows a type to specify a set of other types that are referenced by this type.
+/// </summary>
+/// <remarks>For example, <see cref="ListType{TCountType,TElementType}"/> uses this to reference it's count and element types.</remarks>
+public interface IReferencingType : IType
+{
+    /// <summary>
+    /// Types that are referenced by this type.
+    /// </summary>
+    OneOrMore<IType> ReferencedTypes { get; }
+}
 
 public interface ITypeVisitor
 {

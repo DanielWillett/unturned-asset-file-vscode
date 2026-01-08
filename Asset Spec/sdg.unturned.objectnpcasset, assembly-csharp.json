@@ -530,14 +530,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Pose",
-                            "Operation": "eq",
-                            "Comparand": "CROUCH"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Pose",
+                        "Operation": "eq",
+                        "Comparand": "CROUCH"
+                    },
                     "Value": 0.1
                 },
                 {

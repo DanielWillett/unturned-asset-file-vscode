@@ -22,7 +22,7 @@
             "Key": "Grow",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,

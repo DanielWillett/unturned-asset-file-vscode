@@ -1,6 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Immutable;
@@ -29,7 +28,7 @@ partial class SpecificationFileReader
         string key = element.GetString()!;
         bool isImport = string.IsNullOrWhiteSpace(key);
         DatProperty? overriding = null;
-        if (!isImport)
+        if (!isImport && (!root.TryGetProperty("PreventOverride"u8, out element) || element.ValueKind != JsonValueKind.True))
         {
             // find property to override in parent types
             for (DatTypeWithProperties? parentType = owner.BaseType; parentType is T pType && overriding != null; parentType = parentType.BaseType)
@@ -91,6 +90,8 @@ partial class SpecificationFileReader
         }
 
         DatProperty property = DatProperty.Create(key, type, owner, element);
+
+        property.OverriddenProperty = overriding;
 
         LegacyExpansionFilter filter = LegacyExpansionFilter.Either;
 

@@ -6,7 +6,6 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Immutable;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 
@@ -121,38 +120,7 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
         _baseTypes = baseTypes;
         SupportsThis = supportsThis;
         PreventSelfReference = preventSelfReference;
-        if (baseTypes.IsNull
-            || baseTypes.IsSingle && (baseTypes.Value == QualifiedType.AssetBaseType || baseTypes.Value == QualifiedType.AssetBaseType))
-        {
-            DisplayName = DisplayNames[(int)Kind];
-            return;
-        }
-
-        string fmt = DisplayNamesFormattable[(int)kind];
-        if (baseTypes.IsSingle)
-        {
-            DisplayName = string.Format(fmt, baseTypes.Value.GetTypeName());
-        }
-        else if (baseTypes.Length == 2)
-        {
-            DisplayName = string.Format(fmt, baseTypes.Values[0].GetTypeName() + " or " + baseTypes.Values[1].GetTypeName());
-        }
-        else
-        {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < baseTypes.Length; i++)
-            {
-                QualifiedType type = baseTypes[i];
-                if (i != 0)
-                    sb.Append(", ");
-                if (i == baseTypes.Length - 1)
-                    sb.Append("or ");
-
-                sb.Append(type.GetTypeName());
-            }
-
-            DisplayName = sb.ToString();
-        }
+        DisplayName = AssetReferenceHelper.GetDisplayName(baseTypes, DisplayNames[(int)kind], DisplayNamesFormattable[(int)kind]);
     }
 
     public bool TryParse(ref TypeParserArgs<Guid> args, in FileEvaluationContext ctx, out Optional<Guid> value)
@@ -250,52 +218,19 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
 
         if (typeDefinition.ValueKind == JsonValueKind.String)
         {
-            return new AssetReferenceType(mode);
+            return GetInstance(mode);
         }
 
-        OneOrMore<QualifiedType> baseTypes;
-        if (typeDefinition.TryGetProperty("BaseType"u8, out JsonElement element)
-            && element.ValueKind != JsonValueKind.Null)
-        {
-            baseTypes = new OneOrMore<QualifiedType>(new QualifiedType(element.GetString()!, isCaseInsensitive: true));
-        }
-        else if (typeDefinition.TryGetProperty("BaseTypes"u8, out element)
-                 && element.ValueKind != JsonValueKind.Null)
-        {
-            int len = element.GetArrayLength();
-            QualifiedType[] arr = new QualifiedType[len];
-            for (int i = 0; i < len; ++i)
-            {
-                arr[i] = new QualifiedType(element[i].GetString()!, isCaseInsensitive: true);
-            }
+        AssetReferenceHelper.ReadCommonJsonProperties(in typeDefinition, out OneOrMore<QualifiedType> baseTypes, out bool allowThis, out bool preventSelfRef, out bool isDefault);
 
-            baseTypes = new OneOrMore<QualifiedType>(arr);
-        }
-        else
-        {
-            baseTypes = OneOrMore<QualifiedType>.Null;
-        }
-
-        bool allowThis = false, preventSelfRef = false;
-        if (typeDefinition.TryGetProperty("SupportsThis"u8, out element)
-            && element.ValueKind != JsonValueKind.Null)
-        {
-            allowThis = element.GetBoolean();
-        }
-        if (typeDefinition.TryGetProperty("PreventSelfReference"u8, out element)
-            && element.ValueKind != JsonValueKind.Null)
-        {
-            preventSelfRef = element.GetBoolean();
-        }
-
-        return baseTypes.IsNull && !allowThis && !preventSelfRef
+        return isDefault
             ? GetInstance(mode)
             : new AssetReferenceType(mode, baseTypes, allowThis, preventSelfRef);
     }
 
     public override void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
-        if (_baseTypes.IsNull)
+        if (_baseTypes.IsNull && !SupportsThis && !PreventSelfReference)
         {
             writer.WriteStringValue(Id);
             return;
@@ -304,26 +239,7 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
         writer.WriteStartObject();
 
         WriteTypeName(writer);
-        if (!_baseTypes.IsNull)
-        {
-            if (_baseTypes.IsSingle)
-            {
-                writer.WriteString("BaseType"u8, _baseTypes[0].Type);
-            }
-            else
-            {
-                writer.WritePropertyName("BaseTypes"u8);
-                writer.WriteStartArray();
-                foreach (QualifiedType t in _baseTypes)
-                    writer.WriteStringValue(t.Type);
-                writer.WriteEndArray();
-            }
-        }
-
-        if (SupportsThis)
-            writer.WriteBoolean("SupportsThis"u8, true);
-        if (PreventSelfReference)
-            writer.WriteBoolean("PreventSelfReference"u8, true);
+        AssetReferenceHelper.WriteCommonJsonProperties(writer, _baseTypes, SupportsThis, PreventSelfReference);
 
         writer.WriteEndObject();
     }
@@ -332,11 +248,11 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
 
     protected override bool Equals(AssetReferenceType other)
     {
-        return other.Kind == Kind && other._baseTypes.Equals(_baseTypes);
+        return other.Kind == Kind && other._baseTypes.Equals(_baseTypes) && other.SupportsThis == SupportsThis && other.PreventSelfReference == PreventSelfReference;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(1499429627, Kind, _baseTypes);
+        return HashCode.Combine(1499429627, Kind, _baseTypes.Value, SupportsThis, PreventSelfReference);
     }
 }

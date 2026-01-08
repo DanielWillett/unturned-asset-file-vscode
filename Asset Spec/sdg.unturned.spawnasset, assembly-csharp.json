@@ -59,14 +59,12 @@
                     "Description":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Key",
-                                    "Operation": "eq-i",
-                                    "Comparand": "Roots"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Key",
+                                "Operation": "eq-i",
+                                "Comparand": "Roots"
+                            },
                             "Value": "Specifies the GUID of a root spawn to which this spawn will be attached to."
                         },
                         {
@@ -76,14 +74,12 @@
                     "Docs":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Key",
-                                    "Operation": "eq-i",
-                                    "Comparand": "Roots"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Key",
+                                "Operation": "eq-i",
+                                "Comparand": "Roots"
+                            },
                             "Value": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#roots"
                         },
                         {
@@ -104,8 +100,7 @@
                                 "Operation": "eq",
                                 "Comparand": 0
                             }
-                        ],
-                        "Value": true
+                        ]
                     },
                     "ExclusiveWith":
                     [
@@ -126,8 +121,7 @@
                                         "Comparand": "SDG.Unturned.SpawnAsset, Assembly-CSharp",
                                         "Inverted": true
                                     }
-                                ],
-                                "Value": true
+                                ]
                             }
                         }
                     ],
@@ -146,7 +140,7 @@
                     "DefaultValue": 0,
                     "Type":
                     {
-                        "Type": "Id",
+                        "Type": "LegacyAssetReference",
                         "AssetTypes": [ "SDG.Unturned.ItemAsset, Assembly-CSharp", "SDG.Unturned.VehicleAsset, Assembly-CSharp", "SDG.Unturned.AnimalAsset, Assembly-CSharp" ]
                     },
                     "Description": "Specifies the ID of a resolved asset.",
@@ -154,14 +148,12 @@
                     "Docs":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Key",
-                                    "Operation": "eq-i",
-                                    "Comparand": "Roots"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Key",
+                                "Operation": "eq-i",
+                                "Comparand": "Roots"
+                            },
                             "Value": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#roots"
                         },
                         {
@@ -182,8 +174,7 @@
                                 "Operation": "eq",
                                 "Comparand": 0
                             }
-                        ],
-                        "Value": true
+                        ]
                     },
                     "ExclusiveWith":
                     [
@@ -211,21 +202,19 @@
                     ],
                     "Type":
                     {
-                        "Type": "Id",
+                        "Type": "LegacyAssetReference",
                         "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
                     },
                     "DefaultValue": 0,
                     "Description":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Key",
-                                    "Operation": "eq-i",
-                                    "Comparand": "Roots"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Key",
+                                "Operation": "eq-i",
+                                "Comparand": "Roots"
+                            },
                             "Value": "Specifies the ID of a root spawn to which this spawn will be attached to."
                         },
                         {
@@ -236,14 +225,12 @@
                     "Docs":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Key",
-                                    "Operation": "eq-i",
-                                    "Comparand": "Roots"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Key",
+                                "Operation": "eq-i",
+                                "Comparand": "Roots"
+                            },
                             "Value": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#roots"
                         },
                         {
@@ -264,8 +251,7 @@
                                 "Operation": "eq",
                                 "Comparand": "00000000-0000-0000-0000-000000000000"
                             }
-                        ],
-                        "Value": true
+                        ]
                     },
                     "Variable": "legacySpawnId"
                 },
@@ -282,14 +268,12 @@
                     "Type": 
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#Self.IsLegacy",
-                                    "Operation": "eq",
-                                    "Comparand": true
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#Self.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
                             "Value": "Flag"
                         },
                         {
@@ -299,14 +283,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#Self.IsLegacy",
-                                    "Operation": "eq",
-                                    "Comparand": true
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#Self.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
                             "Value": false
                         },
                         {
@@ -316,14 +298,12 @@
                     "Description":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Key",
-                                    "Operation": "eq-i",
-                                    "Comparand": "Roots"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Key",
+                                "Operation": "eq-i",
+                                "Comparand": "Roots"
+                            },
                             "Value": "When enabled, zeros the weights of all other tables in the overridden Spawn asset."
                         },
                         {
@@ -333,14 +313,12 @@
                     "Docs":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Key",
-                                    "Operation": "eq-i",
-                                    "Comparand": "Roots"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Key",
+                                "Operation": "eq-i",
+                                "Comparand": "Roots"
+                            },
                             "Value": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#roots"
                         },
                         {
@@ -392,14 +370,12 @@
                     "Description":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Key",
-                                    "Operation": "eq-i",
-                                    "Comparand": "Roots"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Key",
+                                "Operation": "eq-i",
+                                "Comparand": "Roots"
+                            },
                             "Value": "The relative chance of this spawn table being chosen in the overridden spawn table."
                         },
                         {
@@ -409,14 +385,12 @@
                     "Docs":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Key",
-                                    "Operation": "eq-i",
-                                    "Comparand": "Roots"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Key",
+                                "Operation": "eq-i",
+                                "Comparand": "Roots"
+                            },
                             "Value": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#roots"
                         },
                         {

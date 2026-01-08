@@ -248,7 +248,7 @@ public sealed class ListType : ITypeFactory
 /// <typeparam name="TElementType">The type of values to read from the elements of the list.</typeparam>
 /// <typeparam name="TCountType">The data-type of the count of the list.</typeparam>
 public class ListType<TCountType, TElementType>
-    : BaseType<EquatableArray<TElementType>, ListType<TCountType, TElementType>>, ITypeParser<EquatableArray<TElementType>>
+    : BaseType<EquatableArray<TElementType>, ListType<TCountType, TElementType>>, ITypeParser<EquatableArray<TElementType>>, IReferencingType
     where TElementType : IEquatable<TElementType>
     where TCountType : IEquatable<TCountType>
 {
@@ -264,6 +264,22 @@ public class ListType<TCountType, TElementType>
     public override string DisplayName { get; }
 
     public override ITypeParser<EquatableArray<TElementType>> Parser => this;
+
+    /// <inheritdoc />
+    public OneOrMore<IType> ReferencedTypes
+    {
+        get
+        {
+            if (field.IsNull)
+            {
+                field = _countType != null
+                    ? new OneOrMore<IType>([ _countType, _subType ])
+                    : new OneOrMore<IType>(_subType);
+            }
+
+            return field;
+        }
+    }
 
     /// <summary>
     /// Use the factory methods in <see cref="ListType"/> to create a list type.
@@ -625,6 +641,16 @@ public class ListType<TCountType, TElementType>
 
                                 if (defaultValue == null)
                                     continue;
+
+                                if (defaultValue is IndexDataRef)
+                                {
+                                    ConvertVisitor<TElementType> convert = default;
+                                    convert.Accept(i);
+                                    if (convert.WasSuccessful)
+                                    {
+                                        array[i] = convert.Result;
+                                    }
+                                }
 
                                 DefaultValueVisitor v;
                                 v.Array = array;

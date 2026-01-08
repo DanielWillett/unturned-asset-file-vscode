@@ -2437,7 +2437,7 @@
                     "Key": "Sight",
                     "Type":
                     {
-                        "Type": "DefaultableId",
+                        "Type": "DefaultableLegacyAssetReference",
                         "AssetType": "SDG.Unturned.ItemSightAsset, Assembly-CSharp"
                     },
                     "DefaultValue": -1,
@@ -2461,7 +2461,7 @@
                     "Key": "Tactical",
                     "Type":
                     {
-                        "Type": "DefaultableId",
+                        "Type": "DefaultableLegacyAssetReference",
                         "AssetType": "SDG.Unturned.ItemTacticalAsset, Assembly-CSharp"
                     },
                     "DefaultValue": -1,
@@ -2485,7 +2485,7 @@
                     "Key": "Grip",
                     "Type":
                     {
-                        "Type": "DefaultableId",
+                        "Type": "DefaultableLegacyAssetReference",
                         "AssetType": "SDG.Unturned.ItemGripAsset, Assembly-CSharp"
                     },
                     "DefaultValue": -1,
@@ -2509,7 +2509,7 @@
                     "Key": "Barrel",
                     "Type":
                     {
-                        "Type": "DefaultableId",
+                        "Type": "DefaultableLegacyAssetReference",
                         "AssetType": "SDG.Unturned.ItemBarrelAsset, Assembly-CSharp"
                     },
                     "DefaultValue": -1,
@@ -2533,7 +2533,7 @@
                     "Key": "Magazine",
                     "Type":
                     {
-                        "Type": "DefaultableId",
+                        "Type": "DefaultableLegacyAssetReference",
                         "AssetType": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
                     },
                     "DefaultValue": -1,

@@ -71,8 +71,7 @@
                                 "Operation": "eq",
                                 "Comparand": false
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]

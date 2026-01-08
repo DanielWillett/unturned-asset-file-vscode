@@ -104,9 +104,14 @@ public static class TypeConverters
     public static ITypeConverter<GuidOrId> GuidOrId { get; } = new GuidOrIdTypeConverter();
 
     /// <summary>
-    /// The type converter for <see cref="DanielWillett.UnturnedDataFileLspServer.Data.Types.IPv4Filter"/> values.
+    /// The type converter for <see cref="Data.Types.IPv4Filter"/> values.
     /// </summary>
     public static ITypeConverter<IPv4Filter> IPv4Filter { get; } = new IPv4FilterTypeConverter();
+
+    /// <summary>
+    /// The type converter for <see cref="Data.QualifiedType"/> values.
+    /// </summary>
+    public static ITypeConverter<QualifiedType> QualifiedType { get; } = new QualifiedTypeTypeConverter();
 
     /// <summary>
     /// Gets the type converter for the given type.
@@ -192,6 +197,8 @@ public static class TypeConverters
                     Converter = (ITypeConverter<T>)TimeSpan;
                 else if (typeof(T) == typeof(IPv4Filter))
                     Converter = (ITypeConverter<T>)IPv4Filter;
+                else if (typeof(T) == typeof(QualifiedType))
+                    Converter = (ITypeConverter<T>)QualifiedType;
                 return;
             }
 

@@ -12,14 +12,12 @@
             "Type":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "#Self.ValueType",
-                            "Operation": "eq",
-                            "Comparand": "Dictionary"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "#Self.ValueType",
+                        "Operation": "eq",
+                        "Comparand": "Dictionary"
+                    },
                     "Value": "TranslationReference"
                 },
                 {
@@ -30,14 +28,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "#Self.ValueType",
-                            "Operation": "eq",
-                            "Comparand": "Dictionary"
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "#Self.ValueType",
+                        "Operation": "eq",
+                        "Comparand": "Dictionary"
+                    },
                     "Value": null
                 },
                 {

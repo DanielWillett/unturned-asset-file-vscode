@@ -126,14 +126,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Bleeding",
-                            "Operation": "eq",
-                            "Comparand": true
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Bleeding",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
                     "Value": "Heal"
                 },
                 {
@@ -159,14 +157,12 @@
             "DefaultValue":
             [
                 {
-                    "And":
-                    [
-                        {
-                            "Variable": "Broken",
-                            "Operation": "eq",
-                            "Comparand": true
-                        }
-                    ],
+                    "Case":
+                    {
+                        "Variable": "Broken",
+                        "Operation": "eq",
+                        "Comparand": true
+                    },
                     "Value": "Heal"
                 },
                 {
@@ -209,7 +205,7 @@
             "Key": "Item_Reward_Spawn_ID",
             "Type":
             {
-                "Type": "Id",
+                "Type": "LegacyAssetReference",
                 "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
             },
             "DefaultValue": 0,
