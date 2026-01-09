@@ -182,6 +182,27 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
+        /// Reports an out-of-range character cosmetic index. 
+        /// </summary>
+        public void UNT1008<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            CharacterCosmeticKind kind, byte index, int max
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1008,
+                Message = string.Format(kind switch
+                {
+                    CharacterCosmeticKind.Beard => DiagnosticResources.UNT1008_Beard,
+                    CharacterCosmeticKind.Face => DiagnosticResources.UNT1008_Face,
+                    _ => DiagnosticResources.UNT1008_Hair
+                }, index, max),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
         /// Reports a legacy color with a value outside the range 0-1. 
         /// </summary>
         public void UNT1012<TDiagnosticProvider>(

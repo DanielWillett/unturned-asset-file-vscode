@@ -160,13 +160,13 @@
     <value>Type '{0}' can not be resolved.</value>
   </data>
   <data name="UNT1008_Face" xml:space="preserve">
-    <value>There is not a beard with this index, valid indexes include 0 through {0}.</value>
+    <value>There is not a beard with index {0}, valid indexes include 0 through {1}.</value>
   </data>
   <data name="UNT1008_Hair" xml:space="preserve">
-    <value>There is not a hair with this index, valid indexes include 0 through {0}.</value>
+    <value>There is not a hair with index {0}, valid indexes include 0 through {1}.</value>
   </data>
   <data name="UNT1008_Beard" xml:space="preserve">
-    <value>There is not a face with this index, valid indexes include 0 through {0}.</value>
+    <value>There is not a face with index {0}, valid indexes include 0 through {1}.</value>
   </data>
   <data name="UNT101" xml:space="preserve">
     <value>Blueprint supply IDs that are the same as their containing asset can be replaced with 'This'.</value>

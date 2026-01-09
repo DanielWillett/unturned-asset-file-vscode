@@ -59,7 +59,7 @@ internal static class AssetReferenceHelper
             if (typeDefinition.TryGetProperty("AssetType"u8, out JsonElement element)
                 && element.ValueKind != JsonValueKind.Null)
             {
-                baseTypes = new OneOrMore<QualifiedType>(new QualifiedType(element.GetString()!, isCaseInsensitive: true));
+                baseTypes = new OneOrMore<QualifiedType>(new QualifiedType(element.GetString()!, isCaseInsensitive: true).Normalized);
             }
             else if (typeDefinition.TryGetProperty("AssetTypes"u8, out element)
                      && element.ValueKind != JsonValueKind.Null)
@@ -68,7 +68,7 @@ internal static class AssetReferenceHelper
                 QualifiedType[] arr = new QualifiedType[len];
                 for (int i = 0; i < len; ++i)
                 {
-                    arr[i] = new QualifiedType(element[i].GetString()!, isCaseInsensitive: true);
+                    arr[i] = new QualifiedType(element[i].GetString()!, isCaseInsensitive: true).Normalized;
                 }
 
                 baseTypes = new OneOrMore<QualifiedType>(arr);

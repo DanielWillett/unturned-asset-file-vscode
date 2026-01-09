@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -183,6 +184,40 @@ public abstract class DatType : BaseType<DatType>, IDatSpecificationObject
             : new DatFileType(typeName, baseType, element);
     }
 
+    /// <summary>
+    /// Attempt to get a type by it's fully-qualified type name. Types in this type or any base types will be returned.
+    /// </summary>
+    public bool TryGetType(QualifiedType typeName, [NotNullWhen(true)] out DatType? type)
+    {
+        if (!typeName.IsCaseInsensitive)
+        {
+            typeName = typeName.CaseInsensitive;
+        }
+
+        for (DatType? baseType = this; baseType != null; baseType = baseType.BaseType)
+        {
+            if (typeName.Equals(baseType.TypeName))
+            {
+                type = baseType;
+                return true;
+            }
+
+            if (baseType.TryGetTypeInFileIntl(typeName, out type))
+            {
+                return true;
+            }
+        }
+
+        type = null;
+        return false;
+    }
+
+    protected virtual bool TryGetTypeInFileIntl(QualifiedType typeName, [NotNullWhen(true)] out DatType? type)
+    {
+        type = null;
+        return false;
+    }
+
     string IDatSpecificationObject.FullName => FullName;
 
     public override void Visit<TVisitor>(ref TVisitor visitor) { }
@@ -254,6 +289,9 @@ public interface IDatTypeWithBundleAssets
 /// </summary>
 public class DatFileType : DatTypeWithProperties
 {
+    // allows type properties to reference other types before they're finalized.
+    internal ImmutableDictionary<QualifiedType, DatType>.Builder? TypesBuilder;
+
     /// <inheritdoc />
     public override DatSpecificationType Type => DatSpecificationType.File;
 
@@ -275,16 +313,34 @@ public class DatFileType : DatTypeWithProperties
     /// <inheritdoc cref="DatType.BaseType" />
     public DatFileType? Parent { get; }
 
+    /// <summary>
+    /// List of all available types that are defined within this file.
+    /// </summary>
+    public ImmutableDictionary<QualifiedType, DatType> Types { get; internal set; }
+
     internal DatFileType(QualifiedType type, DatFileType? baseType, JsonElement element) : base(type, baseType, element)
     {
         Types = ImmutableDictionary<QualifiedType, DatType>.Empty;
         Parent = baseType;
     }
 
-    /// <summary>
-    /// List of all available types that are defined within this file.
-    /// </summary>
-    public ImmutableDictionary<QualifiedType, DatType> Types { get; internal set; }
+    protected override bool TryGetTypeInFileIntl(QualifiedType typeName, [NotNullWhen(true)] out DatType? type)
+    {
+        if (TypesBuilder != null)
+        {
+            if (TypesBuilder.TryGetValue(typeName, out type))
+            {
+                return true;
+            }
+        }
+        else if (Types.TryGetValue(typeName, out type))
+        {
+            return true;
+        }
+
+        type = null;
+        return false;
+    }
 }
 
 

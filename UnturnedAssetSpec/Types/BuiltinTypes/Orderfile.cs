@@ -7,6 +7,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -16,6 +17,10 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <summary>
 /// An Orderfile defines the ideal order of properties in asset files.
 /// </summary>
+[SpecificationType(FactoryMethod = nameof(Create))]
+#if NET5_0_OR_GREATER
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicMethods)]
+#endif
 public sealed class Orderfile : DatFileType
 {
     /// <summary>
@@ -38,6 +43,14 @@ public sealed class Orderfile : DatFileType
         {
             database.OnInitialize(GenerateProperties);
         }
+    }
+
+    /// <summary>
+    /// Factory method for the <see cref="Orderfile"/> type.
+    /// </summary>
+    private static Orderfile Create(in SpecificationTypeFactoryArgs args)
+    {
+        return FromDatabase(args.Context.DatabaseFacade);
     }
 
     /// <summary>

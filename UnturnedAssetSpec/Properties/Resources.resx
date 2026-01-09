@@ -216,6 +216,9 @@
   <data name="Log_UnableToReadFile" xml:space="preserve">
     <value>Unable to read file "{0}" from any of the available sources.</value>
   </data>
+  <data name="Type_AssetTypeAlias_Description" xml:space="preserve">
+    <value>Asset type corresponding to '{0}'.</value>
+  </data>
   <data name="Type_Name_AssetReference" xml:space="preserve">
     <value>Asset Reference</value>
   </data>
@@ -227,6 +230,9 @@
   </data>
   <data name="Type_Name_AssetReference_Type" xml:space="preserve">
     <value>Asset Reference to {0}</value>
+  </data>
+  <data name="Type_Name_AssetTypeAlias" xml:space="preserve">
+    <value>Asset Type</value>
   </data>
   <data name="Type_Name_AudioReference" xml:space="preserve">
     <value>Audio Reference</value>
@@ -248,6 +254,9 @@
   </data>
   <data name="Type_Name_BackwardsCompatibleAssetReferenceGuidOrLegacyId_Type" xml:space="preserve">
     <value>Asset Reference to {0} (GUID or ID)</value>
+  </data>
+  <data name="Type_Name_BeardIndex" xml:space="preserve">
+    <value>Beard Index</value>
   </data>
   <data name="Type_Name_Boolean" xml:space="preserve">
     <value>Boolean</value>
@@ -273,8 +282,14 @@
   <data name="Type_Name_DateTimeOffset" xml:space="preserve">
     <value>Timestamp + Timezone</value>
   </data>
+  <data name="Type_Name_FaceIndex" xml:space="preserve">
+    <value>Face Index</value>
+  </data>
   <data name="Type_Name_Flag" xml:space="preserve">
     <value>Flag</value>
+  </data>
+  <data name="Type_Name_FlagId" xml:space="preserve">
+    <value>Quest Flag ID</value>
   </data>
   <data name="Type_Name_Float32" xml:space="preserve">
     <value>Single-Precision Decimal</value>
@@ -290,6 +305,9 @@
   </data>
   <data name="Type_Name_GuidOrId" xml:space="preserve">
     <value>GUID or Unsigned 16-Bit Integer</value>
+  </data>
+  <data name="Type_Name_HairIndex" xml:space="preserve">
+    <value>Hairstyle Index</value>
   </data>
   <data name="Type_Name_Int8" xml:space="preserve">
     <value>Signed 8-Bit Integer</value>
@@ -324,17 +342,29 @@
   <data name="Type_Name_MasterBundleReferenceString" xml:space="preserve">
     <value>Masterbundle Reference (Legacy)</value>
   </data>
+  <data name="Type_Name_NavId" xml:space="preserve">
+    <value>Navmesh ID</value>
+  </data>
+  <data name="Type_Name_NPCAchievementId" xml:space="preserve">
+    <value>NPC Achievement ID</value>
+  </data>
   <data name="Type_Name_Orderfile" xml:space="preserve">
     <value>Orderfile</value>
   </data>
   <data name="Type_Name_OrderfilePropertyReference" xml:space="preserve">
     <value>Orderfile Property Reference</value>
   </data>
+  <data name="Type_Name_OverlapVolumeId" xml:space="preserve">
+    <value>NPC Overlap Volume ID</value>
+  </data>
   <data name="Type_Name_QualifiedType" xml:space="preserve">
     <value>Assembly-Qualified C# Type Name</value>
   </data>
   <data name="Type_Name_RegEx" xml:space="preserve">
     <value>Regular Expression (RegEx)</value>
+  </data>
+  <data name="Type_Name_SpawnpointId" xml:space="preserve">
+    <value>Spawnpoint ID</value>
   </data>
   <data name="Type_Name_String" xml:space="preserve">
     <value>Text</value>
@@ -350,6 +380,9 @@
   </data>
   <data name="Type_Name_TypeReference_Type" xml:space="preserve">
     <value>Type Reference of {0}</value>
+  </data>
+  <data name="Type_Name_TypeReference_TypeOrEnum" xml:space="preserve">
+    <value>{0} or {1}</value>
   </data>
   <data name="Type_Name_UInt8" xml:space="preserve">
     <value>Unsigned 8-Bit Integer</value>
@@ -386,5 +419,11 @@
   </data>
   <data name="Type_Name_Vector4_Unspecified" xml:space="preserve">
     <value>4D Vector</value>
+  </data>
+  <data name="Type_Name_ZombieCooldownId" xml:space="preserve">
+    <value>Zombie Cooldown ID</value>
+  </data>
+  <data name="Type_Name_ZombieTableId" xml:space="preserve">
+    <value>Zombie Table ID</value>
   </data>
 </root>

@@ -4,10 +4,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -22,31 +25,29 @@ public static class CommonTypes
     {
         ImmutableDictionary<string, Func<ITypeFactory>>.Builder knownTypes = ImmutableDictionary.CreateBuilder<string, Func<ITypeFactory>>(StringComparer.Ordinal);
         
-        knownTypes["Flag"]                              = () => FlagType.Instance;
-        knownTypes["UInt8"]                             = () => UInt8Type.Instance;
-        knownTypes["UInt16"]                            = () => UInt16Type.Instance;
-        knownTypes["UInt32"]                            = () => UInt32Type.Instance;
-        knownTypes["UInt64"]                            = () => UInt64Type.Instance;
-        knownTypes["Int8"]                              = () => Int8Type.Instance;
-        knownTypes["Int16"]                             = () => Int16Type.Instance;
-        knownTypes["Int32"]                             = () => Int32Type.Instance;
-        knownTypes["Int64"]                             = () => Int64Type.Instance;
-        knownTypes["String"]                            = () => StringType.Instance;
-        knownTypes["RegEx"]                             = () => RegexStringType.Instance;
-        knownTypes["Float32"]                           = () => Float32Type.Instance;
-        knownTypes["Float64"]                           = () => Float64Type.Instance;
-        knownTypes["Float128"]                          = () => Float128Type.Instance;
-        knownTypes["Boolean"]                           = () => BooleanType.Instance;
-        knownTypes["BooleanOrFlag"]                     = () => BooleanOrFlagType.Instance;
-        knownTypes["Character"]                         = () => CharacterType.Instance;
-        knownTypes["List"]                              = () => ListType.Factory;
-        knownTypes["Type"]                              = () => TypeReferenceType.Factory;
-        knownTypes["QualifiedType"]                     = () => QualifiedTypeType.Instance;
-        knownTypes["TypeOrEnum"]                        = () => StringType.Instance;    // todo
-        knownTypes["Guid"]                              = () => GuidType.Instance;
-        knownTypes["GuidOrId"]                          = () => GuidOrIdType.Instance;
-        knownTypes["Color32"]                           = () => Color32Type.Instance;
-        knownTypes["Color"]                             = () => ColorType.Instance;
+        knownTypes[FlagType.TypeId]                     = () => FlagType.Instance;
+        knownTypes[UInt8Type.TypeId]                    = () => UInt8Type.Instance;
+        knownTypes[UInt16Type.TypeId]                   = () => UInt16Type.Instance;
+        knownTypes[UInt32Type.TypeId]                   = () => UInt32Type.Instance;
+        knownTypes[UInt64Type.TypeId]                   = () => UInt64Type.Instance;
+        knownTypes[Int8Type.TypeId]                     = () => Int8Type.Instance;
+        knownTypes[Int16Type.TypeId]                    = () => Int16Type.Instance;
+        knownTypes[Int32Type.TypeId]                    = () => Int32Type.Instance;
+        knownTypes[Int64Type.TypeId]                    = () => Int64Type.Instance;
+        knownTypes[StringType.TypeId]                   = () => StringType.Instance;
+        knownTypes[RegexStringType.TypeId]              = () => RegexStringType.Instance;
+        knownTypes[Float32Type.TypeId]                  = () => Float32Type.Instance;
+        knownTypes[Float64Type.TypeId]                  = () => Float64Type.Instance;
+        knownTypes[Float128Type.TypeId]                 = () => Float128Type.Instance;
+        knownTypes[BooleanType.TypeId]                  = () => BooleanType.Instance;
+        knownTypes[BooleanOrFlagType.TypeId]            = () => BooleanOrFlagType.Instance;
+        knownTypes[CharacterType.TypeId]                = () => CharacterType.Instance;
+        knownTypes[ListType.TypeId]                     = () => ListType.Factory;
+        knownTypes[QualifiedTypeType.TypeId]            = () => QualifiedTypeType.Instance;
+        knownTypes[GuidType.TypeId]                     = () => GuidType.Instance;
+        knownTypes[GuidOrIdType.TypeId]                 = () => GuidOrIdType.Instance;
+        knownTypes[Color32Type.TypeId]                  = () => Color32Type.Instance;
+        knownTypes[ColorType.TypeId]                    = () => ColorType.Instance;
         knownTypes["AssetReference"]                    = () => AssetReferenceType.Factory;
         knownTypes["AssetReferenceString"]              = () => AssetReferenceType.Factory;
         knownTypes["BcAssetReference"]                  = () => BackwardsCompatibleAssetReferenceType.Factory;
@@ -58,25 +59,24 @@ public static class CommonTypes
         knownTypes["MasterBundleOrContentReference"]    = () => BundleReferenceType.Factory;
         knownTypes["MasterBundleReferenceString"]       = () => BundleReferenceType.Factory;
         knownTypes["TranslationReference"]              = () => BundleReferenceType.Factory;
-        knownTypes["FaceIndex"]                         = () => UInt8Type.Instance;     // todo
-        knownTypes["BeardIndex"]                        = () => UInt8Type.Instance;     // todo
-        knownTypes["HairIndex"]                         = () => UInt8Type.Instance;     // todo
+        knownTypes["FaceIndex"]                         = () => CharacterCosmeticIndexType.Factory;
+        knownTypes["BeardIndex"]                        = () => CharacterCosmeticIndexType.Factory;
+        knownTypes["HairIndex"]                         = () => CharacterCosmeticIndexType.Factory;
         knownTypes["LegacyAssetReference"]              = () => LegacyAssetReferenceType.Factory;
         knownTypes["DefaultableLegacyAssetReference"]   = () => LegacyAssetReferenceType.Factory;
-        knownTypes["NavId"]                             = () => UInt8Type.Instance;     // todo
-        knownTypes["SpawnpointId"]                      = () => StringType.Instance;    // todo
-        knownTypes["OverlapVolumeId"]                   = () => StringType.Instance;    // todo
-        knownTypes["ZombieTableId"]                     = () => Int32Type.Instance;     // todo
-        knownTypes["ZombieCooldownId"]                  = () => StringType.Instance;    // todo
-        knownTypes["FlagId"]                            = () => Int16Type.Instance;     // todo
-        knownTypes["BlueprintId"]                       = () => StringType.Instance;    // todo
-        knownTypes["NPCAchievementId"]                  = () => StringType.Instance;    // todo
-        knownTypes["DateTime"]                          = () => DateTimeType.Instance;
-        knownTypes["TimeSpan"]                          = () => TimeSpanType.Instance;
-        knownTypes["DateTimeOffset"]                    = () => DateTimeOffsetType.Instance;
-        knownTypes["Vector4"]                           = () => Vector4Type.Instance;
-        knownTypes["Vector3"]                           = () => Vector3Type.Instance;
-        knownTypes["Vector2"]                           = () => Vector2Type.Instance;
+        knownTypes[NavIdType.TypeId]                    = () => NavIdType.Instance;
+        knownTypes[SpawnpointIdType.TypeId]             = () => SpawnpointIdType.Instance;
+        knownTypes[OverlapVolumeIdType.TypeId]          = () => OverlapVolumeIdType.Instance;
+        knownTypes[ZombieTableIdType.TypeId]            = () => ZombieTableIdType.Instance;
+        knownTypes[ZombieCooldownIdType.TypeId]         = () => ZombieCooldownIdType.Instance;
+        knownTypes[FlagIdType.TypeId]                   = () => FlagIdType.Instance;
+        knownTypes[NPCAchievementIdType.TypeId]         = () => NPCAchievementIdType.Instance;
+        knownTypes[DateTimeType.TypeId]                 = () => DateTimeType.Instance;
+        knownTypes[TimeSpanType.TypeId]                 = () => TimeSpanType.Instance;
+        knownTypes[DateTimeOffsetType.TypeId]           = () => DateTimeOffsetType.Instance;
+        knownTypes[Vector4Type.TypeId]                  = () => Vector4Type.Instance;
+        knownTypes[Vector3Type.TypeId]                  = () => Vector3Type.Instance;
+        knownTypes[Vector2Type.TypeId]                  = () => Vector2Type.Instance;
         knownTypes["CommaDelimitedString"]              = () => StringType.Instance;    // todo
         knownTypes["Dictionary"]                        = () => StringType.Instance;    // todo
         knownTypes["MasterBundleName"]                  = () => StringType.Instance;    // todo
@@ -88,7 +88,7 @@ public static class CommonTypes
         knownTypes["LocalizableRichString"]             = () => StringType.Instance;    // todo
         knownTypes["LocalizableTargetString"]           = () => StringType.Instance;    // todo
         knownTypes["LocalizableTargetRichString"]       = () => StringType.Instance;    // todo
-        knownTypes["SkillLevel"]                        = () => Int32Type.Instance ;    // todo
+        knownTypes["SkillLevel"]                        = () => Int32Type.Instance;     // todo
         knownTypes["LegacyCompatibleList"]              = () => StringType.Instance;    // todo
         knownTypes["Skill"]                             = () => StringType.Instance;    // todo
         knownTypes["BlueprintSkill"]                    = () => StringType.Instance;    // todo
@@ -338,4 +338,85 @@ public static class CommonTypes
 
         return true;
     }
+
+    private static readonly Type[] FactoryMethodTypes = [ typeof(SpecificationTypeFactoryArgs).MakeByRefType() ];
+
+    /// <summary>
+    /// Attempts to create a type from a built-in C# type, optionally using the factory method.
+    /// </summary>
+    /// <remarks>The type must be decorated with the <see cref="SpecificationTypeAttribute"/> and implement <see cref="IType"/> for this to succeed.</remarks>
+    public static bool TryCreateBuiltInType(Type clrType, IDatSpecificationReadContext context, IDatSpecificationObject owner, string typeId, [NotNullWhen(true)] out IType? type, bool throwExceptions = false)
+    {
+        type = null;
+
+        if (!typeof(IType).IsAssignableFrom(clrType))
+        {
+            return false;
+        }
+
+        Attribute? attribute = clrType.GetCustomAttribute(typeof(SpecificationTypeAttribute), inherit: false);
+        if (attribute is not SpecificationTypeAttribute specTypeAttribute)
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrEmpty(specTypeAttribute.FactoryMethod))
+        {
+            try
+            {
+                MethodInfo? method = clrType.GetMethod(
+                    specTypeAttribute.FactoryMethod,
+                    BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly,
+                    null,
+                    FactoryMethodTypes,
+                    null
+                );
+
+                if (method == null)
+                {
+                    return false;
+                }
+
+                SpecificationTypeFactory factory = (SpecificationTypeFactory)method.CreateDelegate(typeof(SpecificationTypeFactory));
+
+                SpecificationTypeFactoryArgs args = new SpecificationTypeFactoryArgs(context, owner, typeId);
+
+                type = factory(in args);
+                return type != null;
+            }
+            catch
+            {
+                if (throwExceptions)
+                    throw;
+                
+                return false;
+            }
+        }
+
+        object? newType = null;
+        try
+        {
+            newType = Activator.CreateInstance(clrType, nonPublic: true);
+            if (newType is not IType t)
+            {
+                if (newType is IDisposable disp)
+                    disp.Dispose();
+                return false;
+            }
+
+            type = t;
+            return true;
+        }
+        catch
+        {
+            if (newType is IDisposable disp)
+                disp.Dispose();
+            if (throwExceptions)
+                throw;
+
+            return false;
+        }
+    }
+
+    private delegate IType? SpecificationTypeFactory(in SpecificationTypeFactoryArgs args);
 }

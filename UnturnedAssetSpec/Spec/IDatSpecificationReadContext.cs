@@ -16,6 +16,16 @@ public interface IDatSpecificationReadContext
     AssetInformation Information { get; }
 
     /// <summary>
+    /// The facade to the output database. May not be fully implemented.
+    /// </summary>
+    IAssetSpecDatabaseFacade DatabaseFacade { get; }
+
+    /// <summary>
+    /// Finds an already read type or reads it from the <paramref name="owner"/>'s context.
+    /// </summary>
+    IType? GetOrReadType(IDatSpecificationObject owner, QualifiedType typeName);
+
+    /// <summary>
     /// Reads a type from a JSON object or string.
     /// </summary>
     IType ReadType(in JsonElement root, IDatSpecificationObject readObject, string context = "");

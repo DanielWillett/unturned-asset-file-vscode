@@ -271,9 +271,12 @@
         },
         {
             "Key": "Useable",
-            "Type": "TypeOrEnum",
-            "ElementType": "SDG.Unturned.EUseableType, Assembly-CSharp",
-            "SpecialTypes": [ "SDG.Unturned.Useable, Assembly-CSharp" ],
+            "Type":
+            {
+                "Type": "TypeReference",
+                "BaseType": "SDG.Unturned.Useable, Assembly-CSharp",
+                "EnumType": "SDG.Unturned.EUseableType, Assembly-CSharp"
+            },
             "DefaultValue": null,
             "Description": "The type of Useable object to create when this item is equipped.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#useable-doc-item-asset-intro-euseabletype-none",
@@ -1077,7 +1080,12 @@
             [
                 {
                     "Key": "ID",
-                    "Type": "BlueprintId",
+                    "Type":
+                    {
+                        "Type": "BcAssetReference",
+                        "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                        "SupportsThis": true
+                    },
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#doc-item-asset-blueprints-inputitem-id",
                     "Description": "The item that is consumed, or 'this' to refer to the current item.",
                     "Required": true,
@@ -1202,7 +1210,12 @@
             [
                 {
                     "Key": "ID",
-                    "Type": "BlueprintId",
+                    "Type":
+                    {
+                        "Type": "BcAssetReference",
+                        "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                        "SupportsThis": true
+                    },
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_outputitem.html#doc-item-asset-blueprints-outputitem-id",
                     "Description": "The item that is produced, or 'this' to refer to the current item.",
                     "Required": true,

@@ -11,8 +11,11 @@
         {
             "Key": "Mesh",
             "Required": true,
-            "Type": "ContentReference",
-            "ElementType": "UnityEngine.Mesh, UnityEngine.CoreModule",
+            "Type":
+            {
+                "Type": "ContentReference",
+                "BaseType": "UnityEngine.Mesh, UnityEngine.CoreModule"
+            },
             "Description": "The mesh to spawn where foliage is expected to be visible.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "mesh"
@@ -20,8 +23,11 @@
         {
             "Key": "Material",
             "Required": true,
-            "Type": "ContentReference",
-            "ElementType": "UnityEngine.Material, UnityEngine.CoreModule",
+            "Type":
+            {
+                "Type": "ContentReference",
+                "BaseType": "UnityEngine.Material, UnityEngine.CoreModule"
+            },
             "Description": "The material to render the mesh with.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
             "Variable": "material"

@@ -8,6 +8,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 partial class SpecificationFileReader
 {
+    private JsonElement _typeRoot;
+    private int _currentTypeIndex;
+
     public DatFileType ReadFileType(JsonDocument doc, QualifiedType fileType, ImmutableDictionary<QualifiedType, DatFileType>.Builder fileTypes)
     {
         JsonElement root = doc.RootElement;
@@ -90,14 +93,21 @@ partial class SpecificationFileReader
 
         if (root.TryGetProperty("Types"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
+            _typeRoot = element;
             AssertValueKind(in element, fileType, JsonValueKind.Array);
             int typeCount = element.GetArrayLength();
             ImmutableDictionary<QualifiedType, DatType>.Builder typeDictionaryBuilder = ImmutableDictionary.CreateBuilder<QualifiedType, DatType>();
+            type.TypesBuilder = typeDictionaryBuilder;
 
             for (int i = 0; i < typeCount; ++i)
             {
+                _currentTypeIndex = i;
                 ReadTypeFirstPass(in element, i, typeDictionaryBuilder, type);
             }
+
+            type.Types = typeDictionaryBuilder.ToImmutable();
+            type.TypesBuilder = null;
+            _typeRoot = default;
         }
 
         if (root.TryGetProperty("Properties"u8, out element) && element.ValueKind != JsonValueKind.Null)
@@ -111,6 +121,8 @@ partial class SpecificationFileReader
             {
                 ReadPropertyFirstPass(in element, i, "Properties", t => t.Properties, propertyBuilder, type);
             }
+
+            type.Properties = propertyBuilder.ToImmutable();
         }
 
         return type;

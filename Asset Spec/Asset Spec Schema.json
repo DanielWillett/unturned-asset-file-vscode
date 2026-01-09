@@ -1171,6 +1171,11 @@
                             "type": [ "string", "null" ],
                             "description": "The type of TypeReference to parse.",
                             "enum": [ "String", "Object" ]
+                        },
+                        "EnumType":
+                        {
+                            "$ref": "#/$defs/QualifiedType",
+                            "description": "An optional fully-qualified enum type that can also be used to reference types by an enum value."
                         }
                     },
                     "required": [ "Type" ],
@@ -1303,10 +1308,6 @@
                 {
                     "const": "FlagId",
                     "title": "A flag short ID."
-                },
-                {
-                    "const": "BlueprintId",
-                    "title": "A backwards-compatible asset reference, or 'this' (case insensitive) to reference the current item."
                 },
                 {
                     "const": "NPCAchievementId",
@@ -1950,6 +1951,11 @@
                 {
                     "type": [ "boolean", "null" ],
                     "description": "If this enum is a [Flags] enum and should be parsed by comma-separated values."
+                },
+                "UnderlyingType":
+                {
+                    "$ref": "#/$defs/Type",
+                    "description": "The underlying type of the enum."
                 },
                 "Docs":
                 {

@@ -68,6 +68,13 @@ public readonly struct FileEvaluationContext
         TemplateIndices = OneOrMore<int>.Null;
     }
 
+    public bool TryGetRelevantMap([NotNullWhen(true)] out RelevantMapInfo? mapInfo)
+    {
+        // todo
+        mapInfo = null;
+        return false;
+    }
+
     public bool TryGetValue(out ISpecDynamicValue? value, ICollection<DatDiagnosticMessage>? diagnostics = null)
     {
         return TryGetValue(out value, out _, diagnostics);
@@ -95,3 +102,5 @@ public readonly struct FileEvaluationContext
         return value != null;
     }
 }
+
+public class RelevantMapInfo;

@@ -19,9 +19,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// Prop Vehicle_Paint_Tool
 /// </code>
 /// </summary>
-public sealed class AssetTypeAlias : BaseSpecPropertyType<AssetTypeAlias, string>,
+public sealed class AssetTypeAliasOld : BaseSpecPropertyType<AssetTypeAliasOld, string>,
     IStringParseableSpecPropertyType,
-    IEquatable<AssetTypeAlias>,
+    IEquatable<AssetTypeAliasOld>,
     IAutoCompleteSpecPropertyType,
     ISpecType,
     IValueHoverProviderSpecPropertyType
@@ -43,7 +43,7 @@ public sealed class AssetTypeAlias : BaseSpecPropertyType<AssetTypeAlias, string
     public QualifiedType Parent => QualifiedType.None;
 
     /// <inheritdoc cref="ISpecPropertyType.Type" />
-    public override string Type => "DanielWillett.UnturnedDataFileLspServer.Data.Types.AssetTypeAlias, UnturnedAssetSpec";
+    public override string Type => "DanielWillett.UnturnedDataFileLspServer.Data.Types.AssetTypeAliasOld, UnturnedAssetSpec";
 
     /// <inheritdoc />
     public override SpecPropertyTypeKind Kind => SpecPropertyTypeKind.Enum;
@@ -51,7 +51,7 @@ public sealed class AssetTypeAlias : BaseSpecPropertyType<AssetTypeAlias, string
     /// <inheritdoc />
     public ValueHoverProviderResult? GetDescription(in SpecPropertyTypeParseContext ctx, ISpecDynamicValue value)
     {
-        if (value is not AssetTypeAliasValue assetTypeAlias)
+        if (value is not AssetTypeAliasOldValue assetTypeAlias)
             return null;
 
         return new ValueHoverProviderResult(
@@ -62,7 +62,7 @@ public sealed class AssetTypeAlias : BaseSpecPropertyType<AssetTypeAlias, string
         );
     }
 
-    protected override ISpecDynamicValue CreateValue(string value) => new AssetTypeAliasValue(value!, this);
+    protected override ISpecDynamicValue CreateValue(string value) => new AssetTypeAliasOldValue(value!, this);
 
     /// <inheritdoc />
     public override bool TryParseValue(in SpecPropertyTypeParseContext parse, out string? value)
@@ -104,7 +104,7 @@ public sealed class AssetTypeAlias : BaseSpecPropertyType<AssetTypeAlias, string
             return false;
         }
 
-        dynamicValue = new AssetTypeAliasValue(stringValue ?? span.ToString(), this);
+        dynamicValue = new AssetTypeAliasOldValue(stringValue ?? span.ToString(), this);
         return true;
     }
 
@@ -114,9 +114,9 @@ public sealed class AssetTypeAlias : BaseSpecPropertyType<AssetTypeAlias, string
         return value.AsConcrete<string>();
     }
 
-    public bool Equals(AssetTypeAlias? other) => other != null;
-    public bool Equals(ISpecType? other) => other is AssetTypeAlias;
-    public override bool Equals(object? obj) => obj is AssetTypeAlias;
+    public bool Equals(AssetTypeAliasOld? other) => other != null;
+    public bool Equals(ISpecType? other) => other is AssetTypeAliasOld;
+    public override bool Equals(object? obj) => obj is AssetTypeAliasOld;
     public override int GetHashCode() => 0;
 
     public Task<AutoCompleteResult[]> GetAutoCompleteResults(in AutoCompleteParameters parameters,
@@ -135,12 +135,12 @@ public sealed class AssetTypeAlias : BaseSpecPropertyType<AssetTypeAlias, string
 
 }
 
-public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatable<AssetTypeAliasValue?>, IEquatable<ISpecDynamicValue?>, ISpecConcreteValue
+public class AssetTypeAliasOldValue : ICorrespondingTypeSpecDynamicValue, IEquatable<AssetTypeAliasOldValue?>, IEquatable<ISpecDynamicValue?>, ISpecConcreteValue
 {
     public string Value { get; }
     public ISpecPropertyType ValueType { get; }
 
-    public AssetTypeAliasValue(string value, AssetTypeAlias type)
+    public AssetTypeAliasOldValue(string value, AssetTypeAliasOld type)
     {
         ValueType = type;
         Value = value;
@@ -225,9 +225,9 @@ public class AssetTypeAliasValue : ICorrespondingTypeSpecDynamicValue, IEquatabl
         writer.WriteStringValue(Value);
     }
 
-    public bool Equals(AssetTypeAliasValue? other) => other != null && string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
-    public bool Equals(ISpecDynamicValue? other) => other is AssetTypeAliasValue v && Equals(v);
-    public override bool Equals(object? obj) => obj is AssetTypeAliasValue v && Equals(v);
+    public bool Equals(AssetTypeAliasOldValue? other) => other != null && string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    public bool Equals(ISpecDynamicValue? other) => other is AssetTypeAliasOldValue v && Equals(v);
+    public override bool Equals(object? obj) => obj is AssetTypeAliasOldValue v && Equals(v);
     public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
     public override string ToString() => Value;
 }

@@ -1,5 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Collections.Immutable;
 using System.Text.Json;
@@ -8,23 +8,30 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 partial class SpecificationFileReader
 {
-    private DatType? FindExistingType(string typeName, in JsonElement arrayRoot, int minIndex, ImmutableDictionary<QualifiedType, DatType>.Builder typeDictionary, DatFileType file)
+    public IType? GetOrReadType(IDatSpecificationObject owner, QualifiedType typeName)
     {
-        QualifiedType qt = new QualifiedType(typeName, true);
-        if (typeDictionary.TryGetValue(qt, out DatType? type))
+        if (owner.Owner.TryGetType(typeName, out DatType? type))
         {
             return type;
         }
 
-        if (file.Parent != null && file.Parent.Types.TryGetValue(qt, out type))
+        Type? intlType = Type.GetType(typeName.Type, throwOnError: false, ignoreCase: true);
+        if (intlType != null && CommonTypes.TryCreateBuiltInType(intlType, this, owner, typeName.Type, out IType? t, throwExceptions: true))
         {
-            return type;
+            return t;
         }
 
-        int typeCount = arrayRoot.GetArrayLength();
-        for (int i = minIndex; i < typeCount; ++i)
+        ReadOnlySpan<char> typeNameSpan = typeName.Type.AsSpan();
+        int typeCount = _typeRoot.GetArrayLength();
+        ImmutableDictionary<QualifiedType, DatType>.Builder? ownerTypes = owner.Owner.TypesBuilder;
+        if (ownerTypes == null)
         {
-            JsonElement root = arrayRoot[i];
+            return null;
+        }
+
+        for (int i = _currentTypeIndex + 1; i < typeCount; ++i)
+        {
+            JsonElement root = _typeRoot[i];
             if (root.ValueKind != JsonValueKind.Object
                 || !root.TryGetProperty("Type"u8, out JsonElement element)
                 || element.ValueKind != JsonValueKind.String)
@@ -32,9 +39,25 @@ partial class SpecificationFileReader
                 continue;
             }
 
-            if (element.ValueEquals(typeName.AsSpan()))
+            if (element.ValueEquals(typeNameSpan))
             {
-                return ReadTypeFirstPass(in arrayRoot, i, typeDictionary, file);
+                return ReadTypeFirstPass(in _typeRoot, i, ownerTypes, owner.Owner);
+            }
+        }
+
+        for (int i = _currentTypeIndex + 1; i < typeCount; ++i)
+        {
+            JsonElement root = _typeRoot[i];
+            if (root.ValueKind != JsonValueKind.Object
+                || !root.TryGetProperty("Type"u8, out JsonElement element)
+                || element.ValueKind != JsonValueKind.String)
+            {
+                continue;
+            }
+
+            if (typeNameSpan.Equals(element.GetString(), StringComparison.OrdinalIgnoreCase))
+            {
+                return ReadTypeFirstPass(in _typeRoot, i, ownerTypes, owner.Owner);
             }
         }
 
@@ -116,7 +139,7 @@ partial class SpecificationFileReader
                 string? parentTypeName = element.GetString();
                 if (parentTypeName != null && !string.Equals(parentTypeName, typeName.Type, StringComparison.OrdinalIgnoreCase))
                 {
-                    parentType = FindExistingType(parentTypeName, in arrayRoot, index + 1, typeDictionary, file) as DatTypeWithProperties;
+                    parentType = GetOrReadType(file, new QualifiedType(parentTypeName, true)) as DatTypeWithProperties;
                     if (parentType == null)
                     {
                         throw new JsonException(string.Format(Resources.JsonException_ParentTypeNotFound, parentTypeName, typeName.GetFullTypeName()), $"Types[{index}].Parent", null, null);

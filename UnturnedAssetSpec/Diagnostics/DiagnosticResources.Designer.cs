@@ -169,7 +169,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There is not a face with this index, valid indexes include 0 through {0}..
+        ///   Looks up a localized string similar to There is not a face with index {0}, valid indexes include 0 through {1}..
         /// </summary>
         public static string UNT1008_Beard {
             get {
@@ -178,7 +178,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There is not a beard with this index, valid indexes include 0 through {0}..
+        ///   Looks up a localized string similar to There is not a beard with index {0}, valid indexes include 0 through {1}..
         /// </summary>
         public static string UNT1008_Face {
             get {
@@ -187,7 +187,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There is not a hair with this index, valid indexes include 0 through {0}..
+        ///   Looks up a localized string similar to There is not a hair with index {0}, valid indexes include 0 through {1}..
         /// </summary>
         public static string UNT1008_Hair {
             get {

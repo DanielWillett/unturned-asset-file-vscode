@@ -47,6 +47,8 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 
     public AssetInformation Information => _readInformation ?? throw new InvalidOperationException("Not yet read.");
 
+    public IAssetSpecDatabaseFacade DatabaseFacade => throw new NotImplementedException();
+
     public SpecificationFileReader(
         bool allowInternet,
         ILoggerFactory loggerFactory,

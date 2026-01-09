@@ -12,7 +12,7 @@
 //
 //   Any types not specified will fall back to the default order.
 //   
-//   Lines starting with a '$' are imports for all properties from another type
+//   Lines starting with a '$' are imports for all properties from another type and its base types.
 //   
 // Example:
 //   "SDG.Unturned.Asset, Assembly-CSharp"
@@ -57,6 +57,8 @@
     Asset_Prefix
     Asset_Bundle_Version
 ]
+
+// Shared properties between a web and asset server list curation
 "SDG.Unturned.ServerListCurationFile, Assembly-CSharp"
 [
     Name

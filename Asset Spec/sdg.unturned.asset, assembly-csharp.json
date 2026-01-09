@@ -19,9 +19,12 @@
         },
         {
             "Key": "Type",
-            "Type": "TypeOrEnum",
-            "ElementType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.AssetTypeAlias, UnturnedAssetSpec",
-            "SpecialTypes": [ "SDG.Unturned.Asset, Assembly-CSharp" ],
+            "Type":
+            {
+                "Type": "TypeReference",
+                "BaseType": "SDG.Unturned.Asset, Assembly-CSharp",
+                "EnumType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.AssetTypeAlias, UnturnedAssetSpec"
+            },
             "Description": "Type of Asset to create.",
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header",

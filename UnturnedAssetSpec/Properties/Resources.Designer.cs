@@ -358,6 +358,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Asset type corresponding to &apos;{0}&apos;..
+        /// </summary>
+        internal static string Type_AssetTypeAlias_Description {
+            get {
+                return ResourceManager.GetString("Type_AssetTypeAlias_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Asset Reference.
         /// </summary>
         internal static string Type_Name_AssetReference {
@@ -390,6 +399,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_AssetReferenceString_Type {
             get {
                 return ResourceManager.GetString("Type_Name_AssetReferenceString_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset Type.
+        /// </summary>
+        internal static string Type_Name_AssetTypeAlias {
+            get {
+                return ResourceManager.GetString("Type_Name_AssetTypeAlias", resourceCulture);
             }
         }
         
@@ -453,6 +471,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_BackwardsCompatibleAssetReferenceGuidOrLegacyId_Type {
             get {
                 return ResourceManager.GetString("Type_Name_BackwardsCompatibleAssetReferenceGuidOrLegacyId_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Beard Index.
+        /// </summary>
+        internal static string Type_Name_BeardIndex {
+            get {
+                return ResourceManager.GetString("Type_Name_BeardIndex", resourceCulture);
             }
         }
         
@@ -529,11 +556,29 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Face Index.
+        /// </summary>
+        internal static string Type_Name_FaceIndex {
+            get {
+                return ResourceManager.GetString("Type_Name_FaceIndex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Flag.
         /// </summary>
         internal static string Type_Name_Flag {
             get {
                 return ResourceManager.GetString("Type_Name_Flag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quest Flag ID.
+        /// </summary>
+        internal static string Type_Name_FlagId {
+            get {
+                return ResourceManager.GetString("Type_Name_FlagId", resourceCulture);
             }
         }
         
@@ -579,6 +624,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_GuidOrId {
             get {
                 return ResourceManager.GetString("Type_Name_GuidOrId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hairstyle Index.
+        /// </summary>
+        internal static string Type_Name_HairIndex {
+            get {
+                return ResourceManager.GetString("Type_Name_HairIndex", resourceCulture);
             }
         }
         
@@ -682,6 +736,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Navmesh ID.
+        /// </summary>
+        internal static string Type_Name_NavId {
+            get {
+                return ResourceManager.GetString("Type_Name_NavId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NPC Achievement ID.
+        /// </summary>
+        internal static string Type_Name_NPCAchievementId {
+            get {
+                return ResourceManager.GetString("Type_Name_NPCAchievementId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Orderfile.
         /// </summary>
         internal static string Type_Name_Orderfile {
@@ -700,6 +772,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NPC Overlap Volume ID.
+        /// </summary>
+        internal static string Type_Name_OverlapVolumeId {
+            get {
+                return ResourceManager.GetString("Type_Name_OverlapVolumeId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Assembly-Qualified C# Type Name.
         /// </summary>
         internal static string Type_Name_QualifiedType {
@@ -714,6 +795,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_RegEx {
             get {
                 return ResourceManager.GetString("Type_Name_RegEx", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spawnpoint ID.
+        /// </summary>
+        internal static string Type_Name_SpawnpointId {
+            get {
+                return ResourceManager.GetString("Type_Name_SpawnpointId", resourceCulture);
             }
         }
         
@@ -759,6 +849,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_TypeReference_Type {
             get {
                 return ResourceManager.GetString("Type_Name_TypeReference_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} or {1}.
+        /// </summary>
+        internal static string Type_Name_TypeReference_TypeOrEnum {
+            get {
+                return ResourceManager.GetString("Type_Name_TypeReference_TypeOrEnum", resourceCulture);
             }
         }
         
@@ -867,6 +966,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_Vector4_Unspecified {
             get {
                 return ResourceManager.GetString("Type_Name_Vector4_Unspecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zombie Cooldown ID.
+        /// </summary>
+        internal static string Type_Name_ZombieCooldownId {
+            get {
+                return ResourceManager.GetString("Type_Name_ZombieCooldownId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zombie Table ID.
+        /// </summary>
+        internal static string Type_Name_ZombieTableId {
+            get {
+                return ResourceManager.GetString("Type_Name_ZombieTableId", resourceCulture);
             }
         }
     }

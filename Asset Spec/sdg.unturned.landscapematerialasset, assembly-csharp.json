@@ -9,8 +9,11 @@
     [
         {
             "Key": "Texture",
-            "Type": "ContentReference",
-            "ElementType": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Type":
+            {
+                "Type": "ContentReference",
+                "BaseType": "UnityEngine.Texture2D, UnityEngine.CoreModule"
+            },
             "DefaultValue": null,
             "Description": "The albedo texture of the terrain.",
             "Variable": "texture",
@@ -18,8 +21,11 @@
         },
         {
             "Key": "Mask",
-            "Type": "ContentReference",
-            "ElementType": "UnityEngine.Texture2D, UnityEngine.CoreModule",
+            "Type":
+            {
+                "Type": "ContentReference",
+                "BaseType": "UnityEngine.Texture2D, UnityEngine.CoreModule"
+            },
             "DefaultValue": null,
             "Description": "The normal map texture of the terrain.",
             "Variable": "mask",
@@ -28,7 +34,6 @@
         {
             "Key": "Physics_Material",
             "Type": "PhysicsMaterialLegacy",
-            "ElementType": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "DefaultValue": null,
             "Description": "The physics material used by this material.",
             "Variable": "physicsMaterialName",

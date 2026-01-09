@@ -53,8 +53,11 @@
         },
         {
             "Key": "Song",
-            "Type": "MasterBundleOrContentReference",
-            "ElementType": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Type":
+            {
+                "Type": "MasterBundleOrContentReference",
+                "BaseType": "UnityEngine.AudioClip, UnityEngine.AudioModule"
+            },
             "DefaultValue": null,
             "Description": "The audio clip to play.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/stereo-song-asset.html#asset-properties-reference",

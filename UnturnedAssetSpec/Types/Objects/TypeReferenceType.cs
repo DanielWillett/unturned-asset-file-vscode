@@ -26,7 +26,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// }
 /// </code>
 /// </summary>
-public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceType>, ITypeParser<QualifiedType>, ITypeFactory
+public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceType>, ITypeParser<QualifiedType>, ITypeFactory, IReferencingType
 {
     /// <summary>
     /// Gets the default instance for a <see cref="TypeReferenceType"/>.
@@ -34,33 +34,69 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
     [field: MaybeNull]
     public static TypeReferenceType Instance => field ??= new TypeReferenceType();
 
-
+    /// <summary>
+    /// Type ID of this type (<see cref="TypeReferenceType"/>).
+    /// </summary>
     public const string TypeId = "TypeReference";
 
+    private readonly OneOrMore<QualifiedType> _baseTypes;
+    private readonly DatEnumType? _enumType;
+    
+    /// <summary>
+    /// Factory used to create this type.
+    /// </summary>
     public static ITypeFactory Factory => Instance;
 
-
-    private readonly OneOrMore<QualifiedType> _baseTypes;
-
+    /// <inheritdoc />
     public override string Id => TypeId;
 
-
-    public TypeReferenceKind Kind { get; }
+    /// <inheritdoc />
     public override string DisplayName { get; }
+
+    /// <summary>
+    /// Type of syntax to accept.
+    /// </summary>
+    public TypeReferenceKind Kind { get; }
+
+    /// <summary>
+    /// Whether or not this kind of type reference is case-sensitive.
+    /// </summary>
     public bool IsCaseSensitive => Kind == TypeReferenceKind.Object;
 
+    /// <inheritdoc />
+    public OneOrMore<IType> ReferencedTypes => _enumType == null ? OneOrMore<IType>.Null : new OneOrMore<IType>(_enumType);
+
+    /// <inheritdoc />
     public override ITypeParser<QualifiedType> Parser => this;
 
     public TypeReferenceType() : this(TypeReferenceKind.String, OneOrMore<QualifiedType>.Null) { }
 
-    public TypeReferenceType(TypeReferenceKind kind, OneOrMore<QualifiedType> baseTypes)
+    public TypeReferenceType(TypeReferenceKind kind, OneOrMore<QualifiedType> baseTypes) : this(kind, baseTypes, null!, null!, QualifiedType.None) { }
+    public TypeReferenceType(TypeReferenceKind kind, OneOrMore<QualifiedType> baseTypes, IDatSpecificationObject owner, IDatSpecificationReadContext context, QualifiedType enumType)
     {
         if (kind is < TypeReferenceKind.String or > TypeReferenceKind.Object)
             throw new InvalidEnumArgumentException(nameof(kind), (int)kind, typeof(TypeReferenceKind));
+        if (!enumType.IsNull && context == null)
+            throw new ArgumentNullException(nameof(context));
+        if (!enumType.IsNull && owner == null)
+            throw new ArgumentNullException(nameof(owner));
 
         Kind = kind;
         _baseTypes = baseTypes;
+        if (!enumType.IsNull)
+        {
+            _enumType = context.GetOrReadType(owner, enumType) as DatEnumType;
+            if (_enumType == null)
+            {
+                throw new InvalidOperationException(string.Format(Resources.JsonException_PropertyTypeNotFound, enumType.Type, owner.FullName + ".Type.EnumType"));
+            }
+        }
+
         DisplayName = AssetReferenceHelper.GetDisplayName(baseTypes, Resources.Type_Name_TypeReference, Resources.Type_Name_TypeReference_Type, isAsset: false);
+        if (_enumType != null)
+        {
+            DisplayName = string.Format(Resources.Type_Name_TypeReference_TypeOrEnum, _enumType.DisplayName, DisplayName);
+        }
     }
 
     public bool TryParse(ref TypeParserArgs<QualifiedType> args, in FileEvaluationContext ctx, out Optional<QualifiedType> value)
@@ -242,11 +278,12 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
             }
         }
 
+        QualifiedType enumType;
         OneOrMore<QualifiedType> baseTypes;
         if (typeDefinition.TryGetProperty("BaseType"u8, out element)
             && element.ValueKind != JsonValueKind.Null)
         {
-            baseTypes = new OneOrMore<QualifiedType>(new QualifiedType(element.GetString()!, isCaseInsensitive: true));
+            baseTypes = new OneOrMore<QualifiedType>(new QualifiedType(element.GetString()!, isCaseInsensitive: true).Normalized);
         }
         else if (typeDefinition.TryGetProperty("BaseTypes"u8, out element)
                  && element.ValueKind != JsonValueKind.Null)
@@ -255,7 +292,7 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
             QualifiedType[] arr = new QualifiedType[len];
             for (int i = 0; i < len; ++i)
             {
-                arr[i] = new QualifiedType(element[i].GetString()!, isCaseInsensitive: true);
+                arr[i] = new QualifiedType(element[i].GetString()!, isCaseInsensitive: true).Normalized;
             }
 
             baseTypes = new OneOrMore<QualifiedType>(arr);
@@ -265,12 +302,26 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
             baseTypes = OneOrMore<QualifiedType>.Null;
         }
 
+        if (typeDefinition.TryGetProperty("EnumType"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            enumType = new QualifiedType(element.GetString()!, isCaseInsensitive: true).Normalized;
+        }
+        else
+        {
+            enumType = QualifiedType.None;
+        }
+
+        if (!enumType.IsNull)
+        {
+            return new TypeReferenceType(mode, baseTypes, owner, spec, enumType);
+        }
+
         return baseTypes.IsNull && mode == TypeReferenceKind.String ? Instance : new TypeReferenceType(mode, baseTypes);
     }
 
     public override void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
-        if (_baseTypes.IsNull && Kind == TypeReferenceKind.String)
+        if (_enumType == null && _baseTypes.IsNull && Kind == TypeReferenceKind.String)
         {
             writer.WriteStringValue(Id);
             return;
@@ -301,6 +352,11 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
             }
         }
 
+        if (_enumType != null)
+        {
+            writer.WriteString("EnumType"u8, _enumType.TypeName.Type);
+        }
+
         writer.WriteEndObject();
     }
 
@@ -308,12 +364,12 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
 
     protected override bool Equals(TypeReferenceType other)
     {
-        return other.Kind == Kind && other._baseTypes.Equals(_baseTypes);
+        return other.Kind == Kind && (_enumType?.Equals(other._enumType) ?? other._enumType == null) && other._baseTypes.Equals(_baseTypes);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(1167138807, Kind, _baseTypes.Value);
+        return HashCode.Combine(1167138807, Kind, _enumType, _baseTypes.Value);
     }
 }
 
