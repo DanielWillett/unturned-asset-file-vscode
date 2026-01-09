@@ -529,6 +529,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Comma-Separated List of {0}.
+        /// </summary>
+        internal static string Type_Name_CommaDelimitedString_Generic {
+            get {
+                return ResourceManager.GetString("Type_Name_CommaDelimitedString_Generic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Content Reference.
         /// </summary>
         internal static string Type_Name_ContentReference {

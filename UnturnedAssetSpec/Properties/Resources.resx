@@ -273,6 +273,9 @@
   <data name="Type_Name_Color32" xml:space="preserve">
     <value>Color (0-255)</value>
   </data>
+  <data name="Type_Name_CommaDelimitedString_Generic" xml:space="preserve">
+    <value>Comma-Separated List of {0}</value>
+  </data>
   <data name="Type_Name_ContentReference" xml:space="preserve">
     <value>Content Reference</value>
   </data>

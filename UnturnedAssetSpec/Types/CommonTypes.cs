@@ -77,7 +77,7 @@ public static class CommonTypes
         knownTypes[Vector4Type.TypeId]                  = () => Vector4Type.Instance;
         knownTypes[Vector3Type.TypeId]                  = () => Vector3Type.Instance;
         knownTypes[Vector2Type.TypeId]                  = () => Vector2Type.Instance;
-        knownTypes["CommaDelimitedString"]              = () => StringType.Instance;    // todo
+        knownTypes["CommaDelimitedString"]              = () => CommaDelimitedStringType.Factory;
         knownTypes["Dictionary"]                        = () => StringType.Instance;    // todo
         knownTypes["MasterBundleName"]                  = () => StringType.Instance;    // todo
         knownTypes["LegacyBundleName"]                  = () => StringType.Instance;    // todo

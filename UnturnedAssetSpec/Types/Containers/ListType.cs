@@ -419,7 +419,7 @@ public class ListType<TCountType, TElementType>
 
     protected override bool Equals(ListType<TCountType, TElementType> other)
     {
-        return _args.Equals(in other._args);
+        return _subType.Equals(other._subType) && _args.Equals(in other._args);
     }
 
     private void CheckCount(int ct, ref TypeParserArgs<EquatableArray<TElementType>> args)
@@ -767,7 +767,10 @@ public class ListType<TCountType, TElementType>
     }
 #endif
 
-    public override int GetHashCode() => HashCode.Combine(1745437037, _args.GetHashCode());
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(1745437037, _subType, _args);
+    }
 }
 
 /// <summary>
