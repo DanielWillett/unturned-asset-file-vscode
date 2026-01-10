@@ -565,6 +565,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dictionary of {0} to {1}.
+        /// </summary>
+        internal static string Type_Name_Dictionary_Generic {
+            get {
+                return ResourceManager.GetString("Type_Name_Dictionary_Generic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dictionary of {0}.
+        /// </summary>
+        internal static string Type_Name_Dictionary_Generic_String {
+            get {
+                return ResourceManager.GetString("Type_Name_Dictionary_Generic_String", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Face Index.
         /// </summary>
         internal static string Type_Name_FaceIndex {

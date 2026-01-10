@@ -206,7 +206,7 @@ public sealed class DictionarySpecPropertyType<TElementType> :
 
         if (index < eqArray.Array.Length)
         {
-            eqArray = new EquatableArray<DictionaryPair<TElementType>>(eqArray.Array, index);
+            eqArray = new EquatableArray<DictionaryPair<TElementType?>>(eqArray.Array, index);
         }
 
         value = eqArray;
@@ -233,12 +233,12 @@ public sealed class DictionarySpecPropertyType<TElementType> :
 /// </summary>
 /// <typeparam name="TElementType">The value type.</typeparam>
 [DebuggerDisplay("{ToString(),nq}")]
-public readonly struct DictionaryPair<TElementType> : IEquatable<DictionaryPair<TElementType>> where TElementType : IEquatable<TElementType>
+public readonly struct DictionaryPair<TElementType> : IEquatable<DictionaryPair<TElementType>> where TElementType : IEquatable<TElementType>?
 {
     public string Key { get; }
-    public TElementType Value { get; }
+    public TElementType? Value { get; }
 
-    public DictionaryPair(string key, TElementType value)
+    public DictionaryPair(string key, TElementType? value)
     {
         Key = key;
         Value = value;
@@ -247,7 +247,7 @@ public readonly struct DictionaryPair<TElementType> : IEquatable<DictionaryPair<
     /// <inheritdoc />
     public bool Equals(DictionaryPair<TElementType> other)
     {
-        return string.Equals(other.Key, Key, StringComparison.OrdinalIgnoreCase) && (Value == null ? other.Value == null : Value.Equals(other.Value));
+        return string.Equals(other.Key, Key, StringComparison.OrdinalIgnoreCase) && (Value == null ? other.Value == null : other.Value != null && Value.Equals(other.Value));
     }
 
     /// <inheritdoc />

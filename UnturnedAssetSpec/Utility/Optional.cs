@@ -7,7 +7,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 /// Allows differentiating between a null value and a default value generically.
 /// </summary>
 /// <typeparam name="T">The type being contained.</typeparam>
-public readonly struct Optional<T>(T? value) : IEquatable<T>, IEquatable<Optional<T>> where T : IEquatable<T>
+public readonly struct Optional<T>(T? value) : IEquatable<T>, IEquatable<Optional<T>> where T : IEquatable<T>?
 {
     /// <summary>
     /// A null value.

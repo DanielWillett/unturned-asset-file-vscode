@@ -18,6 +18,17 @@ public class TypeConverterParser<T>(ITypeConverter<T> typeConverter)
     private readonly ITypeConverter<T> _typeConverter = typeConverter;
 
     /// <summary>
+    /// The type converter used to parse values.
+    /// </summary>
+    public ITypeConverter<T> TypeConverter => _typeConverter;
+
+    /// <summary>
+    /// Whether or not certain types, such as the comma-delimited string,
+    /// can bypass this parser to avoid extra allocations when parsing from a span.
+    /// </summary>
+    public virtual bool CanUseTypeConverterDirectly => true;
+
+    /// <summary>
     /// Overridable behavior for parsing a string value, allowing for injecting more diagnostics after parsing.
     /// </summary>
     /// <param name="v">The value node being parsed.</param>

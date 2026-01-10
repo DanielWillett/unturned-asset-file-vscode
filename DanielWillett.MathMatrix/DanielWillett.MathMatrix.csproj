@@ -12,13 +12,13 @@
     <CircularCompilation>True</CircularCompilation>
     <CircularCompilation Condition="'$(CircularCompilation)' And !exists('../UnturnedAssetSpec/bin/$(Configuration)/$(TargetFramework)/UnturnedAssetSpec.dll')">False</CircularCompilation>
     <DefineConstants Condition="'$(CircularCompilation)' == 'True'">$(DefineConstants);SUBSEQUENT_COMPILE</DefineConstants>
+    <!--<DepsFileGenerationMode>old</DepsFileGenerationMode>-->
   </PropertyGroup>
 
   <PropertyGroup Condition="exists($(StrongNameKeyPath))">
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$(StrongNameKeyPath)</AssemblyOriginatorKeyFile>
-    <DelaySign>False</DelaySign>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,7 +31,7 @@
 
   <ItemGroup Condition="'$(CircularCompilation)' == 'True'">
 
-    <Reference Include="UnturnedAssetSpec" Private="True" HintPath="../UnturnedAssetSpec/bin/$(Configuration)/$(TargetFramework)/UnturnedAssetSpec.dll" />
+    <Reference Include="UnturnedAssetSpec" Private="False" HintPath="../UnturnedAssetSpec/bin/$(Configuration)/$(TargetFramework)/UnturnedAssetSpec.dll" />
 
     <Using Include="DanielWillett.UnturnedDataFileLspServer.Data.Types"/>
 

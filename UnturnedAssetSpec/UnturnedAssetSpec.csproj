@@ -44,7 +44,7 @@
 
   <ItemGroup>
 
-    <ProjectReference Include="../DanielWillett.MathMatrix/DanielWillett.MathMatrix.csproj" />
+    <ProjectReference Include="../DanielWillett.MathMatrix/DanielWillett.MathMatrix.csproj" Private="False" />
 
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'" />
     <PackageReference Include="System.Text.Json" Version="4.7.1" />

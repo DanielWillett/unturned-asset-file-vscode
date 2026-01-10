@@ -854,8 +854,11 @@
                 },
                 {
                     "Key": "UI_Requirements",
-                    "Type": "CommaDelimitedString",
-                    "ElementType": "Int32",
+                    "Type":
+                    {
+                        "Type": "CommaDelimitedString",
+                        "ElementType": "Int32"
+                    },
                     "Description": "Comma-separated indexes of other conditions that must be met first before this condition will be visible in-game.",
                     "ValueTemplateGroupReference": "This.TemplateGroups[0]{PreventSelfReference=true}",
                     "DefaultValue": null,

@@ -1,16 +1,15 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -77,8 +76,8 @@ public static class CommonTypes
         knownTypes[Vector4Type.TypeId]                  = () => Vector4Type.Instance;
         knownTypes[Vector3Type.TypeId]                  = () => Vector3Type.Instance;
         knownTypes[Vector2Type.TypeId]                  = () => Vector2Type.Instance;
-        knownTypes["CommaDelimitedString"]              = () => CommaDelimitedStringType.Factory;
-        knownTypes["Dictionary"]                        = () => StringType.Instance;    // todo
+        knownTypes[CommaDelimitedStringType.TypeId]     = () => CommaDelimitedStringType.Factory;
+        knownTypes[DictionaryType.TypeId]               = () => DictionaryType.Factory;
         knownTypes["MasterBundleName"]                  = () => StringType.Instance;    // todo
         knownTypes["LegacyBundleName"]                  = () => StringType.Instance;    // todo
         knownTypes["AssetBundleVersion"]                = () => Int32Type.Instance;     // todo

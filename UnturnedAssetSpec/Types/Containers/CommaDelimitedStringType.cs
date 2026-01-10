@@ -4,10 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
-using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
-using System.Collections.Immutable;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -18,6 +15,23 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class CommaDelimitedStringType : ITypeFactory
 {
     public const string TypeId = "CommaDelimitedString";
+
+    internal const StringSplitOptions DefaultSplitOptions = StringSplitOptions.RemoveEmptyEntries
+#if NET5_0_OR_GREATER
+                                                         | StringSplitOptions.TrimEntries;
+#else
+                                                         | (StringSplitOptions)FallbackStringSplitOptions.TrimEntries;
+#endif
+#if !NET5_0_OR_GREATER
+    internal enum FallbackStringSplitOptions
+    {
+        // netstandard/framework does not have TrimEntries so we have to add a polyfill for it.
+        // It was added in .NET 5.
+        None = 0,
+        RemoveEmptyEntries = 1,
+        TrimEntries = 2
+    }
+#endif
 
     /// <summary>
     /// Factory used to create <see cref="CommaDelimitedStringType{TElementType}"/> values from JSON.
@@ -31,15 +45,31 @@ public sealed class CommaDelimitedStringType : ITypeFactory
     /// Create a new comma-delimted list type.
     /// </summary>
     /// <typeparam name="TElementType">The type of values to read from the elements of the list.</typeparam>
-    /// <typeparam name="TCountType">The data-type of the count of the list.</typeparam>
-    /// <param name="args">Parameters for how the list should be parsed.</param>
+    /// <param name="minCount">Minimum number of items that must be in the list, inclusive.</param>
+    /// <param name="maxCount">Maximum number of items that must be in the list, inclusive.</param>
     /// <param name="subType">The element type of the list.</param>
     public static CommaDelimitedStringType<TElementType> Create<TElementType>(
         int? minCount, int? maxCount,
         IType<TElementType> subType)
         where TElementType : IEquatable<TElementType>
     {
-        return new CommaDelimitedStringType<TElementType>(minCount, maxCount, subType);
+        return new CommaDelimitedStringType<TElementType>(minCount, maxCount, DefaultSplitOptions, subType);
+    }
+
+    /// <summary>
+    /// Create a new comma-delimted list type.
+    /// </summary>
+    /// <typeparam name="TElementType">The type of values to read from the elements of the list.</typeparam>
+    /// <param name="minCount">Minimum number of items that must be in the list, inclusive.</param>
+    /// <param name="maxCount">Maximum number of items that must be in the list, inclusive.</param>
+    /// <param name="splitOptions">Options used for splitting the text using <see cref="string.Split(string, StringSplitOptions)"/>.</param>
+    /// <param name="subType">The element type of the list.</param>
+    public static CommaDelimitedStringType<TElementType> Create<TElementType>(
+        int? minCount, int? maxCount, StringSplitOptions splitOptions,
+        IType<TElementType> subType)
+        where TElementType : IEquatable<TElementType>
+    {
+        return new CommaDelimitedStringType<TElementType>(minCount, maxCount, splitOptions, subType);
     }
 
     /// <summary>
@@ -50,7 +80,7 @@ public sealed class CommaDelimitedStringType : ITypeFactory
     public static CommaDelimitedStringType<TElementType> Create<TElementType>(IType<TElementType> subType)
         where TElementType : IEquatable<TElementType>
     {
-        return new CommaDelimitedStringType<TElementType>(null, null, subType);
+        return new CommaDelimitedStringType<TElementType>(null, null, DefaultSplitOptions, subType);
     }
 
     IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
@@ -102,7 +132,7 @@ public sealed class CommaDelimitedStringType : ITypeFactory
                 if (!TypeConverters.Get<int>().TryReadJson(in Json, out minValue, ref parseArgs))
                     throw new JsonException(string.Format(
                             Resources.JsonException_FailedToParseValue,
-                            type.Id,
+                            Int32Type.TypeId,
                             Context.Length != 0 ? $"{Owner.FullName}.{Context}.MinimumCount" : $"{Owner.FullName}.MinimumCount"
                         )
                     );
@@ -114,13 +144,40 @@ public sealed class CommaDelimitedStringType : ITypeFactory
                 if (!TypeConverters.Get<int>().TryReadJson(in Json, out minValue, ref parseArgs))
                     throw new JsonException(string.Format(
                             Resources.JsonException_FailedToParseValue,
-                            type.Id,
+                            Int32Type.TypeId,
                             Context.Length != 0 ? $"{Owner.FullName}.{Context}.MaximumCount" : $"{Owner.FullName}.MaximumCount"
                         )
                     );
             }
 
-            Result = new CommaDelimitedStringType<TElementType>(minValue.AsNullable(), maxValue.AsNullable(), type);
+            StringSplitOptions splitOptions = DefaultSplitOptions;
+
+            if (Json.TryGetProperty("SplitOptions"u8, out element) && element.ValueKind != JsonValueKind.Null)
+            {
+                if (!Enum.TryParse(element.GetString(), out
+#if NET5_0_OR_GREATER
+                            splitOptions
+#else
+                            FallbackStringSplitOptions options
+#endif
+                    ))
+                {
+                    throw new JsonException(
+                        string.Format(
+                            Resources.JsonException_FailedToParseEnum,
+                            nameof(ListMode),
+                            element.GetString(),
+                            Context.Length != 0 ? $"{Owner.FullName}.{Context}.Mode" : $"{Owner.FullName}.Mode"
+                        )
+                    );
+                }
+
+#if !NET5_0_OR_GREATER
+                splitOptions = (StringSplitOptions)options;
+#endif
+            }
+
+            Result = new CommaDelimitedStringType<TElementType>(minValue.AsNullable(), maxValue.AsNullable(), splitOptions, type);
         }
     }
 }
@@ -179,6 +236,8 @@ public class CommaDelimitedStringType<TElementType>
 
     public override void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
+        writer.WriteStartObject();
+
         WriteTypeName(writer);
         writer.WritePropertyName("ElementType"u8);
         _subType.WriteToJson(writer, options);
@@ -188,6 +247,17 @@ public class CommaDelimitedStringType<TElementType>
 
         if (_maxCount is > 0)
             writer.WriteNumber("MaximumCount"u8, _maxCount.Value);
+
+        if (_splitOptions != CommaDelimitedStringType.DefaultSplitOptions)
+        {
+#if NET5_0_OR_GREATER
+            writer.WriteString("SplitOptions"u8, _splitOptions.ToString());
+#else
+            writer.WriteString("SplitOptions"u8, ((CommaDelimitedStringType.FallbackStringSplitOptions)_splitOptions).ToString());
+#endif
+        }
+
+        writer.WriteEndObject();
     }
 
     public bool TryReadValueFromJson(in JsonElement json, out Optional<EquatableArray<TElementType>> value, IType<EquatableArray<TElementType>> valueType)
@@ -275,59 +345,8 @@ public class CommaDelimitedStringType<TElementType>
     public bool TryParse(ref TypeParserArgs<EquatableArray<TElementType>> args, in FileEvaluationContext ctx, out Optional<EquatableArray<TElementType>> value)
     {
         value = Optional<EquatableArray<TElementType>>.Null;
-        bool legacy = (_args.Mode & CommaDelimitedStringMode.Legacy) != 0 && args.KeyFilter != LegacyExpansionFilter.Modern;
-        bool modern = (_args.Mode & CommaDelimitedStringMode.Modern) != 0 && args.KeyFilter != LegacyExpansionFilter.Legacy;
-        if (!modern && !legacy) modern = true;
+        bool trimEntries = (_splitOptions & (StringSplitOptions)2) != 0;
 
-        TElementType?[] array;
-
-        if (legacy && (_args.Mode & CommaDelimitedStringMode.LegacySingle) == CommaDelimitedStringMode.LegacySingle)
-        {
-            string? singlePropertyName = _args.LegacySingleKey;
-            
-            if (string.IsNullOrEmpty(singlePropertyName))
-                singlePropertyName = _args.LegacySingularKey;
-
-            if (string.IsNullOrEmpty(singlePropertyName))
-            {
-                if (args.ParentNode is IPropertySourceNode property)
-                {
-                    singlePropertyName = property.Key;
-                }
-                else
-                {
-                    singlePropertyName = ctx.Self.Key;
-                }
-            }
-
-            if (args.ParentNode is IPropertySourceNode { Parent: IDictionarySourceNode dictionary }
-                && dictionary.TryGetProperty(singlePropertyName, out IPropertySourceNode? singularProperty))
-            {
-                args.ReferencedPropertySink?.AcceptReferencedProperty(singularProperty);
-
-                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, singularProperty.Value, args.ParentNode, _subType, LegacyExpansionFilter.Modern);
-
-                if (!_subType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> element))
-                {
-                    if (!parseArgs.ShouldIgnoreFailureDiagnostic)
-                        args.DiagnosticSink?.UNT2004_Generic(ref args, singularProperty.Value == null ? "-" : singularProperty.Value.ToString()!, _subType);
-                }
-                else if (!element.HasValue)
-                {
-                    // value = null;
-                    return true;
-                }
-                else
-                {
-                    array = new TElementType[1];
-                    array[0] = element.Value;
-                    value = new EquatableArray<TElementType>(array!);
-                    return true;
-                }
-            }
-        }
-
-        bool allFailed = true;
         switch (args.ValueNode)
         {
             // null (no value)
@@ -345,41 +364,92 @@ public class CommaDelimitedStringType<TElementType>
                 break;
 
             case IValueSourceNode valueNode:
-                string val = valueNode.Value;
-                string[] values = val.Split(',', StringSplitOptions.None)
-                break;
+                bool allPassed = true;
+                ReadOnlySpan<char> valueSpan = valueNode.Value.AsSpan();
+
+                int maxElementCount = valueSpan.Count(',') + 1;
+                Span<Range> ranges = stackalloc Range[maxElementCount];
+
+                int segments = valueSpan.Split(ranges, ',', trimEntries, trimEntries, _splitOptions);
+                CheckCount(segments, ref args);
+
+                TElementType?[] array = new TElementType[segments];
+
+                ITypeParser<TElementType> parser = _subType.Parser;
+
+                FileRange valueNodeRange = valueNode.Range;
+                if (parser is TypeConverterParser<TElementType> { CanUseTypeConverterDirectly: true } typeConverterParser)
+                {
+                    ITypeConverter<TElementType> converter = typeConverterParser.TypeConverter;
+                    args.CreateTypeConverterParseArgs(out TypeConverterParseArgs<TElementType> parseArgs, _subType);
+                    for (int i = 0; i < segments; ++i)
+                    {
+                        Range range = ranges[i];
+                        ReadOnlySpan<char> span = valueSpan[range];
+
+                        (int offset, int length) = range.GetOffsetAndLength(valueSpan.Length);
+
+                        parseArgs.ValueRange.Start.Character = valueNodeRange.Start.Character + offset;
+                        parseArgs.ValueRange.End.Character = valueNodeRange.Start.Character + offset + length - 1;
+                        parseArgs.TextAsString = segments == 1 && length == valueSpan.Length ? valueNode.Value : null;
+
+                        if (converter.TryParse(span, ref parseArgs, out array[i]))
+                            continue;
+
+                        allPassed = false;
+                        if (parseArgs.DiagnosticSink == null)
+                            break;
+                        if (parseArgs.ShouldIgnoreFailureDiagnostic)
+                            continue;
+                        
+                        parseArgs.DiagnosticSink?.UNT2004_Generic(ref parseArgs, parseArgs.GetString(span), _subType);
+                        args.ShouldIgnoreFailureDiagnostic = true;
+                    }
+                }
+                else
+                {
+                    AnySourceNodeProperties props = default;
+                    props.Range = valueNodeRange;
+                    props.Index = valueNode.Index;
+                    props.ChildIndex = valueNode.ChildIndex;
+                    props.Depth = valueNode.Depth;
+                    int valueNodeFirstCharacterIndex = valueNode.FirstCharacterIndex;
+                    int valueNodeLastCharacterIndex = valueNode.LastCharacterIndex;
+                    for (int i = 0; i < segments; ++i)
+                    {
+                        Range range = ranges[i];
+                        ReadOnlySpan<char> span = valueSpan[range];
+
+                        (int offset, int length) = range.GetOffsetAndLength(valueSpan.Length);
+
+                        props.Range.Start.Character = valueNodeRange.Start.Character + offset;
+                        props.Range.End.Character = valueNodeRange.Start.Character + offset + length - 1;
+
+                        props.FirstCharacterIndex = valueNodeFirstCharacterIndex + offset;
+                        props.LastCharacterIndex = valueNodeLastCharacterIndex + offset + length - 1;
+                        ValueNode fakeNode = ValueNode.Create(span.ToString(), false, Comment.None, in props);
+
+                        args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, fakeNode, args.ParentNode, _subType, ctx.PropertyContext switch
+                        {
+                            PropertyResolutionContext.Modern => LegacyExpansionFilter.Modern,
+                            _ => LegacyExpansionFilter.Legacy
+                        });
+
+                        if (parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> optionalValue)
+                            && optionalValue.TryGetValueOrNull(out array[i]))
+                        {
+                            continue;
+                        }
+
+                        allPassed = false;
+                        args.ShouldIgnoreFailureDiagnostic |= parseArgs.ShouldIgnoreFailureDiagnostic;
+                    }
+                }
+
+                return allPassed;
         }
 
         return false;
-    }
-
-    private struct DefaultValueVisitor : IValueVisitor
-    {
-        public TElementType?[] Array;
-        public int Index;
-
-        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
-        {
-            if (!value.HasValue)
-                return;
-
-            if (typeof(TValue) == typeof(TElementType))
-            {
-                Array[Index] = Unsafe.As<TValue, TElementType>(ref Unsafe.AsRef(in value.Value));
-                return;
-            }
-
-            ConvertVisitor<TElementType> converter;
-            converter.IsNull = false;
-            converter.WasSuccessful = false;
-            converter.Result = default;
-            converter.Accept(value.Value);
-
-            if (!converter.WasSuccessful)
-                return;
-
-            Array[Index] = converter.Result;
-        }
     }
 
     public override int GetHashCode() => HashCode.Combine(611860609, _subType, _minCount, _maxCount);

@@ -312,6 +312,8 @@ public class ListType<TCountType, TElementType>
 
     public override void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
+        writer.WriteStartObject();
+
         WriteTypeName(writer);
         writer.WritePropertyName("ElementType"u8);
         _subType.WriteToJson(writer, options);
@@ -351,6 +353,8 @@ public class ListType<TCountType, TElementType>
             writer.WritePropertyName("LegacyIncludedDefaultElementTypeValue"u8);
             _args.LegacyIncludedDefaultElementTypeValue.WriteToJson(writer, options);
         }
+
+        writer.WriteEndObject();
     }
 
     public bool TryReadValueFromJson(in JsonElement json, out Optional<EquatableArray<TElementType>> value, IType<EquatableArray<TElementType>> valueType)
@@ -551,7 +555,7 @@ public class ListType<TCountType, TElementType>
                     }
                 }
 
-                value = new EquatableArray<TElementType>(array!);
+                value = new EquatableArray<TElementType>(array!, index);
                 return !allFailed;
 
             case IValueSourceNode valueNode:

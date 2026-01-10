@@ -693,6 +693,93 @@
                     {
                         "Type":
                         {
+                            "const": "CommaDelimitedString",
+                            "title": "A list of values separated by commas in a string value."
+                        },
+                        "ElementType":
+                        {
+                            "$ref": "#/$defs/Type",
+                            "description": "Type of elements in the list."
+                        },
+                        "SplitOptions":
+                        {
+                            "type": "string",
+                            "enum":
+                            [
+                                "RemoveEmptyEntries, TrimEntries",
+                                "TrimEntries",
+                                "RemoveEmptyEntries",
+                                "None"
+                            ],
+                            "description": "How to handle string values when splitting elements."
+                        },
+                        "MinimumCount":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum number of items (inclusive)."
+                        },
+                        "MaximumCount":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum number of items (inclusive)."
+                        }
+                    },
+                    "required": [ "Type", "ElementType" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "Dictionary",
+                            "title": "A list of key-value pairs."
+                        },
+                        "ValueType":
+                        {
+                            "$ref": "#/$defs/Type",
+                            "description": "Type of values in the dictionary."
+                        },
+                        "KeyType":
+                        {
+                            "$ref": "#/$defs/Type",
+                            "description": "Type of key to parse. Also influences auto-complete. Defaults to \"String\"."
+                        },
+                        "MinimumCount":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum number of items (inclusive)."
+                        },
+                        "MaximumCount":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum number of items (inclusive)."
+                        },
+                        "RequireKeyType":
+                        {
+                            "type": "boolean",
+                            "description": "Whether or not a key that isn't a valid value in \"KeyType\" should produce an error."
+                        },
+                        "DefaultValue":
+                        {
+                            "description": "Default value for undefined values.",
+                            "$ref": "#/$defs/ValueAllowConditionals"
+                        }
+                    },
+                    "required": [ "Type", "ValueType" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
                             "const": "Steam64ID",
                             "title": "A CSteamID in decimal format."
                         },
@@ -1336,14 +1423,6 @@
                 {
                     "const": "Vector2",
                     "title": "A Vector2 (X, Y) or object."
-                },
-                {
-                    "const": "CommaDelimitedString",
-                    "title": "A comma-separated list of values in a string."
-                },
-                {
-                    "const": "Dictionary",
-                    "title": "A string dictionary of values."
                 },
                 {
                     "const": "ContentReference",

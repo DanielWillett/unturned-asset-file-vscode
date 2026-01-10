@@ -65,6 +65,33 @@ public interface IType<TValue> : IType where TValue : IEquatable<TValue>
 }
 
 /// <summary>
+/// A type with a list of elements.
+/// </summary>
+public interface IListType : IType
+{
+    /// <summary>
+    /// The type used to parse list elements.
+    /// </summary>
+    IType ElementType { get; }
+}
+
+/// <summary>
+/// A type with a list of key-value pairs.
+/// </summary>
+public interface IDictionaryType : IType
+{
+    /// <summary>
+    /// The type used to parse keys. Usually just <see cref="StringType"/>.
+    /// </summary>
+    IType KeyType { get; }
+
+    /// <summary>
+    /// The type used to parse dictionary values.
+    /// </summary>
+    IType ValueType { get; }
+}
+
+/// <summary>
 /// Allows a type to specify a set of other types that are referenced by this type.
 /// </summary>
 /// <remarks>For example, <see cref="ListType{TCountType,TElementType}"/> uses this to reference it's count and element types.</remarks>

@@ -285,6 +285,12 @@
   <data name="Type_Name_DateTimeOffset" xml:space="preserve">
     <value>Timestamp + Timezone</value>
   </data>
+  <data name="Type_Name_Dictionary_Generic" xml:space="preserve">
+    <value>Dictionary of {0} to {1}</value>
+  </data>
+  <data name="Type_Name_Dictionary_Generic_String" xml:space="preserve">
+    <value>Dictionary of {0}</value>
+  </data>
   <data name="Type_Name_FaceIndex" xml:space="preserve">
     <value>Face Index</value>
   </data>

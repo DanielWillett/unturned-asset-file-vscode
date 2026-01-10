@@ -260,8 +260,14 @@
         },
         {
             "Key": "Speciality_Health_Overrides",
-            "Type": "Dictionary",
-            "ElementType": "Float32",
+            "Type":
+            {
+                "Type": "Dictionary",
+                "KeyType": "SDG.Unturned.EZombieSpeciality, Assembly-CSharp",
+                "ValueType": "Float32",
+                "DefaultValue": null,
+                "RequireKeyType": true
+            },
             "DefaultValue": null,
             "Required":
             {
@@ -272,7 +278,6 @@
             "Description": "Pairs zombie speciality (e.g., Crawler, Sprinter, Flanker, etc) to a number, the meaning of which is decided by @Speciality_Health_Overrides.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/zombie-difficulty-asset.html#properties-reference",
             "Variable": "SpecialityHealthOverrides",
-            "KeyEnumType": "SDG.Unturned.EZombieSpeciality, Assembly-CSharp",
             "InclusiveWith":
             [
                 {

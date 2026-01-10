@@ -10,10 +10,17 @@
     [
         {
             "Key": "AudioDefs",
-            "Type": "Dictionary",
-            "ElementType": "MasterBundleReference",
-            "SpecialTypes": [ "SDG.Unturned.OneShotAudioDefinition, Assembly-CSharp" ],
-            "KeyEnumType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.PhysicsMaterialAudioDef, UnturnedAssetSpec",
+            "Type":
+            {
+                "Type": "Dictionary",
+                "KeyType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.PhysicsMaterialAudioDef, UnturnedAssetSpec",
+                "ValueType":
+                {
+                    "Type": "MasterBundleReference",
+                    "BaseType": "SDG.Unturned.OneShotAudioDefinition, Assembly-CSharp"
+                },
+                "DefaultValue": null
+            },
             "DefaultValue": null,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
             "Description": "List of clothing items to be worn in the preview image.",
@@ -24,7 +31,7 @@
     [
         {
             "Type": "DanielWillett.UnturnedDataFileLspServer.Data.Types.PhysicsMaterialAudioDef, UnturnedAssetSpec",
-            "DisplayName": "Known Physics Material Audio Def IDs",
+            "DisplayName": "Known Physics Material Audio Def ID",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
             "Values":
             [
