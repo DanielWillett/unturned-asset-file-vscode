@@ -1,0 +1,121 @@
+{
+    "name": "unturned-data-file-lite",
+    "displayName": "Unturned Data File (Lite)",
+    "description": "Syntax highlighting for Unturned's .dat/.asset file extension, supporting the v1 and v2 formats. The 'lite' version does not include a language server.",
+    "author": "DanielWillett",
+    "publisher": "DanielWillett",
+    "version": "1.0.0",
+    "icon": "resources/icon.png",
+    "pricing": "Free",
+    "keywords":
+    [
+        "unturned",
+        "SDG",
+        "smartly dressed games",
+        "nelson",
+        "udat",
+        "unturneddat",
+        ".dat",
+        ".asset",
+        "unturned asset",
+        "unturned config",
+        "modding",
+        "modded",
+        "workshop",
+        "datv2",
+        "datv1"
+    ],
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/DanielWillett/unturned-asset-file-vscode"
+    },
+    "license": "GPL-3.0-only",
+    "engines":
+    {
+        "vscode": "^1.0.0"
+    },
+    "categories":
+    [
+        "Programming Languages"
+    ],
+    "contributes":
+    {
+        "languages":
+        [
+            {
+                "id": "unturned-dat",
+                "aliases":
+                [
+                    "Unturned Data File",
+                    "unturned-dat",
+                    "unturned-data-file",
+                    "Unturned Asset File"
+                ],
+                "extensions":
+                [
+                    ".dat",
+                    ".asset",
+                    ".vdf",
+                    ".tool",
+                    ".udat",
+                    ".udatproj"
+                ],
+                "configuration": "./language-configuration.json",
+                "firstLine": "^(?:\\/+\\s*udat-.*:\\s*(?:.*)\\s*|\\/\\/\\s\\>\\sUnturned\\sServer\\sConfiguration\\sFile)$",
+                "filenames":
+                [
+                    "Config_EasyDifficulty.txt",
+                    "Config_NormalDifficulty.txt",
+                    "Config_HardDifficulty.txt",
+                    "Config.txt",
+                    "Level.hierarchy",
+                    "Visibility.config",
+                    "Curse_Words.txt"
+                ],
+                "icon":
+                {
+                    "light": "./resources/file-icon-offcenter.png",
+                    "dark": "./resources/file-icon-offcenter.png"
+                }
+            }
+        ],
+        "grammars":
+        [
+            {
+                "language": "unturned-dat",
+                "scopeName": "source.unturned-dat-lite",
+                "path": "./syntaxes/unturned-dat.tmLanguage.json"
+            }
+        ],
+        "commands":
+        [
+            {
+                "command": "unturnedDataFileLite.reportIssue",
+                "title": "Report Issue"
+            }
+        ],
+        "menus":
+        {
+            "issue/reporter":
+            [
+                {
+                    "command": "unturnedDataFileLite.reportIssue"
+                }
+            ]
+        }
+    },
+    "scripts":
+    {
+        "vscode:prepublish": "npm run package",
+        "package": ""
+    },
+    "devDependencies":
+    {
+        "@types/vscode": "^1.0.0",
+        "@types/node": "22.x",
+        "esbuild": "^0.27.2",
+        "npm-run-all": "^4.1.5",
+        "typescript": "^5.9.3"
+    }
+}

@@ -3069,9 +3069,9 @@
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html#effect",
                     "Required":
                     {
-                        "Variable": "Spawnpoint",
-                        "Operation": "excluded",
-                        "Comparand": null
+                        "Variable": "#Spawnpoint.Excluded",
+                        "Operation": "eq",
+                        "Comparand": true
                     },
                     "ExclusiveWith": [ "Spawnpoint" ],
                     "Version": "3.25.8.4"
@@ -3136,9 +3136,9 @@
                     "Variable": "ShouldUseRandomAirdropNode",
                     "Required":
                     {
-                        "Variable": "Spawnpoint",
-                        "Operation": "excluded",
-                        "Comparand": null
+                        "Variable": "#Spawnpoint.Excluded",
+                        "Operation": "eq",
+                        "Comparand": true
                     },
                     "ExclusiveWith": [ "Spawnpoint" ]
                 },
@@ -3239,11 +3239,12 @@
                     [
                         {
                             "Key": "CooldownId",
+                            "RequirementCondition": true,
                             "Condition":
                             {
-                                "Variable": "CooldownId",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#CooldownId.Included{RequireValue=true}",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ]
@@ -3291,67 +3292,67 @@
                     "Value": "NONE",
                     "Casing": "None",
                     "Description": "Use the default for this asset.",
-                    "Color": "#888888"
+                    "Color": "888888"
                 },
                 {
                     "Value": "GROUND",
                     "Casing": "Ground",
                     "Description": "Uses a linearly interpolated value from 'Height_Strip' based on the current y-position of the object.",
-                    "Color": "#66875c"
+                    "Color": "66875c"
                 },
                 {
                     "Value": "IGNORE",
                     "Casing": "Ignore",
                     "Description": "Skip this asset, and use whatever is underneath.",
-                    "Color": "#888888"
+                    "Color": "888888"
                 },
                 {
                     "Value": "HIGHWAY",
                     "Casing": "Highway",
                     "Description": "A concrete road larger than 16m. Uses the 1st pixel in 'Layer_Strip'.",
-                    "Color": "#e37728"
+                    "Color": "e37728"
                 },
                 {
                     "Value": "ROAD",
                     "Casing": "Road",
                     "Description": "A concrete road with a width at most 16m. Uses the 3rd pixel in 'Layer_Strip'.",
-                    "Color": "#bfbfbf"
+                    "Color": "bfbfbf"
                 },
                 {
                     "Value": "STREET",
                     "Casing": "Street",
                     "Description": "A city street, generally used with level object streets. Uses the 2nd pixel in 'Layer_Strip'.",
-                    "Color": "#d9a236"
+                    "Color": "d9a236"
                 },
                 {
                     "Value": "PATH",
                     "Casing": "Path",
                     "Description": "A non-concrete road. Uses the 4th pixel in 'Layer_Strip'.",
-                    "Color": "#8f846f"
+                    "Color": "8f846f"
                 },
                 {
                     "Value": "LARGE",
                     "Casing": "Large",
                     "Description": "A large-sized object. Uses the 16th pixel in 'Layer_Strip'.",
-                    "Color": "#5a5a5a"
+                    "Color": "5a5a5a"
                 },
                 {
                     "Value": "MEDIUM",
                     "Casing": "Medium",
                     "Description": "A medium-sized object. Uses the 17th pixel in 'Layer_Strip'.",
-                    "Color": "#787878"
+                    "Color": "787878"
                 },
                 {
                     "Value": "WATER",
                     "Casing": "Water",
                     "Description": "The level's water color. Uses the 1st pixel in 'Height_Strip'.",
-                    "Color": "#305a59"
+                    "Color": "305a59"
                 },
                 {
                     "Value": "CLIFF",
                     "Casing": "Cliff",
                     "Description": "A cliff rock. Uses the 5th pixel in 'Layer_Strip'.",
-                    "Color": "#7f7f7f"
+                    "Color": "7f7f7f"
                 }
             ]
         },
@@ -3555,37 +3556,37 @@
                     "Value": "COMMON",
                     "Casing": "Common",
                     "Description": "Corresponds to the 'Common' (white-colored) rarity.",
-                    "Color": "#ffffff"
+                    "Color": "ffffff"
                 },
                 {
                     "Value": "UNCOMMON",
                     "Casing": "Uncommon",
                     "Description": "Corresponds to the 'Uncommon' (green-colored) rarity.",
-                    "Color": "#1f871f"
+                    "Color": "1f871f"
                 },
                 {
                     "Value": "RARE",
                     "Casing": "Rare",
                     "Description": "Corresponds to the 'Rare' (blue-colored) rarity.",
-                    "Color": "#4b64fa"
+                    "Color": "4b64fa"
                 },
                 {
                     "Value": "EPIC",
                     "Casing": "Epic",
                     "Description": "Corresponds to the 'Epic' (purple-colored) rarity.",
-                    "Color": "#964bfa"
+                    "Color": "964bfa"
                 },
                 {
                     "Value": "LEGENDARY",
                     "Casing": "Legendary",
                     "Description": "Corresponds to the 'Legendary' (pink-colored) rarity.",
-                    "Color": "#c832fa"
+                    "Color": "c832fa"
                 },
                 {
                     "Value": "MYTHICAL",
                     "Casing": "Mythical",
                     "Description": "Corresponds to the 'Mythical' (red-colored) rarity.",
-                    "Color": "#fa3219"
+                    "Color": "fa3219"
                 }
             ]
         }

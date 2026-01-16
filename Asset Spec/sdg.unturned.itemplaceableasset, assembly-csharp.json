@@ -62,6 +62,53 @@
             "Variable": "SalvageItemRef"
         },
         {
+            "Key": "Items_Recovered_On_Salvage_Full_Health",
+            "Type": "Int32",
+            "DefaultValue": 1,
+            "Minimum": 0,
+            "Maximum": 100,
+            "Description": "Number of items from @SalvageItem_FullHealth to recover when this item is salvaged at full health.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "MinItemsRecoveredOnSalvageFullHealth",
+            "ExclusiveWith": [ "Min_Items_Recovered_On_Salvage_Full_Health", "Max_Items_Recovered_On_Salvage_Full_Health" ],
+            "Version": "3.26.1.0"
+        },
+        {
+            "Key": "Min_Items_Recovered_On_Salvage_Full_Health",
+            "Type": "Int32",
+            "Minimum": 0,
+            "Maximum": "@Max_Items_Recovered_On_Salvage_Full_Health",
+            "DefaultValue": "@Items_Recovered_On_Salvage_Full_Health",
+            "Description": "Minimum number of items from @SalvageItem_FullHealth to recover when this item is salvaged at full health. A random value will be chosen between this and @Max_Items_Recovered_On_Salvage_Full_Health.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "MinItemsRecoveredOnSalvageFullHealth",
+            "Version": "3.26.1.0"
+        },
+        {
+            "Key": "Max_Items_Recovered_On_Salvage_Full_Health",
+            "Type": "Int32",
+            "Minimum": "@Min_Items_Recovered_On_Salvage_Full_Health",
+            "Maximum": 100,
+            "DefaultValue": "@Items_Recovered_On_Salvage_Full_Health",
+            "Description": "Maximum number of items from @SalvageItem_FullHealth to recover when this item is salvaged at full health. A random value will be chosen between @Min_Items_Recovered_On_Salvage_Full_Health and this.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "MaxItemsRecoveredOnSalvageFullHealth",
+            "Version": "3.26.1.0"
+        },
+        {
+            "Key": "SalvageItem_FullHealth",
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetTypes": [ "SDG.Unturned.ItemAsset, Assembly-CSharp", "SDG.Unturned.SpawnAsset, Assembly-CSharp" ]
+            },
+            "DefaultValue": "00000000-0000-0000-0000-000000000000",
+            "Description": "The item or spawn to give when salvaging this item at full health. Defaults to a random supply from the first blueprint on this asset that outputs only this item.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/placeable-asset.html#placeable-asset-properties",
+            "Variable": "SalvageItemFullHealthRef",
+            "Version": "3.26.1.0"
+        },
+        {
             "Key": "Items_Dropped_On_Destroy",
             "Type": "Int32",
             "DefaultValue": 0,

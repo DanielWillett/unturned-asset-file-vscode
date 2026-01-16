@@ -5,6 +5,31 @@
     "author": "DanielWillett",
     "publisher": "DanielWillett",
     "version": "0.0.1",
+    "icon": "resources/icon.png",
+    "pricing": "Free",
+    "keywords":
+    [
+        "unturned",
+        "SDG",
+        "smartly dressed games",
+        "nelson",
+        "udat",
+        "unturneddat",
+        ".dat",
+        ".asset",
+        "unturned asset",
+        "unturned config",
+        "modding",
+        "modded",
+        "workshop",
+        "datv2",
+        "datv1"
+    ],
+    "extensionKind":
+    [
+        "ui",
+        "workspace"
+    ],
     "repository":
     {
         "type": "git",
@@ -18,9 +43,6 @@
     "categories":
     [
         "Programming Languages"
-    ],
-    "activationEvents":
-    [
     ],
     "main": "./dist/extension.js",
     "contributes":
@@ -85,6 +107,10 @@
         "commands":
         [
             {
+                "command": "unturnedDataFile.reportIssue",
+                "title": "Report Issue"
+            },
+            {
                 "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
                 "title": "Refresh Asset Properties",
                 "icon":
@@ -117,6 +143,12 @@
                 {
                     "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
                     "when": "editorLangId == unturned-dat"
+                }
+            ],
+            "issue/reporter":
+            [
+                {
+                    "command": "unturnedDataFile.reportIssue"
                 }
             ]
         },

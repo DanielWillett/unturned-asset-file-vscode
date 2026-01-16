@@ -747,9 +747,9 @@
                 {
                     "Case":
                     {
-                        "Variable": "Actions",
-                        "Operation": "included",
-                        "Comparand": null
+                        "Variable": "#Actions.Included",
+                        "Operation": "eq",
+                        "Comparand": true
                     },
                     "Value": false
                 },
@@ -859,9 +859,9 @@
                             "Comparand": "SDG.Unturned.ItemMagazineAsset, Assembly-CSharp"
                         },
                         {
-                            "Variable": "Delete_Empty",
-                            "Operation": "included",
-                            "Comparand": null
+                            "Variable": "#Delete_Empty.Included",
+                            "Operation": "eq",
+                            "Comparand": true
                         }
                     ],
                     "Value": true
@@ -1039,7 +1039,7 @@
             ]
         },
         {
-            "DisplayName": "Blueprint Skill",
+            "DisplayName": "Legacy Blueprint Skill",
             "Type": "SDG.Unturned.EBlueprintSkill, Assembly-CSharp",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-skill-eblueprintskill-none",
             "Values":
@@ -1547,9 +1547,32 @@
                 },
                 {
                     "Key": "Skill_Level",
-                    "Type": "SkillLevel",
+                    "Type":
+                    [
+                        {
+                            "Case":
+                            {
+                                "Variable": "#Self.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
+                            "Value":
+                            {
+                                "Type": "SkillLevel",
+                                "Skill": "Skill",
+                                "AllowNegatives": false
+                            }
+                        },
+                        {
+                            "Value":
+                            {
+                                "Type": "SkillLevel",
+                                "Skill": "Skill",
+                                "AllowNegatives": true
+                            }
+                        }
+                    ],
                     "DefaultValue": 0,
-                    "SpecialTypes": [ "Skill" ],
                     "KeyLegacyExpansionFilter": "Modern",
                     "Aliases":
                     [
@@ -2000,9 +2023,9 @@
                             "Key": "RequiresNearbyCraftingTags",
                             "Condition":
                             {
-                                "Variable": "RequiresNearbyCraftingTags",
-                                "Operation": "included",
-                                "Comparand": null
+                                "Variable": "#RequiresNearbyCraftingTags.Included",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ],
@@ -2223,9 +2246,9 @@
                         {
                             "Case":
                             {
-                                "Variable": "Name",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#Name.Included{RequireValue=true}",
+                                "Operation": "eq",
+                                "Comparand": true
                             },
                             "Value": -1
                         },

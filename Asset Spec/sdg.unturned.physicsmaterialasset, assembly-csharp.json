@@ -29,12 +29,7 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
             "Description": "Unity 'Physic Material' name this material represents. Must be unique to this asset.",
             "Variable": "physicMaterialNames",
-            "Required":
-            {
-                "Variable": "UnityNames",
-                "Operation": "excluded",
-                "Comparand": null
-            },
+            "Required": "#UnityNames.Excluded",
             "ExclusiveWith": [ "UnityName" ]
         },
         {

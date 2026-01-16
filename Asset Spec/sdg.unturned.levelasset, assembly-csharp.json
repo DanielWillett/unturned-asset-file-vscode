@@ -392,7 +392,12 @@
                 },
                 {
                     "Key": "Default_Level",
-                    "Type": "SkillLevel",
+                    "Type":
+                    {
+                        "Type": "SkillLevel",
+                        "Skill": "Id",
+                        "AllowNegatives": true
+                    },
                     "DefaultValue": 0,
                     "Description": "The default skill level for new players.",
                     "Variable": "defaultLevel",
@@ -400,8 +405,13 @@
                 },
                 {
                     "Key": "Max_Unlockable_Level",
-                    "Type": "SkillLevel",
-                    "DefaultValue": 255,
+                    "Type":
+                    {
+                        "Type": "SkillLevel",
+                        "Skill": "Id",
+                        "AllowNegatives": true
+                    },
+                    "DefaultValue": -1,
                     "IncludedDefaultValue": 0,
                     "Description": "Maximum skill level attainable through gameplay. Levels exceeding the usual maximum level do not have any effect.",
                     "Variable": "maxUnlockableLevel",

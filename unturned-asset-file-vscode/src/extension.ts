@@ -45,7 +45,9 @@ export function getAssetPropertiesViewProvider(): AssetPropertiesViewProvider
 
 export async function activate(context: ExtensionContext): Promise<void>
 {
-    // todo
+    await window.showInformationMessage("Thank you for using the UnturnedDat extension.");
+
+    // todo: package with extension
     const dllPath = context.asAbsolutePath(join('..', 'LspServer', 'bin', 'Debug', 'net9.0', 'LspServer.dll'));
 
     if (!existsSync(dllPath))
@@ -126,7 +128,6 @@ export async function activate(context: ExtensionContext): Promise<void>
 
 export async function deactivate(): Promise<void>
 {
-
     console.log("Deactivating...");
 
     registrations.forEach(f => f.dispose());

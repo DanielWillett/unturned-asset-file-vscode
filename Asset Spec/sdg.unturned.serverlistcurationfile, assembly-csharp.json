@@ -117,9 +117,9 @@
                                 "Comparand": "Name"
                             },
                             {
-                                "Variable": "Regex",
-                                "Operation": "excluded",
-                                "Comparand": null
+                                "Variable": "#Regex.Excluded",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         ]
                     },
@@ -153,9 +153,9 @@
                                 "Comparand": "Name"
                             },
                             {
-                                "Variable": "Regexes",
-                                "Operation": "excluded",
-                                "Comparand": null
+                                "Variable": "#Regexes.Excluded",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         ]
                     },
@@ -193,9 +193,9 @@
                                 "Comparand": "IPv4"
                             },
                             {
-                                "Variable": "Filter",
-                                "Operation": "excluded",
-                                "Comparand": null
+                                "Variable": "#Filter.Excluded",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         ]
                     },
@@ -229,9 +229,9 @@
                                 "Comparand": "IPv4"
                             },
                             {
-                                "Variable": "Filters",
-                                "Operation": "excluded",
-                                "Comparand": null
+                                "Variable": "#Filters.Excluded",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         ]
                     },
@@ -273,9 +273,9 @@
                                 "Comparand": "ServerID"
                             },
                             {
-                                "Variable": "Value",
-                                "Operation": "excluded",
-                                "Comparand": null
+                                "Variable": "#Value.Excluded",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         ]
                     },
@@ -313,9 +313,9 @@
                                 "Comparand": "ServerID"
                             },
                             {
-                                "Variable": "Values",
-                                "Operation": "excluded",
-                                "Comparand": null
+                                "Variable": "#Values.Excluded",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         ]
                     },

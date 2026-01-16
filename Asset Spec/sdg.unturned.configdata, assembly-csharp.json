@@ -603,14 +603,12 @@
                             "Value": 0.35
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.15
                         },
                         {
@@ -640,36 +638,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 50.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 100.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 150.0
                         },
                         {
@@ -702,14 +694,12 @@
                             "Value": 0.1
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.01
                         },
                         {
@@ -734,36 +724,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.1
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.05
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.025
                         },
                         {
@@ -780,36 +764,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 1.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.25
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.1
                         },
                         {
@@ -826,36 +804,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.1
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.05
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.025
                         },
                         {
@@ -872,36 +844,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 1.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.5
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.25
                         },
                         {
@@ -918,36 +884,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.1
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.05
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.025
                         },
                         {
@@ -980,14 +940,12 @@
                             "Value": 1.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.75
                         },
                         {
@@ -1206,36 +1164,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 1.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.8
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.25
                         },
                         {
@@ -1252,36 +1204,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.8
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.5
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.1
                         },
                         {
@@ -1298,36 +1244,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 1.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.75
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.3
                         },
                         {
@@ -1344,36 +1284,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 1.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.85
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.7
                         },
                         {
@@ -1492,36 +1426,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.2
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.25
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.3
                         },
                         {
@@ -1538,36 +1466,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.55
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.5
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.3
                         },
                         {
@@ -1584,36 +1506,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.15
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.125
                         },
                         {
@@ -1630,36 +1546,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.15
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.175
                         },
                         {
@@ -1676,36 +1586,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.025
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.05
                         },
                         {
@@ -1722,36 +1626,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.025
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.05
                         },
                         {
@@ -1768,36 +1666,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.025
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.05
                         },
                         {
@@ -1905,25 +1797,21 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.75
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 1.5
                         },
                         {
@@ -1939,25 +1827,21 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 1.25
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.75
                         },
                         {
@@ -2162,25 +2046,21 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.75
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 1.5
                         },
                         {
@@ -2196,25 +2076,21 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 1.25
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 0.75
                         },
                         {
@@ -2449,14 +2325,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 85
                         },
                         {
@@ -2472,25 +2346,21 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 350
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 250
                         },
                         {
@@ -2513,14 +2383,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 85
                         },
                         {
@@ -2536,25 +2404,21 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 320
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 220
                         },
                         {
@@ -2609,9 +2473,9 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "Leg_Regen_Ticks",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#Leg_Regen_Ticks.Included{RequireValue=true}",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ]
@@ -2636,9 +2500,9 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "Bleed_Regen_Ticks",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#Bleed_Regen_Ticks.Included{RequireValue=true}",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ]
@@ -2658,36 +2522,30 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 1.5
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 1.0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 1.5
                         },
                         {
@@ -2703,25 +2561,21 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.5
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 1.25
                         },
                         {
@@ -2759,25 +2613,21 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 2
                         },
                         {
@@ -2792,25 +2642,21 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "HARD"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "HARD"
+                            },
                             "Value": 2
                         },
                         {
@@ -3157,9 +3003,9 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "Airdrop_Frequency_Min",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#Airdrop_Frequency_Min.Included{RequireValue=true}",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ]
@@ -3177,9 +3023,9 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "Airdrop_Frequency_Max",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#Airdrop_Frequency_Max.Included{RequireValue=true}",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ]
@@ -3197,9 +3043,9 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "Airdrop_Speed",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#Airdrop_Speed.Included{RequireValue=true}",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ]
@@ -3217,9 +3063,9 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "Airdrop_Force",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#Airdrop_Force.Included{RequireValue=true}",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ]
@@ -3557,9 +3403,9 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "Timer_Leave_Group",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#Timer_Leave_Group.Included{RequireValue=true}",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ]
@@ -3576,9 +3422,9 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "Max_Group_Members",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#Max_Group_Members.Included{RequireValue=true}",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ]
@@ -3626,14 +3472,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.25
                         },
                         {
@@ -3649,14 +3493,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 1.0
                         },
                         {
@@ -3672,14 +3514,12 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 1.0
                         },
                         {
@@ -3704,25 +3544,21 @@
                     "DefaultValue":
                     [
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "EASY"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
                             "Value": 0.2
                         },
                         {
-                            "And":
-                            [
-                                {
-                                    "Variable": "#This.Difficulty",
-                                    "Operation": "eq",
-                                    "Comparand": "NORMAL"
-                                }
-                            ],
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "NORMAL"
+                            },
                             "Value": 0.5
                         },
                         {

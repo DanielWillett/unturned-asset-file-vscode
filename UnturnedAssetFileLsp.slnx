@@ -8,9 +8,17 @@
     <File Path=".editorconfig" />
     <File Path="test.runsettings" />
   </Folder>
+  <Folder Name="/Solution Items/Assets/">
+    <File Path="Assets/Syntax Highlighting.png" />
+  </Folder>
   <Project Path="DanielWillett.MathMatrix/DanielWillett.MathMatrix.csproj" Id="67583d02-e72d-406c-a081-20d53f6a1288" />
   <Project Path="LspServer/LspServer.csproj" />
   <Project Path="unturned-asset-file-vscode/unturned-asset-file-vscode.esproj">
+    <Platform Project="AnyCPU" />
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="unturned-dat-lite/unturned-dat-lite.esproj">
     <Platform Project="AnyCPU" />
     <Build />
     <Deploy />

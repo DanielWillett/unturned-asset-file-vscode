@@ -68,12 +68,7 @@
             "Key": "VanillaPhysicsMaterial",
             "Type": "SDG.Unturned.EPhysicsMaterial, Assembly-CSharp",
             "DefaultValue": "NONE",
-            "Required":
-            {
-                "Variable": "PhysicsMaterial",
-                "Operation": "excluded",
-                "Comparand": null
-            },
+            "Required": "#PhysicsMaterial.Excluded",
             "Description": "Name of a built-in physics material that will be used for the surface of this road. Use @PhysicsMaterial instead for custom materials.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-vanillaphysicsmaterial",
             "Variable": "UnityPhysicsMaterial",
@@ -87,12 +82,7 @@
                 "BaseType": "UnityEngine.PhysicMaterial, UnityEngine.PhysicsModule"
             },
             "DefaultValue": null,
-            "Required":
-            {
-                "Variable": "VanillaPhysicsMaterial",
-                "Operation": "excluded",
-                "Comparand": null
-            },
+            "Required": "#VanillaPhysicsMaterial.Excluded",
             "Description": "Reference to a Physic Material that will be used for the surface of this road. Use @VanillaPhysicsMaterial instead for built-in materials.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html#doc-assets-road-physicsmaterial",
             "Variable": "UnityPhysicsMaterial",

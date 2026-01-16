@@ -132,10 +132,7 @@
                         "ends-with-i",
                         "assignable-to",
                         "assignable-from",
-                        "included",
-                        "is-type",
-                        "value-included",
-                        "excluded"
+                        "is-type"
                     ]
                 },
                 "Comparand":
@@ -1269,6 +1266,57 @@
                     "additionalProperties": false
                 },
                 {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "SkillLevel",
+                            "title": "The level of a skill or blueprint skill."
+                        },
+                        "Skill":
+                        {
+                            "$ref": "#/$defs/ValueAllowConditionals",
+                            "description": "Property reference to a skill name property. Should not be set with \"SpecialityIndex\" and \"SkillIndex\". Assumes a property-ref."
+                        },
+                        "AllowNegatives":
+                        {
+                            "type": [ "boolean", "null" ],
+                            "description": "Whether or not negative values can be used to imply no skill."
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "SkillLevel",
+                            "title": "The level of a skill or blueprint skill."
+                        },
+                        "SpecialityIndex":
+                        {
+                            "$ref": "#/$defs/ValueAllowConditionals",
+                            "description": "Property reference to a speciality index property. Also requires that \"SkillIndex\" is set. Assumes a property-ref."
+                        },
+                        "SkillIndex":
+                        {
+                            "$ref": "#/$defs/ValueAllowConditionals",
+                            "description": "Property reference to a skill index property. Also requires that \"SpecialityIndex\" is set. Assumes a property-ref."
+                        },
+                        "AllowNegatives":
+                        {
+                            "type": [ "boolean", "null" ],
+                            "description": "Whether or not negative values can be used to imply no skill."
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
                     "const": "Flag",
                     "title": "A flag which does not have a value."
                 },
@@ -1483,10 +1531,6 @@
                 {
                     "const": "LocalizableTargetRichString",
                     "title": "A string that acts as the key for a localization property that supports rich text."
-                },
-                {
-                    "const": "SkillLevel",
-                    "title": "The level of a skill, where the special type is the skill name, the property containing the skill name, or two properties separated by a colon containing the speciality and skill indices."
                 },
                 {
                     "const": "Skill",
@@ -2112,6 +2156,12 @@
                 {
                     "$ref": "#/$defs/StringValue",
                     "description": "Additional property for the EBlueprintSkill enum mapping to the corresponding skill."
+                },
+                "Color":
+                {
+                    "type": [ "string", "null" ],
+                    "pattern": "^[a-fA-F0-9]{6}(?:[a-fA-F0-9]{2}){0,1}$",
+                    "description": "Defines a corresponding color for an enum value."
                 },
                 "Abbreviation":
                 {

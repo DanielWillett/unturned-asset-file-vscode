@@ -70,9 +70,9 @@
                 {
                     "Case":
                     {
-                        "Variable": "Scale",
-                        "Operation": "value-included",
-                        "Comparand": null
+                        "Variable": "#Scale.Included{RequireValue=true}",
+                        "Operation": "eq",
+                        "Comparand": true
                     },
                     "Value": 0.0
                 },
@@ -103,9 +103,9 @@
                 {
                     "Case":
                     {
-                        "Variable": "Scale",
-                        "Operation": "value-included",
-                        "Comparand": null
+                        "Variable": "#Scale.Included{RequireValue=true}",
+                        "Operation": "eq",
+                        "Comparand": true
                     },
                     "Value": "=ADD(1.1 =MUL(@Scale 2.0))"
                 },

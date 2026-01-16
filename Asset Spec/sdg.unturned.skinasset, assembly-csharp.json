@@ -238,12 +238,7 @@
             "Type": "UnityEngine.Material, UnityEngine.CoreModule",
             "Description": "The material to apply to attachments without custom base textures.",
             "Variable": "tertiarySkin",
-            "Required":
-            {
-                "Variable": "Skin_Attachment",
-                "Operation": "included",
-                "Comparand": null
-            }
+            "Required": "#Skin_Attachment.Included"
         },
         {
             "Key": "Override_Mesh_*",

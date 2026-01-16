@@ -421,9 +421,9 @@
                 {
                     "Case":
                     {
-                        "Variable": "$bndl$::Horn",
-                        "Operation": "value-included",
-                        "Comparand": null
+                        "Variable": "#(($bndl$::Horn).Included{RequireValue=true})",
+                        "Operation": "eq",
+                        "Comparand": true
                     },
                     "Value": true
                 },
@@ -459,9 +459,9 @@
                 {
                     "Case":
                     {
-                        "Variable": "Steer_Max",
-                        "Operation": "value-included",
-                        "Comparand": null
+                        "Variable": "#Steer_Max.Included{RequireValue=true})",
+                        "Operation": "eq",
+                        "Comparand": true
                     },
                     "Value": "=MUL(@Steer_Max 0.75)"
                 },
@@ -482,9 +482,9 @@
                 {
                     "Case":
                     {
-                        "Variable": "Steering_Angle_Max",
-                        "Operation": "value-included",
-                        "Comparand": null
+                        "Variable": "#Steering_Angle_Max.Included{RequireValue=true})",
+                        "Operation": "eq",
+                        "Comparand": true
                     },
                     "Value": "=DIV(@Steer_Max 0.75)"
                 },
@@ -505,9 +505,9 @@
                 {
                     "Case":
                     {
-                        "Variable": "Steer_Min",
-                        "Operation": "value-included",
-                        "Comparand": null
+                        "Variable": "#Steer_Min.Included{RequireValue=true})",
+                        "Operation": "eq",
+                        "Comparand": true
                     },
                     "Value": "=DIV(@Steer_Min @Steering_Angle_Max)"
                 },
@@ -528,9 +528,9 @@
                 {
                     "Case":
                     {
-                        "Variable": "Steering_Angle_FullSpeed_Factor",
-                        "Operation": "value-included",
-                        "Comparand": null
+                        "Variable": "#Steering_Angle_FullSpeed_Factor.Included{RequireValue=true})",
+                        "Operation": "eq",
+                        "Comparand": true
                     },
                     "Value": "=MUL(@Steering_Angle_Max @Steering_Angle_FullSpeed_Factor)"
                 },
@@ -2352,9 +2352,9 @@
                             },
                             "RequirementCondition":
                             {
-                                "Variable": "CrawlerTrackTilingMaterials",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#CrawlerTrackTilingMaterials.Included{RequireValue=true})",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ]
@@ -2428,9 +2428,9 @@
                         {
                             "Case":
                             {
-                                "Variable": "IsColliderSteered",
-                                "Operation": "value-included",
-                                "Comparand": null
+                                "Variable": "#IsColliderSteered.Included{RequireValue=true})",
+                                "Operation": "eq",
+                                "Comparand": true
                             },
                             "Value": "SteeringAngle"
                         },

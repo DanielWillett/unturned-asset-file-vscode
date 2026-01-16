@@ -764,9 +764,9 @@
                     "And":
                     [
                         {
-                            "Variable": "Ballistic_Steps",
-                            "Operation": "value-included",
-                            "Comparand": null
+                            "Variable": "#Ballistic_Steps.Included{RequireValue=true}",
+                            "Operation": "eq",
+                            "Comparand": true
                         },
                         {
                             "Variable": "Ballistic_Steps",
@@ -795,9 +795,9 @@
                 {
                     "When":
                     {
-                        "Variable": "Ballistic_Drop",
-                        "Operation": "value-included",
-                        "Comparand": null
+                        "Variable": "#Ballistic_Drop.Included{RequireValue=true}",
+                        "Operation": "eq",
+                        "Comparand": true
                     },
                     "Cases":
                     [

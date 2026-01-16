@@ -44,6 +44,24 @@
             "Variable": "shouldCloseWhenOutsideRange"
         },
         {
+            "Key": "Can_Players_Open",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not players can interact with the barricade to open its storage.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
+            "Variable": "CanPlayersOpen",
+            "Version": "3.26.1.0"
+        },
+        {
+            "Key": "Delete_Contained_Items_On_Destroy",
+            "Type": "Boolean",
+            "DefaultValue": true,
+            "Description": "Whether or not any stored items are despawned rather than dropped when destroyed.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
+            "Variable": "ShouldDeleteContainedItemsOnDestroy",
+            "Version": "3.26.1.0"
+        },
+        {
             "Key": "Default_Contained_Items",
             "Type":
             {

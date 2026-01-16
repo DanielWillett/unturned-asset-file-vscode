@@ -83,18 +83,18 @@
                             "Key": "Blueprint",
                             "Condition":
                             {
-                                "Variable": "BlueprintName",
-                                "Operation": "excluded",
-                                "Comparand": null
+                                "Variable": "#BlueprintName.Excluded",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         },
                         {
                             "Key": "BlueprintName",
                             "Condition":
                             {
-                                "Variable": "Blueprint",
-                                "Operation": "excluded",
-                                "Comparand": null
+                                "Variable": "#Blueprint.Excluded",
+                                "Operation": "eq",
+                                "Comparand": true
                             }
                         }
                     ]
