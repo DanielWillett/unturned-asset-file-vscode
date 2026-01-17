@@ -378,4 +378,13 @@
   <data name="UNT2004_TypeReferenceStringOnly" xml:space="preserve">
     <value>Dictionary can not be converted to a value of type '{0}', which expects a type name as a string only. Property '{1}' expects a value.</value>
   </data>
+  <data name="UNT109_Skill" xml:space="preserve">
+    <value>Unable to determine the skill referenced by this property. Expected a skill name at property "{0}".</value>
+  </data>
+  <data name="UNT109_Indices" xml:space="preserve">
+    <value>Unable to determine the skill referenced by this property. Expected a speciality index at property "{0}" and a skill index at property "{1}".</value>
+  </data>
+  <data name="UNT1016_Generic" xml:space="preserve">
+    <value>Skill level {0} should not exceed {1}.</value>
+  </data>
 </root>

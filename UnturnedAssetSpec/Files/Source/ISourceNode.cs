@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -120,7 +119,7 @@ public interface IAnyValueSourceNode : ISourceNode
     /// <summary>
     /// The type of value this value contains.
     /// </summary>
-    ValueTypeDataRefType ValueType { get; }
+    SourceValueType ValueType { get; }
 }
 
 /// <summary>
@@ -151,8 +150,8 @@ public interface IPropertySourceNode : IParentSourceNode
     /// <summary>
     /// The type of value stored in <see cref="Value"/>.
     /// </summary>
-    /// <remarks>If this node is a flag, this property will be equal to <see cref="ValueTypeDataRefType.Value"/>.</remarks>
-    ValueTypeDataRefType ValueKind { get; }
+    /// <remarks>If this node is a flag, this property will be equal to <see cref="SourceValueType.Value"/>.</remarks>
+    SourceValueType ValueKind { get; }
 
     /// <summary>
     /// Gets the value as a string without necessarily instantiating the value node.
@@ -232,6 +231,47 @@ public interface IDictionarySourceNode : IAnyChildrenSourceNode
     /// Try to get a property by name.
     /// </summary>
     bool TryGetProperty(string propertyName, [NotNullWhen(true)] out IPropertySourceNode? node);
+}
+
+/// <summary>
+/// Indicates which type of value is contained within a property or list node.
+/// </summary>
+public enum SourceValueType
+{
+    /// <summary>
+    /// A string value (or no value).
+    /// <code>
+    /// Prop
+    /// Prop Value
+    /// </code>
+    /// </summary>
+    Value,
+
+    /// <summary>
+    /// A dictionary value.
+    /// <code>
+    /// Prop
+    /// {
+    ///     A 1
+    ///     B 2
+    ///     C 3
+    /// }
+    /// </code>
+    /// </summary>
+    Dictionary,
+
+    /// <summary>
+    /// A list value.
+    /// <code>
+    /// Prop
+    /// [
+    ///     1
+    ///     2
+    ///     3
+    /// ]
+    /// </code>
+    /// </summary>
+    List
 }
 
 /// <summary>

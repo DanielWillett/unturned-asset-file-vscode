@@ -66,17 +66,17 @@ internal sealed class GuidTypeConverter : ITypeConverter<Guid>
 
         if (typeof(TTo) == typeof(bool))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(value != Guid.Empty);
+            result = MathMatrix.As<bool, TTo>(value != Guid.Empty);
             return true;
         }
         if (typeof(TTo) == typeof(string))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(value.ToString("N"));
+            result = MathMatrix.As<string, TTo>(value.ToString("N"));
             return true;
         }
         if (typeof(TTo) == typeof(GuidOrId))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<GuidOrId, TTo>(new GuidOrId(value));
+            result = MathMatrix.As<GuidOrId, TTo>(new GuidOrId(value));
             return true;
         }
 

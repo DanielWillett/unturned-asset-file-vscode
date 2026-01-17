@@ -1,19 +1,17 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 public readonly struct FileEvaluationContext
 {
-    public readonly SpecProperty Self;
-    public readonly ISpecType This;
+    internal static readonly FileEvaluationContext None = default;
+
+    public readonly DatProperty Self;
+    public readonly DatTypeWithProperties This;
     public readonly ISourceFile SourceFile;
     public readonly AssetFileType FileType;
     public readonly IWorkspaceEnvironment Workspace;
@@ -24,12 +22,12 @@ public readonly struct FileEvaluationContext
     public readonly PropertyResolutionContext PropertyContext;
     public readonly OneOrMore<int> TemplateIndices;
 
-    public FileEvaluationContext(SpecProperty self, ISourceFile file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information, PropertyResolutionContext propertyContext)
+    public FileEvaluationContext(DatProperty self, ISourceFile file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information, PropertyResolutionContext propertyContext)
         : this(self, self.Owner, file, workspace, environment, information, propertyContext)
     {
         TemplateIndices = OneOrMore<int>.Null;
     }
-    public FileEvaluationContext(SpecProperty self, ISpecType @this, ISourceFile file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information, PropertyResolutionContext propertyContext)
+    public FileEvaluationContext(DatProperty self, DatTypeWithProperties @this, ISourceFile file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information, PropertyResolutionContext propertyContext)
     {
         Self = self;
         This = @this;
@@ -42,7 +40,7 @@ public readonly struct FileEvaluationContext
         TemplateIndices = OneOrMore<int>.Null;
     }
 
-    public FileEvaluationContext(in FileEvaluationContext self, SpecProperty newProperty, PropertyResolutionContext propertyContext)
+    public FileEvaluationContext(in FileEvaluationContext self, DatProperty newProperty, PropertyResolutionContext propertyContext)
     {
         Self = newProperty;
         PropertyContext = propertyContext;
@@ -73,33 +71,6 @@ public readonly struct FileEvaluationContext
         // todo
         mapInfo = null;
         return false;
-    }
-
-    public bool TryGetValue(out ISpecDynamicValue? value, ICollection<DatDiagnosticMessage>? diagnostics = null)
-    {
-        return TryGetValue(out value, out _, diagnostics);
-    }
-
-    public bool TryGetValue([NotNullWhen(true)] out ISpecDynamicValue? value, out IPropertySourceNode? property, ICollection<DatDiagnosticMessage>? diagnostics = null)
-    {
-        if (diagnostics is { IsReadOnly: true })
-            throw new ArgumentException("Diagnostics collection is readonly.", nameof(diagnostics));
-
-        if (!SourceFile.TryResolveProperty(Self, out property, PropertyContext))
-        {
-            value = Self.DefaultValue!;
-            return value != null;
-        }
-
-        SpecPropertyTypeParseContext parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(this, PropertyBreadcrumbs.Root, Self, property, property.Value, diagnostics);
-
-        if (Self.Type.TryParseValue(in parse, out value))
-        {
-            return true;
-        }
-
-        value = Self.IncludedDefaultValue ?? Self.DefaultValue!;
-        return value != null;
     }
 }
 

@@ -59,7 +59,7 @@ internal sealed class QualifiedTypeTypeConverter : ITypeConverter<QualifiedType>
         ref readonly QualifiedType value = ref obj.Value;
         if (typeof(TTo) == typeof(string))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(value.ToString());
+            result = MathMatrix.As<string, TTo>(value.ToString());
             return true;
         }
         

@@ -39,5 +39,52 @@ internal struct ConvertVisitor<TResult> : IGenericVisitor
             IsNull = !result.HasValue;
             WasSuccessful = true;
         }
+
+        if (typeof(TResult) == typeof(string))
+        {
+            string? toString = value.ToString();
+            Result = MathMatrix.As<string?, TResult?>(toString);
+            IsNull = toString == null;
+            WasSuccessful = true;
+        }
+    }
+
+    /// <summary>
+    /// Attempts to convert a value of type <typeparamref name="TFrom"/> to a value of type <typeparamref name="TResult"/>.
+    /// </summary>
+    /// <param name="value">The value to convert.</param>
+    /// <param name="result">The converted value.</param>
+    /// <returns>Whether or not the conversion was successful.</returns>
+    public static bool TryConvert<TFrom>(TFrom? value, out Optional<TResult> result) where TFrom : IEquatable<TFrom>
+    {
+        ConvertVisitor<TResult> v = default;
+        v.Accept(value);
+
+        if (!v.WasSuccessful)
+        {
+            result = Optional<TResult>.Null;
+            return false;
+        }
+
+        result = v.IsNull ? Optional<TResult>.Null : new Optional<TResult>(v.Result);
+        return true;
+    }
+
+    /// <summary>
+    /// Attempts to convert a value of type <typeparamref name="TFrom"/> to a value of type <typeparamref name="TResult"/>.
+    /// </summary>
+    /// <param name="value">The value to convert.</param>
+    /// <param name="result">The converted value.</param>
+    /// <returns>
+    /// Whether or not the conversion was successful.
+    /// If a value type attempts to be converted to <see langword="null"/> this will also return <see langword="false"/>, so use the overload which returns an <see cref="Optional{T}"/> instead if needed.
+    /// </returns>
+    public static bool TryConvert<TFrom>(TFrom? value, out TResult? result) where TFrom : IEquatable<TFrom>
+    {
+        if (TryConvert(value, out Optional<TResult> optionalResult) && optionalResult.TryGetValueOrNull(out result))
+            return true;
+
+        result = default;
+        return false;
     }
 }

@@ -28,7 +28,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// Example: <c>ItemBarricadeAsset.Bypass_Claim</c>
 /// </summary>
-public sealed class BooleanOrFlagType : PrimitiveType<bool, BooleanOrFlagType>
+public sealed class BooleanOrFlagType : PrimitiveType<bool, BooleanOrFlagType>, IFlagType
 {
     public const string TypeId = "BooleanOrFlag";
 

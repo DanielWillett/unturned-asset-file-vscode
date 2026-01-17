@@ -94,3 +94,104 @@ public readonly struct BundleReference : IEquatable<BundleReference>, IComparabl
     public static bool operator ==(BundleReference left, BundleReference right) => left.Equals(right);
     public static bool operator !=(BundleReference left, BundleReference right) => !left.Equals(right);
 }
+
+/// <summary>
+/// Various different variations of a masterbundle name and path structure.
+/// </summary>
+public enum BundleReferenceKind
+{
+    Unspecified,
+
+    /// <summary>
+    /// Supports the string representation or object representation of a master bundle reference.
+    /// Represented in-game by the <see cref="T:SDG.Unturned.MasterBundleReference{T}"/> type.
+    /// <code>
+    /// Path (current masterbundle)
+    /// Name:Path
+    /// 
+    /// // or
+    /// 
+    /// {
+    ///     MasterBundle "Name"
+    ///     AssetPath "Path"
+    /// }
+    /// </code>
+    /// </summary>
+    MasterBundleReference,
+
+    /// <summary>
+    /// Only supports the string representation of a master bundle reference.
+    /// Represented in-game by the <see cref="T:SDG.Unturned.MasterBundleReference{T}"/> type.
+    /// <code>
+    /// Path (current masterbundle)
+    /// Name:Path
+    /// </code>
+    /// </summary>
+    MasterBundleReferenceString,
+
+    /// <summary>
+    /// Supports the string representation or object representation of a master bundle reference.
+    /// Represented in-game by the <see cref="T:SDG.Unturned.ContentReference{T}"/> type.
+    /// <code>
+    /// Path (current masterbundle)
+    /// Name:Path
+    /// 
+    /// // or
+    /// 
+    /// {
+    ///     Name "Name"
+    ///     Path "Path"
+    /// }
+    /// </code>
+    /// </summary>
+    ContentReference,
+
+    /// <summary>
+    /// Only supports the string representation of a master bundle reference, specifically for Audio Clips or One Shot Audio definitions.
+    /// Represented in-game by the <see cref="T:SDG.Unturned.AudioReference"/> type.
+    /// <code>
+    /// Path (current masterbundle)
+    /// Name:Path
+    /// </code>
+    /// </summary>
+    AudioReference,
+
+    /// <summary>
+    /// Supports the string representation or object representation of a master bundle reference.
+    /// Either <see cref="MasterBundleReference"/> or <see cref="ContentReference"/>, preferring <see cref="MasterBundleReference"/>.
+    /// <code>
+    /// Path (current masterbundle)
+    /// Name:Path
+    /// 
+    /// // or
+    /// 
+    /// {
+    ///     Name "Name"
+    ///     Path "Path"
+    /// }
+    ///
+    /// // or
+    /// 
+    /// {
+    ///     MasterBundle "Name"
+    ///     AssetPath "Path"
+    /// }
+    /// </code>
+    /// </summary>
+    MasterBundleOrContentReference,
+
+    /// <summary>
+    /// TranslationReference is an old structure that was used to reference legacy translation tokens.
+    /// <code>
+    /// {
+	///     Namespace SDG
+	///     Token Stereo_Songs.Unturned_Theme.Title
+	/// }
+    /// </code>
+    /// It could also be represented like these:
+    /// <para><c>SDG::Stereo_Songs.Unturned_Theme.Title</c></para>
+    /// <para><c>SDG#Stereo_Songs.Unturned_Theme.Title</c></para>
+    /// </summary>
+    /// <remarks>It has been removed from the game but still remains in the documentation for StereoSongAsset.</remarks>
+    TranslationReference
+}

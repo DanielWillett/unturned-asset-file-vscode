@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +12,7 @@ internal class DictionaryNode : AnySourceNode, IDictionarySourceNode
 
     public override SourceNodeType Type => SourceNodeType.Dictionary;
 
-    public ValueTypeDataRefType ValueType => ValueTypeDataRefType.Dictionary;
+    public SourceValueType ValueType => SourceValueType.Dictionary;
 
     public int Count { get; set; }
 

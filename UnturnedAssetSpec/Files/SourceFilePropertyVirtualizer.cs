@@ -1,10 +1,14 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -24,7 +28,7 @@ public class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
         _installationEnvironment = installationEnvironment;
     }
 
-    protected void GetEvalCtx(out FileEvaluationContext ctx, SpecProperty property, ISourceFile file)
+    protected void GetEvalCtx(out FileEvaluationContext ctx, DatProperty property, ISourceFile file)
     {
         ctx = new FileEvaluationContext(
             property,
@@ -42,16 +46,16 @@ public class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
         yield break;
     }
 
-    public IFileProperty? FindProperty(ISourceFile file, SpecProperty property)
+    public IFileProperty? FindProperty(ISourceFile file, DatProperty property)
     {
         return FindProperty(file, property, PropertyBreadcrumbs.Root);
     }
 
-    public IFileProperty? FindProperty(ISourceFile file, SpecProperty property, in PropertyBreadcrumbs breadcrumbs)
+    public IFileProperty? FindProperty(ISourceFile file, DatProperty property, in PropertyBreadcrumbs breadcrumbs)
     {
         AssetFileType fileType = AssetFileType.FromFile(file, _database);
 
-        AssetSpecType assetType = fileType.Information;
+        DatType assetType = fileType.Information;
 
         SpecPropertyContext ctx = file switch
         {
@@ -59,28 +63,18 @@ public class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
             _ => SpecPropertyContext.Property
         };
 
-        SpecProperty[] properties = ctx == SpecPropertyContext.Localization ? assetType.LocalizationProperties : assetType.Properties;
+        ImmutableArray<DatProperty> properties = assetType.GetPropertyArray(ctx);
 
-        int index = Array.IndexOf(properties, property);
+        int index = properties.IndexOf(property);
 
         if (index == -1)
         {
-            foreach (SpecProperty import in assetType.Properties)
-            {
-                if (!import.TryGetImportType(out IPropertiesSpecType t))
-                    continue;
-
-                properties = ctx == SpecPropertyContext.Localization ? t.LocalizationProperties : t.Properties;
-                index = Array.IndexOf(properties, property);
-                if (index >= 0)
-                    break;
-            }
-
-            if (index == -1)
-                return null;
+            return null;
         }
 
-        if (file.TryGetProperty(property, out IPropertySourceNode? propertyNode))
+        GetEvalCtx(out FileEvaluationContext evalCtx, property, file);
+
+        if (file.TryGetProperty(property, in evalCtx, out IPropertySourceNode? propertyNode))
         {
             return new BasicProperty(
                 property,
@@ -97,48 +91,44 @@ public class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
         // i doubt there will ever be any advanced 'Metadata' properties
         IDictionarySourceNode assetData = file is IAssetSourceFile a ? a.AssetData : file;
 
-        ISpecPropertyType? type;
-        if (property.Type.IsSwitch)
+        IType? type = property.Type as IType;
+        if (type == null && property.Type is TypeSwitch switchCase)
         {
-            GetEvalCtx(out FileEvaluationContext evalCtx, property, file);
-            type = property.Type.GetType(in evalCtx);
-        }
-        else
-        {
-            type = property.Type.Type;
+            switchCase.TryEvaluateType(out type, in evalCtx);
         }
 
-        if (type is ILegacyCompositeTypeProvider { IsEnabled: true } compType)
-        {
-            LinkedPropertyVisit visitor = default;
-            IPropertySourceNode[] nodes;
-            GetEvalCtx(out FileEvaluationContext evalCtx, property, file);
-            visitor.List = new PooledList<IPropertySourceNode>();
-            try
-            {
-                compType.VisitLinkedProperties(in evalCtx, property, assetData, ref visitor, breadcrumbs);
-                nodes = visitor.List.ToArray();
-            }
-            finally
-            {
-                visitor.List.Dispose();
-            }
-
-            return new LegacyCompositeTypeProperty(
-                property,
-                nodes,
-                file,
-                assetType,
-                _workspaceEnvironment,
-                _installationEnvironment,
-                _database,
-                PropertyResolutionContext.Modern
-            );
-        }
+        // todo
+        // if (type is ILegacyCompositeTypeProvider { IsEnabled: true } compType)
+        // {
+        //     LinkedPropertyVisit visitor = default;
+        //     IPropertySourceNode[] nodes;
+        //     GetEvalCtx(out FileEvaluationContext evalCtx, property, file);
+        //     visitor.List = new PooledList<IPropertySourceNode>();
+        //     try
+        //     {
+        //         compType.VisitLinkedProperties(in evalCtx, property, assetData, ref visitor, breadcrumbs);
+        //         nodes = visitor.List.ToArray();
+        //     }
+        //     finally
+        //     {
+        //         visitor.List.Dispose();
+        //     }
+        // 
+        //     return new LegacyCompositeTypeProperty(
+        //         property,
+        //         nodes,
+        //         file,
+        //         assetType,
+        //         _workspaceEnvironment,
+        //         _installationEnvironment,
+        //         _database,
+        //         PropertyResolutionContext.Modern
+        //     );
+        // }
 
         if (property.IsTemplate)
         {
-            if (!breadcrumbs.TryGetProperty(file, property, out IPropertySourceNode? propNode))
+            if (!breadcrumbs.TryGetProperty(file, property, in evalCtx, out IPropertySourceNode? propNode))
             {
                 return null;
             }
@@ -159,7 +149,7 @@ public class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
     }
 
     /// <inheritdoc />
-    public SpecProperty? GetProperty(IPropertySourceNode propertyNode, out PropertyResolutionContext context)
+    public DatProperty? GetProperty(IPropertySourceNode propertyNode, out PropertyResolutionContext context)
     {
         AssetFileType fileType = AssetFileType.FromFile(propertyNode.File, _database);
         PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromNode(propertyNode);
@@ -167,7 +157,7 @@ public class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
     }
 
     /// <inheritdoc />
-    public SpecProperty? GetProperty(IPropertySourceNode node, in AssetFileType fileType, in PropertyBreadcrumbs propertyBreadcrumbs, out PropertyResolutionContext context)
+    public DatProperty? GetProperty(IPropertySourceNode node, in AssetFileType fileType, in PropertyBreadcrumbs propertyBreadcrumbs, out PropertyResolutionContext context)
     {
         context = PropertyResolutionContext.Modern;
 
@@ -180,24 +170,25 @@ public class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
         }
 
         string propertyName = node.Key;
-        if (!propertyBreadcrumbs.TryGetDictionaryAndType(
-                node.File,
-                in fileType,
-                _database,
-                out _,
-                out ISpecType? type))
-        {
-            return null;
-        }
+        //if (!propertyBreadcrumbs.TryGetDictionaryAndType(
+        //        node.File,
+        //        in fileType,
+        //        _database,
+        //        out _,
+        //        out DatType? type))
+        //{
+        //    return null;
+        //}
 
-        AssetSpecDatabaseExtensions.PropertyFindResult result = _database.FindPropertyInfoByKey(
-            propertyName,
-            type,
-            PropertyResolutionContext.Modern,
-            context: node.File is ILocalizationSourceFile ? SpecPropertyContext.Localization : SpecPropertyContext.Property
-        );
-
-        return result.Property;
+        return null;
+        // AssetSpecDatabaseExtensions.PropertyFindResult result = _database.FindPropertyInfoByKey(
+        //     propertyName,
+        //     type,
+        //     PropertyResolutionContext.Modern,
+        //     context: node.File is ILocalizationSourceFile ? SpecPropertyContext.Localization : SpecPropertyContext.Property
+        // );
+        // 
+        // return result.Property;
     }
 
     private struct LinkedPropertyVisit : ISourceNodePropertyVisitor
@@ -211,9 +202,9 @@ public class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
 }
 
 internal abstract class BaseProperty(
-    SpecProperty property,
+    DatProperty property,
     ISourceFile file,
-    AssetSpecType type,
+    DatType type,
     IWorkspaceEnvironment workspaceEnvironment,
     InstallationEnvironment installationEnvironment,
     IAssetSpecDatabase database,
@@ -225,15 +216,14 @@ internal abstract class BaseProperty(
     protected readonly ISourceFile File = file;
     protected readonly PropertyResolutionContext Context = context;
 
-    public SpecProperty Property { get; } = property;
+    public DatProperty Property { get; } = property;
 
-    public ISpecType Owner { get; } = type;
+    public DatType Owner { get; } = type;
 
     protected void GetEvalCtx(out FileEvaluationContext ctx)
     {
         ctx = new FileEvaluationContext(
             Property,
-            Owner,
             File,
             WorkspaceEnvironment,
             InstallationEnvironment,
@@ -242,11 +232,10 @@ internal abstract class BaseProperty(
         );
     }
 
-    protected void GetParseCtx(IPropertySourceNode propertyNode, out SpecPropertyTypeParseContext parse)
+    protected void GetParseCtx(IPropertySourceNode propertyNode, in FileEvaluationContext ctx, [UnscopedRef] out SpecPropertyTypeParseContext parse)
     {
-        GetEvalCtx(out FileEvaluationContext ctx);
         parse = SpecPropertyTypeParseContext.FromFileEvaluationContext(
-            ctx,
+            in ctx,
             PropertyBreadcrumbs.Root,
             Property,
             propertyNode,
@@ -256,35 +245,38 @@ internal abstract class BaseProperty(
 }
 
 internal class BasicProperty(
-    SpecProperty property,
+    DatProperty property,
     IPropertySourceNode node,
     ISourceFile file,
-    AssetSpecType type,
+    DatType type,
     IWorkspaceEnvironment workspaceEnvironment,
     InstallationEnvironment installationEnvironment,
     IAssetSpecDatabase database,
     PropertyResolutionContext context)
     : BaseProperty(property, file, type, workspaceEnvironment, installationEnvironment, database, context), IFileProperty
 {
-    public bool TryGetValue(out ISpecDynamicValue? value)
+    public bool TryGetValue(out IValue? value)
     {
-        GetParseCtx(node, out SpecPropertyTypeParseContext parse);
-
-        if (Property.Type.TryParseValue(in parse, out value))
-        {
-            return true;
-        }
-
-        value = Property.IncludedDefaultValue ?? Property.DefaultValue!;
+        value = null;
         return false;
+        //GetEvalCtx(out FileEvaluationContext ctx);
+        //GetParseCtx(node, in ctx, out SpecPropertyTypeParseContext parse);
+        //
+        //if (Property.Type.TryParseValue(in parse, out value))
+        //{
+        //    return true;
+        //}
+        //
+        //value = Property.IncludedDefaultValue ?? Property.DefaultValue!;
+        //return false;
     }
 }
 
 internal class LegacyCompositeTypeProperty(
-    SpecProperty property,
+    DatProperty property,
     IPropertySourceNode[] nodes,
     ISourceFile file,
-    AssetSpecType type,
+    DatType type,
     IWorkspaceEnvironment workspaceEnvironment,
     InstallationEnvironment installationEnvironment,
     IAssetSpecDatabase database,
@@ -294,22 +286,25 @@ internal class LegacyCompositeTypeProperty(
     public IPropertySourceNode[] Nodes { get; } = nodes;
 
     /// <inheritdoc />
-    public bool TryGetValue(out ISpecDynamicValue? value)
+    public bool TryGetValue(out IValue? value)
     {
-        if (Nodes.Length == 0)
-        {
-            value = null;
-            return false;
-        }
-
-        GetParseCtx(Nodes[0], out SpecPropertyTypeParseContext parse);
-
-        if (Property.Type.TryParseValue(in parse, out value))
-        {
-            return true;
-        }
-
-        value = Property.IncludedDefaultValue ?? Property.DefaultValue!;
+        value = null;
         return false;
+        // if (Nodes.Length == 0)
+        // {
+        //     value = null;
+        //     return false;
+        // }
+        // 
+        // GetEvalCtx(out FileEvaluationContext ctx);
+        // GetParseCtx(Nodes[0], in ctx, out SpecPropertyTypeParseContext parse);
+        // 
+        // if (Property.Type.TryParseValue(in parse, out value))
+        // {
+        //     return true;
+        // }
+        // 
+        // value = Property.IncludedDefaultValue ?? Property.DefaultValue!;
+        // return false;
     }
 }

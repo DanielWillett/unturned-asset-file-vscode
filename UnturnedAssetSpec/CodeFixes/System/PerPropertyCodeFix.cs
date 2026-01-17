@@ -7,6 +7,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 
@@ -23,7 +24,7 @@ public interface IPerPropertyCodeFix : ICodeFix
     /// <summary>
     /// A set of types of properties this code fix is valid on, or <see langword="null"/> to analyze all types of properties.
     /// </summary>
-    HashSet<ISpecPropertyType>? ValidTypes { get; }
+    HashSet<IType>? ValidTypes { get; }
 
     /// <summary>
     /// Final check to see if this code fix should be added to the property.
@@ -31,8 +32,8 @@ public interface IPerPropertyCodeFix : ICodeFix
     /// <remarks>No need to check type and inclusion flags if they're included.</remarks>
     CodeFixInstance? TryApplyToProperty(
         IPropertySourceNode propertyNode,
-        ISpecPropertyType propertyType,
-        SpecProperty property,
+        IType propertyType,
+        DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
         in SpecPropertyTypeParseContext parseContext
     );
@@ -49,7 +50,7 @@ public interface IPerPropertyCodeFix : ICodeFix
     /// <summary>
     /// Checks if a type passes the type check on <see cref="Type"/> and <see cref="Types"/>.
     /// </summary>
-    bool PassesTypeCheck(ISpecPropertyType propertyType);
+    bool PassesTypeCheck(IType propertyType);
 }
 
 [Flags]
@@ -95,7 +96,7 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
     private readonly InstallationEnvironment _installEnv;
     private readonly IWorkspaceEnvironment _workspaceEnv;
 
-    public HashSet<ISpecPropertyType>? ValidTypes { get; protected set; }
+    public HashSet<IType>? ValidTypes { get; protected set; }
 
     protected PerPropertyCodeFix(DatDiagnostic diagnostic,
         IFilePropertyVirtualizer virtualizer,
@@ -114,8 +115,8 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
 
     public CodeFixInstance? TryApplyToProperty(
         IPropertySourceNode propertyNode,
-        ISpecPropertyType propertyType,
-        SpecProperty property,
+        IType propertyType,
+        DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
         in SpecPropertyTypeParseContext parseContext
     )
@@ -149,7 +150,7 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
         }, this, range, hasDiagnostic);
     }
 
-    public bool PassesTypeCheck(ISpecPropertyType propertyType)
+    public bool PassesTypeCheck(IType propertyType)
     {
         if (ValidTypes != null && !ValidTypes.Contains(propertyType))
             return false;
@@ -162,8 +163,8 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
         out FileRange range,
         ref bool hasDiagnostic,
         IPropertySourceNode propertyNode,
-        ISpecPropertyType propertyType,
-        SpecProperty property,
+        IType propertyType,
+        DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
         in SpecPropertyTypeParseContext parseContext
     );
@@ -208,8 +209,8 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
         }
 
         protected override void AcceptResolvedProperty(
-            SpecProperty property,
-            ISpecPropertyType propertyType,
+            DatProperty property,
+            IType propertyType,
             in SpecPropertyTypeParseContext parseCtx,
             IPropertySourceNode node,
             in PropertyBreadcrumbs breadcrumbs)

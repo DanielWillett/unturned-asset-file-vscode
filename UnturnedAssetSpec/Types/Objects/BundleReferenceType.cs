@@ -251,7 +251,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
             return false;
         }
 
-        if (!pathNode.HasValue || pathNode.ValueKind != ValueTypeDataRefType.Value)
+        if (!pathNode.HasValue || pathNode.ValueKind != SourceValueType.Value)
         {
             value = new BundleReference(string.Empty, string.Empty, rType);
             return false;
@@ -298,7 +298,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
         TypeParsers.String.WriteValueToJson(writer, value.ToString(), StringType.Instance, options);
     }
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
     {
         BundleReferenceKind mode = BundleReferenceKind.Unspecified;
         for (int i = 1; i < TypeIds.Length; ++i)

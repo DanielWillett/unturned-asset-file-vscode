@@ -218,12 +218,13 @@ internal ref struct ExpressionNodeParser : IDisposable
                 return new PropertyReferenceExpressionNode(propRef);
             
             case ExpressionValueType.DataRef:
-                if (!SpecDynamicValue.TryParseDataRef(span, token.ContentAsString, out ISpecDynamicValue? val) || val is not DataRef dr)
-                {
-                    throw new FormatException($"Failed to parse data-ref: \"{token.GetContent()}\".");
-                }
+                //if (!Values.TryParseDataRef(span, token.ContentAsString, out ISpecDynamicValue? val) || val is not DataRef dr)
+                //{
+                //    throw new FormatException($"Failed to parse data-ref: \"{token.GetContent()}\".");
+                //}
 
-                return dr;
+                //return dr;
+                throw new NotImplementedException();
 
             default:
                 throw new FormatException("Invalid value type, shouldn't happen.");

@@ -1,5 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
@@ -283,7 +283,7 @@ public static class Conditions
     /// Attempt to read a condition from a JSON object and return it as a boolean value.
     /// </summary>
     /// <remarks>Some values returned may not be a <see cref="Condition{TComparand}"/> object. For example, a boolean token results in a <see cref="BooleanType"/> value.</remarks>
-    public static bool TryReadConditionFromJson(in JsonElement root, [NotNullWhen(true)] out IValue<bool>? condition)
+    public static bool TryReadConditionFromJson(in JsonElement root, IAssetSpecDatabase database, DatProperty owner, [NotNullWhen(true)] out IValue<bool>? condition)
     {
         switch (root.ValueKind)
         {
@@ -302,7 +302,7 @@ public static class Conditions
 
         BoxConditionVisitor visitor;
         visitor.Condition = null;
-        if (!TryReadConditionFromJson(in root, ref visitor))
+        if (!TryReadConditionFromJson(in root, database, owner, ref visitor))
         {
             condition = null;
             return false;
@@ -324,7 +324,7 @@ public static class Conditions
     /// <summary>
     /// Attempt to read a condition from a JSON object and report it to a <see cref="IConditionVisitor"/>.
     /// </summary>
-    public static unsafe bool TryReadConditionFromJson<TVisitor>(in JsonElement root, ref TVisitor visitor)
+    public static unsafe bool TryReadConditionFromJson<TVisitor>(in JsonElement root, IAssetSpecDatabase database, DatProperty owner, ref TVisitor visitor)
         where TVisitor : IConditionVisitor
     {
         switch (root.ValueKind)
@@ -369,7 +369,7 @@ public static class Conditions
         {
             valueVisitor.Visitor = visitorPtr;
             valueVisitor.Element = elementPtr;
-            variable = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeProperty | ValueReadOptions.Default, ref valueVisitor, valueType: null);
+            variable = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeProperty | ValueReadOptions.Default, ref valueVisitor, valueType: null, database, owner);
             if (variable == null)
                 return false;
             
@@ -391,7 +391,7 @@ public static class Conditions
         fixed (TVisitor* visitorPtr = &visitor)
         {
             v.Visitor = visitorPtr;
-            IValue? comparand = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeValue, ref v, null);
+            IValue? comparand = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeValue, ref v, null, database, owner);
             if (comparand == null)
                 return false;
 
@@ -454,10 +454,10 @@ public static class Conditions
     /// Attempts to read either a <see cref="Condition{TComparand}"/> or a <see cref="ComplexConditionalValue"/> from a JSON object.
     /// </summary>
     /// <returns>Whether or not the value could be read.</returns>
-    public static bool TryReadComplexOrBasicConditionFromJson(in JsonElement root, [NotNullWhen(true)] out IValue<bool>? condition)
+    public static bool TryReadComplexOrBasicConditionFromJson(in JsonElement root, IAssetSpecDatabase database, DatProperty owner, [NotNullWhen(true)] out IValue<bool>? condition)
     {
         condition = null;
-        if (TryReadConditionFromJson(in root, out IValue<bool>? cond))
+        if (TryReadConditionFromJson(in root, database, owner, out IValue<bool>? cond))
         {
             condition = cond;
             return true;
@@ -470,10 +470,10 @@ public static class Conditions
 
         if (root.TryGetProperty("Case"u8, out JsonElement element))
         {
-            if (!TryReadComplexOrBasicConditionFromJson(in element, out cond))
+            if (!TryReadComplexOrBasicConditionFromJson(in element, database, owner, out cond))
                 return false;
 
-            condition = new ComplexConditionalValue(ImmutableArray.Create(cond), SpecDynamicSwitchCaseOperation.Or);
+            condition = new ComplexConditionalValue(ImmutableArray.Create(cond), JointConditionOperation.Or);
             return true;
         }
 
@@ -490,7 +490,7 @@ public static class Conditions
         for (int i = 0; i < cases; ++i)
         {
             JsonElement item = element[i];
-            if (!TryReadComplexOrBasicConditionFromJson(in item, out cond))
+            if (!TryReadComplexOrBasicConditionFromJson(in item, database, owner, out cond))
                 return false;
 
             bldr.Add(cond);
@@ -498,7 +498,7 @@ public static class Conditions
 
         condition = new ComplexConditionalValue(
             bldr.MoveToImmutable(),
-            isAnd ? SpecDynamicSwitchCaseOperation.And : SpecDynamicSwitchCaseOperation.Or
+            !isAnd ? JointConditionOperation.Or : JointConditionOperation.And
         );
         return true;
     }

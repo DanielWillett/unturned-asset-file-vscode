@@ -34,7 +34,8 @@ public class DownloadActionButtonsTest
     [Ignore("Makes network requests.")]
     public async Task TestFromInternet()
     {
-        _runner = new AssetSpecDatabase(new InstallDirUtility("NotUnturned", "Not304930")) { UseInternet = true };
+        InstallDirUtility dirUtil = new InstallDirUtility("NotUnturned", "Not304930");
+        _runner = AssetSpecDatabase.FromOnline(false);
 
         await _runner.InitializeAsync();
 
@@ -45,7 +46,7 @@ public class DownloadActionButtonsTest
     [Ignore("Makes network requests.")]
     public async Task TestInitializedSuccessfully()
     {
-        _runner = new AssetSpecDatabase { UseInternet = true };
+        _runner = AssetSpecDatabase.FromOnline();
 
         await _runner.InitializeAsync();
 

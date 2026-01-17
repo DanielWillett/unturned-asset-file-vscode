@@ -82,16 +82,14 @@ public static class CommonTypes
         knownTypes["LegacyBundleName"]                  = () => StringType.Instance;    // todo
         knownTypes["AssetBundleVersion"]                = () => Int32Type.Instance;     // todo
         knownTypes["MapName"]                           = () => StringType.Instance;    // todo
-        knownTypes["ActionKey"]                         = () => StringType.Instance;    // todo
+        knownTypes["ActionKey"]                         = () => ActionKeyType.Instance;
         knownTypes["LocalizableString"]                 = () => StringType.Instance;    // todo
         knownTypes["LocalizableRichString"]             = () => StringType.Instance;    // todo
         knownTypes["LocalizableTargetString"]           = () => StringType.Instance;    // todo
         knownTypes["LocalizableTargetRichString"]       = () => StringType.Instance;    // todo
-        knownTypes["SkillLevel"]                        = () => Int32Type.Instance;     // todo
-        knownTypes["LegacyCompatibleList"]              = () => StringType.Instance;    // todo
-        knownTypes["Skill"]                             = () => StringType.Instance;    // todo
-        knownTypes["BlueprintSkill"]                    = () => StringType.Instance;    // todo
-        knownTypes["SkillLevel"]                        = () => StringType.Instance;    // todo
+        knownTypes["SkillLevel"]                        = () => SkillLevelType.Factory;
+        knownTypes["Skill"]                             = () => SkillType.Factory;
+        knownTypes["BlueprintSkill"]                    = () => SkillType.Factory;
         knownTypes["SteamItemDef"]                      = () => Int32Type.Instance;     // todo
         knownTypes["CaliberId"]                         = () => UInt16Type.Instance;    // todo
         knownTypes["BladeId"]                           = () => UInt8Type.Instance;     // todo
@@ -183,7 +181,7 @@ public static class CommonTypes
                 return false;
             }
 
-            result = SpecDynamicExpressionTreeValueHelpers.As<int, TResult>((int)i);
+            result = MathMatrix.As<int, TResult>((int)i);
         }
         else if (typeof(TResult) == typeof(uint))
         {
@@ -193,11 +191,11 @@ public static class CommonTypes
                 return false;
             }
 
-            result = SpecDynamicExpressionTreeValueHelpers.As<uint, TResult>((uint)i);
+            result = MathMatrix.As<uint, TResult>((uint)i);
         }
         else if (typeof(TResult) == typeof(long))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<long, TResult>(i);
+            result = MathMatrix.As<long, TResult>(i);
         }
         else if (typeof(TResult) == typeof(ushort))
         {
@@ -207,7 +205,7 @@ public static class CommonTypes
                 return false;
             }
 
-            result = SpecDynamicExpressionTreeValueHelpers.As<ushort, TResult>((ushort)i);
+            result = MathMatrix.As<ushort, TResult>((ushort)i);
         }
         else if (typeof(TResult) == typeof(GuidOrId))
         {
@@ -217,7 +215,7 @@ public static class CommonTypes
                 return false;
             }
 
-            result = SpecDynamicExpressionTreeValueHelpers.As<GuidOrId, TResult>(new GuidOrId((ushort)i));
+            result = MathMatrix.As<GuidOrId, TResult>(new GuidOrId((ushort)i));
         }
         else if (typeof(TResult) == typeof(char))
         {
@@ -227,7 +225,7 @@ public static class CommonTypes
                 return false;
             }
 
-            result = SpecDynamicExpressionTreeValueHelpers.As<char, TResult>((char)(i + '0'));
+            result = MathMatrix.As<char, TResult>((char)(i + '0'));
         }
         else if (typeof(TResult) == typeof(ulong))
         {
@@ -237,7 +235,7 @@ public static class CommonTypes
                 return false;
             }
 
-            result = SpecDynamicExpressionTreeValueHelpers.As<ulong, TResult>((ulong)i);
+            result = MathMatrix.As<ulong, TResult>((ulong)i);
         }
         else if (typeof(TResult) == typeof(short))
         {
@@ -247,7 +245,7 @@ public static class CommonTypes
                 return false;
             }
 
-            result = SpecDynamicExpressionTreeValueHelpers.As<short, TResult>((short)i);
+            result = MathMatrix.As<short, TResult>((short)i);
         }
         else if (typeof(TResult) == typeof(sbyte))
         {
@@ -257,7 +255,7 @@ public static class CommonTypes
                 return false;
             }
 
-            result = SpecDynamicExpressionTreeValueHelpers.As<sbyte, TResult>((sbyte)i);
+            result = MathMatrix.As<sbyte, TResult>((sbyte)i);
         }
         else if (typeof(TResult) == typeof(byte))
         {
@@ -267,23 +265,23 @@ public static class CommonTypes
                 return false;
             }
 
-            result = SpecDynamicExpressionTreeValueHelpers.As<byte, TResult>((byte)i);
+            result = MathMatrix.As<byte, TResult>((byte)i);
         }
         else if (typeof(TResult) == typeof(float))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<float, TResult>(i);
+            result = MathMatrix.As<float, TResult>(i);
         }
         else if (typeof(TResult) == typeof(double))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<double, TResult>(i);
+            result = MathMatrix.As<double, TResult>(i);
         }
         else if (typeof(TResult) == typeof(decimal))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<decimal, TResult>(i);
+            result = MathMatrix.As<decimal, TResult>(i);
         }
         else if (typeof(TResult) == typeof(string))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<string, TResult>(i.ToString(CultureInfo.InvariantCulture));
+            result = MathMatrix.As<string, TResult>(i.ToString(CultureInfo.InvariantCulture));
         }
         else
         {
@@ -299,13 +297,13 @@ public static class CommonTypes
     /// Attempts to read a value of the given <paramref name="type"/> from a JSON <paramref name="element"/>.
     /// </summary>
     /// <returns>Whether or not the value was successfully parsed.</returns>
-    public static bool TryReadFromJson<TValue>(this IType<TValue> type, in JsonElement element, [NotNullWhen(true)] out IValue<TValue>? value)
+    public static bool TryReadFromJson<TValue>(this IType<TValue> type, in JsonElement element, IAssetSpecDatabase database, DatProperty owner, [NotNullWhen(true)] out IValue<TValue>? value)
         where TValue : IEquatable<TValue>
 
     {
         if (element.ValueKind == JsonValueKind.Object)
         {
-            if (typeof(TValue) == typeof(bool) && Conditions.TryReadComplexOrBasicConditionFromJson(in element, out IValue<bool>? condition))
+            if (typeof(TValue) == typeof(bool) && Conditions.TryReadComplexOrBasicConditionFromJson(in element, database, owner, out IValue<bool>? condition))
             {
                 value = Unsafe.As<IValue<bool>, IValue<TValue>>(ref condition);
                 return true;
@@ -344,11 +342,25 @@ public static class CommonTypes
     /// Attempts to create a type from a built-in C# type, optionally using the factory method.
     /// </summary>
     /// <remarks>The type must be decorated with the <see cref="SpecificationTypeAttribute"/> and implement <see cref="IType"/> for this to succeed.</remarks>
-    public static bool TryCreateBuiltInType(Type clrType, IDatSpecificationReadContext context, IDatSpecificationObject owner, string typeId, [NotNullWhen(true)] out IType? type, bool throwExceptions = false)
+    public static bool TryCreateBuiltInType(
+        Type clrType,
+        IDatSpecificationReadContext context,
+        IDatSpecificationObject owner,
+        string typeId,
+        [NotNullWhen(true)] out IType? type,
+        bool throwExceptions = false,
+        bool requireDatType = false)
     {
         type = null;
 
-        if (!typeof(IType).IsAssignableFrom(clrType))
+        if (requireDatType)
+        {
+            if (!clrType.IsSubclassOf(typeof(DatType)))
+            {
+                return false;
+            }
+        }
+        else if (!typeof(IType).IsAssignableFrom(clrType))
         {
             return false;
         }

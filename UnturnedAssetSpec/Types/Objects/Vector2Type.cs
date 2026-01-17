@@ -162,7 +162,7 @@ public sealed class Vector2Type : BaseVectorType<Vector2, Vector2Type>
 
     #region JSON
 
-    protected override IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context = "")
+    protected override IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context = "")
     {
         if (typeDefinition.ValueKind == JsonValueKind.String)
         {

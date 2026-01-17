@@ -26,18 +26,19 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 
     private readonly ILoggerFactory _loggerFactory;
     private readonly Lazy<HttpClient> _httpClientFactory;
-    private readonly JsonSerializerOptions _serializerOptions;
-    private readonly InstallDirUtility? _installDir;
-    private readonly ISpecDatabaseCache? _cache;
+    internal readonly InstallDirUtility? InstallDirUtility;
+    internal readonly ISpecDatabaseCache? Cache;
     private readonly ILogger<SpecificationFileReader> _logger;
 
     private AssetInformation? _readInformation;
     private JsonDocument? _statusFile;
-    private ImmutableArray<string> _actionButtons;
+    private ImmutableDictionary<string, ActionButton>? _actionButtons;
     private Dictionary<QualifiedType, JsonDocument>? _assetFiles;
     private QualifiedType _currentType;
-    private ImmutableDictionary<QualifiedType, DatFileType>? _types;
+    private ImmutableDictionary<QualifiedType, DatFileType>.Builder? _fileTypeBuilder;
+    private ImmutableDictionary<QualifiedType, DatType>.Builder? _allTypeBuilder;
     private ImmutableDictionary<string, DatFileType>? _localizationFiles;
+    private IAssetSpecDatabase? _database;
 
     public bool AllowInternet { get; }
 
@@ -45,9 +46,13 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
     
     private bool IsCacheUpToDate { get; set; }
 
+    /// <inheritdoc />
     public AssetInformation Information => _readInformation ?? throw new InvalidOperationException("Not yet read.");
 
-    public IAssetSpecDatabaseFacade DatabaseFacade => throw new NotImplementedException();
+    /// <inheritdoc />
+    public IAssetSpecDatabase Database => _database ?? throw new InvalidOperationException("Not yet initialized.");
+
+    public JsonSerializerOptions JsonOptions { get; }
 
     public SpecificationFileReader(
         bool allowInternet,
@@ -61,31 +66,60 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
         _logger = loggerFactory.CreateLogger<SpecificationFileReader>();
         _loggerFactory = loggerFactory;
         _httpClientFactory = httpClientFactory;
-        _serializerOptions = serializerOptions;
-        _installDir = installDir;
-        _cache = cache;
+        JsonOptions = serializerOptions;
+        InstallDirUtility = installDir;
+        Cache = cache;
         AllowInternet = allowInternet;
 
 
         _fileProviderFactory = fileProviderFactory ?? (static reader =>
         [
-            new UnturnedInstallationFileProvider(reader._installDir, reader._loggerFactory.CreateLogger<UnturnedInstallationFileProvider>()),
-            new CacheSpecificationFileProvider(reader._cache, reader.LatestCommitHash),
+            new UnturnedInstallationFileProvider(reader.InstallDirUtility, reader._loggerFactory.CreateLogger<UnturnedInstallationFileProvider>()),
+            new CacheSpecificationFileProvider(reader.Cache, reader.LatestCommitHash),
             new GitHubSpecificationFileProvider(reader._loggerFactory.CreateLogger<GitHubSpecificationFileProvider>(), reader._httpClientFactory, reader.AllowInternet, () => reader._readInformation),
             new EmbeddedResourceSpecificationFileProvider(reader._loggerFactory.CreateLogger<EmbeddedResourceSpecificationFileProvider>())
         ]);
     }
 
-    public async Task ReadSpecifications(CancellationToken token)
+    public async Task<SpecificationReadResult> ReadSpecifications(IAssetSpecDatabase database, CancellationToken token)
+    {
+        SpecificationReadResult result;
+        try
+        {
+            _database = database;
+            result = await ReadSpecificationsIntl(token);
+        }
+        catch
+        {
+            if (_statusFile != null)
+            {
+                _statusFile.Dispose();
+                _statusFile = null;
+            }
+
+            throw;
+        }
+        finally
+        {
+            Interlocked.CompareExchange(ref _database, null, database);
+        }
+
+        Interlocked.CompareExchange(ref _statusFile, null, result.StatusFile);
+        _actionButtons = null;
+        _localizationFiles = null;
+        return result;
+    }
+
+    private async Task<SpecificationReadResult> ReadSpecificationsIntl(CancellationToken token)
     {
         using HttpClient client = new HttpClient();
         IsCacheUpToDate = false;
-        if (AllowInternet && _cache != null)
+        if (AllowInternet && Cache != null)
         {
             LatestCommitHash = await GetLatestCommitAsync(client, token).ConfigureAwait(false);
             if (LatestCommitHash != null)
             {
-                IsCacheUpToDate = _cache.IsUpToDateCache(LatestCommitHash);
+                IsCacheUpToDate = Cache.IsUpToDateCache(LatestCommitHash);
             }
             else
             {
@@ -94,6 +128,9 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
         }
 
         Task generateLocalizationFiles = Task.Run(() => GenerateLocalizationFiles(token), token);
+
+        ImmutableDictionary<QualifiedType, DatFileType> fileTypes;
+        ImmutableDictionary<QualifiedType, DatType> allTypes;
 
         ISpecificationFileProvider[] providers = _fileProviderFactory(this);
         try
@@ -106,7 +143,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
             {
                 reader._readInformation = await JsonSerializer.DeserializeAsync<AssetInformation>(
                     stream,
-                    reader._serializerOptions,
+                    reader.JsonOptions,
                     token
                 ).ConfigureAwait(false);
             }, isFirst: true, token).ConfigureAwait(false);
@@ -122,7 +159,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
             // custom type converter can't read property name
             foreach (KeyValuePair<QualifiedType, TypeHierarchy> type in _readInformation.Types)
             {
-                type.Value.Type = new QualifiedType(type.Key);
+                type.Value.Type = new QualifiedType(type.Key, isCaseInsensitive: true);
             }
 
             _readInformation.AssetAliases ??= new Dictionary<string, QualifiedType>(0);
@@ -182,8 +219,6 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
                 types.Enqueue(baseType);
             }
 
-            ImmutableDictionary<QualifiedType, DatFileType>.Builder resolvedTypes;
-
             _assetFiles = new Dictionary<QualifiedType, JsonDocument>(_readInformation.ParentTypes.Count);
             List<QualifiedType> typeReadOrder = new List<QualifiedType>(_readInformation.ParentTypes.Count);
             try
@@ -219,12 +254,16 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 
                 _currentType = QualifiedType.None;
 
-                resolvedTypes = ImmutableDictionary.CreateBuilder<QualifiedType, DatFileType>();
+                _fileTypeBuilder = ImmutableDictionary.CreateBuilder<QualifiedType, DatFileType>();
+                _allTypeBuilder = ImmutableDictionary.CreateBuilder<QualifiedType, DatType>();
 
                 foreach (QualifiedType type in typeReadOrder)
                 {
-                    ReadFileType(_assetFiles[type], type.CaseInsensitive, resolvedTypes);
+                    ReadFileType(_assetFiles[type], type.CaseInsensitive);
                 }
+
+                fileTypes = _fileTypeBuilder.ToImmutable();
+                allTypes = _allTypeBuilder.ToImmutable();
             }
             catch
             {
@@ -238,9 +277,9 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
             finally
             {
                 _assetFiles = null;
+                _fileTypeBuilder = null;
+                _allTypeBuilder = null;
             }
-
-            _types = resolvedTypes.ToImmutable();
         }
         finally
         {
@@ -248,11 +287,22 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
         }
 
         await generateLocalizationFiles;
+
+        return new SpecificationReadResult
+        {
+            Information = _readInformation,
+            AllTypes = allTypes,
+            FileTypes = fileTypes,
+            StatusFile = _statusFile ?? JsonDocument.Parse("{}"),
+            ActionButtons = _actionButtons ?? ImmutableDictionary<string, ActionButton>.Empty,
+            LocalizationFileTypes = _localizationFiles ?? ImmutableDictionary<string, DatFileType>.Empty,
+            LatestCommit = LatestCommitHash
+        };
     }
 
     private async Task GenerateLocalizationFiles(CancellationToken token)
     {
-        if (_installDir == null || !_installDir.TryGetInstallDirectory(out GameInstallDir installDirectory))
+        if (InstallDirUtility == null || !InstallDirUtility.TryGetInstallDirectory(out GameInstallDir installDirectory))
             return;
 
         string folder = Path.Combine(installDirectory.BaseFolder, "Localization", "English");
@@ -283,7 +333,13 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
                 if (!fileType.IsKeyOnlyLocalizationFile)
                 {
                     using StreamReader sr = new StreamReader(file, Encoding.UTF8);
-                    while (await sr.ReadLineAsync() is { } line)
+                    while (
+#if NET7_0_OR_GREATER
+                        await sr.ReadLineAsync(token)
+#else
+                        await sr.ReadLineAsync()
+#endif
+                        is { } line)
                     {
                         if (line.Length == 0 || line[0] == '#')
                             continue;
@@ -396,22 +452,23 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 
     private void ReadActionLabels(ISourceFile file)
     {
-        ImmutableArray<string>.Builder builder = ImmutableArray.CreateBuilder<string>(16);
+        ImmutableDictionary<string, ActionButton>.Builder builder = ImmutableDictionary.CreateBuilder<string, ActionButton>(StringComparer.OrdinalIgnoreCase);
         foreach (IPropertySourceNode property in file.Properties)
         {
             if (property.KeyIsQuoted)
                 continue;
             
             if (property.Key.EndsWith("_Button")
-                && property is { HasValue: true, ValueKind: ValueTypeDataRefType.Value }
+                && property is { HasValue: true, ValueKind: SourceValueType.Value }
                 && file.TryGetProperty(property.Key + "_Tooltip", out IPropertySourceNode? tooltipProperty)
-                && tooltipProperty is { HasValue: true, ValueKind: ValueTypeDataRefType.Value })
+                && tooltipProperty is { HasValue: true, ValueKind: SourceValueType.Value })
             {
-                builder.Add(property.Key[..^7]);
+                string key = property.Key[..^7];
+                builder.Add(key, new ActionButton(key, property.GetValueString(out _)!, tooltipProperty.GetValueString(out _)!));
             }
         }
 
-        _actionButtons = builder.MoveToImmutableOrCopy();
+        _actionButtons = builder.ToImmutable();
     }
 
     private async Task<bool> ReadKnownFileAsync(
@@ -486,7 +543,11 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
                 using (HttpResponseMessage response = await httpClient.SendAsync(msg, HttpCompletionOption.ResponseContentRead, token))
                 {
                     doc = await JsonDocument.ParseAsync(
+#if NET5_0_OR_GREATER
+                        await response.Content.ReadAsStreamAsync(token),
+#else
                         await response.Content.ReadAsStreamAsync(),
+#endif
                         new JsonDocumentOptions
                         {
                             AllowTrailingCommas = false,
@@ -520,4 +581,15 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
             doc?.Dispose();
         }
     }
+}
+
+public class SpecificationReadResult
+{
+    public required AssetInformation Information { get; init; }
+    public required ImmutableDictionary<QualifiedType, DatFileType> FileTypes { get; init; }
+    public required ImmutableDictionary<QualifiedType, DatType> AllTypes { get; init; }
+    public required ImmutableDictionary<string, DatFileType> LocalizationFileTypes { get; init; }
+    public required ImmutableDictionary<string, ActionButton> ActionButtons { get; init; }
+    public required JsonDocument StatusFile { get; init; }
+    public required string? LatestCommit { get; init; }
 }

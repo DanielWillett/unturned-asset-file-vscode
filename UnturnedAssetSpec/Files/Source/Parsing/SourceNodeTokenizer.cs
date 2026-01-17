@@ -1,6 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
@@ -21,12 +20,12 @@ public enum SourceNodeTokenizerOptions
     /// <summary>
     /// Parsed data includes comments and whitespace.
     /// </summary>
-    Metadata     = 1 << 0,
+    Metadata = 1 << 0,
     
     /// <summary>
     /// Property values are not resolved until they're first accessed.
     /// </summary>
-    Lazy         = 1 << 1,
+    Lazy = 1 << 1,
     
     /// <summary>
     /// Indicates that assets read with this tokenizer shouldn't attempt to load related localization files.
@@ -867,11 +866,11 @@ public ref partial struct SourceNodeTokenizer : IDisposable
         lazySource = default;
         comments = OneOrMore<Comment>.Null;
 
-        ValueTypeDataRefType type = _char switch
+        SourceValueType type = _char switch
         {
-            '[' => ValueTypeDataRefType.List,
-            '{' => ValueTypeDataRefType.Dictionary,
-            _ => ValueTypeDataRefType.Value
+            '[' => SourceValueType.List,
+            '{' => SourceValueType.Dictionary,
+            _ => SourceValueType.Value
         };
 
         if ((_options & SourceNodeTokenizerOptions.Lazy) != 0)
@@ -897,6 +896,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                 }
             }
 
+#pragma warning disable IDE0004 // Redundant cast (its lying)
             long rangeOffset;
             if (_position.Line == 1)
             {
@@ -916,6 +916,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                 IndexDepthOffset = ((long)(startIndex + _indexOffset) << 32)
                                    | (long)(propertyDepth + _depthOffset)
             };
+#pragma warning restore IDE0004
 
             SkipWhiteSpace();
             if ((_options & SourceNodeTokenizerOptions.Metadata) != 0)
@@ -934,8 +935,8 @@ public ref partial struct SourceNodeTokenizer : IDisposable
         {
             IAnyValueSourceNode value = type switch
             {
-                ValueTypeDataRefType.List       => ParseListOrDictionary(propertyDepth, false, true, in RootInfo.None, -1, -1, out comments),
-                ValueTypeDataRefType.Dictionary => ParseListOrDictionary(propertyDepth, false, false, in RootInfo.None, -1, -1, out comments),
+                SourceValueType.List       => ParseListOrDictionary(propertyDepth, false, true, in RootInfo.None, -1, -1, out comments),
+                SourceValueType.Dictionary => ParseListOrDictionary(propertyDepth, false, false, in RootInfo.None, -1, -1, out comments),
                 _ => ParseValueIntl(propertyDepth, false, -1, -1, out comments)
             };
 

@@ -6,6 +6,11 @@
 public enum PropertyResolutionContext
 {
     /// <summary>
+    /// Could go either way.
+    /// </summary>
+    Unknown,
+
+    /// <summary>
     /// Property is being read from a modern dictionary node.
     /// <code>
     /// Blueprints
@@ -26,4 +31,23 @@ public enum PropertyResolutionContext
     /// </code>
     /// </summary>
     Legacy
+}
+
+/// <summary>
+/// Extension methods for the <see cref="PropertyResolutionContext"/> enum.
+/// </summary>
+public static class PropertyResolutionContextExtensions
+{
+    /// <summary>
+    /// Converts a <see cref="PropertyResolutionContext"/> value to the corresponding <see cref="LegacyExpansionFilter"/> value.
+    /// </summary>
+    public static LegacyExpansionFilter ToKeyFilter(this PropertyResolutionContext value)
+    {
+        return value switch
+        {
+            PropertyResolutionContext.Modern => LegacyExpansionFilter.Modern,
+            PropertyResolutionContext.Legacy => LegacyExpansionFilter.Legacy,
+            _ => LegacyExpansionFilter.Either
+        };
+    }
 }

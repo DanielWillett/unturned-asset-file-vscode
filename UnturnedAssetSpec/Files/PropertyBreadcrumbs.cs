@@ -363,12 +363,12 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     /// <summary>
     /// Resolves possible properties in-place from this property-ref.
     /// </summary>
-    public void ResolveFromPropertyRef(ISpecType baseType, IAssetSpecDatabase database, SpecPropertyContext context = SpecPropertyContext.Property)
+    public void ResolveFromPropertyRef(DatType baseType, IAssetSpecDatabase database, SpecPropertyContext context = SpecPropertyContext.Property)
     {
         if (IsRoot)
             return;
 
-        ISpecType? typeOwner = baseType;
+        DatType? typeOwner = baseType;
         int skipType = 0;
 
         for (int i = 0; i < _sections.Length; ++i)
@@ -376,10 +376,10 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
             ref PropertyBreadcrumbSection section = ref _sections[i];
             if (typeOwner != null && skipType <= 0)
             {
-                SpecProperty? property = section.Property as SpecProperty;
+                DatProperty? property = section.Property as DatProperty;
                 if (property == null && section.Property is string propertyName && typeOwner != null)
                 {
-                    property = database.FindPropertyInfoByKey(propertyName, typeOwner, section.Context, context: context).Property;
+                    // todo property = database.FindPropertyInfoByKey(propertyName, typeOwner, section.Context, context: context).Property;
                 }
 
                 if (property == null)
@@ -389,27 +389,27 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
                 else
                 {
                     section = new PropertyBreadcrumbSection(in section, property);
-                    ISpecPropertyType? typeOrListType = property.Type.Type;
+                    IPropertyType? typeOrListType = property.Type;
                     skipType = 0;
                     typeOwner = null;
                     while (typeOrListType != null)
                     {
                         switch (typeOrListType)
                         {
-                            case ISpecType t:
+                            case DatType t:
                                 typeOwner = t;
                                 break;
 
-                            case IListTypeSpecPropertyType list:
-                                ISpecPropertyType? innerType = list.GetInnerType();
+                            case IListType list:
+                                IType? innerType = list.ElementType;
                                 if (innerType == null)
                                     break;
                                 ++skipType;
                                 typeOrListType = innerType;
                                 continue;
 
-                            case IDictionaryTypeSpecPropertyType dict:
-                                innerType = dict.GetInnerType(database);
+                            case IDictionaryType dict:
+                                innerType = dict.ValueType;
                                 if (innerType == null)
                                     break;
                                 ++skipType;
@@ -507,52 +507,52 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     /// <summary>
     /// Try to find the property in <paramref name="file"/> in the dictionary this breadcrumb points to.
     /// </summary>
-    public bool TryGetProperty(ISourceFile file, SpecProperty property, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, ICollection<ISourceNode>? nodePath = null)
+    public bool TryGetProperty(ISourceFile file, DatProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, ICollection<ISourceNode>? nodePath = null)
     {
         lock (file.TreeSync)
         {
             if (IsRoot)
             {
-                return file.TryResolveProperty(property, out propertyNode, PropertyResolutionContext.Modern);
+                return file.TryResolveProperty(property, in ctx, out propertyNode, PropertyResolutionContext.Modern);
             }
 
             AssetFileType fileType = default;
-            if (!TryGetDictionaryAndTypeIntl(file, out IDictionarySourceNode? dictionary, null, in fileType, out _, nodePath))
+            if (!TryGetDictionaryAndTypeIntl(file, out IDictionarySourceNode? dictionary, in ctx, null, in fileType, out _, nodePath))
             {
                 propertyNode = null;
                 return false;
             }
 
-            return dictionary.TryGetProperty(property, out propertyNode, PropertyResolutionContext.Modern);
+            return dictionary.TryGetProperty(property, in ctx, out propertyNode, PropertyResolutionContext.Modern);
         }
     }
 
     /// <summary>
     /// Try to find the the object type this breadcrumb points to.
     /// </summary>
-    public bool TryGetDictionaryAndType(ISourceFile file, in AssetFileType fileType, IAssetSpecDatabase database, [NotNullWhen(true)] out IDictionarySourceNode? dictionary, [MaybeNullWhen(false)] out ISpecType type, ICollection<ISourceNode>? nodePath = null)
+    public bool TryGetDictionaryAndType(ISourceFile file, in AssetFileType fileType, IAssetSpecDatabase database, in FileEvaluationContext ctx, [NotNullWhen(true)] out IDictionarySourceNode? dictionary, [MaybeNullWhen(false)] out DatType type, ICollection<ISourceNode>? nodePath = null)
     {
         if (database == null)
             throw new ArgumentNullException(nameof(database));
         lock (file.TreeSync)
         {
-            return TryGetDictionaryAndTypeIntl(file, out dictionary, database, in fileType, out type, nodePath) && type != null;
+            return TryGetDictionaryAndTypeIntl(file, out dictionary, in ctx, database, in fileType, out type, nodePath) && type != null;
         }
     }
 
     /// <summary>
     /// Try to find the the dictionary this breadcrumb points to.
     /// </summary>
-    public bool TryGetDictionary(ISourceFile file, [NotNullWhen(true)] out IDictionarySourceNode? dictionary, ICollection<ISourceNode>? nodePath = null)
+    public bool TryGetDictionary(ISourceFile file, [NotNullWhen(true)] out IDictionarySourceNode? dictionary, in FileEvaluationContext ctx, ICollection<ISourceNode>? nodePath = null)
     {
         lock (file.TreeSync)
         {
             AssetFileType type = default;
-            return TryGetDictionaryAndTypeIntl(file, out dictionary, null, in type, out _, nodePath);
+            return TryGetDictionaryAndTypeIntl(file, out dictionary, in ctx, null, in type, out _, nodePath);
         }
     }
 
-    private bool TryGetDictionaryAndTypeIntl(ISourceFile file, [NotNullWhen(true)] out IDictionarySourceNode? referencedDictionary, IAssetSpecDatabase? database, in AssetFileType fileType, out ISpecType? type, ICollection<ISourceNode>? nodePath)
+    private bool TryGetDictionaryAndTypeIntl(ISourceFile file, [NotNullWhen(true)] out IDictionarySourceNode? referencedDictionary, in FileEvaluationContext ctx, IAssetSpecDatabase? database, in AssetFileType fileType, out DatType? type, ICollection<ISourceNode>? nodePath)
     {
         type = null;
         if (IsRoot)
@@ -594,7 +594,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
         if (dictionary is IAssetSourceFile a)
             dictionary = a.AssetData;
 
-        ISpecType? typeOwner = fileType.Information;
+        DatType? typeOwner = fileType.Information;
         int skipType = 0;
 
         for (int i = startIndex; i < _sections.Length; ++i)
@@ -602,37 +602,37 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
             ref PropertyBreadcrumbSection section = ref _sections[i];
             if (database != null && typeOwner != null && skipType <= 0)
             {
-                SpecProperty? property = section.Property as SpecProperty;
+                DatProperty? property = section.Property as DatProperty;
                 if (property == null && section.ParentNode is IPropertySourceNode propNode)
                 {
-                    property = database.FindPropertyInfoByKey(propNode.Key, typeOwner, PropertyResolutionContext.Modern, requireCanBeInMetadata: false, context).Property;
+                    // todo property = database.FindPropertyInfoByKey(propNode.Key, typeOwner, PropertyResolutionContext.Modern, requireCanBeInMetadata: false, context).Property;
                 }
 
                 if (property == null)
                     typeOwner = null;
                 else
                 {
-                    ISpecPropertyType? typeOrListType = property.Type.Type;
+                    IPropertyType? typeOrListType = property.Type;
                     skipType = 0;
                     typeOwner = null;
                     while (typeOrListType != null)
                     {
                         switch (typeOrListType)
                         {
-                            case ISpecType t:
+                            case DatType t:
                                 typeOwner = t;
                                 break;
 
-                            case IListTypeSpecPropertyType list:
-                                ISpecPropertyType? innerType = list.GetInnerType();
+                            case IListType list:
+                                IType? innerType = list.ElementType;
                                 if (innerType == null)
                                     break;
                                 ++skipType;
                                 typeOrListType = innerType;
                                 continue;
 
-                            case IDictionaryTypeSpecPropertyType dict:
-                                innerType = dict.GetInnerType(database);
+                            case IDictionaryType dict:
+                                innerType = dict.ValueType;
                                 if (innerType == null)
                                     break;
                                 ++skipType;
@@ -649,7 +649,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
                 --skipType;
             }
 
-            dictionary = section.GetValueNode(dictionary);
+            dictionary = section.GetValueNode(dictionary, in ctx);
             if (dictionary == null)
             {
                 referencedDictionary = null;
@@ -765,7 +765,7 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
     // index or -1
     public int Index;
 
-    // either null, SpecProperty, or string (for generic dictionary)
+    // either null, DatProperty, or string (for generic dictionary)
     public readonly object? Property;
     
     // either list or property
@@ -787,14 +787,14 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
         Index = index;
     }
 
-    public PropertyBreadcrumbSection(SpecProperty property, PropertyResolutionContext context)
+    public PropertyBreadcrumbSection(DatProperty property, PropertyResolutionContext context)
     {
         Property = property;
         Context = context;
         Index = -1;
     }
 
-    public PropertyBreadcrumbSection(SpecProperty property, PropertyResolutionContext context, int index)
+    public PropertyBreadcrumbSection(DatProperty property, PropertyResolutionContext context, int index)
     {
         Property = property;
         Context = context;
@@ -855,7 +855,7 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
         return value as IAnyChildrenSourceNode;
     }
 
-    internal readonly IAnyChildrenSourceNode? GetValueNode(IAnyChildrenSourceNode parentNode)
+    internal readonly IAnyChildrenSourceNode? GetValueNode(IAnyChildrenSourceNode parentNode, in FileEvaluationContext ctx)
     {
         if (ParentNode != null && ReferenceEquals(parentNode.File, ParentNode.File))
             return GetValueNode();
@@ -875,8 +875,8 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
                             return null;
                         break;
 
-                    case SpecProperty prop:
-                        if (!dict.TryGetProperty(prop, out propSrc, PropertyResolutionContext.Modern))
+                    case DatProperty prop:
+                        if (!dict.TryGetProperty(prop, in ctx, out propSrc, PropertyResolutionContext.Modern))
                             return null;
                         break;
                 }
@@ -931,7 +931,7 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
         return ParentNode switch
         {
             IPropertySourceNode prop => prop.Key,
-            null => Property as string ?? (Property as SpecProperty)?.Key ?? string.Empty,
+            null => Property as string ?? (Property as DatProperty)?.Key ?? string.Empty,
             _ => string.Empty
         };
     }

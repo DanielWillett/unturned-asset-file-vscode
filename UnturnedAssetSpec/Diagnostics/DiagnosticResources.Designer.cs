@@ -313,6 +313,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Skill level {0} should not exceed {1}..
+        /// </summary>
+        public static string UNT1016_Generic {
+            get {
+                return ResourceManager.GetString("UNT1016_Generic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unexpected amount supplied for an item ID or GUID..
         /// </summary>
         public static string UNT1017 {
@@ -543,6 +552,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         public static string UNT108_CodeFix_Annotation_Label {
             get {
                 return ResourceManager.GetString("UNT108_CodeFix_Annotation_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to determine the skill referenced by this property. Expected a speciality index at property &quot;{0}&quot; and a skill index at property &quot;{1}&quot;..
+        /// </summary>
+        public static string UNT109_Indices {
+            get {
+                return ResourceManager.GetString("UNT109_Indices", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to determine the skill referenced by this property. Expected a skill name at property &quot;{0}&quot;..
+        /// </summary>
+        public static string UNT109_Skill {
+            get {
+                return ResourceManager.GetString("UNT109_Skill", resourceCulture);
             }
         }
         

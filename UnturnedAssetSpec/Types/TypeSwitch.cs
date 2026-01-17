@@ -67,14 +67,14 @@ public class TypeSwitch : SwitchValue<IType>, IPropertyType
 internal class TypeOfType : BaseType<IType, TypeOfType>, ITypeParser<IType>, ITypeFactory
 {
     private readonly IDatSpecificationReadContext? _context;
-    private readonly IDatSpecificationObject? _owner;
+    private readonly DatProperty? _owner;
     private readonly string? _contextString;
 
     internal static readonly TypeOfType Factory = new TypeOfType();
     static TypeOfType() { }
 
     public TypeOfType() { }
-    public TypeOfType(IDatSpecificationReadContext context, IDatSpecificationObject owner, string contextString)
+    public TypeOfType(IDatSpecificationReadContext context, DatProperty owner, string contextString)
     {
         _context = context;
         _owner = owner;
@@ -92,7 +92,7 @@ internal class TypeOfType : BaseType<IType, TypeOfType>, ITypeParser<IType>, ITy
     protected override bool Equals(TypeOfType other) => true;
     public override int GetHashCode() => 49349843;
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
     {
         return new TypeOfType(spec, owner, context);
     }

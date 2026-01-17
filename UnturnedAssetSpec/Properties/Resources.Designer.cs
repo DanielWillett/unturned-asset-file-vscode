@@ -88,6 +88,105 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Any animal..
+        /// </summary>
+        internal static string Description_EAssetType_ANIMAL {
+            get {
+                return ResourceManager.GetString("Description_EAssetType_ANIMAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Any world effect or UI..
+        /// </summary>
+        internal static string Description_EAssetType_EFFECT {
+            get {
+                return ResourceManager.GetString("Description_EAssetType_EFFECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Any item..
+        /// </summary>
+        internal static string Description_EAssetType_ITEM {
+            get {
+                return ResourceManager.GetString("Description_EAssetType_ITEM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A mythical cosmetic effect..
+        /// </summary>
+        internal static string Description_EAssetType_MYTHIC {
+            get {
+                return ResourceManager.GetString("Description_EAssetType_MYTHIC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Doesn&apos;t fall into a legacy category. In this case short IDs are not used..
+        /// </summary>
+        internal static string Description_EAssetType_NONE {
+            get {
+                return ResourceManager.GetString("Description_EAssetType_NONE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A dialogue, quest, or vendor configuration..
+        /// </summary>
+        internal static string Description_EAssetType_NPC {
+            get {
+                return ResourceManager.GetString("Description_EAssetType_NPC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Any level object or NPC..
+        /// </summary>
+        internal static string Description_EAssetType_OBJECT {
+            get {
+                return ResourceManager.GetString("Description_EAssetType_OBJECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A resource that can spawn on the map and be harvested..
+        /// </summary>
+        internal static string Description_EAssetType_RESOURCE {
+            get {
+                return ResourceManager.GetString("Description_EAssetType_RESOURCE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An item or vehicle skin..
+        /// </summary>
+        internal static string Description_EAssetType_SKIN {
+            get {
+                return ResourceManager.GetString("Description_EAssetType_SKIN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An asset spawn for a map..
+        /// </summary>
+        internal static string Description_EAssetType_SPAWN {
+            get {
+                return ResourceManager.GetString("Description_EAssetType_SPAWN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Any vehicle..
+        /// </summary>
+        internal static string Description_EAssetType_VEHICLE {
+            get {
+                return ResourceManager.GetString("Description_EAssetType_VEHICLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected function name at beginning of expression..
         /// </summary>
         internal static string FormatException_Expression_ExpectedFunctionName {
@@ -367,6 +466,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Action Button Label.
+        /// </summary>
+        internal static string Type_Name_ActionKey {
+            get {
+                return ResourceManager.GetString("Type_Name_ActionKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Asset Reference.
         /// </summary>
         internal static string Type_Name_AssetReference {
@@ -484,6 +592,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Skill (or Legacy Blueprint Skill).
+        /// </summary>
+        internal static string Type_Name_BlueprintSkill {
+            get {
+                return ResourceManager.GetString("Type_Name_BlueprintSkill", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Boolean.
         /// </summary>
         internal static string Type_Name_Boolean {
@@ -579,6 +696,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_Dictionary_Generic_String {
             get {
                 return ResourceManager.GetString("Type_Name_Dictionary_Generic_String", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset Category.
+        /// </summary>
+        internal static string Type_Name_EAssetType {
+            get {
+                return ResourceManager.GetString("Type_Name_EAssetType", resourceCulture);
             }
         }
         
@@ -822,6 +948,24 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_RegEx {
             get {
                 return ResourceManager.GetString("Type_Name_RegEx", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skill.
+        /// </summary>
+        internal static string Type_Name_Skill {
+            get {
+                return ResourceManager.GetString("Type_Name_Skill", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skill Level.
+        /// </summary>
+        internal static string Type_Name_SkillLevel {
+            get {
+                return ResourceManager.GetString("Type_Name_SkillLevel", resourceCulture);
             }
         }
         

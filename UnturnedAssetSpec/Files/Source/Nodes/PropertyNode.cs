@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics;
 
@@ -20,7 +19,7 @@ internal class PropertyNode : AnySourceNode, IPropertySourceNode
 
     public bool HasValue => _hasValue ? _value != null : !ValueSource.Segment.IsEmpty;
 
-    public ValueTypeDataRefType ValueKind { get; }
+    public SourceValueType ValueKind { get; }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public IAnyValueSourceNode? Value
@@ -71,7 +70,7 @@ internal class PropertyNode : AnySourceNode, IPropertySourceNode
         }
         else
         {
-            ValueKind = valueSource.Segment.IsEmpty ? ValueTypeDataRefType.Value : valueSource.ExpectedType;
+            ValueKind = valueSource.Segment.IsEmpty ? SourceValueType.Value : valueSource.ExpectedType;
         }
     }
 
@@ -170,7 +169,7 @@ internal class PropertyNode : AnySourceNode, IPropertySourceNode
             return null;
         }
 
-        if (src.ExpectedType != ValueTypeDataRefType.Value)
+        if (src.ExpectedType != SourceValueType.Value)
         {
             throw new InvalidOperationException("Expected value.");
         }

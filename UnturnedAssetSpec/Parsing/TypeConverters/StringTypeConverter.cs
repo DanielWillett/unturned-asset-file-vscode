@@ -117,13 +117,13 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
 
             if (typeof(TTo) == typeof(QualifiedType))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<QualifiedType, TTo>(new QualifiedType(value, isCaseInsensitive: true));
+                result = MathMatrix.As<QualifiedType, TTo>(new QualifiedType(value, isCaseInsensitive: true));
                 return true;
             }
 
             if (typeof(TTo) == typeof(QualifiedOrAliasedType))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<QualifiedOrAliasedType, TTo>(QualifiedOrAliasedType.FromType(value));
+                result = MathMatrix.As<QualifiedOrAliasedType, TTo>(QualifiedOrAliasedType.FromType(value));
                 return true;
             }
 
@@ -193,7 +193,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(parsed);
+        result = MathMatrix.As<bool, TTo>(parsed);
         return true;
     }
 
@@ -205,7 +205,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<char, TTo>(value[0]);
+        result = MathMatrix.As<char, TTo>(value[0]);
         return true;
     }
 
@@ -217,7 +217,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<long, TTo>(parsed);
+        result = MathMatrix.As<long, TTo>(parsed);
         return true;
     }
 
@@ -229,7 +229,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<int, TTo>(parsed);
+        result = MathMatrix.As<int, TTo>(parsed);
         return true;
     }
 
@@ -241,7 +241,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<short, TTo>(parsed);
+        result = MathMatrix.As<short, TTo>(parsed);
         return true;
     }
 
@@ -253,7 +253,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<sbyte, TTo>(parsed);
+        result = MathMatrix.As<sbyte, TTo>(parsed);
         return true;
     }
 
@@ -281,7 +281,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             v = parsed;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<nint, TTo>(v);
+        result = MathMatrix.As<nint, TTo>(v);
         return true;
     }
 
@@ -293,7 +293,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<ulong, TTo>(parsed);
+        result = MathMatrix.As<ulong, TTo>(parsed);
         return true;
     }
 
@@ -305,7 +305,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<uint, TTo>(parsed);
+        result = MathMatrix.As<uint, TTo>(parsed);
         return true;
     }
 
@@ -317,7 +317,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<ushort, TTo>(parsed);
+        result = MathMatrix.As<ushort, TTo>(parsed);
         return true;
     }
 
@@ -329,7 +329,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<GuidOrId, TTo>(new GuidOrId(parsed));
+        result = MathMatrix.As<GuidOrId, TTo>(new GuidOrId(parsed));
         return true;
     }
 
@@ -341,7 +341,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<IPv4Filter, TTo>(parsed);
+        result = MathMatrix.As<IPv4Filter, TTo>(parsed);
         return true;
     }
 
@@ -353,7 +353,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<BundleReference, TTo>(parsed);
+        result = MathMatrix.As<BundleReference, TTo>(parsed);
         return true;
     }
 
@@ -365,7 +365,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<byte, TTo>(parsed);
+        result = MathMatrix.As<byte, TTo>(parsed);
         return true;
     }
 
@@ -393,7 +393,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             v = parsed;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<nuint, TTo>(v);
+        result = MathMatrix.As<nuint, TTo>(v);
         return true;
     }
 
@@ -405,7 +405,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<decimal, TTo>(parsed);
+        result = MathMatrix.As<decimal, TTo>(parsed);
         return true;
     }
 
@@ -417,7 +417,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<double, TTo>(parsed);
+        result = MathMatrix.As<double, TTo>(parsed);
         return true;
     }
 
@@ -429,7 +429,7 @@ internal sealed class StringTypeConverter : ITypeConverter<string>
             return false;
         }
 
-        result = SpecDynamicExpressionTreeValueHelpers.As<float, TTo>(parsed);
+        result = MathMatrix.As<float, TTo>(parsed);
         return true;
     }
 

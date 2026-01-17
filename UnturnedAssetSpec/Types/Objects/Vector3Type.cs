@@ -200,7 +200,7 @@ public sealed class Vector3Type : BaseVectorType<Vector3, Vector3Type>
 
     #region JSON
 
-    protected override IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context = "")
+    protected override IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context = "")
     {
         if (typeDefinition.ValueKind == JsonValueKind.String)
         {

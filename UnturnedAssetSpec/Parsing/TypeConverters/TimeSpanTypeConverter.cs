@@ -75,12 +75,12 @@ internal sealed class TimeSpanTypeConverter : ITypeConverter<TimeSpan>
 
         if (typeof(TTo) == typeof(bool))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(value != TimeSpan.Zero);
+            result = MathMatrix.As<bool, TTo>(value != TimeSpan.Zero);
             return true;
         }
         if (typeof(TTo) == typeof(string))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(value.ToString("c"));
+            result = MathMatrix.As<string, TTo>(value.ToString("c"));
             return true;
         }
 

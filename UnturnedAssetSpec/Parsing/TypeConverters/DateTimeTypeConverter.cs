@@ -82,12 +82,12 @@ internal sealed class DateTimeTypeConverter : ITypeConverter<DateTime>
 
         if (typeof(TTo) == typeof(bool))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(value != DateTime.MinValue);
+            result = MathMatrix.As<bool, TTo>(value != DateTime.MinValue);
             return true;
         }
         if (typeof(TTo) == typeof(string))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(value.ToString("O"));
+            result = MathMatrix.As<string, TTo>(value.ToString("O"));
             return true;
         }
         if (typeof(TTo) == typeof(DateTimeOffset))
@@ -110,7 +110,7 @@ internal sealed class DateTimeTypeConverter : ITypeConverter<DateTime>
                 }
             }
 
-            result = SpecDynamicExpressionTreeValueHelpers.As<DateTimeOffset, TTo>(o);
+            result = MathMatrix.As<DateTimeOffset, TTo>(o);
             return true;
         }
 

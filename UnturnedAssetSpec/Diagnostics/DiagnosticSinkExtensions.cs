@@ -46,7 +46,7 @@ public static class DiagnosticSinkExtensions
     {
 
         /// <summary>
-        /// Reports a format string that isn't using one or more of the arguments. 
+        /// Reports a format string that isn't using one or more of the arguments.
         /// </summary>
         public void UNT102<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -62,7 +62,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a type reference that doesn't derive from it's expected base type. 
+        /// Reports a type reference that doesn't derive from it's expected base type.
         /// </summary>
         public void UNT103<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -78,7 +78,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports the usage of a ContentReference when a MasterBundleReference could've been used instead. 
+        /// Reports the usage of a ContentReference when a MasterBundleReference could've been used instead.
         /// </summary>
         public void UNT104<TDiagnosticProvider>(
             ref TDiagnosticProvider provider
@@ -93,7 +93,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports the usage of an object for a bundle reference. 
+        /// Reports the usage of an object for a bundle reference.
         /// </summary>
         public void UNT108<TDiagnosticProvider>(
             ref TDiagnosticProvider provider
@@ -108,7 +108,37 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a value provided for a flag property. 
+        /// Reports a SkillLevel property that wasn't able to figure out what skill index it's referencing.
+        /// </summary>
+        public void UNT109<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, string skillProperty
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT109,
+                Message = string.Format(DiagnosticResources.UNT109_Skill, skillProperty),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a SkillLevel property that wasn't able to figure out what skill name it's referencing.
+        /// </summary>
+        public void UNT109<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, string specialityProperty, string skillProperty
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT109,
+                Message = string.Format(DiagnosticResources.UNT109_Indices, specialityProperty, skillProperty),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a value provided for a flag property.
         /// </summary>
         public void UNT1003<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -131,7 +161,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a warning when rich text is used in a string that doesn't support it. 
+        /// Reports a warning when rich text is used in a string that doesn't support it.
         /// </summary>
         public void CheckUNT1006<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -150,7 +180,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a related property missing for a property. 
+        /// Reports a related property missing for a property.
         /// </summary>
         public void UNT1007<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -166,7 +196,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a related property missing in a dictionary. 
+        /// Reports a related property missing in a dictionary.
         /// </summary>
         public void UNT1007_Modern<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -182,7 +212,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports an out-of-range character cosmetic index. 
+        /// Reports an out-of-range character cosmetic index.
         /// </summary>
         public void UNT1008<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -203,7 +233,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a legacy color with a value outside the range 0-1. 
+        /// Reports a legacy color with a value outside the range 0-1.
         /// </summary>
         public void UNT1012<TDiagnosticProvider>(
             ref TDiagnosticProvider provider
@@ -218,7 +248,22 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports an invalid enum value. 
+        /// Reports an unsupported achievement ID.
+        /// </summary>
+        public void UNT1013<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, string achievementId
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1013,
+                Message = string.Join(DiagnosticResources.UNT1013, achievementId),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports an invalid enum value.
         /// </summary>
         public void UNT1014<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -234,7 +279,37 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports an unsupported TranslationReference. 
+        /// Reports a skill level too large with an unknown skill.
+        /// </summary>
+        public void UNT1016<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, int level, int maxLevel
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1016,
+                Message = string.Format(DiagnosticResources.UNT1016_Generic, level, maxLevel),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a skill level too large with a known skill.
+        /// </summary>
+        public void UNT1016<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, int level, SkillInfo skill
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1016,
+                Message = string.Format(DiagnosticResources.UNT1016, level, skill.DisplayName ?? skill.Skill),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports an unsupported TranslationReference.
         /// </summary>
         public void UNT1018<TDiagnosticProvider>(
             ref TDiagnosticProvider provider
@@ -465,7 +540,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a <see langword="false"/> value provided for a flag property. 
+        /// Reports a <see langword="false"/> value provided for a flag property.
         /// </summary>
         public void UNT2003<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -481,7 +556,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a generic failed to parse message for a type. 
+        /// Reports a generic failed to parse message for a type.
         /// </summary>
         public void UNT2004_Generic<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -497,7 +572,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a failed to parse RegEx message for a type. 
+        /// Reports a failed to parse RegEx message for a type.
         /// </summary>
         public void UNT2004_Regex<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -527,7 +602,7 @@ public static class DiagnosticSinkExtensions
 
         /// <summary>
         /// Reports a failed to parse where a boolean value was 'T', 'Y', 'F', or 'N'.
-        /// The boolean parser only accepts lowercase values for one-letter repsonses. 
+        /// The boolean parser only accepts lowercase values for one-letter repsonses.
         /// </summary>
         public void UNT2004_BooleanSingleCharCapitalized<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -552,7 +627,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a string value when a list was expected. 
+        /// Reports a string value when a list was expected.
         /// </summary>
         public void UNT2004_ValueInsteadOfList<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -568,7 +643,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a string value when a dictionary was expected. 
+        /// Reports a string value when a dictionary was expected.
         /// </summary>
         public void UNT2004_ValueInsteadOfDictionary<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -584,7 +659,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a list when a string value was expected. 
+        /// Reports a list when a string value was expected.
         /// </summary>
         public void UNT2004_ListInsteadOfValue<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -600,7 +675,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a list when a string value was expected. 
+        /// Reports a list when a string value was expected.
         /// </summary>
         public void UNT2004_DictionaryInsteadOfValue<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -616,7 +691,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a list when a dictionary was expected. 
+        /// Reports a list when a dictionary was expected.
         /// </summary>
         public void UNT2004_ListInsteadOfDictionary<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -632,7 +707,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a dictionary when a list was expected. 
+        /// Reports a dictionary when a list was expected.
         /// </summary>
         public void UNT2004_DictionaryInsteadOfList<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -648,7 +723,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a missing string value. 
+        /// Reports a missing string value.
         /// </summary>
         public void UNT2004_NoValue<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -664,7 +739,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a missing list value. 
+        /// Reports a missing list value.
         /// </summary>
         public void UNT2004_NoList<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -680,7 +755,7 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
-        /// Reports a missing dictionary value. 
+        /// Reports a missing dictionary value.
         /// </summary>
         public void UNT2004_NoDictionary<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,
@@ -785,9 +860,23 @@ public static class DiagnosticSinkExtensions
             });
         }
 
+        /// <summary>
+        /// Reports a type that should be available that isn't.
+        /// </summary>
+        public void UNT2005<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider, string typeName
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2005,
+                Message = string.Format(DiagnosticResources.UNT2005, typeName),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
 
         /// <summary>
-        /// Reports a malformed format string. 
+        /// Reports a malformed format string.
         /// </summary>
         public void UNT2012<TDiagnosticProvider>(
             ref TDiagnosticProvider provider,

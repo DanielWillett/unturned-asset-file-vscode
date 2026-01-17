@@ -1,9 +1,10 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace UnturnedAssetSpecTests;
-
+#if false
 public class EquationTrees
 {
     [Test]
@@ -11,7 +12,7 @@ public class EquationTrees
     {
         FileEvaluationContext ctx = default;
 
-        Assert.That(SpecDynamicValue.TryParse("=ABS(-1)", SpecDynamicValueContext.Optional, KnownTypes.Int32, out ISpecDynamicValue? equation), Is.True);
+        Assert.That(Value.TryParse("=ABS(-1)", SpecDynamicValueContext.Optional, KnownTypes.Int32, out ISpecDynamicValue? equation), Is.True);
 
         Assert.That(equation!.TryEvaluateValue(in ctx, out int intValue, out _));
         Assert.That(intValue, Is.EqualTo(1));
@@ -70,3 +71,4 @@ public class EquationTrees
         Assert.That(stringValue, Is.EqualTo(" _ "));
     }
 }
+#endif

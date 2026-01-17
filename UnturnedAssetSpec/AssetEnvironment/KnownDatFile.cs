@@ -204,7 +204,7 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
                                 string str = content.ToString();
                                 if (database.Information.AssetAliases.TryGetValue(str, out QualifiedType aliasedType))
                                 {
-                                    Type = aliasedType;
+                                    Type = aliasedType.CaseInsensitive;
                                 }
                                 else if (KnownTypeValueHelper.TryParseType(content, out QualifiedType type))
                                 {
@@ -221,9 +221,9 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
                             break;
 
                         case NextValueType.AssetCategory:
-                            if (AssetCategory.TryParse(content.ToString(), out EnumSpecTypeValue categoryEnum))
+                            if (AssetCategory.TryParse(content, out int categoryEnum))
                             {
-                                overrideAssetCategory = categoryEnum.Index;
+                                overrideAssetCategory = categoryEnum;
                             }
                             else
                             {

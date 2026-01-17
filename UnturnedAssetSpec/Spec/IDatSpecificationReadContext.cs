@@ -16,9 +16,9 @@ public interface IDatSpecificationReadContext
     AssetInformation Information { get; }
 
     /// <summary>
-    /// The facade to the output database. May not be fully implemented.
+    /// The database being read into. Note that only some information will be available at this time.
     /// </summary>
-    IAssetSpecDatabaseFacade DatabaseFacade { get; }
+    IAssetSpecDatabase Database { get; }
 
     /// <summary>
     /// Finds an already read type or reads it from the <paramref name="owner"/>'s context.
@@ -28,10 +28,10 @@ public interface IDatSpecificationReadContext
     /// <summary>
     /// Reads a type from a JSON object or string.
     /// </summary>
-    IType ReadType(in JsonElement root, IDatSpecificationObject readObject, string context = "");
+    IType ReadType(in JsonElement root, DatProperty readObject, string context = "");
 
     /// <summary>
     /// Reads a property value from a JSON object or string.
     /// </summary>
-    IValue ReadValue(in JsonElement root, IPropertyType valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default);
+    IValue ReadValue(in JsonElement root, IPropertyType valueType, DatProperty readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default);
 }

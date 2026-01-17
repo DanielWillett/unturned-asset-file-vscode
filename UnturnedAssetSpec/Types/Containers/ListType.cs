@@ -73,7 +73,7 @@ public sealed class ListType : ITypeFactory
         }, subType);
     }
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
     {
         ElementTypeVisitor v;
         v.Result = null;
@@ -112,7 +112,7 @@ public sealed class ListType : ITypeFactory
         public IType? Result;
         public JsonElement Json;
         public IDatSpecificationReadContext Spec;
-        public IDatSpecificationObject Owner;
+        public DatProperty Owner;
         public string Context;
 
         public void Accept<TElementType>(IType<TElementType> type) where TElementType : IEquatable<TElementType>
@@ -142,7 +142,7 @@ public sealed class ListType : ITypeFactory
         public IType? Result;
         public JsonElement Json;
         public IDatSpecificationReadContext Spec;
-        public IDatSpecificationObject Owner;
+        public DatProperty Owner;
         public IType<TElementType> SubType;
         public string Context;
 

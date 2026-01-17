@@ -1,9 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -16,6 +14,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 /// </summary>
 public class AssetInformation
 {
+    private int? _maxSkillLevelCached;
+
     /// <summary>
     /// The GitHub commit (SHA) where this information was taken from, if any. Note that some information may have been pulled from other places.
     /// </summary>
@@ -54,7 +54,17 @@ public class AssetInformation
     public string?[]? KeyOnlyLocalizationFiles { get; set; }
     public AssetBundleVersionInfo?[]? AssetBundleVersions { get; set; }
     public SkillsetInfo?[]? Skillsets { get; set; }
-    public SpecialityInfo?[]? Specialities { get; set; }
+
+    public SpecialityInfo?[]? Specialities
+    {
+        get;
+        set
+        {
+            field = value;
+            _maxSkillLevelCached = null;
+        }
+    }
+
     public Color32[]? SkinColors { get; set; }
     public int[]? EmissiveFaces { get; set; }
     public string? FaceTextureTemplate { get; set; }
@@ -65,6 +75,47 @@ public class AssetInformation
     public string? PlayerDashboardInventoryLocalizationFallbackUrl { get; set; }
     public string? SkillsLocalizationFallbackUrl { get; set; }
     public string? SkillsetsLocalizationFallbackUrl { get; set; }
+
+    /// <summary>
+    /// Calculates and caches the maximum level of all known skills.
+    /// </summary>
+    /// <returns>The highest reachable level of at least one skill under normal circumstances.</returns>
+    public int GetMaximumSkillLevel()
+    {
+        int? maxSkillLevel = _maxSkillLevelCached;
+        if (maxSkillLevel.HasValue)
+            return maxSkillLevel.Value;
+
+        int max = GetMaxSkillLevelIntl(Specialities);
+        _maxSkillLevelCached = max;
+        return max;
+    }
+
+    private static int GetMaxSkillLevelIntl(SpecialityInfo?[]? specialities)
+    {
+        if (specialities == null)
+            return 0;
+
+        int max = 0;
+        for (int spec = 0; spec < specialities.Length; ++spec)
+        {
+            SpecialityInfo? specInfo = specialities[spec];
+            SkillInfo[]? skills = specInfo?.Skills;
+            if (skills == null)
+                continue;
+
+            for (int skill = 0; skill < skills.Length; ++skill)
+            {
+                SkillInfo skillInfo = skills[skill];
+                if (skillInfo == null || skillInfo.MaximumLevel < max)
+                    continue;
+
+                max = skillInfo.MaximumLevel;
+            }
+        }
+
+        return max;
+    }
 
     public bool TryGetAssetBundleVersionInfo(int assetBundleVersion, out UnityEngineVersion version, out string displayName)
     {
@@ -179,8 +230,8 @@ public class AssetInformation
 
     public TypeHierarchy GetHierarchy(QualifiedType baseType)
     {
-        if (baseType.IsCaseInsensitive)
-            baseType = baseType.CaseSensitive;
+        if (!baseType.IsCaseInsensitive)
+            baseType = baseType.CaseInsensitive;
 
         if (Types == null || !Types.TryGetValue(baseType, out TypeHierarchy? hierarchy))
             return new TypeHierarchy();
@@ -190,8 +241,8 @@ public class AssetInformation
 
     public InverseTypeHierarchy GetParentTypes(QualifiedType type)
     {
-        if (type.IsCaseInsensitive)
-            type = type.CaseSensitive;
+        if (!type.IsCaseInsensitive)
+            type = type.CaseInsensitive;
 
         return ParentTypes.TryGetValue(type, out InverseTypeHierarchy? typeHierarchy)
             ? typeHierarchy
@@ -250,7 +301,7 @@ public class AssetInformation
     /// </summary>
     /// <returns>
     /// -1 if more than one asset category could be searched, 0 if no asset categories could be searched,
-    /// otherwise the index of the category in <see cref="AssetCategory.TypeOf"/>'s values.
+    /// otherwise the index of the category in <see cref="AssetCategory.Instance"/>'s values.
     /// </returns>
     public int GetAssetCategory(OneOrMore<QualifiedType> elementTypes)
     {
@@ -262,7 +313,7 @@ public class AssetInformation
     /// </summary>
     /// <returns>
     /// -1 if more than one asset category could be searched, 0 if no asset categories could be searched,
-    /// otherwise the index of the category in <see cref="AssetCategory.TypeOf"/>'s values.
+    /// otherwise the index of the category in <see cref="AssetCategory.Instance"/>'s values.
     /// </returns>
     public int GetAssetCategory(QualifiedType elementType, OneOrMore<QualifiedType> otherElementTypes)
     {

@@ -84,6 +84,11 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT108 = new DatDiagnostic("UNT108", DatDiagnosticSeverity.Hint);
 
+    /// <summary>
+    /// Relevant skill can not be determined for a SkillLevel property.
+    /// </summary>
+    public static readonly DatDiagnostic UNT109 = new DatDiagnostic("UNT109", DatDiagnosticSeverity.Warning);
+
     /* Warnings */
 
     /// <summary>

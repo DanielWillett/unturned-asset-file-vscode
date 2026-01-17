@@ -47,12 +47,12 @@ internal sealed class IPv4FilterTypeConverter : ITypeConverter<IPv4Filter>
 
         if (typeof(TTo) == typeof(bool))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(value != IPv4Filter.All);
+            result = MathMatrix.As<bool, TTo>(value != IPv4Filter.All);
             return true;
         }
         if (typeof(TTo) == typeof(string))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(value.ToString());
+            result = MathMatrix.As<string, TTo>(value.ToString());
             return true;
         }
 

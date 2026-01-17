@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics;
 
@@ -10,7 +9,7 @@ internal class ValueNode : AnySourceNode, IValueSourceNode
 {
     public override SourceNodeType Type => SourceNodeType.Value;
 
-    public ValueTypeDataRefType ValueType => ValueTypeDataRefType.Value;
+    public SourceValueType ValueType => SourceValueType.Value;
 
     public string Value { get; set; }
 

@@ -1,5 +1,4 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
@@ -24,24 +23,24 @@ public class ComplexConditionalSwitchCase : ISwitchCase
     /// <summary>
     /// The operation used to combine <see cref="Conditions"/>.
     /// </summary>
-    public SpecDynamicSwitchCaseOperation Operation { get; }
+    public JointConditionOperation Operation { get; }
 
     /// <inheritdoc />
     public IValue Value { get; }
 
     protected virtual bool WriteValueToJson => true;
 
-    public ComplexConditionalSwitchCase(ImmutableArray<IValue<bool>> conditions, SpecDynamicSwitchCaseOperation operation, IValue value)
+    public ComplexConditionalSwitchCase(ImmutableArray<IValue<bool>> conditions, JointConditionOperation operation, IValue value)
     {
-        if (operation is not SpecDynamicSwitchCaseOperation.And and not SpecDynamicSwitchCaseOperation.Or)
-            throw new InvalidEnumArgumentException(nameof(operation), (int)operation, typeof(SpecDynamicSwitchCaseOperation));
+        if (operation is not JointConditionOperation.And and not JointConditionOperation.Or)
+            throw new InvalidEnumArgumentException(nameof(operation), (int)operation, typeof(JointConditionOperation));
 
         Value = value ?? throw new ArgumentNullException(nameof(value));
         Conditions = conditions;
         Operation = conditions.Length switch
         {
-            0 => SpecDynamicSwitchCaseOperation.And,
-            1 => SpecDynamicSwitchCaseOperation.Or,
+            0 => JointConditionOperation.And,
+            1 => JointConditionOperation.Or,
             _ => operation
         };
     }
@@ -61,7 +60,7 @@ public class ComplexConditionalSwitchCase : ISwitchCase
             }
             else
             {
-                writer.WritePropertyName(Operation == SpecDynamicSwitchCaseOperation.And ? "And"u8 : "Or"u8);
+                writer.WritePropertyName(Operation == JointConditionOperation.And ? "And"u8 : "Or"u8);
                 writer.WriteStartArray();
                 foreach (IValue<bool> condition in conditions)
                 {
@@ -92,17 +91,17 @@ public class ComplexConditionalSwitchCase : ISwitchCase
 
             switch (Operation)
             {
-                case SpecDynamicSwitchCaseOperation.Or when passesCondition:
+                case JointConditionOperation.Or when passesCondition:
                     doesPassConditions = true;
                     return true;
 
-                case SpecDynamicSwitchCaseOperation.And when !passesCondition:
+                case JointConditionOperation.And when !passesCondition:
                     doesPassConditions = false;
                     return true;
             }
         }
 
-        doesPassConditions = Operation == SpecDynamicSwitchCaseOperation.And;
+        doesPassConditions = Operation == JointConditionOperation.And;
         return true;
     }
 
@@ -118,17 +117,17 @@ public class ComplexConditionalSwitchCase : ISwitchCase
 
             switch (Operation)
             {
-                case SpecDynamicSwitchCaseOperation.Or when passesCondition:
+                case JointConditionOperation.Or when passesCondition:
                     doesPassConditions = true;
                     return true;
 
-                case SpecDynamicSwitchCaseOperation.And when !passesCondition:
+                case JointConditionOperation.And when !passesCondition:
                     doesPassConditions = false;
                     return true;
             }
         }
 
-        doesPassConditions = Operation == SpecDynamicSwitchCaseOperation.And;
+        doesPassConditions = Operation == JointConditionOperation.And;
         return true;
     }
 
@@ -213,7 +212,7 @@ public class ComplexConditionalSwitchCase<TResult> : ComplexConditionalSwitchCas
     /// <inheritdoc />
     public new IValue<TResult> Value => (IValue<TResult>)base.Value;
 
-    public ComplexConditionalSwitchCase(ImmutableArray<IValue<bool>> conditions, SpecDynamicSwitchCaseOperation operation, IValue<TResult> value)
+    public ComplexConditionalSwitchCase(ImmutableArray<IValue<bool>> conditions, JointConditionOperation operation, IValue<TResult> value)
         : base(conditions, operation, value)
     {
         Type = value.Type;
@@ -263,7 +262,7 @@ public class ComplexConditionalValue : ComplexConditionalSwitchCase<bool>
 {
     protected override bool WriteValueToJson => false;
 
-    public ComplexConditionalValue(ImmutableArray<IValue<bool>> conditions, SpecDynamicSwitchCaseOperation operation)
+    public ComplexConditionalValue(ImmutableArray<IValue<bool>> conditions, JointConditionOperation operation)
         : base(conditions, operation, Values.Value.True) { }
 
     /// <inheritdoc />

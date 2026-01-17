@@ -1,5 +1,4 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
@@ -7,19 +6,19 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 internal struct LazySource
 {
     internal ReadOnlyMemory<char> Segment { get; }
-    internal ValueTypeDataRefType ExpectedType { get; }
+    internal SourceValueType ExpectedType { get; }
     internal object? CachedNode { get; set; }
     internal SourceNodeTokenizerOptions Options { get; set; }
     internal long PositionOffset { get; set; }
     internal long IndexDepthOffset { get; set; }
 
-    internal LazySource(object? cachedNode, ValueTypeDataRefType expectedType)
+    internal LazySource(object? cachedNode, SourceValueType expectedType)
     {
         CachedNode = cachedNode;
         ExpectedType = expectedType;
     }
 
-    internal LazySource(ReadOnlyMemory<char> segment, ValueTypeDataRefType expectedType)
+    internal LazySource(ReadOnlyMemory<char> segment, SourceValueType expectedType)
     {
         Segment = segment;
         ExpectedType = expectedType;

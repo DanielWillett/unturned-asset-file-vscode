@@ -1,5 +1,4 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System.Text.Json;
 
 namespace UnturnedAssetSpecTests;
@@ -26,7 +25,7 @@ public class StatusTests
             Assert.Inconclusive("Game not installed where it's expected.");
         }
 
-        _runner = new AssetSpecDatabase { UseInternet = false, MultiThreaded = false };
+        _runner = AssetSpecDatabase.FromOffline(useInstallDir: true);
 
         await _runner.InitializeAsync();
 
@@ -38,7 +37,7 @@ public class StatusTests
     [Ignore("Makes network requests.")]
     public async Task TestFromInternet()
     {
-        _runner = new AssetSpecDatabase(new InstallDirUtility("NotUnturned", "Not304930")) { UseInternet = true };
+        _runner = AssetSpecDatabase.FromOffline(useInstallDir: false);
 
         await _runner.InitializeAsync();
 
@@ -50,7 +49,7 @@ public class StatusTests
     [Ignore("Makes network requests.")]
     public async Task TestInitializedSuccessfully()
     {
-        _runner = new AssetSpecDatabase { UseInternet = true };
+        _runner = AssetSpecDatabase.FromOnline(useInstallDir: false);
 
         await _runner.InitializeAsync();
 

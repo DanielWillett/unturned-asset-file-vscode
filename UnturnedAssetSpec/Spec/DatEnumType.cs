@@ -116,7 +116,7 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
         }
         if (typeof(TTo) == typeof(string))
         {
-            result = new Optional<TTo>(SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(v.ToString()));
+            result = new Optional<TTo>(MathMatrix.As<string, TTo>(v.ToString()));
             return true;
         }
 

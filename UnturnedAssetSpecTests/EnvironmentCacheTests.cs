@@ -1,4 +1,4 @@
-#if TEST_LSP
+#if false && TEST_LSP
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Files;

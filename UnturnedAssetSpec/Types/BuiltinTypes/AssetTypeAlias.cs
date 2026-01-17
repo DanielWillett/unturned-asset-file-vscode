@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -25,13 +26,13 @@ public sealed class AssetTypeAlias : DatEnumType
     /// </summary>
     private static AssetTypeAlias Create(in SpecificationTypeFactoryArgs args)
     {
-        return new AssetTypeAlias(args.Context.DatabaseFacade, args.Owner.Owner);
+        return new AssetTypeAlias(args.Context, args.Owner.Owner);
     }
 
-    internal AssetTypeAlias(IAssetSpecDatabase database, DatFileType owner)
+    internal AssetTypeAlias(IDatSpecificationReadContext context, DatFileType owner)
         : base(TypeId, default, owner)
     {
-        AssetInformation information = database.Information;
+        AssetInformation information = context.Information;
         Dictionary<string, QualifiedType> dict = information.AssetAliases;
         ImmutableArray<DatEnumValue>.Builder bldr = ImmutableArray.CreateBuilder<DatEnumValue>(dict.Count);
 
@@ -51,15 +52,20 @@ public sealed class AssetTypeAlias : DatEnumType
         DisplayNameIntl = Resources.Type_Name_AssetTypeAlias;
         Docs = "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html";
 
-        database.OnInitialize(UpdateDescriptionsOnDatabaseInitialize);
+        context.Database.OnInitialize(UpdateDescriptionsOnDatabaseInitialize);
     }
 
-    private Task UpdateDescriptionsOnDatabaseInitialize(IAssetSpecDatabase database)
+    private Task UpdateDescriptionsOnDatabaseInitialize(IAssetSpecDatabase database, ILoggerFactory loggerFactory)
     {
+        ILogger<AssetTypeAlias>? logger = null;
         foreach (DatEnumValue value in Values)
         {
             if (!database.FileTypes.TryGetValue(value.CorrespondingType, out DatFileType? type))
+            {
+                logger ??= loggerFactory.CreateLogger<AssetTypeAlias>();
+                logger.LogError("Unknown asset type {0} configured for asset alias {1}.", value.CorrespondingType.Type, value.Value);
                 continue;
+            }
 
             value.Description = string.Format(Resources.Type_AssetTypeAlias_Description, type.DisplayName);
             value.Docs = type.Docs;

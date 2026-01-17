@@ -204,7 +204,7 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
         TypeParsers.Guid.WriteValueToJson(writer, value, valueType, options);
     }
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
     {
         AssetReferenceKind mode = AssetReferenceKind.Unspecified;
         for (int i = 1; i < TypeIds.Length; ++i)

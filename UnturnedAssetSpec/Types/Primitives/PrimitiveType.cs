@@ -46,7 +46,7 @@ public abstract class PrimitiveType<TValue, TSelf>
     }
 
     /// <inheritdoc cref="ITypeFactory.CreateType"/>
-    protected virtual IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context) => this;
+    protected virtual IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context) => this;
 
     /// <inheritdoc />
     public override void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
@@ -54,7 +54,7 @@ public abstract class PrimitiveType<TValue, TSelf>
         writer.WriteStringValue(Id);
     }
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
     {
         return CreateType(in typeDefinition, typeId, spec, owner, context);
     }

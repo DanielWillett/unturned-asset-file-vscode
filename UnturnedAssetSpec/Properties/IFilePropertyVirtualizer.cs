@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System.Collections.Generic;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -11,11 +12,11 @@ public interface IFilePropertyVirtualizer
 {
     IEnumerable<IFileProperty> EnumerateProperties(ISourceFile file);
 
-    IFileProperty? FindProperty(ISourceFile file, SpecProperty property);
-    IFileProperty? FindProperty(ISourceFile file, SpecProperty property, in PropertyBreadcrumbs propertyBreadcrumbs);
+    IFileProperty? FindProperty(ISourceFile file, DatProperty property);
+    IFileProperty? FindProperty(ISourceFile file, DatProperty property, in PropertyBreadcrumbs propertyBreadcrumbs);
 
-    SpecProperty? GetProperty(IPropertySourceNode propertyNode, out PropertyResolutionContext context);
-    SpecProperty? GetProperty(IPropertySourceNode propertyNode, in AssetFileType fileType, in PropertyBreadcrumbs propertyBreadcrumbs, out PropertyResolutionContext context);
+    DatProperty? GetProperty(IPropertySourceNode propertyNode, out PropertyResolutionContext context);
+    DatProperty? GetProperty(IPropertySourceNode propertyNode, in AssetFileType fileType, in PropertyBreadcrumbs propertyBreadcrumbs, out PropertyResolutionContext context);
 }
 
 /// <summary>
@@ -23,19 +24,19 @@ public interface IFilePropertyVirtualizer
 /// </summary>
 public interface IFileProperty
 {
-    SpecProperty Property { get; }
+    DatProperty Property { get; }
 
-    ISpecType Owner { get; }
+    DatType Owner { get; }
 
-    bool TryGetValue(out ISpecDynamicValue? value);
+    bool TryGetValue(out IValue? value);
 }
 
 public struct FilePropertyInstance
 {
-    public SpecProperty Property { get; }
+    public DatProperty Property { get; }
     public IPropertySourceNode Node { get; }
 
-    public FilePropertyInstance(SpecProperty property, IPropertySourceNode node)
+    public FilePropertyInstance(DatProperty property, IPropertySourceNode node)
     {
         Property = property;
         Node = node;

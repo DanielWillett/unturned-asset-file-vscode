@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -34,9 +35,9 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
         : base(DatDiagnostics.UNT107, virtualizer, database, installEnv, workspaceEnv)
     {
         _installEnv = installEnv;
-        database.OnInitialize(_ =>
+        database.OnInitialize((_, _) =>
         {
-            ValidTypes = [ KnownTypes.Guid ];
+            ValidTypes = [ GuidType.Instance ];
             return Task.CompletedTask;
         });
     }
@@ -46,15 +47,15 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
         out FileRange range,
         ref bool hasDiagnostic,
         IPropertySourceNode propertyNode,
-        ISpecPropertyType propertyType,
-        SpecProperty property,
+        IType propertyType,
+        DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
         in SpecPropertyTypeParseContext parseContext)
     {
         state = default;
         range = default;
 
-        if (propertyNode.ValueKind == ValueTypeDataRefType.Value)
+        if (propertyNode.ValueKind == SourceValueType.Value)
         {
             string? valueStr = propertyNode.GetValueString(out _);
             state.Dashes = valueStr != null && Guid.TryParseExact(valueStr, "D", out _);

@@ -18,9 +18,9 @@ public sealed class CommaDelimitedStringType : ITypeFactory
 
     internal const StringSplitOptions DefaultSplitOptions = StringSplitOptions.RemoveEmptyEntries
 #if NET5_0_OR_GREATER
-                                                         | StringSplitOptions.TrimEntries;
+                                                            | StringSplitOptions.TrimEntries;
 #else
-                                                         | (StringSplitOptions)FallbackStringSplitOptions.TrimEntries;
+                                                            | (StringSplitOptions)FallbackStringSplitOptions.TrimEntries;
 #endif
 #if !NET5_0_OR_GREATER
     internal enum FallbackStringSplitOptions
@@ -83,7 +83,8 @@ public sealed class CommaDelimitedStringType : ITypeFactory
         return new CommaDelimitedStringType<TElementType>(null, null, DefaultSplitOptions, subType);
     }
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec,
+        DatProperty owner, string context)
     {
         ElementTypeVisitor v;
         v.Result = null;

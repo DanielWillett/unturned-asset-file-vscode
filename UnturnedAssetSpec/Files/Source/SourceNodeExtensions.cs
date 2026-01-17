@@ -1,10 +1,11 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -60,27 +61,32 @@ public static class SourceNodeExtensions
         /// Try to get a property by it's key or alias.
         /// </summary>
         /// <remarks>Does not support template properties.</remarks>
-        public bool TryGetProperty(SpecProperty property, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+        public bool TryGetProperty(DatProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
         {
-            if (property.IsTemplate || property.IsImport)
+            if (property.IsTemplate)
             {
                 propertyNode = null;
                 return false;
             }
 
-            if (FilterMatches(property.KeyLegacyExpansionFilter, context))
+            if (property.Keys.IsDefaultOrEmpty)
             {
                 if (node.TryGetProperty(property.Key, out propertyNode))
                     return true;
             }
-
-            foreach (Alias alias in property.Aliases)
+            else
             {
-                if (!FilterMatches(alias.Filter, context))
-                    continue;
+                foreach (DatPropertyKey key in property.Keys)
+                {
+                    if (!FilterMatches(key.Filter, context) || key.TemplateProcessor != null)
+                        continue;
 
-                if (node.TryGetProperty(alias.Value, out propertyNode))
-                    return true;
+                    if (key.Condition != null && !key.Condition.TryEvaluateValue(out Optional<bool> passesCondition, in ctx) && !passesCondition.GetValueOrDefault(false))
+                        continue;
+
+                    if (node.TryGetProperty(key.Key, out propertyNode))
+                        return true;
+                }
             }
 
             propertyNode = null;
@@ -91,19 +97,19 @@ public static class SourceNodeExtensions
         /// Gets a property of this asset from the root level of the asset data. This properly handles 'Metadata' properties.
         /// </summary>
         /// <remarks>Also will look for localization properties in the corresponding localization files, and vice versa with asset properties.</remarks>
-        public bool TryResolveProperty(SpecProperty property, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+        public bool TryResolveProperty(DatProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
         {
             if (node is ILocalizationSourceFile local && property.Context != SpecPropertyContext.Localization)
                 node = local.Asset;
 
             if (node is not IAssetSourceFile asset)
-                return node.TryGetProperty(property, out propertyNode, context);
+                return node.TryGetProperty(property, in ctx, out propertyNode, context);
 
             if (property.Context == SpecPropertyContext.Localization)
             {
                 foreach (ILocalizationSourceFile localFile in asset.Localization)
                 {
-                    if (localFile.TryResolveProperty(property, out propertyNode, context))
+                    if (localFile.TryResolveProperty(property, in ctx, out propertyNode, context))
                         return true;
                 }
 
@@ -112,7 +118,7 @@ public static class SourceNodeExtensions
             }
 
             if (!property.CanBeInMetadata)
-                return asset.AssetData.TryGetProperty(property, out propertyNode, context);
+                return asset.AssetData.TryGetProperty(property, in ctx, out propertyNode, context);
 
             IDictionarySourceNode? assetData = asset.GetAssetDataDictionary();
             IDictionarySourceNode? metadata = asset.GetMetadataDictionary();
@@ -121,15 +127,15 @@ public static class SourceNodeExtensions
             {
                 IDictionarySourceNode dict = metadata ?? node;
 
-                if (!dict.TryGetProperty(property, out propertyNode) && dict != node)
+                if (!dict.TryGetProperty(property, in ctx, out propertyNode) && dict != node)
                 {
-                    hasValue = node.TryGetProperty(property, out propertyNode, context);
+                    hasValue = node.TryGetProperty(property, in ctx, out propertyNode, context);
                 }
                 else hasValue = true;
             }
-            else if (!property.Key.Equals("GUID", StringComparison.OrdinalIgnoreCase) || property.Owner is not AssetSpecType)
+            else if (!property.Key.Equals("GUID", StringComparison.OrdinalIgnoreCase) || property.Owner is not DatAssetFileType)
             {
-                hasValue = assetData.TryGetProperty(property, out propertyNode, context);
+                hasValue = assetData.TryGetProperty(property, in ctx, out propertyNode, context);
             }
             else
             {

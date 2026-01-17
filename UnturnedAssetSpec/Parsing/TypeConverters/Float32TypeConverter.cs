@@ -73,7 +73,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
         {
             if (typeof(TTo) == typeof(bool))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(value != 0);
+                result = MathMatrix.As<bool, TTo>(value != 0);
                 return true;
             }
 
@@ -85,7 +85,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<int, TTo>((int)MathF.Round(value));
+                result = MathMatrix.As<int, TTo>((int)MathF.Round(value));
                 return true;
             }
 
@@ -97,7 +97,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<long, TTo>((long)MathF.Round(value));
+                result = MathMatrix.As<long, TTo>((long)MathF.Round(value));
                 return true;
             }
 
@@ -117,7 +117,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<nint, TTo>((nint)MathF.Round(value));
+                result = MathMatrix.As<nint, TTo>((nint)MathF.Round(value));
                 return true;
             }
 
@@ -129,7 +129,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<short, TTo>((short)MathF.Round(value));
+                result = MathMatrix.As<short, TTo>((short)MathF.Round(value));
                 return true;
             }
 
@@ -141,7 +141,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<sbyte, TTo>((sbyte)MathF.Round(value));
+                result = MathMatrix.As<sbyte, TTo>((sbyte)MathF.Round(value));
                 return true;
             }
 
@@ -153,7 +153,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<ulong, TTo>((ulong)MathF.Round(value));
+                result = MathMatrix.As<ulong, TTo>((ulong)MathF.Round(value));
                 return true;
             }
 
@@ -165,7 +165,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<uint, TTo>((uint)MathF.Round(value));
+                result = MathMatrix.As<uint, TTo>((uint)MathF.Round(value));
                 return true;
             }
 
@@ -185,7 +185,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<nuint, TTo>((nuint)MathF.Round(value));
+                result = MathMatrix.As<nuint, TTo>((nuint)MathF.Round(value));
                 return true;
             }
 
@@ -197,7 +197,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<ushort, TTo>((ushort)MathF.Round(value));
+                result = MathMatrix.As<ushort, TTo>((ushort)MathF.Round(value));
                 return true;
             }
 
@@ -209,7 +209,7 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<GuidOrId, TTo>(new GuidOrId((ushort)Math.Round(value)));
+                result = MathMatrix.As<GuidOrId, TTo>(new GuidOrId((ushort)Math.Round(value)));
                 return true;
             }
 
@@ -221,13 +221,13 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<byte, TTo>((byte)MathF.Round(value));
+                result = MathMatrix.As<byte, TTo>((byte)MathF.Round(value));
                 return true;
             }
 
             if (typeof(TTo) == typeof(double))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<double, TTo>(value);
+                result = MathMatrix.As<double, TTo>(value);
                 return true;
             }
 
@@ -239,18 +239,18 @@ internal sealed class Float32TypeConverter : ITypeConverter<float>
                     return false;
                 }
 
-                result = SpecDynamicExpressionTreeValueHelpers.As<char, TTo>((char)((int)MathF.Round(value) % 10 + '0'));
+                result = MathMatrix.As<char, TTo>((char)((int)MathF.Round(value) % 10 + '0'));
                 return true;
             }
         }
         else if (typeof(TTo) == typeof(string))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(value.ToString(CultureInfo.InvariantCulture));
+            result = MathMatrix.As<string, TTo>(value.ToString(CultureInfo.InvariantCulture));
             return true;
         }
         else if (typeof(TTo) == typeof(decimal))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<decimal, TTo>(new decimal(value));
+            result = MathMatrix.As<decimal, TTo>(new decimal(value));
             return true;
         }
 

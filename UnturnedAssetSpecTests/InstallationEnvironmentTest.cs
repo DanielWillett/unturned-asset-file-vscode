@@ -1,7 +1,6 @@
 using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System.Diagnostics;
 
@@ -49,7 +48,7 @@ public class InstallationEnvironmentTest
         Assert.That(aceAsset.Value.Type, Is.EqualTo(new QualifiedType("SDG.Unturned.ItemGunAsset, Assembly-CSharp")));
         Assert.That(aceAsset.Value.Id, Is.EqualTo(107));
 
-        OneOrMore<DiscoveredDatFile> aceAssetById = _runner.FindFile(107, AssetCategory.Item);
+        OneOrMore<DiscoveredDatFile> aceAssetById = _runner.FindFile(107, AssetCategoryValue.Item);
         Assert.That(aceAssetById, Is.EqualTo(aceAsset));
     }
 
@@ -234,8 +233,8 @@ public class InstallationEnvironmentTest
         Assert.That(_waitForUpdate.Task.IsCompleted);
 
         // file ID was changed
-        Assert.That(_runner.FindFile(2, AssetCategory.Item).Single(), Is.EqualTo(_waitForUpdate.Task.Result));
-        Assert.That(_runner.FindFile(1, AssetCategory.Item), Is.EqualTo(OneOrMore<DiscoveredDatFile>.Null));
+        Assert.That(_runner.FindFile(2, AssetCategoryValue.Item).Single(), Is.EqualTo(_waitForUpdate.Task.Result));
+        Assert.That(_runner.FindFile(1, AssetCategoryValue.Item), Is.EqualTo(OneOrMore<DiscoveredDatFile>.Null));
 
         // -----
 
@@ -254,7 +253,7 @@ public class InstallationEnvironmentTest
         // file ID was changed
         Assert.That(_waitForUpdate.Task.Result.FriendlyName, Is.EqualTo("Test Asset 1 (Changed)"));
         Assert.That(_runner.FindFile(new Guid("86510e2d8de7482ea1a9f42a64064865")).Single(), Is.EqualTo(_waitForUpdate.Task.Result));
-        Assert.That(_runner.FindFile(2, AssetCategory.Item).Single(), Is.EqualTo(_waitForUpdate.Task.Result));
+        Assert.That(_runner.FindFile(2, AssetCategoryValue.Item).Single(), Is.EqualTo(_waitForUpdate.Task.Result));
 
         _runner.OnFileUpdated -= RunnerOnOnFileUpdated;
     }

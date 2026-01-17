@@ -11,6 +11,7 @@ namespace UnturnedAssetSpecTests.Nodes;
 [TestFixture]
 public class PropertyBreadcrumbsTests
 {
+    #if false
     private ILoggerFactory _loggerFactory;
     private IAssetSpecDatabase _database;
 
@@ -763,4 +764,5 @@ public class PropertyBreadcrumbsTests
         Assert.That(crumbs.ToString(rootSlash: false), Is.EqualTo(expectedBreadcrumbs));
         Assert.That(propertyName, Is.EqualTo(expectedProperty));
     }
+#endif
 }

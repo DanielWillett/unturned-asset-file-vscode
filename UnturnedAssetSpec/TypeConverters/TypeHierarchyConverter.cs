@@ -29,7 +29,7 @@ public class TypeHierarchyConverter : JsonConverter<TypeHierarchy?>
                 return null;
 
             case JsonTokenType.PropertyName:
-                hierarchy.Type = new QualifiedType(reader.GetString());
+                hierarchy.Type = new QualifiedType(reader.GetString()!, isCaseInsensitive: true);
                 if (!reader.Read())
                     throw new JsonException("Expected object after starting on property name.");
                 goto recheck;

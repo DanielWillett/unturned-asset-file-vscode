@@ -8,6 +8,8 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+
 #pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
@@ -33,7 +35,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
     /// <summary>
     /// Attempts to read a switch value from a JSON array.
     /// </summary>
-    public static bool TryRead<TResult>(in JsonElement element, IType<TResult> type, [NotNullWhen(true)] out SwitchValue<TResult>? value)
+    public static bool TryRead<TResult>(in JsonElement element, IType<TResult> type, IAssetSpecDatabase database, DatProperty owner, [NotNullWhen(true)] out SwitchValue<TResult>? value)
         where TResult : IEquatable<TResult>
     {
         value = null;
@@ -48,7 +50,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
         for (int i = 0; i < cases; ++i)
         {
             JsonElement obj = element[i];
-            if (SwitchCase.TryReadSwitchCase(type, in obj) is not { } sc)
+            if (SwitchCase.TryReadSwitchCase(type, database, owner, in obj) is not { } sc)
             {
                 for (int j = 0; j < i; ++j)
                 {
@@ -69,13 +71,15 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
     /// <summary>
     /// Attempts to read an untyped switch value from a JSON array.
     /// </summary>
-    public static unsafe bool TryRead(in JsonElement element, IPropertyType type, [NotNullWhen(true)] out SwitchValue? value)
+    public static unsafe bool TryRead(in JsonElement element, IPropertyType type, IAssetSpecDatabase database, DatProperty owner, [NotNullWhen(true)] out SwitchValue? value)
     {
         if (type.TryGetConcreteType(out IType? actualType))
         {
             CreateTypedSwitchValueVisitor v;
             v.Visited = false;
             v.Created = null;
+            v.Database = database;
+            v.Owner = owner;
             fixed (JsonElement* elementPtr = &element)
             {
                 v.Element = elementPtr;
@@ -106,7 +110,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
         {
             JsonElement item = element[i];
 
-            ISwitchCase? sc = SwitchCase.TryReadSwitchCase(actualType, in item);
+            ISwitchCase? sc = SwitchCase.TryReadSwitchCase(actualType, database, owner, in item);
             if (sc == null)
                 return false;
 
@@ -118,7 +122,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
                     return false;
                 }
 
-                sc = SwitchCase.TryReadSwitchCase(typeOfValue.Type, in item);
+                sc = SwitchCase.TryReadSwitchCase(typeOfValue.Type, database, owner, in item);
                 if (sc == null)
                     return false;
             }
@@ -135,10 +139,12 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
         public SwitchValue? Created;
         public bool Visited;
         public JsonElement* Element;
+        public IAssetSpecDatabase Database;
+        public DatProperty Owner;
         public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
         {
             Visited = true;
-            if (TryRead(in Unsafe.AsRef<JsonElement>(Element), type, out SwitchValue<TValue>? value))
+            if (TryRead(in Unsafe.AsRef<JsonElement>(Element), type, Database, Owner, out SwitchValue<TValue>? value))
             {
                 Created = value;
             }
@@ -255,7 +261,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
 
                     switch (complexConditional.Operation)
                     {
-                        case SpecDynamicSwitchCaseOperation.And:
+                        case JointConditionOperation.And:
                             // must contain all cases from parent
                             if (conditions.Length > 1)
                             {
@@ -287,7 +293,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
 
                             break;
 
-                        case SpecDynamicSwitchCaseOperation.Or:
+                        case JointConditionOperation.Or:
                             // must contain at least one case from parent
 
                             // check group first
@@ -532,7 +538,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
                 continue;
 
             ImmutableArray<IValue<bool>> conditions = falseConditional.Conditions;
-            if (falseConditional.Operation == SpecDynamicSwitchCaseOperation.Or || conditions.Length == 1)
+            if (falseConditional.Operation == JointConditionOperation.Or || conditions.Length == 1)
             {
                 foreach (IValue<bool> condition in conditions)
                 {
@@ -572,7 +578,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
             return;
 
         ImmutableArray<IValue<bool>> conditions = conditional.Conditions;
-        if (conditional.Operation == SpecDynamicSwitchCaseOperation.And || conditions.Length == 1)
+        if (conditional.Operation == JointConditionOperation.And || conditions.Length == 1)
         {
             foreach (IValue<bool> condition in conditions)
             {

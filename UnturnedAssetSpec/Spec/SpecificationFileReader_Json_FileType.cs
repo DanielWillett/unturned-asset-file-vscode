@@ -1,5 +1,4 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Collections.Immutable;
 using System.Text.Json;
@@ -11,7 +10,7 @@ partial class SpecificationFileReader
     private JsonElement _typeRoot;
     private int _currentTypeIndex;
 
-    public DatFileType ReadFileType(JsonDocument doc, QualifiedType fileType, ImmutableDictionary<QualifiedType, DatFileType>.Builder fileTypes)
+    private DatFileType ReadFileType(JsonDocument doc, QualifiedType fileType)
     {
         JsonElement root = doc.RootElement;
 
@@ -31,7 +30,7 @@ partial class SpecificationFileReader
             if (parentTypeStr != null)
             {
                 QualifiedType qualifiedType = new QualifiedType(parentTypeStr, isCaseInsensitive: true);
-                fileTypes.TryGetValue(qualifiedType, out parentType);
+                _fileTypeBuilder?.TryGetValue(qualifiedType, out parentType);
             }
         }
 
@@ -39,7 +38,7 @@ partial class SpecificationFileReader
 
         DatFileType type = DatType.CreateFileType(fileType, isAsset, root, parentType);
 
-        fileTypes[fileType] = type;
+        _fileTypeBuilder?[fileType] = type;
 
         if (type is DatAssetFileType assetType)
         {
@@ -119,7 +118,7 @@ partial class SpecificationFileReader
 
             for (int i = 0; i < propertyCount; ++i)
             {
-                ReadPropertyFirstPass(in element, i, "Properties", t => t.Properties, propertyBuilder, type);
+                ReadPropertyFirstPass(in element, i, "Properties", t => t.Properties, propertyBuilder, SpecPropertyContext.Property, type);
             }
 
             type.Properties = propertyBuilder.ToImmutable();

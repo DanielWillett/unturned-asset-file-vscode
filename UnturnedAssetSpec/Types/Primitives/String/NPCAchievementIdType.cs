@@ -1,6 +1,8 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -30,12 +32,16 @@ public sealed class NPCAchievementIdType : PrimitiveType<string, NPCAchievementI
         if (!TypeParsers.String.TryParse(ref args, in ctx, out value))
             return false;
 
-        if (args.DiagnosticSink == null || !ctx.TryGetRelevantMap(out _))
-        {
+        if (args.DiagnosticSink == null || !value.HasValue)
             return true;
+
+        // NPCAchievementIds usually implemented with ImmutableHashSet
+        ICollection<string>? achIds = ctx.Information.NPCAchievementIds;
+        if (achIds == null || !achIds.Contains(value.Value))
+        {
+            args.DiagnosticSink?.UNT1013(ref args, value.Value);
         }
 
-        // todo check if NPC ID exists
         return true;
     }
 

@@ -13,10 +13,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 /// <summary>
 /// A property that can be defined in the file of a <see cref="DatFileType"/> or within an instance of a custom type.
 /// </summary>
-public sealed class DatProperty : IDatSpecificationObject
+public class DatProperty : IDatSpecificationObject
 {
     /// <inheritdoc />
     public JsonElement DataRoot { get; }
+
+    /// <summary>
+    /// The context of this property.
+    /// </summary>
+    public SpecPropertyContext Context { get; }
 
     /// <summary>
     /// The type that defines this property.
@@ -51,7 +56,7 @@ public sealed class DatProperty : IDatSpecificationObject
     /// Type of value this property stores.
     /// </summary>
     /// <remarks>Corresponds to the <c>Type</c> property.</remarks>
-    public IPropertyType Type { get; }
+    public IPropertyType Type { get; internal set; }
 
     /// <summary>
     /// List of available keys, if extra information is given for any.
@@ -162,16 +167,28 @@ public sealed class DatProperty : IDatSpecificationObject
     /// <remarks>Corresponds to the <c>IncludedDefaultValue</c> property.</remarks>
     public IValue? IncludedDefaultValue { get; internal set; }
 
-    internal DatProperty(string key, IPropertyType type, DatTypeWithProperties owner, JsonElement element)
+    internal DatProperty(string key, DatTypeWithProperties owner, JsonElement element, SpecPropertyContext context)
     {
         Key = key;
         Owner = owner;
-        Type = type;
         DataRoot = element;
+        Context = context;
+        Type = null!;
+    }
+
+    /// <inheritdoc cref="Create(string,IPropertyType,DatTypeWithProperties,JsonElement,SpecPropertyContext)("/>
+    internal static DatProperty Create(string key, DatTypeWithProperties owner, JsonElement element, SpecPropertyContext context)
+    {
+        return new DatProperty(
+            key   ?? throw new ArgumentNullException(nameof(key)),
+            owner ?? throw new ArgumentNullException(nameof(owner)),
+            element,
+            context
+        );
     }
 
     /// <summary>
-    /// Create a new <see cref="DatProperty"/> instance given a <paramref name="key"/> and <paramref name="type"/>.
+    /// Create a new <see cref="DatProperty"/> instance given a <paramref name="key"/>.
     /// </summary>
     /// <param name="key">The primary key for this property.</param>
     /// <param name="type">The type of value this property stores.</param>
@@ -179,14 +196,14 @@ public sealed class DatProperty : IDatSpecificationObject
     /// <param name="element">The JSON element this property was read from.</param>
     /// <returns>The newly-created <see cref="DatProperty"/> instance.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static DatProperty Create(string key, IPropertyType type, DatTypeWithProperties owner, JsonElement element)
+    public static DatProperty Create(string key, IPropertyType type, DatTypeWithProperties owner, JsonElement element, SpecPropertyContext context)
     {
-        return new DatProperty(
-            key   ?? throw new ArgumentNullException(nameof(key)),
-            type  ?? throw new ArgumentNullException(nameof(type)),
-            owner ?? throw new ArgumentNullException(nameof(owner)),
-            element
-        );
+        if (type == null)
+            throw new ArgumentNullException(nameof(type));
+
+        DatProperty property = Create(key, owner, element, context);
+        property.Type = type;
+        return property;
     }
 
     private const int CachedLocalizationStringTypes = 8;
@@ -230,9 +247,11 @@ public sealed class DatProperty : IDatSpecificationObject
             type = new StringType(int.MinValue, int.MaxValue, true, false, maxFormatArguments, OneOrMore<Regex>.Null);
         }
 
-        return new DatProperty(key, type, owner, default)
+        // note: these are not considered Localization properties since they're still in the main file.
+        return new DatProperty(key, owner, default, SpecPropertyContext.Property)
         {
-            DefaultValue = value == null ? null : Value.Create(value, type)
+            DefaultValue = value == null ? null : Value.Create(value, type),
+            Type = type
         };
     }
 
@@ -243,21 +262,22 @@ public sealed class DatProperty : IDatSpecificationObject
     /// <param name="owner">The type that defines this property.</param>
     /// <returns>The newly-created <see cref="DatProperty"/> instance.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static DatProperty Hide(DatProperty overriding, DatTypeWithProperties owner)
+    public static DatProperty Hide(DatProperty overriding, DatTypeWithProperties owner, SpecPropertyContext context)
     {
         if (owner == null)
             throw new ArgumentNullException(nameof(owner));
         if (overriding == null)
             throw new ArgumentNullException(nameof(overriding));
 
-        return new DatProperty(overriding.Key, overriding.Type, owner, default)
+        return new DatProperty(overriding.Key, owner, default, context)
         {
             HideOverridden = true,
-            OverriddenProperty = overriding
+            OverriddenProperty = overriding,
+            Type = overriding.Type
         };
     }
 
-    string IDatSpecificationObject.FullName => $"{((IDatSpecificationObject)Owner).FullName}.{Key}";
+    public string FullName => $"{((IDatSpecificationObject)Owner).FullName}.{Key}";
     DatFileType IDatSpecificationObject.Owner => Owner.Owner;
 }
 

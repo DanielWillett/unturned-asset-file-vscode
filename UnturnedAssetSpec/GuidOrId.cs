@@ -1,5 +1,4 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -63,23 +62,16 @@ public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable
         IsId = true;
     }
 
-    public GuidOrId(ushort id, in EnumSpecTypeValue category)
-    {
-        Id = id;
-        Category = (byte)category.Index;
-        IsId = true;
-    }
-
     /// <inheritdoc />
     public override string ToString()
     {
         if (!IsId)
             return Guid.ToString("N");
 
-        if (Category == 0 || Category >= AssetCategory.TypeOf.Values.Length)
+        if (Category == 0 || Category >= AssetCategory.Instance.Values.Length)
             return Id.ToString(CultureInfo.InvariantCulture);
 
-        return $"{AssetCategory.TypeOf.Values[Category].Value}:{Id.ToString(CultureInfo.InvariantCulture)}";
+        return $"{AssetCategory.Instance.Values[Category].Value}:{Id.ToString(CultureInfo.InvariantCulture)}";
     }
 
     /// <inheritdoc />
@@ -90,7 +82,7 @@ public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable
 
     public bool Equals(ushort id) => IsId && Id == id;
 
-    public bool Equals(ushort id, in EnumSpecTypeValue assetCategory) => IsId && Id == id && Category == assetCategory.Index;
+    public bool Equals(ushort id, AssetCategoryValue assetCategory) => IsId && Id == id && Category == assetCategory.Index;
 
     public bool Equals(Guid guid) => !IsId && Guid == guid;
 

@@ -187,55 +187,8 @@ internal readonly struct ExpressionNodeFormatter
         WriteEscaped(propRef.Breadcrumbs.ToString(false, propRef.PropertyName));
     }
 
-    private void WriteDataRef(DataRef dataRef)
+    private void WriteDataRef(IDataRef dataRef)
     {
-        IDataRefTarget target = dataRef.Target;
-        switch (target)
-        {
-            case IExpressionNode node:
-                WriteValue(node, false);
-                Write('.');
-                break;
-            
-            case not null:
-                WriteEscaped(target.ToString()!);
-                Write('.');
-                break;
-        }
-
-        WriteEscaped(dataRef.PropertyName);
-
-        if (dataRef is IIndexableDataRef indexable)
-        {
-            Write('[');
-            if (_sb != null)
-                _sb.Append(indexable.Index);
-            else
-                _writer?.Write(indexable.Index);
-            Write(']');
-        }
-
-        if (dataRef is not IPropertiesDataRef properties)
-            return;
-
-        using IEnumerator<KeyValuePair<string, string>> props = properties.EnumerateProperties().GetEnumerator();
-        if (!props.MoveNext())
-            return;
-
-        Write('{');
-        bool needsComma = false;
-        do
-        {
-            KeyValuePair<string, string> property = props.Current;
-            if (needsComma)
-                Write(',');
-            else
-                needsComma = true;
-            WriteEscaped(property.Key);
-            Write('=');
-            WriteEscaped(property.Value);
-        } while (props.MoveNext());
-
-        Write('}');
+        WriteEscaped(dataRef.GetExpressionString(hash: false));
     }
 }

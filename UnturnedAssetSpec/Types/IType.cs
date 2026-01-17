@@ -36,6 +36,11 @@ public interface IType : IPropertyType, IEquatable<IType?>
 }
 
 /// <summary>
+/// Marker interface implemented by types that should still parse when a value is not defined.
+/// </summary>
+public interface IFlagType : IType;
+
+/// <summary>
 /// A factory that can create types from JSON information.
 /// </summary>
 public interface ITypeFactory
@@ -44,7 +49,7 @@ public interface ITypeFactory
     /// Resolves the type.
     /// </summary>
     /// <remarks>Some factories will just return themselves.</remarks>
-    IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context = "");
+    IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context = "");
 }
 
 /// <summary>

@@ -138,7 +138,7 @@ public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetRefer
         TypeParsers.UInt16.WriteValueToJson(writer, value, valueType, options);
     }
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
     {
         bool defaultable = typeId.Equals(DefaultableTypeId, StringComparison.Ordinal);
         if (!defaultable && typeDefinition.ValueKind == JsonValueKind.String)

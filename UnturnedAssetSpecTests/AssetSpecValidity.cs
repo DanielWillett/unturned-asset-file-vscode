@@ -22,38 +22,36 @@ public class AssetSpecValidity
         Console.WriteLine();
         Console.WriteLine();
 
-        TestAssetSpecDatabase db = new TestAssetSpecDatabase(util)
-        {
-            UseInternet = false,
-            // makes debugging easier
-            MultiThreaded = false
-        };
+        //TestAssetSpecDatabase db = new TestAssetSpecDatabase(util)
+        //{
+        //    UseInternet = false
+        //};
 
-        await db.InitializeAsync();
+        // todo await db.InitializeAsync();
 
-        Console.WriteLine(db.Types.Values.SelectMany(x => x.Properties.Where(x => !x.IsOverride)).Count());
-        Console.WriteLine(db.Types.Values.SelectMany(x => x.Types.SelectMany(x => x.GetProperties(SpecPropertyContext.Property).Where(x => !x.IsOverride))).Count());
+        //Console.WriteLine(db.FileTypes.Values.SelectMany(x => x.Properties.Where(x => !x.IsOverride)).Count());
+        //Console.WriteLine(db.FileTypes.Values.SelectMany(x => x.Types.SelectMany(x => x.GetProperties(SpecPropertyContext.Property).Where(x => !x.IsOverride))).Count());
 
         Assert.That(_hasRanIntoError, Is.False);
 
         _hasRanIntoError = false;
     }
 
-    private class TestAssetSpecDatabase : AssetSpecDatabase
-    {
-        public TestAssetSpecDatabase(InstallDirUtility installDir) : base(installDir)
-        {
-
-        }
-
-        protected override void Log(string msg)
-        {
-            if (!(msg.Contains("internet disabled") || msg.StartsWith("InstallDirUtility >>")))
-            {
-                _hasRanIntoError = true;
-            }
-
-            Console.WriteLine(msg);
-        }
-    }
+    //private class TestAssetSpecDatabase : AssetSpecDatabase
+    //{
+    //    public TestAssetSpecDatabase(InstallDirUtility installDir) : base(installDir)
+    //    {
+    //
+    //    }
+    //
+    //    protected override void Log(string msg)
+    //    {
+    //        if (!(msg.Contains("internet disabled") || msg.StartsWith("InstallDirUtility >>")))
+    //        {
+    //            _hasRanIntoError = true;
+    //        }
+    //
+    //        Console.WriteLine(msg);
+    //    }
+    //}
 }

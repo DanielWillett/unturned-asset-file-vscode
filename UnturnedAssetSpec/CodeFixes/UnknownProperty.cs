@@ -1,10 +1,10 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
-using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 
@@ -33,11 +33,7 @@ internal class UnknownProperty : PerPropertyCodeFix<UnknownProperty.UnknownPrope
         IWorkspaceEnvironment workspaceEnv)
         : base(DatDiagnostics.UNT1025, virtualizer, database, installEnv, workspaceEnv)
     {
-        database.OnInitialize(_ =>
-        {
-            ValidTypes = [ KnownTypes.Guid ];
-            return Task.CompletedTask;
-        });
+
     }
 
     public override bool TryApplyToProperty(
@@ -45,8 +41,8 @@ internal class UnknownProperty : PerPropertyCodeFix<UnknownProperty.UnknownPrope
         out FileRange range,
         ref bool hasDiagnostic,
         IPropertySourceNode propertyNode,
-        ISpecPropertyType propertyType,
-        SpecProperty property,
+        IType propertyType,
+        DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
         in SpecPropertyTypeParseContext parseContext)
     {

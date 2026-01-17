@@ -4,10 +4,11 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </summary>
 [SpecificationType(FactoryMethod = nameof(Create))]
 #if NET5_0_OR_GREATER
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicMethods)]
+[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicMethods)]
 #endif
 public sealed class Orderfile : DatFileType
 {
@@ -37,7 +38,7 @@ public sealed class Orderfile : DatFileType
 
         if (database.IsInitialized)
         {
-            GenerateProperties(database);
+            GenerateProperties(database, NullLoggerFactory.Instance);
         }
         else
         {
@@ -50,7 +51,7 @@ public sealed class Orderfile : DatFileType
     /// </summary>
     private static Orderfile Create(in SpecificationTypeFactoryArgs args)
     {
-        return FromDatabase(args.Context.DatabaseFacade);
+        return FromDatabase(args.Context.Database);
     }
 
     /// <summary>
@@ -63,7 +64,7 @@ public sealed class Orderfile : DatFileType
     }
 
     // set up auto-generated auto-complete for the Orderfile file type
-    private Task GenerateProperties(IAssetSpecDatabase database)
+    private Task GenerateProperties(IAssetSpecDatabase database, ILoggerFactory loggerFactory)
     {
         ImmutableArray<DatProperty>.Builder properties = ImmutableArray.CreateBuilder<DatProperty>(database.FileTypes.Count);
         int firstCustomTypeIndex = 0;
@@ -98,7 +99,7 @@ public sealed class Orderfile : DatFileType
         {
             OrderfileListElementType elementType = new OrderfileListElementType(database, type, true);
             string key = PropertyReference.CreateContextSpecifier(SpecPropertyContext.Localization) + typeName.Type;
-            DatProperty property = DatProperty.Create(key, ListType.Create(elementType), this, default);
+            DatProperty property = DatProperty.Create(key, ListType.Create(elementType), this, default, SpecPropertyContext.Property);
             if (isFile)
             {
                 properties.Insert(firstCustomTypeIndex, property);
@@ -122,7 +123,7 @@ public sealed class Orderfile : DatFileType
         {
             OrderfileListElementType elementType = new OrderfileListElementType(database, propertyType, false);
             string key = PropertyReference.CreateContextSpecifier(SpecPropertyContext.Localization) + typeName.Type;
-            DatProperty property = DatProperty.Create(key, ListType.Create(elementType), this, default);
+            DatProperty property = DatProperty.Create(key, ListType.Create(elementType), this, default, SpecPropertyContext.Property);
             if (isFile)
             {
                 properties.Insert(firstCustomTypeIndex, property);
@@ -274,7 +275,7 @@ internal sealed class OrderfileListElementType : BaseType<string, OrderfileListE
 
             strValue = StringHelper.Unescape(typeNameIntl);
             QualifiedType type = new QualifiedType(strValue, isCaseInsensitive: true);
-            if (!_database.AllTypes.TryGetValue(type, out DatType? dt))
+            if (!_database.TryFindType(type, out DatType? dt, _type))
             {
                 args.DiagnosticSink?.UPROJ2002(ref args, strValue);
             }

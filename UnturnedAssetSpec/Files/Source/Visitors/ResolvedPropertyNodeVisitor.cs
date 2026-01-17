@@ -1,9 +1,10 @@
-﻿using System;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using System;
 using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
@@ -21,7 +22,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
     private readonly PropertyInclusionFlags _flags;
     private AssetFileType _fileType;
     private bool _hasFileType;
-    private HashSet<(PropertyBreadcrumbs, SpecProperty)>? _visitedMultiProperties;
+    private HashSet<(PropertyBreadcrumbs, DatProperty)>? _visitedMultiProperties;
     private readonly FileRange? _range;
 
     protected override bool IgnoreMetadata => true;
@@ -73,8 +74,8 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
     }
 
     protected virtual void AcceptResolvedProperty(
-        SpecProperty property,
-        ISpecPropertyType propertyType,
+        DatProperty property,
+        IType propertyType,
         in SpecPropertyTypeParseContext parseCtx,
         IPropertySourceNode node,
         in PropertyBreadcrumbs breadcrumbs) { }
@@ -88,7 +89,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         if (!node.IsIncluded(_flags))
             return;
         
-        if (node is { File: IAssetSourceFile, ValueKind: ValueTypeDataRefType.Dictionary }
+        if (node is { File: IAssetSourceFile, ValueKind: SourceValueType.Dictionary }
             && ReferenceEquals(node.Parent, node.File)
             && (node.Key.Equals("Asset", StringComparison.OrdinalIgnoreCase) || node.Key.Equals("Metadata", StringComparison.OrdinalIgnoreCase))
             )
@@ -119,7 +120,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
 
         PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(node);
 
-        SpecProperty? property = _virtualizer.GetProperty(node, in _fileType, in breadcrumbs, out PropertyResolutionContext context);
+        DatProperty? property = _virtualizer.GetProperty(node, in _fileType, in breadcrumbs, out PropertyResolutionContext context);
         if (property == null)
         {
             if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0)
@@ -139,21 +140,21 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
             Parent = node
         };
 
-        ISpecPropertyType? type = property.Type.GetType(in ctx);
-        if (type == null)
+        if (!property.Type.TryEvaluateType(out IType? type, in ctx))
             return;
 
-        if (type is ILegacyCompositeTypeProvider)
-        {
-            _visitedMultiProperties ??= new HashSet<(PropertyBreadcrumbs, SpecProperty)>();
-            if (_visitedMultiProperties.Add((breadcrumbs, property)))
-            {
-                AcceptResolvedProperty(property, type, in parseContext, node, in breadcrumbs);
-            }
-        }
-        else
-        {
+        // todo
+        //if (type is ILegacyCompositeTypeProvider)
+        //{
+        //    _visitedMultiProperties ??= new HashSet<(PropertyBreadcrumbs, DatProperty)>();
+        //    if (_visitedMultiProperties.Add((breadcrumbs, property)))
+        //    {
+        //        AcceptResolvedProperty(property, type, in parseContext, node, in breadcrumbs);
+        //    }
+        //}
+        //else
+        //{
             AcceptResolvedProperty(property, type, in parseContext, node, in breadcrumbs);
-        }
+        //}
     }
 }

@@ -406,7 +406,7 @@ internal static class JsonHelper
             case JsonTokenType.False:
                 if (typeof(TTo) == typeof(bool))
                 {
-                    value = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(reader.TokenType == JsonTokenType.True);
+                    value = MathMatrix.As<bool, TTo>(reader.TokenType == JsonTokenType.True);
                     return true;
                 }
 
@@ -490,7 +490,7 @@ internal static class JsonHelper
                     if (!reader.TryGetUInt16(out ushort v))
                         return false;
 
-                    value = SpecDynamicExpressionTreeValueHelpers.As<GuidOrId, TTo>(new GuidOrId(v));
+                    value = MathMatrix.As<GuidOrId, TTo>(new GuidOrId(v));
                     return true;
                 }
                 if (typeof(TTo) == typeof(byte))
@@ -514,7 +514,7 @@ internal static class JsonHelper
                     if (!reader.TryGetUInt16(out ushort v))
                         return false;
 
-                    value = SpecDynamicExpressionTreeValueHelpers.As<char, TTo>((char)v);
+                    value = MathMatrix.As<char, TTo>((char)v);
                     return true;
                 }
 
@@ -523,7 +523,7 @@ internal static class JsonHelper
             case JsonTokenType.String:
                 if (typeof(TTo) == typeof(string))
                 {
-                    value = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(reader.GetString()!);
+                    value = MathMatrix.As<string, TTo>(reader.GetString()!);
                     return true;
                 }
 
@@ -548,7 +548,7 @@ internal static class JsonHelper
                         return true;
                     }
 
-                    value = SpecDynamicExpressionTreeValueHelpers.As<GuidOrId, TTo>(new GuidOrId(guid));
+                    value = MathMatrix.As<GuidOrId, TTo>(new GuidOrId(guid));
                     return true;
                 }
 
@@ -606,7 +606,7 @@ internal static class JsonHelper
                     if (str.Length != 1)
                         return false;
 
-                    value = SpecDynamicExpressionTreeValueHelpers.As<char, TTo>(str[0]);
+                    value = MathMatrix.As<char, TTo>(str[0]);
                     return true;
                 }
 
@@ -626,7 +626,7 @@ internal static class JsonHelper
                     if (!KnownTypeValueHelper.TryParseColorHex(str, out Color32 color, allowAlpha: true))
                         return false;
 
-                    value = SpecDynamicExpressionTreeValueHelpers.As<Color, TTo>(color);
+                    value = MathMatrix.As<Color, TTo>(color);
                     return true;
                 }
 
@@ -636,7 +636,7 @@ internal static class JsonHelper
                     if (!KnownTypeValueHelper.TryParseVector2Components(str, out Vector2 v2))
                         return false;
 
-                    value = SpecDynamicExpressionTreeValueHelpers.As<Vector2, TTo>(v2);
+                    value = MathMatrix.As<Vector2, TTo>(v2);
                     return true;
                 }
 
@@ -646,7 +646,7 @@ internal static class JsonHelper
                     if (!KnownTypeValueHelper.TryParseVector3Components(str, out Vector3 v3))
                         return false;
 
-                    value = SpecDynamicExpressionTreeValueHelpers.As<Vector3, TTo>(v3);
+                    value = MathMatrix.As<Vector3, TTo>(v3);
                     return true;
                 }
 
@@ -656,21 +656,21 @@ internal static class JsonHelper
                     if (!KnownTypeValueHelper.TryParseVector4Components(str, out Vector4 v4))
                         return false;
 
-                    value = SpecDynamicExpressionTreeValueHelpers.As<Vector4, TTo>(v4);
+                    value = MathMatrix.As<Vector4, TTo>(v4);
                     return true;
                 }
 
                 if (typeof(TTo) == typeof(QualifiedType))
                 {
                     string str = reader.GetString()!;
-                    value = SpecDynamicExpressionTreeValueHelpers.As<QualifiedType, TTo>(new QualifiedType(str));
+                    value = MathMatrix.As<QualifiedType, TTo>(new QualifiedType(str));
                     return true;
                 }
 
                 if (typeof(TTo) == typeof(QualifiedOrAliasedType))
                 {
                     string str = reader.GetString()!;
-                    value = SpecDynamicExpressionTreeValueHelpers.As<QualifiedOrAliasedType, TTo>(QualifiedOrAliasedType.FromType(str));
+                    value = MathMatrix.As<QualifiedOrAliasedType, TTo>(QualifiedOrAliasedType.FromType(str));
                     return true;
                 }
 
@@ -751,7 +751,7 @@ internal static class JsonHelper
             if (typeof(TTo) == typeof(GuidOrId))
             {
                 bool s = json.TryGetUInt16(out ushort v);
-                value = SpecDynamicExpressionTreeValueHelpers.As<GuidOrId, TTo>(new GuidOrId(v));
+                value = MathMatrix.As<GuidOrId, TTo>(new GuidOrId(v));
                 return s;
             }
             if (typeof(TTo) == typeof(sbyte))
@@ -787,13 +787,13 @@ internal static class JsonHelper
             if (typeof(TTo) == typeof(char))
             {
                 bool s = json.TryGetUInt16(out ushort v);
-                value = SpecDynamicExpressionTreeValueHelpers.As<char, TTo>((char)v);
+                value = MathMatrix.As<char, TTo>((char)v);
                 return s;
             }
             if (typeof(TTo) == typeof(bool))
             {
                 bool s = json.TryGetDouble(out double d);
-                value = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(d != 0);
+                value = MathMatrix.As<bool, TTo>(d != 0);
                 return s;
             }
         }
@@ -802,84 +802,84 @@ internal static class JsonHelper
             bool v = json.ValueKind == JsonValueKind.True;
             if (typeof(TTo) == typeof(bool))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(v);
+                value = MathMatrix.As<bool, TTo>(v);
                 return true;
             }
             if (typeof(TTo) == typeof(int))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<int, TTo>(v ? 1 : 0);
+                value = MathMatrix.As<int, TTo>(v ? 1 : 0);
                 return true;
             }
             if (typeof(TTo) == typeof(uint))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<uint, TTo>(v ? 1u : 0u);
+                value = MathMatrix.As<uint, TTo>(v ? 1u : 0u);
                 return true;
             }
             if (typeof(TTo) == typeof(long))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<long, TTo>(v ? 1L : 0L);
+                value = MathMatrix.As<long, TTo>(v ? 1L : 0L);
                 return true;
             }
             if (typeof(TTo) == typeof(ulong))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<ulong, TTo>(v ? 1ul : 0ul);
+                value = MathMatrix.As<ulong, TTo>(v ? 1ul : 0ul);
                 return true;
             }
             if (typeof(TTo) == typeof(short))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<short, TTo>(v ? (short)1 : (short)0);
+                value = MathMatrix.As<short, TTo>(v ? (short)1 : (short)0);
                 return true;
             }
             if (typeof(TTo) == typeof(ushort))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<ushort, TTo>(v ? (ushort)1 : (ushort)0);
+                value = MathMatrix.As<ushort, TTo>(v ? (ushort)1 : (ushort)0);
                 return true;
             }
             if (typeof(TTo) == typeof(GuidOrId))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<GuidOrId, TTo>(new GuidOrId(v ? (ushort)1 : (ushort)0));
+                value = MathMatrix.As<GuidOrId, TTo>(new GuidOrId(v ? (ushort)1 : (ushort)0));
                 return true;
             }
             if (typeof(TTo) == typeof(sbyte))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<sbyte, TTo>(v ? (sbyte)1 : (sbyte)0);
+                value = MathMatrix.As<sbyte, TTo>(v ? (sbyte)1 : (sbyte)0);
                 return true;
             }
             if (typeof(TTo) == typeof(byte))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<byte, TTo>(v ? (byte)1 : (byte)0);
+                value = MathMatrix.As<byte, TTo>(v ? (byte)1 : (byte)0);
                 return true;
             }
             if (typeof(TTo) == typeof(float))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<float, TTo>(v ? 1f : 0f);
+                value = MathMatrix.As<float, TTo>(v ? 1f : 0f);
                 return true;
             }
             if (typeof(TTo) == typeof(double))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<double, TTo>(v ? 1d : 0d);
+                value = MathMatrix.As<double, TTo>(v ? 1d : 0d);
                 return true;
             }
             if (typeof(TTo) == typeof(decimal))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<decimal, TTo>(v ? decimal.One : decimal.Zero);
+                value = MathMatrix.As<decimal, TTo>(v ? decimal.One : decimal.Zero);
                 return true;
             }
             if (typeof(TTo) == typeof(char))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<char, TTo>(v ? '1' : '0');
+                value = MathMatrix.As<char, TTo>(v ? '1' : '0');
                 return true;
             }
             if (typeof(TTo) == typeof(string))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(v ? "true" : "false");
+                value = MathMatrix.As<string, TTo>(v ? "true" : "false");
                 return true;
             }
         }
 
         if (typeof(TTo) == typeof(string))
         {
-            value = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(json.ValueKind == JsonValueKind.String ? json.GetString()! : json.GetRawText());
+            value = MathMatrix.As<string, TTo>(json.ValueKind == JsonValueKind.String ? json.GetString()! : json.GetRawText());
             return true;
         }
 
@@ -906,12 +906,12 @@ internal static class JsonHelper
             }
             if (typeof(TTo) == typeof(QualifiedType))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<QualifiedType, TTo>(new QualifiedType(str, isCaseInsensitive: true));
+                value = MathMatrix.As<QualifiedType, TTo>(new QualifiedType(str, isCaseInsensitive: true));
                 return true;
             }
             if (typeof(TTo) == typeof(QualifiedOrAliasedType))
             {
-                value = SpecDynamicExpressionTreeValueHelpers.As<QualifiedOrAliasedType, TTo>(new QualifiedType(str, isCaseInsensitive: true));
+                value = MathMatrix.As<QualifiedOrAliasedType, TTo>(new QualifiedType(str, isCaseInsensitive: true));
                 return true;
             }
             if (typeof(TTo) == typeof(DateTime))
@@ -947,7 +947,7 @@ internal static class JsonHelper
             if (typeof(TTo) == typeof(Color))
             {
                 bool s = KnownTypeValueHelper.TryParseColorHex(str, out Color32 v, allowAlpha: true);
-                value = SpecDynamicExpressionTreeValueHelpers.As<Color, TTo>(v);
+                value = MathMatrix.As<Color, TTo>(v);
                 return s;
             }
             if (typeof(TTo) == typeof(Vector2))

@@ -126,6 +126,39 @@
   <data name="ArgumentException_CompositeFlagValue" xml:space="preserve">
     <value>Value list can not contain a value made up of other values.</value>
   </data>
+  <data name="Description_EAssetType_ANIMAL" xml:space="preserve">
+    <value>Any animal.</value>
+  </data>
+  <data name="Description_EAssetType_EFFECT" xml:space="preserve">
+    <value>Any world effect or UI.</value>
+  </data>
+  <data name="Description_EAssetType_ITEM" xml:space="preserve">
+    <value>Any item.</value>
+  </data>
+  <data name="Description_EAssetType_MYTHIC" xml:space="preserve">
+    <value>A mythical cosmetic effect.</value>
+  </data>
+  <data name="Description_EAssetType_NONE" xml:space="preserve">
+    <value>Doesn't fall into a legacy category. In this case short IDs are not used.</value>
+  </data>
+  <data name="Description_EAssetType_NPC" xml:space="preserve">
+    <value>A dialogue, quest, or vendor configuration.</value>
+  </data>
+  <data name="Description_EAssetType_OBJECT" xml:space="preserve">
+    <value>Any level object or NPC.</value>
+  </data>
+  <data name="Description_EAssetType_RESOURCE" xml:space="preserve">
+    <value>A resource that can spawn on the map and be harvested.</value>
+  </data>
+  <data name="Description_EAssetType_SKIN" xml:space="preserve">
+    <value>An item or vehicle skin.</value>
+  </data>
+  <data name="Description_EAssetType_SPAWN" xml:space="preserve">
+    <value>An asset spawn for a map.</value>
+  </data>
+  <data name="Description_EAssetType_VEHICLE" xml:space="preserve">
+    <value>Any vehicle.</value>
+  </data>
   <data name="FormatException_Expression_ExpectedFunctionName" xml:space="preserve">
     <value>Expected function name at beginning of expression.</value>
   </data>
@@ -219,6 +252,9 @@
   <data name="Type_AssetTypeAlias_Description" xml:space="preserve">
     <value>Asset type corresponding to '{0}'.</value>
   </data>
+  <data name="Type_Name_ActionKey" xml:space="preserve">
+    <value>Action Button Label</value>
+  </data>
   <data name="Type_Name_AssetReference" xml:space="preserve">
     <value>Asset Reference</value>
   </data>
@@ -258,6 +294,9 @@
   <data name="Type_Name_BeardIndex" xml:space="preserve">
     <value>Beard Index</value>
   </data>
+  <data name="Type_Name_BlueprintSkill" xml:space="preserve">
+    <value>Skill (or Legacy Blueprint Skill)</value>
+  </data>
   <data name="Type_Name_Boolean" xml:space="preserve">
     <value>Boolean</value>
   </data>
@@ -290,6 +329,9 @@
   </data>
   <data name="Type_Name_Dictionary_Generic_String" xml:space="preserve">
     <value>Dictionary of {0}</value>
+  </data>
+  <data name="Type_Name_EAssetType" xml:space="preserve">
+    <value>Asset Category</value>
   </data>
   <data name="Type_Name_FaceIndex" xml:space="preserve">
     <value>Face Index</value>
@@ -371,6 +413,12 @@
   </data>
   <data name="Type_Name_RegEx" xml:space="preserve">
     <value>Regular Expression (RegEx)</value>
+  </data>
+  <data name="Type_Name_Skill" xml:space="preserve">
+    <value>Skill</value>
+  </data>
+  <data name="Type_Name_SkillLevel" xml:space="preserve">
+    <value>Skill Level</value>
   </data>
   <data name="Type_Name_SpawnpointId" xml:space="preserve">
     <value>Spawnpoint ID</value>

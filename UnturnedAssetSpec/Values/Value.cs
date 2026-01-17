@@ -1,6 +1,6 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Logic;
-using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
@@ -39,108 +39,108 @@ public static class Value
         if (typeof(T) == typeof(long))
         {
             if (ReferenceEquals(type, Int64Type.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<long>, NullValue<T>>(Int64Type.Null);
+                return MathMatrix.As<NullValue<long>, NullValue<T>>(Int64Type.Null);
         }
         else if (typeof(T) == typeof(ulong))
         {
             if (ReferenceEquals(type, UInt64Type.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<ulong>, NullValue<T>>(UInt64Type.Null);
+                return MathMatrix.As<NullValue<ulong>, NullValue<T>>(UInt64Type.Null);
         }
         else if (typeof(T) == typeof(int))
         {
             if (ReferenceEquals(type, Int32Type.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<int>, NullValue<T>>(Int32Type.Null);
+                return MathMatrix.As<NullValue<int>, NullValue<T>>(Int32Type.Null);
         }
         else if (typeof(T) == typeof(uint))
         {
             if (ReferenceEquals(type, UInt32Type.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<uint>, NullValue<T>>(UInt32Type.Null);
+                return MathMatrix.As<NullValue<uint>, NullValue<T>>(UInt32Type.Null);
         }
         else if (typeof(T) == typeof(short))
         {
             if (ReferenceEquals(type, Int16Type.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<short>, NullValue<T>>(Int16Type.Null);
+                return MathMatrix.As<NullValue<short>, NullValue<T>>(Int16Type.Null);
         }
         else if (typeof(T) == typeof(ushort))
         {
             if (ReferenceEquals(type, UInt16Type.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<ushort>, NullValue<T>>(UInt16Type.Null);
+                return MathMatrix.As<NullValue<ushort>, NullValue<T>>(UInt16Type.Null);
         }
         else if (typeof(T) == typeof(sbyte))
         {
             if (ReferenceEquals(type, Int8Type.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<sbyte>, NullValue<T>>(Int8Type.Null);
+                return MathMatrix.As<NullValue<sbyte>, NullValue<T>>(Int8Type.Null);
         }
         else if (typeof(T) == typeof(byte))
         {
             if (ReferenceEquals(type, UInt8Type.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<byte>, NullValue<T>>(UInt8Type.Null);
+                return MathMatrix.As<NullValue<byte>, NullValue<T>>(UInt8Type.Null);
         }
         else if (typeof(T) == typeof(float))
         {
             if (ReferenceEquals(type, Float32Type.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<float>, NullValue<T>>(Float32Type.Null);
+                return MathMatrix.As<NullValue<float>, NullValue<T>>(Float32Type.Null);
         }
         else if (typeof(T) == typeof(double))
         {
             if (ReferenceEquals(type, Float64Type.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<double>, NullValue<T>>(Float64Type.Null);
+                return MathMatrix.As<NullValue<double>, NullValue<T>>(Float64Type.Null);
         }
         else if (typeof(T) == typeof(decimal))
         {
             if (ReferenceEquals(type, Float128Type.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<decimal>, NullValue<T>>(Float128Type.Null);
+                return MathMatrix.As<NullValue<decimal>, NullValue<T>>(Float128Type.Null);
         }
         else if (typeof(T) == typeof(string))
         {
             if (ReferenceEquals(type, StringType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<string>, NullValue<T>>(StringType.Null);
+                return MathMatrix.As<NullValue<string>, NullValue<T>>(StringType.Null);
             if (ReferenceEquals(type, RegexStringType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<string>, NullValue<T>>(RegexStringType.Null);
+                return MathMatrix.As<NullValue<string>, NullValue<T>>(RegexStringType.Null);
         }
         else if (typeof(T) == typeof(bool))
         {
             if (ReferenceEquals(type, BooleanType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<bool>, NullValue<T>>(BooleanType.Null);
+                return MathMatrix.As<NullValue<bool>, NullValue<T>>(BooleanType.Null);
             if (ReferenceEquals(type, FlagType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<bool>, NullValue<T>>(FlagType.Null);
+                return MathMatrix.As<NullValue<bool>, NullValue<T>>(FlagType.Null);
             if (ReferenceEquals(type, BooleanOrFlagType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<bool>, NullValue<T>>(BooleanOrFlagType.Null);
+                return MathMatrix.As<NullValue<bool>, NullValue<T>>(BooleanOrFlagType.Null);
         }
         else if (typeof(T) == typeof(char))
         {
             if (ReferenceEquals(type, CharacterType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<char>, NullValue<T>>(CharacterType.Null);
+                return MathMatrix.As<NullValue<char>, NullValue<T>>(CharacterType.Null);
         }
         else if (typeof(T) == typeof(DateTime))
         {
             if (ReferenceEquals(type, DateTimeType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<DateTime>, NullValue<T>>(DateTimeType.Null);
+                return MathMatrix.As<NullValue<DateTime>, NullValue<T>>(DateTimeType.Null);
         }
         else if (typeof(T) == typeof(DateTimeOffset))
         {
             if (ReferenceEquals(type, DateTimeOffsetType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<DateTimeOffset>, NullValue<T>>(DateTimeOffsetType.Null);
+                return MathMatrix.As<NullValue<DateTimeOffset>, NullValue<T>>(DateTimeOffsetType.Null);
         }
         else if (typeof(T) == typeof(IPv4Filter))
         {
             if (ReferenceEquals(type, IPv4FilterType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<IPv4Filter>, NullValue<T>>(IPv4FilterType.Null);
+                return MathMatrix.As<NullValue<IPv4Filter>, NullValue<T>>(IPv4FilterType.Null);
         }
         else if (typeof(T) == typeof(TimeSpan))
         {
             if (ReferenceEquals(type, TimeSpanType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<TimeSpan>, NullValue<T>>(TimeSpanType.Null);
+                return MathMatrix.As<NullValue<TimeSpan>, NullValue<T>>(TimeSpanType.Null);
         }
         else if (typeof(T) == typeof(GuidOrId))
         {
             if (ReferenceEquals(type, GuidOrIdType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<GuidOrId>, NullValue<T>>(GuidOrIdType.Null);
+                return MathMatrix.As<NullValue<GuidOrId>, NullValue<T>>(GuidOrIdType.Null);
         }
         else if (typeof(T) == typeof(Guid))
         {
             if (ReferenceEquals(type, GuidType.Instance))
-                return SpecDynamicExpressionTreeValueHelpers.As<NullValue<Guid>, NullValue<T>>(GuidType.Null);
+                return MathMatrix.As<NullValue<Guid>, NullValue<T>>(GuidType.Null);
         }
 
         return new NullValue<T>(type);
@@ -212,14 +212,14 @@ public static class Value
         {
             if (ReferenceEquals(type, BooleanType.Instance))
             {
-                return SpecDynamicExpressionTreeValueHelpers.As<ConcreteValue<bool>, ConcreteValue<TValue>>(
-                    Boolean(SpecDynamicExpressionTreeValueHelpers.As<TValue, bool>(v))
+                return MathMatrix.As<ConcreteValue<bool>, ConcreteValue<TValue>>(
+                    Boolean(MathMatrix.As<TValue, bool>(v))
                 );
             }
             if (ReferenceEquals(type, FlagType.Instance))
             {
-                return SpecDynamicExpressionTreeValueHelpers.As<ConcreteValue<bool>, ConcreteValue<TValue>>(
-                    Flag(SpecDynamicExpressionTreeValueHelpers.As<TValue, bool>(v))
+                return MathMatrix.As<ConcreteValue<bool>, ConcreteValue<TValue>>(
+                    Flag(MathMatrix.As<TValue, bool>(v))
                 );
             }
         }
@@ -305,17 +305,17 @@ public static class Value
     /// Parse a value from a JSON token.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static IValue? TryReadValueFromJson(in JsonElement root, ValueReadOptions options, IPropertyType? valueType)
+    public static IValue? TryReadValueFromJson(in JsonElement root, ValueReadOptions options, IPropertyType? valueType, IAssetSpecDatabase database, DatProperty owner)
     {
         NullReadValueVisitor v;
-        return TryReadValueFromJson(in root, options, ref v, valueType);
+        return TryReadValueFromJson(in root, options, ref v, valueType, database, owner);
     }
 
     /// <summary>
     /// Parse a value from a JSON token. The visitor will only be invoked if the value is strongly typed.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static unsafe IValue? TryReadValueFromJson<TVisitor>(in JsonElement root, ValueReadOptions options, ref TVisitor visitor, IPropertyType? valueType)
+    public static unsafe IValue? TryReadValueFromJson<TVisitor>(in JsonElement root, ValueReadOptions options, ref TVisitor visitor, IPropertyType? valueType, IAssetSpecDatabase database, DatProperty owner)
         where TVisitor : IReadValueVisitor
     {
         IType? type = valueType as IType;
@@ -324,6 +324,8 @@ public static class Value
             ReadStronglyTypedValueVisitor<TVisitor> v;
             v.Value = null;
             v.Options = options;
+            v.Database = database;
+            v.Owner = owner;
             fixed (TVisitor* ptr = &visitor)
             fixed (JsonElement* elementPtr = &root)
             {
@@ -360,7 +362,7 @@ public static class Value
                 break;
 
             case JsonValueKind.String:
-                string str = root.GetString();
+                string str = root.GetString()!;
                 if (str.Length == 0)
                 {
                     if ((options & (ValueReadOptions.AssumeProperty | ValueReadOptions.AssumeDataRef)) != 0)
@@ -407,13 +409,8 @@ public static class Value
                         return strVal;
 
                     case ExpressionValueType.DataRef:
-                        if (!SpecDynamicValue.TryParseDataRef(str, str, out ISpecDynamicValue? dynamicValue) || dynamicValue is not IDataRefTarget dataRefTarget)
-                        {
-                            break;
-                        }
-
                         // todo
-                        return (IValue)dataRefTarget;
+                        throw new NotImplementedException();
 
                     case ExpressionValueType.PropertyRef:
                         PropertyReference pRef;
@@ -421,8 +418,8 @@ public static class Value
                             pRef = PropertyReference.Parse(str.AsSpan(0, str.Length - 1), null);
                         else
                             pRef = PropertyReference.Parse(str, str);
-                        
-                        return new PropertyReferenceValue(pRef);
+
+                        return pRef.CreateValue(owner, database);
 
                     case ExpressionValueType.Expression:
                         if (valueType == null || !valueType.TryGetConcreteType(out IType? concreteType))
@@ -450,7 +447,7 @@ public static class Value
                 return boolVal;
 
             case JsonValueKind.Array:
-                if (valueType != null && SwitchValue.TryRead(in root, valueType, out SwitchValue? value))
+                if (valueType != null && SwitchValue.TryRead(in root, valueType, database, owner, out SwitchValue? value))
                 {
                     return value;
                 }
@@ -465,7 +462,7 @@ public static class Value
     /// Parse a value from a JSON token.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static IValue<TValue>? TryReadValueFromJson<TValue>(in JsonElement root, ValueReadOptions options, IType<TValue> valueType)
+    public static IValue<TValue>? TryReadValueFromJson<TValue>(in JsonElement root, ValueReadOptions options, IType<TValue> valueType, IAssetSpecDatabase database, DatProperty owner)
         where TValue : IEquatable<TValue>
     {
         switch (root.ValueKind)
@@ -474,7 +471,7 @@ public static class Value
             case JsonValueKind.False:
             case JsonValueKind.Number:
             case JsonValueKind.Object:
-                if (valueType.TryReadFromJson(in root, out IValue<TValue>? val))
+                if (valueType.TryReadFromJson(in root, database, owner, out IValue<TValue>? val))
                 {
                     return val;
                 }
@@ -482,7 +479,7 @@ public static class Value
                 break;
 
             case JsonValueKind.String:
-                string str = root.GetString();
+                string str = root.GetString()!;
                 if (str.Length == 0)
                 {
                     if ((options & (ValueReadOptions.AssumeProperty | ValueReadOptions.AssumeDataRef)) != 0)
@@ -490,7 +487,7 @@ public static class Value
                         return null;
                     }
 
-                    return valueType.TryReadFromJson(in root, out val)
+                    return valueType.TryReadFromJson(in root, database, owner, out val)
                         ? val
                         : Null(valueType);
                 }
@@ -512,13 +509,8 @@ public static class Value
                         return null;
 
                     case ExpressionValueType.DataRef:
-                        if (!SpecDynamicValue.TryParseDataRef(str, str, out ISpecDynamicValue? dynamicValue) || dynamicValue is not IDataRefTarget dataRefTarget)
-                        {
-                            break;
-                        }
-
                         // todo
-                        return (IValue<TValue>)dataRefTarget;
+                        throw new NotImplementedException();
 
                     case ExpressionValueType.PropertyRef:
                         PropertyReference pRef;
@@ -526,8 +518,8 @@ public static class Value
                             pRef = PropertyReference.Parse(str.AsSpan(0, str.Length - 1), null);
                         else
                             pRef = PropertyReference.Parse(str, str);
-                        
-                        return new PropertyReferenceValue<TValue>(valueType, pRef);
+
+                        return pRef.CreateValue(valueType, owner, database);
 
                     case ExpressionValueType.Expression:
                         try
@@ -546,11 +538,11 @@ public static class Value
                 break;
 
             case JsonValueKind.Array:
-                if (SwitchValue.TryRead(in root, valueType, out SwitchValue<TValue>? value))
+                if (SwitchValue.TryRead(in root, valueType, database, owner, out SwitchValue<TValue>? value))
                 {
                     return value;
                 }
-                if (valueType.TryReadFromJson(in root, out val))
+                if (valueType.TryReadFromJson(in root, database, owner, out val))
                 {
                     return val;
                 }
@@ -620,10 +612,12 @@ public static class Value
         public TVisitor* Visitor;
         public JsonElement* Element;
         public ValueReadOptions Options;
+        public IAssetSpecDatabase Database;
+        public DatProperty Owner;
         public void Accept<TValue>(IType<TValue> type)
             where TValue : IEquatable<TValue>
         {
-            IValue<TValue>? value = TryReadValueFromJson(in Unsafe.AsRef<JsonElement>(Element), Options, type);
+            IValue<TValue>? value = TryReadValueFromJson(in Unsafe.AsRef<JsonElement>(Element), Options, type, Database, Owner);
             if (value != null)
             {
                 Visitor->Accept(value);
@@ -637,7 +631,7 @@ public static class Value
     {
         if (typeof(TValue) == typeof(string))
         {
-            IValue<string> v = Create(str ?? element.GetString(), Unsafe.As<IType<TValue>, IType<string>>(ref type));
+            IValue<string> v = Create(str ?? element.GetString()!, Unsafe.As<IType<TValue>, IType<string>>(ref type));
             readValue = Unsafe.As<IValue<string>, IValue<TValue>>(ref v);
             return true;
         }

@@ -78,17 +78,17 @@ internal sealed class DateTimeOffsetTypeConverter : ITypeConverter<DateTimeOffse
 
         if (typeof(TTo) == typeof(bool))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(value != DateTimeOffset.MinValue);
+            result = MathMatrix.As<bool, TTo>(value != DateTimeOffset.MinValue);
             return true;
         }
         if (typeof(TTo) == typeof(string))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(value.ToString("O"));
+            result = MathMatrix.As<string, TTo>(value.ToString("O"));
             return true;
         }
         if (typeof(TTo) == typeof(DateTime))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<DateTime, TTo>(value.DateTime);
+            result = MathMatrix.As<DateTime, TTo>(value.DateTime);
             return true;
         }
 

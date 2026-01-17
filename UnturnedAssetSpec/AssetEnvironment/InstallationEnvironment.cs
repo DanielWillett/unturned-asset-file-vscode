@@ -1,5 +1,4 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
@@ -71,7 +70,7 @@ public class InstallationEnvironment : IDisposable
         _database = database;
         _sourceDirs = new List<SourceDirectory>();
 
-        _idIndex = new Dictionary<ushort, OneOrMore<DiscoveredDatFile>>[AssetCategory.TypeOf.Values.Length - 1]; // NONE not included
+        _idIndex = new Dictionary<ushort, OneOrMore<DiscoveredDatFile>>[AssetCategory.Instance.Values.Length - 1]; // NONE not included
         for (int i = 0; i < _idIndex.Length; ++i)
             _idIndex[i] = new Dictionary<ushort, OneOrMore<DiscoveredDatFile>>(64);
 
@@ -217,6 +216,17 @@ public class InstallationEnvironment : IDisposable
         return null;
     }
 
+    public OneOrMore<DiscoveredDatFile> FindFile(GuidOrId id)
+    {
+        if (!id.IsId)
+            return FindFile(id.Guid);
+
+        if (id.Category == 0)
+            return OneOrMore<DiscoveredDatFile>.Null;
+
+        return FindFile(id.Id, new AssetCategoryValue(id.Category));
+    }
+
     public OneOrMore<DiscoveredDatFile> FindFile(Guid guid)
     {
         lock (_fileSync)
@@ -230,7 +240,7 @@ public class InstallationEnvironment : IDisposable
         return OneOrMore<DiscoveredDatFile>.Null;
     }
 
-    public OneOrMore<DiscoveredDatFile> FindFile(ushort id, EnumSpecTypeValue assetCategory)
+    public OneOrMore<DiscoveredDatFile> FindFile(ushort id, AssetCategoryValue assetCategory)
     {
         int category = assetCategory.Index;
         if (category <= 0 || category > _idIndex.Length)

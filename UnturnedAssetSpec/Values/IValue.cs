@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Text.Json;
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -75,68 +76,129 @@ public static class ValueExtensions
     extension(IValue value)
     {
         /// <summary>
-        /// Attempts to invoke <see cref="IGenericVisitor.Accept"/> on the current value, evaluating with context if necessary.
+        /// Attempts to invoke <see cref="IGenericVisitor.Accept"/> on the current value without context.
         /// </summary>
         /// <remarks>If the value is <see langword="null"/>, the visitor will be invoked using a <see langword="null"/> <see cref="string"/> value.</remarks>
+        /// <param name="visitor">Visitor which will accept the result.</param>
         /// <returns><see langword="false"/> if the visitor didn't get invoked, otherwise <see langword="true"/>.</returns>
-        public bool VisitConcreteValueGeneric<TVisitor>(ref TVisitor visitor)
+        public unsafe bool VisitConcreteValueGeneric<TVisitor>(ref TVisitor visitor)
             where TVisitor : IGenericVisitor
         {
             ValueVisitor<TVisitor> v;
             v.Visited = false;
-            v.Visitor = visitor;
+            fixed (TVisitor* visitorPtr = &visitor)
+            {
+                v.Visitor = visitorPtr;
+                v.Visited &= value.VisitConcreteValue(ref v);
+            }
 
-            value.VisitConcreteValue(ref v);
-            if (!v.Visited)
-                return false;
-
-            visitor = v.Visitor;
-            return true;
+            return v.Visited;
         }
 
         /// <summary>
-        /// Attempts to invoke <see cref="IGenericVisitor.Accept"/> on the current value, evaluating with context if necessary.
+        /// Attempts to invoke <see cref="IGenericVisitor.Accept"/> on the current value, evaluating with context.
         /// </summary>
         /// <remarks>If the value is <see langword="null"/>, the visitor will be invoked using a <see langword="null"/> <see cref="string"/> value.</remarks>
+        /// <param name="visitor">Visitor which will accept the result.</param>
+        /// <param name="ctx">Workspace context.</param>
         /// <returns><see langword="false"/> if the visitor didn't get invoked, otherwise <see langword="true"/>.</returns>
-        public bool VisitValueGeneric<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        public unsafe bool VisitValueGeneric<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
             where TVisitor : IGenericVisitor
         {
             ValueVisitor<TVisitor> v;
             v.Visited = false;
-            v.Visitor = visitor;
+            fixed (TVisitor* visitorPtr = &visitor)
+            {
+                v.Visitor = visitorPtr;
+                v.Visited &= value.VisitValue(ref v, in ctx);
+            }
 
-            value.VisitValue(ref v, in ctx);
-            if (!v.Visited)
+            return v.Visited;
+        }
+
+        /// <summary>
+        /// Attempts to get the value of the current value without context and convert the result to <typeparamref name="TResult"/> if necessary.
+        /// </summary>
+        /// <typeparam name="TResult">The destination type.</typeparam>
+        /// <param name="ctx">Workspace context.</param>
+        /// <param name="result">Converted value.</param>
+        /// <returns>Whether or not the value could be determined without context and converted.</returns>
+        public bool TryGetConcreteValueAs<TResult>(out Optional<TResult> result) where TResult : IEquatable<TResult>
+        {
+            ValueConvertVisitor<TResult> v = default;
+
+            if (!value.VisitConcreteValue(ref v))
+            {
+                result = Optional<TResult>.Null;
                 return false;
+            }
 
-            visitor = v.Visitor;
-            return true;
+            result = v.Result;
+            return v.Visited;
+        }
+
+        /// <summary>
+        /// Attempts to get the value of the current value and convert the result to <typeparamref name="TResult"/> if necessary, evaluating with context.
+        /// </summary>
+        /// <typeparam name="TResult">The destination type.</typeparam>
+        /// <param name="ctx">Workspace context.</param>
+        /// <param name="result">Converted value.</param>
+        /// <returns>Whether or not the value could be determined and converted.</returns>
+        public bool TryGetValueAs<TResult>(in FileEvaluationContext ctx, out Optional<TResult> result) where TResult : IEquatable<TResult>
+        {
+            ValueConvertVisitor<TResult> v = default;
+
+            if (!value.VisitValue(ref v, in ctx))
+            {
+                result = Optional<TResult>.Null;
+                return false;
+            }
+
+            result = v.Result;
+            return v.Visited;
         }
     }
 
-    private struct ValueVisitor<TVisitor> : IValueVisitor
+    private unsafe struct ValueVisitor<TVisitor> : IValueVisitor
         where TVisitor : IGenericVisitor
     {
-        public TVisitor Visitor;
+        public TVisitor* Visitor;
         public bool Visited;
 
         public void Accept<T>(Optional<T> value) where T : IEquatable<T>
         {
             if (value.HasValue)
             {
-                Visitor.Accept(value.Value);
+                Visitor->Accept(value.Value);
             }
             else if (default(T) == null)
             {
-                Visitor.Accept<T>(default);
+                Visitor->Accept(default(T));
             }
             else
             {
-                Visitor.Accept<string>(null);
+                Visitor->Accept<string>(null);
             }
 
             Visited = true;
+        }
+    }
+
+    private struct ValueConvertVisitor<TResult> : IValueVisitor where TResult : IEquatable<TResult>
+    {
+        public bool Visited;
+        public Optional<TResult> Result;
+
+        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        {
+            if (!value.HasValue)
+            {
+                Result = Optional<TResult>.Null;
+                Visited = true;
+                return;
+            }
+
+            Visited = ConvertVisitor<TResult>.TryConvert(value.Value, out Result);
         }
     }
 }

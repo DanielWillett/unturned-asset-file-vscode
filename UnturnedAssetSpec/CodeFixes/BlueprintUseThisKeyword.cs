@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -34,32 +35,32 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
         IWorkspaceEnvironment workspaceEnv)
         : base(DatDiagnostics.UNT101, virtualizer, database, installEnv, workspaceEnv)
     {
-        database.OnInitialize(database =>
+        database.OnInitialize((database, _) =>
         {
-            AssetFileType assetFileType =
-                AssetFileType.FromType(
-                    QualifiedOrAliasedType.FromType("SDG.Unturned.ItemAsset, Assembly-CSharp"),
-                    database
-                );
+            //AssetFileType assetFileType =
+            //    AssetFileType.FromType(
+            //        QualifiedOrAliasedType.FromType("SDG.Unturned.ItemAsset, Assembly-CSharp"),
+            //        database
+            //    );
 
-            HashSet<ISpecPropertyType> types = new HashSet<ISpecPropertyType>();
-            ISpecType? outputType = database.FindType("SDG.Unturned.BlueprintOutput, Assembly-CSharp", assetFileType);
-            if (outputType is ISpecPropertyType<CustomSpecTypeInstance> outputPropType)
-            {
-                types.Add(outputPropType);
-                types.Add(KnownTypes.List(outputPropType, allowSingle: true));
-                types.Add(KnownTypes.LegacyCompatibleList(outputPropType, allowSingleLegacy: false, allowSingleModern: true));
-            }
+            //HashSet<IType> types = new HashSet<IType>();
+            //ISpecType? outputType = database.FindType("SDG.Unturned.BlueprintOutput, Assembly-CSharp", assetFileType);
+            //if (outputType is IType<DatCustomTypeInstance> outputPropType)
+            //{
+            //    types.Add(outputPropType);
+            //    types.Add(ListType.Create(new ListTypeArgs<>(), outputPropType));
+            //    types.Add(KnownTypes.LegacyCompatibleList(outputPropType, allowSingleLegacy: false, allowSingleModern: true));
+            //}
 
-            ISpecType? supplyType = database.FindType("SDG.Unturned.BlueprintSupply, Assembly-CSharp", assetFileType);
-            if (supplyType is ISpecPropertyType<CustomSpecTypeInstance> supplyPropType)
-            {
-                types.Add(supplyPropType);
-                types.Add(KnownTypes.List(supplyPropType, allowSingle: true));
-                types.Add(KnownTypes.LegacyCompatibleList(supplyPropType, allowSingleLegacy: false, allowSingleModern: true));
-            }
+            //ISpecType? supplyType = database.FindType("SDG.Unturned.BlueprintSupply, Assembly-CSharp", assetFileType);
+            //if (supplyType is IType<CustomSpecTypeInstance> supplyPropType)
+            //{
+            //    types.Add(supplyPropType);
+            //    types.Add(KnownTypes.List(supplyPropType, allowSingle: true));
+            //    types.Add(KnownTypes.LegacyCompatibleList(supplyPropType, allowSingleLegacy: false, allowSingleModern: true));
+            //}
 
-            ValidTypes = types;
+            //ValidTypes = types;
             return Task.CompletedTask;
         });
     }
@@ -69,8 +70,8 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
         out FileRange range,
         ref bool hasDiagnostic,
         IPropertySourceNode propertyNode,
-        ISpecPropertyType propertyType,
-        SpecProperty property,
+        IType propertyType,
+        DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
         in SpecPropertyTypeParseContext parseContext)
     {
@@ -85,7 +86,7 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
         ushort? id = assetFile.Id;
         switch (propertyType)
         {
-            case IListTypeSpecPropertyType when propertyNode.Value is IListSourceNode listNode:
+            case IListType when propertyNode.Value is IListSourceNode listNode:
                 string? valueStr;
                 state.Ranges = new List<FileRange>();
                 foreach (ISourceNode v in listNode.Children)
@@ -101,7 +102,7 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
 
                 return state.Ranges.Count > 0;
 
-            case var _ when propertyNode.ValueKind == ValueTypeDataRefType.Value:
+            case var _ when propertyNode.ValueKind == SourceValueType.Value:
                 valueStr = propertyNode.GetValueString(out _);
                 if (TryCheckIsThisable(valueStr, guid, id))
                 {

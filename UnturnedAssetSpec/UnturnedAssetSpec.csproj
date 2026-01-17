@@ -33,6 +33,9 @@
     <EmbeddedResource Include="../Asset Spec/**">
       <Link>%(RecursiveDir)/Asset Spec/%(Filename)%(Extension)</Link>
     </EmbeddedResource>
+    <Compile Remove="OldTypes\**" />
+    <EmbeddedResource Remove="OldTypes\**" />
+    <None Remove="OldTypes\**" />
     <EmbeddedResource Remove="../Asset Spec/asset-spec.g.bin" />
   </ItemGroup>
 
@@ -87,10 +90,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Values\PropertyRefs\" />
   </ItemGroup>
 
 </Project>

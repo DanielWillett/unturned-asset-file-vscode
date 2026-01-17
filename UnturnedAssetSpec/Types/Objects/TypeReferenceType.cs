@@ -72,7 +72,7 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
     public TypeReferenceType() : this(TypeReferenceKind.String, OneOrMore<QualifiedType>.Null) { }
 
     public TypeReferenceType(TypeReferenceKind kind, OneOrMore<QualifiedType> baseTypes) : this(kind, baseTypes, null!, null!, QualifiedType.None) { }
-    public TypeReferenceType(TypeReferenceKind kind, OneOrMore<QualifiedType> baseTypes, IDatSpecificationObject owner, IDatSpecificationReadContext context, QualifiedType enumType)
+    public TypeReferenceType(TypeReferenceKind kind, OneOrMore<QualifiedType> baseTypes, DatProperty owner, IDatSpecificationReadContext context, QualifiedType enumType)
     {
         if (kind is < TypeReferenceKind.String or > TypeReferenceKind.Object)
             throw new InvalidEnumArgumentException(nameof(kind), (int)kind, typeof(TypeReferenceKind));
@@ -255,7 +255,7 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
         TypeParsers.QualifiedType.WriteValueToJson(writer, value, valueType, options);
     }
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
     {
         if (typeDefinition.ValueKind == JsonValueKind.String)
         {

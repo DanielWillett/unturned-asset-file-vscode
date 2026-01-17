@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +12,7 @@ internal class ListNode : AnySourceNode, IListSourceNode
 
     public override SourceNodeType Type => SourceNodeType.List;
 
-    public ValueTypeDataRefType ValueType => ValueTypeDataRefType.List;
+    public SourceValueType ValueType => SourceValueType.List;
 
     public int Count { get; set; }
 

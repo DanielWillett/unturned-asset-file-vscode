@@ -11,7 +11,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 internal class TypeFactoryById : ITypeFactory
 {
     private readonly ImmutableDictionary<string, Func<IType>>? _typeFactoriesSimple;
-    private readonly ImmutableDictionary<string, Func<IDatSpecificationReadContext, IDatSpecificationObject, string, IType>>? _typeFactoriesComplex;
+    private readonly ImmutableDictionary<string, Func<IDatSpecificationReadContext, DatProperty, string, IType>>? _typeFactoriesComplex;
 
     public TypeFactoryById(params (string, Func<IType>)[] typeTable)
     {
@@ -27,13 +27,13 @@ internal class TypeFactoryById : ITypeFactory
         _typeFactoriesSimple = bldr.ToImmutable();
     }
 
-    public TypeFactoryById(params (string, Func<IDatSpecificationReadContext, IDatSpecificationObject, string, IType>)[] typeTable)
+    public TypeFactoryById(params (string, Func<IDatSpecificationReadContext, DatProperty, string, IType>)[] typeTable)
     {
         if (typeTable == null)
             throw new ArgumentNullException(nameof(typeTable));
 
-        ImmutableDictionary<string, Func<IDatSpecificationReadContext, IDatSpecificationObject, string, IType>>.Builder bldr = ImmutableDictionary.CreateBuilder<string, Func<IDatSpecificationReadContext, IDatSpecificationObject, string, IType>>();
-        foreach ((string Key, Func<IDatSpecificationReadContext, IDatSpecificationObject, string, IType> Value) factory in typeTable)
+        ImmutableDictionary<string, Func<IDatSpecificationReadContext, DatProperty, string, IType>>.Builder bldr = ImmutableDictionary.CreateBuilder<string, Func<IDatSpecificationReadContext, DatProperty, string, IType>>();
+        foreach ((string Key, Func<IDatSpecificationReadContext, DatProperty, string, IType> Value) factory in typeTable)
         {
             bldr[factory.Key] = factory.Value;
         }
@@ -42,7 +42,7 @@ internal class TypeFactoryById : ITypeFactory
     }
 
     /// <inheritdoc />
-    public IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context = "")
+    public IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context = "")
     {
         if (_typeFactoriesSimple == null)
         {

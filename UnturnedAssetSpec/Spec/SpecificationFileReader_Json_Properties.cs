@@ -15,6 +15,7 @@ partial class SpecificationFileReader
         string propertyList,
         Func<T, ImmutableArray<DatProperty>> getPropertyListFromChild,
         ImmutableArray<DatProperty>.Builder properties,
+        SpecPropertyContext context,
         T owner) where T : DatTypeWithProperties, IDatSpecificationObject
     {
         if (!root.TryGetProperty("Key"u8, out JsonElement element) || element.ValueKind != JsonValueKind.String)
@@ -55,13 +56,15 @@ partial class SpecificationFileReader
 
                 if (hideInherited)
                 {
-                    properties.Add(DatProperty.Hide(overriding, owner));
+                    properties.Add(DatProperty.Hide(overriding, owner, context));
                     return;
                 }
             }
         }
 
-        // Types
+        DatProperty property = DatProperty.Create(key, owner, element, context);
+
+        // Type
         IPropertyType type;
         if (!root.TryGetProperty("Type"u8, out element)
             || element.ValueKind is not JsonValueKind.String and not JsonValueKind.Object and not JsonValueKind.Array)
@@ -73,8 +76,10 @@ partial class SpecificationFileReader
         }
         else
         {
-            type = ReadTypeReference(in element, owner, key);
+            type = ReadTypeReference(in element, owner, property);
         }
+
+        property.Type = type;
 
         // Template
         bool isTemplate = false;
@@ -88,8 +93,6 @@ partial class SpecificationFileReader
         {
             keyTemplateProcessor = TemplateProcessor.CreateForKey(ref key);
         }
-
-        DatProperty property = DatProperty.Create(key, type, owner, element);
 
         property.OverriddenProperty = overriding;
 
@@ -109,7 +112,7 @@ partial class SpecificationFileReader
 
         if (root.TryGetProperty("KeyCondition"u8, out element))
         {
-            if (!Conditions.TryReadComplexOrBasicConditionFromJson(in element, out keyCondition))
+            if (!Conditions.TryReadComplexOrBasicConditionFromJson(in element, Database, property, out keyCondition))
             {
                 throw new JsonException(
                     string.Format(Resources.JsonException_FailedToParseValue, "complex/basic condition", $"{owner.FullName}.{key}.KeyCondition")
@@ -124,7 +127,7 @@ partial class SpecificationFileReader
             DatPropertyKey? singleAlias = null;
             if (root.TryGetProperty("Alias"u8, out singleAliasElement) && singleAliasElement.ValueKind != JsonValueKind.Null)
             {
-                singleAlias = ReadAlias(in singleAliasElement, isTemplate, owner, key, -1);
+                singleAlias = ReadAlias(in singleAliasElement, isTemplate, owner, property, key, -1);
             }
 
             ImmutableArray<DatPropertyKey>.Builder b = ImmutableArray.CreateBuilder<DatPropertyKey>(aliasCount + 1 + (singleAlias != null ? 1 : 0));
@@ -133,7 +136,7 @@ partial class SpecificationFileReader
             for (int i = 0; i < aliasCount; ++i)
             {
                 JsonElement aliasObj = element[i];
-                b.Add(ReadAlias(in aliasObj, isTemplate, owner, key, i));
+                b.Add(ReadAlias(in aliasObj, isTemplate, owner, property, key, i));
             }
 
             if (singleAlias != null)
@@ -143,7 +146,7 @@ partial class SpecificationFileReader
         }
         else if (root.TryGetProperty("Alias"u8, out singleAliasElement) && singleAliasElement.ValueKind != JsonValueKind.Null)
         {
-            DatPropertyKey singleAlias = ReadAlias(in singleAliasElement, isTemplate, owner, key, -1);
+            DatPropertyKey singleAlias = ReadAlias(in singleAliasElement, isTemplate, owner, property, key, -1);
             property.Keys = ImmutableArray.Create(
                 new DatPropertyKey(key, filter, keyCondition, keyTemplateProcessor),
                 singleAlias
@@ -187,7 +190,7 @@ partial class SpecificationFileReader
 
         if (root.TryGetProperty("FileCrossRef"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
-            property.CrossReferenceTarget = Value.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty, null);
+            property.CrossReferenceTarget = Value.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty, null, Database, property);
             if (property.CrossReferenceTarget == null)
             {
                 throw new JsonException(
@@ -211,7 +214,7 @@ partial class SpecificationFileReader
 
         if (root.TryGetProperty("ListReference"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
-            property.AvailableValuesTarget = Value.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty | ValueReadOptions.AllowExclamationSuffix, null);
+            property.AvailableValuesTarget = Value.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty | ValueReadOptions.AllowExclamationSuffix, null, Database, property);
             if (property.AvailableValuesTarget == null)
             {
                 throw new JsonException(
@@ -225,7 +228,7 @@ partial class SpecificationFileReader
         // todo
     }
 
-    private static DatPropertyKey ReadAlias(in JsonElement aliasObj, bool isTemplate, IDatSpecificationObject owner, string key, int i)
+    private DatPropertyKey ReadAlias(in JsonElement aliasObj, bool isTemplate, IDatSpecificationObject owner, DatProperty property, string key, int i)
     {
         string? alias = null;
         IValue<bool>? aliasCondition = null;
@@ -258,7 +261,7 @@ partial class SpecificationFileReader
 
                 if (aliasObj.TryGetProperty("Condition"u8, out aliasElement))
                 {
-                    if (!Conditions.TryReadComplexOrBasicConditionFromJson(in aliasElement, out aliasCondition))
+                    if (!Conditions.TryReadComplexOrBasicConditionFromJson(in aliasElement, Database, property, out aliasCondition))
                     {
                         throw new JsonException(
                             string.Format(
@@ -285,8 +288,9 @@ partial class SpecificationFileReader
         return new DatPropertyKey(alias, aliasFilter, aliasCondition, processor);
     }
 
-    private IPropertyType ReadTypeReference(in JsonElement root, IDatSpecificationObject owner, string key, bool allowSwitch = true)
+    private IPropertyType ReadTypeReference(in JsonElement root, IDatSpecificationObject owner, DatProperty property, bool allowSwitch = true)
     {
+        string key = property.Key;
         string? type;
         bool isObject = root.ValueKind == JsonValueKind.Object;
         if (isObject)
@@ -307,7 +311,7 @@ partial class SpecificationFileReader
         else
         {
             if (allowSwitch)
-                return ReadTypeSwitch(in root, owner, key);
+                return ReadTypeSwitch(in root, property, key);
 
             throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type (No Switches)", $"{owner.FullName}.{key}.Type[ ... ]"));
         }
@@ -332,7 +336,7 @@ partial class SpecificationFileReader
             if (clrType != null && typeof(ITypeFactory).IsAssignableFrom(clrType))
             {
                 ITypeFactory factory = (ITypeFactory?)Activator.CreateInstance(clrType, true)!;
-                IType newType = factory.CreateType(in root, type, this, owner, key);
+                IType newType = factory.CreateType(in root, type, this, property, key);
                 return newType;
             }
         }
@@ -340,24 +344,24 @@ partial class SpecificationFileReader
         if (CommonTypes.TypeFactories.TryGetValue(type, out Func<ITypeFactory>? factoryGetter))
         {
             ITypeFactory factory = factoryGetter();
-            IType newType = factory.CreateType(in root, type, this, owner, key);
+            IType newType = factory.CreateType(in root, type, this, property, key);
             return newType;
         }
 
         throw new JsonException(string.Format(Resources.JsonException_PropertyTypeNotFound, type, $"{owner.FullName}.{key}.Type"));
     }
 
-    public IType ReadType(in JsonElement root, IDatSpecificationObject readObject, string context = "")
+    public IType ReadType(in JsonElement root, DatProperty property, string context = "")
     {
-        if (ReadTypeReference(in root, readObject, context, allowSwitch: false) is IType t)
+        if (ReadTypeReference(in root, property.Owner, property, allowSwitch: false) is IType t)
             return t;
 
-        throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type", context.Length == 0 ? readObject.FullName : $"{readObject.FullName}.{context}"));
+        throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type", context.Length == 0 ? property.FullName : $"{property.FullName}.{context}"));
     }
 
-    public IValue ReadValue(in JsonElement root, IPropertyType valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default)
+    public IValue ReadValue(in JsonElement root, IPropertyType valueType, DatProperty readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default)
     {
-        if (Value.TryReadValueFromJson(in root, options, valueType) is { } value)
+        if (Value.TryReadValueFromJson(in root, options, valueType, Database, readObject) is { } value)
         {
             return value;
         }
@@ -365,7 +369,7 @@ partial class SpecificationFileReader
         throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, valueType, context.Length == 0 ? readObject.FullName : $"{readObject.FullName}.{context}"));
     }
 
-    private TypeSwitch ReadTypeSwitch(in JsonElement root, IDatSpecificationObject owner, string key)
+    private TypeSwitch ReadTypeSwitch(in JsonElement root, DatProperty owner, string key)
     {
         int cases = root.GetArrayLength();
         if (cases <= 0)
@@ -381,7 +385,7 @@ partial class SpecificationFileReader
         for (int i = 0; i < cases; ++i)
         {
             JsonElement caseObj = root[i];
-            if (SwitchCase.TryReadSwitchCase(switchType, in caseObj) is not { } sw)
+            if (SwitchCase.TryReadSwitchCase(switchType, Database, owner, in caseObj) is not { } sw)
             {
                 throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type", $"{owner.FullName}.{key}.Type[{i}]"));
             }

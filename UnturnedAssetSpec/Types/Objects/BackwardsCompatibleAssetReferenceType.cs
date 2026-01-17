@@ -169,6 +169,11 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
                         args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
                         return false;
                     }
+
+                    if (guidOrId.IsId && _defaultCategory != AssetCategoryValue.None)
+                    {
+                        guidOrId = new GuidOrId(guidOrId.Id, _defaultCategory);
+                    }
                 }
                 else
                 {
@@ -271,7 +276,7 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
         TypeParsers.GuidOrId.WriteValueToJson(writer, value, valueType, options);
     }
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
     {
         BackwardsCompatibleAssetReferenceKind mode = BackwardsCompatibleAssetReferenceKind.GuidOrLegacyId;
         for (int i = 1; i < TypeIds.Length; ++i)

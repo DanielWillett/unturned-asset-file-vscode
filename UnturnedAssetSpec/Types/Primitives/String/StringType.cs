@@ -152,7 +152,7 @@ public sealed class StringType : PrimitiveType<string, StringType>, ITypeParser<
         TypeParsers.String.WriteValueToJson(writer, value, valueType, options);
     }
 
-    protected override IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    protected override IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
     {
         if (typeDefinition.ValueKind == JsonValueKind.String)
         {

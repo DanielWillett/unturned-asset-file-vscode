@@ -257,7 +257,7 @@ public sealed class Color32Type : BaseVectorType<Color32, Color32Type>
 
     #region JSON
 
-    protected override IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context = "")
+    protected override IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context = "")
     {
         if (typeDefinition.ValueKind == JsonValueKind.String)
         {

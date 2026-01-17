@@ -157,67 +157,67 @@ public abstract class ExpressionFunction : IExpressionFunction
     {
         if (typeof(T) == typeof(double))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, double>(value!);
+            dbl = MathMatrix.As<T, double>(value!);
             return true;
         }
         if (typeof(T) == typeof(float))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, float>(value!);
+            dbl = MathMatrix.As<T, float>(value!);
             return true;
         }
         if (typeof(T) == typeof(decimal))
         {
-            dbl = (double)SpecDynamicExpressionTreeValueHelpers.As<T, decimal>(value!);
+            dbl = (double)MathMatrix.As<T, decimal>(value!);
             return true;
         }
         if (typeof(T) == typeof(byte))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, byte>(value!);
+            dbl = MathMatrix.As<T, byte>(value!);
             return true;
         }
         if (typeof(T) == typeof(sbyte))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, sbyte>(value!);
+            dbl = MathMatrix.As<T, sbyte>(value!);
             return true;
         }
         if (typeof(T) == typeof(ushort))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, ushort>(value!);
+            dbl = MathMatrix.As<T, ushort>(value!);
             return true;
         }
         if (typeof(T) == typeof(short))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, short>(value!);
+            dbl = MathMatrix.As<T, short>(value!);
             return true;
         }
         if (typeof(T) == typeof(uint))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, uint>(value!);
+            dbl = MathMatrix.As<T, uint>(value!);
             return true;
         }
         if (typeof(T) == typeof(int))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, int>(value!);
+            dbl = MathMatrix.As<T, int>(value!);
             return true;
         }
         if (typeof(T) == typeof(ulong))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, ulong>(value!);
+            dbl = MathMatrix.As<T, ulong>(value!);
             return true;
         }
         if (typeof(T) == typeof(long))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, long>(value!);
+            dbl = MathMatrix.As<T, long>(value!);
             return true;
         }
         if (typeof(T) == typeof(bool))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, bool>(value!) ? 1d : 0d;
+            dbl = MathMatrix.As<T, bool>(value!) ? 1d : 0d;
             return true;
         }
         if (typeof(T) == typeof(char))
         {
-            char c = SpecDynamicExpressionTreeValueHelpers.As<T, char>(value!);
+            char c = MathMatrix.As<T, char>(value!);
             if (c is >= '0' and <= '9')
             {
                 dbl = c - '0';
@@ -229,51 +229,51 @@ public abstract class ExpressionFunction : IExpressionFunction
         }
         if (typeof(T) == typeof(GuidOrId))
         {
-            GuidOrId guidOrId = SpecDynamicExpressionTreeValueHelpers.As<T, GuidOrId>(value!);
+            GuidOrId guidOrId = MathMatrix.As<T, GuidOrId>(value!);
             dbl = guidOrId.Id;
             return guidOrId.IsId;
         }
         if (typeof(T) == typeof(DateTime))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, DateTime>(value!).Ticks;
+            dbl = MathMatrix.As<T, DateTime>(value!).Ticks;
             return true;
         }
         if (typeof(T) == typeof(DateTimeOffset))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, DateTimeOffset>(value!).Ticks;
+            dbl = MathMatrix.As<T, DateTimeOffset>(value!).Ticks;
             return true;
         }
         if (typeof(T) == typeof(TimeSpan))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, TimeSpan>(value!).Ticks;
+            dbl = MathMatrix.As<T, TimeSpan>(value!).Ticks;
             return true;
         }
         if (typeof(T) == typeof(nint))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, nint>(value!);
+            dbl = MathMatrix.As<T, nint>(value!);
             return true;
         }
         if (typeof(T) == typeof(nuint))
         {
-            dbl = SpecDynamicExpressionTreeValueHelpers.As<T, nuint>(value!);
+            dbl = MathMatrix.As<T, nuint>(value!);
             return true;
         }
 #if NET5_0_OR_GREATER
         if (typeof(T) == typeof(Half))
         {
-            dbl = (double)SpecDynamicExpressionTreeValueHelpers.As<T, Half>(value!);
+            dbl = (double)MathMatrix.As<T, Half>(value!);
             return true;
         }
 #endif
 #if NET7_0_OR_GREATER
         if (typeof(T) == typeof(UInt128))
         {
-            dbl = (double)SpecDynamicExpressionTreeValueHelpers.As<T, UInt128>(value!);
+            dbl = (double)MathMatrix.As<T, UInt128>(value!);
             return true;
         }
         if (typeof(T) == typeof(Int128))
         {
-            dbl = (double)SpecDynamicExpressionTreeValueHelpers.As<T, Int128>(value!);
+            dbl = (double)MathMatrix.As<T, Int128>(value!);
             return true;
         }
 #endif
@@ -281,7 +281,7 @@ public abstract class ExpressionFunction : IExpressionFunction
         if (typeof(T) == typeof(string))
         {
             return double.TryParse(
-                SpecDynamicExpressionTreeValueHelpers.As<T, string>(value!),
+                MathMatrix.As<T, string>(value!),
                 NumberStyles.Any,
                 CultureInfo.InvariantCulture,
                 out dbl

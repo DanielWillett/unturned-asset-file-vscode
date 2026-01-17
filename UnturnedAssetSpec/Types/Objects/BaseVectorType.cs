@@ -51,7 +51,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
         return vector.ToString() ?? string.Empty;
     }
 
-    protected abstract IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context = "");
+    protected abstract IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context = "");
 
     public bool TryParse(ref TypeParserArgs<TVector> args, in FileEvaluationContext ctx, out Optional<TVector> value)
     {
@@ -218,7 +218,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
         }
     }
 
-    protected static VectorTypeOptions ReadOptions(in JsonElement typeDefinition, IDatSpecificationObject owner, string context)
+    protected static VectorTypeOptions ReadOptions(in JsonElement typeDefinition, DatProperty owner, string context)
     {
         if (typeDefinition.ValueKind != JsonValueKind.Object)
         {
@@ -276,14 +276,14 @@ public abstract class BaseVectorType<TVector, TSelf> :
 
         if (typeof(TTo) == typeof(string))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(ToString(obj.Value));
+            result = MathMatrix.As<string, TTo>(ToString(obj.Value));
             return true;
         }
 
         IVectorTypeProvider<TVector> provider = VectorTypes.GetProvider<TVector>();
         if (typeof(TTo) == typeof(double))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<double, TTo>(provider.GetComponent(obj.Value, 0));
+            result = MathMatrix.As<double, TTo>(provider.GetComponent(obj.Value, 0));
             return true;
         }
 
@@ -307,7 +307,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
 
     IType<TVector> ITypeConverter<TVector>.DefaultType => this;
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
     {
         return CreateType(in typeDefinition, typeId, spec, owner, context);
     }

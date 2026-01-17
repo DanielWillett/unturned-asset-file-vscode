@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 
@@ -1271,7 +1272,7 @@ public static class OneOrMoreExtensions
     /// <summary>
     /// Attempts to get a value from a <see cref="OneOrMore{T}"/> acting as a dictionary.
     /// </summary>
-    public static bool TryGetValue<TKey, TValue>(this OneOrMore<KeyValuePair<TKey, TValue>> dictionary, TKey key, out TValue value)
+    public static bool TryGetValue<TKey, TValue>(this OneOrMore<KeyValuePair<TKey, TValue>> dictionary, TKey key, [MaybeNullWhen(false)] out TValue value)
     {
         foreach (KeyValuePair<TKey, TValue> pair in dictionary)
         {
@@ -1289,7 +1290,7 @@ public static class OneOrMoreExtensions
     /// <summary>
     /// Attempts to get a value from a <see cref="OneOrMore{T}"/> acting as a dictionary based on a string comparison type.
     /// </summary>
-    public static bool TryGetValue<TValue>(this OneOrMore<KeyValuePair<string, TValue>> dictionary, string key, out TValue value, StringComparison stringComparison)
+    public static bool TryGetValue<TValue>(this OneOrMore<KeyValuePair<string, TValue>> dictionary, string key, [MaybeNullWhen(false)] out TValue value, StringComparison stringComparison)
     {
         foreach (KeyValuePair<string, TValue> pair in dictionary)
         {
@@ -1302,6 +1303,23 @@ public static class OneOrMoreExtensions
 
         value = default!;
         return false;
+    }
+
+    /// <summary>
+    /// Attempts to get a value from a <see cref="OneOrMore{T}"/> acting as a dictionary based on a string comparison type.
+    /// </summary>
+    [return: NotNullIfNotNull(nameof(defaultValue))]
+    public static TValue? GetValueOrDefault<TValue>(this OneOrMore<KeyValuePair<string, TValue>> dictionary, string key, TValue? defaultValue, StringComparison stringComparison)
+    {
+        return dictionary.TryGetValue(key, out TValue? value, stringComparison) ? value : defaultValue;
+    }
+
+    /// <summary>
+    /// Attempts to get a value from a <see cref="OneOrMore{T}"/> acting as a dictionary based on a string comparison type.
+    /// </summary>
+    public static TValue? GetValueOrDefault<TValue>(this OneOrMore<KeyValuePair<string, TValue>> dictionary, string key, StringComparison stringComparison)
+    {
+        return dictionary.TryGetValue(key, out TValue? value, stringComparison) ? value : default;
     }
 
     /// <summary>

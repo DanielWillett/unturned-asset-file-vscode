@@ -83,96 +83,96 @@ internal sealed class GuidOrIdTypeConverter : ITypeConverter<GuidOrId>
         {
             if (typeof(TTo) == typeof(bool))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<bool, TTo>(value.IsId ? value.Id != 0 : value.Guid != Guid.Empty);
+                result = MathMatrix.As<bool, TTo>(value.IsId ? value.Id != 0 : value.Guid != Guid.Empty);
                 return true;
             }
 
             if (typeof(TTo) == typeof(int))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<int, TTo>(value.Id);
+                result = MathMatrix.As<int, TTo>(value.Id);
                 return value.IsId;
             }
 
             if (typeof(TTo) == typeof(nint))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<nint, TTo>(value.Id);
+                result = MathMatrix.As<nint, TTo>(value.Id);
                 return value.IsId;
             }
 
             if (typeof(TTo) == typeof(short))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<short, TTo>((short)value.Id);
+                result = MathMatrix.As<short, TTo>((short)value.Id);
                 return value.IsId && value.Id <= short.MaxValue;
             }
 
             if (typeof(TTo) == typeof(ushort))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<ushort, TTo>(value.Id);
+                result = MathMatrix.As<ushort, TTo>(value.Id);
                 return value.IsId;
             }
 
             if (typeof(TTo) == typeof(sbyte))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<sbyte, TTo>((sbyte)value.Id);
+                result = MathMatrix.As<sbyte, TTo>((sbyte)value.Id);
                 return value.IsId && value.Id <= sbyte.MaxValue;
             }
 
             if (typeof(TTo) == typeof(long))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<long, TTo>(value.Id);
+                result = MathMatrix.As<long, TTo>(value.Id);
                 return value.IsId;
             }
 
             if (typeof(TTo) == typeof(ulong))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<ulong, TTo>(value.Id);
+                result = MathMatrix.As<ulong, TTo>(value.Id);
                 return value.IsId;
             }
 
             if (typeof(TTo) == typeof(nuint))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<nuint, TTo>(value.Id);
+                result = MathMatrix.As<nuint, TTo>(value.Id);
                 return value.IsId;
             }
 
             if (typeof(TTo) == typeof(uint))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<uint, TTo>(value.Id);
+                result = MathMatrix.As<uint, TTo>(value.Id);
                 return value.IsId;
             }
 
             if (typeof(TTo) == typeof(byte))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<byte, TTo>((byte)value.Id);
+                result = MathMatrix.As<byte, TTo>((byte)value.Id);
                 return value is { IsId: true, Id: <= byte.MaxValue };
             }
 
             if (typeof(TTo) == typeof(float))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<float, TTo>(value.Id);
+                result = MathMatrix.As<float, TTo>(value.Id);
                 return value.IsId;
             }
 
             if (typeof(TTo) == typeof(double))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<double, TTo>(value.Id);
+                result = MathMatrix.As<double, TTo>(value.Id);
                 return value.IsId;
             }
 
             if (typeof(TTo) == typeof(char))
             {
-                result = SpecDynamicExpressionTreeValueHelpers.As<char, TTo>((char)(value.Id % 10 + '0'));
+                result = MathMatrix.As<char, TTo>((char)(value.Id % 10 + '0'));
                 return value is { IsId: true, Id: < 10 };
             }
         }
         else if (typeof(TTo) == typeof(string))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<string, TTo>(value.ToString());
+            result = MathMatrix.As<string, TTo>(value.ToString());
             return true;
         }
         else if (typeof(TTo) == typeof(decimal))
         {
-            result = SpecDynamicExpressionTreeValueHelpers.As<decimal, TTo>(value.Id);
+            result = MathMatrix.As<decimal, TTo>(value.Id);
             return value.IsId;
         }
 

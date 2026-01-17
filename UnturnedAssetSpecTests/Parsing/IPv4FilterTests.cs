@@ -1,5 +1,5 @@
-﻿using System.Net;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data;
+using System.Net;
 // ReSharper disable InconsistentNaming
 
 namespace UnturnedAssetSpecTests.Parsing;

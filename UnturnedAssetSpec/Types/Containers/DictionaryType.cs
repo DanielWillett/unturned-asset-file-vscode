@@ -60,7 +60,7 @@ public sealed class DictionaryType : ITypeFactory
         return new DictionaryType<TKeyType, TValueType>(args, keyType, valueType);
     }
 
-    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, IDatSpecificationObject owner, string context)
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
     {
         ValueTypeVisitor v;
         v.Result = null;
@@ -99,7 +99,7 @@ public sealed class DictionaryType : ITypeFactory
         public IType? Result;
         public JsonElement Json;
         public IDatSpecificationReadContext Spec;
-        public IDatSpecificationObject Owner;
+        public DatProperty Owner;
         public string Context;
 
         public void Accept<TValueType>(IType<TValueType> type) where TValueType : IEquatable<TValueType>
@@ -129,7 +129,7 @@ public sealed class DictionaryType : ITypeFactory
         public IType? Result;
         public JsonElement Json;
         public IDatSpecificationReadContext Spec;
-        public IDatSpecificationObject Owner;
+        public DatProperty Owner;
         public IType<TValueType> SubType;
         public string Context;
 
@@ -310,7 +310,7 @@ public class DictionaryType<TKeyType, TValueType>
                         return false;
                     }
 
-                    arr[i] = new DictionaryPair<TValueType>(keyElement.GetString(), parsedValue);
+                    arr[i] = new DictionaryPair<TValueType>(keyElement.GetString()!, parsedValue);
                 }
 
                 value = new EquatableArray<DictionaryPair<TValueType>>(arr);

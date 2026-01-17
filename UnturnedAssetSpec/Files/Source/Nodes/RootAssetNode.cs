@@ -1,11 +1,11 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -129,7 +129,7 @@ internal class RootAssetNodeSkippedLocalization : RootDictionaryNode, IAssetSour
                 {
                     isErrored = true;
                 }
-                else if (Database.Information.AssetAliases.TryGetValue(typeProp.Value, out QualifiedType parsedActualType))
+                else if (Database!.Information.AssetAliases.TryGetValue(typeProp.Value, out QualifiedType parsedActualType))
                 {
                     actualType = parsedActualType;
                     type = QualifiedOrAliasedType.FromAlias(typeProp.Value);
@@ -161,7 +161,7 @@ internal class RootAssetNodeSkippedLocalization : RootDictionaryNode, IAssetSour
                         category = new AssetCategoryValue(index);
                     }
                 }
-                else if (Database.Information.AssetCategories.TryGetValue(actualType.Value, out string? catStr))
+                else if (Database!.Information.AssetCategories.TryGetValue(actualType.Value, out string? catStr))
                 {
                     category = new AssetCategoryValue(catStr);
                 }
@@ -210,7 +210,7 @@ internal sealed class RootAssetNode : RootAssetNodeSkippedLocalization
         return new RootAssetNode(
             localization,
             withoutLocalization.WorkspaceFile,
-            withoutLocalization.Database,
+            withoutLocalization.Database!,
             withoutLocalization.Count,
             withoutLocalization.Properties.UnsafeThaw(),
             withoutLocalization.GetAnyNodeProperties(),
@@ -235,7 +235,7 @@ internal sealed class RootAssetNode : RootAssetNodeSkippedLocalization
 
         Localization = ImmutableArray<ILocalizationSourceFile>.Empty;
         
-        if (Database.Types.TryGetValue(ActualType, out AssetSpecType specType) && specType.LocalizationProperties is not { Length: > 0 })
+        if (database.FileTypes.TryGetValue(ActualType, out DatFileType specType) && specType is not IDatTypeWithLocalizationProperties { LocalizationProperties.Length: > 0 })
         {
             return;
         }
