@@ -45,8 +45,6 @@ export function getAssetPropertiesViewProvider(): AssetPropertiesViewProvider
 
 export async function activate(context: ExtensionContext): Promise<void>
 {
-    await window.showInformationMessage("Thank you for using the UnturnedDat extension.");
-
     // todo: package with extension
     const dllPath = context.asAbsolutePath(join('..', 'LspServer', 'bin', 'Debug', 'net9.0', 'LspServer.dll'));
 

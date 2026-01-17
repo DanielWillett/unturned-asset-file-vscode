@@ -18173,7 +18173,6 @@ function getAssetPropertiesViewProvider() {
   return assetPropertiesViewProvider;
 }
 async function activate(context) {
-  await import_vscode5.window.showInformationMessage("Thank you for using the UnturnedDat extension.");
   const dllPath = context.asAbsolutePath((0, import_path2.join)("..", "LspServer", "bin", "Debug", "net9.0", "LspServer.dll"));
   if (!(0, import_fs.existsSync)(dllPath)) {
     await import_vscode5.window.showErrorMessage('LSP executible not found at "' + dllPath + '".');
