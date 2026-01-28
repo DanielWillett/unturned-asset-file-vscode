@@ -217,11 +217,11 @@ Code style should follow the existing style in the repo.
 * Prefer collection initialization [ ], include spacing between brackets and content (`[ 1, 2, 3 ]`).
 * Don't overcomment, write self-documenting code.
 * All new public members should have XML documenation in `UnturnedAssetSpec`. Use `<see langword="xyz"/>` for keywords.
-* Use `OneOrMore` or `System.Collections.Immutable` for public collections.
+* Use `System.Collections.Immutable` for public collections.
 * Use visitors over reflection for invoking generic members from non-generic context. `IType`, `IValue` both have an Accept function that takes a visitor.
 * Use value types for visitors.
 * Keep performance in mind. The language server is scanning over thousands of files and needs to run fast and keep a low memory footprint.
 * Include `unchecked ( <math> )` when math relies on overflow (such as a hash code calculation).
 * Use `System.HashCode` over math.
-* Singleton types/type converters/values should use a random int32 value as the hash code. I like to use the Visaul Studio's interactive C# window to get this (`Random.Shared.Next()` with no semicolon).
+* Singleton types/type converters/values should use a random int32 value as the hash code. I like to use the Visual Studio's interactive C# window to get this (`Random.Shared.Next()` with no semicolon).
 * Use spaces (4 per indentation), not tabs.
