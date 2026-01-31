@@ -111,10 +111,7 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT1004 = new DatDiagnostic("UNT1004", DatDiagnosticSeverity.Warning);
 
-    /// <summary>
-    /// Displayed when a property is missing a value that isn't a flag, list, or dictionary.
-    /// </summary>
-    public static readonly DatDiagnostic UNT1005 = new DatDiagnostic("UNT1005", DatDiagnosticSeverity.Warning);
+    // todo 1005
 
     /// <summary>
     /// Displayed when rich text is used on a string property that doesn't usually support it.
@@ -220,6 +217,26 @@ public static class DatDiagnostics
     /// A color supplied an alpha value when it doesn't support it.
     /// </summary>
     public static readonly DatDiagnostic UNT1026 = new DatDiagnostic("UNT1026", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// A list has a duplicate value where it shouldn't.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1027 = new DatDiagnostic("UNT1027", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// A value is either under the declared minimum value or over the declared maximum value.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1028 = new DatDiagnostic("UNT1028", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// A Steam64 ID is not using the correct account type.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1029 = new DatDiagnostic("UNT1029", DatDiagnosticSeverity.Warning);
+
+    /// <summary>
+    /// A localization file wasn't found when a property expected one.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1030 = new DatDiagnostic("UNT1030", DatDiagnosticSeverity.Warning);
 
     /* Errors */
 

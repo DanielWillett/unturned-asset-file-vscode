@@ -1,6 +1,8 @@
+
 using System.Text;
 using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Files;
@@ -33,6 +35,8 @@ internal class HoverHandler : IHoverHandler
     /// <inheritdoc />
     public Task<Hover?> Handle(HoverParams request, CancellationToken cancellationToken)
     {
+        return Task.FromResult<Hover?>(null);
+#if false
         if (!_evalFactory.TryCreate(request.Position, request.TextDocument.Uri, out SpecPropertyTypeParseContext ctx, out ISourceNode? hoverNode) && hoverNode == null)
         {
             return Task.FromResult<Hover?>(null);
@@ -74,9 +78,10 @@ internal class HoverHandler : IHoverHandler
                 Value = builder.ToString()
             })
         });
+#endif
     }
 }
-
+#if false
 public readonly struct HoverMarkdownBuilder
 {
     private readonly StringBuilder _hov;
@@ -298,3 +303,4 @@ public readonly struct HoverMarkdownBuilder
         }
     }
 }
+#endif

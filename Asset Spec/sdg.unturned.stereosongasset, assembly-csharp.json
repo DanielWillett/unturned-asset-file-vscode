@@ -21,10 +21,13 @@
                     "Value": "TranslationReference"
                 },
                 {
-                    "Value": "LocalizableString"
+                    "Value":
+                    {
+                        "Type": "LocalizableString",
+                        "LocalizationKeyOverride": "Name"
+                    }
                 }
             ],
-            "LocalizationKeyOverride": "Name",
             "DefaultValue":
             [
                 {

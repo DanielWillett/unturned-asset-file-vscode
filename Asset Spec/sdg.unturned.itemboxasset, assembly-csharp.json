@@ -29,22 +29,14 @@
         },
         {
             "Key": "Drops",
-            "Type": "Int32",
-            "Minimum": 0,
-            "DefaultValue": 0,
-            "Description": "Corresponds to the total number of items in the box, so that the correct number of UI elements are displayed when showing box contents.",
-            "Variable": "drops",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
-            "CountForTemplateGroup": "item-box-drops"
-        },
-        {
-            "Key": "Drop_*",
-            "Type": "SteamItemDef",
-            "Template": true,
-            "TemplateGroups": [ "item-box-drops" ],
-            "DefaultValue": 0,
-            "Required": true,
-            "Description": "The itemdefid of an item in the box, which is visually displayed as a UI element when showing box contents.",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SteamItemDef",
+                "Mode": "LegacyList"
+            },
+            "DefaultValue": [ ],
+            "Description": "The itemdefid of the items in the box, which are visually displayed as a UI element when showing box contents.",
             "Variable": "drops",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties"
         },

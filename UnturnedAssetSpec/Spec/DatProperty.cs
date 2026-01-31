@@ -65,25 +65,6 @@ public class DatProperty : IDatSpecificationObject
     public ImmutableArray<DatPropertyKey> Keys { get; internal set; }
 
     /// <summary>
-    /// List of template grops, if any.
-    /// </summary>
-    /// <remarks>Corresponds to the <c>TemplateGroups</c> property.</remarks>
-    public ImmutableArray<TemplateGroup> TemplateGroups { get; internal set; }
-
-    /// <summary>
-    /// Whether or not this property is a template property that uses <see cref="TemplateGroups"/>.
-    /// </summary>
-    /// <remarks>Corresponds to the <c>Template</c> property.</remarks>
-    [MemberNotNullWhen(true, nameof(TemplateGroups))]
-    public bool IsTemplate { get; internal set; }
-
-    /// <summary>
-    /// Whether or not every value in this template group should be unique.
-    /// </summary>
-    /// <remarks>Corresponds to the <c>TemplateGroupUniqueValue</c> property.</remarks>
-    public bool TemplateGroupUniqueValue { get; internal set; }
-
-    /// <summary>
     /// URL to the SDG docs for this property.
     /// </summary>
     /// <remarks>Corresponds to the <c>Docs</c> property.</remarks>
@@ -212,12 +193,9 @@ public class DatProperty : IDatSpecificationObject
     /// <summary>
     /// Create a new <see cref="DatProperty"/> for a localization file.
     /// </summary>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
     public static DatProperty CreateLocalizationKey(string key, string? value, DatTypeWithProperties owner)
     {
-        int maxFormatArguments = -1;
+        int maxFormatArgument = 0;
         bool allowLineBreak = false;
         if (string.IsNullOrEmpty(value))
         {
@@ -226,25 +204,25 @@ public class DatProperty : IDatSpecificationObject
         else
         {
             allowLineBreak = value.Contains("<br>", StringComparison.Ordinal);
-            maxFormatArguments = StringHelper.GetHighestFormattingArgument(value);
+            maxFormatArgument = StringHelper.GetHighestFormattingArgument(value);
         }
 
 
-        ++maxFormatArguments;
+        uint maxFormatArguments = maxFormatArgument < 0 ? 0u : (uint)(maxFormatArgument + 1);
 
         StringType type;
         if (allowLineBreak)
         {
-            type = new StringType(int.MinValue, int.MaxValue, true, true, maxFormatArguments, OneOrMore<Regex>.Null);
+            type = new StringType(0, int.MaxValue, true, true, maxFormatArguments, OneOrMore<Regex>.Null);
         }
         else if (maxFormatArguments < CachedLocalizationStringTypes)
         {
             type = LocalizationStringTypeCache[maxFormatArguments]
-                ??= new StringType(int.MinValue, int.MaxValue, true, false, maxFormatArguments, OneOrMore<Regex>.Null);
+                ??= new StringType(0, int.MaxValue, true, false, maxFormatArguments, OneOrMore<Regex>.Null);
         }
         else
         {
-            type = new StringType(int.MinValue, int.MaxValue, true, false, maxFormatArguments, OneOrMore<Regex>.Null);
+            type = new StringType(0, int.MaxValue, true, false, maxFormatArguments, OneOrMore<Regex>.Null);
         }
 
         // note: these are not considered Localization properties since they're still in the main file.
@@ -304,16 +282,10 @@ public sealed class DatPropertyKey
     /// <remarks>Corresponds to the <c>Aliases.Condition</c>/<c>KeyCondition</c> properties.</remarks>
     public IValue<bool>? Condition { get; }
 
-    /// <summary>
-    /// If this property is a template, the processor for that template.
-    /// </summary>
-    public TemplateProcessor? TemplateProcessor { get; }
-
-    internal DatPropertyKey(string key, LegacyExpansionFilter filter, IValue<bool>? condition, TemplateProcessor? templateProcessor)
+    internal DatPropertyKey(string key, LegacyExpansionFilter filter, IValue<bool>? condition)
     {
         Key = key;
         Filter = filter;
         Condition = condition;
-        TemplateProcessor = templateProcessor;
     }
 }

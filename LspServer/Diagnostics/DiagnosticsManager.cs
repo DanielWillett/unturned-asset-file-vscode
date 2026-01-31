@@ -233,7 +233,7 @@ internal class DiagnosticsManager : IDisposable
     {
         if (!_database.IsInitialized && Interlocked.Exchange(ref _queuedMaybeStart, 1) == 0)
         {
-            _database.OnInitialize(_ =>
+            _database.OnInitialize((_, _) =>
             {
                 MaybeStartWorkerThread(true);
                 return Task.CompletedTask;

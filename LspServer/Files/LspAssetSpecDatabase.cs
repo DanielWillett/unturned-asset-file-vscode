@@ -1,4 +1,5 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
@@ -8,17 +9,25 @@ public class LspAssetSpecDatabase : AssetSpecDatabase
 {
     private readonly ILogger<LspAssetSpecDatabase> _logger;
 
-    public LspAssetSpecDatabase(ILogger<LspAssetSpecDatabase> logger, JsonSerializerOptions options
+    public LspAssetSpecDatabase(ILoggerFactory loggerFactory, JsonSerializerOptions options
 #if !DEBUG
         , ISpecDatabaseCache cache
 #endif
         ) : base(
+        new SpecificationFileReader(
+            allowInternet: true,
+            loggerFactory,
+            new Lazy<HttpClient>(() => new HttpClient()),
+            options,
+            new InstallDirUtility("Unturned", "304930"),
 #if !DEBUG
-        cache
+            cache: cache
+#else
+            cache: null
 #endif
-    )
+        ), loggerFactory)
     {
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger<LspAssetSpecDatabase>();
         Options = options;
     }
 

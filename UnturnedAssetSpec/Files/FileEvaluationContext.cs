@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System.Diagnostics.CodeAnalysis;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -21,6 +22,9 @@ public readonly struct FileEvaluationContext
     // todo:
     public readonly PropertyResolutionContext PropertyContext;
     public readonly OneOrMore<int> TemplateIndices;
+
+    // todo:
+    public readonly INestedObjectContext? CurrentObject;
 
     public FileEvaluationContext(DatProperty self, ISourceFile file, IWorkspaceEnvironment workspace, InstallationEnvironment environment, IAssetSpecDatabase information, PropertyResolutionContext propertyContext)
         : this(self, self.Owner, file, workspace, environment, information, propertyContext)

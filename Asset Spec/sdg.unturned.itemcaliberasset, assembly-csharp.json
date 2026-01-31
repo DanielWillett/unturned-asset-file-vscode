@@ -21,8 +21,7 @@
             "DefaultValue": [ ],
             "Description": "Arbitrary IDs that have to be shared between an attachment and weapon for them to be compatible.",
             "Variable": "calibers",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#calibers-uint8-0",
-            "CountForTemplateGroup": "item-caliber-calibers"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/caliber-asset.html#calibers-uint8-0"
         },
         {
             "Key": "Recoil_X",

@@ -1,5 +1,8 @@
+using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
@@ -27,30 +30,86 @@ public static class OmniSharpAssetSpecExtensionsExtensions
         return new Range(range.Start.Line - 1, range.Start.Character - 1, range.End.Line - 1, range.End.Character);
     }
 
-    public static SymbolKind GetSymbolKind(this ISpecPropertyType type)
+    public static SymbolKind GetSymbolKind(this IType type)
     {
-        return type.Kind switch
-        {
-            SpecPropertyTypeKind.String => SymbolKind.String,
-            SpecPropertyTypeKind.Number => SymbolKind.Number,
-            SpecPropertyTypeKind.Boolean => SymbolKind.Boolean,
-            SpecPropertyTypeKind.Struct => SymbolKind.Struct,
-            SpecPropertyTypeKind.Class => SymbolKind.Class,
-            SpecPropertyTypeKind.Enum => SymbolKind.EnumMember,
-            _ => SymbolKind.String
-        };
+        SymbolKindVisitor v;
+        v.Kind = SymbolKind.Class;
+        type.Visit(ref v);
+        return v.Kind;
     }
-    public static CompletionItemKind GetCompletionItemKind(this ISpecPropertyType type)
+
+    private struct SymbolKindVisitor : ITypeVisitor
     {
-        return type.Kind switch
+        public SymbolKind Kind;
+        public void Accept<TValue>(IType<TValue> type)
+            where TValue : IEquatable<TValue>
         {
-            SpecPropertyTypeKind.String => CompletionItemKind.Value,
-            SpecPropertyTypeKind.Number => CompletionItemKind.Value,
-            SpecPropertyTypeKind.Boolean => CompletionItemKind.Keyword,
-            SpecPropertyTypeKind.Struct => CompletionItemKind.Struct,
-            SpecPropertyTypeKind.Class => CompletionItemKind.Class,
-            SpecPropertyTypeKind.Enum => CompletionItemKind.EnumMember,
-            _ => CompletionItemKind.Value
-        };
+            if (typeof(TValue) == typeof(string))
+            {
+                Kind = SymbolKind.String;
+            }
+            else if (typeof(TValue).IsPrimitive)
+            {
+                if (typeof(TValue) == typeof(sbyte)
+                    || typeof(TValue) == typeof(byte)
+                    || typeof(TValue) == typeof(short)
+                    || typeof(TValue) == typeof(ushort)
+                    || typeof(TValue) == typeof(int)
+                    || typeof(TValue) == typeof(uint)
+                    || typeof(TValue) == typeof(long)
+                    || typeof(TValue) == typeof(ulong)
+                    || typeof(TValue) == typeof(float)
+                    || typeof(TValue) == typeof(double)
+                    || typeof(TValue) == typeof(nint)
+                    || typeof(TValue) == typeof(nuint)
+                    )
+                {
+                    Kind = SymbolKind.Number;
+                }
+                else if (typeof(TValue) == typeof(char))
+                {
+                    Kind = SymbolKind.String;
+                }
+                else if (typeof(TValue) == typeof(bool))
+                {
+                    Kind = SymbolKind.Boolean;
+                }
+                else
+                {
+                    Kind = SymbolKind.Struct;
+                }
+            }
+            else if (typeof(TValue).IsValueType)
+            {
+                if (typeof(TValue) == typeof(decimal))
+                {
+                    Kind = SymbolKind.Number;
+                }
+                if (typeof(TValue) == typeof(QualifiedType) || typeof(TValue) == typeof(QualifiedOrAliasedType))
+                {
+                    Kind = SymbolKind.Class;
+                }
+                else if (typeof(TValue).IsGenericType && typeof(TValue).GetGenericTypeDefinition() == typeof(EquatableArray<>))
+                {
+                    Kind = SymbolKind.Array;
+                }
+                else
+                {
+                    Kind = SymbolKind.Struct;
+                }
+            }
+            else if (typeof(DatEnumValue).IsAssignableFrom(typeof(TValue)))
+            {
+                Kind = SymbolKind.Enum;
+            }
+            else if (typeof(TValue) == typeof(Type))
+            {
+                Kind = SymbolKind.Class;
+            }
+            else
+            {
+                Kind = SymbolKind.Object;
+            }
+        }
     }
 }

@@ -36,7 +36,7 @@ partial class SpecificationFileReader
 
         bool isAsset = _readInformation != null && _readInformation.IsAssignableFrom(QualifiedType.AssetBaseType, fileType.Type);
 
-        DatFileType type = DatType.CreateFileType(fileType, isAsset, root, parentType);
+        DatFileType type = DatType.CreateFileType(fileType, isAsset, root, parentType, this);
 
         _fileTypeBuilder?[fileType] = type;
 
@@ -122,6 +122,21 @@ partial class SpecificationFileReader
             }
 
             type.Properties = propertyBuilder.ToImmutable();
+        }
+
+        if (type is DatAssetFileType assetFile && root.TryGetProperty("Localization"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            AssertValueKind(in element, fileType, JsonValueKind.Array);
+            int propertyCount = element.GetArrayLength();
+
+            ImmutableArray<DatProperty>.Builder propertyBuilder = ImmutableArray.CreateBuilder<DatProperty>(propertyCount);
+
+            for (int i = 0; i < propertyCount; ++i)
+            {
+                ReadPropertyFirstPass(in element, i, "Localization", t => t.Properties, propertyBuilder, SpecPropertyContext.Localization, type);
+            }
+
+            assetFile.LocalizationProperties = propertyBuilder.ToImmutable();
         }
 
         return type;

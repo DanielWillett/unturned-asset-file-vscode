@@ -52,6 +52,8 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
     /// <inheritdoc />
     public IAssetSpecDatabase Database => _database ?? throw new InvalidOperationException("Not yet initialized.");
 
+    public ILoggerFactory LoggerFactory => _loggerFactory;
+
     public JsonSerializerOptions JsonOptions { get; }
 
     public SpecificationFileReader(
@@ -323,7 +325,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
             if (string.IsNullOrEmpty(id))
                 continue;
 
-            DatFileType fileType = DatFileType.CreateFileType(id, false, default, null);
+            DatFileType fileType = DatFileType.CreateFileType(id, false, default, null, this);
             fileType.IsKeyOnlyLocalizationFile = _readInformation != null && Array.IndexOf(_readInformation.KeyOnlyLocalizationFiles!, id) >= 0;
 
             ImmutableArray<DatProperty>.Builder propertiesBuilder = ImmutableArray.CreateBuilder<DatProperty>();

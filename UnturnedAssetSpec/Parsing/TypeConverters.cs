@@ -114,6 +114,11 @@ public static class TypeConverters
     public static ITypeConverter<QualifiedType> QualifiedType { get; } = new QualifiedTypeTypeConverter();
 
     /// <summary>
+    /// The type converter for steam item def values.
+    /// </summary>
+    public static ITypeConverter<int> SteamItemDef => SteamItemDefType.Instance;
+
+    /// <summary>
     /// Gets the type converter for the given type.
     /// </summary>
     /// <typeparam name="T">The type to convert.</typeparam>

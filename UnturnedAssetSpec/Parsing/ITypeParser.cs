@@ -1,6 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -34,7 +33,6 @@ public interface ITypeParser<T> where T : IEquatable<T>
     /// </summary>
     void WriteValueToJson(Utf8JsonWriter writer, T value, IType<T> valueType, JsonSerializerOptions options);
 }
-
 
 /// <summary>
 /// Arguments passed to all implementations of <see cref="ITypeParser{T}.TryParse"/>.

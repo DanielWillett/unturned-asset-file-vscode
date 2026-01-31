@@ -174,8 +174,7 @@
             "Description": "Total number of tires that should turn when steering. Replaced by the @WheelConfigurations property.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#num-steering-tires-int32",
             "Deprecated": true,
-            "Variable": "numSteeringTires",
-            "CountForTemplateGroup": "vehicle-steering-tires"
+            "Variable": "numSteeringTires"
         },
         {
             "Key": "Has_Clip_Prefab",
@@ -1034,8 +1033,7 @@
             "DefaultValue": [ ],
             "Description": "The number of seats designated as turrets.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turrets-uint8-0",
-            "Variable": "turrets",
-            "CountForTemplateGroup": "vehicle-turrets"
+            "Variable": "turrets"
         },
         {
             "Key": "Invulnerable",

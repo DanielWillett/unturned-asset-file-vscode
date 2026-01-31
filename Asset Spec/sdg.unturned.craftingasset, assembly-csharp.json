@@ -17,8 +17,7 @@
             },
             "Description": "List of blueprints to define.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-asset.html#properties",
-            "Variable": "_blueprints",
-            "CountForTemplateGroup": "crafting-blueprints"
+            "Variable": "_blueprints"
         }
     ]
 }

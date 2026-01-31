@@ -126,24 +126,24 @@ public class SourceFilePropertyVirtualizer : IFilePropertyVirtualizer
         //     );
         // }
 
-        if (property.IsTemplate)
-        {
-            if (!breadcrumbs.TryGetProperty(file, property, in evalCtx, out IPropertySourceNode? propNode))
-            {
-                return null;
-            }
-
-            return new BasicProperty(
-                property,
-                propNode,
-                file,
-                assetType, 
-                _workspaceEnvironment,
-                _installationEnvironment,
-                _database,
-                PropertyResolutionContext.Modern
-            );
-        }
+        //if (property.IsTemplate)
+        //{
+        //    if (!breadcrumbs.TryGetProperty(file, property, in evalCtx, out IPropertySourceNode? propNode))
+        //    {
+        //        return null;
+        //    }
+        //
+        //    return new BasicProperty(
+        //        property,
+        //        propNode,
+        //        file,
+        //        assetType, 
+        //        _workspaceEnvironment,
+        //        _installationEnvironment,
+        //        _database,
+        //        PropertyResolutionContext.Modern
+        //    );
+        //}
 
         return null;
     }

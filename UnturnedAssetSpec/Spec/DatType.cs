@@ -107,7 +107,7 @@ public abstract class DatType : BaseType<DatType>, IDatSpecificationObject
     /// Pre-defined fully-qualified C# type name used to parse values of this type.
     /// </summary>
     /// <remarks>This type should implement <see cref="ITypeConverter{T}"/> for the correct type.</remarks>
-    public Type? StringParseableType { get; internal set; }
+    public QualifiedType StringParseableType { get; internal set; }
 
     /// <summary>
     /// The version of Unturned this type was added in.
@@ -133,7 +133,7 @@ public abstract class DatType : BaseType<DatType>, IDatSpecificationObject
     /// <param name="file">The file this type is defined in.</param>
     /// <returns>The newly-created <see cref="DatEnumType"/> or <see cref="DatFlagEnumType"/> instance.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static DatEnumType CreateEnumType(QualifiedType typeName, bool isFlagEnum, JsonElement element, DatFileType file)
+    public static DatEnumType CreateEnumType(QualifiedType typeName, bool isFlagEnum, JsonElement element, DatFileType file, IDatSpecificationReadContext context)
     {
         if (file == null)
             throw new ArgumentNullException(nameof(file));
@@ -155,14 +155,14 @@ public abstract class DatType : BaseType<DatType>, IDatSpecificationObject
     /// <param name="file">The file this type is defined in.</param>
     /// <returns>The newly-created <see cref="DatCustomType"/> or <see cref="DatCustomAssetType"/> instance.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static DatCustomType CreateCustomType(QualifiedType typeName, JsonElement element, DatTypeWithProperties? baseType, DatFileType file)
+    public static DatCustomType CreateCustomType(QualifiedType typeName, JsonElement element, DatTypeWithProperties? baseType, DatFileType file, IDatSpecificationReadContext context)
     {
         if (string.IsNullOrEmpty(typeName.Type))
             throw new ArgumentNullException(nameof(typeName));
 
         return file is DatAssetFileType assetFileType
-            ? new DatCustomAssetType(typeName, baseType, element, assetFileType)
-            : new DatCustomType(typeName, baseType, element, file);
+            ? new DatCustomAssetType(typeName, baseType, element, assetFileType, context)
+            : new DatCustomType(typeName, baseType, element, file, context);
     }
 
     /// <summary>
@@ -174,7 +174,7 @@ public abstract class DatType : BaseType<DatType>, IDatSpecificationObject
     /// <param name="baseType">The base type of this custom type.</param>
     /// <returns>The newly-created <see cref="DatFileType"/> or <see cref="DatAssetFileType"/> instance.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static DatFileType CreateFileType(QualifiedType typeName, bool isAssetFileType, JsonElement element, DatFileType? baseType)
+    public static DatFileType CreateFileType(QualifiedType typeName, bool isAssetFileType, JsonElement element, DatFileType? baseType, IDatSpecificationReadContext context)
     {
         if (string.IsNullOrEmpty(typeName.Type))
             throw new ArgumentNullException(nameof(typeName));

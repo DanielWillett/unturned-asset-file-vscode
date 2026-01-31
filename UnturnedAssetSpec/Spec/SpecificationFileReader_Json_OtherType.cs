@@ -110,7 +110,7 @@ partial class SpecificationFileReader
             AssertValueKind(in enumValues, fileType, JsonValueKind.Array);
             bool isFlags = root.TryGetProperty("IsFlags"u8, out element) && element.ValueKind != JsonValueKind.Null && element.GetBoolean();
 
-            DatEnumType enumType = DatType.CreateEnumType(typeName, isFlags, root, file);
+            DatEnumType enumType = DatType.CreateEnumType(typeName, isFlags, root, file, this);
             enumType.DisplayNameIntl = displayName;
 
             typeDictionary[typeName] = parsedType = enumType;
@@ -160,7 +160,7 @@ partial class SpecificationFileReader
                 }
             }
 
-            DatCustomType customType = DatType.CreateCustomType(typeName, root, parentType, file);
+            DatCustomType customType = DatType.CreateCustomType(typeName, root, parentType, file, this);
             customType.DisplayNameIntl = displayName;
 
             typeDictionary[typeName] = parsedType = customType;

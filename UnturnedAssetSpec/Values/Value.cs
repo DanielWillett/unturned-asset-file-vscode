@@ -36,111 +36,117 @@ public static class Value
     [OverloadResolutionPriority(1)]
     public static NullValue<T> Null<T>(IType<T> type) where T : IEquatable<T>
     {
-        if (typeof(T) == typeof(long))
+        if (typeof(T).IsValueType)
         {
-            if (ReferenceEquals(type, Int64Type.Instance))
-                return MathMatrix.As<NullValue<long>, NullValue<T>>(Int64Type.Null);
-        }
-        else if (typeof(T) == typeof(ulong))
-        {
-            if (ReferenceEquals(type, UInt64Type.Instance))
-                return MathMatrix.As<NullValue<ulong>, NullValue<T>>(UInt64Type.Null);
-        }
-        else if (typeof(T) == typeof(int))
-        {
-            if (ReferenceEquals(type, Int32Type.Instance))
-                return MathMatrix.As<NullValue<int>, NullValue<T>>(Int32Type.Null);
-        }
-        else if (typeof(T) == typeof(uint))
-        {
-            if (ReferenceEquals(type, UInt32Type.Instance))
-                return MathMatrix.As<NullValue<uint>, NullValue<T>>(UInt32Type.Null);
-        }
-        else if (typeof(T) == typeof(short))
-        {
-            if (ReferenceEquals(type, Int16Type.Instance))
-                return MathMatrix.As<NullValue<short>, NullValue<T>>(Int16Type.Null);
-        }
-        else if (typeof(T) == typeof(ushort))
-        {
-            if (ReferenceEquals(type, UInt16Type.Instance))
-                return MathMatrix.As<NullValue<ushort>, NullValue<T>>(UInt16Type.Null);
-        }
-        else if (typeof(T) == typeof(sbyte))
-        {
-            if (ReferenceEquals(type, Int8Type.Instance))
-                return MathMatrix.As<NullValue<sbyte>, NullValue<T>>(Int8Type.Null);
-        }
-        else if (typeof(T) == typeof(byte))
-        {
-            if (ReferenceEquals(type, UInt8Type.Instance))
-                return MathMatrix.As<NullValue<byte>, NullValue<T>>(UInt8Type.Null);
-        }
-        else if (typeof(T) == typeof(float))
-        {
-            if (ReferenceEquals(type, Float32Type.Instance))
-                return MathMatrix.As<NullValue<float>, NullValue<T>>(Float32Type.Null);
-        }
-        else if (typeof(T) == typeof(double))
-        {
-            if (ReferenceEquals(type, Float64Type.Instance))
-                return MathMatrix.As<NullValue<double>, NullValue<T>>(Float64Type.Null);
-        }
-        else if (typeof(T) == typeof(decimal))
-        {
-            if (ReferenceEquals(type, Float128Type.Instance))
-                return MathMatrix.As<NullValue<decimal>, NullValue<T>>(Float128Type.Null);
+            if (typeof(T).IsPrimitive)
+            {
+                if (typeof(T) == typeof(long))
+                {
+                    if ((object)type == Int64Type.Instance)
+                        return MathMatrix.As<NullValue<long>, NullValue<T>>(Int64Type.Null);
+                }
+                else if (typeof(T) == typeof(ulong))
+                {
+                    if ((object)type == UInt64Type.Instance)
+                        return MathMatrix.As<NullValue<ulong>, NullValue<T>>(UInt64Type.Null);
+                }
+                else if (typeof(T) == typeof(int))
+                {
+                    if ((object)type == Int32Type.Instance)
+                        return MathMatrix.As<NullValue<int>, NullValue<T>>(Int32Type.Null);
+                }
+                else if (typeof(T) == typeof(uint))
+                {
+                    if ((object)type == UInt32Type.Instance)
+                        return MathMatrix.As<NullValue<uint>, NullValue<T>>(UInt32Type.Null);
+                }
+                else if (typeof(T) == typeof(short))
+                {
+                    if ((object)type == Int16Type.Instance)
+                        return MathMatrix.As<NullValue<short>, NullValue<T>>(Int16Type.Null);
+                }
+                else if (typeof(T) == typeof(ushort))
+                {
+                    if ((object)type == UInt16Type.Instance)
+                        return MathMatrix.As<NullValue<ushort>, NullValue<T>>(UInt16Type.Null);
+                }
+                else if (typeof(T) == typeof(sbyte))
+                {
+                    if ((object)type == Int8Type.Instance)
+                        return MathMatrix.As<NullValue<sbyte>, NullValue<T>>(Int8Type.Null);
+                }
+                else if (typeof(T) == typeof(byte))
+                {
+                    if ((object)type == UInt8Type.Instance)
+                        return MathMatrix.As<NullValue<byte>, NullValue<T>>(UInt8Type.Null);
+                }
+                else if (typeof(T) == typeof(float))
+                {
+                    if ((object)type == Float32Type.Instance)
+                        return MathMatrix.As<NullValue<float>, NullValue<T>>(Float32Type.Null);
+                }
+                else if (typeof(T) == typeof(double))
+                {
+                    if ((object)type == Float64Type.Instance)
+                        return MathMatrix.As<NullValue<double>, NullValue<T>>(Float64Type.Null);
+                }
+                else if (typeof(T) == typeof(bool))
+                {
+                    if ((object)type == BooleanType.Instance)
+                        return MathMatrix.As<NullValue<bool>, NullValue<T>>(BooleanType.Null);
+                    if ((object)type == FlagType.Instance)
+                        return MathMatrix.As<NullValue<bool>, NullValue<T>>(FlagType.Null);
+                    if ((object)type == BooleanOrFlagType.Instance)
+                        return MathMatrix.As<NullValue<bool>, NullValue<T>>(BooleanOrFlagType.Null);
+                }
+                else if (typeof(T) == typeof(char))
+                {
+                    if ((object)type == CharacterType.Instance)
+                        return MathMatrix.As<NullValue<char>, NullValue<T>>(CharacterType.Null);
+                }
+            }
+            else if (typeof(T) == typeof(decimal))
+            {
+                if ((object)type == Float128Type.Instance)
+                    return MathMatrix.As<NullValue<decimal>, NullValue<T>>(Float128Type.Null);
+            }
+            else if (typeof(T) == typeof(DateTime))
+            {
+                if ((object)type == DateTimeType.Instance)
+                    return MathMatrix.As<NullValue<DateTime>, NullValue<T>>(DateTimeType.Null);
+            }
+            else if (typeof(T) == typeof(DateTimeOffset))
+            {
+                if ((object)type == DateTimeOffsetType.Instance)
+                    return MathMatrix.As<NullValue<DateTimeOffset>, NullValue<T>>(DateTimeOffsetType.Null);
+            }
+            else if (typeof(T) == typeof(IPv4Filter))
+            {
+                if ((object)type == IPv4FilterType.Instance)
+                    return MathMatrix.As<NullValue<IPv4Filter>, NullValue<T>>(IPv4FilterType.Null);
+            }
+            else if (typeof(T) == typeof(TimeSpan))
+            {
+                if ((object)type == TimeSpanType.Instance)
+                    return MathMatrix.As<NullValue<TimeSpan>, NullValue<T>>(TimeSpanType.Null);
+            }
+            else if (typeof(T) == typeof(GuidOrId))
+            {
+                if ((object)type == GuidOrIdType.Instance)
+                    return MathMatrix.As<NullValue<GuidOrId>, NullValue<T>>(GuidOrIdType.Null);
+            }
+            else if (typeof(T) == typeof(Guid))
+            {
+                if ((object)type == GuidType.Instance)
+                    return MathMatrix.As<NullValue<Guid>, NullValue<T>>(GuidType.Null);
+            }
         }
         else if (typeof(T) == typeof(string))
         {
-            if (ReferenceEquals(type, StringType.Instance))
+            if ((object)type == StringType.Instance)
                 return MathMatrix.As<NullValue<string>, NullValue<T>>(StringType.Null);
-            if (ReferenceEquals(type, RegexStringType.Instance))
+            if ((object)type == RegexStringType.Instance)
                 return MathMatrix.As<NullValue<string>, NullValue<T>>(RegexStringType.Null);
-        }
-        else if (typeof(T) == typeof(bool))
-        {
-            if (ReferenceEquals(type, BooleanType.Instance))
-                return MathMatrix.As<NullValue<bool>, NullValue<T>>(BooleanType.Null);
-            if (ReferenceEquals(type, FlagType.Instance))
-                return MathMatrix.As<NullValue<bool>, NullValue<T>>(FlagType.Null);
-            if (ReferenceEquals(type, BooleanOrFlagType.Instance))
-                return MathMatrix.As<NullValue<bool>, NullValue<T>>(BooleanOrFlagType.Null);
-        }
-        else if (typeof(T) == typeof(char))
-        {
-            if (ReferenceEquals(type, CharacterType.Instance))
-                return MathMatrix.As<NullValue<char>, NullValue<T>>(CharacterType.Null);
-        }
-        else if (typeof(T) == typeof(DateTime))
-        {
-            if (ReferenceEquals(type, DateTimeType.Instance))
-                return MathMatrix.As<NullValue<DateTime>, NullValue<T>>(DateTimeType.Null);
-        }
-        else if (typeof(T) == typeof(DateTimeOffset))
-        {
-            if (ReferenceEquals(type, DateTimeOffsetType.Instance))
-                return MathMatrix.As<NullValue<DateTimeOffset>, NullValue<T>>(DateTimeOffsetType.Null);
-        }
-        else if (typeof(T) == typeof(IPv4Filter))
-        {
-            if (ReferenceEquals(type, IPv4FilterType.Instance))
-                return MathMatrix.As<NullValue<IPv4Filter>, NullValue<T>>(IPv4FilterType.Null);
-        }
-        else if (typeof(T) == typeof(TimeSpan))
-        {
-            if (ReferenceEquals(type, TimeSpanType.Instance))
-                return MathMatrix.As<NullValue<TimeSpan>, NullValue<T>>(TimeSpanType.Null);
-        }
-        else if (typeof(T) == typeof(GuidOrId))
-        {
-            if (ReferenceEquals(type, GuidOrIdType.Instance))
-                return MathMatrix.As<NullValue<GuidOrId>, NullValue<T>>(GuidOrIdType.Null);
-        }
-        else if (typeof(T) == typeof(Guid))
-        {
-            if (ReferenceEquals(type, GuidType.Instance))
-                return MathMatrix.As<NullValue<Guid>, NullValue<T>>(GuidType.Null);
         }
 
         return new NullValue<T>(type);
@@ -152,7 +158,7 @@ public static class Value
     [OverloadResolutionPriority(2)]
     public static NullValue<T> Null<TType, T>(PrimitiveType<T, TType> type) where TType : PrimitiveType<T, TType>, new() where T : IEquatable<T>
     {
-        return PrimitiveType<T, TType>.Null;
+        return (object)type == PrimitiveType<T, TType>.Instance ? PrimitiveType<T, TType>.Null : new NullValue<T>(type);
     }
 
     /// <summary>

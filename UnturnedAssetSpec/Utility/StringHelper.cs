@@ -756,7 +756,7 @@ internal static class StringHelper
     }
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
-    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
     public static void AppendSpan(StringBuilder sb, ReadOnlySpan<char> span)
     {
@@ -777,7 +777,7 @@ internal static class StringHelper
     }
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
-    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
     public static void WriteSpan(TextWriter writer, ReadOnlySpan<char> span)
     {

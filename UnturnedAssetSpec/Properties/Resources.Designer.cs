@@ -412,6 +412,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to find string-parseable type &quot;{0}&quot; for custom type &quot;{1}&quot;..
+        /// </summary>
+        internal static string Log_FailedToFindStringParseableType {
+            get {
+                return ResourceManager.GetString("Log_FailedToFindStringParseableType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to read resource at &quot;{0}&quot;..
         /// </summary>
         internal static string Log_FailedToParseResource {
@@ -862,6 +871,42 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Localizable Text.
+        /// </summary>
+        internal static string Type_Name_LocalizableString {
+            get {
+                return ResourceManager.GetString("Type_Name_LocalizableString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Type_Name_LocalizableString_Rich {
+            get {
+                return ResourceManager.GetString("Type_Name_LocalizableString_Rich", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Localization Key.
+        /// </summary>
+        internal static string Type_Name_LocalizationKey {
+            get {
+                return ResourceManager.GetString("Type_Name_LocalizationKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Localization Key for Rich Text.
+        /// </summary>
+        internal static string Type_Name_LocalizationKey_Rich {
+            get {
+                return ResourceManager.GetString("Type_Name_LocalizationKey_Rich", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Masterbundle or Content Reference.
         /// </summary>
         internal static string Type_Name_MasterBundleOrContentReference {
@@ -975,6 +1020,132 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_SpawnpointId {
             get {
                 return ResourceManager.GetString("Type_Name_SpawnpointId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Steam64 ID ({0}).
+        /// </summary>
+        internal static string Type_Name_Steam64ID {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Anonymous Game Server.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_AnonGameServer {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_AnonGameServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Anonymous User.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_AnonUser {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_AnonUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Any.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_Any {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_Any", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Group Chat.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_Chat {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_Chat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Group.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_Clan {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_Clan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Console User.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_ConsoleUser {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_ConsoleUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Content Server.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_ContentServer {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_ContentServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Game Server.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_GameServer {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_GameServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User Account.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_Individual {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_Individual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to or.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_Join {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_Join", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiseat Account.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_Multiseat {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_Multiseat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pending Entity.
+        /// </summary>
+        internal static string Type_Name_Steam64ID_Pending {
+            get {
+                return ResourceManager.GetString("Type_Name_Steam64ID_Pending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Steam Item Identifier.
+        /// </summary>
+        internal static string Type_Name_SteamItemDef {
+            get {
+                return ResourceManager.GetString("Type_Name_SteamItemDef", resourceCulture);
             }
         }
         

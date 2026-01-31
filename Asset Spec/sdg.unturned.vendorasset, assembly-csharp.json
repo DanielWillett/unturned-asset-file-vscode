@@ -26,7 +26,6 @@
                 "CountType": "UInt8",
                 "ElementType": "SDG.Unturned.VendorBuying, Assembly-CSharp"
             },
-            "CountForTemplateGroup": "vendor-buying",
             "MaximumCount": 255,
             "DefaultValue": null,
             "Description": "Items being bought from players by the vendor shop.",
@@ -42,7 +41,6 @@
                 "CountType": "UInt8",
                 "ElementType": "SDG.Unturned.VendorSellingBase, Assembly-CSharp"
             },
-            "CountForTemplateGroup": "vendor-selling",
             "MaximumCount": 255,
             "DefaultValue": null,
             "Description": "Items and vehicles being sold by the vendor shop to players.",
@@ -103,14 +101,12 @@
                     {
                         "Type": "List",
                         "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                        "LegacySingularKey": "Condition",
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": null,
                     "Description": "Conditions that must be met for players to be able to sell item #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
-                    "Variable": "conditionsList",
-                    "CountForTemplateGroup": "vendor-buying-conditions"
+                    "Variable": "conditionsList"
                 },
                 {
                     "Key": "Rewards",
@@ -118,14 +114,12 @@
                     {
                         "Type": "List",
                         "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                        "LegacySingularKey": "Reward",
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": null,
                     "Description": "Rewards applied after the player sells item #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
-                    "Variable": "rewardsList",
-                    "CountForTemplateGroup": "vendor-buying-rewards"
+                    "Variable": "rewardsList"
                 }
             ],
             "Localization":
@@ -212,14 +206,12 @@
                     {
                         "Type": "List",
                         "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                        "LegacySingularKey": "Condition",
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": null,
                     "Description": "Conditions that must be met for players to be able to buy listing #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
-                    "Variable": "conditionsList",
-                    "CountForTemplateGroup": "vendor-selling-conditions"
+                    "Variable": "conditionsList"
                 },
                 {
                     "Key": "Rewards",
@@ -227,14 +219,12 @@
                     {
                         "Type": "List",
                         "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                        "LegacySingularKey": "Reward",
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": null,
                     "Description": "Rewards applied after the player buys listing #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
-                    "Variable": "rewardsList",
-                    "CountForTemplateGroup": "vendor-selling-rewards"
+                    "Variable": "rewardsList"
                 },
                 {
                     "Key": "Sight",

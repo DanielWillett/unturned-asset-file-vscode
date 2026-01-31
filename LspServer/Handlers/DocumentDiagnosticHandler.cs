@@ -1,19 +1,16 @@
-using System.Collections.Immutable;
-using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using System.Diagnostics;
-using DanielWillett.UnturnedDataFileLspServer.Diagnostics;
-using OmniSharp.Extensions.LanguageServer.Protocol;
-using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 
@@ -128,14 +125,14 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
 
         /// <inheritdoc />
         protected override void AcceptResolvedProperty(
-            SpecProperty property,
-            ISpecPropertyType propertyType,
+            DatProperty property,
+            IType propertyType,
             in SpecPropertyTypeParseContext parseCtx,
             IPropertySourceNode node,
             in PropertyBreadcrumbs breadcrumbs)
         {
-            SpecPropertyTypeParseContext ctx = parseCtx.WithDiagnostics(Diagnostics);
-            propertyType.TryParseValue(in ctx, out _);
+            // todo SpecPropertyTypeParseContext ctx = parseCtx.WithDiagnostics(Diagnostics);
+            // todo propertyType.TryParseValue(in ctx, out _);
         }
 
         /// <inheritdoc />

@@ -7,7 +7,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </summary>
 /// <remarks>Override the creation code using a <see cref="FactoryMethod"/>.</remarks>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false)]
-public class SpecificationTypeAttribute : Attribute
+public sealed class SpecificationTypeAttribute : Attribute
 {
     /// <summary>
     /// The name of a static method that will create this object given an <see cref="SpecificationTypeFactoryArgs"/>.

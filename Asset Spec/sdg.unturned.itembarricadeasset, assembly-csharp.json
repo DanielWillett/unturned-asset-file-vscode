@@ -128,8 +128,7 @@
                                 "Operation": "is-type",
                                 "Comparand": "SDG.Unturned.EffectAsset, Assembly-CSharp"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 },
                 {
@@ -148,8 +147,7 @@
                                 "Operation": "is-type",
                                 "Comparand": "SDG.Unturned.VehicleAsset, Assembly-CSharp"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]

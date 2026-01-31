@@ -11,32 +11,20 @@
     [
         {
             "Key": "BladeIDs",
-            "Type": "UInt8",
-            "DefaultValue": 1,
-            "Description": "Number of blade IDs set on this weapon.",
-            "Variable": "bladeIDs",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
-            "CountForTemplateGroup": "item-weapon-bladeid"
-        },
-        {
-            "Key": "BladeID_*",
-            "Type": "BladeId",
-            "Template": true,
-            "TemplateGroups": [ "item-weapon-bladeid" ],
-            "DefaultValue": "@BladeID",
-            "Required": true,
-            "TemplateGroupUniqueValue": true,
-            "Description": "An arbitrary ID that has to be shared between an object or resource and a weapon.",
+            "Type":
+            {
+                "Type": "List",
+                "CountType": "UInt8",
+                "ElementType": "BladeId",
+                "Mode": "LegacySingle, LegacyList",
+                "LegacySingleKey": "BladeID",
+                "MinimumCount": 1,
+                "RequireUniqueValues": true
+            },
+            "DefaultValue": [ 0 ],
+            "Description": "Arbitrary IDs that have to be shared between an object or resource and a weapon.",
             "Variable": "bladeIDs",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage"
-        },
-        {
-            "Key": "BladeID",
-            "Type": "BladeId",
-            "Deprecated": true,
-            "Description": "An arbitrary ID that has to be shared between an object or resource and a weapon. Use @BladeIDs instead.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/weapon-asset.html#construct-damage",
-            "Variable": "bladeIDs"
         },
         {
             "Key": "Range",

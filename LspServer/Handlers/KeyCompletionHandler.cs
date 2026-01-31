@@ -3,8 +3,6 @@ using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types.AutoComplete;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
@@ -50,6 +48,7 @@ internal class KeyCompletionHandler : ICompletionHandler
         };
     }
 
+#if false
     private void FindSpecProperties(ref KeyCompletionState state, List<CompletionItem> completions)
     {
         if (!_specDictionary.Types.TryGetValue(state.TypeHierarchy.Type, out AssetSpecType? info))
@@ -164,16 +163,21 @@ internal class KeyCompletionHandler : ICompletionHandler
 
         return item;
     }
+#endif
 
     public async Task<CompletionList> Handle(CompletionParams request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Received completion: {0} @ {1}.", request.TextDocument.Uri, request.Position);
 
+        #if false
         if (!_fileTracker.Files.TryGetValue(request.TextDocument.Uri, out OpenedFile? file))
         {
+#endif
             _logger.LogInformation("File not found.");
             return new CompletionList();
         }
+        #if false
+    }
 
         FilePosition position = request.Position.ToFilePosition();
 
@@ -259,7 +263,8 @@ internal class KeyCompletionHandler : ICompletionHandler
 
         return new CompletionList();
     }
-
+    
+#endif
     CompletionRegistrationOptions IRegistration<CompletionRegistrationOptions, CompletionCapability>.GetRegistrationOptions(
         CompletionCapability capability, ClientCapabilities clientCapabilities)
     {

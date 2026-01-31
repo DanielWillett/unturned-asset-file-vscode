@@ -83,21 +83,19 @@ public static class CommonTypes
         knownTypes["AssetBundleVersion"]                = () => Int32Type.Instance;     // todo
         knownTypes["MapName"]                           = () => StringType.Instance;    // todo
         knownTypes["ActionKey"]                         = () => ActionKeyType.Instance;
-        knownTypes["LocalizableString"]                 = () => StringType.Instance;    // todo
-        knownTypes["LocalizableRichString"]             = () => StringType.Instance;    // todo
-        knownTypes["LocalizableTargetString"]           = () => StringType.Instance;    // todo
-        knownTypes["LocalizableTargetRichString"]       = () => StringType.Instance;    // todo
+        knownTypes["LocalizableString"]                 = () => LocalizableStringType.Factory;
+        knownTypes["LocalizableTargetString"]           = () => LocalizationKeyType.Factory;
         knownTypes["SkillLevel"]                        = () => SkillLevelType.Factory;
         knownTypes["Skill"]                             = () => SkillType.Factory;
         knownTypes["BlueprintSkill"]                    = () => SkillType.Factory;
-        knownTypes["SteamItemDef"]                      = () => Int32Type.Instance;     // todo
+        knownTypes["SteamItemDef"]                      = () => SteamItemDefType.Instance;
         knownTypes["CaliberId"]                         = () => UInt16Type.Instance;    // todo
         knownTypes["BladeId"]                           = () => UInt8Type.Instance;     // todo
         knownTypes["PhysicsMaterial"]                   = () => StringType.Instance;    // todo
         knownTypes["PhysicsMaterialLegacy"]             = () => StringType.Instance;    // todo
         knownTypes["TypeReference"]                     = () => TypeReferenceType.Factory;
         knownTypes["IPv4Filter"]                        = () => IPv4FilterType.Instance;
-        knownTypes["Steam64ID"]                         = () => UInt64Type.Instance;    // todo
+        knownTypes[Steam64IdType.TypeId]                = () => Steam64IdType.Factory;
         knownTypes["Url"]                               = () => StringType.Instance;    // todo
         knownTypes["Path"]                              = () => StringType.Instance;    // todo
 

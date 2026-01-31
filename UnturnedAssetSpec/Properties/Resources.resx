@@ -234,6 +234,9 @@
   <data name="Log_FailedToFindEmbeddedResource" xml:space="preserve">
     <value>Unable to locate embedded resource "{0}", which was expected to exist.</value>
   </data>
+  <data name="Log_FailedToFindStringParseableType" xml:space="preserve">
+    <value>Failed to find string-parseable type "{0}" for custom type "{1}".</value>
+  </data>
   <data name="Log_FailedToParseResource" xml:space="preserve">
     <value>Unable to read resource at "{0}".</value>
   </data>
@@ -423,6 +426,9 @@
   <data name="Type_Name_SpawnpointId" xml:space="preserve">
     <value>Spawnpoint ID</value>
   </data>
+  <data name="Type_Name_SteamItemDef" xml:space="preserve">
+    <value>Steam Item Identifier</value>
+  </data>
   <data name="Type_Name_String" xml:space="preserve">
     <value>Text</value>
   </data>
@@ -482,5 +488,56 @@
   </data>
   <data name="Type_Name_ZombieTableId" xml:space="preserve">
     <value>Zombie Table ID</value>
+  </data>
+  <data name="Type_Name_Steam64ID_Any" xml:space="preserve">
+    <value>Any</value>
+  </data>
+  <data name="Type_Name_Steam64ID_Individual" xml:space="preserve">
+    <value>User Account</value>
+  </data>
+  <data name="Type_Name_Steam64ID_Multiseat" xml:space="preserve">
+    <value>Multiseat Account</value>
+  </data>
+  <data name="Type_Name_Steam64ID_GameServer" xml:space="preserve">
+    <value>Game Server</value>
+  </data>
+  <data name="Type_Name_Steam64ID_AnonGameServer" xml:space="preserve">
+    <value>Anonymous Game Server</value>
+  </data>
+  <data name="Type_Name_Steam64ID" xml:space="preserve">
+    <value>Steam64 ID ({0})</value>
+  </data>
+  <data name="Type_Name_Steam64ID_Pending" xml:space="preserve">
+    <value>Pending Entity</value>
+  </data>
+  <data name="Type_Name_Steam64ID_ContentServer" xml:space="preserve">
+    <value>Content Server</value>
+  </data>
+  <data name="Type_Name_Steam64ID_Clan" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="Type_Name_Steam64ID_Chat" xml:space="preserve">
+    <value>Group Chat</value>
+  </data>
+  <data name="Type_Name_Steam64ID_ConsoleUser" xml:space="preserve">
+    <value>Console User</value>
+  </data>
+  <data name="Type_Name_Steam64ID_AnonUser" xml:space="preserve">
+    <value>Anonymous User</value>
+  </data>
+  <data name="Type_Name_Steam64ID_Join" xml:space="preserve">
+    <value>or</value>
+  </data>
+  <data name="Type_Name_LocalizationKey" xml:space="preserve">
+    <value>Localization Key</value>
+  </data>
+  <data name="Type_Name_LocalizableString" xml:space="preserve">
+    <value>Localizable Text</value>
+  </data>
+  <data name="Type_Name_LocalizationKey_Rich" xml:space="preserve">
+    <value>Localization Key for Rich Text</value>
+  </data>
+  <data name="Type_Name_LocalizableString_Rich" xml:space="preserve">
+    <value>Localizable Rich Text</value>
   </data>
 </root>

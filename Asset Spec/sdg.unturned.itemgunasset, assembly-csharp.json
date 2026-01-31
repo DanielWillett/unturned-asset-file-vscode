@@ -231,8 +231,7 @@
             "DefaultValue": [ ],
             "Description": "List of replacements that allow guns to use different values for @Magazine for certain maps.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-replacements-int-0",
-            "Variable": "magazineReplacements",
-            "CountForTemplateGroup": "gun-magazine-replacements"
+            "Variable": "magazineReplacements"
         },
         {
             "Key": "Unplace",
@@ -319,8 +318,7 @@
             "DefaultValue": [ "@Caliber" ],
             "Description": "Arbitrary IDs that must be also be present in magazines for them to be attachable to this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-calibers-int32",
-            "Variable": "magazineCalibers",
-            "CountForTemplateGroup": "gun-magazine-calibers"
+            "Variable": "magazineCalibers"
         },
         {
             "Key": "Attachment_Calibers",
@@ -336,7 +334,6 @@
             "Description": "Arbitrary IDs that must be also be present in attachments for them to be attachable to this gun. Defaults to @Magazine_Calibers.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#attachment-calibers-int32",
             "Variable": "attachmentCalibers",
-            "CountForTemplateGroup": "gun-attachment-calibers",
             "InclusiveWith":
             [
                 {
@@ -1213,14 +1210,12 @@
             {
                 "Type": "List",
                 "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                "LegacySingularKey": "Shoot_Quest_Reward",
                 "Mode": "LegacyList, ModernList"
             },
             "DefaultValue": null,
             "Description": "Rewards applied when the player fires a shot.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#npc-rewards",
-            "Variable": "shootQuestRewards",
-            "CountForTemplateGroup": "gun-shoot-rewards"
+            "Variable": "shootQuestRewards"
         },
         {
             "Key": "Aim_In_Duration",

@@ -1,11 +1,13 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Files;
@@ -32,17 +34,18 @@ internal class FileEvaluationContextFactory
         _propertyVirtualizer = propertyVirtualizer;
     }
 
-    public bool TryCreate(Position position, DocumentUri uri, out SpecPropertyTypeParseContext ctx, out ISourceNode? node)
+    public bool TryCreate(Position position, DocumentUri uri, [UnscopedRef] out FileEvaluationContext fileCtx, out SpecPropertyTypeParseContext ctx, out ISourceNode? node)
     {
-        return TryCreate(position, uri, null, out ctx, out node);
+        return TryCreate(position, uri, null, out fileCtx, out ctx, out node);
     }
     
-    public bool TryCreate(Position position, DocumentUri uri, ICollection<DatDiagnosticMessage>? diagnosticSink, out SpecPropertyTypeParseContext ctx, out ISourceNode? node)
+    public bool TryCreate(Position position, DocumentUri uri, IDiagnosticSink? diagnosticSink, [UnscopedRef] out FileEvaluationContext fileCtx, out SpecPropertyTypeParseContext ctx, out ISourceNode? node)
     {
         node = null;
         if (!_fileTracker.Files.TryGetValue(uri, out OpenedFile? file))
         {
             Unsafe.SkipInit(out ctx);
+            Unsafe.SkipInit(out fileCtx);
             return false;
         }
 
@@ -55,15 +58,16 @@ internal class FileEvaluationContextFactory
 
         if (parentNode == null)
         {
+            fileCtx = new FileEvaluationContext(
+                null!,
+                null!,
+                sourceFile,
+                _workspaceEnvironment,
+                _installationEnvironment,
+                _specDatabase,
+                PropertyResolutionContext.Modern);
             ctx = new SpecPropertyTypeParseContext(
-                new FileEvaluationContext(
-                    null!,
-                    null!,
-                    sourceFile,
-                    _workspaceEnvironment,
-                    _installationEnvironment,
-                    _specDatabase,
-                    PropertyResolutionContext.Modern),
+                in fileCtx,
                 PropertyBreadcrumbs.Root,
                 null)
             {
@@ -82,14 +86,14 @@ internal class FileEvaluationContextFactory
         }
         else
             breadcrumbs = PropertyBreadcrumbs.FromNode(valueNode?.Parent ?? parentNode);
-        SpecProperty? property = _propertyVirtualizer.GetProperty(
+        DatProperty? property = _propertyVirtualizer.GetProperty(
             parentNode,
             in fileType,
             in breadcrumbs,
             out PropertyResolutionContext context
         );
 
-        FileEvaluationContext evalCtx = new FileEvaluationContext(
+        fileCtx = new FileEvaluationContext(
             property!,
             fileType.Information,
             sourceFile,
@@ -99,7 +103,7 @@ internal class FileEvaluationContextFactory
             context
         );
 
-        ctx = SpecPropertyTypeParseContext.FromFileEvaluationContext(evalCtx, breadcrumbs, property, parentNode, valueNode, diagnosticSink);
+        ctx = SpecPropertyTypeParseContext.FromFileEvaluationContext(in fileCtx, breadcrumbs, property, parentNode, valueNode, diagnosticSink);
         return property != null;
     }
 
@@ -133,7 +137,7 @@ internal class FileEvaluationContextFactory
         }
 
         PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(value?.Parent ?? propertyNode);
-        SpecProperty? property = _propertyVirtualizer.GetProperty(
+        DatProperty? property = _propertyVirtualizer.GetProperty(
             propertyNode,
             in fileType,
             in breadcrumbs,

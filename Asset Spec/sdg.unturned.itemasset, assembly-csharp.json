@@ -712,14 +712,12 @@
                 "Type": "List",
                 "ElementType": "SDG.Unturned.Blueprint, Assembly-CSharp",
                 "CountType": "UInt8",
-                "Mode": "LegacyList, ModernList",
-                "LegacySingularKey": "Blueprint"
+                "Mode": "LegacyList, ModernList"
             },
             "DefaultValue": null,
             "Description": "Blueprints defined for this item. Blueprints are crafting recipes that either consume this item or produce this item.",
             "Variable": "blueprints",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprints-int-0",
-            "CountForTemplateGroup": "item-blueprints"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprints-int-0"
         },
         {
             "Key": "Actions",
@@ -728,14 +726,12 @@
                 "Type": "List",
                 "ElementType": "SDG.Unturned.Action, Assembly-CSharp",
                 "CountType": "UInt8",
-                "Mode": "LegacyList, ModernList",
-                "LegacySingularKey": "Blueprint"
+                "Mode": "LegacyList, ModernList"
             },
             "DefaultValue": null,
             "Description": "Context menu actions defined for this item.",
             "Variable": "actions",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#actions-int-0",
-            "CountForTemplateGroup": "item-actions"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#actions-int-0"
         },
         {
             "Key": "Add_Default_Actions",
@@ -834,8 +830,7 @@
                     "Key": "Should_Delete_At_Zero_Quality",
                     "Value": true
                 }
-            ],
-            "CountForTemplateGroup": "item-deleted-0-quality-rewards"
+            ]
         },
         {
             "Key": "Destroy_Item_Colliders",
@@ -1075,7 +1070,6 @@
             "DisplayName": "Blueprint Supply",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html",
             "StringParseableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.BlueprintSupplyStringParseableSpecPropertyType, UnturnedAssetSpec",
-            "PluralBaseKey": "Supply",
             "Properties":
             [
                 {
@@ -1367,7 +1361,6 @@
                     "DefaultValue": null,
                     "Description": "Input items defined for this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#inputitems-list-of-doc-item-asset-blueprints-inputitem",
-                    "CountForTemplateGroup": "item-blueprints-supplies",
                     "Variable": "supplies"
                 },
                 {
@@ -1454,7 +1447,6 @@
                     ],
                     "Description": "Output items defined for this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#outputitems-list-of-doc-item-asset-blueprints-outputitem",
-                    "CountForTemplateGroup": "item-blueprints-outputs",
                     "Variable": "outputs"
                 },
                 {
@@ -1732,13 +1724,11 @@
                     {
                         "Type": "List",
                         "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                        "LegacySingularKey": "Condition",
                         "Mode": "LegacyList, ModernList"
                     },
                     "Description": "Conditions that must be met for this blueprint to be visible and craftable.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
-                    "Variable": "questConditionsList",
-                    "CountForTemplateGroup": "item-blueprints-conditions"
+                    "Variable": "questConditionsList"
                 },
                 {
                     "Key": "Rewards",
@@ -1746,13 +1736,11 @@
                     {
                         "Type": "List",
                         "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                        "LegacySingularKey": "Reward",
                         "Mode": "LegacyList, ModernList"
                     },
                     "Description": "Rewards applied after crafting this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
-                    "Variable": "questRewardsList",
-                    "CountForTemplateGroup": "item-blueprints-rewards"
+                    "Variable": "questRewardsList"
                 },
                 {
                     "Key": "Searchable",
@@ -2130,7 +2118,7 @@
                 },
                 {
                     "Key": "TextId",
-                    "Type": "LocalizableTargetString",
+                    "Type": "LocalizationKey",
                     "KeyLegacyExpansionFilter": "Modern",
                     "DefaultValue": null,
                     "Required":
@@ -2157,7 +2145,7 @@
                 },
                 {
                     "Key": "TooltipId",
-                    "Type": "LocalizableTargetString",
+                    "Type": "LocalizationKey",
                     "KeyLegacyExpansionFilter": "Modern",
                     "DefaultValue": null,
                     "Required":

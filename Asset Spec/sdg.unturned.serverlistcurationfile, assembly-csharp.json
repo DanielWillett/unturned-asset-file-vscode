@@ -34,8 +34,7 @@
             },
             "Description": "Defines a list of labels that can be applied by rules.",
             "Variable": "labels",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#labels-list-of-dictionaries",
-            "CountForTemplateGroup": "server-list-curation-labels"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#labels-list-of-dictionaries"
         },
         {
             "Key": "Rules",
@@ -47,8 +46,7 @@
             "Description": "Defines a list of rules that are applied to each discovered server in order.",
             "Variable": "rules",
             "Required": true,
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#rules-list-of-dictionaries",
-            "CountForTemplateGroup": "server-list-curation-rules"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#rules-list-of-dictionaries"
         }
     ],
     "Types":
@@ -69,8 +67,11 @@
                 },
                 {
                     "Key": "Text",
-                    "Type": "LocalizableString",
-                    "LocalizationKeyOverride": "=CAT(Label_ @Name)",
+                    "Type":
+                    {
+                        "Type": "LocalizableString",
+                        "LocalizationKeyOverride": "=CAT(Label_ @Name)"
+                    },
                     "Description": "The display name of this label.",
                     "DefaultValue": null,
                     "Required": true
@@ -259,7 +260,7 @@
                         "ElementType":
                         {
                             "Type": "Steam64ID",
-                            "AccountType": 3
+                            "AccountType": "GameServer"
                         }
                     },
                     "Description": "List of Steam server IDs (server codes), one of which must match against a server's code for this rule to match it.",
@@ -300,7 +301,7 @@
                     "Type":
                     {
                         "Type": "Steam64ID",
-                        "AccountType": 3
+                        "AccountType": "GameServer"
                     },
                     "Description": "A Steam server ID (server code) which must match against a server's code for this rule to match it.",
                     "Required":

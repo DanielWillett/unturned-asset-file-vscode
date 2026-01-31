@@ -837,4 +837,37 @@ public static class KnownTypeValueHelper
         color = Color32.White;
         return false;
     }
+
+    // matches CSteamID in Steamworks.NET
+
+    public static int CSteamID_GetEAccountType(ulong steam64)
+    {
+        return (int)((long)(steam64 >> 52) & 15L);
+    }
+
+    public static int CSteamID_GetEUniverse(ulong steam64)
+    {
+        return (int)((long)(steam64 >> 56) & byte.MaxValue);
+    }
+
+    public static uint CSteamID_GetAccountId(ulong steam64)
+    {
+        return (uint)(steam64 & uint.MaxValue);
+    }
+
+    public static uint CSteamID_GetUnAccountInstance(ulong steam64)
+    {
+        return (uint)((steam64 >> 32) & 0x0FFFFFL);
+    }
+
+    public static bool CSteamID_IsValid(ulong steam64)
+    {
+        int acctType = CSteamID_GetEAccountType(steam64);
+        int universe = CSteamID_GetEUniverse(steam64);
+        return acctType is > 0 and < 11
+               && universe is > 0 and < 5
+               && (acctType != 1 || (CSteamID_GetAccountId(steam64) != 0 && CSteamID_GetUnAccountInstance(steam64) <= 1U))
+               && (acctType != 7 || (CSteamID_GetAccountId(steam64) != 0 && CSteamID_GetUnAccountInstance(steam64) == 0U))
+               && (acctType != 3 || CSteamID_GetAccountId(steam64) != 0);
+    }
 }

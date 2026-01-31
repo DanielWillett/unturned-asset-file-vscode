@@ -217,6 +217,11 @@
                         {
                             "$ref": "#/$defs/QualifiedType",
                             "description": "The type of object to create."
+                        },
+                        "$udat-localization":
+                        {
+                            "type": [ "object", "null" ],
+                            "description": "Additional localization properties."
                         }
                     },
                     "required": [ "$udat-type" ]
@@ -612,6 +617,147 @@
                     {
                         "Type":
                         {
+                            "const": "LocalizationKey",
+                            "title": "A property using this type defines the key of a localization property by it's value."
+                        },
+                        "MinimumLength":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum character count of the key (inclusive)."
+                        },
+                        "MaximumLength":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Maximum character count of the key (inclusive)."
+                        },
+                        "MinimumValueLength":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum character count of the value (inclusive)."
+                        },
+                        "MaximumValueLength":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Maximum character count of the value (inclusive)."
+                        },
+                        "ValueSupportsRichText":
+                        {
+                            "type": "boolean",
+                            "description": "Whether or not rich text is allowed in the localization value."
+                        },
+                        "ValueSupportsNewLines":
+                        {
+                            "type": "boolean",
+                            "description": "Whether or not the line break tag is allowed in the localization value (<br>)."
+                        },
+                        "ValueFormatArguments":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Maximum number of formatting args that can be present in the localization value."
+                        },
+                        "ValueExtraTag":
+                        {
+                            "type": "string",
+                            "minimum": 0,
+                            "description": "An additional rich text tags that can be used in the localization value."
+                        },
+                        "ValueExtraTags":
+                        {
+                            "type": "array",
+                            "minimum": 0,
+                            "description": "Additional rich text tags that can be used in the localization value.",
+                            "items":
+                            {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "LocalizableString",
+                            "title": "A string that can either appear in the asset file or localization file."
+                        },
+                        "MinimumLength":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum character count (inclusive)."
+                        },
+                        "MaximumLength":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Minimum character count (inclusive)."
+                        },
+                        "SupportsRichText":
+                        {
+                            "type": "boolean",
+                            "description": "Whether or not rich text is allowed."
+                        },
+                        "SupportsNewLines":
+                        {
+                            "type": "boolean",
+                            "description": "Whether or not the line break tag is allowed (<br>)."
+                        },
+                        "RequiresValue":
+                        {
+                            "type": "boolean",
+                            "description": "Whether or not the non-local property must have a value to not use the one in localization. Basically if TryGetValue is used instead of ContainsKey. Defaults to false."
+                        },
+                        "PreferLocalizationValue":
+                        {
+                            "type": "boolean",
+                            "description": "Whether or not the localization value will be used first if both exist. Defaults to false."
+                        },
+                        "FormatArguments":
+                        {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Maximum number of formatting args that can be present."
+                        },
+                        "ExtraTag":
+                        {
+                            "type": "string",
+                            "minimum": 0,
+                            "description": "An additional rich text tags that can be used in the localization value."
+                        },
+                        "ExtraTags":
+                        {
+                            "type": "array",
+                            "minimum": 0,
+                            "description": "Additional rich text tags that can be used in the localization value.",
+                            "items":
+                            {
+                                "type": "string"
+                            }
+                        },
+                        "LocalizationKeyOverride":
+                        {
+                            "description": "Expression used to get the localization key instead of just using the same key as the given property.",
+                            "$ref": "#/$defs/ValueAllowConditionals"
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
                             "const": "List",
                             "title": "A list of values."
                         },
@@ -627,7 +773,7 @@
                         },
                         "Mode":
                         {
-                            "type": "string",
+                            "type": [ "string", "null" ],
                             "enum":
                             [
                                 "LegacySingle, LegacyList, ModernSingle, ModernList",
@@ -650,35 +796,51 @@
                         },
                         "MinimumCount":
                         {
-                            "type": "integer",
+                            "type": [ "integer", "null" ],
                             "minimum": 0,
                             "description": "Minimum number of items (inclusive)."
                         },
                         "MaximumCount":
                         {
-                            "type": "integer",
+                            "type": [ "integer", "null" ],
                             "minimum": 0,
                             "description": "Minimum number of items (inclusive)."
                         },
                         "LegacySingleKey":
                         {
-                            "type": "string",
+                            "type": [ "string", "null" ],
                             "description": "Key for the single property when \"LegacySingle\" is included. Defaults to the value of LegacySingularKey."
                         },
                         "LegacySingularKey":
                         {
-                            "type": "string",
+                            "type": [ "string", "null" ],
                             "description": "Base key for elements in legacy lists. For example, 'Condition', for Conditions, Condition_0, etc."
                         },
                         "SkipUnderscoreInLegacyKey":
                         {
-                            "type": "boolean",
+                            "type": [ "boolean", "null" ],
                             "description": "Indicates that the '_' should not be used to separate LegacySingularKey's value and the index. Defaults to false."
                         },
                         "LegacyDefaultElementTypeValue":
                         {
                             "description": "Default value for undefined legacy elements or elements without values.",
                             "$ref": "#/$defs/ValueAllowConditionals"
+                        },
+                        "RequireUniqueValues":
+                        {
+                            "type": [ "boolean", "null" ],
+                            "description": "Determines whether or not all elements in the list must be unique (or a warning is shown). Defaults to false."
+                        },
+                        "ElementContext":
+                        {
+                            "type": [ "string", "null" ],
+                            "enum":
+                            [
+                                "Property",
+                                "Localization",
+                                "Unspecified"
+                            ],
+                            "description": "Determines which type of property the actual elements of the list should be in. This only works for legacy list modes. Defaults to \"Unspecified\"."
                         }
                     },
                     "required": [ "Type", "ElementType" ],
@@ -782,8 +944,18 @@
                         },
                         "AccountType":
                         {
-                            "type": "integer",
-                            "description": "Numeric EAccountType to verify against values."
+                            "type": [ "null", "string" ],
+                            "enum": [ "Any", "Individual", "Multiseat", "GameServer", "AnonGameServer", "Pending", "ContentServer", "Clan", "Chat", "ConsoleUser", "AnonUser" ],
+                            "description": "EAccountType to verify against values."
+                        },
+                        "AccountTypes":
+                        {
+                            "type": [ "null", "array" ],
+                            "items": {
+                                "type": [ "null", "string" ],
+                                "enum": [ "Individual", "Multiseat", "GameServer", "AnonGameServer", "Pending", "ContentServer", "Clan", "Chat", "ConsoleUser", "AnonUser" ]
+                            },
+                            "description": "EAccountTypes to verify against values."
                         }
                     },
                     "required": [ "Type" ],
@@ -1518,19 +1690,11 @@
                 },
                 {
                     "const": "LocalizableString",
-                    "title": "A string that can be in the asset or localization file."
+                    "title": "A string that can either appear in the asset file or localization file."
                 },
                 {
-                    "const": "LocalizableRichString",
-                    "title": "A string that can be in the asset or localization file that supports rich text."
-                },
-                {
-                    "const": "LocalizableTargetString",
-                    "title": "A string that acts as the key for a localization property."
-                },
-                {
-                    "const": "LocalizableTargetRichString",
-                    "title": "A string that acts as the key for a localization property that supports rich text."
+                    "const": "LocalizationKey",
+                    "title": "A property using this type defines the key of a localization property by it's value."
                 },
                 {
                     "const": "Skill",
@@ -1791,44 +1955,15 @@
                     "$ref": "#/$defs/StringValue",
                     "description": "If 'Template', the singular version of the key which would not be a template (ex. Blade for Blade_#)."
                 },
-                "Template":
-                {
-                    "type": "boolean",
-                    "description": "If 'Key' is a template expression to match properties with indices."
-                },
-                "TemplateGroupUniqueValue":
-                {
-                    "type": "boolean",
-                    "description": "If every value in this template group should be unique. Ignored if 'Template' is not true."
-                },
-                "TemplateGroups":
-                {
-                    "type": [ "array", "null" ],
-                    "description": "If 'Template', then this is a list of groups by name to match with other properties within the given template group.",
-                    "items":
-                    {
-                        "$ref": "#/$defs/TemplateGroup"
-                    }
-                },
                 "FileCrossRef":
                 {
                     "$ref": "#/$defs/StringValue",
                     "description": "Designates a property that selects the cross-ref file for any properties starting with \"$cr$::\"."
                 },
-                "CountForTemplateGroup":
-                {
-                    "$ref": "#/$defs/StringValue",
-                    "description": "The template group for which this property is a count for."
-                },
                 "ListReference":
                 {
                     "$ref": "#/$defs/StringValue",
                     "description": "Reference to a set of values from a list. Example: 'Blueprints.Id'. If it ends with '!' it's an error to not reference a valid value."
-                },
-                "ValueTemplateGroupReference":
-                {
-                    "$ref": "#/$defs/StringValue",
-                    "description": "A data-ref to another key's template group (such as ($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).TemplateGroups[0] ) to reference the blueprint ID of another item. Valid values will be the present indices in the other property's template groups."
                 },
                 "Aliases":
                 {
@@ -2157,6 +2292,11 @@
                     "$ref": "#/$defs/StringValue",
                     "description": "Additional property for the EBlueprintSkill enum mapping to the corresponding skill."
                 },
+                "InteractableType":
+                {
+                    "$ref": "#/$defs/QualifiedTypeOrNull",
+                    "description": "Additional property for the EBuild enum mapping to the Interactable type used by the game."
+                },
                 "Color":
                 {
                     "type": [ "string", "null" ],
@@ -2200,6 +2340,30 @@
                 {
                     "$ref": "#/$defs/StringValue",
                     "description": "If 'Template', the singular version of the key which would not be template."
+                },
+                "Template":
+                {
+                    "type": "boolean",
+                    "description": "If 'Key' is a template expression to match properties with indices."
+                },
+                "TemplateGroupUniqueValue":
+                {
+                    "type": "boolean",
+                    "description": "If every value in this template group should be unique. Ignored if 'Template' is not true."
+                },
+                "TemplateGroups":
+                {
+                    "type": [ "array", "null" ],
+                    "description": "If 'Template', then this is a list of groups by name to match with other properties within the given template group.",
+                    "items":
+                    {
+                        "$ref": "#/$defs/TemplateGroup"
+                    }
+                },
+                "ValueTemplateGroupReference":
+                {
+                    "$ref": "#/$defs/StringValue",
+                    "description": "A data-ref to another key's template group (such as ($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).TemplateGroups[0] ) to reference the blueprint ID of another item. Valid values will be the present indices in the other property's template groups."
                 },
                 "AnimationComponentFindArgument":
                 {

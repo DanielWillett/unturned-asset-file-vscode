@@ -81,19 +81,6 @@ partial class SpecificationFileReader
 
         property.Type = type;
 
-        // Template
-        bool isTemplate = false;
-        if (root.TryGetProperty("Template"u8, out element) && element.ValueKind != JsonValueKind.Null)
-        {
-            isTemplate = element.GetBoolean();
-        }
-
-        TemplateProcessor keyTemplateProcessor = TemplateProcessor.None;
-        if (isTemplate)
-        {
-            keyTemplateProcessor = TemplateProcessor.CreateForKey(ref key);
-        }
-
         property.OverriddenProperty = overriding;
 
         LegacyExpansionFilter filter = LegacyExpansionFilter.Either;
@@ -127,16 +114,16 @@ partial class SpecificationFileReader
             DatPropertyKey? singleAlias = null;
             if (root.TryGetProperty("Alias"u8, out singleAliasElement) && singleAliasElement.ValueKind != JsonValueKind.Null)
             {
-                singleAlias = ReadAlias(in singleAliasElement, isTemplate, owner, property, key, -1);
+                singleAlias = ReadAlias(in singleAliasElement, owner, property, key, -1);
             }
 
             ImmutableArray<DatPropertyKey>.Builder b = ImmutableArray.CreateBuilder<DatPropertyKey>(aliasCount + 1 + (singleAlias != null ? 1 : 0));
-            b.Add(new DatPropertyKey(key, filter, keyCondition, keyTemplateProcessor));
+            b.Add(new DatPropertyKey(key, filter, keyCondition));
 
             for (int i = 0; i < aliasCount; ++i)
             {
                 JsonElement aliasObj = element[i];
-                b.Add(ReadAlias(in aliasObj, isTemplate, owner, property, key, i));
+                b.Add(ReadAlias(in aliasObj, owner, property, key, i));
             }
 
             if (singleAlias != null)
@@ -146,46 +133,19 @@ partial class SpecificationFileReader
         }
         else if (root.TryGetProperty("Alias"u8, out singleAliasElement) && singleAliasElement.ValueKind != JsonValueKind.Null)
         {
-            DatPropertyKey singleAlias = ReadAlias(in singleAliasElement, isTemplate, owner, property, key, -1);
+            DatPropertyKey singleAlias = ReadAlias(in singleAliasElement, owner, property, key, -1);
             property.Keys = ImmutableArray.Create(
-                new DatPropertyKey(key, filter, keyCondition, keyTemplateProcessor),
+                new DatPropertyKey(key, filter, keyCondition),
                 singleAlias
             );
         }
         else if (filter != LegacyExpansionFilter.Either || keyCondition != null)
         {
-            property.Keys = ImmutableArray.Create(new DatPropertyKey(key, filter, keyCondition, keyTemplateProcessor));
+            property.Keys = ImmutableArray.Create(new DatPropertyKey(key, filter, keyCondition));
         }
         else
         {
             property.Keys = ImmutableArray<DatPropertyKey>.Empty;
-        }
-
-        property.IsTemplate = isTemplate;
-        if (isTemplate && root.TryGetProperty("TemplateGroups"u8, out element) && element.ValueKind != JsonValueKind.Null)
-        {
-            int templateCt = element.GetArrayLength();
-            ImmutableArray<TemplateGroup>.Builder b = ImmutableArray.CreateBuilder<TemplateGroup>(templateCt);
-
-            for (int i = 0; i < templateCt; ++i)
-            {
-                JsonElement item = element[i];
-                if (!TemplateGroup.TryReadFromJson(i, in item, out TemplateGroup? group))
-                {
-                    throw new JsonException(
-                        string.Format(Resources.JsonException_FailedToParseValue, "Template Group", $"{owner.FullName}.{key}.TemplateGroups[{i}]")
-                    );
-                }
-
-                b.Add(group);
-            }
-
-            b.Sort((a, b) => a.Group.CompareTo(b.Group));
-            property.TemplateGroups = b.MoveToImmutable();
-        }
-        else
-        {
-            property.TemplateGroups = isTemplate ? ImmutableArray<TemplateGroup>.Empty : default;
         }
 
         if (root.TryGetProperty("FileCrossRef"u8, out element) && element.ValueKind != JsonValueKind.Null)
@@ -197,19 +157,6 @@ partial class SpecificationFileReader
                     string.Format(Resources.JsonException_FailedToParseValue, "Property Reference", $"{owner.FullName}.{key}.FileCrossRef")
                 );
             }
-        }
-
-        if (root.TryGetProperty("CountForTemplateGroup"u8, out element) && element.ValueKind != JsonValueKind.Null)
-        {
-            string templateGroupId = element.GetString()!;
-            if (string.IsNullOrEmpty(templateGroupId))
-            {
-                throw new JsonException(
-                    string.Format(Resources.JsonException_FailedToParseValue, "Template Group Name", $"{owner.FullName}.{key}.CountForTemplateGroup")
-                );
-            }
-
-            property.CountForTemplateGroup = templateGroupId;
         }
 
         if (root.TryGetProperty("ListReference"u8, out element) && element.ValueKind != JsonValueKind.Null)
@@ -228,7 +175,7 @@ partial class SpecificationFileReader
         // todo
     }
 
-    private DatPropertyKey ReadAlias(in JsonElement aliasObj, bool isTemplate, IDatSpecificationObject owner, DatProperty property, string key, int i)
+    private DatPropertyKey ReadAlias(in JsonElement aliasObj, IDatSpecificationObject owner, DatProperty property, string key, int i)
     {
         string? alias = null;
         IValue<bool>? aliasCondition = null;
@@ -281,11 +228,7 @@ partial class SpecificationFileReader
             );
         }
 
-        TemplateProcessor processor = isTemplate
-            ? TemplateProcessor.CreateForKey(ref alias)
-            : TemplateProcessor.None;
-
-        return new DatPropertyKey(alias, aliasFilter, aliasCondition, processor);
+        return new DatPropertyKey(alias, aliasFilter, aliasCondition);
     }
 
     private IPropertyType ReadTypeReference(in JsonElement root, IDatSpecificationObject owner, DatProperty property, bool allowSwitch = true)

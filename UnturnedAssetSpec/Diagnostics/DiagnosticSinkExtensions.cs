@@ -1,8 +1,12 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Threading;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 // ReSharper disable InconsistentNaming
 
@@ -19,6 +23,12 @@ public static class DiagnosticSinkExtensions
     // match any <[ ]br[ ]/[ ]>
     private static readonly Regex InvalidLineBreakTagsMatcher =
         new Regex(@"\<\s*br\s*\/\s*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+
+    private static readonly object Boxed999 = 999;
+    private const int CachedMaxFormattingArg = 8;
+
+    private static readonly object[]?[] _formattingArgs = new object[]?[CachedMaxFormattingArg];
 
     private static string NodePropertyName<TDiagnosticProvider>(ISourceNode? node, ref TDiagnosticProvider provider) where TDiagnosticProvider : struct, IDiagnosticProvider
     {
@@ -41,7 +51,40 @@ public static class DiagnosticSinkExtensions
             _   => node.ToString()!
         };
     }
-    
+
+    /// <summary>
+    /// Runs all shared string diagnostics. Expects that <see cref="TypeParserArgs{T}.DiagnosticSink"/> is not <see langword="null"/>.
+    /// </summary>
+    internal static void CheckStringDiagnostics(
+        ref TypeParserArgs<string> args,
+        IValueSourceNode valueNode,
+        int minCount,
+        int maxCount,
+        bool allowLineBreakTag,
+        bool allowRichText,
+        OneOrMore<Regex> extraRichTextTags,
+        uint maxFormatArguments)
+    {
+        string val = valueNode.Value;
+        args.DiagnosticSink!.CheckUNT1024_String(val.Length, ref args, args.ParentNode, minCount, maxCount);
+
+        if (!allowRichText)
+            args.DiagnosticSink!.CheckUNT1006(ref args, valueNode);
+        else
+        {
+            // todo: args.DiagnosticSink!.CheckWhateverForInvalidRichTextTags(ref args, valueNode, extraRichTextTags)...
+        }
+
+        // newlines
+        if (allowLineBreakTag)
+            args.DiagnosticSink!.CheckUNT1022_UNT106(ref args, valueNode);
+        else
+            args.DiagnosticSink!.CheckUNT1021(ref args, valueNode);
+
+        args.DiagnosticSink!.CheckUNT2012_UNT102(ref args, valueNode, maxFormatArguments);
+
+    }
+
     extension(IDiagnosticSink diagnosticSink)
     {
 
@@ -540,6 +583,144 @@ public static class DiagnosticSinkExtensions
         }
 
         /// <summary>
+        /// Reports an extra 'A' property on a color that doesn't support alpha.
+        /// </summary>
+        public void UNT1027<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            ISourceNode? property, int duplicateIndex, int conflictingIndex
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1027,
+                Message = string.Format(DiagnosticResources.UNT1027, NodePropertyName(property, ref provider), duplicateIndex, conflictingIndex),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a violation of the inclusive minimum bound on a property value.
+        /// </summary>
+        public void UNT1028_MinimumInclusive<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            ISourceNode? property, string? actualValue, string? minimumValue
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1028,
+                Message = property != null
+                    ? string.Format(DiagnosticResources.UNT1028_Minimum_Inclusive, NodePropertyName(property, ref provider), actualValue, minimumValue)
+                    : string.Format(DiagnosticResources.UNT1028_Minimum_Inclusive_Anonymous, actualValue, minimumValue),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a violation of the exclusive minimum bound on a property value.
+        /// </summary>
+        public void UNT1028_MinimumExclusive<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            ISourceNode? property, string? actualValue, string? minimumValue
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1028,
+                Message = property != null
+                    ? string.Format(DiagnosticResources.UNT1028_Minimum_Exclusive, NodePropertyName(property, ref provider), actualValue, minimumValue)
+                    : string.Format(DiagnosticResources.UNT1028_Minimum_Exclusive_Anonymous, actualValue, minimumValue),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a violation of the inclusive maximum bound on a property value.
+        /// </summary>
+        public void UNT1028_MaximumInclusive<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            ISourceNode? property, string? actualValue, string? maximumValue
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1028,
+                Message = property != null
+                    ? string.Format(DiagnosticResources.UNT1028_Maximum_Inclusive, NodePropertyName(property, ref provider), actualValue, maximumValue)
+                    : string.Format(DiagnosticResources.UNT1028_Maximum_Inclusive_Anonymous, actualValue, maximumValue),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a violation of the exclusive maximum bound on a property value.
+        /// </summary>
+        public void UNT1028_MaximumExclusive<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            ISourceNode? property, string? actualValue, string? maximumValue
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1028,
+                Message = property != null
+                    ? string.Format(DiagnosticResources.UNT1028_Maximum_Exclusive, NodePropertyName(property, ref provider), actualValue, maximumValue)
+                    : string.Format(DiagnosticResources.UNT1028_Maximum_Exclusive_Anonymous, actualValue, maximumValue),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a violation of the exclusive maximum bound on a property value.
+        /// </summary>
+        public void UNT1029<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            ISourceNode property, string? attemptedUseAccountType
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1028,
+                Message = attemptedUseAccountType != null
+                    ? string.Format(DiagnosticResources.UNT1029, NodePropertyName(property, ref provider), attemptedUseAccountType)
+                    : string.Format(DiagnosticResources.UNT1029_Invalid, NodePropertyName(property, ref provider)),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a missing localization file needed by a normal property, such as a <see cref="LocalizationKeyType"/>.
+        /// </summary>
+        public void UNT1030_Property<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            ISourceNode property
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1028,
+                Message = string.Format(DiagnosticResources.UNT1030_Property, NodePropertyName(property, ref provider)),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a missing localization file needed by a required localization property.
+        /// </summary>
+        public void UNT1030_RequiredLocal<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            string propertyKey
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT1028,
+                Message = string.Format(DiagnosticResources.UNT1030_RequiredLocal, propertyKey),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
         /// Reports a <see langword="false"/> value provided for a flag property.
         /// </summary>
         public void UNT2003<TDiagnosticProvider>(
@@ -567,6 +748,39 @@ public static class DiagnosticSinkExtensions
             {
                 Diagnostic = DatDiagnostics.UNT2004,
                 Message = string.Format(DiagnosticResources.UNT2004, original, type.DisplayName),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a failure to parse when an expected file isn't present,
+        /// such as a value that should exist in the localization file when there is no localization file.
+        /// </summary>
+        public void UNT2004_MissingFile<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            IValueSourceNode referencingNode
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2004,
+                Message = string.Format(DiagnosticResources.UNT2004_MissingFile, NodePropertyName(referencingNode, ref provider)),
+                Range = provider.GetRangeAndRegisterDiagnostic()
+            });
+        }
+
+        /// <summary>
+        /// Reports a legacy object that was entered as a modern object.
+        /// </summary>
+        public void UNT2004_LegacyFormatExpected<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            IDictionarySourceNode valueNode
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            diagnosticSink.AcceptDiagnostic(new DatDiagnosticMessage
+            {
+                Diagnostic = DatDiagnostics.UNT2004,
+                Message = string.Format(DiagnosticResources.UNT2004_LegacyFormatExpected, NodePropertyName(valueNode, ref provider)),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
         }
@@ -902,6 +1116,84 @@ public static class DiagnosticSinkExtensions
                 Message = message == null ? DiagnosticResources.UNT2012 : string.Format(DiagnosticResources.UNT2012_WithMessage, message),
                 Range = provider.GetRangeAndRegisterDiagnostic()
             });
+        }
+
+        /// <summary>
+        /// Checks for formatting arguments that are out of range and missing formatting arguments, and emits diagnostics about them.
+        /// </summary>
+        public void CheckUNT2012_UNT102<TDiagnosticProvider>(
+            ref TDiagnosticProvider provider,
+            IValueSourceNode valueNode,
+            uint maxFormatArguments
+        ) where TDiagnosticProvider : struct, IDiagnosticProvider
+        {
+            string str = valueNode.Value;
+
+            object[]? fmtArgs;
+            if (maxFormatArguments == 0)
+            {
+                if (str.IndexOf('{') < 0)
+                    return;
+
+                fmtArgs = Array.Empty<object>();
+            }
+            else if (maxFormatArguments < CachedMaxFormattingArg)
+            {
+                fmtArgs = Volatile.Read(ref _formattingArgs[maxFormatArguments - 1u]);
+                if (fmtArgs == null)
+                {
+                    fmtArgs = new object[maxFormatArguments];
+                    for (uint i = 0; i < maxFormatArguments; ++i)
+                        fmtArgs[i] = Boxed999;
+                }
+
+                Volatile.Write(ref _formattingArgs[maxFormatArguments - 1u], fmtArgs);
+            }
+            else
+            {
+                fmtArgs = new object[maxFormatArguments];
+                for (uint i = 0; i < maxFormatArguments; ++i)
+                    fmtArgs[i] = Boxed999;
+            }
+
+            bool malformed = false;
+            try
+            {
+                _ = string.Format(str, fmtArgs);
+            }
+            catch (FormatException ex)
+            {
+                diagnosticSink.UNT2012(ref provider, str, ex);
+                malformed = true;
+            }
+
+            if (malformed)
+                return;
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+            ReadOnlySpan<char> span = str;
+            Span<char> buffer = stackalloc char[1 + StringHelper.CountDigits(maxFormatArguments - 1)];
+            buffer[0] = '{';
+            for (uint i = 0; i < maxFormatArguments; ++i)
+            {
+                i.TryFormat(buffer[1..], out int charsWritten, provider: CultureInfo.InvariantCulture);
+                
+                Span<char> fullBuffer = buffer.Slice(0, 1 + charsWritten);
+                if (span.IndexOf(fullBuffer, StringComparison.Ordinal) >= 0)
+                    continue;
+
+                diagnosticSink.UNT102(ref provider, fullBuffer[1..].ToString());
+            }
+#else
+            for (uint i = 0; i < maxFormatArguments; ++i)
+            {
+                string iStr = i.ToString(CultureInfo.InvariantCulture);
+                if (str.IndexOf($"{{{iStr}", StringComparison.Ordinal) >= 0)
+                    continue;
+
+                diagnosticSink.UNT102(ref provider, iStr);
+            }
+#endif
         }
 
 

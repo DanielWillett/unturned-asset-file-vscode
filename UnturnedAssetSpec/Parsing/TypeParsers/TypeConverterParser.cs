@@ -58,36 +58,23 @@ public class TypeConverterParser<T>(ITypeConverter<T> typeConverter)
     /// <inheritdoc />
     public bool TryParse(ref TypeParserArgs<T> args, in FileEvaluationContext ctx, out Optional<T> value)
     {
-        switch (args.ValueNode)
+        if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? v))
         {
-            case IValueSourceNode v:
-                if (TryParseValueNode(v, ref args, in ctx, out value))
-                {
-                    return true;
-                }
-
-                if (!args.ShouldIgnoreFailureDiagnostic)
-                {
-                    args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
-                    args.ShouldIgnoreFailureDiagnostic = true;
-                }
-
-                return false;
-
-            case IListSourceNode l:
-                args.DiagnosticSink?.UNT2004_ListInsteadOfValue(ref args, l, args.Type);
-                break;
-
-            case IDictionarySourceNode d:
-                args.DiagnosticSink?.UNT2004_DictionaryInsteadOfValue(ref args, d, args.Type);
-                break;
-
-            default:
-                args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
-                break;
+            value = Optional<T>.Null;
+            return false;
         }
 
-        value = Optional<T>.Null;
+        if (TryParseValueNode(v, ref args, in ctx, out value))
+        {
+            return true;
+        }
+
+        if (!args.ShouldIgnoreFailureDiagnostic)
+        {
+            args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
+            args.ShouldIgnoreFailureDiagnostic = true;
+        }
+
         return false;
     }
 

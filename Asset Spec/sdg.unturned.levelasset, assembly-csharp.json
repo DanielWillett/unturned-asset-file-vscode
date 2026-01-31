@@ -230,10 +230,17 @@
         },
         {
             "Key": "Skillset_Loadouts",
-            "Type": "Dictionary",
-            "DictionaryKeyKnownType": "SDG.Unturned.EPlayerSkillset, Assembly-CSharp",
-            "ElementType": "List",
-            "SpecialTypes": [ "SDG.Unturned.LevelAsset+DefaultLoadoutItem, Assembly-CSharp" ],
+            "Type":
+            {
+                "Type": "Dictionary",
+                "KeyType": "SDG.Unturned.EPlayerSkillset, Assembly-CSharp",
+                "ValueType":
+                {
+                    "Type": "List",
+                    "ElementType": "SDG.Unturned.LevelAsset+DefaultLoadoutItem, Assembly-CSharp"
+                },
+                "RequireKeyType": true
+            },
             "DefaultValue": null,
             "Version": "3.25.8.2",
             "Variable": "DefaultSkillsetLoadouts",

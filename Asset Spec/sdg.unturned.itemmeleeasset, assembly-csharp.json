@@ -168,8 +168,7 @@
             "DefaultValue": null,
             "Description": "Rewards applied when the player performs a weak attack.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#npc-rewards",
-            "Variable": "weakAttackQuestRewards",
-            "CountForTemplateGroup": "melee-weak-rewards"
+            "Variable": "weakAttackQuestRewards"
         },
         {
             "Key": "Strong_Attack_Quest_Rewards",
@@ -182,8 +181,7 @@
             "DefaultValue": null,
             "Description": "Rewards applied when the player performs a strong attack.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#npc-rewards",
-            "Variable": "strongAttackQuestRewards",
-            "CountForTemplateGroup": "melee-strong-rewards"
+            "Variable": "strongAttackQuestRewards"
         }
     ],
     "BundleAssets":

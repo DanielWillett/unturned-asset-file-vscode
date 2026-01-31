@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -19,6 +20,11 @@ public interface IDatSpecificationReadContext
     /// The database being read into. Note that only some information will be available at this time.
     /// </summary>
     IAssetSpecDatabase Database { get; }
+
+    /// <summary>
+    /// Allows readers to create loggers to log non-critical errors.
+    /// </summary>
+    ILoggerFactory LoggerFactory { get; }
 
     /// <summary>
     /// Finds an already read type or reads it from the <paramref name="owner"/>'s context.

@@ -192,14 +192,12 @@
             {
                 "Type": "List",
                 "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                "LegacySingularKey": "Quest_Reward",
                 "Mode": "LegacyList, ModernList"
             },
             "DefaultValue": null,
             "Description": "Rewards applied when consuming this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/consumeable-asset.html#rewards",
-            "Variable": "questRewardsList",
-            "CountForTemplateGroup": "consumable-rewards"
+            "Variable": "questRewardsList"
         },
         {
             "Key": "Item_Reward_Spawn_ID",

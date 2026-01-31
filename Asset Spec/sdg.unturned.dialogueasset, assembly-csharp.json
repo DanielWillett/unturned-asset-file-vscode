@@ -17,39 +17,29 @@
         },
         {
             "Key": "Messages",
-            "Type": "Int32",
-            "Minimum": 0,
-            "DefaultValue": 0,
-            "Description": "The number of messages defined in this dialogue. Messages are the entry-point of a dialogue, where the first message that passes it's condition check is shown to the player.",
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.DialogueMessage, Assembly-CSharp",
+                "Mode": "LegacyList"
+            },
+            "DefaultValue": [ ],
+            "Description": "List of messages defined in this dialogue. Messages are the entry-point of a dialogue, where the first message that passes it's condition check is shown to the player.",
             "Variable": "messages",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
-            "CountForTemplateGroup": "dialogue-messages"
-        },
-        {
-            "Key": "Message_*",
-            "Type": "SDG.Unturned.DialogueMessage, Assembly-CSharp",
-            "Template": true,
-            "TemplateGroups": [ "dialogue-messages" ],
-            "Description": "A message presented by the NPC. Messages are the entry-point of a dialogue, where the first message that passes it's condition check is shown to the player.",
-            "Variable": "pages",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages"
         },
         {
             "Key": "Responses",
-            "Type": "UInt8",
-            "DefaultValue": 0,
+            "Type":
+            {
+                "Type": "List",
+                "ElementType": "SDG.Unturned.DialogueMessage, Assembly-CSharp",
+                "Mode": "LegacyList",
+                "CountType": "UInt8"
+            },
+            "DefaultValue": [ ],
             "Description": "The number of responses defined in this dialogue. Messages can reference responses by index to indicate which responses are shown per message.",
             "Variable": "responses",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
-            "CountForTemplateGroup": "dialogue-responses"
-        },
-        {
-            "Key": "Response_*",
-            "Type": "SDG.Unturned.DialogueResponse, Assembly-CSharp",
-            "Template": true,
-            "TemplateGroups": [ "dialogue-responses" ],
-            "Description": "A response to the NPC's message. Messages can reference responses by index to indicate which responses are shown per message.",
-            "Variable": "pages",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses"
         }
     ],
@@ -59,42 +49,45 @@
             "Type": "SDG.Unturned.DialogueMessage, Assembly-CSharp",
             "DisplayName": "Dialogue Message",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
-            "IsLegacyExpandedType": true,
             "Properties":
             [
                 {
                     "Key": "Pages",
-                    "Type": "UInt8",
-                    "DefaultValue": 0,
-                    "Description": "The number of pages for message #(Self.TemplateGroups[0]).",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "ElementType":
+                        {
+                            "Type": "String",
+                            "SupportsRichText": true,
+                            "SupportsNewLines": true,
+                            "ExtraTags": [ "<name_npc>", "<name_char>", "<pause>" ]
+                        },
+                        "ElementContext": "Localization",
+                        "Mode": "LegacyList",
+                        "CountType": "UInt8",
+                        "LegacyDefaultElementTypeValue": "#Self.Key"
+                    },
+                    "DefaultValue": [ ],
+                    "MaximumExclusive": "@(SDG.Unturned.DialogueAsset, Assembly-CSharp::Responses)",
+                    "Description": "The localized text on each page of this message.",
                     "Variable": "pages",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
-                    "CountForTemplateGroup": "dialogue-message-pages"
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#localization"
                 },
                 {
                     "Key": "Responses",
-                    "Type": "UInt8",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "CountType": "UInt8",
+                        "Mode": "LegacyList",
+                        "ElementType": "UInt8"
+                    },
                     "DefaultValue": 0,
                     "Maximum": "@SDG.Unturned.DialogueAsset, Assembly-CSharp::Responses",
-                    "Description": "The number of responses for message #(Self.TemplateGroups[0]). Responses appear as buttons for the player to answer an NPC. Note that only either @(SDG.Unturned.DialogueAsset, Assembly-CSharp::Response_@(SDG.Unturned.DialogueAsset, Assembly-CSharp::dialogue-responses)_Messages) or @(SDG.Unturned.DialogueAsset, Assembly-CSharp::Message_@(SDG.Unturned.DialogueAsset, Assembly-CSharp::dialogue-messages)_Responses) can be used, not both.",
+                    "Description": "List of responses for this message. Responses appear as buttons for the player to answer an NPC. Note that only either @(SDG.Unturned.DialogueMessage, Assembly-CSharp::Responses) or @(SDG.Unturned.DialogueResponse, Assembly-CSharp::Messages) can be used, not both.",
                     "Variable": "responses",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
-                    "CountForTemplateGroup": "dialogue-message-responses"
-                },
-                {
-                    "Key": "Response_*",
-                    "Type": "UInt8",
-                    "Template": true,
-                    "TemplateGroups": [ "dialogue-message-responses" ],
-                    "DefaultValue": 0,
-                    "MaximumExclusive": "@SDG.Unturned.DialogueAsset, Assembly-CSharp::Responses",
-                    "Required": true,
-                    "ExclusiveWith": [ "SDG.Unturned.DialogueAsset, Assembly-CSharp::Response_#(Self.Value)_Messages" ],
-                    "InclusiveWith": [ "$local$::SDG.Unturned.DialogueAsset, Assembly-CSharp::Response_#(Self.Value)" ],
-                    "Description": "The index of a response in @(SDG.Unturned.DialogueAsset, Assembly-CSharp::Responses). Responses appear as buttons for the player to answer an NPC.",
-                    "Variable": "responses",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages",
-                    "CountForTemplateGroup": "dialogue-message-responses"
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#messages"
                 },
                 {
                     "Key": "Prev",
@@ -122,14 +115,12 @@
                     {
                         "Type": "List",
                         "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                        "LegacySingularKey": "Condition",
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": null,
                     "Description": "Conditions that must be met for message #(Self.TemplateGroups[0]) to be shown.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
-                    "Variable": "conditions",
-                    "CountForTemplateGroup": "dialogue-message-conditions"
+                    "Variable": "conditions"
                 },
                 {
                     "Key": "Rewards",
@@ -137,33 +128,12 @@
                     {
                         "Type": "List",
                         "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                        "LegacySingularKey": "Reward",
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": null,
                     "Description": "Rewards applied before viewing message #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
-                    "Variable": "rewards",
-                    "CountForTemplateGroup": "dialogue-message-rewards"
-                }
-            ],
-            "Localization":
-            [
-                {
-                    "Key": "Page_*",
-                    "Type":
-                    {
-                        "Type": "String",
-                        "SupportsRichText": true,
-                        "SupportsNewLines": true,
-                        "ExtraTags": [ "<name_npc>", "<name_char>", "<pause>" ]
-                    },
-                    "Template": true,
-                    "TemplateGroups": [ "dialogue-message-pages" ],
-                    "Required": true,
-                    "Variable": "text",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#localization",
-                    "Description": "The localized text on page @dialogue-message-pages of message @dialogue-messages."
+                    "Variable": "rewards"
                 }
             ]
         },
@@ -171,30 +141,21 @@
             "Type": "SDG.Unturned.DialogueResponse, Assembly-CSharp",
             "DisplayName": "Dialogue Response",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
-            "IsLegacyExpandedType": true,
             "Properties":
             [
                 {
                     "Key": "Messages",
-                    "Type": "UInt8",
+                    "Type":
+                    {
+                        "Type": "List",
+                        "CountType": "UInt8",
+                        "Mode": "LegacyList",
+                        "ElementType": "UInt8"
+                    },
                     "DefaultValue": 0,
-                    "Maximum": "@SDG.Unturned.DialogueAsset, Assembly-CSharp::Messages",
-                    "Description": "The number of messages listed to show response @dialogue-responses on. Responses appear as buttons for the player to answer an NPC.",
-                    "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses",
+                    "Maximum": "@SDG.Unturned.DialogueAsset, Assembly-CSharp::Responses",
+                    "Description": "List of messages this response should come after. Responses appear as buttons for the player to answer an NPC. Note that only either @(SDG.Unturned.DialogueMessage, Assembly-CSharp::Responses) or @(SDG.Unturned.DialogueResponse, Assembly-CSharp::Messages) can be used, not both.",
                     "Variable": "messages",
-                    "CountForTemplateGroup": "dialogue-response-messages"
-                },
-                {
-                    "Key": "Message_*",
-                    "Type": "UInt8",
-                    "Template": true,
-                    "TemplateGroups": [ "dialogue-response-messages" ],
-                    "DefaultValue": 0,
-                    "MaximumExclusive": "@SDG.Unturned.DialogueAsset, Assembly-CSharp::Messages",
-                    "Required": true,
-                    "Description": "The index of a message in @(SDG.Unturned.DialogueAsset, Assembly-CSharp::Messages). Responses appear as buttons for the player to answer an NPC.",
-                    "Variable": "messages",
-                    "ExclusiveWith": [ "SDG.Unturned.DialogueAsset, Assembly-CSharp::Message_#(Self.Value)_Responses" ],
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html#responses"
                 },
                 {
@@ -242,14 +203,12 @@
                     {
                         "Type": "List",
                         "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                        "LegacySingularKey": "Condition",
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": null,
                     "Description": "Conditions that must be met for response #(Self.TemplateGroups[0]) to be shown.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
-                    "Variable": "conditions",
-                    "CountForTemplateGroup": "dialogue-response-conditions"
+                    "Variable": "conditions"
                 },
                 {
                     "Key": "Rewards",
@@ -257,14 +216,12 @@
                     {
                         "Type": "List",
                         "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                        "LegacySingularKey": "Reward",
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": null,
                     "Description": "Rewards applied before viewing response #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
-                    "Variable": "rewards",
-                    "CountForTemplateGroup": "dialogue-response-rewards"
+                    "Variable": "rewards"
                 }
             ],
             "Localization":

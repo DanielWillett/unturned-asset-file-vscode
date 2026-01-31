@@ -1,5 +1,8 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -114,7 +117,7 @@ public static class TypeParsers
     public static ITypeParser<GuidOrId> GuidOrId { get; } = new TypeConverterParser<GuidOrId>(TypeConverters.GuidOrId);
 
     /// <summary>
-    /// The type parser for <see cref="Data.Types.IPv4Filter"/> values.
+    /// The type parser for <see cref="Data.IPv4Filter"/> values.
     /// </summary>
     public static ITypeParser<IPv4Filter> IPv4Filter { get; } = new TypeConverterParser<IPv4Filter>(TypeConverters.IPv4Filter);
 
@@ -124,6 +127,11 @@ public static class TypeParsers
     public static ITypeParser<QualifiedType> QualifiedType { get; } = new TypeConverterParser<QualifiedType>(TypeConverters.QualifiedType);
 
     /// <summary>
+    /// The type parser for steam item def values.
+    /// </summary>
+    public static ITypeParser<int> SteamItemDef => SteamItemDefType.Instance;
+
+    /// <summary>
     /// Gets the type parser for the given type.
     /// </summary>
     /// <typeparam name="T">The type to convert.</typeparam>
@@ -131,6 +139,32 @@ public static class TypeParsers
     public static ITypeParser<T> Get<T>() where T : IEquatable<T>
     {
         return TypeParserCache<T>.Parser;
+    }
+
+    internal static bool TryParseStringValueOnly<TValue>(ref TypeParserArgs<TValue> args, [NotNullWhen(true)] out IValueSourceNode? valueNode)
+        where TValue : IEquatable<TValue>
+    {
+        switch (args.ValueNode)
+        {
+            case IValueSourceNode v:
+                valueNode = v;
+                return true;
+
+            case IListSourceNode l:
+                args.DiagnosticSink?.UNT2004_ListInsteadOfValue(ref args, l, args.Type);
+                break;
+
+            case IDictionarySourceNode d:
+                args.DiagnosticSink?.UNT2004_DictionaryInsteadOfValue(ref args, d, args.Type);
+                break;
+
+            default:
+                args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                break;
+        }
+
+        valueNode = null;
+        return false;
     }
 
     private static class TypeParserCache<T> where T : IEquatable<T>

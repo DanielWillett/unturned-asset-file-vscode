@@ -144,9 +144,6 @@
   <data name="UNT1002" xml:space="preserve">
     <value>Expected double quotation mark at end of quoted string.</value>
   </data>
-  <data name="UNT1005" xml:space="preserve">
-    <value>Value expected for property '{0}'.</value>
-  </data>
   <data name="UNT2004" xml:space="preserve">
     <value>Value '{0}' can not be converted to a value of type '{1}'.</value>
   </data>
@@ -386,5 +383,50 @@
   </data>
   <data name="UNT1016_Generic" xml:space="preserve">
     <value>Skill level {0} should not exceed {1}.</value>
+  </data>
+  <data name="UNT1027" xml:space="preserve">
+    <value>Property '{0}' shouldn't contain duplicate values. Element {1} is the same as element {2}.</value>
+  </data>
+  <data name="UNT2004_MissingFile" xml:space="preserve">
+    <value>Property '{0}' can not be parsed because it relies on values in a file that doesn't exist (like a localization file).</value>
+  </data>
+  <data name="UNT2004_LegacyFormatExpected" xml:space="preserve">
+    <value>Property '{0}' can only be expressed using the legacy object format using underscores.</value>
+  </data>
+  <data name="UNT1028_Minimum_Inclusive" xml:space="preserve">
+    <value>The value of property '{0}' ("{1}") should not be less than "{2}".</value>
+  </data>
+  <data name="UNT1028_Minimum_Exclusive" xml:space="preserve">
+    <value>The value of property '{0}' ("{1}") should not be "{2}" or lower.</value>
+  </data>
+  <data name="UNT1028_Maximum_Inclusive" xml:space="preserve">
+    <value>The value of property '{0}' ("{1}") should not be higher than "{2}".</value>
+  </data>
+  <data name="UNT1028_Maximum_Exclusive" xml:space="preserve">
+    <value>The value of property '{0}' ("{1}") should not be "{2}" or higher.</value>
+  </data>
+  <data name="UNT1028_Minimum_Inclusive_Anonymous" xml:space="preserve">
+    <value>The value "{0}" should not be less than "{1}".</value>
+  </data>
+  <data name="UNT1028_Minimum_Exclusive_Anonymous" xml:space="preserve">
+    <value>The value "{0}" should not be "{1}" or less.</value>
+  </data>
+  <data name="UNT1028_Maximum_Inclusive_Anonymous" xml:space="preserve">
+    <value>The value "{0}" should not be higher than "{1}".</value>
+  </data>
+  <data name="UNT1028_Maximum_Exclusive_Anonymous" xml:space="preserve">
+    <value>The value "{0}" should not be "{1}" or higher.</value>
+  </data>
+  <data name="UNT1029" xml:space="preserve">
+    <value>Property '{0}' doesn't accept Steam64 IDs with the account type "{1}". Make sure this ID is the correct type.</value>
+  </data>
+  <data name="UNT1029_Invalid" xml:space="preserve">
+    <value>The value for property '{0}' doesn't appear to be a correctly formed Steam64 ID.</value>
+  </data>
+  <data name="UNT1030_Property" xml:space="preserve">
+    <value>Property '{0}' expected a localization file to be present for this asset.</value>
+  </data>
+  <data name="UNT1030_RequiredLocal" xml:space="preserve">
+    <value>Localization property '{0}' is required but a localization file doesn't exist for this asset.</value>
   </data>
 </root>

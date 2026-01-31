@@ -99,9 +99,9 @@
                     "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
                 },
                 "LegacySingularKey": "Secondary",
-                "Mode": "LegacyList"
+                "Mode": "LegacyList",
+                "RequireUniqueValues": true
             },
-            "TemplateGroupUniqueValue": true,
             "DefaultValue": 0,
             "Description": "The item IDs of attachments for which this skin provides a custom material for. The material should be named 'Skin_Secondary_#' where # would be the value of this property.",
             "Variable": "secondarySkins",

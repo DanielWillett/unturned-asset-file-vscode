@@ -60,15 +60,8 @@ public static class SourceNodeExtensions
         /// <summary>
         /// Try to get a property by it's key or alias.
         /// </summary>
-        /// <remarks>Does not support template properties.</remarks>
         public bool TryGetProperty(DatProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
         {
-            if (property.IsTemplate)
-            {
-                propertyNode = null;
-                return false;
-            }
-
             if (property.Keys.IsDefaultOrEmpty)
             {
                 if (node.TryGetProperty(property.Key, out propertyNode))
@@ -78,7 +71,7 @@ public static class SourceNodeExtensions
             {
                 foreach (DatPropertyKey key in property.Keys)
                 {
-                    if (!FilterMatches(key.Filter, context) || key.TemplateProcessor != null)
+                    if (!FilterMatches(key.Filter, context))
                         continue;
 
                     if (key.Condition != null && !key.Condition.TryEvaluateValue(out Optional<bool> passesCondition, in ctx) && !passesCondition.GetValueOrDefault(false))

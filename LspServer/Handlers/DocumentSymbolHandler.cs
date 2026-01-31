@@ -200,10 +200,10 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
 
             FileRange range = node.Range;
             FileRange selectionRange = range;
-            ValueTypeDataRefType valueKind = node.ValueKind;
+            SourceValueType valueKind = node.ValueKind;
             switch (valueKind)
             {
-                case ValueTypeDataRefType.List:
+                case SourceValueType.List:
                     kind = SymbolKind.Array;
                     IListSourceNode list = (IListSourceNode)node.Value!;
                     builder.Children = new PooledList<DocumentSymbol>();
@@ -213,7 +213,7 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
                     range.Encapsulate(list.Range);
                     break;
 
-                case ValueTypeDataRefType.Dictionary:
+                case SourceValueType.Dictionary:
                     kind = SymbolKind.Object;
                     IDictionarySourceNode dict = (IDictionarySourceNode)node.Value!;
                     builder.Children = new PooledList<DocumentSymbol>();
@@ -247,7 +247,7 @@ internal class DocumentSymbolHandler : IDocumentSymbolHandler
 
             builder.Children?.Dispose();
 
-            if (valueKind is ValueTypeDataRefType.List or ValueTypeDataRefType.Dictionary)
+            if (valueKind is SourceValueType.List or SourceValueType.Dictionary)
             {
                 Levels.Pop();
             }

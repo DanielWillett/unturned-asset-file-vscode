@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -255,8 +256,8 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
         }
 
         protected override void AcceptResolvedProperty(
-            SpecProperty property,
-            ISpecPropertyType propertyType,
+            DatProperty property,
+            IType propertyType,
             in SpecPropertyTypeParseContext parseCtx,
             IPropertySourceNode node,
             in PropertyBreadcrumbs breadcrumbs)

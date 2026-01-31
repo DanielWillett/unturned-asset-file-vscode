@@ -225,8 +225,7 @@
                                 "Operation": "neq",
                                 "Comparand": "MILITARY"
                             }
-                        ],
-                        "Value": true
+                        ]
                     }
                 }
             ]

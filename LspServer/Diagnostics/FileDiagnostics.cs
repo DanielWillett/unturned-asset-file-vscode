@@ -11,6 +11,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Diagnostics;
 
@@ -288,14 +289,14 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
 
         /// <inheritdoc />
         protected override void AcceptResolvedProperty(
-            SpecProperty property,
-            ISpecPropertyType propertyType,
+            DatProperty property,
+            IType propertyType,
             in SpecPropertyTypeParseContext parseCtx,
             IPropertySourceNode node,
             in PropertyBreadcrumbs breadcrumbs)
         {
-            SpecPropertyTypeParseContext ctx = parseCtx.WithDiagnostics(Diagnostics);
-            propertyType.TryParseValue(in ctx, out _);
+            // todo SpecPropertyTypeParseContext ctx = parseCtx.WithDiagnostics(Diagnostics);
+            // todo propertyType.TryParseValue(in ctx, out _);
         }
 
         /// <inheritdoc />

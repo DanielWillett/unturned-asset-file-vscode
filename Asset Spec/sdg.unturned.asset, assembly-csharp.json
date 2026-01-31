@@ -844,9 +844,13 @@
                 },
                 {
                     "Key": "TextId",
-                    "Type": "LocalizableTargetRichString",
+                    "Type":
+                    {
+                        "Type": "LocalizationKey",
+                        "ValueSupportsRichText": true,
+                        "ValueSupportsNewLines": true
+                    },
                     "DefaultValue": null,
-                    "SupportsNewLines": true,
                     "Description": "The localization key for the 'Text' property for this condition in the localization file for this asset.",
                     "Variable": "text",
                     "KeyLegacyExpansionFilter": "Modern",
@@ -2097,9 +2101,12 @@
                 },
                 {
                     "Key": "TextId",
-                    "Type": "LocalizableTargetString",
+                    "Type":
+                    {
+                        "Type": "LocalizationKey",
+                        "ValueSupportsNewLines": true
+                    },
                     "DefaultValue": null,
-                    "SupportsNewLines": true,
                     "Description": "The localization key for the 'Text' property for this reward in the localization file for this asset.",
                     "Variable": "text",
                     "KeyLegacyExpansionFilter": "Modern",

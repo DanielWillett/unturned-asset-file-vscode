@@ -185,7 +185,7 @@ public sealed class AssetCategory : DatEnumType, IEquatable<AssetCategory>, ICom
     {
         QualifiedType typeName = new QualifiedType(TypeId, true);
         
-        Instance = new AssetCategory(typeName, CreateFileType(typeName, false, default, null))
+        Instance = new AssetCategory(typeName, CreateFileType(typeName, false, default, null, null!))
         {
             Docs = "https://docs.smartlydressedgames.com/en/stable/data/enum/eassettype.html",
             DisplayNameIntl = Resources.Type_Name_EAssetType

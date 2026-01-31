@@ -1,7 +1,9 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using DanielWillett.UnturnedDataFileLspServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
@@ -41,8 +43,8 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
             return Task.FromResult(Invalid);
         }
 
-        SpecProperty? property = fileType.Information.Properties.FirstOrDefault(x => string.Equals(x.Key, request.Key, StringComparison.Ordinal));
-        if (property == null || property.IsHidden)
+        DatProperty? property = fileType.Information.Properties.FirstOrDefault(x => string.Equals(x.Key, request.Key, StringComparison.Ordinal));
+        if (property == null || property.HideOverridden)
         {
             return Task.FromResult(Invalid);
         }
@@ -59,10 +61,9 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
             asset = sourceFile;
         }
         
-        List<SpecProperty> properties = fileType.Information.Properties
-            .Where(x => ReferenceEquals(x.Deprecated, SpecDynamicValue.False))
-            .OrderByDescending(x => x.Priority)
-            .ThenBy(x => x.Key)
+        List<DatProperty> properties = fileType.Information.Properties
+            .Where(x => ReferenceEquals(x.Deprecated, Value.False))
+            .OrderBy(x => x.Key)
             .ToList();
 
         int lines;
@@ -78,17 +79,17 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
         {
             int index = properties.FindIndex(x => x.Key.Equals(request.Key));
 
-            (SpecProperty? property, IPropertySourceNode? node) after = default;
+            (DatProperty? property, IPropertySourceNode? node) after = default;
             if (index != -1)
             {
-                after = properties
-                    .Take(index)
-                    .Reverse()
-                    .Select(x => file.SourceFile.TryGetProperty(x, out IPropertySourceNode? node, PropertyResolutionContext.Modern) ? (property, node) : (null, null))
-                    .FirstOrDefault(x => x.property != null);
+                // todo after = properties
+                // todo     .Take(index)
+                // todo     .Reverse()
+                // todo     .Select(x => file.SourceFile.TryGetProperty(x, out IPropertySourceNode? node, PropertyResolutionContext.Modern) ? (property, node) : (null, null))
+                // todo     .FirstOrDefault(x => x.property != null);
             }
 
-            (SpecProperty? afterProperty, IPropertySourceNode? afterNode) = after;
+            (DatProperty? afterProperty, IPropertySourceNode? afterNode) = after;
             
             if (afterNode != null)
             {
@@ -113,7 +114,7 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
         {
             Position = pos,
             InsertLines = lines,
-            IsFlag = property.Type.Equals(KnownTypes.Flag)
+            IsFlag = property.Type.Equals(FlagType.Instance)
         });
     }
 }

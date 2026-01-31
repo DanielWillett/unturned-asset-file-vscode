@@ -144,7 +144,6 @@ internal class EnvironmentCache : ISpecDatabaseCache
     public async Task CacheNewFilesAsync(IAssetSpecDatabase database, CancellationToken token = default)
     {
         string? commit = database.Information.Commit;
-        commit ??= database.Types.Values.FirstOrDefault(x => x.Commit != null)?.Commit;
 
         bool hasNewCommit = !string.Equals(_cacheMetadataInfo.LatestCommit, commit, StringComparison.Ordinal);
         if (hasNewCommit)
@@ -189,12 +188,9 @@ internal class EnvironmentCache : ISpecDatabaseCache
             }
         }
 
-        foreach (AssetSpecType t in database.Types.Values)
+        foreach (DatType t in database.AllTypes.Values)
         {
-            if (!string.Equals(t.Commit, commit, StringComparison.Ordinal))
-                continue;
-
-            string path = Path.Combine(_cacheDir, t.Type.Normalized.Type.ToLowerInvariant() + ".json");
+            string path = Path.Combine(_cacheDir, t.TypeName.Normalized.Type.ToLowerInvariant() + ".json");
 
 
             if (!hasNewCommit && File.Exists(path))
@@ -293,34 +289,6 @@ internal class EnvironmentCache : ISpecDatabaseCache
             _logger.LogWarning(ex, "Failed to read cache file {0}, null value.", file);
             return false;
         }
-    }
-
-    /// <inheritdoc />
-    public async Task<AssetInformation?> GetCachedInformationAsync(CancellationToken token = default)
-    {
-        AssetInformation? info = await ReadCacheFileAsync<AssetInformation>(_informationFile, token).ConfigureAwait(false);
-
-        if (info != null)
-        {
-            info.Commit = _cacheMetadataInfo.LatestCommit;
-        }
-
-        return info;
-    }
-
-    /// <inheritdoc />
-    public async Task<AssetSpecType?> GetCachedTypeAsync(QualifiedType type, CancellationToken token = default)
-    {
-        string path = Path.Combine(_cacheDir, type.Normalized.Type.ToLowerInvariant() + ".json");
-
-        AssetSpecType? specType = await ReadCacheFileAsync<AssetSpecType>(path, token).ConfigureAwait(false);
-
-        if (specType != null)
-        {
-            specType.Commit = _cacheMetadataInfo.LatestCommit;
-        }
-
-        return specType;
     }
 
     public class CacheMetadata

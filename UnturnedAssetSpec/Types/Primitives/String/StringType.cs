@@ -33,14 +33,12 @@ public sealed class StringType : PrimitiveType<string, StringType>, ITypeParser<
 {
     public const string TypeId = "String";
 
-    private static readonly object Boxed999 = 999;
-
     private readonly int _minCount;
     private readonly int _maxCount;
     private readonly bool _allowRichText;
     private readonly bool _allowLineBreakTag;
     private readonly OneOrMore<Regex> _extraRichTextTags;
-    private readonly int _maxFormatArguments;
+    private readonly uint _maxFormatArguments;
     private object[]? _formatArgs;
 
     public override string Id => TypeId;
@@ -60,7 +58,7 @@ public sealed class StringType : PrimitiveType<string, StringType>, ITypeParser<
         int maxCount,
         bool allowRichText,
         bool allowLineBreakTag,
-        int maxFormatArguments,
+        uint maxFormatArguments,
         OneOrMore<Regex> extraRichTextTags
     ) : this()
     {
@@ -75,66 +73,16 @@ public sealed class StringType : PrimitiveType<string, StringType>, ITypeParser<
 
     public bool TryParse(ref TypeParserArgs<string> args, in FileEvaluationContext ctx, out Optional<string> value)
     {
-        if (!TypeParsers.String.TryParse(ref args, in ctx, out value))
+        if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? valueNode))
         {
+            value = Optional<string>.Null;
             return false;
         }
 
-        IDiagnosticSink? diagnostics = args.DiagnosticSink;
-        if (diagnostics == null || args.ShouldIgnoreFailureDiagnostic || !value.HasValue)
-            return true;
-
-        string str = value.Value;
-
-        diagnostics.CheckUNT1024_String(str.Length, ref args, args.ParentNode, _minCount, _maxCount);
-
-        IValueSourceNode valueNode = (IValueSourceNode?)args.ValueNode!;
-
-        if (_allowLineBreakTag)
+        value = valueNode.Value;
+        if (args.DiagnosticSink != null)
         {
-            diagnostics.CheckUNT1021(ref args, valueNode);
-        }
-        else
-        {
-            diagnostics.CheckUNT1022_UNT106(ref args, valueNode);
-        }
-
-        if (!_allowRichText)
-        {
-            diagnostics.CheckUNT1006(ref args, valueNode);
-        }
-
-        if (_maxFormatArguments > 0)
-        {
-            if (_formatArgs == null)
-            {
-                _formatArgs = new object[_maxFormatArguments];
-                for (int i = 0; i < _maxFormatArguments; ++i)
-                    _formatArgs[i] = Boxed999;
-            }
-
-            bool malformed = false;
-            try
-            {
-                _ = string.Format(str, _formatArgs);
-            }
-            catch (FormatException ex)
-            {
-                diagnostics.UNT2012(ref args, str, ex);
-                malformed = true;
-            }
-
-            if (!malformed)
-            {
-                for (uint i = 0; i < _maxFormatArguments; ++i)
-                {
-                    string iStr = i.ToString(CultureInfo.InvariantCulture);
-                    if (str.Contains($"{{{iStr}"))
-                        continue;
-
-                    diagnostics.UNT102(ref args, iStr);
-                }
-            }
+            DiagnosticSinkExtensions.CheckStringDiagnostics(ref args, valueNode, _minCount, _maxCount, _allowLineBreakTag, _allowRichText, _extraRichTextTags, _maxFormatArguments);
         }
 
         return true;
@@ -159,7 +107,8 @@ public sealed class StringType : PrimitiveType<string, StringType>, ITypeParser<
             return Instance;
         }
 
-        int minCount = 0, maxCount = int.MaxValue, maxFmt = 0;
+        int minCount = 0, maxCount = int.MaxValue;
+        uint maxFmt = 0;
         bool rt = false, nl = false;
         OneOrMore<Regex> tags = OneOrMore<Regex>.Null;
 
@@ -190,7 +139,7 @@ public sealed class StringType : PrimitiveType<string, StringType>, ITypeParser<
         if (typeDefinition.TryGetProperty("FormatArguments"u8, out element)
             && element.ValueKind != JsonValueKind.Null)
         {
-            maxFmt = element.GetInt32();
+            maxFmt = element.GetUInt32();
         }
 
         if (typeDefinition.TryGetProperty("ExtraTag"u8, out element)

@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using DanielWillett.UnturnedDataFileLspServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
@@ -52,23 +53,22 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
             PropertyResolutionContext.Modern
         );
 
-        List<SpecProperty> properties = fileType.Information.Properties
-            .Where(x => ReferenceEquals(x.Deprecated, SpecDynamicValue.False))
-            .OrderByDescending(x => x.Priority)
-            .ThenBy(x => x.Key)
+        List<DatProperty> properties = fileType.Information.Properties
+            .Where(x => ReferenceEquals(x.Deprecated, Value.False))
+            .OrderBy(x => x.Key)
             .ToList();
 
         AssetProperty[] outputProperties = new AssetProperty[properties.Count];
 
         for (int i = 0; i < properties.Count; i++)
         {
-            SpecProperty property = properties[i];
+            DatProperty property = properties[i];
             FileEvaluationContext propContext = new FileEvaluationContext(in context, property, PropertyResolutionContext.Modern);
 
             string? desc = null, markdown = null;
 
-            property.Description?.TryEvaluateValue(in propContext, out desc, out _);
-            property.Markdown?.TryEvaluateValue(in propContext, out markdown, out _);
+            // todo property.Description?.TryEvaluateValue(in propContext, out desc, out _);
+            // todo property.Markdown?.TryEvaluateValue(in propContext, out markdown, out _);
 
             AssetProperty prop = new AssetProperty
             {
@@ -79,17 +79,17 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
 
             outputProperties[i] = prop;
 
-            if (!propContext.TryGetValue(out ISpecDynamicValue? val, out IPropertySourceNode? lineNode))
-                continue;
+            // todo if (!propContext.TryGetValue(out ISpecDynamicValue? val, out IPropertySourceNode? lineNode))
+            // todo     continue;
 
-            if (val != null && val.TryEvaluateValue(in propContext, out object? value))
-            {
-                prop.Value = value is QualifiedType { IsNormalized: false } qt ? qt.Normalized : value;
-            }
-            if (lineNode != null)
-            {
-                prop.Range = lineNode.Range.ToRange();
-            }
+            // todo if (val != null && val.TryEvaluateValue(in propContext, out object? value))
+            // todo {
+            // todo     prop.Value = value is QualifiedType { IsNormalized: false } qt ? qt.Normalized : value;
+            // todo }
+            // todo if (lineNode != null)
+            // todo {
+            // todo     prop.Range = lineNode.Range.ToRange();
+            // todo }
         }
 
         return Task.FromResult(new Container<AssetProperty>(outputProperties));

@@ -313,8 +313,20 @@
         },
         {
             "Key": "Interactability_Text_Lines",
-            "Type": "UInt16",
-            "DefaultValue": 0,
+            "Type":
+            {
+                "Type": "List",
+                "CountType": "UInt16",
+                "ElementType":
+                {
+                    "Type": "String",
+                    "SupportsRichText": true,
+                    "SupportsNewLines": true
+                },
+                "ElementContext": "Localization",
+                "LegacyDefaultElementTypeValue": "#Self.Key"
+            },
+            "DefaultValue": [ ],
             "Description": "Total number of lines to display on a note when it's interacted with.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Variable": "interactabilityText",
@@ -335,8 +347,7 @@
                     "Key": "Interactability",
                     "Value": "NOTE"
                 }
-            ],
-            "CountForTemplateGroup": "object-interactability-note-lines"
+            ]
         },
         {
             "Key": "Interactability_Power",
@@ -457,7 +468,6 @@
                     "Value": "DROPPER"
                 }
             ],
-            "CountForTemplateGroup": "object-interactability-drops",
             "ExclusiveWith":
             [
                 {
@@ -789,8 +799,7 @@
                         ]
                     }
                 }
-            ],
-            "CountForTemplateGroup": "object-interact-conditions"
+            ]
         },
         {
             "Key": "Interactability_Rewards",
@@ -847,8 +856,7 @@
                         ]
                     }
                 }
-            ],
-            "CountForTemplateGroup": "object-interact-rewards"
+            ]
         },
         {
             "Key": "Interactability_Resource",
@@ -890,8 +898,7 @@
                         ]
                     }
                 }
-            ],
-            "CountForTemplateGroup": "object-interact-rewards"
+            ]
         },
         {
             "Key": "Interactability_Health",
@@ -2471,7 +2478,6 @@
             {
                 "Type": "List",
                 "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                "LegacySingularKey": "Condition",
                 "Mode": "LegacyList, ModernList"
             },
             "DefaultValue": null,
@@ -2829,22 +2835,6 @@
                 }
             ],
             "Variable": "objectName"
-        },
-        {
-            "Key": "Interactability_Text_Line_*",
-            "Template": true,
-            "TemplateGroups": [ "object-interactability-note-lines" ],
-            "Type":
-            {
-                "Type": "String",
-                "SupportsRichText": true,
-                "SupportsNewLines": true
-            },
-            "DefaultValue": "#Self.Key",
-            "Variable": "interactabilityText",
-            "Description": "A line in this object's note.",
-            "Required": true,
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables"
         },
         {
             "Key": "Interact",

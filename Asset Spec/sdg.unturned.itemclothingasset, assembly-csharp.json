@@ -171,20 +171,19 @@
                     "Key": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
                     "Condition":
                     {
-                        "Or":
+                        "And":
                         [
                             {
                                 "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
-                                "Operation": "eq",
+                                "Operation": "neq",
                                 "Comparand": "Shirt"
                             },
                             {
                                 "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
-                                "Operation": "eq",
+                                "Operation": "neq",
                                 "Comparand": "Pants"
                             }
-                        ],
-                        "Value": false
+                        ]
                     }
                 }
             ]
@@ -231,20 +230,19 @@
                     "Key": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
                     "Condition":
                     {
-                        "Or":
+                        "And":
                         [
                             {
                                 "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
-                                "Operation": "eq",
+                                "Operation": "neq",
                                 "Comparand": "Shirt"
                             },
                             {
                                 "Variable": "SDG.Unturned.ItemAsset, Assembly-CSharp::Type",
-                                "Operation": "eq",
+                                "Operation": "neq",
                                 "Comparand": "Pants"
                             }
-                        ],
-                        "Value": false
+                        ]
                     }
                 }
             ]

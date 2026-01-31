@@ -12,8 +12,9 @@ public static class SourceFileExtensions
         /// </summary>
         /// <param name="preferredLanguage">The language to prioritize, defaulting to 'English'. If this parameter is overridden and the language isn't available, it will fall back to English.</param>
         /// <returns>The first localization file available, or <see langword="null"/> if there are no localization files for this asset.</returns>
-        public ILocalizationSourceFile? GetDefaultSourceFile(string preferredLanguage = "English")
+        public ILocalizationSourceFile? GetDefaultLocalizationFile(string preferredLanguage = "English")
         {
+            // todo: use project language for this
             ImmutableArray<ILocalizationSourceFile> locals = file.Localization;
 
             if (locals.IsDefaultOrEmpty)

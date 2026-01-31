@@ -21,14 +21,12 @@
             {
                 "Type": "List",
                 "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
-                "LegacySingularKey": "Condition",
                 "Mode": "LegacyList, ModernList"
             },
             "DefaultValue": null,
             "Description": "Conditions that must be met for this quest to be able to be turned in.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
-            "Variable": "conditionsList",
-            "CountForTemplateGroup": "quest-conditions"
+            "Variable": "conditionsList"
         },
         {
             "Key": "Rewards",
@@ -36,14 +34,12 @@
             {
                 "Type": "List",
                 "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                "LegacySingularKey": "Reward",
                 "Mode": "LegacyList, ModernList"
             },
             "DefaultValue": null,
             "Description": "Rewards granted when a player turns in this quest.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
-            "Variable": "rewardsList",
-            "CountForTemplateGroup": "quest-rewards"
+            "Variable": "rewardsList"
         },
         {
             "Key": "AbandonmentRewards",
@@ -51,14 +47,12 @@
             {
                 "Type": "List",
                 "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
-                "LegacySingularKey": "AbandonmentReward",
                 "Mode": "LegacyList, ModernList"
             },
             "DefaultValue": null,
             "Description": "Rewards granted when a player abandons the quest without completing it.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
-            "Variable": "abandonmentRewardsList",
-            "CountForTemplateGroup": "quest-abandon-rewards"
+            "Variable": "abandonmentRewardsList"
         }
     ],
     "Localization":

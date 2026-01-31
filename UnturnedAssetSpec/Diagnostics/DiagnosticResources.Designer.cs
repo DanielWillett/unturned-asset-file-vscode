@@ -133,15 +133,6 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Value expected for property &apos;{0}&apos;..
-        /// </summary>
-        public static string UNT1005 {
-            get {
-                return ResourceManager.GetString("UNT1005", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to This property does not support rich text..
         /// </summary>
         public static string UNT1006 {
@@ -475,11 +466,128 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; shouldn&apos;t contain duplicate values. Element {1} is the same as element {2}..
+        /// </summary>
+        public static string UNT1027 {
+            get {
+                return ResourceManager.GetString("UNT1027", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value of property &apos;{0}&apos; (&quot;{1}&quot;) should not be &quot;{2}&quot; or higher..
+        /// </summary>
+        public static string UNT1028_Maximum_Exclusive {
+            get {
+                return ResourceManager.GetString("UNT1028_Maximum_Exclusive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value &quot;{0}&quot; should not be &quot;{1}&quot; or higher..
+        /// </summary>
+        public static string UNT1028_Maximum_Exclusive_Anonymous {
+            get {
+                return ResourceManager.GetString("UNT1028_Maximum_Exclusive_Anonymous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value of property &apos;{0}&apos; (&quot;{1}&quot;) should not be higher than &quot;{2}&quot;..
+        /// </summary>
+        public static string UNT1028_Maximum_Inclusive {
+            get {
+                return ResourceManager.GetString("UNT1028_Maximum_Inclusive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value &quot;{0}&quot; should not be higher than &quot;{1}&quot;..
+        /// </summary>
+        public static string UNT1028_Maximum_Inclusive_Anonymous {
+            get {
+                return ResourceManager.GetString("UNT1028_Maximum_Inclusive_Anonymous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value of property &apos;{0}&apos; (&quot;{1}&quot;) should not be &quot;{2}&quot; or lower..
+        /// </summary>
+        public static string UNT1028_Minimum_Exclusive {
+            get {
+                return ResourceManager.GetString("UNT1028_Minimum_Exclusive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value &quot;{0}&quot; should not be &quot;{1}&quot; or less..
+        /// </summary>
+        public static string UNT1028_Minimum_Exclusive_Anonymous {
+            get {
+                return ResourceManager.GetString("UNT1028_Minimum_Exclusive_Anonymous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value of property &apos;{0}&apos; (&quot;{1}&quot;) should not be less than &quot;{2}&quot;..
+        /// </summary>
+        public static string UNT1028_Minimum_Inclusive {
+            get {
+                return ResourceManager.GetString("UNT1028_Minimum_Inclusive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value &quot;{0}&quot; should not be less than &quot;{1}&quot;..
+        /// </summary>
+        public static string UNT1028_Minimum_Inclusive_Anonymous {
+            get {
+                return ResourceManager.GetString("UNT1028_Minimum_Inclusive_Anonymous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; doesn&apos;t accept Steam64 IDs with the account type &quot;{1}&quot;. Make sure this ID is the correct type..
+        /// </summary>
+        public static string UNT1029 {
+            get {
+                return ResourceManager.GetString("UNT1029", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value for property &apos;{0}&apos; doesn&apos;t appear to be a correctly formed Steam64 ID..
+        /// </summary>
+        public static string UNT1029_Invalid {
+            get {
+                return ResourceManager.GetString("UNT1029_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type {0} is unknown and may not be assignable to &apos;{1}&apos;..
         /// </summary>
         public static string UNT103 {
             get {
                 return ResourceManager.GetString("UNT103", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; expected a localization file to be present for this asset..
+        /// </summary>
+        public static string UNT1030_Property {
+            get {
+                return ResourceManager.GetString("UNT1030_Property", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Localization property &apos;{0}&apos; is required but a localization file doesn&apos;t exist for this asset..
+        /// </summary>
+        public static string UNT1030_RequiredLocal {
+            get {
+                return ResourceManager.GetString("UNT1030_RequiredLocal", resourceCulture);
             }
         }
         
@@ -673,6 +781,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; can only be expressed using the legacy object format using underscores..
+        /// </summary>
+        public static string UNT2004_LegacyFormatExpected {
+            get {
+                return ResourceManager.GetString("UNT2004_LegacyFormatExpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to List can not be converted to a value of type &apos;{0}&apos;. Property &apos;{1}&apos; expects a dictionary..
         /// </summary>
         public static string UNT2004_ListInsteadOfDictionary {
@@ -687,6 +804,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         public static string UNT2004_ListInsteadOfValue {
             get {
                 return ResourceManager.GetString("UNT2004_ListInsteadOfValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; can not be parsed because it relies on values in a file that doesn&apos;t exist (like a localization file)..
+        /// </summary>
+        public static string UNT2004_MissingFile {
+            get {
+                return ResourceManager.GetString("UNT2004_MissingFile", resourceCulture);
             }
         }
         
