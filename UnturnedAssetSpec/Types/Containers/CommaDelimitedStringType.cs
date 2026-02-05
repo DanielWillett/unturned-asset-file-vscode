@@ -345,112 +345,99 @@ public class CommaDelimitedStringType<TElementType>
 
     public bool TryParse(ref TypeParserArgs<EquatableArray<TElementType>> args, in FileEvaluationContext ctx, out Optional<EquatableArray<TElementType>> value)
     {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
+        if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? valueNode))
+        {
+            return false;
+        }
+
         value = Optional<EquatableArray<TElementType>>.Null;
         bool trimEntries = (_splitOptions & (StringSplitOptions)2) != 0;
 
-        switch (args.ValueNode)
+
+        bool allPassed = true;
+        ReadOnlySpan<char> valueSpan = valueNode.Value.AsSpan();
+
+        int maxElementCount = valueSpan.Count(',') + 1;
+        Span<Range> ranges = stackalloc Range[maxElementCount];
+
+        int segments = valueSpan.Split(ranges, ',', trimEntries, trimEntries, _splitOptions);
+        CheckCount(segments, ref args);
+
+        TElementType?[] array = new TElementType[segments];
+
+        ITypeParser<TElementType> parser = _subType.Parser;
+
+        FileRange valueNodeRange = valueNode.Range;
+        if (parser is TypeConverterParser<TElementType> { CanUseTypeConverterDirectly: true } typeConverterParser)
         {
-            // null (no value)
-            default:
-                args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
-                break;
+            ITypeConverter<TElementType> converter = typeConverterParser.TypeConverter;
+            args.CreateTypeConverterParseArgs(out TypeConverterParseArgs<TElementType> parseArgs, _subType);
+            for (int i = 0; i < segments; ++i)
+            {
+                Range range = ranges[i];
+                ReadOnlySpan<char> span = valueSpan[range];
 
-            // wrong type of value
-            case IDictionarySourceNode dictionaryNode:
-                args.DiagnosticSink?.UNT2004_DictionaryInsteadOfValue(ref args, dictionaryNode, this);
-                break;
+                (int offset, int length) = range.GetOffsetAndLength(valueSpan.Length);
 
-            case IListSourceNode listNode:
-                args.DiagnosticSink?.UNT2004_ListInsteadOfValue(ref args, listNode, this);
-                break;
+                parseArgs.ValueRange.Start.Character = valueNodeRange.Start.Character + offset;
+                parseArgs.ValueRange.End.Character = valueNodeRange.Start.Character + offset + length - 1;
+                parseArgs.TextAsString = segments == 1 && length == valueSpan.Length ? valueNode.Value : null;
 
-            case IValueSourceNode valueNode:
-                bool allPassed = true;
-                ReadOnlySpan<char> valueSpan = valueNode.Value.AsSpan();
+                if (converter.TryParse(span, ref parseArgs, out array[i]))
+                    continue;
 
-                int maxElementCount = valueSpan.Count(',') + 1;
-                Span<Range> ranges = stackalloc Range[maxElementCount];
+                allPassed = false;
+                if (parseArgs.DiagnosticSink == null)
+                    break;
+                if (parseArgs.ShouldIgnoreFailureDiagnostic)
+                    continue;
 
-                int segments = valueSpan.Split(ranges, ',', trimEntries, trimEntries, _splitOptions);
-                CheckCount(segments, ref args);
+                parseArgs.DiagnosticSink?.UNT2004_Generic(ref parseArgs, parseArgs.GetString(span), _subType);
+                args.ShouldIgnoreFailureDiagnostic = true;
+            }
+        }
+        else
+        {
+            AnySourceNodeProperties props = default;
+            props.Range = valueNodeRange;
+            props.Index = valueNode.Index;
+            props.ChildIndex = valueNode.ChildIndex;
+            props.Depth = valueNode.Depth;
+            int valueNodeFirstCharacterIndex = valueNode.FirstCharacterIndex;
+            int valueNodeLastCharacterIndex = valueNode.LastCharacterIndex;
+            for (int i = 0; i < segments; ++i)
+            {
+                Range range = ranges[i];
+                ReadOnlySpan<char> span = valueSpan[range];
 
-                TElementType?[] array = new TElementType[segments];
+                (int offset, int length) = range.GetOffsetAndLength(valueSpan.Length);
 
-                ITypeParser<TElementType> parser = _subType.Parser;
+                props.Range.Start.Character = valueNodeRange.Start.Character + offset;
+                props.Range.End.Character = valueNodeRange.Start.Character + offset + length - 1;
 
-                FileRange valueNodeRange = valueNode.Range;
-                if (parser is TypeConverterParser<TElementType> { CanUseTypeConverterDirectly: true } typeConverterParser)
+                props.FirstCharacterIndex = valueNodeFirstCharacterIndex + offset;
+                props.LastCharacterIndex = valueNodeLastCharacterIndex + offset + length - 1;
+                ValueNode fakeNode = ValueNode.Create(span.ToString(), false, Comment.None, in props);
+
+                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, fakeNode, args.ParentNode, _subType, PropertyResolutionContext.Unknown /* todo: ctx.PropertyContext */);
+
+                if (parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> optionalValue)
+                    && optionalValue.TryGetValueOrNull(out array[i]))
                 {
-                    ITypeConverter<TElementType> converter = typeConverterParser.TypeConverter;
-                    args.CreateTypeConverterParseArgs(out TypeConverterParseArgs<TElementType> parseArgs, _subType);
-                    for (int i = 0; i < segments; ++i)
-                    {
-                        Range range = ranges[i];
-                        ReadOnlySpan<char> span = valueSpan[range];
-
-                        (int offset, int length) = range.GetOffsetAndLength(valueSpan.Length);
-
-                        parseArgs.ValueRange.Start.Character = valueNodeRange.Start.Character + offset;
-                        parseArgs.ValueRange.End.Character = valueNodeRange.Start.Character + offset + length - 1;
-                        parseArgs.TextAsString = segments == 1 && length == valueSpan.Length ? valueNode.Value : null;
-
-                        if (converter.TryParse(span, ref parseArgs, out array[i]))
-                            continue;
-
-                        allPassed = false;
-                        if (parseArgs.DiagnosticSink == null)
-                            break;
-                        if (parseArgs.ShouldIgnoreFailureDiagnostic)
-                            continue;
-                        
-                        parseArgs.DiagnosticSink?.UNT2004_Generic(ref parseArgs, parseArgs.GetString(span), _subType);
-                        args.ShouldIgnoreFailureDiagnostic = true;
-                    }
-                }
-                else
-                {
-                    AnySourceNodeProperties props = default;
-                    props.Range = valueNodeRange;
-                    props.Index = valueNode.Index;
-                    props.ChildIndex = valueNode.ChildIndex;
-                    props.Depth = valueNode.Depth;
-                    int valueNodeFirstCharacterIndex = valueNode.FirstCharacterIndex;
-                    int valueNodeLastCharacterIndex = valueNode.LastCharacterIndex;
-                    for (int i = 0; i < segments; ++i)
-                    {
-                        Range range = ranges[i];
-                        ReadOnlySpan<char> span = valueSpan[range];
-
-                        (int offset, int length) = range.GetOffsetAndLength(valueSpan.Length);
-
-                        props.Range.Start.Character = valueNodeRange.Start.Character + offset;
-                        props.Range.End.Character = valueNodeRange.Start.Character + offset + length - 1;
-
-                        props.FirstCharacterIndex = valueNodeFirstCharacterIndex + offset;
-                        props.LastCharacterIndex = valueNodeLastCharacterIndex + offset + length - 1;
-                        ValueNode fakeNode = ValueNode.Create(span.ToString(), false, Comment.None, in props);
-
-                        args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, fakeNode, args.ParentNode, _subType, ctx.PropertyContext switch
-                        {
-                            PropertyResolutionContext.Modern => LegacyExpansionFilter.Modern,
-                            _ => LegacyExpansionFilter.Legacy
-                        });
-
-                        if (parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> optionalValue)
-                            && optionalValue.TryGetValueOrNull(out array[i]))
-                        {
-                            continue;
-                        }
-
-                        allPassed = false;
-                        args.ShouldIgnoreFailureDiagnostic |= parseArgs.ShouldIgnoreFailureDiagnostic;
-                    }
+                    continue;
                 }
 
-                return allPassed;
+                allPassed = false;
+                args.ShouldIgnoreFailureDiagnostic |= parseArgs.ShouldIgnoreFailureDiagnostic;
+            }
         }
 
-        return false;
+        return allPassed;
     }
 
     public override int GetHashCode() => HashCode.Combine(611860609, _subType, _minCount, _maxCount);

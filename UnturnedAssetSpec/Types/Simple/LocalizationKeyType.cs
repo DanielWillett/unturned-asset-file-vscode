@@ -56,6 +56,8 @@ public sealed class LocalizationKeyType : BaseType<string, LocalizationKeyType>,
     /// </summary>
     public static ITypeFactory Factory => Instance;
 
+    public override PropertySearchTrimmingBehavior TrimmingBehavior => PropertySearchTrimmingBehavior.CreatesOtherPropertiesInLinkedFiles;
+
     public override ITypeParser<string> Parser => this;
 
     public override string Id => TypeId;
@@ -95,9 +97,7 @@ public sealed class LocalizationKeyType : BaseType<string, LocalizationKeyType>,
                 return false;
             }
 
-            IValue? defaultValue = args.ParentNode is IDictionarySourceNode
-                ? args.Property.DefaultValue
-                : args.Property.IncludedDefaultValue ?? args.Property.DefaultValue;
+            IValue? defaultValue = args.Property.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode);
 
             if (defaultValue == null
                 || defaultValue.IsNull
@@ -114,6 +114,11 @@ public sealed class LocalizationKeyType : BaseType<string, LocalizationKeyType>,
         }
         else
         {
+            if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+            {
+                return rtn;
+            }
+
             if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? valueNode))
             {
                 value = Optional<string>.Null;

@@ -27,11 +27,9 @@ internal class UnknownProperty : PerPropertyCodeFix<UnknownProperty.UnknownPrope
     }
 
     public UnknownProperty(
-        IFilePropertyVirtualizer virtualizer,
-        IAssetSpecDatabase database,
-        InstallationEnvironment installEnv,
-        IWorkspaceEnvironment workspaceEnv)
-        : base(DatDiagnostics.UNT1025, virtualizer, database, installEnv, workspaceEnv)
+        IFileRelationalModelProvider modelProvider,
+        IParsingServices parsingServices)
+        : base(DatDiagnostics.UNT1025, modelProvider, parsingServices)
     {
 
     }
@@ -44,7 +42,7 @@ internal class UnknownProperty : PerPropertyCodeFix<UnknownProperty.UnknownPrope
         IType propertyType,
         DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
-        in SpecPropertyTypeParseContext parseContext)
+        in FileEvaluationContext ctx)
     {
         state = default;
         range = default;

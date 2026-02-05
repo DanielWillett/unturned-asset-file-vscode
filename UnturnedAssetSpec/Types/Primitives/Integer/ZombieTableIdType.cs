@@ -27,6 +27,11 @@ public sealed class ZombieTableIdType : PrimitiveType<byte, ZombieTableIdType>, 
     /// <inheritdoc />
     public bool TryParse(ref TypeParserArgs<byte> args, in FileEvaluationContext ctx, out Optional<byte> value)
     {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
         if (!TypeParsers.UInt8.TryParse(ref args, in ctx, out value))
             return false;
 

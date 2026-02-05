@@ -24,6 +24,11 @@ public interface IType : IPropertyType, IEquatable<IType?>
     string DisplayName { get; }
 
     /// <summary>
+    /// How this type may expand to other properties.
+    /// </summary>
+    PropertySearchTrimmingBehavior TrimmingBehavior { get; }
+
+    /// <summary>
     /// Calls <see cref="ITypeVisitor.Accept"/> on the <paramref name="visitor"/> for this type if it's strongly typed.
     /// </summary>
     /// <remarks>Used to create a generic context for a <see cref="IType{T}"/> implementation.</remarks>
@@ -34,11 +39,6 @@ public interface IType : IPropertyType, IEquatable<IType?>
     /// </summary>
     void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options);
 }
-
-/// <summary>
-/// Marker interface implemented by types that should still parse when a value is not defined.
-/// </summary>
-public interface IFlagType : IType;
 
 /// <summary>
 /// A factory that can create types from JSON information.

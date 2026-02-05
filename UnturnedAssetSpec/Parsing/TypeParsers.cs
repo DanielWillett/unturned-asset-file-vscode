@@ -1,8 +1,14 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
+#if NET5_0_OR_GREATER
+using System.Runtime.CompilerServices;
+#endif
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -164,6 +170,68 @@ public static class TypeParsers
         }
 
         valueNode = null;
+        return false;
+    }
+
+    internal static bool TryApplyMissingValueBehavior<T>(ref TypeParserArgs<T> args, in FileEvaluationContext ctx, out Optional<T> value, out bool returnValue)
+        where T : IEquatable<T>
+    {
+        DatProperty? property = args.Property;
+        if (property != null)
+        {
+            switch (args.MissingValueBehavior)
+            {
+                case TypeParserMissingValueBehavior.ErrorOnlyIfValueNotProvided:
+                    if (args.ValueNode != null)
+                    {
+                        break;
+                    }
+
+                    if (args.ParentNode is IPropertySourceNode)
+                    {
+                        break;
+                    }
+
+                    if (property.DefaultValue == null)
+                    {
+                        returnValue = false;
+                        value = Optional<T>.Null;
+                    }
+                    else
+                    {
+                        returnValue = property.DefaultValue.TryGetValueAs(in ctx, out value);
+                    }
+
+                    return true;
+
+                case TypeParserMissingValueBehavior.FallbackToDefaultValue:
+                    if (args.ValueNode != null)
+                    {
+                        break;
+                    }
+
+                    IValue? defaultValue = property.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode);
+
+                    if (defaultValue == null)
+                    {
+                        returnValue = false;
+                        value = Optional<T>.Null;
+                    }
+                    else
+                    {
+                        returnValue = defaultValue.TryGetValueAs(in ctx, out value);
+                    }
+
+                    return true;
+            }
+        }
+
+        returnValue = false;
+#if NET5_0_OR_GREATER
+        Unsafe.SkipInit(out value);
+#else
+        value = Optional<T>.Null;
+#endif
         return false;
     }
 

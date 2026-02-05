@@ -15,7 +15,7 @@
             "Description": "Globally unique identifier for this asset.",
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header",
-            "CanBeInMetadata": true
+            "AssetPosition": "MetadataOnlyIfExistsOtherwiseRoot"
         },
         {
             "Key": "Type",
@@ -28,7 +28,21 @@
             "Description": "Type of Asset to create.",
             "Required": true,
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html#header",
-            "CanBeInMetadata": true
+            "AssetPosition": "MetadataOnlyIfExistsOtherwiseAssetData"
+        },
+        {
+            "Key": "Metadata",
+            "Type": "Any",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html",
+            "Description": "Optional section for asset metadata, including the GUID and asset type.",
+            "AssetPosition": "Root"
+        },
+        {
+            "Key": "Asset",
+            "Type": "Any",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-definitions.html",
+            "Description": "Optional section for other asset properties.",
+            "AssetPosition": "Root"
         },
         {
             "Key": "ID",

@@ -15,41 +15,41 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 internal class FileEvaluationContextFactory
 {
     private readonly OpenedFileTracker _fileTracker;
+    private readonly IParsingServices _services;
     private readonly IAssetSpecDatabase _specDatabase;
     private readonly IWorkspaceEnvironment _workspaceEnvironment;
-    private readonly IFilePropertyVirtualizer _propertyVirtualizer;
     private readonly InstallationEnvironment _installationEnvironment;
 
     public FileEvaluationContextFactory(
         OpenedFileTracker fileTracker,
-        IAssetSpecDatabase specDatabase,
-        IWorkspaceEnvironment workspaceEnvironment,
-        InstallationEnvironment installationEnvironment,
-        IFilePropertyVirtualizer propertyVirtualizer)
+        IParsingServices services)
     {
         _fileTracker = fileTracker;
-        _specDatabase = specDatabase;
-        _workspaceEnvironment = workspaceEnvironment;
-        _installationEnvironment = installationEnvironment;
-        _propertyVirtualizer = propertyVirtualizer;
+        _services = services;
     }
 
-    public bool TryCreate(Position position, DocumentUri uri, [UnscopedRef] out FileEvaluationContext fileCtx, out SpecPropertyTypeParseContext ctx, out ISourceNode? node)
+    public bool TryCreate(Position position, DocumentUri uri, [UnscopedRef] out FileEvaluationContext ctx, out ISourceNode? node)
     {
-        return TryCreate(position, uri, null, out fileCtx, out ctx, out node);
+        return TryCreate(position, uri, null, out ctx, out node);
     }
     
-    public bool TryCreate(Position position, DocumentUri uri, IDiagnosticSink? diagnosticSink, [UnscopedRef] out FileEvaluationContext fileCtx, out SpecPropertyTypeParseContext ctx, out ISourceNode? node)
+    public bool TryCreate(Position position, DocumentUri uri, IDiagnosticSink? diagnosticSink, [UnscopedRef] out FileEvaluationContext ctx, out ISourceNode? node)
     {
         node = null;
         if (!_fileTracker.Files.TryGetValue(uri, out OpenedFile? file))
         {
             Unsafe.SkipInit(out ctx);
-            Unsafe.SkipInit(out fileCtx);
             return false;
         }
 
         ISourceFile sourceFile = file.SourceFile;
+
+        ctx = new FileEvaluationContext(
+            _services,
+            sourceFile);
+        return true;
+        // todo: remove this
+#if false
 
         AssetFileType fileType = AssetFileType.FromFile(sourceFile, _specDatabase);
 
@@ -58,23 +58,9 @@ internal class FileEvaluationContextFactory
 
         if (parentNode == null)
         {
-            fileCtx = new FileEvaluationContext(
-                null!,
-                null!,
-                sourceFile,
-                _workspaceEnvironment,
-                _installationEnvironment,
-                _specDatabase,
-                PropertyResolutionContext.Modern);
-            ctx = new SpecPropertyTypeParseContext(
-                in fileCtx,
-                PropertyBreadcrumbs.Root,
-                null)
-            {
-                Node = valueNode,
-                Parent = null,
-                BaseKey = parentNode?.Key
-            };
+            ctx = new FileEvaluationContext(
+                _services,
+                sourceFile);
             return false;
         }
 
@@ -93,7 +79,7 @@ internal class FileEvaluationContextFactory
             out PropertyResolutionContext context
         );
 
-        fileCtx = new FileEvaluationContext(
+        ctx = new FileEvaluationContext(
             property!,
             fileType.Information,
             sourceFile,
@@ -103,8 +89,10 @@ internal class FileEvaluationContextFactory
             context
         );
 
-        ctx = SpecPropertyTypeParseContext.FromFileEvaluationContext(in fileCtx, breadcrumbs, property, parentNode, valueNode, diagnosticSink);
+        ctx =
+ SpecPropertyTypeParseContext.FromFileEvaluationContext(in ctx, breadcrumbs, property, parentNode, valueNode, diagnosticSink);
         return property != null;
+#endif
     }
 
     public bool TryCreate(Position position, DocumentUri uri, out FileEvaluationContext ctx)
@@ -117,6 +105,12 @@ internal class FileEvaluationContextFactory
 
         ISourceFile sourceFile = file.SourceFile;
 
+        ctx = new FileEvaluationContext(
+            _services,
+            sourceFile);
+        return true;
+        // todo remove this
+#if false
         AssetFileType fileType = AssetFileType.FromFile(sourceFile, _specDatabase);
 
         ISourceNode? node = sourceFile.GetNodeFromPosition(position.ToFilePosition());
@@ -154,6 +148,7 @@ internal class FileEvaluationContextFactory
             context
         );
         return property != null;
+#endif
     }
 
     private static void GetRelationalNodes(ISourceNode? node, out IAnyValueSourceNode? valueNode, out IPropertySourceNode? propertyNode)

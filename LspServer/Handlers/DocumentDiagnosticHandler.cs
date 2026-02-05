@@ -1,4 +1,3 @@
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
@@ -17,29 +16,23 @@ namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
 {
     private readonly OpenedFileTracker _fileTracker;
-    private readonly IAssetSpecDatabase _specDatabase;
+    private readonly IParsingServices _parsingServices;
     private readonly ILogger<DocumentDiagnosticHandler> _logger;
-    private readonly IWorkspaceEnvironment _workspace;
-    private readonly IFilePropertyVirtualizer _virtualizer;
-    private readonly InstallationEnvironment _installationEnvironment;
+    private readonly IFileRelationalModelProvider _modelProvider;
     private readonly DiagnosticsManager _diagnosticsManager;
 
     public DocumentDiagnosticHandler(
         OpenedFileTracker fileTracker,
-        IAssetSpecDatabase specDatabase,
+        IParsingServices parsingServices,
         ILogger<DocumentDiagnosticHandler> logger,
-        IWorkspaceEnvironment workspace,
-        InstallationEnvironment installationEnvironment,
         DiagnosticsManager diagnosticsManager,
-        IFilePropertyVirtualizer virtualizer)
+        IFileRelationalModelProvider modelProvider)
     {
         _fileTracker = fileTracker;
-        _specDatabase = specDatabase;
+        _parsingServices = parsingServices;
         _logger = logger;
-        _workspace = workspace;
-        _installationEnvironment = installationEnvironment;
         _diagnosticsManager = diagnosticsManager;
-        _virtualizer = virtualizer;
+        _modelProvider = modelProvider;
     }
 
     /// <inheritdoc />
@@ -115,11 +108,10 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
 
         public readonly List<DatDiagnosticMessage> Diagnostics = new List<DatDiagnosticMessage>();
 
-        public DiagnosticsNodeVisitor(IAssetSpecDatabase database,
-            IFilePropertyVirtualizer virtualizer,
-            IWorkspaceEnvironment workspace,
-            InstallationEnvironment installEnvironment)
-            : base(virtualizer, database, installEnvironment, workspace)
+        public DiagnosticsNodeVisitor(
+            IFileRelationalModelProvider modelProvider,
+            IParsingServices parsingServices)
+            : base(modelProvider, parsingServices)
         {
         }
 
@@ -127,7 +119,7 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
         protected override void AcceptResolvedProperty(
             DatProperty property,
             IType propertyType,
-            in SpecPropertyTypeParseContext parseCtx,
+            in FileEvaluationContext ctx,
             IPropertySourceNode node,
             in PropertyBreadcrumbs breadcrumbs)
         {

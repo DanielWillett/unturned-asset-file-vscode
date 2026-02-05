@@ -50,6 +50,11 @@ public sealed class RegexStringType : PrimitiveType<string, RegexStringType>, IT
 
     public bool TryParse(ref TypeParserArgs<string> args, in FileEvaluationContext ctx, out Optional<string> value)
     {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
         if (!StringType.Instance.Parser.TryParse(ref args, in ctx, out value))
         {
             return false;

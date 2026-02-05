@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -9,7 +10,6 @@ using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -107,7 +107,7 @@ public static class DatPropertyExtensions
     /// <param name="keyFilter">The current object context (modern/legacy).</param>
     public static bool IsExcluded(this DatProperty property, in FileEvaluationContext ctx)
     {
-        return !ctx.SourceFile.TryGetProperty(property, in ctx, out _);
+        return !ctx.File.TryGetProperty(property, in ctx, out _);
     }
 
     /// <summary>
@@ -119,7 +119,7 @@ public static class DatPropertyExtensions
     /// <param name="keyFilter">The current object context (modern/legacy).</param>
     public static unsafe bool IsIncluded(this DatProperty property, bool requireValue, in FileEvaluationContext ctx)
     {
-        if (!ctx.SourceFile.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode))
+        if (!ctx.File.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode))
         {
             return false;
         }
@@ -129,8 +129,7 @@ public static class DatPropertyExtensions
             return true;
         }
         
-        if (!property.Type.TryEvaluateType(out IType? propertyType, in ctx)
-            || (propertyNode.Value == null && propertyType is not IFlagType))
+        if (!property.Type.TryEvaluateType(out IType? propertyType, in ctx))
         {
             return false;
         }
@@ -145,6 +144,7 @@ public static class DatPropertyExtensions
         v.Visited = false;
         v.DiagnosticSink = null;
         v.ReferencedPropertySink = null;
+        v.MissingValueBehavior = TypeParserMissingValueBehavior.ErrorIfValueOrPropertyNotProvided;
         fixed (FileEvaluationContext* evalCtxPtr = &ctx)
         {
             v.EvaluationContext = evalCtxPtr;
@@ -174,7 +174,6 @@ public static class DatPropertyExtensions
     /// <param name="property">The property to evaluate.</param>
     /// <param name="visitor">A visitor to invoke <see cref="IValueVisitor.Accept{TValue}"/> on.</param>
     /// <param name="ctx">Workspace context for the operation.</param>
-    /// <param name="keyFilter">The current object context (modern/legacy).</param>
     /// <param name="diagnosticSink">Object which will receive any parse diagnostics.</param>
     /// <param name="referencedPropertySink">Object which will receive any other referenced properties.</param>
     /// <returns>Whether or not the visitor was invoked.</returns>
@@ -185,7 +184,7 @@ public static class DatPropertyExtensions
         IDiagnosticSink? diagnosticSink = null,
         IReferencedPropertySink? referencedPropertySink = null) where TVisitor : IValueVisitor
     {
-        if (!ctx.SourceFile.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode))
+        if (!ctx.File.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode))
         {
             IValue? defaultValue = property.DefaultValue;
             return defaultValue != null && defaultValue.VisitValue(ref visitor, in ctx);
@@ -196,12 +195,6 @@ public static class DatPropertyExtensions
             return false;
         }
 
-        if (propertyNode.Value == null && propertyType is not IFlagType)
-        {
-            IValue? defaultValue = property.IncludedDefaultValue ?? property.DefaultValue;
-            return defaultValue != null && defaultValue.VisitValue(ref visitor, in ctx);
-        }
-
         VisitValueTypeVisitor<TVisitor> v;
         v.Property = property;
         v.ValueNode = propertyNode.Value;
@@ -209,6 +202,7 @@ public static class DatPropertyExtensions
         v.Visited = false;
         v.DiagnosticSink = diagnosticSink;
         v.ReferencedPropertySink = referencedPropertySink;
+        v.MissingValueBehavior = TypeParserMissingValueBehavior.FallbackToDefaultValue;
         fixed (FileEvaluationContext* evalCtxPtr = &ctx)
         fixed (TVisitor* visitorPtr = &visitor)
         {
@@ -230,6 +224,7 @@ public static class DatPropertyExtensions
         public IParentSourceNode ParentNode;
         public IDiagnosticSink? DiagnosticSink;
         public IReferencedPropertySink? ReferencedPropertySink;
+        public TypeParserMissingValueBehavior MissingValueBehavior;
         public bool Visited;
 
         public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
@@ -238,11 +233,12 @@ public static class DatPropertyExtensions
             {
                 DiagnosticSink = DiagnosticSink,
                 ReferencedPropertySink = ReferencedPropertySink,
-                KeyFilter = EvaluationContext->PropertyContext.ToKeyFilter(),
+                // todo: KeyFilter = EvaluationContext->PropertyContext.ToKeyFilter(),
                 Property = Property,
                 ValueNode = ValueNode,
                 ParentNode = ParentNode,
-                Type = type
+                Type = type,
+                MissingValueBehavior = MissingValueBehavior
             };
 
             if (type.Parser.TryParse(ref parseArgs, in Unsafe.AsRef<FileEvaluationContext>(EvaluationContext), out Optional<TValue> value))

@@ -16,6 +16,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <remarks>Implements <see cref="IPropertyType"/>.</remarks>
 public class TypeSwitch : SwitchValue<IType>, IPropertyType
 {
+    private IType? _concreteValue;
+
     /// <summary>
     /// The type used for <see cref="IType"/> values.
     /// </summary>
@@ -31,12 +33,19 @@ public class TypeSwitch : SwitchValue<IType>, IPropertyType
     /// <inheritdoc />
     public bool TryGetConcreteType([NotNullWhen(true)] out IType? type)
     {
+        if (_concreteValue != null)
+        {
+            type = _concreteValue;
+            return true;
+        }
+
         if (!TryGetConcreteValue(out Optional<IType> typeOptional) || !typeOptional.HasValue)
         {
             type = null;
             return false;
         }
 
+        _concreteValue = typeOptional.Value;
         type = typeOptional.Value;
         return true;
     }
@@ -44,6 +53,12 @@ public class TypeSwitch : SwitchValue<IType>, IPropertyType
     /// <inheritdoc />
     public bool TryEvaluateType([NotNullWhen(true)] out IType? type, in FileEvaluationContext ctx)
     {
+        if (_concreteValue != null)
+        {
+            type = _concreteValue;
+            return true;
+        }
+
         if (!TryEvaluateValue(out Optional<IType> typeOptional, in ctx) || !typeOptional.HasValue)
         {
             type = null;

@@ -12,7 +12,6 @@
             "Key": "Type",
             "Type": "SDG.Unturned.EObjectType, Assembly-CSharp",
             "Required": true,
-            "PreventOverride": true,
             "Description": "The type of object to create.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#object-assets",
             "Variable": "type"

@@ -898,6 +898,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Type can not be determined for property &apos;{0}&apos;..
+        /// </summary>
+        public static string UNT2005_Property {
+            get {
+                return ResourceManager.GetString("UNT2005_Property", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown asset bundle version, expected a value between {0} and {1}..
         /// </summary>
         public static string UNT2009 {

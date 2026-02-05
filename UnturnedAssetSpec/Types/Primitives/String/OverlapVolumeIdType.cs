@@ -27,6 +27,11 @@ public sealed class OverlapVolumeIdType : PrimitiveType<string, OverlapVolumeIdT
     /// <inheritdoc />
     public bool TryParse(ref TypeParserArgs<string> args, in FileEvaluationContext ctx, out Optional<string> value)
     {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
         if (!TypeParsers.String.TryParse(ref args, in ctx, out value))
             return false;
 

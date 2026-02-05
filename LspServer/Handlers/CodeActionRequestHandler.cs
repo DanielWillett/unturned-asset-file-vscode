@@ -17,25 +17,19 @@ namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
 internal class CodeActionRequestHandler : CodeActionHandlerBase
 {
     private readonly GlobalCodeFixes _codeFixes;
-    private readonly IFilePropertyVirtualizer _virtualizer;
-    private readonly IAssetSpecDatabase _database;
-    private readonly InstallationEnvironment _installEnv;
-    private readonly IWorkspaceEnvironment _workspaceEnv;
+    private readonly IFileRelationalModelProvider _modelProvider;
+    private readonly IParsingServices _parsingServices;
     private readonly OpenedFileTracker _fileTracker;
 
     public CodeActionRequestHandler(
         GlobalCodeFixes codeFixes,
-        IFilePropertyVirtualizer virtualizer,
-        IAssetSpecDatabase database,
-        InstallationEnvironment installEnv,
-        IWorkspaceEnvironment workspaceEnv,
+        IFileRelationalModelProvider modelProvider,
+        IParsingServices parsingServices,
         OpenedFileTracker fileTracker)
     {
         _codeFixes = codeFixes;
-        _virtualizer = virtualizer;
-        _database = database;
-        _installEnv = installEnv;
-        _workspaceEnv = workspaceEnv;
+        _modelProvider = modelProvider;
+        _parsingServices = parsingServices;
         _fileTracker = fileTracker;
     }
 
@@ -137,7 +131,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
             if (perPropertyFixes.Count > 0)
             {
                 InvokePerPropertyCodeFixesVisitor propertyVisitor = new InvokePerPropertyCodeFixesVisitor(
-                    _virtualizer, _database, _installEnv, _workspaceEnv,
+                    _modelProvider, _parsingServices,
                     perPropertyFixes, actions, listener, options, request, listener.File, inclusionFlags, range
                 )
                 {
@@ -233,10 +227,9 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
         private readonly CodeActionParams _request;
         private readonly IMutableWorkspaceFile _file;
 
-        public InvokePerPropertyCodeFixesVisitor(IFilePropertyVirtualizer virtualizer,
-            IAssetSpecDatabase database,
-            InstallationEnvironment installEnv,
-            IWorkspaceEnvironment workspaceEnv,
+        public InvokePerPropertyCodeFixesVisitor(
+            IFileRelationalModelProvider modelProvider,
+            IParsingServices parsingServices,
             List<IPerPropertyCodeFix> perPropertyFixes,
             List<CommandOrCodeAction> actions,
             FileUpdateListener listener,
@@ -245,7 +238,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
             IMutableWorkspaceFile file,
             PropertyInclusionFlags flags,
             FileRange? requestRange)
-            : base(virtualizer, database, installEnv, workspaceEnv, requestRange, flags)
+            : base(modelProvider, parsingServices, requestRange, flags)
         {
             _perPropertyFixes = perPropertyFixes;
             _actions = actions;
@@ -258,7 +251,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
         protected override void AcceptResolvedProperty(
             DatProperty property,
             IType propertyType,
-            in SpecPropertyTypeParseContext parseCtx,
+            in FileEvaluationContext ctx,
             IPropertySourceNode node,
             in PropertyBreadcrumbs breadcrumbs)
         {
@@ -271,7 +264,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
                 if (!codeFix.PassesTypeCheck(propertyType))
                     continue;
 
-                CodeFixInstance? instance = codeFix.TryApplyToProperty(node, propertyType, property, in breadcrumbs, in parseCtx);
+                CodeFixInstance? instance = codeFix.TryApplyToProperty(node, propertyType, property, in breadcrumbs, in ctx);
                 if (instance == null)
                     continue;
 

@@ -32,7 +32,7 @@ public interface ICrossedPropertyReference : IPropertyReferenceValue
     /// Attempts to create a new <see cref="FileEvaluationContext"/> for the cross-referenced file.
     /// Callers of this method must always call <see cref="DisposeContext"/> after they're done using it.
     /// </summary>
-    bool TryResolveReference(in FileEvaluationContext oldContext, [UnscopedRef] out FileEvaluationContext newContext);
+    bool TryResolveReference(in FileEvaluationContext oldContext, [UnscopedRef] out FileEvaluationContext newContext, [NotNullWhen(true)] out DatProperty? property);
 
     /// <summary>
     /// Disposes a context created from <see cref="TryResolveReference"/> after the caller is done with it.

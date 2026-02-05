@@ -11,6 +11,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 
+#if false
 internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
 {
     private static readonly Container<AssetProperty> Empty = new Container<AssetProperty>(Array.Empty<AssetProperty>());
@@ -95,3 +96,4 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
         return Task.FromResult(new Container<AssetProperty>(outputProperties));
     }
 }
+#endif

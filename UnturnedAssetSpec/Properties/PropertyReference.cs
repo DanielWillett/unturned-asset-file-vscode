@@ -360,7 +360,7 @@ public struct PropertyReference : IEquatable<PropertyReference>
         GuidOrId idVal = guidOrId.Value;
         if (target == null || target.IsRemoved || (idVal.IsId ? target.Id != idVal.Id || target.Category != idVal.Category : target.Guid != idVal.Guid))
         {
-            OneOrMore<DiscoveredDatFile> files = ctx.Environment.FindFile(idVal);
+            OneOrMore<DiscoveredDatFile> files = ctx.Services.Installation.FindFile(idVal);
             if (!files.IsSingle)
                 return false;
 

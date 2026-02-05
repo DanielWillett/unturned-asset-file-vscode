@@ -31,6 +31,11 @@ public sealed class ActionKeyType : PrimitiveType<string, ActionKeyType>, ITypeP
     /// <inheritdoc />
     public bool TryParse(ref TypeParserArgs<string> args, in FileEvaluationContext ctx, out Optional<string> value)
     {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
         if (!TypeParsers.String.TryParse(ref args, in ctx, out value))
             return false;
 
@@ -38,7 +43,7 @@ public sealed class ActionKeyType : PrimitiveType<string, ActionKeyType>, ITypeP
             return true;
 
         // ActionKeys usually implemented with ImmutableHashSet
-        IDictionary<string, ActionButton>? achIds = ctx.Information.ValidActionButtons;
+        IDictionary<string, ActionButton>? achIds = ctx.Services.Database.ValidActionButtons;
         if (achIds == null || !achIds.ContainsKey(value.Value))
         {
             args.DiagnosticSink?.UNT1014(ref args, value.Value);

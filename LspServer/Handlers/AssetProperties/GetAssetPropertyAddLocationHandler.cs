@@ -10,6 +10,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 
+#if false
 internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocationHandler
 {
     private static readonly GetAssetPropertyAddLocationResponse Invalid = new GetAssetPropertyAddLocationResponse
@@ -118,3 +119,4 @@ internal class GetAssetPropertyAddLocationHandler : IGetAssetPropertyAddLocation
         });
     }
 }
+#endif

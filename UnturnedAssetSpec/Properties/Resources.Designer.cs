@@ -880,7 +880,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Localizable Rich Text.
         /// </summary>
         internal static string Type_Name_LocalizableString_Rich {
             get {
@@ -948,6 +948,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_NPCAchievementId {
             get {
                 return ResourceManager.GetString("Type_Name_NPCAchievementId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Any Type.
+        /// </summary>
+        internal static string Type_Name_NullType {
+            get {
+                return ResourceManager.GetString("Type_Name_NullType", resourceCulture);
             }
         }
         

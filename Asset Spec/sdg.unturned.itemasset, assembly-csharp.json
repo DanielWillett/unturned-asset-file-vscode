@@ -35,7 +35,6 @@
             "Key": "Type",
             "Type": "SDG.Unturned.EItemType, Assembly-CSharp",
             "Required": true,
-            "PreventOverride": true,
             "Description": "The type of item to create.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#type-doc-data-eitemtype",
             "Variable": "type"

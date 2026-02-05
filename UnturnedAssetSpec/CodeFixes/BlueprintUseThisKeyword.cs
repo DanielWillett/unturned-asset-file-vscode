@@ -29,13 +29,11 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
     }
 
     public BlueprintUseThisKeyword(
-        IFilePropertyVirtualizer virtualizer,
-        IAssetSpecDatabase database,
-        InstallationEnvironment installEnv,
-        IWorkspaceEnvironment workspaceEnv)
-        : base(DatDiagnostics.UNT101, virtualizer, database, installEnv, workspaceEnv)
+        IFileRelationalModelProvider modelProvider,
+        IParsingServices parsingServices)
+        : base(DatDiagnostics.UNT101, modelProvider, parsingServices)
     {
-        database.OnInitialize((database, _) =>
+        parsingServices.Database.OnInitialize((database, _) =>
         {
             //AssetFileType assetFileType =
             //    AssetFileType.FromType(
@@ -73,7 +71,7 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
         IType propertyType,
         DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
-        in SpecPropertyTypeParseContext parseContext)
+        in FileEvaluationContext ctx)
     {
         state = default;
         range = default;

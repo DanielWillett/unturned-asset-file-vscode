@@ -29,6 +29,11 @@ public sealed class NPCAchievementIdType : PrimitiveType<string, NPCAchievementI
     /// <inheritdoc />
     public bool TryParse(ref TypeParserArgs<string> args, in FileEvaluationContext ctx, out Optional<string> value)
     {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
         if (!TypeParsers.String.TryParse(ref args, in ctx, out value))
             return false;
 
@@ -36,7 +41,7 @@ public sealed class NPCAchievementIdType : PrimitiveType<string, NPCAchievementI
             return true;
 
         // NPCAchievementIds usually implemented with ImmutableHashSet
-        ICollection<string>? achIds = ctx.Information.NPCAchievementIds;
+        ICollection<string>? achIds = ctx.Services.Database.NPCAchievementIds;
         if (achIds == null || !achIds.Contains(value.Value))
         {
             args.DiagnosticSink?.UNT1013(ref args, value.Value);

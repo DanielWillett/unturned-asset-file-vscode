@@ -161,6 +161,11 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
     /// <inheritdoc />
     public bool TryParse(ref TypeParserArgs<int> args, in FileEvaluationContext ctx, out Optional<int> value)
     {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
         if (!TypeParsers.Int32.TryParse(ref args, in ctx, out value))
         {
             return false;
@@ -215,7 +220,7 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
         {
             SkillReferenceVisitor v;
             v.Value = SkillReference.None;
-            v.Information = ctx.Information;
+            v.Information = ctx.Services.Database;
             v.Success = false;
 
             if (!_skillValue.VisitValue(ref v, in ctx) || !v.Success)

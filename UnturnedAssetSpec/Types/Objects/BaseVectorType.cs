@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -24,6 +25,10 @@ public abstract class BaseVectorType<TVector, TSelf> :
     public VectorTypeOptions Options { get; }
 
     public override ITypeParser<TVector> Parser => this;
+
+    public override PropertySearchTrimmingBehavior TrimmingBehavior => (Options & VectorTypeOptions.Legacy) != 0
+        ? PropertySearchTrimmingBehavior.CreatesOtherPropertiesInSameFileAtSameLevel
+        : PropertySearchTrimmingBehavior.ExactPropertyOnly;
 
     protected BaseVectorType(VectorTypeOptions options)
     {
@@ -61,7 +66,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
         bool sendNullMsg = true;
         switch (args.ValueNode)
         {
-            case null:
+            default:
                 if ((Options & VectorTypeOptions.Legacy) != 0
                     // get parent dictionary
                     && (args.ParentNode as IDictionarySourceNode ?? (args.ParentNode as IPropertySourceNode)?.Parent as IDictionarySourceNode) is { } dictionary
@@ -84,20 +89,32 @@ public abstract class BaseVectorType<TVector, TSelf> :
                     }
                 }
 
-                if (sendNullMsg)
+                if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
                 {
-                    if ((Options & VectorTypeOptions.String) != 0)
+                    if (sendNullMsg)
                     {
-                        args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                        if ((Options & VectorTypeOptions.String) != 0)
+                        {
+                            args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                        }
+                        else if ((Options & VectorTypeOptions.Object) != 0)
+                        {
+                            args.DiagnosticSink?.UNT2004_NoDictionary(ref args, args.ParentNode);
+                        }
+                        else
+                        {
+                            args.DiagnosticSink?.UNT2004_Generic(ref args, "<no value>", args.Type);
+                        }
                     }
-                    else if ((Options & VectorTypeOptions.Object) != 0)
+                }
+                else
+                {
+                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                     {
-                        args.DiagnosticSink?.UNT2004_NoDictionary(ref args, args.ParentNode);
+                        return defValue.TryGetValueAs(in ctx, out value);
                     }
-                    else
-                    {
-                        args.DiagnosticSink?.UNT2004_Generic(ref args, "<no value>", args.Type);
-                    }
+
+                    return false;
                 }
 
                 break;
@@ -113,7 +130,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
                 }
                 else
                 {
-                    goto case null;
+                    goto default;
                 }
                 break;
 
@@ -128,7 +145,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
 
                     if ((Options & VectorTypeOptions.Legacy) != 0)
                     {
-                        goto case null;
+                        goto default;
                     }
 
                     break;
@@ -143,7 +160,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
                         args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
                     }
                     if ((Options & VectorTypeOptions.Legacy) != 0)
-                        goto case null;
+                        goto default;
 
                     return false;
                 }
@@ -162,7 +179,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
 
                     if ((Options & VectorTypeOptions.Legacy) != 0)
                     {
-                        goto case null;
+                        goto default;
                     }
 
                     break;

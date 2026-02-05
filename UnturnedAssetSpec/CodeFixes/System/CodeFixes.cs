@@ -1,6 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -18,10 +17,8 @@ public sealed class GlobalCodeFixes
     public IReadOnlyList<ICodeFix> All { get; }
 
     public GlobalCodeFixes(
-        IFilePropertyVirtualizer virtualizer,
-        IAssetSpecDatabase database,
-        InstallationEnvironment installEnv,
-        IWorkspaceEnvironment workspaceEnv)
+        IFileRelationalModelProvider modelProvider,
+        IParsingServices parsingServices)
     {
         // _virtualizer = virtualizer;
         // _database = database;
@@ -30,9 +27,9 @@ public sealed class GlobalCodeFixes
 
         AllArray =
         [
-            new BlueprintUseThisKeyword(virtualizer, database, installEnv, workspaceEnv),
-            new GenerateNewGuid(virtualizer, database, installEnv, workspaceEnv),
-            new UnknownProperty(virtualizer, database, installEnv, workspaceEnv),
+            new BlueprintUseThisKeyword(modelProvider, parsingServices),
+            new GenerateNewGuid(modelProvider, parsingServices),
+            new UnknownProperty(modelProvider, parsingServices)
         ];
 
         for (int i = 0; i < AllArray.Length; ++i)

@@ -91,7 +91,7 @@ public class InstallationEnvironment : IDisposable
     {
         lock (_fileSync)
         {
-            if (_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile> files))
+            if (_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile>? files))
             {
                 files.ForEach(action);
             }
@@ -113,7 +113,7 @@ public class InstallationEnvironment : IDisposable
     {
         lock (_fileSync)
         {
-            if (_bladeIndex.TryGetValue(bladeId, out List<DiscoveredDatFile> files))
+            if (_bladeIndex.TryGetValue(bladeId, out List<DiscoveredDatFile>? files))
             {
                 files.ForEach(action);
             }
@@ -533,7 +533,7 @@ public class InstallationEnvironment : IDisposable
             if (caliber == 0)
                 continue;
 
-            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile> f))
+            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile>? f))
             {
                 continue;
             }
@@ -573,7 +573,7 @@ public class InstallationEnvironment : IDisposable
                 continue;
             }
 
-            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile> f))
+            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile>? f))
             {
                 _caliberIndex.Add(caliber, new List<DiscoveredDatFile>(8) { file });
                 continue;
@@ -587,7 +587,7 @@ public class InstallationEnvironment : IDisposable
             if (blade == 0)
                 continue;
 
-            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile> f))
+            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile>? f))
             {
                 continue;
             }
@@ -625,7 +625,7 @@ public class InstallationEnvironment : IDisposable
                 continue;
             }
 
-            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile> f))
+            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile>? f))
             {
                 _bladeIndex.Add(blade, new List<DiscoveredDatFile>(4) { file });
                 continue;
@@ -694,7 +694,7 @@ public class InstallationEnvironment : IDisposable
             if (caliber == 0)
                 continue;
 
-            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile> f))
+            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile>? f))
             {
                 continue;
             }
@@ -712,7 +712,7 @@ public class InstallationEnvironment : IDisposable
             if (blade == 0)
                 continue;
 
-            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile> f))
+            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile>? f))
             {
                 continue;
             }
@@ -774,7 +774,7 @@ public class InstallationEnvironment : IDisposable
             if (caliber == 0)
                 continue;
 
-            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile> f))
+            if (!_caliberIndex.TryGetValue(caliber, out List<DiscoveredDatFile>? f))
             {
                 _caliberIndex.Add(caliber, new List<DiscoveredDatFile>(8) { file });
                 continue;
@@ -789,7 +789,7 @@ public class InstallationEnvironment : IDisposable
             if (blade == 0)
                 continue;
 
-            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile> f))
+            if (!_bladeIndex.TryGetValue(blade, out List<DiscoveredDatFile>? f))
             {
                 _bladeIndex.Add(blade, new List<DiscoveredDatFile>(8) { file });
                 continue;
@@ -993,7 +993,7 @@ public class InstallationEnvironment : IDisposable
             for (int i = discoveredFiles.Count - 1; i >= 0; i--)
             {
                 ReadOnlySpan<char> existingAsset = discoveredFiles[i].AsSpan();
-                if (existingAsset[existingAsset.Length - 2] is not 'e' and not 'E' // .asset
+                if (existingAsset[^2] is not 'e' and not 'E' // .asset
                     || !existingAsset.StartsWith(dirPath, StringComparison.OrdinalIgnoreCase))
                     continue;
 
@@ -1006,7 +1006,7 @@ public class InstallationEnvironment : IDisposable
                 }
 
                 if (i != discoveredFiles.Count - 1)
-                    discoveredFiles[i] = discoveredFiles[discoveredFiles.Count - 1];
+                    discoveredFiles[i] = discoveredFiles[^1];
                 discoveredFiles.RemoveAt(discoveredFiles.Count - 1);
             }
 

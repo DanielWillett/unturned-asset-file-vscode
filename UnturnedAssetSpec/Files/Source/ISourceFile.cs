@@ -21,9 +21,14 @@ public interface ISourceFile : IDictionarySourceNode, IAdditionalPropertyProvide
     object TreeSync { get; }
 
     /// <summary>
+    /// A value that's incremented every time this <see cref="ISourceFile"/> instance is updated.
+    /// </summary>
+    int FileVersion { get; internal set; }
+
+    /// <summary>
     /// List of properties at the root level.
     /// </summary>
-    ImmutableArray<IPropertySourceNode> Properties { get; }
+    ImmutableArray <IPropertySourceNode> Properties { get; }
 
     /// <summary>
     /// The fully resolved type of the asset, if provided. This will never be a type alias.

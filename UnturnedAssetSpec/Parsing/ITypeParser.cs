@@ -5,6 +5,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -73,7 +74,12 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
     /// <summary>
     /// The filter currently active based on the key used.
     /// </summary>
-    public LegacyExpansionFilter KeyFilter;
+    public PropertyResolutionContext KeyFilter;
+
+    /// <summary>
+    /// The behavior parsers should follow when a value is not provided but one is expected.
+    /// </summary>
+    public TypeParserMissingValueBehavior MissingValueBehavior;
 
     /// <summary>
     /// The property being read for.
@@ -97,7 +103,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         IAnyValueSourceNode? valueNode,
         IParentSourceNode parentNode,
         IType<TElementType> type,
-        LegacyExpansionFilter filter)
+        PropertyResolutionContext filter)
         where TElementType : IEquatable<TElementType>
     {
         args.ValueNode = valueNode;
@@ -108,6 +114,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         args.ReferencedPropertySink = ReferencedPropertySink;
         args.KeyFilter = filter;
         args.Property = Property;
+        args.MissingValueBehavior = MissingValueBehavior;
     }
 
     /// <summary>
@@ -177,4 +184,28 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         ShouldIgnoreFailureDiagnostic = true;
         return ValueNode?.Range ?? ParentNode.Range;
     }
+}
+
+/// <summary>
+/// Defines how <see cref="ITypeParser{T}"/> implementations should behave when a value or property node is missing.
+/// </summary>
+public enum TypeParserMissingValueBehavior
+{
+    /// <summary>
+    /// Errors if the property or it's value is missing.
+    /// </summary>
+    ErrorIfValueOrPropertyNotProvided,
+
+    /// <summary>
+    /// Errors only if the value is missing, not if the property is missing.
+    /// <para>
+    /// If the property is missing, the <see cref="DatProperty.DefaultValue"/> will be returned instead.
+    /// </para>
+    /// </summary>
+    ErrorOnlyIfValueNotProvided,
+
+    /// <summary>
+    /// The <see cref="DatProperty.IncludedDefaultValue"/> or <see cref="DatProperty.DefaultValue"/> will be returned if the value or property are missing.
+    /// </summary>
+    FallbackToDefaultValue
 }

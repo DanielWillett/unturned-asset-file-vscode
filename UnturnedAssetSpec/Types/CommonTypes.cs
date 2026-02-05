@@ -98,6 +98,7 @@ public static class CommonTypes
         knownTypes[Steam64IdType.TypeId]                = () => Steam64IdType.Factory;
         knownTypes["Url"]                               = () => StringType.Instance;    // todo
         knownTypes["Path"]                              = () => StringType.Instance;    // todo
+        knownTypes[NullType.TypeId]                     = () => NullType.Instance;
 
         TypeFactories = knownTypes.ToImmutable();
     }

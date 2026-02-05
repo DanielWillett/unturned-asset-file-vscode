@@ -10,7 +10,7 @@ In the mean-time, a 'lite' version of the extension is available for download wh
 ## Technology
 * C#/.NET
 * [OmniSharp Language Server](https://github.com/OmniSharp/csharp-language-server-protocol)
-* TypeScript (vscode)
+* TypeScript ([vscode](https://www.npmjs.com/package/@types/vscode))
 * [TextMate Grammars](https://github.com/DanielWillett/unturned-asset-file-vscode/blob/master/unturned-dat/syntaxes/unturned-dat.tmLanguage.json)
 * Complex type and value system using generics for performance.
 * File parse trees.
@@ -20,7 +20,7 @@ In the mean-time, a 'lite' version of the extension is available for download wh
   * [Expressions](https://github.com/DanielWillett/unturned-asset-file-vscode/tree/master/UnturnedAssetSpec/Values/Expressions)
   * [Property References](https://github.com/DanielWillett/unturned-asset-file-vscode/tree/master/UnturnedAssetSpec/Values/PropertyRefs)
   * [Metadata References](https://github.com/DanielWillett/unturned-asset-file-vscode/tree/master/UnturnedAssetSpec/Values/DataRefs)
-* The visitor pattern... a lot.
+* [docfx](https://dotnet.github.io/docfx/index.html)
 
 ## Browse the Code
 
@@ -214,7 +214,7 @@ Code style should follow the existing style in the repo.
 * Don't prefix enums with 'E'.
 * Brackets on new line.
 * No implicit typing (var, new(), etc).
-* Prefer collection initialization [ ], include spacing between brackets and content (`[ 1, 2, 3 ]`).
+* Prefer collection initialization `[ ]`, include spacing between brackets and content (`[ 1, 2, 3 ]`).
 * Don't overcomment, write self-documenting code.
 * All new public members should have XML documenation in `UnturnedAssetSpec`. Use `<see langword="xyz"/>` for keywords.
 * Use `System.Collections.Immutable` for public collections.

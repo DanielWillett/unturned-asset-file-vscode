@@ -93,9 +93,14 @@ internal class SkillType : BaseType<SkillReference, SkillType>, ITypeParser<Skil
     /// <inheritdoc />
     public bool TryParse(ref TypeParserArgs<SkillReference> args, in FileEvaluationContext ctx, out Optional<SkillReference> value)
     {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
         value = Optional<SkillReference>.Null;
 
-        args.CreateSubTypeParserArgs(out TypeParserArgs<string> stringParseArgs, args.ValueNode, args.ParentNode, StringType.Instance, LegacyExpansionFilter.Either);
+        args.CreateSubTypeParserArgs(out TypeParserArgs<string> stringParseArgs, args.ValueNode, args.ParentNode, StringType.Instance, PropertyResolutionContext.Unknown);
         
         if (!TypeParsers.String.TryParse(ref stringParseArgs, in ctx, out Optional<string> valueAsString) || string.IsNullOrEmpty(valueAsString.Value))
         {
@@ -104,11 +109,11 @@ internal class SkillType : BaseType<SkillReference, SkillType>, ITypeParser<Skil
 
         if (Kind == SkillKind.BackwardsCompatibleBlueprintSkill)
         {
-            if (ctx.Information.BlueprintSkills is not { Count: > 0 })
+            if (ctx.Services.Database.BlueprintSkills is not { Count: > 0 })
             {
                 args.DiagnosticSink?.UNT2005(ref args, BlueprintSkillEnumType);
             }
-            else if (SkillReference.TryParseFromBlueprintSkill(valueAsString.Value, ctx.Information, out SkillReference blueprintEnumValue))
+            else if (SkillReference.TryParseFromBlueprintSkill(valueAsString.Value, ctx.Services.Database, out SkillReference blueprintEnumValue))
             {
                 value = blueprintEnumValue;
                 return true;

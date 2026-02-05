@@ -8,6 +8,7 @@ using System;
 using System.Collections.Immutable;
 using System.Text.Json;
 using System.Threading;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -152,8 +153,20 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
 
         switch (args.ValueNode)
         {
-            case null:
-                args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+            default:
+                if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
+                {
+                    args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                }
+                else
+                {
+                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
+                    {
+                        return defValue.TryGetValueAs(in ctx, out value);
+                    }
+
+                    return false;
+                }
                 break;
 
             case IListSourceNode l:
@@ -199,7 +212,7 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
                     // Parse GUID dictionary
                     args.ReferencedPropertySink?.AcceptReferencedProperty(guidNode);
 
-                    args.CreateSubTypeParserArgs(out TypeParserArgs<Guid> guidArgs, guidNode.Value, guidNode, GuidType.Instance, LegacyExpansionFilter.Modern);
+                    args.CreateSubTypeParserArgs(out TypeParserArgs<Guid> guidArgs, guidNode.Value, guidNode, GuidType.Instance, PropertyResolutionContext.Modern);
                     if (!TypeParsers.Guid.TryParse(ref guidArgs, in ctx, out Optional<Guid> guid))
                     {
                         return false;
@@ -224,7 +237,7 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
                         // Parse Type + ID dictionary
                         args.ReferencedPropertySink?.AcceptReferencedProperty(idNode!);
 
-                        args.CreateSubTypeParserArgs(out TypeParserArgs<string> guidArgs, typeNode!.Value, typeNode, StringType.Instance, LegacyExpansionFilter.Modern);
+                        args.CreateSubTypeParserArgs(out TypeParserArgs<string> guidArgs, typeNode!.Value, typeNode, StringType.Instance, PropertyResolutionContext.Modern);
                         if (!TypeParsers.String.TryParse(ref guidArgs, in ctx, out Optional<string> typeString))
                         {
                             return false;
@@ -236,7 +249,7 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
                             categoryIndex = -1;
                         }
 
-                        args.CreateSubTypeParserArgs(out TypeParserArgs<ushort> ushortArgs, idNode!.Value, idNode, UInt16Type.Instance, LegacyExpansionFilter.Modern);
+                        args.CreateSubTypeParserArgs(out TypeParserArgs<ushort> ushortArgs, idNode!.Value, idNode, UInt16Type.Instance, PropertyResolutionContext.Modern);
                         if (!TypeParsers.UInt16.TryParse(ref ushortArgs, in ctx, out Optional<ushort> id) || categoryIndex < 0 || !id.HasValue)
                         {
                             return false;

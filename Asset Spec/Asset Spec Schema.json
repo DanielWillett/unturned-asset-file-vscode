@@ -1745,6 +1745,10 @@
                     "title": "A path to a Unity component or GameObject."
                 },
                 {
+                    "const": "Any",
+                    "title": "A property that can have any kind of value. Not validated at all."
+                },
+                {
                     "$ref": "#/$defs/QualifiedType"
                 }
             ]
@@ -1989,10 +1993,43 @@
                     "$ref": "#/$defs/BooleanValueAllowConditionals",
                     "description": "If this property is required."
                 },
-                "CanBeInMetadata":
+                "AssetPosition":
                 {
-                    "type": [ "boolean", "null" ],
-                    "description": "If this property can be read from the Metadata section."
+                    "anyOf":
+                    [
+                        {
+                            "const": "AssetData",
+                            "description": "Property must appear in the 'Asset' section. If there isn't an 'Asset' section, it must be at the root level."
+                        },
+                        {
+                            "const": "MetadataOnlyIfExistsOtherwiseRoot",
+                            "description": "If the 'Metadata' section is present, this property can only be read from it. If not it must be at the root level."
+                        },
+                        {
+                            "const": "MetadataOnlyIfExistsOtherwiseAssetData",
+                            "description": "If the 'Metadata' section is present, this property can only be read from it. If not it must be in the 'Asset' section if it exists, otherwise at the root level."
+                        },
+                        {
+                            "const": "MetadataOrAssetData",
+                            "description": "Prioritizes reading the property from the 'Metadata' section, but if it's not present it will be read from the 'Asset' section instead. If the 'Asset' section is also not present it'll be read at the root level."
+                        },
+                        {
+                            "const": "Root",
+                            "description": "The property can only exist at the root level, even if an 'Asset' section is present."
+                        },
+                        {
+                            "const": "Metadata",
+                            "description": "The property can only exist in the 'Metadata' section."
+                        },
+                        {
+                            "const": "Asset",
+                            "description": "The property can only exist in the 'Asset' section."
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "The expected location of this property when it's in an asset."
                 },
                 "DefaultValue":
                 {

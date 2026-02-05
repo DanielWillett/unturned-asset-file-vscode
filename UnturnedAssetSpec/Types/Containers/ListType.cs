@@ -288,6 +288,14 @@ public class ListType<TCountType, TElementType>
     public override string DisplayName { get; }
 
     public override ITypeParser<EquatableArray<TElementType>> Parser => this;
+    public override PropertySearchTrimmingBehavior TrimmingBehavior
+    {
+        get
+        {
+            PropertySearchTrimmingBehavior behavior = (_args.Mode & ListMode.Legacy) != 0 ? PropertySearchTrimmingBehavior.CreatesSiblingPropertiesInSameFile : PropertySearchTrimmingBehavior.ExactPropertyOnly;
+            return (PropertySearchTrimmingBehavior)Math.Max((int)behavior, (int)_subType.TrimmingBehavior);
+        }
+    }
 
     /// <inheritdoc />
     public OneOrMore<IType> ReferencedTypes
@@ -472,8 +480,8 @@ public class ListType<TCountType, TElementType>
     public bool TryParse(ref TypeParserArgs<EquatableArray<TElementType>> args, in FileEvaluationContext ctx, out Optional<EquatableArray<TElementType>> value)
     {
         value = Optional<EquatableArray<TElementType>>.Null;
-        bool legacy = (_args.Mode & ListMode.Legacy) != 0 && args.KeyFilter != LegacyExpansionFilter.Modern;
-        bool modern = (_args.Mode & ListMode.Modern) != 0 && args.KeyFilter != LegacyExpansionFilter.Legacy;
+        bool legacy = (_args.Mode & ListMode.Legacy) != 0 && args.KeyFilter != PropertyResolutionContext.Modern;
+        bool modern = (_args.Mode & ListMode.Modern) != 0 && args.KeyFilter != PropertyResolutionContext.Legacy;
         if (!modern && !legacy) modern = true;
 
         TElementType?[] array;
@@ -493,7 +501,7 @@ public class ListType<TCountType, TElementType>
                 }
                 else
                 {
-                    singlePropertyName = ctx.Self.Key;
+                    singlePropertyName = args.Property?.Key ?? string.Empty;
                 }
 
                 // trim 's' from end by default
@@ -508,7 +516,7 @@ public class ListType<TCountType, TElementType>
             {
                 args.ReferencedPropertySink?.AcceptReferencedProperty(singularProperty);
 
-                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, singularProperty.Value, args.ParentNode, _subType, LegacyExpansionFilter.Modern);
+                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, singularProperty.Value, args.ParentNode, _subType, PropertyResolutionContext.Modern);
 
                 if (!_subType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> element))
                 {
@@ -535,10 +543,22 @@ public class ListType<TCountType, TElementType>
         {
             // null (no value)
             default:
-                if (!modern)
-                    args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
+                {
+                    if (!modern)
+                        args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                    else
+                        args.DiagnosticSink?.UNT2004_NoList(ref args, args.ParentNode);
+                }
                 else
-                    args.DiagnosticSink?.UNT2004_NoList(ref args, args.ParentNode);
+                {
+                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
+                    {
+                        return defValue.TryGetValueAs(in ctx, out value);
+                    }
+
+                    return false;
+                }
 
                 break;
 
@@ -574,7 +594,7 @@ public class ListType<TCountType, TElementType>
                     if (node is not IAnyValueSourceNode v)
                         continue;
 
-                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, v, listNode, _subType, LegacyExpansionFilter.Modern);
+                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, v, listNode, _subType, PropertyResolutionContext.Modern);
 
                     if (!_subType.Parser.TryParse(ref elementParseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
                     {
@@ -599,8 +619,8 @@ public class ListType<TCountType, TElementType>
                 return !allFailed;
 
             case IValueSourceNode valueNode:
-                bool couldBeModernSingle = modern && (_args.Mode & ListMode.ModernSingle) == ListMode.ModernSingle && args.KeyFilter != LegacyExpansionFilter.Legacy;
-                bool couldBeLegacyCount = legacy && (_args.Mode & ListMode.LegacyList) == ListMode.LegacyList && args.KeyFilter != LegacyExpansionFilter.Modern;
+                bool couldBeModernSingle = modern && (_args.Mode & ListMode.ModernSingle) == ListMode.ModernSingle && args.KeyFilter != PropertyResolutionContext.Legacy;
+                bool couldBeLegacyCount = legacy && (_args.Mode & ListMode.LegacyList) == ListMode.LegacyList && args.KeyFilter != PropertyResolutionContext.Modern;
                 if (!couldBeLegacyCount && !couldBeModernSingle)
                 {
                     args.DiagnosticSink?.UNT2004_ValueInsteadOfList(ref args, valueNode, this);
@@ -645,7 +665,7 @@ public class ListType<TCountType, TElementType>
                             }
                             else
                             {
-                                singularPropertyName = ctx.Self.Key;
+                                singularPropertyName = args.Property?.Key ?? string.Empty;
                             }
 
                             // trim 's' from end by default
@@ -654,10 +674,10 @@ public class ListType<TCountType, TElementType>
                                 singularPropertyName = singularPropertyName[..^1];
                             }
                         }
-                        else if (ctx.CurrentObject != null)
-                        {
-                            singularPropertyName = ctx.CurrentObject.BaseKey + "_" + singularPropertyName;
-                        }
+                        // todo: else if (ctx.CurrentObject != null)
+                        // todo: {
+                        // todo:     singularPropertyName = ctx.CurrentObject.BaseKey + "_" + singularPropertyName;
+                        // todo: }
 
                         IDictionarySourceNode? dictionaryNode = _args.ElementContext switch
                         {
@@ -696,7 +716,7 @@ public class ListType<TCountType, TElementType>
                             {
                                 wasIncluded = true;
                                 args.ReferencedPropertySink?.AcceptReferencedProperty(property);
-                                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, property.Value, property, _subType, LegacyExpansionFilter.Modern);
+                                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, property.Value, property, _subType, PropertyResolutionContext.Modern);
 
                                 if (!_subType.Parser.TryParse(ref elementParseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
                                 {
@@ -752,7 +772,7 @@ public class ListType<TCountType, TElementType>
 
                 if (couldBeModernSingle)
                 {
-                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, args.ValueNode, args.ParentNode, _subType, LegacyExpansionFilter.Modern);
+                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, args.ValueNode, args.ParentNode, _subType, PropertyResolutionContext.Modern);
 
                     if (!_subType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> element))
                     {
@@ -834,6 +854,10 @@ public class ListType<TCountType, TElementType>
 
     private string CreateLegacyKey(string baseKey, int i)
     {
+        if (string.IsNullOrEmpty(baseKey))
+        {
+            return i.ToString(CultureInfo.InvariantCulture);
+        }
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
         int l = baseKey.Length + StringHelper.CountDigits(i);
         CreateLegacyKeyState state;

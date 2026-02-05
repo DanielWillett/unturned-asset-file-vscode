@@ -12,7 +12,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 
 internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewGuidState>
 {
-    private readonly InstallationEnvironment _installEnv;
+    private readonly IParsingServices _parsingServices;
 
     internal struct GenerateNewGuidState
     {
@@ -28,14 +28,12 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
     }
 
     public GenerateNewGuid(
-        IFilePropertyVirtualizer virtualizer,
-        IAssetSpecDatabase database,
-        InstallationEnvironment installEnv,
-        IWorkspaceEnvironment workspaceEnv)
-        : base(DatDiagnostics.UNT107, virtualizer, database, installEnv, workspaceEnv)
+        IFileRelationalModelProvider modelProvider,
+        IParsingServices parsingServices)
+        : base(DatDiagnostics.UNT107, modelProvider, parsingServices)
     {
-        _installEnv = installEnv;
-        database.OnInitialize((_, _) =>
+        _parsingServices = parsingServices;
+        parsingServices.Database.OnInitialize((_, _) =>
         {
             ValidTypes = [ GuidType.Instance ];
             return Task.CompletedTask;
@@ -50,7 +48,7 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
         IType propertyType,
         DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
-        in SpecPropertyTypeParseContext parseContext)
+        in FileEvaluationContext ctx)
     {
         state = default;
         range = default;
@@ -83,7 +81,7 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
             {
                 guid = Guid.NewGuid();
             }
-            while (!_installEnv.FindFile(guid).IsNull);
+            while (!_parsingServices.Installation.FindFile(guid).IsNull);
 
             updater.ReplaceText(state.Range, state.Dashes ? guid.ToString("D") : guid.ToString("N"), annotation);
         });

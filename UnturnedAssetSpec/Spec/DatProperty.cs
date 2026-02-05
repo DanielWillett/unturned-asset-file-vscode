@@ -47,10 +47,16 @@ public class DatProperty : IDatSpecificationObject
     public bool HideOverridden { get; internal set; }
 
     /// <summary>
-    /// Whether or not this property can be read from the Metadata section.
+    /// The expected location of this property when it's in an asset.
     /// </summary>
-    /// <remarks>Corresponds to the <c>CanBeInMetadata</c> property.</remarks>
-    public bool CanBeInMetadata { get; internal set; }
+    /// <remarks>Corresponds to the <c>AssetPosition</c> property.</remarks>
+    public AssetDatPropertyPositionExpectation AssetPosition { get; internal set; }
+
+    /// <summary>
+    /// Whether or not this property has to be in the Metadata section if it exists.
+    /// </summary>
+    /// <remarks>Corresponds to the <c>MustBeInMetadata</c> property.</remarks>
+    public bool MustBeInMetadata { get; internal set; }
 
     /// <summary>
     /// Type of value this property stores.
@@ -141,6 +147,9 @@ public class DatProperty : IDatSpecificationObject
     /// </summary>
     /// <remarks>Corresponds to the <c>DefaultValue</c> property.</remarks>
     public IValue? DefaultValue { get; internal set; }
+
+    internal IValue? GetIncludedDefaultValue() => IncludedDefaultValue ?? DefaultValue;
+    internal IValue? GetIncludedDefaultValue(bool hasProperty) => hasProperty ? IncludedDefaultValue ?? DefaultValue : DefaultValue;
 
     /// <summary>
     /// The default value for this property when the property is included without a parsable value. Defaults to <see cref="DefaultValue"/>.
@@ -288,4 +297,235 @@ public sealed class DatPropertyKey
         Filter = filter;
         Condition = condition;
     }
+}
+
+/// <summary>
+/// Determines which section a property can be in when a Metadata section is provded.
+/// </summary>
+public enum AssetDatPropertyPositionExpectation
+{
+    /// <summary>
+    /// Property must appear in the <c>Asset</c> section. If there isn't an <c>Asset</c> section, it must be at the root level.
+    /// <example>
+    /// <code>
+    /// Asset
+    /// {
+    ///     Prop ...
+    /// }
+    ///
+    /// // or
+    ///
+    /// Prop ...
+    /// </code>
+    /// </example>
+    /// </summary>
+    /// <remarks>This is the default value for most properties.</remarks>
+    AssetData,
+
+    /// <summary>
+    /// If the <c>Metadata</c> section is present, this property can only be read from it. If not it must be at the root level.
+    /// <example>
+    /// <code>
+    /// Metadata
+    /// {
+    ///     Prop ...
+    /// }
+    ///
+    /// // or
+    ///
+    /// Prop ...
+    /// </code>
+    /// </example>
+    /// </summary>
+    /// <remarks>Used by the <c>GUID</c> property.</remarks>
+    MetadataOnlyIfExistsOtherwiseRoot,
+
+    /// <summary>
+    /// If the <c>Metadata</c> section is present, this property can only be read from it. If not it must be in the <c>Asset</c> section if it exists, otherwise at the root level.
+    /// <example>
+    /// <code>
+    /// Metadata
+    /// {
+    ///     Prop ...
+    /// }
+    ///
+    /// // or
+    ///
+    /// Asset
+    /// {
+    ///     Prop ...
+    /// }
+    ///
+    /// // or
+    ///
+    /// Prop ...
+    /// </code>
+    /// </example>
+    /// </summary>
+    /// <remarks>Used by the <c>Type</c> property.</remarks>
+    MetadataOnlyIfExistsOtherwiseAssetData,
+
+    /// <summary>
+    /// Prioritizes reading the property from the <c>Metadata</c> section, but if it's not present it will be read from the <c>Asset</c> section instead.
+    /// If the <c>Asset</c> section is also not present it'll be read at the root level.
+    /// <example>
+    /// <code>
+    /// Metadata
+    /// {
+    ///     Prop ... &lt;----
+    /// }
+    /// Asset
+    /// {
+    ///     Prop ...
+    /// }
+    ///
+    /// // or
+    ///
+    /// Asset
+    /// {
+    ///     Prop ...
+    /// }
+    ///
+    /// // or
+    ///
+    /// Metadata
+    /// {
+    ///     Prop ... &lt;----
+    /// }
+    /// 
+    /// Prop ...
+    ///
+    /// // or
+    ///
+    /// Prop ...
+    /// </code>
+    /// </example>
+    /// </summary>
+    /// <remarks>Currently unused by Unturned.</remarks>
+    MetadataOrAssetData,
+
+    /// <summary>
+    /// The property can only exist at the root level, even if an <c>Asset</c> section is present.
+    /// <example>
+    /// <code>
+    /// Metadata
+    /// {
+    ///     Prop ...
+    /// }
+    /// Asset
+    /// {
+    ///     Prop ...
+    /// }
+    ///
+    /// Prop ... &lt;----
+    /// </code>
+    /// </example>
+    /// </summary>
+    /// <remarks>Currently unused by Unturned.</remarks>
+    Root,
+
+    /// <summary>
+    /// The property can only exist in the <c>Metadata</c> section.
+    /// <example>
+    /// <code>
+    /// Metadata
+    /// {
+    ///     Prop ... &lt;----
+    /// }
+    /// Asset
+    /// {
+    ///     Prop ...
+    /// }
+    ///
+    /// Prop ...
+    ///
+    /// // NOT:
+    ///
+    /// Prop ...
+    ///
+    /// // NOT:
+    ///
+    /// Asset
+    /// {
+    ///     Prop ...
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    /// <remarks>Currently unused by Unturned.</remarks>
+    Metadata,
+
+    /// <summary>
+    /// The property can only exist in the <c>Asset</c> section.
+    /// <example>
+    /// <code>
+    /// Metadata
+    /// {
+    ///     Prop ...
+    /// }
+    /// Asset
+    /// {
+    ///     Prop ... &lt;----
+    /// }
+    ///
+    /// Prop ...
+    ///
+    /// // NOT:
+    ///
+    /// Prop ...
+    ///
+    /// // NOT:
+    ///
+    /// Metadata
+    /// {
+    ///     Prop ...
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    /// <remarks>Currently unused by Unturned.</remarks>
+    Asset
+}
+
+/// <summary>
+/// Expresses the location of a property within an asset file.
+/// </summary>
+public enum AssetDatPropertyPosition
+{
+    /// <summary>
+    /// In the root dictionary of the asset file.
+    /// <example>
+    /// <code>
+    /// Prop ...
+    /// </code>
+    /// </example>
+    /// </summary>
+    /// <remarks>All properties use this value in non-asset files.</remarks>
+    Root,
+
+    /// <summary>
+    /// In the <c>Asset</c> section of the asset file.
+    /// <example>
+    /// <code>
+    /// Asset
+    /// {
+    ///     Prop ...
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    Asset,
+
+    /// <summary>
+    /// In the <c>Metadata</c> section of the asset file.
+    /// <example>
+    /// <code>
+    /// Metadata
+    /// {
+    ///     Prop ...
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    Metadata
 }

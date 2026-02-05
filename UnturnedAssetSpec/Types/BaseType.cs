@@ -22,6 +22,9 @@ public abstract class BaseType<TSelf> : IType
     public abstract string DisplayName { get; }
 
     /// <inheritdoc />
+    public virtual PropertySearchTrimmingBehavior TrimmingBehavior => PropertySearchTrimmingBehavior.ExactPropertyOnly;
+
+    /// <inheritdoc />
     public abstract void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options);
     protected void WriteTypeName(Utf8JsonWriter writer) => writer.WriteString("Type"u8, Id);
 

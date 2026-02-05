@@ -73,6 +73,11 @@ public sealed class StringType : PrimitiveType<string, StringType>, ITypeParser<
 
     public bool TryParse(ref TypeParserArgs<string> args, in FileEvaluationContext ctx, out Optional<string> value)
     {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
         if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? valueNode))
         {
             value = Optional<string>.Null;

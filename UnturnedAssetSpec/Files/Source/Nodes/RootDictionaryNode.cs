@@ -14,6 +14,7 @@ internal class RootDictionaryNode : DictionaryNode, ISourceFile
 
     public IWorkspaceFile WorkspaceFile { get; internal set; }
     public object TreeSync { get; }
+    public int FileVersion { get; private set; }
     public ImmutableArray<IPropertySourceNode> Properties { get; internal set; }
     public QualifiedType ActualType { get; protected set; }
 
@@ -38,6 +39,7 @@ internal class RootDictionaryNode : DictionaryNode, ISourceFile
     )
        : base(count, nodes, in properties)
     {
+        FileVersion = 1;
         WorkspaceFile = file;
         Database = database;
         AdditionalProperties = additionalProperties;
@@ -72,4 +74,6 @@ internal class RootDictionaryNode : DictionaryNode, ISourceFile
     {
         base.SetParentInfo(file, parent);
     }
+
+    int ISourceFile.FileVersion { get => FileVersion; set => FileVersion = value; }
 }

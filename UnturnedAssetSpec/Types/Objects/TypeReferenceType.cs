@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -105,8 +106,20 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
 
         switch (args.ValueNode)
         {
-            case null:
-                args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+            default:
+                if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
+                {
+                    args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                }
+                else
+                {
+                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
+                    {
+                        return defValue.TryGetValueAs(in ctx, out value);
+                    }
+
+                    return false;
+                }
                 break;
 
             case IListSourceNode l:
@@ -138,7 +151,7 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
 
                 args.ReferencedPropertySink?.AcceptReferencedProperty(guidNode);
 
-                args.CreateSubTypeParserArgs(out TypeParserArgs<QualifiedType> typeArgs, guidNode.Value, guidNode, this, LegacyExpansionFilter.Modern);
+                args.CreateSubTypeParserArgs(out TypeParserArgs<QualifiedType> typeArgs, guidNode.Value, guidNode, this, PropertyResolutionContext.Modern);
                 switch (guidNode.Value)
                 {
                     default:
@@ -226,7 +239,7 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
 
         if (args.DiagnosticSink != null && !_baseTypes.IsNull)
         {
-            InverseTypeHierarchy parents = ctx.Information.Information.GetParentTypes(value);
+            InverseTypeHierarchy parents = ctx.Services.Database.Information.GetParentTypes(value);
             if (!parents.IsValid || !_baseTypes.Any(x => Array.IndexOf(parents.ParentTypes, x) >= 0))
             {
                 args.DiagnosticSink?.UNT103(ref args, value, string.Join(", ", _baseTypes.Select(x => x.Type)));

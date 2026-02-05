@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -94,8 +95,20 @@ public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetRefer
 
         switch (args.ValueNode)
         {
-            case null:
-                args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+            default:
+                if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
+                {
+                    args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                }
+                else
+                {
+                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
+                    {
+                        return defValue.TryGetValueAs(in ctx, out value);
+                    }
+
+                    return false;
+                }
                 break;
 
             case IListSourceNode l:

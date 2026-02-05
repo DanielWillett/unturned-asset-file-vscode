@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using DanielWillett.UnturnedDataFileLspServer.Handlers;
@@ -8,9 +9,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using System.Collections.Concurrent;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Diagnostics;
 
@@ -23,7 +22,6 @@ internal class DiagnosticsManager : IDisposable
     private readonly UnturnedAssetFileSyncHandler _fileSync;
     private readonly LspWorkspaceEnvironment _workspaceEnvironment;
     private readonly ILanguageServerFacade _languageServer;
-    private readonly IAssetSpecDatabase _database;
 
     private readonly ConcurrentQueue<DiagnosticsWorkItem> _workQueue;
     private readonly Lock _workerThreadLock = new Lock();
@@ -33,30 +31,28 @@ internal class DiagnosticsManager : IDisposable
 
     private readonly ConcurrentDictionary<string, FileDiagnostics> _diagnostics;
 
-    internal IFilePropertyVirtualizer Virtualizer;
-    internal IWorkspaceEnvironment Workspace;
-    internal InstallationEnvironment InstallEnvironment;
+    internal IParsingServices Services;
+    internal IFileRelationalModelProvider RelationalModelProvider;
 
     public DiagnosticsManager(
         OpenedFileTracker fileTracker,
         UnturnedAssetFileSyncHandler fileSync,
         LspWorkspaceEnvironment workspaceEnvironment,
+        IFileRelationalModelProvider relationalModelProvider,
         ILanguageServerFacade languageServer,
-        IAssetSpecDatabase database,
-        IFilePropertyVirtualizer virtualizer,
-        IWorkspaceEnvironment workspace,
-        InstallationEnvironment installEnvironment)
+        IParsingServices parsingServices)
     {
-        Virtualizer = virtualizer;
-        Workspace = workspace;
-        InstallEnvironment = installEnvironment;
-        _fileTracker = fileTracker;
-        _fileSync = fileSync;
         _workQueue = new ConcurrentQueue<DiagnosticsWorkItem>();
         _diagnostics = new ConcurrentDictionary<string, FileDiagnostics>(OSPathHelper.PathComparer);
+
+        _fileTracker = fileTracker;
+        _fileSync = fileSync;
         _workspaceEnvironment = workspaceEnvironment;
         _languageServer = languageServer;
-        _database = database;
+
+        RelationalModelProvider = relationalModelProvider;
+        Services = parsingServices;
+
         _workspaceEnvironment.FileCreated += OnFileCreated;
         _workspaceEnvironment.FileDeleted += OnFileDeleted;
         _workspaceEnvironment.FileUpdated += OnFileUpdated;
@@ -131,7 +127,7 @@ internal class DiagnosticsManager : IDisposable
         if (_diagnostics.TryGetValue(filePath, out FileDiagnostics? d))
             return d;
 
-        FileDiagnostics newDiagnostics = new FileDiagnostics(filePath, uri ?? DocumentUri.File(filePath), this, _database);
+        FileDiagnostics newDiagnostics = new FileDiagnostics(filePath, uri ?? DocumentUri.File(filePath), this, Services.Database);
         d = _diagnostics.GetOrAdd(filePath, newDiagnostics);
         if (ReferenceEquals(d, newDiagnostics) && _fileTracker.Files.TryGetValue(newDiagnostics.Uri, out OpenedFile? openedFile))
         {
@@ -231,9 +227,9 @@ internal class DiagnosticsManager : IDisposable
 
     private void MaybeStartWorkerThread(bool forceRunOnWorkerThread = false)
     {
-        if (!_database.IsInitialized && Interlocked.Exchange(ref _queuedMaybeStart, 1) == 0)
+        if (!Services.Database.IsInitialized && Interlocked.Exchange(ref _queuedMaybeStart, 1) == 0)
         {
-            _database.OnInitialize((_, _) =>
+            Services.Database.OnInitialize((_, _) =>
             {
                 MaybeStartWorkerThread(true);
                 return Task.CompletedTask;

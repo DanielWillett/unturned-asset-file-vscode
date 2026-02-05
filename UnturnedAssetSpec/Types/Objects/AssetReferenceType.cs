@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Immutable;
 using System.Text.Json;
@@ -129,8 +130,20 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
 
         switch (args.ValueNode)
         {
-            case null:
-                args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+            default:
+                if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
+                {
+                    args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                }
+                else
+                {
+                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
+                    {
+                        return defValue.TryGetValueAs(in ctx, out value);
+                    }
+
+                    return false;
+                }
                 break;
 
             case IListSourceNode l:
@@ -162,7 +175,7 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
 
                 args.ReferencedPropertySink?.AcceptReferencedProperty(guidNode);
 
-                args.CreateSubTypeParserArgs(out TypeParserArgs<Guid> guidArgs, guidNode.Value, guidNode, this, LegacyExpansionFilter.Modern);
+                args.CreateSubTypeParserArgs(out TypeParserArgs<Guid> guidArgs, guidNode.Value, guidNode, this, PropertyResolutionContext.Modern);
                 switch (guidNode.Value)
                 {
                     default:

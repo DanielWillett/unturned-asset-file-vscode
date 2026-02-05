@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -11,7 +12,6 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Diagnostics;
 
@@ -168,10 +168,8 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
             }
 
             DiagnosticsNodeVisitor visitor = new DiagnosticsNodeVisitor(
-                _database,
-                _manager.Virtualizer,
-                _manager.Workspace,
-                _manager.InstallEnvironment,
+                _manager.RelationalModelProvider,
+                _manager.Services,
                 _diagnosticBuffer
             );
 
@@ -277,12 +275,11 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
 
         public readonly List<DatDiagnosticMessage> Diagnostics;
 
-        public DiagnosticsNodeVisitor(IAssetSpecDatabase database,
-            IFilePropertyVirtualizer virtualizer,
-            IWorkspaceEnvironment workspace,
-            InstallationEnvironment installEnvironment,
+        public DiagnosticsNodeVisitor(
+            IFileRelationalModelProvider modelProvider,
+            IParsingServices parsingServices,
             List<DatDiagnosticMessage> diagnostics)
-            : base(virtualizer, database, installEnvironment, workspace, flags: PropertyInclusionFlags.All)
+            : base(modelProvider, parsingServices, flags: PropertyInclusionFlags.All)
         {
             Diagnostics = diagnostics;
         }
@@ -291,7 +288,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
         protected override void AcceptResolvedProperty(
             DatProperty property,
             IType propertyType,
-            in SpecPropertyTypeParseContext parseCtx,
+            in FileEvaluationContext ctx,
             IPropertySourceNode node,
             in PropertyBreadcrumbs breadcrumbs)
         {

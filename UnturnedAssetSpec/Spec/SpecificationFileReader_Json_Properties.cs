@@ -169,7 +169,37 @@ partial class SpecificationFileReader
                 );
             }
 
-            property.AvailableValuesTargetIsRequired = element.ValueKind == JsonValueKind.String && element.GetString()!.EndsWith("!");
+            property.AvailableValuesTargetIsRequired = element.ValueKind == JsonValueKind.String && element.GetString()!.EndsWith("!", StringComparison.Ordinal);
+        }
+
+        if (root.TryGetProperty("DefaultValue"u8, out element))
+        {
+            property.DefaultValue = ReadValue(in element, type, property, $"{owner.FullName}.{key}.DefaultValue");
+        }
+        else if (property.Type is FlagType)
+        {
+            property.DefaultValue = Value.False;
+        }
+
+        if (root.TryGetProperty("IncludedDefaultValue"u8, out element))
+        {
+            property.IncludedDefaultValue = ReadValue(in element, type, property, $"{owner.FullName}.{key}.IncludedDefaultValue");
+        }
+        else if (property.Type is FlagType or BooleanOrFlagType)
+        {
+            property.IncludedDefaultValue = Value.True;
+        }
+
+        if (root.TryGetProperty("AssetPosition"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            if (!Enum.TryParse(element.GetString(), out AssetDatPropertyPositionExpectation assetPosition))
+            {
+                throw new JsonException(
+                    string.Format(Resources.JsonException_FailedToParseEnum, nameof(LegacyExpansionFilter), element.GetString(), $"{owner.FullName}.{key}.KeyLegacyExpansionFilter")
+                );
+            }
+
+            property.AssetPosition = assetPosition;
         }
 
         // todo

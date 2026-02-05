@@ -540,4 +540,7 @@
   <data name="Type_Name_LocalizableString_Rich" xml:space="preserve">
     <value>Localizable Rich Text</value>
   </data>
+  <data name="Type_Name_NullType" xml:space="preserve">
+    <value>Any Type</value>
+  </data>
 </root>

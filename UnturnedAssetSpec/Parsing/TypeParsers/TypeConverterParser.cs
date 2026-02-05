@@ -58,6 +58,11 @@ public class TypeConverterParser<T>(ITypeConverter<T> typeConverter)
     /// <inheritdoc />
     public bool TryParse(ref TypeParserArgs<T> args, in FileEvaluationContext ctx, out Optional<T> value)
     {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
         if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? v))
         {
             value = Optional<T>.Null;

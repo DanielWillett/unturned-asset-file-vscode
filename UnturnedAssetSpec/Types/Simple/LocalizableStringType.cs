@@ -59,6 +59,8 @@ public sealed class LocalizableStringType : BaseType<string, LocalizableStringTy
     /// </summary>
     public static ITypeFactory Factory => Instance;
 
+    public override PropertySearchTrimmingBehavior TrimmingBehavior => PropertySearchTrimmingBehavior.CreatesOtherPropertiesInLinkedFiles;
+
     public override ITypeParser<string> Parser => this;
 
     public override string Id => TypeId;
@@ -117,6 +119,11 @@ public sealed class LocalizableStringType : BaseType<string, LocalizableStringTy
             }
             value = Optional<string>.Null;
             return false;
+        }
+
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
         }
 
         if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? valueNode))

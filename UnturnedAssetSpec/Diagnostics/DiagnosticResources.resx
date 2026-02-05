@@ -429,4 +429,7 @@
   <data name="UNT1030_RequiredLocal" xml:space="preserve">
     <value>Localization property '{0}' is required but a localization file doesn't exist for this asset.</value>
   </data>
+  <data name="UNT2005_Property" xml:space="preserve">
+    <value>Type can not be determined for property '{0}'.</value>
+  </data>
 </root>

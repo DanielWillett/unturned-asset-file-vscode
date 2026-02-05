@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -15,10 +14,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 /// <remarks>Inheriting classes should override <see cref="AcceptResolvedProperty"/>.</remarks>
 public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
 {
-    private readonly IFilePropertyVirtualizer _virtualizer;
-    private readonly IAssetSpecDatabase _database;
-    private readonly InstallationEnvironment _installEnv;
-    private readonly IWorkspaceEnvironment _workspaceEnv;
+    private readonly IFileRelationalModelProvider _modelProvider;
+    private readonly IParsingServices _parsingServices;
     private readonly PropertyInclusionFlags _flags;
     private AssetFileType _fileType;
     private bool _hasFileType;
@@ -28,17 +25,13 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
     protected override bool IgnoreMetadata => true;
 
     protected ResolvedPropertyNodeVisitor(
-        IFilePropertyVirtualizer virtualizer,
-        IAssetSpecDatabase database,
-        InstallationEnvironment installEnv,
-        IWorkspaceEnvironment workspaceEnv,
+        IFileRelationalModelProvider modelProvider,
+        IParsingServices parsingServices,
         FileRange? range = null,
         PropertyInclusionFlags flags = PropertyInclusionFlags.All | PropertyInclusionFlags.ResolvedOnly)
     {
-        _virtualizer = virtualizer;
-        _database = database;
-        _installEnv = installEnv;
-        _workspaceEnv = workspaceEnv;
+        _modelProvider = modelProvider;
+        _parsingServices = parsingServices;
         _flags = flags;
         _range = range;
     }
@@ -76,7 +69,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
     protected virtual void AcceptResolvedProperty(
         DatProperty property,
         IType propertyType,
-        in SpecPropertyTypeParseContext parseCtx,
+        in FileEvaluationContext ctx,
         IPropertySourceNode node,
         in PropertyBreadcrumbs breadcrumbs) { }
 
@@ -114,13 +107,13 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
 
         if (!_hasFileType)
         {
-            _fileType = AssetFileType.FromFile(node.File, _database);
+            _fileType = AssetFileType.FromFile(node.File, _parsingServices.Database);
             _hasFileType = true;
         }
 
         PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(node);
 
-        DatProperty? property = _virtualizer.GetProperty(node, in _fileType, in breadcrumbs, out PropertyResolutionContext context);
+        DatProperty? property = null;// todo: _modelProvider.GetProperty(node, in _fileType, in breadcrumbs, out PropertyResolutionContext context);
         if (property == null)
         {
             if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0)
@@ -133,12 +126,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         if ((_flags & PropertyInclusionFlags.UnresolvedOnly) != 0)
             return;
 
-        FileEvaluationContext ctx = new FileEvaluationContext(property, node.File, _workspaceEnv, _installEnv, _database, context);
-        SpecPropertyTypeParseContext parseContext = new SpecPropertyTypeParseContext(ctx, breadcrumbs, null)
-        {
-            Node = node.Value,
-            Parent = node
-        };
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, node.File);
 
         if (!property.Type.TryEvaluateType(out IType? type, in ctx))
             return;
@@ -154,7 +142,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         //}
         //else
         //{
-            AcceptResolvedProperty(property, type, in parseContext, node, in breadcrumbs);
+            AcceptResolvedProperty(property, type, in ctx, node, in breadcrumbs);
         //}
     }
 }

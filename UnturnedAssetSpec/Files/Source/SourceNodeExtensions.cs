@@ -1,11 +1,11 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -110,34 +110,44 @@ public static class SourceNodeExtensions
                 return false;
             }
 
-            if (!property.CanBeInMetadata)
-                return asset.AssetData.TryGetProperty(property, in ctx, out propertyNode, context);
-
             IDictionarySourceNode? assetData = asset.GetAssetDataDictionary();
             IDictionarySourceNode? metadata = asset.GetMetadataDictionary();
-            bool hasValue;
-            if (metadata != null || assetData == null)
+            switch (property.AssetPosition)
             {
-                IDictionarySourceNode dict = metadata ?? node;
+                default:
+                    return (assetData ?? asset).TryGetProperty(property, in ctx, out propertyNode, context);
 
-                if (!dict.TryGetProperty(property, in ctx, out propertyNode) && dict != node)
-                {
-                    hasValue = node.TryGetProperty(property, in ctx, out propertyNode, context);
-                }
-                else hasValue = true;
-            }
-            else if (!property.Key.Equals("GUID", StringComparison.OrdinalIgnoreCase) || property.Owner is not DatAssetFileType)
-            {
-                hasValue = assetData.TryGetProperty(property, in ctx, out propertyNode, context);
-            }
-            else
-            {
-                propertyNode = null;
-                hasValue = false;
-            }
+                case AssetDatPropertyPositionExpectation.MetadataOnlyIfExistsOtherwiseRoot:
+                    return (metadata ?? asset).TryGetProperty(property, in ctx, out propertyNode, context);
+                
+                case AssetDatPropertyPositionExpectation.MetadataOnlyIfExistsOtherwiseAssetData:
+                    return (metadata ?? (assetData ?? asset)).TryGetProperty(property, in ctx, out propertyNode, context);
 
-            return hasValue;
+                case AssetDatPropertyPositionExpectation.MetadataOrAssetData:
+                    if (metadata != null && metadata.TryGetProperty(property, in ctx, out propertyNode, context))
+                    {
+                        return true;
+                    }
 
+                    return (assetData ?? asset).TryGetProperty(property, in ctx, out propertyNode, context);
+                
+                case AssetDatPropertyPositionExpectation.Root:
+                    return asset.TryGetProperty(property, in ctx, out propertyNode, context);
+
+                case AssetDatPropertyPositionExpectation.Asset:
+                    if (assetData != null)
+                        return assetData.TryGetProperty(property, in ctx, out propertyNode, context);
+
+                    propertyNode = null;
+                    return false;
+
+                case AssetDatPropertyPositionExpectation.Metadata:
+                    if (metadata != null)
+                        return metadata.TryGetProperty(property, in ctx, out propertyNode, context);
+
+                    propertyNode = null;
+                    return false;
+            }
         }
     }
 

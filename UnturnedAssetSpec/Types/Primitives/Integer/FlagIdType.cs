@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using System.ComponentModel;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System.Text.Json;
@@ -27,6 +28,11 @@ public sealed class FlagIdType : PrimitiveType<ushort, FlagIdType>, ITypeParser<
     /// <inheritdoc />
     public bool TryParse(ref TypeParserArgs<ushort> args, in FileEvaluationContext ctx, out Optional<ushort> value)
     {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
         if (!TypeParsers.UInt16.TryParse(ref args, in ctx, out value))
             return false;
 

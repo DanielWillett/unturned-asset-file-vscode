@@ -215,6 +215,8 @@ public class DictionaryType<TKeyType, TValueType>
 
     public override ITypeParser<EquatableArray<DictionaryPair<TValueType>>> Parser => this;
 
+    public override PropertySearchTrimmingBehavior TrimmingBehavior => (PropertySearchTrimmingBehavior)Math.Max((int)_keyType.TrimmingBehavior, (int)_valueType.TrimmingBehavior);
+
     /// <inheritdoc />
     public OneOrMore<IType> ReferencedTypes
     {
@@ -403,7 +405,20 @@ public class DictionaryType<TKeyType, TValueType>
         {
             // null (no value)
             default:
-                args.DiagnosticSink?.UNT2004_NoDictionary(ref args, args.ParentNode);
+
+                if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
+                {
+                    args.DiagnosticSink?.UNT2004_NoDictionary(ref args, args.ParentNode);
+                }
+                else
+                {
+                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
+                    {
+                        return defValue.TryGetValueAs(in ctx, out value);
+                    }
+
+                    return false;
+                }
                 break;
 
             case IDictionarySourceNode dictionaryNode:
@@ -442,7 +457,7 @@ public class DictionaryType<TKeyType, TValueType>
                          valueNode,
                          property,
                          _valueType,
-                         LegacyExpansionFilter.Modern
+                         PropertyResolutionContext.Modern
                     );
 
                     if (!_valueType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TValueType> parsedValue)
@@ -516,11 +531,7 @@ public class DictionaryType<TKeyType, TValueType>
             props.LastCharacterIndex = property.LastCharacterIndex;
             ValueNode fakeNode = ValueNode.Create(key, property.KeyIsQuoted, Comment.None, in props);
 
-            args.CreateSubTypeParserArgs(out TypeParserArgs<TKeyType> parseArgs, fakeNode, args.ParentNode, _keyType, ctx.PropertyContext switch
-            {
-                PropertyResolutionContext.Modern => LegacyExpansionFilter.Modern,
-                _ => LegacyExpansionFilter.Legacy
-            });
+            args.CreateSubTypeParserArgs(out TypeParserArgs<TKeyType> parseArgs, fakeNode, args.ParentNode, _keyType, PropertyResolutionContext.Unknown /* todo: ctx.PropertyContext */);
 
             if (parser.TryParse(ref parseArgs, in ctx, out parsedKey))
             {

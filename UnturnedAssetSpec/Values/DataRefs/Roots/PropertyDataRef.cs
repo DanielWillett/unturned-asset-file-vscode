@@ -22,15 +22,18 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
     [field: MaybeNull]
     public override string PropertyName => field ??= _propReference.ToString();
 
-    internal PropertyDataRef(PropertyReference propRef)
+    public DatProperty Owner { get; }
+
+    internal PropertyDataRef(PropertyReference propRef, DatProperty owner)
     {
+        Owner = owner;
         _propReference = propRef;
     }
 
     /// <inheritdoc />
     public override bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
     {
-        _value ??= _propReference.CreateValue(ctx.Self, ctx.Information);
+        _value ??= _propReference.CreateValue(Owner, ctx.Services.Database);
 
         return _value.VisitValue(ref visitor, in ctx);
     }
@@ -48,17 +51,17 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
 
     protected override bool AcceptProperty(in IncludedProperty property, in FileEvaluationContext ctx, out bool value)
     {
-        _value ??= _propReference.CreateValue(ctx.Self, ctx.Information);
+        _value ??= _propReference.CreateValue(Owner, ctx.Services.Database);
 
         if (_value is ICrossedPropertyReference cr)
         {
-            if (!cr.TryResolveReference(in ctx, out FileEvaluationContext crContext))
+            if (!cr.TryResolveReference(in ctx, out FileEvaluationContext crContext, out DatProperty? crProperty))
             {
                 value = false;
                 return false;
             }
 
-            value = crContext.Self.IsIncluded(property.RequireValue, in crContext);
+            value = crProperty.IsIncluded(property.RequireValue, in crContext);
         }
         else
         {
@@ -71,12 +74,12 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
 
     protected override bool AcceptProperty(in ExcludedProperty property, in FileEvaluationContext ctx, out bool value)
     {
-        _value ??= _propReference.CreateValue(ctx.Self, ctx.Information);
+        _value ??= _propReference.CreateValue(Owner, ctx.Services.Database);
 
         DatProperty prop = _value.Property;
         if (_value is ICrossedPropertyReference cr)
         {
-            if (!cr.TryResolveReference(in ctx, out FileEvaluationContext crContext))
+            if (!cr.TryResolveReference(in ctx, out FileEvaluationContext crContext, out _))
             {
                 value = false;
                 return false;

@@ -1,11 +1,14 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using DanielWillett.UnturnedDataFileLspServer.Handlers;
-using DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 using DanielWillett.UnturnedDataFileLspServer.Protocol;
+using DanielWillett.UnturnedDataFileLspServer.Utility;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
@@ -18,11 +21,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Diagnostics;
-using DanielWillett.UnturnedDataFileLspServer.Utility;
-using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace DanielWillett.UnturnedDataFileLspServer;
 
@@ -89,9 +87,9 @@ internal sealed class UnturnedAssetFileLspServer
                 .WithHandler<HoverHandler>()
                 .WithHandler<DocumentSymbolHandler>()
                 .WithHandler<KeyCompletionHandler>()
-                .WithHandler<DiscoverAssetPropertiesHandler>()
+                // todo: .WithHandler<DiscoverAssetPropertiesHandler>()
                 .WithHandler<LspWorkspaceEnvironment>()
-                .WithHandler<GetAssetPropertyAddLocationHandler>()
+                // todo: .WithHandler<GetAssetPropertyAddLocationHandler>()
                 .WithHandler<CodeActionRequestHandler>()
                 //.WithHandler<DocumentDiagnosticHandler>()
                 .WithServerInfo(new ServerInfo
@@ -112,13 +110,13 @@ internal sealed class UnturnedAssetFileLspServer
                         .AddSingleton<IAssetSpecDatabase, LspAssetSpecDatabase>()
                         .AddSingleton<LspWorkspaceEnvironment>()
                         .AddSingleton<DiagnosticsManager>()
-                        .AddSingleton<IFilePropertyVirtualizer, SourceFilePropertyVirtualizer>()
                         .AddSingleton<GlobalCodeFixes>()
                         .AddSingleton<LspInstallationEnvironment>()
                         .AddSingleton<EnvironmentCache>()
-                        .AddSingleton<ISpecDatabaseCache, EnvironmentCache>(sp => sp.GetRequiredService<EnvironmentCache>())
-                        .AddSingleton<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
-                        .AddSingleton<IWorkspaceEnvironment>(sp => sp.GetRequiredService<LspWorkspaceEnvironment>())
+                        .AddTransient<ISpecDatabaseCache, EnvironmentCache>(sp => sp.GetRequiredService<EnvironmentCache>())
+                        .AddTransient<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
+                        .AddTransient<IWorkspaceEnvironment>(sp => sp.GetRequiredService<LspWorkspaceEnvironment>())
+                        .AddSingleton<IParsingServices, ParsingServiceProvider>(sp => new ParsingServiceProvider(sp))
                         .AddSingleton(new JsonSerializerOptions
                         {
                             WriteIndented = true

@@ -39,6 +39,9 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
     public ITypeParser<DatObjectValue> Parser => this;
 
     /// <inheritdoc />
+    public override PropertySearchTrimmingBehavior TrimmingBehavior => PropertySearchTrimmingBehavior.CreatesOtherPropertiesInLinkedFiles;
+
+    /// <inheritdoc />
     public override DatFileType Owner { get; }
 
     internal DatCustomType(QualifiedType type, DatTypeWithProperties? baseType, JsonElement element, DatFileType file, IDatSpecificationReadContext context) : base(type, baseType, element)
@@ -118,14 +121,28 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
 
         IDictionarySourceNode? legacyParentDictionary = (args.ParentNode as IPropertySourceNode)?.Parent as IDictionarySourceNode;
 
-        bool maybeModern = args.KeyFilter != LegacyExpansionFilter.Legacy;
-        bool maybeLegacy = args.KeyFilter != LegacyExpansionFilter.Modern;
+        bool maybeModern = args.KeyFilter != PropertyResolutionContext.Legacy;
+        bool maybeLegacy = args.KeyFilter != PropertyResolutionContext.Modern;
         maybeLegacy &= legacyParentDictionary != null;
         switch (args.ValueNode)
         {
             default:
-                if (maybeModern)
-                    args.DiagnosticSink?.UNT2004_NoDictionary(ref args, args.ParentNode);
+                if (maybeModern && !maybeLegacy)
+                {
+                    if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
+                    {
+                        args.DiagnosticSink?.UNT2004_NoDictionary(ref args, args.ParentNode);
+                    }
+                    else
+                    {
+                        if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
+                        {
+                            return defValue.TryGetValueAs(in ctx, out value);
+                        }
+
+                        return false;
+                    }
+                }
 
                 return maybeLegacy && TryParseLegacyObject(ref args, in ctx, out value, legacyParentDictionary!);
 
@@ -320,7 +337,7 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
 
         public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
         {
-            IValue? value = Value.TryReadValueFromJson(in _element, ValueReadOptions.Default, _propertyType, ctx.Information, _owner);
+            IValue? value = Value.TryReadValueFromJson(in _element, ValueReadOptions.Default, _propertyType, ctx.Services.Database, _owner);
             return value != null && value.VisitValue(ref visitor, in ctx);
         }
 
