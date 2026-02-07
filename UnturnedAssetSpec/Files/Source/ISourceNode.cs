@@ -58,7 +58,11 @@ public interface ISourceNode : IEquatable<ISourceNode>
     /// Visit just this node.
     /// </summary>
     void Visit<TVisitor>(ref TVisitor visitor)
-        where TVisitor : ISourceNodeVisitor;
+        where TVisitor : ISourceNodeVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    ;
 
     /// <summary>
     /// The index of the fist character in the original file.

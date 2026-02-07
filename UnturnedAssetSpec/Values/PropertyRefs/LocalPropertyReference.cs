@@ -81,7 +81,11 @@ public class LocalPropertyReference : IPropertyReferenceValue
         _propertyReference.WriteToJson(writer);
     }
 
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         if ((_property == null || _propertyReference.IsCrossReference) && !TryCacheProperty(NullLoggerFactory.Instance, in ctx))
         {

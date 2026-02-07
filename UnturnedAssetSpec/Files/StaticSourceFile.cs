@@ -73,6 +73,16 @@ public sealed class StaticSourceFile : IWorkspaceFile
         }, null);
     }
 
+    /// <inheritdoc cref="FromOtherFile(string,ReadOnlyMemory{char},IAssetSpecDatabase?,SourceNodeTokenizerOptions)"/>
+    public static StaticSourceFile FromAssetFile(
+        string filePath,
+        string fileContents,
+        IAssetSpecDatabase database,
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+    {
+        return FromAssetFile(filePath, fileContents.AsMemory(), database, options);
+    }
+
     /// <summary>
     /// Create a source file from an <paramref name="asset"/>'s localization file.
     /// </summary>
@@ -129,6 +139,17 @@ public sealed class StaticSourceFile : IWorkspaceFile
         }, asset);
     }
 
+    /// <inheritdoc cref="FromOtherFile(string,ReadOnlyMemory{char},IAssetSpecDatabase?,SourceNodeTokenizerOptions)"/>
+    public static StaticSourceFile FromLocalizationFile(
+        string filePath,
+        string fileContents,
+        IAssetSpecDatabase database,
+        IAssetSourceFile asset,
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+    {
+        return FromLocalizationFile(filePath, fileContents.AsMemory(), database, asset, options);
+    }
+
     /// <summary>
     /// Create a source file from a generic unturned-dat formatted file.
     /// </summary>
@@ -178,6 +199,16 @@ public sealed class StaticSourceFile : IWorkspaceFile
             using SourceNodeTokenizer tokenizer = new SourceNodeTokenizer(fileContents, options);
             return tokenizer.ReadRootDictionary(info);
         }, null);
+    }
+
+    /// <inheritdoc cref="FromOtherFile(string,ReadOnlyMemory{char},IAssetSpecDatabase?,SourceNodeTokenizerOptions)"/>
+    public static StaticSourceFile FromOtherFile(
+        string filePath,
+        string fileContents,
+        IAssetSpecDatabase? database,
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+    {
+        return FromOtherFile(filePath, fileContents.AsMemory(), database, options);
     }
 
     private StaticSourceFile(string filePath,

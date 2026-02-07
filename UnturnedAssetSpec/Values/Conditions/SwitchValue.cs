@@ -606,7 +606,11 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
 
 
     /// <inheritdoc />
-    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
+    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         foreach (ISwitchCase c in Cases)
         {
@@ -624,7 +628,11 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         foreach (ISwitchCase c in Cases)
         {

@@ -706,14 +706,22 @@ public class DatEnumValue : IValue<DatEnumValue>, IEquatable<DatEnumValue>, IDat
     }
 
     /// <inheritdoc />
-    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
+    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         visitor.Accept(new Optional<DatEnumValue>(this));
         return true;
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         visitor.Accept(new Optional<DatEnumValue>(this));
         return true;

@@ -64,14 +64,22 @@ public sealed class ConcreteValue<TValue>
     }
 
     /// <inheritdoc />
-    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
+    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         visitor.Accept(IsNull ? Optional<TValue>.Null : new Optional<TValue>(_value));
         return true;
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         visitor.Accept(IsNull ? Optional<TValue>.Null : new Optional<TValue>(_value));
         return true;
@@ -89,7 +97,7 @@ public sealed class ConcreteValue<TValue>
         return IsNull ? value == null || value.IsNull : value is { IsNull: false, _value: not null } && _value.Equals(value._value);
     }
 
-    bool IEquatable<IExpressionNode>.Equals(IExpressionNode? other)
+    bool IEquatable<IExpressionNode?>.Equals(IExpressionNode? other)
     {
         switch (other)
         {

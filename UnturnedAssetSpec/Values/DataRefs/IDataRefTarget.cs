@@ -20,5 +20,9 @@ public interface IDataRefTarget : IEquatable<IDataRefTarget?>, IDataRefExpressio
     /// <returns>Whether or not the operation succeeded.</returns>
     bool AcceptProperty<TProperty, TVisitor>(in TProperty property, ref TVisitor valueVisitor, in FileEvaluationContext ctx)
         where TProperty : IDataRefProperty
-        where TVisitor : IValueVisitor;
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    ;
 }

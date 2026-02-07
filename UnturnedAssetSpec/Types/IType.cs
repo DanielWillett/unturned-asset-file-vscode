@@ -32,7 +32,12 @@ public interface IType : IPropertyType, IEquatable<IType?>
     /// Calls <see cref="ITypeVisitor.Accept"/> on the <paramref name="visitor"/> for this type if it's strongly typed.
     /// </summary>
     /// <remarks>Used to create a generic context for a <see cref="IType{T}"/> implementation.</remarks>
-    void Visit<TVisitor>(ref TVisitor visitor) where TVisitor : ITypeVisitor;
+    void Visit<TVisitor>(ref TVisitor visitor)
+        where TVisitor : ITypeVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    ;
 
     /// <summary>
     /// Writes all the information for this type instance to a JSON string or object.

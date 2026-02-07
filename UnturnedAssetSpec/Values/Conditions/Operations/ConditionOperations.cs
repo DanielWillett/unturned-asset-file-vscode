@@ -21,7 +21,7 @@ public static class ConditionOperations
 
     static ConditionOperations()
     {
-        RegisterOperation(Operations.Equals.Instance);
+        RegisterOperation(Operations.Equal.Instance);
     }
 
 

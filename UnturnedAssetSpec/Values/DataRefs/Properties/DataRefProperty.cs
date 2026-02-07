@@ -77,6 +77,9 @@ public class DataRefProperty<TProperty> : IDataRef, IEquatable<DataRefProperty<T
     /// <inheritdoc />
     public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         return Target.AcceptProperty(in _property, ref visitor, in ctx);
     }

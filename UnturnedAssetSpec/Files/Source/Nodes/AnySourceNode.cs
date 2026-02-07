@@ -120,7 +120,11 @@ internal abstract class AnySourceNode : ISourceNode
     }
 
     public abstract void Visit<TVisitor>(ref TVisitor visitor)
-        where TVisitor : ISourceNodeVisitor;
+        where TVisitor : ISourceNodeVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    ;
 }
 internal struct AnySourceNodeProperties
 {

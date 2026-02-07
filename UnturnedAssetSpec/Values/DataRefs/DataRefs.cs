@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -46,5 +47,18 @@ public static class DataRefs
         properties["Excluded"] = (target, _, _) => new DataRefProperty<ExcludedProperty>(target, new ExcludedProperty());
 
         Properties = properties.ToImmutable();
+    }
+
+    public static bool TryReadDataRef(string text, IType? type, [NotNullWhen(true)] out IDataRef? dataRef)
+    {
+        dataRef = SelfDataRef.Instance;
+        return true;
+    }
+
+    public static bool TryReadDataRef<TValue>(string text, IType<TValue> type, [NotNullWhen(true)] out IDataRef? dataRef)
+        where TValue : IEquatable<TValue>
+    {
+        dataRef = SelfDataRef.Instance;
+        return true;
     }
 }

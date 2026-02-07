@@ -9,7 +9,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 /// <summary>
 /// Default implementation of <see cref="IParsingServices"/>.
 /// </summary>
-public class ParsingServiceProvider : IParsingServices
+public class ParsingServiceProvider : IParsingServices, IDisposable
 {
     /// <summary>
     /// The service provider given in <see cref="ParsingServiceProvider(IServiceProvider)"/>, or <see langword="null"/> if one was not provided.
@@ -121,5 +121,18 @@ public class ParsingServiceProvider : IParsingServices
         }
 
         return null;
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (ServiceProvider != null)
+            return;
+
+        (Database as IDisposable)?.Dispose();
+        LoggerFactory.Dispose();
+        (Workspace as IDisposable)?.Dispose();
+        (GameDirectory as IDisposable)?.Dispose();
+        Installation.Dispose();
     }
 }

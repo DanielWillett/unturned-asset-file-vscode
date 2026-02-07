@@ -982,7 +982,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             }
             if (!_fileMemory.IsEmpty
                 && step.Length == _fileMemory.Length
-                && MemoryMarshal.TryGetString(_fileMemory, out string originalString, out int st, out int ln) && st == 0 && ln == step.Length)
+                && MemoryMarshal.TryGetString(_fileMemory, out string? originalString, out int st, out int ln) && st == 0 && ln == step.Length)
                 outString = originalString;
             else
                 outString = step.ToString();
@@ -1199,6 +1199,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             if (escStepper.IsTrailing || escStepper.Character is '\r' or '\n')
             {
                 escStepper.IsTrailing = true;
+                // todo: this doesnt get hit with the following text: Property "\\""
                 LogDiagnostic_StringQuotesNotTerminated(_position.Character + escStepper.Index);
             }
 

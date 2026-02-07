@@ -20,14 +20,22 @@ public sealed class NullValue : IValue
     public bool IsNull => true;
 
     /// <inheritdoc />
-    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
+    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         visitor.Accept(Optional<string>.Null);
         return true;
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         visitor.Accept(Optional<string>.Null);
         return true;
@@ -84,14 +92,22 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T>, IValueExpressionNod
     }
 
     /// <inheritdoc />
-    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
+    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         visitor.Accept(Optional<T>.Null);
         return true;
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         visitor.Accept(Optional<T>.Null);
         return true;

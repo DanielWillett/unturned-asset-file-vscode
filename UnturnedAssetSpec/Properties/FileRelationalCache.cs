@@ -206,7 +206,11 @@ internal class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
         public bool HasLiteralValue;
         public IPropertySourceNode[]? RelatedProperties;
 
-        public virtual bool Visit<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
+        public virtual bool Visit<TVisitor>(ref TVisitor visitor)
+            where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
         {
             return false;
         }

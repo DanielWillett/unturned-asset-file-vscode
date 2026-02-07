@@ -335,7 +335,11 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
             _owner = owner;
         }
 
-        public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+        public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+            where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
         {
             IValue? value = Value.TryReadValueFromJson(in _element, ValueReadOptions.Default, _propertyType, ctx.Services.Database, _owner);
             return value != null && value.VisitValue(ref visitor, in ctx);

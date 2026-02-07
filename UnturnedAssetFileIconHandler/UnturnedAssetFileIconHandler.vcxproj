@@ -111,7 +111,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\UnturnedAssetFileIconHandler.def</ModuleDefinitionFile>
-      <RegisterOutput>true</RegisterOutput>
+      <RegisterOutput>false</RegisterOutput>
       <PerUserRedirection>true</PerUserRedirection>
     </Link>
   </ItemDefinitionGroup>
@@ -211,7 +211,7 @@
       <ModuleDefinitionFile>.\UnturnedAssetFileIconHandler.def</ModuleDefinitionFile>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <RegisterOutput>true</RegisterOutput>
+      <RegisterOutput>false</RegisterOutput>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -273,7 +273,7 @@
     <Midl Include="UnturnedAssetFileIconHandler.idl" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\unturned-asset-file-vscode\resources\unturned-dat.ico" />
+    <Image Include="..\unturned-dat\resources\unturned-dat.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

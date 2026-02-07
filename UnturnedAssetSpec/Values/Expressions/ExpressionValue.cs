@@ -53,7 +53,11 @@ public class ExpressionValue<TResult> : IValue<TResult>, IEquatable<ExpressionVa
     }
 
     /// <inheritdoc />
-    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
+    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         if (!TryGetConcreteValue(out Optional<TResult> r))
             return false;
@@ -63,7 +67,11 @@ public class ExpressionValue<TResult> : IValue<TResult>, IEquatable<ExpressionVa
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         if (!TryEvaluateValue(out Optional<TResult> r, in ctx))
             return false;

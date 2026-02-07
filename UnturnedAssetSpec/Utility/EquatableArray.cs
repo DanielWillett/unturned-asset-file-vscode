@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -10,9 +11,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 /// </summary>
 /// <typeparam name="T">The element type.</typeparam>
 [JsonConverter(typeof(EquatableArrayConverterFactory))]
-public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>> where T : IEquatable<T>
+public readonly struct EquatableArray<T> : IEquatableArray<EquatableArray<T>> where T : IEquatable<T>
 {
     public readonly T[] Array;
+
+    Array IEquatableArray<EquatableArray<T>>.Array => Array;
 
     public static EquatableArray<T> Empty => new EquatableArray<T>(System.Array.Empty<T>());
 
@@ -49,6 +52,16 @@ public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>> where T
     }
 
     /// <inheritdoc />
+    public void Visit<TVisitor>(ref TVisitor visitor)
+        where TVisitor : IEquatableArrayVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        visitor.Accept(this);
+    }
+
+    /// <inheritdoc />
     public bool Equals(EquatableArray<T> other)
     {
         return EquatableArray.EqualsEquatable(Array, other.Array);
@@ -75,6 +88,64 @@ public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>> where T
         }
 
         return hash;
+    }
+}
+
+/// <summary>
+/// Interface implemented by <see cref="EquatableArray{T}"/>.
+/// </summary>
+/// <typeparam name="TSelf">The equatable array type. Should be <see cref="EquatableArray{T}"/>.</typeparam>
+/// <remarks>Should not be implemented.</remarks>
+public interface IEquatableArray<TSelf> : IEquatable<TSelf>
+    where TSelf : IEquatable<TSelf>
+{
+    /// <summary>
+    /// The underlying array.
+    /// </summary>
+    Array Array { get; }
+
+    /// <summary>
+    /// Invokes <see cref="IEquatableArrayVisitor.Accept"/> on a visitor.
+    /// </summary>
+    void Visit<TVisitor>(ref TVisitor visitor)
+        where TVisitor : IEquatableArrayVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    ;
+}
+
+/// <summary>
+/// A visitor invoked from <see cref="EquatableArray{T}.Visit"/>. Used to transform generic method parameters.
+/// </summary>
+public interface IEquatableArrayVisitor
+{
+    /// <summary>
+    /// Invoked from <see cref="EquatableArray{T}.Visit"/>.
+    /// </summary>
+    /// <typeparam name="T">Element type.</typeparam>
+    /// <param name="superset">The array being visited.</param>
+    void Accept<T>(EquatableArray<T> superset)
+        where T : IEquatable<T>;
+}
+
+internal static class EquatableArrayHelper<TArrayType>
+    where TArrayType : IEquatable<TArrayType>
+{
+    public static bool IsEquatableArray { get; }
+    public static Type? ElementType { get; }
+
+    static EquatableArrayHelper()
+    {
+        if (!typeof(TArrayType).IsValueType
+            || !typeof(TArrayType).IsConstructedGenericType
+            || typeof(TArrayType).GetGenericTypeDefinition() != typeof(EquatableArray<>))
+        {
+            return;
+        }
+
+        ElementType = typeof(TArrayType).GetGenericArguments()[0];
+        IsEquatableArray = true;
     }
 }
 

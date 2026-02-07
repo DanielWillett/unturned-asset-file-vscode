@@ -27,13 +27,21 @@ public interface IValue : IEquatable<IValue?>
     /// Attempts to invoke <see cref="IValueVisitor.Accept"/> on the current value, but only when the value can be determined without context.
     /// </summary>
     bool VisitConcreteValue<TVisitor>(ref TVisitor visitor)
-        where TVisitor : IValueVisitor;
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    ;
 
     /// <summary>
     /// Attempts to invoke <see cref="IValueVisitor.Accept"/> on the current value, evaluating with context if necessary.
     /// </summary>
     bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
-        where TVisitor : IValueVisitor;
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    ;
 }
 
 /// <summary>

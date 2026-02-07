@@ -80,7 +80,7 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\unturned-asset-file-vscode\resources\unturned-dat.ico">
+    <Image Include="..\unturned-dat\resources\unturned-dat.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -200,7 +200,11 @@ public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>
     }
 
     /// <inheritdoc />
-    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
+    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         if (!TryGetConcreteValue(out Optional<bool> v) || !v.HasValue)
             return false;
@@ -210,7 +214,11 @@ public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         if (!TryEvaluateValue(out Optional<bool> v, in ctx) || !v.HasValue)
             return false;
@@ -272,12 +280,12 @@ public static class Conditions
     /// <summary>
     /// A condition that always evaluates to <see langword="true"/>.
     /// </summary>
-    public static Condition<bool> True { get; } = new Condition<bool>(Value.True, Operations.Equals.Instance, new Optional<bool>(true));
+    public static Condition<bool> True { get; } = new Condition<bool>(Value.True, Operations.Equal.Instance, new Optional<bool>(true));
 
     /// <summary>
     /// A condition that always evaluates to <see langword="false"/>.
     /// </summary>
-    public static Condition<bool> False { get; } = new Condition<bool>(Value.True, Operations.Equals.Instance, new Optional<bool>(false));
+    public static Condition<bool> False { get; } = new Condition<bool>(Value.True, Operations.Equal.Instance, new Optional<bool>(false));
 
     /// <summary>
     /// Attempt to read a condition from a JSON object and return it as a boolean value.

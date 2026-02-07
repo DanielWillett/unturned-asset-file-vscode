@@ -22,7 +22,7 @@ public class MatchingSwitches
                     ImmutableArray.Create<IValue<bool>>
                     (
                         new Condition<bool>(new LocalPropertyReference(in pref, null!, offline),
-                            DanielWillett.UnturnedDataFileLspServer.Data.Values.Operations.Equals.Instance, true, false)
+                            DanielWillett.UnturnedDataFileLspServer.Data.Values.Operations.Equal.Instance, true, false)
                     ),
                     JointConditionOperation.Or,
                     Value.Type(Float32Type.Instance)

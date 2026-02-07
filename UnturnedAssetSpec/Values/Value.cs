@@ -415,8 +415,7 @@ public static class Value
                         return strVal;
 
                     case ExpressionValueType.DataRef:
-                        // todo
-                        throw new NotImplementedException();
+                        return DataRefs.TryReadDataRef(str, type, out IDataRef? dataRef) ? dataRef : null;
 
                     case ExpressionValueType.PropertyRef:
                         PropertyReference pRef;
@@ -515,8 +514,7 @@ public static class Value
                         return null;
 
                     case ExpressionValueType.DataRef:
-                        // todo
-                        throw new NotImplementedException();
+                        return DataRefs.TryReadDataRef(str, valueType, out IDataRef? dataRef) ? dataRef as IValue<TValue> : null;
 
                     case ExpressionValueType.PropertyRef:
                         PropertyReference pRef;

@@ -29,11 +29,16 @@ public abstract class BaseType<TSelf> : IType
     protected void WriteTypeName(Utf8JsonWriter writer) => writer.WriteString("Type"u8, Id);
 
     /// <inheritdoc />
-    public abstract void Visit<TVisitor>(ref TVisitor visitor) where TVisitor : ITypeVisitor;
+    public abstract void Visit<TVisitor>(ref TVisitor visitor)
+        where TVisitor : ITypeVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    ;
 
-    /// <summary>
-    /// Determines whether or not the given value is equal to the current object.
-    /// </summary>
+        /// <summary>
+        /// Determines whether or not the given value is equal to the current object.
+        /// </summary>
     protected abstract bool Equals(TSelf other);
 
     /// <inheritdoc />

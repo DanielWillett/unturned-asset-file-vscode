@@ -182,7 +182,11 @@ public static class DatPropertyExtensions
         ref TVisitor visitor,
         in FileEvaluationContext ctx,
         IDiagnosticSink? diagnosticSink = null,
-        IReferencedPropertySink? referencedPropertySink = null) where TVisitor : IValueVisitor
+        IReferencedPropertySink? referencedPropertySink = null)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         if (!ctx.File.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode))
         {
@@ -216,6 +220,9 @@ public static class DatPropertyExtensions
 
     private unsafe struct VisitValueTypeVisitor<TVisitor> : ITypeVisitor
         where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         public FileEvaluationContext* EvaluationContext;
         public TVisitor* Visitor;

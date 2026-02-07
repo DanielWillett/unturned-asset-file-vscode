@@ -26,9 +26,13 @@ public abstract class RootDataRef<TSelf> : BaseDataRefTarget, IDataRef
 
     /// <inheritdoc />
     public abstract bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
-        where TVisitor : IValueVisitor;
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    ;
 
-    /// <inheritdoc />
+        /// <inheritdoc />
     public void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
         writer.WriteStringValue(GetExpressionString());

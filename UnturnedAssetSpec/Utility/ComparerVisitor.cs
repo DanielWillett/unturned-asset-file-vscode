@@ -50,6 +50,16 @@ internal struct ComparerVisitor<TValue> : IValueVisitor, IGenericVisitor
                     StringComparison.OrdinalIgnoreCase
                 );
             }
+            else if (CaseInsensitive && typeof(TValue) == typeof(char))
+            {
+                Comparison = char.ToLowerInvariant(
+                    MathMatrix.As<TValue?, char>(Value)
+                ).CompareTo(
+                    char.ToLowerInvariant(
+                        MathMatrix.As<TOtherValue?, char>(optVal.Value)
+                    )
+                );
+            }
             else
             {
                 Comparison = Comparer<TValue>.Default.Compare(Value!, MathMatrix.As<TOtherValue, TValue>(optVal.Value));

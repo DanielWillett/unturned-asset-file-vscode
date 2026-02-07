@@ -118,7 +118,8 @@ partial class SpecificationFileReader
 
             for (int i = 0; i < propertyCount; ++i)
             {
-                ReadPropertyFirstPass(in element, i, "Properties", t => t.Properties, propertyBuilder, SpecPropertyContext.Property, type);
+                JsonElement prop = element[i];
+                ReadPropertyFirstPass(in prop, i, "Properties", t => t.Properties, propertyBuilder, SpecPropertyContext.Property, type);
             }
 
             type.Properties = propertyBuilder.ToImmutable();
@@ -133,7 +134,8 @@ partial class SpecificationFileReader
 
             for (int i = 0; i < propertyCount; ++i)
             {
-                ReadPropertyFirstPass(in element, i, "Localization", t => t.Properties, propertyBuilder, SpecPropertyContext.Localization, type);
+                JsonElement prop = element[i];
+                ReadPropertyFirstPass(in prop, i, "Localization", t => t.Properties, propertyBuilder, SpecPropertyContext.Localization, type);
             }
 
             assetFile.LocalizationProperties = propertyBuilder.ToImmutable();

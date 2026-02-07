@@ -98,7 +98,11 @@ public class ConditionalSwitchCase<TComparand> : IConditionalSwitchCase
     }
 
     /// <inheritdoc />
-    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor) where TVisitor : IValueVisitor
+    public bool VisitConcreteValue<TVisitor>(ref TVisitor visitor)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         if (!Condition.TryGetConcreteValue(out Optional<bool> v) || !v.GetValueOrDefault(false))
             return false;
@@ -107,7 +111,11 @@ public class ConditionalSwitchCase<TComparand> : IConditionalSwitchCase
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx) where TVisitor : IValueVisitor
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         if (!Condition.TryEvaluateValue(out Optional<bool> v, in ctx) || !v.GetValueOrDefault(false))
             return false;
