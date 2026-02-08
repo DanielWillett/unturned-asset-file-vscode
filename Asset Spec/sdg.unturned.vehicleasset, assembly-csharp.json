@@ -1869,7 +1869,13 @@
             "Type": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp",
             "DisplayName": "Paintable Vehicle Section",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-paintablevehiclesection-dictionary",
-            "StringParseableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.PaintableVehicleSectionStringParseableSpecPropertyType, UnturnedAssetSpec",
+            "StringDefaultValue":
+            {
+                "$udat-type": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp",
+                "Path": "#Value",
+                "MaterialIndex": -1,
+                "AllMaterials": true
+            },
             "Version": "3.24.4.0",
             "Properties":
             [
@@ -1880,7 +1886,20 @@
                     "Required": true,
                     "Description": "Scene hierarchy path to a Renderer component relative to the vehicle's root transform.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-paintablevehiclesection-path",
-                    "Variable": "path"
+                    "Variable": "path",
+                    "ExclusiveWith":
+                    [
+                        {
+                            "Key": "Path",
+                            "Value": "",
+                            "Condition":
+                            {
+                                "Variable": "#Self.ValueType",
+                                "Operation": "eq",
+                                "Comparand": "Value"
+                            }
+                        }
+                    ]
                 },
                 {
                     "Key": "MaterialIndex",

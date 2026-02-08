@@ -31,6 +31,7 @@ public static class DataRefs
         bldr.Add("This");
         bldr.Add("Self");
         bldr.Add("Index");
+        bldr.Add("Value");
 
         Keywords = bldr.ToImmutable();
 

@@ -57,7 +57,7 @@ internal static class SwitchCase
     /// <param name="switchType">The type of value to read.</param>
     /// <param name="root">The JSON object of the case.</param>
     /// <returns>The case, if it was successfully parsed.</returns>
-    public static ISwitchCase<TResult>? TryReadSwitchCase<TResult>(IType<TResult> switchType, IAssetSpecDatabase database, DatProperty owner, in JsonElement root)
+    public static ISwitchCase<TResult>? TryReadSwitchCase<TResult>(IType<TResult> switchType, IAssetSpecDatabase database, IDatSpecificationObject owner, in JsonElement root)
         where TResult : IEquatable<TResult>
     {
         IValue<TResult>? value;
@@ -151,7 +151,7 @@ internal static class SwitchCase
     /// <param name="switchType">If <see langword="null"/>, indicates that the value should be skipped, otherwise the type of value to read.</param>
     /// <param name="root">The JSON object of the case.</param>
     /// <returns>The case, if it was successfully parsed.</returns>
-    internal static unsafe ISwitchCase? TryReadSwitchCase(IType? switchType, IAssetSpecDatabase database, DatProperty owner, in JsonElement root)
+    internal static unsafe ISwitchCase? TryReadSwitchCase(IType? switchType, IAssetSpecDatabase database, IDatSpecificationObject owner, in JsonElement root)
     {
         if (switchType != null)
         {
@@ -243,7 +243,7 @@ internal static class SwitchCase
         public bool Visited;
         public JsonElement* Element;
         public IAssetSpecDatabase Database;
-        public DatProperty Owner;
+        public IDatSpecificationObject Owner;
         public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
         {
             Visited = true;

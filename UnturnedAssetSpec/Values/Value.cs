@@ -311,7 +311,7 @@ public static class Value
     /// Parse a value from a JSON token.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static IValue? TryReadValueFromJson(in JsonElement root, ValueReadOptions options, IPropertyType? valueType, IAssetSpecDatabase database, DatProperty owner)
+    public static IValue? TryReadValueFromJson(in JsonElement root, ValueReadOptions options, IPropertyType? valueType, IAssetSpecDatabase database, IDatSpecificationObject owner)
     {
         NullReadValueVisitor v;
         return TryReadValueFromJson(in root, options, ref v, valueType, database, owner);
@@ -321,7 +321,7 @@ public static class Value
     /// Parse a value from a JSON token. The visitor will only be invoked if the value is strongly typed.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static unsafe IValue? TryReadValueFromJson<TVisitor>(in JsonElement root, ValueReadOptions options, ref TVisitor visitor, IPropertyType? valueType, IAssetSpecDatabase database, DatProperty owner)
+    public static unsafe IValue? TryReadValueFromJson<TVisitor>(in JsonElement root, ValueReadOptions options, ref TVisitor visitor, IPropertyType? valueType, IAssetSpecDatabase database, IDatSpecificationObject owner)
         where TVisitor : IReadValueVisitor
     {
         IType? type = valueType as IType;
@@ -418,13 +418,15 @@ public static class Value
                         return DataRefs.TryReadDataRef(str, type, out IDataRef? dataRef) ? dataRef : null;
 
                     case ExpressionValueType.PropertyRef:
+                        if (owner is not DatProperty propertyOwner)
+                            return null;
                         PropertyReference pRef;
                         if (str.Length > 0 && (options & ValueReadOptions.AllowExclamationSuffix) != 0 && str[^1] == '!')
                             pRef = PropertyReference.Parse(str.AsSpan(0, str.Length - 1), null);
                         else
                             pRef = PropertyReference.Parse(str, str);
 
-                        return pRef.CreateValue(owner, database);
+                        return pRef.CreateValue(propertyOwner, database);
 
                     case ExpressionValueType.Expression:
                         if (valueType == null || !valueType.TryGetConcreteType(out IType? concreteType))
@@ -458,6 +460,11 @@ public static class Value
                 }
 
                 break;
+
+            case JsonValueKind.Null:
+                if (type != null)
+                    return Null(type);
+                break;
         }
 
         return null;
@@ -467,7 +474,7 @@ public static class Value
     /// Parse a value from a JSON token.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static IValue<TValue>? TryReadValueFromJson<TValue>(in JsonElement root, ValueReadOptions options, IType<TValue> valueType, IAssetSpecDatabase database, DatProperty owner)
+    public static IValue<TValue>? TryReadValueFromJson<TValue>(in JsonElement root, ValueReadOptions options, IType<TValue> valueType, IAssetSpecDatabase database, IDatSpecificationObject owner)
         where TValue : IEquatable<TValue>
     {
         switch (root.ValueKind)
@@ -517,13 +524,15 @@ public static class Value
                         return DataRefs.TryReadDataRef(str, valueType, out IDataRef? dataRef) ? dataRef as IValue<TValue> : null;
 
                     case ExpressionValueType.PropertyRef:
+                        if (owner is not DatProperty propertyOwner)
+                            return null;
                         PropertyReference pRef;
                         if (str.Length > 0 && (options & ValueReadOptions.AllowExclamationSuffix) != 0 && str[^1] == '!')
                             pRef = PropertyReference.Parse(str.AsSpan(0, str.Length - 1), null);
                         else
                             pRef = PropertyReference.Parse(str, str);
 
-                        return pRef.CreateValue(valueType, owner, database);
+                        return pRef.CreateValue(valueType, propertyOwner, database);
 
                     case ExpressionValueType.Expression:
                         try
@@ -552,6 +561,8 @@ public static class Value
                 }
                 break;
 
+            case JsonValueKind.Null:
+                return Null(valueType);
         }
 
         return null;
@@ -617,7 +628,7 @@ public static class Value
         public JsonElement* Element;
         public ValueReadOptions Options;
         public IAssetSpecDatabase Database;
-        public DatProperty Owner;
+        public IDatSpecificationObject Owner;
         public void Accept<TValue>(IType<TValue> type)
             where TValue : IEquatable<TValue>
         {

@@ -30,7 +30,7 @@ public sealed class AssetTypeAlias : DatEnumType
     }
 
     internal AssetTypeAlias(IDatSpecificationReadContext context, DatFileType owner)
-        : base(TypeId, default, owner)
+        : base(TypeId, default, owner, null!)
     {
         AssetInformation information = context.Information;
         Dictionary<string, QualifiedType> dict = information.AssetAliases;

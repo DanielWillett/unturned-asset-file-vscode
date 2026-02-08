@@ -17,6 +17,9 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     public bool AcceptProperty<TProperty, TVisitor>(in TProperty property, ref TVisitor valueVisitor, in FileEvaluationContext ctx)
         where TProperty : IDataRefProperty
         where TVisitor : IValueVisitor
+    #if NET9_0_OR_GREATER
+        , allows ref struct
+    #endif
     {
         if (typeof(TProperty) == typeof(IncludedProperty))
         {
@@ -37,6 +40,9 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     protected virtual bool AcceptUnknownProperty<TProperty, TVisitor>(in TProperty property, ref TVisitor valueVisitor, in FileEvaluationContext ctx)
         where TProperty : IDataRefProperty
         where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         return false;
     }

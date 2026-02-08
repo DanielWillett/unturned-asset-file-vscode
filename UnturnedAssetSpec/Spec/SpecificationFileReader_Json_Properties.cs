@@ -289,10 +289,31 @@ partial class SpecificationFileReader
             throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type (No Switches)", $"{owner.FullName}.{key}.Type[ ... ]"));
         }
 
+        string? fileType = null;
+        int fileTypeSeparator = type.IndexOf("::", StringComparison.Ordinal);
+        if (fileTypeSeparator > 0 && fileTypeSeparator < type.Length - 2)
+        {
+            fileType = type.Substring(0, fileTypeSeparator);
+            type = type.Substring(fileTypeSeparator + 2);
+        }
+
+        if (CommonTypes.TypeFactories.TryGetValue(type, out Func<ITypeFactory>? factoryGetter))
+        {
+            ITypeFactory factory = factoryGetter();
+            IType newType = factory.CreateType(in root, type, this, property, key);
+            return newType;
+        }
+
         if (type.IndexOf(',') >= 0)
         {
             QualifiedType qualType = new QualifiedType(type, isCaseInsensitive: true);
-            for (DatFileType? file = owner.Owner; file != null; file = file.Parent)
+            DatFileType? file = owner.Owner;
+            if (fileType != null)
+            {
+                file = GetOrReadFileType(new QualifiedType(fileType, true));
+            }
+
+            for (; file != null; file = file.Parent)
             {
                 if (qualType.Equals(file.TypeName))
                 {
@@ -305,7 +326,7 @@ partial class SpecificationFileReader
                 }
             }
 
-            Type clrType = Type.GetType(type, throwOnError: true, ignoreCase: false)!;
+            Type clrType = Type.GetType(type, throwOnError: false, ignoreCase: false)!;
             if (clrType != null && typeof(ITypeFactory).IsAssignableFrom(clrType))
             {
                 ITypeFactory factory = (ITypeFactory?)Activator.CreateInstance(clrType, true)!;
@@ -314,13 +335,6 @@ partial class SpecificationFileReader
             }
         }
         
-        if (CommonTypes.TypeFactories.TryGetValue(type, out Func<ITypeFactory>? factoryGetter))
-        {
-            ITypeFactory factory = factoryGetter();
-            IType newType = factory.CreateType(in root, type, this, property, key);
-            return newType;
-        }
-
         throw new JsonException(string.Format(Resources.JsonException_PropertyTypeNotFound, type, $"{owner.FullName}.{key}.Type"));
     }
 
@@ -332,7 +346,7 @@ partial class SpecificationFileReader
         throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type", context.Length == 0 ? property.FullName : $"{property.FullName}.{context}"));
     }
 
-    public IValue ReadValue(in JsonElement root, IPropertyType valueType, DatProperty readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default)
+    public IValue ReadValue(in JsonElement root, IPropertyType valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default)
     {
         if (Value.TryReadValueFromJson(in root, options, valueType, Database, readObject) is { } value)
         {

@@ -4,19 +4,26 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 /// <summary>
 /// A subclass of <see cref="DatType"/> which defines a specific set of values or a set of flags which can be combined (or'd) into a bitwise value.
 /// </summary>
-public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumValue>
+public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumValue>, IDatTypeWithStringParseableType<DatEnumValue>, IDisposable
 {
+    internal readonly IDatSpecificationReadContext Context;
+    private bool _hasStringParser;
+    private bool _stringParserNoFallback;
+
     /// <summary>
     /// The file that defines this enum type.
     /// </summary>
@@ -42,13 +49,74 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
     [field: MaybeNull]
     public ITypeParser<DatEnumValue> Parser => field ??= new TypeConverterParser<DatEnumValue>(this);
 
-    internal DatEnumType(QualifiedType type, JsonElement element, DatFileType owner) : base(type, null, element)
+    /// <inheritdoc />
+    public QualifiedType StringParseableType { get; internal set; }
+
+    internal DatEnumType(QualifiedType type, JsonElement element, DatFileType owner, IDatSpecificationReadContext context) : base(type, null, element)
     {
+        Context = context;
         Owner = owner;
     }
 
     /// <summary>
-    /// Attempts to parse an enum value from text.
+    /// The parser for this enum type. Requires a constructor with the signature <c>ctor(DatEnumType)</c>.
+    /// </summary>
+    public ITypeConverter<DatEnumValue>? StringParser
+    {
+        get
+        {
+            if (_hasStringParser)
+                return field;
+
+            _stringParserNoFallback = false;
+            QualifiedType stringParseableType = StringParseableType;
+            if (stringParseableType.IsNull)
+            {
+                _hasStringParser = true;
+                return null;
+            }
+
+            Type? clrType = System.Type.GetType(stringParseableType.Type, throwOnError: false, ignoreCase: true);
+            if (clrType == null
+                || clrType.GetCustomAttribute(typeof(StringParseableTypeAttribute), false) is not StringParseableTypeAttribute attr
+                || !typeof(ITypeConverter<DatEnumValue>).IsAssignableFrom(clrType)
+                || clrType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, [typeof(DatCustomType)], null) is not { } ctor)
+            {
+                _hasStringParser = true;
+                Context.LoggerFactory
+                    .CreateLogger(TypeName.GetFullTypeName())
+                    .LogError(string.Format(Resources.Log_FailedToFindStringParseableType, stringParseableType.Type, TypeName.GetFullTypeName()));
+                return null;
+            }
+
+            ITypeConverter<DatEnumValue> obj;
+            try
+            {
+                obj = (ITypeConverter<DatEnumValue>)ctor.Invoke([this]);
+            }
+            catch (Exception ex)
+            {
+                Context.LoggerFactory
+                    .CreateLogger(TypeName.GetFullTypeName())
+                    .LogError(ex, string.Format(Resources.Log_FailedToFindStringParseableType, stringParseableType.Type, TypeName.GetFullTypeName()));
+                _hasStringParser = true;
+                return null;
+            }
+
+            ITypeConverter<DatEnumValue>? otherVal = Interlocked.CompareExchange(ref field, obj, null);
+            if (otherVal != null && obj is IDisposable disp)
+            {
+                disp.Dispose();
+            }
+
+            _hasStringParser = true;
+            _stringParserNoFallback = attr.PreventReadFallback;
+            return field;
+        }
+    }
+
+    /// <summary>
+    /// Attempts to parse an enum value from text. Does not use the <see cref="StringParser"/>.
     /// </summary>
     /// <param name="text">Text to parse.</param>
     /// <param name="value">Parsed enum value.</param>
@@ -126,6 +194,21 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
 
     bool ITypeConverter<DatEnumValue>.TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<DatEnumValue> args, [NotNullWhen(true)] out DatEnumValue? parsedValue)
     {
+        if (StringParser is { } stringParser)
+        {
+            if (stringParser.TryParse(text, ref args, out DatEnumValue? stringParsedValue))
+            {
+                parsedValue = stringParsedValue;
+                return true;
+            }
+
+            if (_stringParserNoFallback)
+            {
+                parsedValue = null;
+                return false;
+            }
+        }
+
         return TryParse(text, out parsedValue);
     }
 
@@ -184,6 +267,13 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
     string IType.Id => TypeName.Type;
     IValue<DatEnumValue> IType<DatEnumValue>.CreateValue(Optional<DatEnumValue> value) => value.Value ?? Null;
     IType<DatEnumValue> ITypeConverter<DatEnumValue>.DefaultType => this;
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (_hasStringParser && StringParser is IDisposable disp)
+            disp.Dispose();
+    }
 }
 
 public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConverter<DatFlagEnumValue>
@@ -201,7 +291,7 @@ public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConver
     /// <inheritdoc />
     public override DatSpecificationType Type => DatSpecificationType.FlagEnum;
 
-    internal DatFlagEnumType(QualifiedType type, JsonElement element, DatFileType file) : base(type, element, file) { }
+    internal DatFlagEnumType(QualifiedType type, JsonElement element, DatFileType file, IDatSpecificationReadContext context) : base(type, element, file, context) { }
 
     public bool TryReadValueFromJson(ref Utf8JsonReader reader, [NotNullWhen(true)] out IValue<DatFlagEnumValue>? value)
     {

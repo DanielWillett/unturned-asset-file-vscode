@@ -291,7 +291,7 @@ public static class Conditions
     /// Attempt to read a condition from a JSON object and return it as a boolean value.
     /// </summary>
     /// <remarks>Some values returned may not be a <see cref="Condition{TComparand}"/> object. For example, a boolean token results in a <see cref="BooleanType"/> value.</remarks>
-    public static bool TryReadConditionFromJson(in JsonElement root, IAssetSpecDatabase database, DatProperty owner, [NotNullWhen(true)] out IValue<bool>? condition)
+    public static bool TryReadConditionFromJson(in JsonElement root, IAssetSpecDatabase database, IDatSpecificationObject owner, [NotNullWhen(true)] out IValue<bool>? condition)
     {
         switch (root.ValueKind)
         {
@@ -332,7 +332,7 @@ public static class Conditions
     /// <summary>
     /// Attempt to read a condition from a JSON object and report it to a <see cref="IConditionVisitor"/>.
     /// </summary>
-    public static unsafe bool TryReadConditionFromJson<TVisitor>(in JsonElement root, IAssetSpecDatabase database, DatProperty owner, ref TVisitor visitor)
+    public static unsafe bool TryReadConditionFromJson<TVisitor>(in JsonElement root, IAssetSpecDatabase database, IDatSpecificationObject owner, ref TVisitor visitor)
         where TVisitor : IConditionVisitor
     {
         switch (root.ValueKind)
@@ -462,7 +462,7 @@ public static class Conditions
     /// Attempts to read either a <see cref="Condition{TComparand}"/> or a <see cref="ComplexConditionalValue"/> from a JSON object.
     /// </summary>
     /// <returns>Whether or not the value could be read.</returns>
-    public static bool TryReadComplexOrBasicConditionFromJson(in JsonElement root, IAssetSpecDatabase database, DatProperty owner, [NotNullWhen(true)] out IValue<bool>? condition)
+    public static bool TryReadComplexOrBasicConditionFromJson(in JsonElement root, IAssetSpecDatabase database, IDatSpecificationObject owner, [NotNullWhen(true)] out IValue<bool>? condition)
     {
         condition = null;
         if (TryReadConditionFromJson(in root, database, owner, out IValue<bool>? cond))

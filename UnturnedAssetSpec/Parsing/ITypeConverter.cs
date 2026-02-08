@@ -99,6 +99,11 @@ public struct TypeConverterParseArgs<T> : IDiagnosticProvider where T : IEquatab
     public FileRange ValueRange;
 
     /// <summary>
+    /// The value node being parsed.
+    /// </summary>
+    public IValueSourceNode? ValueNode;
+
+    /// <summary>
     /// The property being parsed.
     /// </summary>
     public DatProperty? Property;

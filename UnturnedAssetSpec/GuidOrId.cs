@@ -98,8 +98,13 @@ public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable
     /// <summary>
     /// Convert a <see cref="string"/> to a <see cref="GuidOrId"/>.
     /// </summary>
-    public static bool TryParse(string str, out GuidOrId id)
+    public static bool TryParse(string? str, out GuidOrId id)
     {
+        if (string.IsNullOrEmpty(str))
+        {
+            id = Empty;
+            return false;
+        }
         if (ushort.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out ushort shortId))
         {
             id = new GuidOrId(shortId);
@@ -112,7 +117,7 @@ public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable
             return true;
         }
 
-        id = default;
+        id = Empty;
         return false;
     }
 
@@ -147,7 +152,7 @@ public readonly struct GuidOrId : IEquatable<GuidOrId>, IComparable, IComparable
             return true;
         }
 
-        id = default;
+        id = Empty;
         return false;
     }
 

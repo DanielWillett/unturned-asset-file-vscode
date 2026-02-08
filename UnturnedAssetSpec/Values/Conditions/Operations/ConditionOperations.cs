@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 #pragma warning disable IDE0130
 
@@ -35,6 +36,16 @@ public static class ConditionOperations
         RegisterOperation(Operations.LessThanOrEqualCaseInsensitive.Instance);
         RegisterOperation(Operations.Contains.Instance);
         RegisterOperation(Operations.ContainsCaseInsensitive.Instance);
+        RegisterOperation(Operations.ContainedIn.Instance);
+        RegisterOperation(Operations.ContainedInCaseInsensitive.Instance);
+        RegisterOperation(Operations.StartsWith.Instance);
+        RegisterOperation(Operations.StartsWithCaseInsensitive.Instance);
+        RegisterOperation(Operations.EndsWith.Instance);
+        RegisterOperation(Operations.EndsWithCaseInsensitive.Instance);
+        RegisterOperation(Operations.Matches.Instance);
+        RegisterOperation(Operations.AssignableTo.Instance);
+        RegisterOperation(Operations.AssignableFrom.Instance);
+        RegisterOperation(Operations.IsType.Instance);
     }
 
 
@@ -139,6 +150,37 @@ public static class ConditionOperations
         }
 
         operation = null;
+        return false;
+    }
+
+    internal static bool TryGetType<TComparand>(ref TComparand comparand, out QualifiedType type, out bool isAlias)
+    {
+        isAlias = false;
+        if (typeof(TComparand) == typeof(QualifiedType))
+        {
+            type = Unsafe.As<TComparand, QualifiedType>(ref comparand);
+            return true;
+        }
+
+        if (typeof(TComparand) == typeof(QualifiedOrAliasedType))
+        {
+            ref QualifiedOrAliasedType aliasedType = ref Unsafe.As<TComparand, QualifiedOrAliasedType>(ref comparand);
+            isAlias = aliasedType.IsAlias;
+            type = aliasedType.Type;
+            return true;
+        }
+
+        if (typeof(TComparand) == typeof(string))
+        {
+            string? typeName = Unsafe.As<TComparand, string?>(ref comparand);
+            if (QualifiedType.ExtractParts(typeName, out _, out _))
+            {
+                type = new QualifiedType(typeName!, isCaseInsensitive: true);
+                return true;
+            }
+        }
+
+        type = QualifiedType.None;
         return false;
     }
 }

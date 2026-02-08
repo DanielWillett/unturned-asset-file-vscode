@@ -100,6 +100,8 @@ public static class CommonTypes
         knownTypes["Path"]                              = () => StringType.Instance;    // todo
         knownTypes[NullType.TypeId]                     = () => NullType.Instance;
 
+        knownTypes[AssetCategory.TypeId]                = () => AssetCategory.Instance;
+
         TypeFactories = knownTypes.ToImmutable();
     }
 
@@ -296,7 +298,7 @@ public static class CommonTypes
     /// Attempts to read a value of the given <paramref name="type"/> from a JSON <paramref name="element"/>.
     /// </summary>
     /// <returns>Whether or not the value was successfully parsed.</returns>
-    public static bool TryReadFromJson<TValue>(this IType<TValue> type, in JsonElement element, IAssetSpecDatabase database, DatProperty owner, [NotNullWhen(true)] out IValue<TValue>? value)
+    public static bool TryReadFromJson<TValue>(this IType<TValue> type, in JsonElement element, IAssetSpecDatabase database, IDatSpecificationObject owner, [NotNullWhen(true)] out IValue<TValue>? value)
         where TValue : IEquatable<TValue>
 
     {

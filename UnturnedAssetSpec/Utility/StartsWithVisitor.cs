@@ -6,43 +6,43 @@ using System.Runtime.InteropServices;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
-internal struct ContainedVisitor<TSuperset> : IGenericVisitor, IEquatableArrayVisitor
-    where TSuperset : IEquatable<TSuperset>
+internal struct StartsWithVisitor<TSet> : IGenericVisitor, IEquatableArrayVisitor
+    where TSet : IEquatable<TSet>
 {
-    public TSuperset? Superset;
+    public TSet? Set;
     public bool IsCaseInsensitive;
     public bool Success;
     public bool Result;
 
     /// <summary>
-    /// Checks whether a value is a subset of a value. If one of these values are strings, a string contains operation will be performed instead.
+    /// Checks whether a value is at the beginning of a value. If one of these values are strings, a string starts-with operation will be performed instead.
     /// </summary>
-    /// <typeparam name="TSubset">The type of value that will be checked to see if it's contained in <paramref name="superset"/>.</typeparam>
-    /// <param name="superset">The value to check whether or not <paramref name="value"/> is contained in.</param>
-    /// <param name="value">The value to look for in <paramref name="superset"/>.</param>
-    /// <param name="doesContain">Whether or not <paramref name="value"/> is contained in <paramref name="superset"/>.</param>
+    /// <typeparam name="TSubset">The type of value that will be checked to see if it's at the beginning of <paramref name="set"/>.</typeparam>
+    /// <param name="set">The value to check whether or not <paramref name="value"/> is at the beginning of.</param>
+    /// <param name="value">The value to look for in <paramref name="set"/>.</param>
+    /// <param name="doesContain">Whether or not <paramref name="value"/> is at the beginning of <paramref name="set"/>.</param>
     /// <returns>Whether or not the check was successful.</returns>
-    public static bool TryGetContains<TSubset>(TSuperset? superset, TSubset? value, out bool doesContain)
+    public static bool TryGetStartsWith<TSubset>(TSet? set, TSubset? value, out bool doesContain)
         where TSubset : IEquatable<TSubset>
     {
-        return TryGetContains(superset, value, false, out doesContain);
+        return TryGetStartsWith(set, value, false, out doesContain);
     }
 
     /// <summary>
-    /// Checks whether a value is a subset of a value. If one of these values are strings, a string contains operation will be performed instead.
+    /// Checks whether a value is at the beginning of a value. If one of these values are strings, a string starts-with operation will be performed instead.
     /// </summary>
-    /// <typeparam name="TSubset">The type of value that will be checked to see if it's contained in <paramref name="superset"/>.</typeparam>
-    /// <param name="superset">The value to check whether or not <paramref name="value"/> is contained in.</param>
-    /// <param name="value">The value to look for in <paramref name="superset"/>.</param>
+    /// <typeparam name="TSubset">The type of value that will be checked to see if it's at the beginning of <paramref name="set"/>.</typeparam>
+    /// <param name="set">The value to check whether or not <paramref name="value"/> is at the beginning of.</param>
+    /// <param name="value">The value to look for in <paramref name="set"/>.</param>
     /// <param name="isCaseInsensitive">Whether or not the check should ignore character casing.</param>
-    /// <param name="doesContain">Whether or not <paramref name="value"/> is contained in <paramref name="superset"/>.</param>
+    /// <param name="doesContain">Whether or not <paramref name="value"/> is at the beginning of <paramref name="set"/>.</param>
     /// <returns>Whether or not the check was successful.</returns>
-    public static bool TryGetContains<TSubset>(TSuperset? superset, TSubset? value, bool isCaseInsensitive, out bool doesContain)
+    public static bool TryGetStartsWith<TSubset>(TSet? set, TSubset? value, bool isCaseInsensitive, out bool doesContain)
         where TSubset : IEquatable<TSubset>
     {
-        ContainedVisitor<TSuperset> visitor = default;
+        StartsWithVisitor<TSet> visitor = default;
         visitor.IsCaseInsensitive = isCaseInsensitive;
-        visitor.Superset = superset;
+        visitor.Set = set;
 
         visitor.Accept(value);
 
@@ -52,7 +52,7 @@ internal struct ContainedVisitor<TSuperset> : IGenericVisitor, IEquatableArrayVi
 
     public void Accept<TSubset>(TSubset? subset) where TSubset : IEquatable<TSubset>
     {
-        // array in array (calls Accept in this type)
+        // array starts with array (calls Accept in this type)
         if (EquatableArrayHelper<TSubset>.IsEquatableArray
             && subset is IEquatableArray<TSubset> subsetStrongTyped)
         {
@@ -61,8 +61,8 @@ internal struct ContainedVisitor<TSuperset> : IGenericVisitor, IEquatableArrayVi
         }
 
         // value in array (calls accept in SupersetIsEquatableArrayVisitor)
-        if (EquatableArrayHelper<TSuperset>.IsEquatableArray
-            && Superset is IEquatableArray<TSuperset> supersetStrongTyped)
+        if (EquatableArrayHelper<TSet>.IsEquatableArray
+            && Set is IEquatableArray<TSet> supersetStrongTyped)
         {
 #if NET9_0_OR_GREATER
             scoped SupersetIsEquatableArrayVisitor<TSubset> visitor;
@@ -72,17 +72,17 @@ internal struct ContainedVisitor<TSuperset> : IGenericVisitor, IEquatableArrayVi
             visitor.Subset = subset;
 #endif
             visitor.IsCaseInsensitive = IsCaseInsensitive;
-            visitor.Contains = false;
+            visitor.StartsWith = false;
             supersetStrongTyped.Visit(ref visitor);
-            Result = visitor.Contains;
+            Result = visitor.StartsWith;
             Success = true;
             return;
         }
 
-        // value in string
-        if (typeof(TSuperset) == typeof(string))
+        // string starts with value
+        if (typeof(TSet) == typeof(string))
         {
-            string? superstring = Unsafe.As<TSuperset?, string?>(ref Superset);
+            string? superstring = Unsafe.As<TSet?, string?>(ref Set);
             if (typeof(TSubset) == typeof(char))
             {
                 if (string.IsNullOrEmpty(superstring))
@@ -92,16 +92,24 @@ internal struct ContainedVisitor<TSuperset> : IGenericVisitor, IEquatableArrayVi
                     return;
                 }
 
-                // character in string
+                // string starts with character
                 char substringChar = Unsafe.As<TSubset?, char>(ref subset);
+                if (!IsCaseInsensitive)
+                {
+                    Result = superstring[0] == substringChar;
+                }
+                else
+                {
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
-                ReadOnlySpan<char> character = MemoryMarshal.CreateReadOnlySpan(ref substringChar, 1);
+                    ReadOnlySpan<char> character = MemoryMarshal.CreateReadOnlySpan(ref substringChar, 1);
 #else
-                Span<char> character = stackalloc char[1];
-                character[0] = substringChar;
+                    Span<char> character = stackalloc char[1];
+                    character[0] = substringChar;
 #endif
 
-                Result = superstring.AsSpan().IndexOf(character, IsCaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) >= 0;
+                    Result = superstring.AsSpan().StartsWith(character, StringComparison.OrdinalIgnoreCase);
+                }
+
                 Success = true;
             }
             else
@@ -116,33 +124,33 @@ internal struct ContainedVisitor<TSuperset> : IGenericVisitor, IEquatableArrayVi
                     ConvertVisitor<string>.TryConvert(subset, out substring);
                 }
 
-                ContainsString(superstring, substring);
+                StartsWithString(superstring, substring);
             }
             return;
         }
 
-        // string in value
+        // value starts with string
         if (typeof(TSubset) == typeof(string))
         {
             string? substring = Unsafe.As<TSubset?, string?>(ref subset);
             ConvertVisitor<string>.TryConvert(subset, out string? superstring);
-            ContainsString(superstring, substring);
+            StartsWithString(superstring, substring);
             return;
         }
 
-        // value in value (equality)
-        EqualityVisitor<TSuperset> equal = default;
+        // value starts with value (equality)
+        EqualityVisitor<TSet> equal = default;
         equal.CaseInsensitive = IsCaseInsensitive;
-        equal.Value = Superset;
-        equal.IsNull = Superset == null;
+        equal.Value = Set;
+        equal.IsNull = Set == null;
 
-        equal.Accept(Superset);
+        equal.Accept(Set);
 
         Result = equal.IsEqual;
         Success = equal.Success;
     }
 
-    private void ContainsString(string? s1, string? s2)
+    private void StartsWithString(string? s1, string? s2)
     {
         if (string.IsNullOrEmpty(s2))
         {
@@ -154,7 +162,7 @@ internal struct ContainedVisitor<TSuperset> : IGenericVisitor, IEquatableArrayVi
         }
         else
         {
-            Result = s1.IndexOf(s2, IsCaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) >= 0;
+            Result = s1.StartsWith(s2, IsCaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
         }
 
         Success = true;
@@ -163,9 +171,9 @@ internal struct ContainedVisitor<TSuperset> : IGenericVisitor, IEquatableArrayVi
     /// <inheritdoc />
     public void Accept<T>(EquatableArray<T> subset) where T : IEquatable<T>
     {
-        // array in array
-        if (EquatableArrayHelper<TSuperset>.IsEquatableArray
-            && Superset is IEquatableArray<TSuperset> equatableArray)
+        // array starts with array
+        if (EquatableArrayHelper<TSet>.IsEquatableArray
+            && Set is IEquatableArray<TSet> equatableArray)
         {
             ContainedBothEquatableArrayVisitor<T> visitor;
             visitor.Subset = subset;
@@ -188,7 +196,7 @@ internal struct ContainedVisitor<TSuperset> : IGenericVisitor, IEquatableArrayVi
             v.Value = subset.Array[0];
             v.CaseInsensitive = IsCaseInsensitive;
             v.IsNull = v.Value == null;
-            v.Accept(Superset);
+            v.Accept(Set);
 
             Result = v.IsEqual;
             Success = v.Success;
@@ -209,7 +217,7 @@ file struct ContainedBothEquatableArrayVisitor<TSubsetElement> : IEquatableArray
     public bool IsCaseInsensitive;
     public void Accept<TElement>(EquatableArray<TElement> superset) where TElement : IEquatable<TElement>
     {
-        Contains = SetOperationsHelper.ContainsAll(superset, Subset, IsCaseInsensitive);
+        Contains = SetOperationsHelper.StartsWith(superset, Subset, IsCaseInsensitive);
     }
 }
 
@@ -225,11 +233,11 @@ file
 #else
     public TSubset? Subset;
 #endif
-    public bool Contains;
+    public bool StartsWith;
     public bool IsCaseInsensitive;
 
     public void Accept<TElement>(EquatableArray<TElement> superset) where TElement : IEquatable<TElement>
     {
-        Contains = SetOperationsHelper.Contains(superset, Subset, IsCaseInsensitive);
+        StartsWith = SetOperationsHelper.StartsWith(superset, Subset, IsCaseInsensitive);
     }
 }

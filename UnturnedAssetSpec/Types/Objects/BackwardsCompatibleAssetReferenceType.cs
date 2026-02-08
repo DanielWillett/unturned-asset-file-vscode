@@ -63,7 +63,7 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
     /// <exception cref="ArgumentOutOfRangeException"/>
     public static BackwardsCompatibleAssetReferenceType GetInstance(BackwardsCompatibleAssetReferenceKind kind)
     {
-        if (kind is <= BackwardsCompatibleAssetReferenceKind.GuidOrLegacyId or > BackwardsCompatibleAssetReferenceKind.BcAssetReferenceString)
+        if (kind is < BackwardsCompatibleAssetReferenceKind.GuidOrLegacyId or > BackwardsCompatibleAssetReferenceKind.BcAssetReferenceString)
             throw new ArgumentOutOfRangeException(nameof(kind));
         ref BackwardsCompatibleAssetReferenceType? t = ref DefaultInstances[(int)kind];
         BackwardsCompatibleAssetReferenceType? r = t;
@@ -123,7 +123,7 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
 
     public BackwardsCompatibleAssetReferenceType(BackwardsCompatibleAssetReferenceKind kind, bool supportsThis = false, bool preventSelfReference = false)
     {
-        if (kind is <= BackwardsCompatibleAssetReferenceKind.GuidOrLegacyId or > BackwardsCompatibleAssetReferenceKind.BcAssetReferenceString)
+        if (kind is < BackwardsCompatibleAssetReferenceKind.GuidOrLegacyId or > BackwardsCompatibleAssetReferenceKind.BcAssetReferenceString)
             throw new ArgumentOutOfRangeException(nameof(kind));
 
         Kind = kind;
@@ -136,7 +136,7 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
 
     public BackwardsCompatibleAssetReferenceType(BackwardsCompatibleAssetReferenceKind kind, OneOrMore<QualifiedType> baseTypes, IDatSpecificationReadContext spec, bool supportsThis = false, bool preventSelfReference = false)
     {
-        if (kind is <= BackwardsCompatibleAssetReferenceKind.GuidOrLegacyId or > BackwardsCompatibleAssetReferenceKind.BcAssetReferenceString)
+        if (kind is < BackwardsCompatibleAssetReferenceKind.GuidOrLegacyId or > BackwardsCompatibleAssetReferenceKind.BcAssetReferenceString)
             throw new ArgumentOutOfRangeException(nameof(kind));
 
         Kind = kind;

@@ -33,6 +33,24 @@ public class DatObjectValue :
         Properties = properties;
     }
 
+    /// <summary>
+    /// Attempt to get a property by it's primary key.
+    /// </summary>
+    public bool TryGetProperty(ReadOnlySpan<char> key, out DatObjectPropertyValue value)
+    {
+        foreach (DatObjectPropertyValue v in Properties)
+        {
+            if (!key.Equals(v.Property.Key, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            value = v;
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
+
     /// <inheritdoc />
     public void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {

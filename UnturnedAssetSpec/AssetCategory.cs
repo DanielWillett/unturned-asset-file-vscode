@@ -5,6 +5,8 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;
 
@@ -113,7 +115,7 @@ public readonly struct AssetCategoryValue : IEquatable<AssetCategoryValue>, ICom
 /// <summary>
 /// Special-case enum type for EAssetType.
 /// </summary>
-public sealed class AssetCategory : DatEnumType, IEquatable<AssetCategory>, IComparable<AssetCategory>
+public sealed class AssetCategory : DatEnumType, IEquatable<AssetCategory>, IComparable<AssetCategory>, ITypeFactory
 {
     /// <summary>
     /// The singleton instance of the <see cref="AssetCategory"/> type.
@@ -180,7 +182,7 @@ public sealed class AssetCategory : DatEnumType, IEquatable<AssetCategory>, ICom
     /// </summary>
     public static DatEnumValue NPC { get; }
 
-    private AssetCategory(QualifiedType typeName, DatFileType owner) : base(typeName, default, owner) { }
+    private AssetCategory(QualifiedType typeName, DatFileType owner) : base(typeName, default, owner, null!) { }
     static AssetCategory()
     {
         QualifiedType typeName = new QualifiedType(TypeId, true);
@@ -467,4 +469,9 @@ public sealed class AssetCategory : DatEnumType, IEquatable<AssetCategory>, ICom
 
     /// <inheritdoc />
     public override int GetHashCode() => 543963484;
+
+    IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context = "")
+    {
+        return this;
+    }
 }

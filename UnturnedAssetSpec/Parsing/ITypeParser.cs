@@ -130,6 +130,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         parseArgs.ValueRange = ValueNode?.Range ?? ParentNode.Range;
         parseArgs.TextAsString = text;
         parseArgs.Property = Property;
+        parseArgs.ValueNode = ValueNode as IValueSourceNode;
     }
 
     /// <summary>
@@ -145,6 +146,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         parseArgs.ValueRange = ValueNode?.Range ?? ParentNode.Range;
         parseArgs.TextAsString = text;
         parseArgs.Property = Property;
+        parseArgs.ValueNode = ValueNode as IValueSourceNode;
     }
 
     /// <summary>
@@ -161,6 +163,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         parseArgs.ValueRange = ValueNode?.Range ?? ParentNode.Range;
         parseArgs.TextAsString = text;
         parseArgs.Property = Property;
+        parseArgs.ValueNode = ValueNode as IValueSourceNode;
     }
 
     /// <summary>
@@ -177,6 +180,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         parseArgs.ValueRange = ValueNode?.Range ?? ParentNode.Range;
         parseArgs.TextAsString = text;
         parseArgs.Property = Property;
+        parseArgs.ValueNode = ValueNode as IValueSourceNode;
     }
 
     public FileRange GetRangeAndRegisterDiagnostic()

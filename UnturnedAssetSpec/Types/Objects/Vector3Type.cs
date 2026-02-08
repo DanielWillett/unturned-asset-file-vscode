@@ -72,7 +72,7 @@ public sealed class Vector3Type : BaseVectorType<Vector3, Vector3Type>
     public Vector3Type(Vector3Kind kind, VectorTypeOptions options, string? xKey, string? yKey, string? zKey, string? legacyXKey = null, string? legacyYKey = null, string? legacyZKey = null, bool skipLegacyCombineWithUnderscore = false)
         : this(kind, options)
     {
-        if (kind is < Vector3Kind.Unspecified or >= Vector3Kind.Scale)
+        if (kind is < Vector3Kind.Unspecified or > Vector3Kind.Scale)
             throw new ArgumentOutOfRangeException(nameof(kind));
 
         _xKey = xKey;

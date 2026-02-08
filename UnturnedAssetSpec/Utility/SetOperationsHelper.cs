@@ -9,6 +9,141 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 internal static class SetOperationsHelper
 {
     /// <summary>
+    /// Checks whether or not a set starts with the given value.
+    /// </summary>
+    /// <typeparam name="TSet">The element type of the array.</typeparam>
+    /// <typeparam name="TValue">The type of value to check for.</typeparam>
+    /// <param name="set">The array that should start with <paramref name="value"/>.</param>
+    /// <param name="value">The value that should be the first element in <paramref name="set"/>.</param>
+    /// <param name="caseInsensitive">Whether or not comparisons should be case-insensitive.</param>
+    public static bool StartsWith<TSet, TValue>(EquatableArray<TSet> set, TValue? value, bool caseInsensitive)
+        where TSet : IEquatable<TSet>
+        where TValue : IEquatable<TValue>
+    {
+        TSet?[]? setArray = set.Array;
+        if (setArray == null || setArray.Length == 0)
+        {
+            return false;
+        }
+
+        EqualityVisitor<TSet> visitor = default;
+        visitor.Value = setArray[0];
+        visitor.IsNull = visitor.Value == null;
+        visitor.CaseInsensitive = caseInsensitive;
+
+        visitor.Accept(value);
+
+        return visitor.IsEqual;
+    }
+
+    /// <summary>
+    /// Checks whether or not a set starts with the given set.
+    /// </summary>
+    /// <typeparam name="TSupersetElement">The element type of the array.</typeparam>
+    /// <typeparam name="TSubsetElement">The element type of set to check for at the beginning of the set.</typeparam>
+    /// <param name="superset">The array that should start with <paramref name="subset"/>.</param>
+    /// <param name="subset">The values that should be the first elements in <paramref name="superset"/>.</param>
+    /// <param name="caseInsensitive">Whether or not comparisons should be case-insensitive.</param>
+    public static bool StartsWith<TSupersetElement, TSubsetElement>(EquatableArray<TSupersetElement> superset, EquatableArray<TSubsetElement> subset, bool caseInsensitive)
+        where TSupersetElement : IEquatable<TSupersetElement>
+        where TSubsetElement : IEquatable<TSubsetElement>
+    {
+        TSubsetElement?[]? subsetArray = subset.Array;
+        TSupersetElement?[]? supersetArray = superset.Array;
+        if (subsetArray == null || subsetArray.Length == 0)
+            return true;
+        
+        if (supersetArray == null || supersetArray.Length < subsetArray.Length)
+            return false;
+        
+        EqualityVisitor<TSupersetElement> visitor = default;
+        visitor.CaseInsensitive = caseInsensitive;
+        for (int i = 0; i < subsetArray.Length; ++i)
+        {
+            visitor.Value = supersetArray[i];
+            visitor.IsNull = visitor.Value != null;
+            visitor.IsEqual = false;
+
+            visitor.Accept(subsetArray[i]);
+
+            if (!visitor.IsEqual)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Checks whether or not a set ends with the given value.
+    /// </summary>
+    /// <typeparam name="TSet">The element type of the array.</typeparam>
+    /// <typeparam name="TValue">The type of value to check for.</typeparam>
+    /// <param name="set">The array that should end with <paramref name="value"/>.</param>
+    /// <param name="value">The value that should be the last element in <paramref name="set"/>.</param>
+    /// <param name="caseInsensitive">Whether or not comparisons should be case-insensitive.</param>
+    public static bool EndsWith<TSet, TValue>(EquatableArray<TSet> set, TValue? value, bool caseInsensitive)
+        where TSet : IEquatable<TSet>
+        where TValue : IEquatable<TValue>
+    {
+        TSet?[]? setArray = set.Array;
+        if (setArray == null || setArray.Length == 0)
+        {
+            return false;
+        }
+
+        EqualityVisitor<TSet> visitor = default;
+        visitor.Value = setArray[^1];
+        visitor.IsNull = visitor.Value == null;
+        visitor.CaseInsensitive = caseInsensitive;
+
+        visitor.Accept(value);
+
+        return visitor.IsEqual;
+    }
+
+    /// <summary>
+    /// Checks whether or not a set ends with the given set.
+    /// </summary>
+    /// <typeparam name="TSupersetElement">The element type of the array.</typeparam>
+    /// <typeparam name="TSubsetElement">The element type of set to check for at the end of the set.</typeparam>
+    /// <param name="superset">The array that should end with <paramref name="subset"/>.</param>
+    /// <param name="subset">The values that should be the last elements in <paramref name="superset"/>.</param>
+    /// <param name="caseInsensitive">Whether or not comparisons should be case-insensitive.</param>
+    public static bool EndsWith<TSupersetElement, TSubsetElement>(EquatableArray<TSupersetElement> superset, EquatableArray<TSubsetElement> subset, bool caseInsensitive)
+        where TSupersetElement : IEquatable<TSupersetElement>
+        where TSubsetElement : IEquatable<TSubsetElement>
+    {
+        TSubsetElement?[]? subsetArray = subset.Array;
+        TSupersetElement?[]? supersetArray = superset.Array;
+        if (subsetArray == null || subsetArray.Length == 0)
+            return true;
+        
+        if (supersetArray == null || supersetArray.Length < subsetArray.Length)
+            return false;
+        
+        EqualityVisitor<TSupersetElement> visitor = default;
+        visitor.CaseInsensitive = caseInsensitive;
+        int diff = supersetArray.Length - subsetArray.Length;
+        for (int i = subsetArray.Length - 1; i >= 0; ++i)
+        {
+            visitor.Value = supersetArray[i + diff];
+            visitor.IsNull = visitor.Value != null;
+            visitor.IsEqual = false;
+
+            visitor.Accept(subsetArray[i]);
+
+            if (!visitor.IsEqual)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
     /// Check if an array (<paramref name="superset"/>) contains all elements in another array (<paramref name="subset"/>).
     /// </summary>
     /// <typeparam name="TSuperset">The element type of the superset array.</typeparam>

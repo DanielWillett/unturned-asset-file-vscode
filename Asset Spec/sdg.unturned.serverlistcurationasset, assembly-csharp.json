@@ -23,7 +23,7 @@
         },
         {
             "Key": "",
-            "Type": "SDG.Unturned.ServerListCurationFile, Assembly-CSharp",
+            "Type": "SDG.Unturned.ServerListCurationFile, Assembly-CSharp::SDG.Unturned.ServerListCurationFile, Assembly-CSharp",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html",
             "Variable": "curationFile"
         }

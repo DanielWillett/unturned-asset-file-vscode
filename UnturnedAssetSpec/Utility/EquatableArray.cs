@@ -124,8 +124,8 @@ public interface IEquatableArrayVisitor
     /// Invoked from <see cref="EquatableArray{T}.Visit"/>.
     /// </summary>
     /// <typeparam name="T">Element type.</typeparam>
-    /// <param name="superset">The array being visited.</param>
-    void Accept<T>(EquatableArray<T> superset)
+    /// <param name="array">The array being visited.</param>
+    void Accept<T>(EquatableArray<T> array)
         where T : IEquatable<T>;
 }
 

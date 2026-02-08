@@ -38,6 +38,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
     private ImmutableDictionary<QualifiedType, DatFileType>.Builder? _fileTypeBuilder;
     private ImmutableDictionary<QualifiedType, DatType>.Builder? _allTypeBuilder;
     private ImmutableDictionary<string, DatFileType>? _localizationFiles;
+    private HashSet<QualifiedType>? _parsedFiles;
     private IAssetSpecDatabase? _database;
 
     public bool AllowInternet { get; }
@@ -259,10 +260,18 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
                 _fileTypeBuilder = ImmutableDictionary.CreateBuilder<QualifiedType, DatFileType>();
                 _allTypeBuilder = ImmutableDictionary.CreateBuilder<QualifiedType, DatType>();
 
+                _parsedFiles = new HashSet<QualifiedType>();
+
                 foreach (QualifiedType type in typeReadOrder)
                 {
+                    if (!_parsedFiles.Add(type))
+                        continue;
+
                     ReadFileType(_assetFiles[type], type.CaseInsensitive);
                 }
+
+                _parsedFiles = null;
+                _currentFiles = null;
 
                 fileTypes = _fileTypeBuilder.ToImmutable();
                 allTypes = _allTypeBuilder.ToImmutable();

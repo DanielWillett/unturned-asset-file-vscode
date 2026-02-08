@@ -27,6 +27,11 @@ public interface IDatSpecificationReadContext
     ILoggerFactory LoggerFactory { get; }
 
     /// <summary>
+    /// Finds an already read file type or reads it from the current context.
+    /// </summary>
+    DatFileType? GetOrReadFileType(QualifiedType typeName);
+
+    /// <summary>
     /// Finds an already read type or reads it from the <paramref name="owner"/>'s context.
     /// </summary>
     IType? GetOrReadType(IDatSpecificationObject owner, QualifiedType typeName);
@@ -39,5 +44,5 @@ public interface IDatSpecificationReadContext
     /// <summary>
     /// Reads a property value from a JSON object or string.
     /// </summary>
-    IValue ReadValue(in JsonElement root, IPropertyType valueType, DatProperty readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default);
+    IValue ReadValue(in JsonElement root, IPropertyType valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default);
 }

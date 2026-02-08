@@ -35,7 +35,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
     /// <summary>
     /// Attempts to read a switch value from a JSON array.
     /// </summary>
-    public static bool TryRead<TResult>(in JsonElement element, IType<TResult> type, IAssetSpecDatabase database, DatProperty owner, [NotNullWhen(true)] out SwitchValue<TResult>? value)
+    public static bool TryRead<TResult>(in JsonElement element, IType<TResult> type, IAssetSpecDatabase database, IDatSpecificationObject owner, [NotNullWhen(true)] out SwitchValue<TResult>? value)
         where TResult : IEquatable<TResult>
     {
         value = null;
@@ -71,7 +71,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
     /// <summary>
     /// Attempts to read an untyped switch value from a JSON array.
     /// </summary>
-    public static unsafe bool TryRead(in JsonElement element, IPropertyType type, IAssetSpecDatabase database, DatProperty owner, [NotNullWhen(true)] out SwitchValue? value)
+    public static unsafe bool TryRead(in JsonElement element, IPropertyType type, IAssetSpecDatabase database, IDatSpecificationObject owner, [NotNullWhen(true)] out SwitchValue? value)
     {
         if (type.TryGetConcreteType(out IType? actualType))
         {
@@ -140,7 +140,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
         public bool Visited;
         public JsonElement* Element;
         public IAssetSpecDatabase Database;
-        public DatProperty Owner;
+        public IDatSpecificationObject Owner;
         public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
         {
             Visited = true;

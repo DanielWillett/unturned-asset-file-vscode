@@ -81,7 +81,7 @@ public interface IValueVisitor
 /// </summary>
 public static class ValueExtensions
 {
-    extension(IValue value)
+    extension(IValue? value)
     {
         /// <summary>
         /// Attempts to invoke <see cref="IGenericVisitor.Accept"/> on the current value without context.
@@ -92,6 +92,11 @@ public static class ValueExtensions
         public unsafe bool VisitConcreteValueGeneric<TVisitor>(ref TVisitor visitor)
             where TVisitor : IGenericVisitor
         {
+            if (value == null)
+            {
+                return false;
+            }
+
             ValueVisitor<TVisitor> v;
             v.Visited = false;
             fixed (TVisitor* visitorPtr = &visitor)
@@ -113,6 +118,11 @@ public static class ValueExtensions
         public unsafe bool VisitValueGeneric<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
             where TVisitor : IGenericVisitor
         {
+            if (value == null)
+            {
+                return false;
+            }
+
             ValueVisitor<TVisitor> v;
             v.Visited = false;
             fixed (TVisitor* visitorPtr = &visitor)
@@ -135,7 +145,7 @@ public static class ValueExtensions
         {
             ValueConvertVisitor<TResult> v = default;
 
-            if (!value.VisitConcreteValue(ref v))
+            if (value == null || !value.VisitConcreteValue(ref v))
             {
                 result = Optional<TResult>.Null;
                 return false;
@@ -156,7 +166,7 @@ public static class ValueExtensions
         {
             ValueConvertVisitor<TResult> v = default;
 
-            if (!value.VisitValue(ref v, in ctx))
+            if (value == null || !value.VisitValue(ref v, in ctx))
             {
                 result = Optional<TResult>.Null;
                 return false;

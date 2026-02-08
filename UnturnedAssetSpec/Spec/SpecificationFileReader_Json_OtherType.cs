@@ -1,9 +1,11 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -65,6 +67,7 @@ partial class SpecificationFileReader
         return null;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private DatType ReadTypeFirstPass(in JsonElement arrayRoot, int index, ImmutableDictionary<QualifiedType, DatType>.Builder typeDictionary, DatFileType file)
     {
         JsonElement root = arrayRoot[index];
@@ -174,6 +177,7 @@ partial class SpecificationFileReader
             if (root.TryGetProperty("OverridableProperties"u8, out element) && element.ValueKind != JsonValueKind.Null)
                 customType.OverridableProperties = element.GetBoolean();
 
+
             // todo: properties, localization
         }
 
@@ -182,16 +186,38 @@ partial class SpecificationFileReader
         if (root.TryGetProperty("Docs"u8, out element))
             parsedType.Docs = element.GetString();
 
-        // StringParseableType
-        if (root.TryGetProperty("StringParseableType"u8, out element) && element.ValueKind != JsonValueKind.Null)
-        {
-            parsedType.StringParseableType = Type.GetType(element.GetString()!, throwOnError: true, ignoreCase: false);
-        }
-
         // Version
         if (root.TryGetProperty("Version"u8, out element) && element.ValueKind != JsonValueKind.Null)
             parsedType.Version = Version.Parse(element.GetString()!);
 
+        // !! needs to be last !!
+        // StringParseableType
+        if (root.TryGetProperty("StringParseableType"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            QualifiedType type = new QualifiedType(element.GetString(), true);
+
+            if (parsedType is DatEnumType enumType)
+                enumType.StringParseableType = type;
+            else if (parsedType is DatCustomType customType)
+                customType.StringParseableType = type;
+        }
+        // StringDefaultValue
+        else if (parsedType is DatCustomType ct && root.TryGetProperty("StringDefaultValue"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            IValue<DatObjectValue>? value = Value.TryReadValueFromJson(in root, ValueReadOptions.AllowConditionals, ct, Database, ct);
+            if (value == null)
+            {
+                throw new JsonException(
+                    string.Format(
+                        Resources.JsonException_FailedToReadValue,
+                        ct.TypeName.GetFullTypeName(),
+                        $"{file.TypeName.GetFullTypeName()}.{ct.TypeName.GetFullTypeName()}.StringDefaultValue"
+                    )
+                );
+            }
+
+            ct.StringDefaultValue = value;
+        }
 
         return parsedType;
     }

@@ -2,15 +2,15 @@
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Operations;
 
-internal sealed class Contains : ConditionOperation<Contains>
+internal sealed class StartsWith : ConditionOperation<StartsWith>
 {
-    public override string Name => "contains";
-    public override string Symbol => "⊇";
+    public override string Name => "starts-with";
+    public override string Symbol => "⊑";
 
     protected override bool TryEvaluateConcrete<TValue, TComparand>(TValue value, TComparand comparand, out bool result)
     {
-        ContainedVisitor<TValue> visitor = default;
-        visitor.Superset = value;
+        StartsWithVisitor<TValue> visitor = default;
+        visitor.Set = value;
 
         visitor.Accept(comparand);
 
@@ -18,18 +18,18 @@ internal sealed class Contains : ConditionOperation<Contains>
         return visitor.Success;
     }
 
-    public override int GetHashCode() => 1525507533;
+    public override int GetHashCode() => 593305815;
 }
 
-internal sealed class ContainsCaseInsensitive : ConditionOperation<ContainsCaseInsensitive>
+internal sealed class StartsWithCaseInsensitive : ConditionOperation<StartsWithCaseInsensitive>
 {
-    public override string Name => "contains-i";
-    public override string Symbol => "¶⊇";
+    public override string Name => "starts-with-i";
+    public override string Symbol => "¶⊑";
 
     protected override bool TryEvaluateConcrete<TValue, TComparand>(TValue value, TComparand comparand, out bool result)
     {
-        ContainedVisitor<TValue> visitor = default;
-        visitor.Superset = value;
+        StartsWithVisitor<TValue> visitor = default;
+        visitor.Set = value;
         visitor.IsCaseInsensitive = true;
 
         visitor.Accept(comparand);
@@ -38,5 +38,5 @@ internal sealed class ContainsCaseInsensitive : ConditionOperation<ContainsCaseI
         return visitor.Success;
     }
 
-    public override int GetHashCode() => 335886083;
+    public override int GetHashCode() => 1958484325;
 }

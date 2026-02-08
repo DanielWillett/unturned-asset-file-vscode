@@ -316,6 +316,7 @@
             {
                 "Type": "List",
                 "CountType": "UInt16",
+                "Mode": "LegacyList",
                 "ElementType":
                 {
                     "Type": "String",

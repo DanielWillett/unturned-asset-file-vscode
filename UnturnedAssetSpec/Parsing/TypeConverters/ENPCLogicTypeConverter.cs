@@ -10,6 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 /// <summary>
 /// String-parseable type converter for <c>SDG.Unturned.ENPCLogicType, Assembly-CSharp</c> to parse via operators.
 /// </summary>
+[StringParseableType]
 // ReSharper disable once InconsistentNaming
 internal sealed class ENPCLogicTypeConverter : ITypeConverter<DatEnumValue>
 {
@@ -25,53 +26,49 @@ internal sealed class ENPCLogicTypeConverter : ITypeConverter<DatEnumValue>
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<DatEnumValue> args, [MaybeNullWhen(false)] out DatEnumValue parsedValue)
     {
         parsedValue = null;
-        if (text.IsEmpty)
+        if (text.Length < 2)
             return false;
 
-        if (text.Length <= 2)
+        int index;
+        switch (text[0])
         {
-            int index;
-            switch (text[0])
-            {
-                case '<' when text.Length == 1:
-                    index = 1; // LESS_THAN
-                    break;
-                case '<' when text.Length == 2 && text[1] == '=':
-                case '≤' when text.Length == 1:
-                    index = 2; // LESS_THAN_OR_EQUAL_TO
-                    break;
+            case '<' when text.Length == 1:
+                index = 1; // LESS_THAN
+                break;
+            case '<' when text.Length == 2 && text[1] == '=':
+            case '≤' when text.Length == 1:
+                index = 2; // LESS_THAN_OR_EQUAL_TO
+                break;
 
-                case '=' when text.Length == 2 && text[1] == '=':
-                case '=' when text.Length == 1:
-                    index = 3; // EQUAL
-                    break;
+            case '=' when text.Length == 2 && text[1] == '=':
+            case '=' when text.Length == 1:
+                index = 3; // EQUAL
+                break;
 
-                case '!' when text.Length == 2 && text[1] == '=':
-                case '≠' when text.Length == 1:
-                    index = 4; // NOT_EQUAL
-                    break;
+            case '!' when text.Length == 2 && text[1] == '=':
+            case '≠' when text.Length == 1:
+                index = 4; // NOT_EQUAL
+                break;
 
-                case '>' when text.Length == 2 && text[1] == '=':
-                case '≥' when text.Length == 1:
-                    index = 5; // GREATER_THAN_OR_EQUAL_TO
-                    break;
-                case '>' when text.Length == 1:
-                    index = 6; // GREATER_THAN
-                    break;
+            case '>' when text.Length == 2 && text[1] == '=':
+            case '≥' when text.Length == 1:
+                index = 5; // GREATER_THAN_OR_EQUAL_TO
+                break;
+            case '>' when text.Length == 1:
+                index = 6; // GREATER_THAN
+                break;
 
-                default:
-                    goto fallback;
-            }
-
-            if (_type.Values.Length > index)
-            {
-                parsedValue = _type.Values[index];
-                return true;
-            }
+            default:
+                return false;
         }
 
-        fallback:
-        return _type.TryParse(text, out parsedValue);
+        if (_type.Values.Length > index)
+        {
+            parsedValue = _type.Values[index];
+            return true;
+        }
+
+        return false;
     }
 
     public string Format(DatEnumValue value, ref TypeConverterFormatArgs args)

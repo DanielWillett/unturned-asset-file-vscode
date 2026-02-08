@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
@@ -176,12 +177,16 @@ internal static class SpanExtensions
     /// <param name="trimEachEntry">Trim white-space off each split entry.</param>
     /// <param name="options">Additional splitting options.</param>
     /// <remarks>Will return as many ranges as <paramref name="ranges"/> can fit. To get a maximum, use <c>span.Count(<paramref name="separator"/>) + 1</c>.</remarks>
-    public static int Split(
-#if !NET8_0_OR_GREATER
-        this
-#endif
-            ReadOnlySpan<char> span, Span<Range> ranges, char separator, bool trimOuter = false, bool trimEachEntry = false, StringSplitOptions options = StringSplitOptions.None)
+    public static int Split(this ReadOnlySpan<char> span, Span<Range> ranges, char separator, bool trimOuter = false, bool trimEachEntry = false, StringSplitOptions options = StringSplitOptions.None)
     {
+#if NET8_0_OR_GREATER
+        if (trimOuter)
+        {
+            span = span.Trim();
+        }
+
+        return span.Split(ranges, separator, options | (trimEachEntry ? StringSplitOptions.TrimEntries : 0));
+#else
         int startIndex = 0;
         int endIndex = span.Length - 1;
 
@@ -304,5 +309,6 @@ internal static class SpanExtensions
 
         ranges[++rangeInd] = new Range(new Index(startInd), new Index(endInd + 1));
         return rangeInd + 1;
+#endif
     }
 }

@@ -18,10 +18,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 /// <summary>
 /// A type referenced by a file type.
 /// </summary>
-public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, ITypeParser<DatObjectValue>, IDisposable
+public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, ITypeParser<DatObjectValue>, IDatTypeWithStringParseableType<DatObjectValue>, IDisposable
 {
-    private readonly IDatSpecificationReadContext _context;
+    internal readonly IDatSpecificationReadContext Context;
     private bool _hasStringParser;
+    private bool _stringParserNoFallback;
 
     /// <summary>
     /// The null value for this type of object.
@@ -44,9 +45,17 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
     /// <inheritdoc />
     public override DatFileType Owner { get; }
 
+    /// <summary>
+    /// The default value when parsing a string, if any. 
+    /// </summary>
+    public IValue<DatObjectValue>? StringDefaultValue { get; internal set; }
+
+    /// <inheritdoc />
+    public QualifiedType StringParseableType { get; internal set; }
+
     internal DatCustomType(QualifiedType type, DatTypeWithProperties? baseType, JsonElement element, DatFileType file, IDatSpecificationReadContext context) : base(type, baseType, element)
     {
-        _context = context;
+        Context = context;
         Owner = file;
     }
 
@@ -60,6 +69,7 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
             if (_hasStringParser)
                 return field;
 
+            _stringParserNoFallback = false;
             QualifiedType stringParseableType = StringParseableType;
             if (stringParseableType.IsNull)
             {
@@ -69,12 +79,12 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
 
             Type? clrType = System.Type.GetType(stringParseableType.Type, throwOnError: false, ignoreCase: true);
             if (clrType == null
-                || !clrType.IsDefined(typeof(StringParseableTypeAttribute), false)
+                || clrType.GetCustomAttribute(typeof(StringParseableTypeAttribute), false) is not StringParseableTypeAttribute attr
                 || !typeof(ITypeConverter<DatObjectValue>).IsAssignableFrom(clrType)
                 || clrType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, [typeof(DatCustomType)], null) is not { } ctor)
             {
                 _hasStringParser = true;
-                _context.LoggerFactory
+                Context.LoggerFactory
                     .CreateLogger(TypeName.GetFullTypeName())
                     .LogError(string.Format(Resources.Log_FailedToFindStringParseableType, stringParseableType.Type, TypeName.GetFullTypeName()));
                 return null;
@@ -87,7 +97,7 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
             }
             catch (Exception ex)
             {
-                _context.LoggerFactory
+                Context.LoggerFactory
                     .CreateLogger(TypeName.GetFullTypeName())
                     .LogError(ex, string.Format(Resources.Log_FailedToFindStringParseableType, stringParseableType.Type, TypeName.GetFullTypeName()));
                 _hasStringParser = true;
@@ -99,11 +109,9 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
             {
                 disp.Dispose();
             }
-            else
-            {
-                _hasStringParser = true;
-            }
 
+            _hasStringParser = true;
+            _stringParserNoFallback = attr.PreventReadFallback;
             return field;
         }
     }
@@ -155,6 +163,10 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
                         value = stringParsedValue;
                         return true;
                     }
+                    if (_stringParserNoFallback)
+                    {
+                        return false;
+                    }
                 }
 
                 if (!maybeLegacy)
@@ -200,6 +212,11 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
         // todo
         value = Optional<DatObjectValue>.Null;
         return false;
+    }
+
+    public override void Visit<TVisitor>(ref TVisitor visitor)
+    {
+        visitor.Accept(this);
     }
 
     #region JSON
@@ -259,7 +276,7 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
             }
             else
             {
-                value = Value.TryReadValueFromJson(in root, ValueReadOptions.Default, type, _context.Database, property);
+                value = Value.TryReadValueFromJson(in root, ValueReadOptions.Default, type, Context.Database, property);
                 if (value == null)
                     return false;
             }

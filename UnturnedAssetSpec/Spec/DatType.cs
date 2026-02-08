@@ -104,12 +104,6 @@ public abstract class DatType : BaseType<DatType>, IDatSpecificationObject
     public bool IsProjectFile { get; internal set; }
 
     /// <summary>
-    /// Pre-defined fully-qualified C# type name used to parse values of this type.
-    /// </summary>
-    /// <remarks>This type should implement <see cref="ITypeConverter{T}"/> for the correct type.</remarks>
-    public QualifiedType StringParseableType { get; internal set; }
-
-    /// <summary>
     /// The version of Unturned this type was added in.
     /// </summary>
     public Version? Version { get; internal set; }
@@ -142,8 +136,8 @@ public abstract class DatType : BaseType<DatType>, IDatSpecificationObject
             throw new ArgumentNullException(nameof(typeName));
 
         return isFlagEnum
-            ? new DatFlagEnumType(typeName, element, file)
-            : new DatEnumType(typeName, element, file);
+            ? new DatFlagEnumType(typeName, element, file, context)
+            : new DatEnumType(typeName, element, file, context);
     }
 
     /// <summary>
@@ -282,6 +276,24 @@ public interface IDatTypeWithBundleAssets
     /// List of all available Unity objects that can be in the bundle for this asset.
     /// </summary>
     ImmutableArray<DatBundleAsset> BundleAssets { get; }
+}
+
+/// <summary>
+/// Base interface for any <see cref="DatType"/> that can use a string parser.
+/// </summary>
+public interface IDatTypeWithStringParseableType<T>
+    where T : IEquatable<T>
+{
+    /// <summary>
+    /// The type parser for this type.
+    /// </summary>
+    ITypeConverter<T>? StringParser { get; }
+
+    /// <summary>
+    /// Pre-defined fully-qualified C# type name used to parse values of this type.
+    /// </summary>
+    /// <remarks>This type should implement <see cref="ITypeConverter{T}"/> for the correct type.</remarks>
+    QualifiedType StringParseableType { get; }
 }
 
 /// <summary>

@@ -1068,17 +1068,36 @@
             "Type": "SDG.Unturned.BlueprintSupply, Assembly-CSharp",
             "DisplayName": "Blueprint Supply",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html",
-            "StringParseableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.BlueprintSupplyStringParseableSpecPropertyType, UnturnedAssetSpec",
+            "StringParseableType": "DanielWillett.UnturnedDataFileLspServer.Data.Parsing.BlueprintItemTypeConverter, UnturnedAssetSpec",
             "Properties":
             [
                 {
                     "Key": "ID",
                     "Type":
-                    {
-                        "Type": "BcAssetReference",
-                        "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
-                        "SupportsThis": true
-                    },
+                    [
+                        {
+                            "Case":
+                            {
+                                "Variable": "#This.IsLegacy",
+                                "Operation": "eq",
+                                "Comparand": true
+                            },
+                            "Value":
+                            {
+                                "Type": "LegacyAssetReference",
+                                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                                "SupportsThis": true
+                            }
+                        },
+                        {
+                            "Value":
+                            {
+                                "Type": "BcAssetReference",
+                                "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp",
+                                "SupportsThis": true
+                            }
+                        }
+                    ],
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_inputitem.html#doc-item-asset-blueprints-inputitem-id",
                     "Description": "The item that is consumed, or 'this' to refer to the current item.",
                     "Required": true,
@@ -1198,7 +1217,7 @@
             "Type": "SDG.Unturned.BlueprintOutput, Assembly-CSharp",
             "DisplayName": "Blueprint Output",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints_outputitem.html",
-            "StringParseableType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.BlueprintOutputStringParseableSpecPropertyType, UnturnedAssetSpec",
+            "StringParseableType": "DanielWillett.UnturnedDataFileLspServer.Data.Parsing.BlueprintItemTypeConverter, UnturnedAssetSpec",
             "Properties":
             [
                 {

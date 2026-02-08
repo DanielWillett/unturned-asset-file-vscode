@@ -115,28 +115,30 @@
                     "description": "The operator being used to compare.",
                     "anyOf":
                     [
-                        { "const": "lt",                "description": "Less Than" },
-                        { "const": "gt",                "description": "Greater Than" },
-                        { "const": "lte",               "description": "Less Than or Equal To" },
-                        { "const": "gte",               "description": "Greater Than or Equal To" },
-                        { "const": "lt-i",              "description": "Less Than (Case Insensitive)" },
-                        { "const": "gt-i",              "description": "Greater Than (Case Insensitive)" },
-                        { "const": "lte-i",             "description": "Less Than or Equal To (Case Insensitive)" },
-                        { "const": "gte-i",             "description": "Greater Than or Equal To (Case Insensitive)" },
-                        { "const": "eq",                "description": "Equal To" },
-                        { "const": "neq",               "description": "Not Equal To" },
-                        { "const": "eq-i",              "description": "Equal To (Case Insensitive)" },
-                        { "const": "neq-i",             "description": "Not Equal To (Case Insensitive)" },
-                        { "const": "contains",          "description": "Contains" },
-                        { "const": "contains-i",        "description": "Contains (Case Insensitive)" },
-                        { "const": "starts-with",       "description": "Starts With" },
-                        { "const": "starts-with-i",     "description": "Starts With (Case Insensitive)" },
-                        { "const": "ends-with",         "description": "Ends With" },
-                        { "const": "ends-with-i",       "description": "Ends With (Case Insensitive)" },
-                        { "const": "matches",           "description": "Matches RegEx" },
-                        { "const": "assignable-to",     "description": "Type Assignable To" },
-                        { "const": "assignable-from",   "description": "Type Assignable From" },
-                        { "const": "is-type",           "description": "Value is Assignable To" }
+                        { "const": "eq",                "description": "= Equal To" },
+                        { "const": "eq-i",              "description": "¶= Equal To (Case Insensitive)" },
+                        { "const": "neq",               "description": "≠ Not Equal To" },
+                        { "const": "neq-i",             "description": "¶≠ Not Equal To (Case Insensitive)" },
+                        { "const": "gt",                "description": "> Greater Than" },
+                        { "const": "gt-i",              "description": "¶> Greater Than (Case Insensitive)" },
+                        { "const": "lt",                "description": "< Less Than" },
+                        { "const": "gte",               "description": "≥ Greater Than or Equal To" },
+                        { "const": "gte-i",             "description": "¶≥ Greater Than or Equal To (Case Insensitive)" },
+                        { "const": "lt-i",              "description": "¶< Less Than (Case Insensitive)" },
+                        { "const": "lte",               "description": "≤ Less Than or Equal To" },
+                        { "const": "lte-i",             "description": "¶≤ Less Than or Equal To (Case Insensitive)" },
+                        { "const": "contains",          "description": "⊇ Contains" },
+                        { "const": "contains-i",        "description": "¶⊇ Contains (Case Insensitive)" },
+                        { "const": "contained-in",      "description": "⊆ Contained In" },
+                        { "const": "contained-in-i",    "description": "¶⊆ Contained In (Case Insensitive)" },
+                        { "const": "starts-with",       "description": "⊑ Starts With" },
+                        { "const": "starts-with-i",     "description": "¶⊑ Starts With (Case Insensitive)" },
+                        { "const": "ends-with",         "description": "⊒ Ends With" },
+                        { "const": "ends-with-i",       "description": "¶⊒ Ends With (Case Insensitive)" },
+                        { "const": "matches",           "description": "~ Matches RegEx" },
+                        { "const": "assignable-to",     "description": "≽ Type Assignable To" },
+                        { "const": "assignable-from",   "description": "≼ Type Assignable From" },
+                        { "const": "is-type",           "description": ": Value is Assignable To" }
                     ]
                 },
                 "Comparand":
@@ -2203,6 +2205,11 @@
                 {
                     "$ref": "#/$defs/QualifiedTypeOrNull",
                     "description": "Pre-defined fully-qualified C# type name used to parse values of this type (a ITypeConverter<T>)."
+                },
+                "StringDefaultValue":
+                {
+                    "$ref": "#/$defs/ValueAllowConditionals",
+                    "description": "Object definition of a resulting value when given a string instead of an object. The '#Value' data-ref can be used to get the original string value."
                 },
                 "Properties":
                 {
