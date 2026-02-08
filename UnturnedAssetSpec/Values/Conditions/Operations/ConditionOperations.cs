@@ -22,6 +22,19 @@ public static class ConditionOperations
     static ConditionOperations()
     {
         RegisterOperation(Operations.Equal.Instance);
+        RegisterOperation(Operations.EqualCaseInsensitive.Instance);
+        RegisterOperation(Operations.NotEqual.Instance);
+        RegisterOperation(Operations.NotEqualCaseInsensitive.Instance);
+        RegisterOperation(Operations.GreaterThan.Instance);
+        RegisterOperation(Operations.GreaterThanCaseInsensitive.Instance);
+        RegisterOperation(Operations.GreaterThanOrEqual.Instance);
+        RegisterOperation(Operations.GreaterThanOrEqualCaseInsensitive.Instance);
+        RegisterOperation(Operations.LessThan.Instance);
+        RegisterOperation(Operations.LessThanCaseInsensitive.Instance);
+        RegisterOperation(Operations.LessThanOrEqual.Instance);
+        RegisterOperation(Operations.LessThanOrEqualCaseInsensitive.Instance);
+        RegisterOperation(Operations.Contains.Instance);
+        RegisterOperation(Operations.ContainsCaseInsensitive.Instance);
     }
 
 

@@ -2,15 +2,16 @@
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Operations;
 
-internal sealed class Contains : ConditionOperation<Contains>
+internal sealed class ContainsCaseInsensitive : ConditionOperation<ContainsCaseInsensitive>
 {
-    public override string Name => "contains";
-    public override string Symbol => "⊇";
+    public override string Name => "contains-i";
+    public override string Symbol => "¶⊇";
 
     protected override bool TryEvaluateConcrete<TValue, TComparand>(TValue value, TComparand comparand, out bool result)
     {
         ContainedVisitor<TValue> visitor = default;
         visitor.Superset = value;
+        visitor.IsCaseInsensitive = true;
 
         visitor.Accept(comparand);
 
@@ -18,5 +19,5 @@ internal sealed class Contains : ConditionOperation<Contains>
         return visitor.Success;
     }
 
-    public override int GetHashCode() => 1525507533;
+    public override int GetHashCode() => 335886083;
 }
