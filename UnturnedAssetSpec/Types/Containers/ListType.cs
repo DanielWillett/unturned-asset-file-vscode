@@ -187,7 +187,7 @@ public sealed class ListType : ITypeFactory
             if (Json.TryGetProperty("MinimumCount"u8, out element) && element.ValueKind != JsonValueKind.Null)
             {
                 TypeConverterParseArgs<TCountType> parseArgs = new TypeConverterParseArgs<TCountType>(type);
-                if (!TypeConverters.Get<TCountType>().TryReadJson(in Json, out minValue, ref parseArgs))
+                if (!TypeConverters.Get<TCountType>().TryReadJson(in element, out minValue, ref parseArgs))
                     throw new JsonException(string.Format(
                             Resources.JsonException_FailedToParseValue,
                             type.Id,
@@ -199,7 +199,7 @@ public sealed class ListType : ITypeFactory
             if (Json.TryGetProperty("MaximumCount"u8, out element) && element.ValueKind != JsonValueKind.Null)
             {
                 TypeConverterParseArgs<TCountType> parseArgs = new TypeConverterParseArgs<TCountType>(type);
-                if (!TypeConverters.Get<TCountType>().TryReadJson(in Json, out minValue, ref parseArgs))
+                if (!TypeConverters.Get<TCountType>().TryReadJson(in element, out minValue, ref parseArgs))
                     throw new JsonException(string.Format(
                             Resources.JsonException_FailedToParseValue,
                             type.Id,
@@ -208,7 +208,7 @@ public sealed class ListType : ITypeFactory
                     );
             }
 
-            IValue? defaultValue = null, includedDefaultValue = null;
+            IValue<TElementType>? defaultValue = null, includedDefaultValue = null;
             if (Json.TryGetProperty("LegacyDefaultElementTypeValue"u8, out element))
             {
                 defaultValue = Spec.ReadValue(in element, SubType, Owner, Context.Length == 0 ? "LegacyDefaultElementTypeValue" : $"{Context}.LegacyDefaultElementTypeValue");
@@ -550,14 +550,9 @@ public class ListType<TCountType, TElementType>
                     else
                         args.DiagnosticSink?.UNT2004_NoList(ref args, args.ParentNode);
                 }
-                else
+                else if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                 {
-                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
-                    {
-                        return defValue.TryGetValueAs(in ctx, out value);
-                    }
-
-                    return false;
+                    return defValue.TryGetValueAs(in ctx, out value);
                 }
 
                 break;
@@ -741,14 +736,15 @@ public class ListType<TCountType, TElementType>
                             if (!needsDefault)
                                 continue;
 
-                            IValue? defaultValue = wasIncluded
+                            IValue<TElementType>? defaultValue = wasIncluded
                                 ? _args.LegacyIncludedDefaultElementTypeValue ?? _args.LegacyDefaultElementTypeValue
                                 : _args.LegacyDefaultElementTypeValue;
 
                             if (defaultValue == null)
                                 continue;
 
-                            if (defaultValue is IndexDataRef
+                            // todo: index needs to work better, use some kind of contextual `#Index = e` global setting
+                            if (defaultValue is IndexDataRef<TElementType>
                                 && ConvertVisitor<TElementType>.TryConvert(i, out TElementType? e))
                             {
                                 array[i] = e;
@@ -945,12 +941,12 @@ public readonly struct ListTypeArgs<TCountType, TElementType>
     /// <summary>
     /// The default value for missing legacy list elements.
     /// </summary>
-    public IValue? LegacyDefaultElementTypeValue { get; init; }
+    public IValue<TElementType>? LegacyDefaultElementTypeValue { get; init; }
 
     /// <summary>
     /// The default value for legacy list elements missing a value.
     /// </summary>
-    public IValue? LegacyIncludedDefaultElementTypeValue { get; init; }
+    public IValue<TElementType>? LegacyIncludedDefaultElementTypeValue { get; init; }
 
     /// <summary>
     /// Determines whether or not all elements in the list must be unique (or a warning is shown).

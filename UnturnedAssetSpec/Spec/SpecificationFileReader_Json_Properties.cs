@@ -32,7 +32,7 @@ partial class SpecificationFileReader
         if (!isImport && (!root.TryGetProperty("PreventOverride"u8, out element) || element.ValueKind != JsonValueKind.True))
         {
             // find property to override in parent types
-            for (DatTypeWithProperties? parentType = owner.BaseType; parentType is T pType && overriding != null; parentType = parentType.BaseType)
+            for (DatTypeWithProperties? parentType = owner.BaseType; parentType is T pType && overriding == null; parentType = parentType.BaseType)
             {
                 ImmutableArray<DatProperty> parentProperties = getPropertyListFromChild(pType);
                 for (int i = 0; i < parentProperties.Length; ++i)
@@ -203,6 +203,7 @@ partial class SpecificationFileReader
         }
 
         // todo
+        properties.Add(property);
     }
 
     private DatPropertyKey ReadAlias(in JsonElement aliasObj, IDatSpecificationObject owner, DatProperty property, string key, int i)
@@ -347,6 +348,17 @@ partial class SpecificationFileReader
     }
 
     public IValue ReadValue(in JsonElement root, IPropertyType valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default)
+    {
+        if (Value.TryReadValueFromJson(in root, options, valueType, Database, readObject) is { } value)
+        {
+            return value;
+        }
+
+        throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, valueType, context.Length == 0 ? readObject.FullName : $"{readObject.FullName}.{context}"));
+    }
+
+    public IValue<T> ReadValue<T>(in JsonElement root, IType<T> valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default)
+        where T : IEquatable<T>
     {
         if (Value.TryReadValueFromJson(in root, options, valueType, Database, readObject) is { } value)
         {

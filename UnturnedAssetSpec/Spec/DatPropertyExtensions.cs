@@ -80,7 +80,7 @@ public static class DatPropertyExtensions
                         property = prop;
                         return true;
                     }
-                    continue;
+                    goto fallback;
             }
 
             foreach (DatProperty prop in propertyList)
@@ -90,6 +90,48 @@ public static class DatPropertyExtensions
 
                 property = prop;
                 return true;
+            }
+
+            fallback:
+            ImmutableArray<DatProperty>.Builder? propertyListFallback;
+            switch (propListCode)
+            {
+                case 0:
+                    propertyListFallback = parent.PropertiesBuilder;
+                    break;
+
+                case 1:
+                    if (parent is not IDatTypeWithLocalizationProperties locals)
+                        continue;
+
+                    propertyListFallback = locals.LocalizationPropertiesBuilder;
+                    break;
+
+                default: // case 2:
+                    if (parent is not IDatTypeWithBundleAssets { BundleAssetsBuilder: { } fallback })
+                        continue;
+
+                    foreach (DatBundleAsset prop in fallback)
+                    {
+                        if (!key.Equals(prop.Key, StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        property = prop;
+                        return true;
+                    }
+                    continue;
+            }
+
+            if (propertyListFallback != null)
+            {
+                foreach (DatProperty prop in propertyListFallback)
+                {
+                    if (!key.Equals(prop.Key, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    property = prop;
+                    return true;
+                }
             }
         }
 

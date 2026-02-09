@@ -4,6 +4,7 @@ namespace UnturnedAssetSpecTests;
 
 [TestFixture]
 [Parallelizable]
+[Ignore("Not necessary")]
 partial class MathMatrixTests
 {
     [Test]

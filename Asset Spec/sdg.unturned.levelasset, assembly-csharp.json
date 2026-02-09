@@ -30,7 +30,7 @@
                     "BaseType": "SDG.Unturned.GameMode, Assembly-CSharp"
                 }
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "List of gamemodes supported by this map. Doesn't appear to be used by the game.",
             "Deprecated": true,
             "Variable": "supportedGameModes"
@@ -70,7 +70,7 @@
                     "AssetType": "SDG.Unturned.CraftingBlacklistAsset, Assembly-CSharp"
                 }
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "List of crafting blacklists applied to this level by default.",
             "Variable": "craftingBlacklists",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
@@ -83,7 +83,7 @@
                 "ElementType": "SDG.Unturned.LevelAsset+SchedulableWeather, Assembly-CSharp"
             },
             "Description": "List making up this level's weather schedule. Ignored if @Perpetual_Weather_Asset is set.",
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Variable": "schedulableWeathers",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
             "ExclusiveWith": [ "Perpetual_Weather_Asset" ]
@@ -109,7 +109,7 @@
                 "ElementType": "SDG.Unturned.LevelAsset+LoadingScreenMusic, Assembly-CSharp"
             },
             "Description": "List of loading screen music options. A random clip will be chosen from the list.",
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Variable": "loadingScreenMusic",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
         },
@@ -150,7 +150,7 @@
                 "ElementType": "SDG.Unturned.LevelAsset+SkillRule, Assembly-CSharp"
             },
             "Description": "List of skill rules that take effect on this level.",
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Variable": "skillRules",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
         },
@@ -211,7 +211,7 @@
                 "ElementType": "SDG.Unturned.LevelAsset+CloudOverrideParticleSystemsPath, Assembly-CSharp"
             },
             "Description": "List of particle system configurations attached to the object specified in @CloudOverride_Prefab.",
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Variable": "CloudOverrideParticleSystemPaths",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#cloud-override-properties",
             "Version": "3.25.8.0"
@@ -224,7 +224,7 @@
                 "ElementType": "SDG.Unturned.LevelAsset+TerrainColorRule, Assembly-CSharp"
             },
             "Description": "Specifies which colors are too similar to terrain colors.",
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Variable": "terrainColorRules",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets"
         },
@@ -239,9 +239,10 @@
                     "Type": "List",
                     "ElementType": "SDG.Unturned.LevelAsset+DefaultLoadoutItem, Assembly-CSharp"
                 },
-                "RequireKeyType": true
+                "RequireKeyType": true,
+                "DefaultValue": [ ]
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Version": "3.25.8.2",
             "Variable": "DefaultSkillsetLoadouts",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#skillset-loadout-properties",

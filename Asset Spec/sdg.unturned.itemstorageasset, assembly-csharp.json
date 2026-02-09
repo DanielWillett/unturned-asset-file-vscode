@@ -68,7 +68,7 @@
                 "Type": "List",
                 "ElementType": "SDG.Unturned.LevelAsset+DefaultLoadoutItem, Assembly-CSharp"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Default items to add to the storage when it's placed..",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/storage-asset.html#storage-asset-properties",
             "Variable": "DefaultContainedItems",

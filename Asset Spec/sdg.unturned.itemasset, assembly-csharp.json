@@ -713,7 +713,7 @@
                 "CountType": "UInt8",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Blueprints defined for this item. Blueprints are crafting recipes that either consume this item or produce this item.",
             "Variable": "blueprints",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprints-int-0"
@@ -727,7 +727,7 @@
                 "CountType": "UInt8",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Context menu actions defined for this item.",
             "Variable": "actions",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#actions-int-0"
@@ -820,7 +820,7 @@
                 "LegacySingularKey": "Deleted_At_Zero_Quality_Reward",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Variable": "DeletedAtZeroQualityRewards",
             "Description": "Rewards granted when the item reaches zero quality.",
             "InclusiveWith":
@@ -1376,7 +1376,7 @@
                             "Alias": "Supplies"
                         }
                     ],
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Description": "Input items defined for this blueprint.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#inputitems-list-of-doc-item-asset-blueprints-inputitem",
                     "Variable": "supplies"
@@ -1853,7 +1853,7 @@
                             "AssetType": "SDG.Unturned.TagAsset, Assembly-CSharp"
                         }
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Variable": "RequiresStaticTags",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#requiresstatictags-list-of-asset-pointer-to-doc-assets-tag",
                     "Description": "Similar to @RequiresNearbyCraftingTags, but only checked once during level startup. Can test for Level Assets Tags."

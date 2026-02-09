@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text.Json;
+using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -163,6 +164,7 @@ partial class SpecificationFileReader
                 int propertyCount = element.GetArrayLength();
 
                 ImmutableArray<DatProperty>.Builder propertyBuilder = ImmutableArray.CreateBuilder<DatProperty>(propertyCount);
+                type.PropertiesBuilder = propertyBuilder;
 
                 for (int i = 0; i < propertyCount; ++i)
                 {
@@ -171,6 +173,7 @@ partial class SpecificationFileReader
                 }
 
                 type.Properties = propertyBuilder.ToImmutable();
+                type.PropertiesBuilder = null;
             }
 
             if (type is DatAssetFileType assetFile && root.TryGetProperty("Localization"u8, out element) && element.ValueKind != JsonValueKind.Null)
@@ -179,6 +182,7 @@ partial class SpecificationFileReader
                 int propertyCount = element.GetArrayLength();
 
                 ImmutableArray<DatProperty>.Builder propertyBuilder = ImmutableArray.CreateBuilder<DatProperty>(propertyCount);
+                assetFile.LocalizationPropertiesBuilder = propertyBuilder;
 
                 for (int i = 0; i < propertyCount; ++i)
                 {
@@ -187,6 +191,7 @@ partial class SpecificationFileReader
                 }
 
                 assetFile.LocalizationProperties = propertyBuilder.ToImmutable();
+                assetFile.LocalizationPropertiesBuilder = null;
             }
         }
         finally

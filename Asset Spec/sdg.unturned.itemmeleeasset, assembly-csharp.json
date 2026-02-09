@@ -165,7 +165,7 @@
                 "CountType": "Int32",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Rewards applied when the player performs a weak attack.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#npc-rewards",
             "Variable": "weakAttackQuestRewards"
@@ -178,7 +178,7 @@
                 "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Rewards applied when the player performs a strong attack.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html#npc-rewards",
             "Variable": "strongAttackQuestRewards"

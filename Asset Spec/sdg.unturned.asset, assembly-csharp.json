@@ -879,7 +879,7 @@
                     },
                     "Description": "Comma-separated indexes of other conditions that must be met first before this condition will be visible in-game.",
                     "ValueTemplateGroupReference": "This.TemplateGroups[0]{PreventSelfReference=true}",
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "uiRequirementIndices"
                 }

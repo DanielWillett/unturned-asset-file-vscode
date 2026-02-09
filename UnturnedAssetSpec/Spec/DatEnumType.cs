@@ -80,7 +80,7 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
             if (clrType == null
                 || clrType.GetCustomAttribute(typeof(StringParseableTypeAttribute), false) is not StringParseableTypeAttribute attr
                 || !typeof(ITypeConverter<DatEnumValue>).IsAssignableFrom(clrType)
-                || clrType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, [typeof(DatCustomType)], null) is not { } ctor)
+                || clrType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, [ typeof(DatEnumType) ], null) is not { } ctor)
             {
                 _hasStringParser = true;
                 Context.LoggerFactory

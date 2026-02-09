@@ -190,8 +190,6 @@ public sealed class StaticSourceFile : IWorkspaceFile
     {
         if (filePath == null)
             throw new ArgumentNullException(nameof(filePath));
-        if (database == null)
-            throw new ArgumentNullException(nameof(database));
 
         return new StaticSourceFile(filePath, database, fileContents, options, static (file, database, fileContents, options, _) =>
         {
@@ -212,7 +210,7 @@ public sealed class StaticSourceFile : IWorkspaceFile
     }
 
     private StaticSourceFile(string filePath,
-        IAssetSpecDatabase database,
+        IAssetSpecDatabase? database,
         ReadOnlyMemory<char> fileContents,
         SourceNodeTokenizerOptions options,
         ReadFile creationCallback,
@@ -225,7 +223,7 @@ public sealed class StaticSourceFile : IWorkspaceFile
 
     private delegate ISourceFile ReadFile(
         StaticSourceFile file,
-        IAssetSpecDatabase database,
+        IAssetSpecDatabase? database,
         ReadOnlyMemory<char> fileContents,
         SourceNodeTokenizerOptions options,
         object? state);

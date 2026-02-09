@@ -760,7 +760,7 @@
                 "Type": "List",
                 "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Version": "3.24.7.0",
             "Description": "Optionally specifies which materials should be darkened after an explosion.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosionburnmaterialsections-list-of-paintablevehiclesection",
@@ -1437,7 +1437,7 @@
                 "Type": "List",
                 "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Each section's material's \"_PaintColor\" property is set to the paint color. This vehicle is not paintable unless this property is defined with at least one section.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#explosionburnmaterialsections-list-of-paintablevehiclesection",
             "Variable": "PaintableVehicleSections"
@@ -1446,20 +1446,11 @@
             "Key": "IsPaintable",
             "Type": "Boolean",
             "DefaultValue":
-            [
-                {
-                    "Case":
-                    {
-                        "Variable": "PaintableSections",
-                        "Operation": "neq",
-                        "Comparand": null
-                    },
-                    "Value": true
-                },
-                {
-                    "Value": false
-                }
-            ],
+            {
+                "Variable": "PaintableSections",
+                "Operation": "neq",
+                "Comparand": [ ]
+            },
             "Description": "Whether or not players can paint this vehicle using vehicle paint tools.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#ispaintable-bool",
             "Variable": "IsPaintable"
@@ -1471,7 +1462,7 @@
                 "Type": "List",
                 "ElementType": "SDG.Unturned.CrawlerTrackTilingMaterial, Assembly-CSharp"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "List of materials which offset their UVs in sync with wheels rolling.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#crawlertracktilingmaterials-list-of-crawlertracktilingmaterial",
             "Variable": "crawlerTrackTilingMaterials"
@@ -1483,7 +1474,7 @@
                 "Type": "List",
                 "ElementType": "SDG.Unturned.PaintableVehicleSection, Assembly-CSharp"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Materials to register as needing transparent sorting. Their render queue is periodically updated according to whether their pivot point is underwater.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#additionaltransparentsections-list-of-paintablevehiclesection",
             "Variable": "extraTransparentSections"
@@ -1499,7 +1490,7 @@
                     "Mode": "String"
                 }
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Version": "3.24.4.0",
             "Description": "List of random colors to pick from when spawning a new vehicle. Can be overridden by a Vehicle Redirector's @(SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp::LoadPaintColor) and @(SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp::SpawnPaintColor) properties.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#defaultpaintcolors-list-of-colors",
@@ -1550,7 +1541,24 @@
         {
             "Key": "DefaultPaintColor_Configuration",
             "Type": "SDG.Unturned.VehicleRandomPaintColorConfiguration, Assembly-CSharp",
-            "DefaultValue": null,
+            "DefaultValue":
+            [
+                {
+                    "Case":
+                    {
+                        "Variable": "DefaultPaintColor_Mode",
+                        "Operation": "eq",
+                        "Comparand": "RandomHueOrGrayscale"
+                    },
+                    "Value":
+                    {
+                        "$udat-type": "SDG.Unturned.VehicleRandomPaintColorConfiguration, Assembly-CSharp"
+                    }
+                },
+                {
+                    "Value": null
+                }
+            ],
             "Version": "3.24.5.0",
             "Description": "Determines the potential colors of a newly-spawned vehicle with a fully randomized hue. Can be overridden by a Vehicle Redirector's @(SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp::LoadPaintColor) and @(SDG.Unturned.VehicleRedirectorAsset, Assembly-CSharp::SpawnPaintColor) properties.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#defaultpaintcolor-configuration-vehiclerandompaintcolorconfiguration",
@@ -1611,7 +1619,7 @@
                 "Type": "List",
                 "ElementType": "SDG.Unturned.VehicleWheelConfiguration, Assembly-CSharp"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Controls WheelCollider components and their corresponding visual models.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#wheelconfigurations-list-of-vehiclewheelconfiguration",
             "Variable": "wheelConfiguration"
@@ -1633,7 +1641,7 @@
                 "ElementType": "Float32"
             },
             "Minimum": 0.0,
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Ratio between engine RPM and wheel RPM in a given gear. For example, if the wheel RPM is 6 and the gear ratio is 5 then the engine RPM is 30.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#reversegearratio-float32-1-0",
             "Variable": "forwardGearRatios"
@@ -1645,7 +1653,7 @@
             {
                 "Variable": "ForwardGearRatios",
                 "Operation": "neq",
-                "Comparand": null
+                "Comparand": [ ]
             },
             "Description": "If gears are configured and this is true, RPM and gear number will be shown in the user interface.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#gearshift-visibleinhud-bool-true",
@@ -1658,7 +1666,7 @@
                     {
                         "Variable": "ForwardGearRatios",
                         "Operation": "neq",
-                        "Comparand": null
+                        "Comparand": [ ]
                     }
                 }
             ]
@@ -2073,7 +2081,7 @@
                         "ElementType": "Int32"
                     },
                     "Minimum": 0,
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Required": true,
                     "Description": "List of wheels which are averaged to calculate how fast crawler track is moving.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-crawlertracktilingmaterial-wheelindices",
@@ -2086,7 +2094,7 @@
                             {
                                 "Variable": "WheelIndices",
                                 "Operation": "neq",
-                                "Comparand": null
+                                "Comparand": [ ]
                             }
                         }
                     ]

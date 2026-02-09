@@ -21,7 +21,7 @@
                 },
                 "DefaultValue": null
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html#properties",
             "Description": "List of clothing items to be worn in the preview image.",
             "Variable": "audioDefs"

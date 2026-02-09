@@ -193,7 +193,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
                     ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.InventoryLocalization, static async (stream, reader, token) =>
                     {
                         string allText = await ReadAllTextAsync(stream, token).ConfigureAwait(false);
-                        using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), null, SourceNodeTokenizerOptions.Lazy);
+                        using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), reader.Database, SourceNodeTokenizerOptions.Lazy);
                         reader.ReadActionLabels(file.SourceFile);
                     }, token: token),
 
@@ -201,7 +201,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
                     ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.SkillsLocalization, static async (stream, reader, token) =>
                     {
                         string allText = await ReadAllTextAsync(stream, token).ConfigureAwait(false);
-                        using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), null, SourceNodeTokenizerOptions.Lazy);
+                        using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), reader.Database, SourceNodeTokenizerOptions.Lazy);
                         reader.ReadSkills(file.SourceFile);
                     }, token: token),
 
@@ -209,7 +209,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
                     ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.CharacterLocalization, static async (stream, reader, token) =>
                     {
                         string allText = await ReadAllTextAsync(stream, token).ConfigureAwait(false);
-                        using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), null, SourceNodeTokenizerOptions.Lazy);
+                        using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), reader.Database, SourceNodeTokenizerOptions.Lazy);
                         reader.ReadSkillsets(file.SourceFile);
                     }, token: token)
                 }
@@ -376,7 +376,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 #else
                 string text = File.ReadAllText(file);
 #endif
-                using StaticSourceFile sourceFile = StaticSourceFile.FromOtherFile(string.Empty, text.AsMemory(), null, SourceNodeTokenizerOptions.Lazy);
+                using StaticSourceFile sourceFile = StaticSourceFile.FromOtherFile(string.Empty, text.AsMemory(), Database, SourceNodeTokenizerOptions.Lazy);
                 
                 foreach (IPropertySourceNode property in sourceFile.SourceFile.Properties)
                 {

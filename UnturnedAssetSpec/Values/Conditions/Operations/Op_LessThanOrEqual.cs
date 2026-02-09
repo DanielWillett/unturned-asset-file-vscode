@@ -7,6 +7,8 @@ internal sealed class LessThanOrEqual : ConditionOperation<LessThanOrEqual>
     public override string Name => "lte";
     public override string Symbol => "≤";
 
+    public override IConditionOperation Inverse => GreaterThan.Instance;
+
     protected override bool TryEvaluateConcrete<TValue, TComparand>(TValue value, TComparand comparand, out bool result)
     {
         ComparerVisitor<TValue> visitor = default;
@@ -25,6 +27,8 @@ internal sealed class LessThanOrEqualCaseInsensitive : ConditionOperation<LessTh
 {
     public override string Name => "lte-i";
     public override string Symbol => "¶≤";
+
+    public override IConditionOperation Inverse => GreaterThanOrEqual.Instance;
 
     protected override bool TryEvaluateConcrete<TValue, TComparand>(TValue value, TComparand comparand, out bool result)
     {

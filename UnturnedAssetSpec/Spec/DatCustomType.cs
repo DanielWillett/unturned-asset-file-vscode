@@ -374,6 +374,10 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
 /// </summary>
 public class DatCustomAssetType : DatCustomType, IDatTypeWithLocalizationProperties, IDatTypeWithBundleAssets
 {
+    internal ImmutableArray<DatProperty>.Builder? LocalizationPropertiesBuilder { get; set; }
+    
+    internal ImmutableArray<DatBundleAsset>.Builder? BundleAssetsBuilder { get; set; }
+
     /// <inheritdoc />
     public override DatSpecificationType Type => DatSpecificationType.CustomAsset;
 
@@ -389,4 +393,9 @@ public class DatCustomAssetType : DatCustomType, IDatTypeWithLocalizationPropert
         LocalizationProperties = ImmutableArray<DatProperty>.Empty;
         BundleAssets = ImmutableArray<DatBundleAsset>.Empty;
     }
+
+    ImmutableArray<DatProperty>.Builder? IDatTypeWithLocalizationProperties.LocalizationPropertiesBuilder
+        => LocalizationPropertiesBuilder;
+    ImmutableArray<DatBundleAsset>.Builder? IDatTypeWithBundleAssets.BundleAssetsBuilder
+        => BundleAssetsBuilder;
 }

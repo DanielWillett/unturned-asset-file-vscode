@@ -27,7 +27,7 @@
                 "ElementType": "SDG.Unturned.VendorBuying, Assembly-CSharp"
             },
             "MaximumCount": 255,
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Items being bought from players by the vendor shop.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/vendor-asset.html#buying",
             "Variable": "buying"
@@ -42,7 +42,7 @@
                 "ElementType": "SDG.Unturned.VendorSellingBase, Assembly-CSharp"
             },
             "MaximumCount": 255,
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Items and vehicles being sold by the vendor shop to players.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/vendor-asset.html#buying",
             "Variable": "selling"
@@ -103,7 +103,7 @@
                         "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
                         "Mode": "LegacyList, ModernList"
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Description": "Conditions that must be met for players to be able to sell item #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "conditionsList"
@@ -116,7 +116,7 @@
                         "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
                         "Mode": "LegacyList, ModernList"
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Description": "Rewards applied after the player sells item #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "rewardsList"
@@ -208,7 +208,7 @@
                         "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
                         "Mode": "LegacyList, ModernList"
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Description": "Conditions that must be met for players to be able to buy listing #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "conditionsList"
@@ -221,7 +221,7 @@
                         "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
                         "Mode": "LegacyList, ModernList"
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Description": "Rewards applied after the player buys listing #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "rewardsList"

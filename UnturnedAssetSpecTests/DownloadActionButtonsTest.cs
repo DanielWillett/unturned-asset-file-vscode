@@ -11,8 +11,8 @@ public class DownloadActionButtonsTest
     
     private void AssertValidButtons()
     {
-        Assert.That(_runner!.ValidActionButtons.Count, Is.Not.EqualTo(0));
-        Assert.That(_runner.ValidActionButtons, Does.Contain("Take"));
+        Assert.That(_runner!.ValidActionButtons, Is.Not.Empty);
+        Assert.That(_runner.ValidActionButtons.Keys, Does.Contain("Take"));
     }
 
     [Test]

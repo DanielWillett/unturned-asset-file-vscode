@@ -19,7 +19,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 public class LocalPropertyReference : IPropertyReferenceValue
 {
     private PropertyReference _propertyReference;
-    private readonly IAssetSpecDatabase _database;
+    private readonly IAssetSpecDatabase? _database;
 
     private DatProperty? _property;
 
@@ -47,7 +47,7 @@ public class LocalPropertyReference : IPropertyReferenceValue
         _propertyReference = pref;
         _database = database;
         
-        if (_propertyReference.IsCrossReference)
+        if (_propertyReference.IsCrossReference || _database == null)
             return;
 
         _database.OnInitialize((_, loggerFactory) =>
@@ -69,10 +69,8 @@ public class LocalPropertyReference : IPropertyReferenceValue
     [MemberNotNullWhen(true, nameof(_property))]
     private bool TryCacheProperty(ILoggerFactory loggerFactory, in FileEvaluationContext ctx)
     {
-        if (!_database.IsInitialized)
-            return false;
-
-        return _propertyReference.TryGetProperty(Owner, in ctx, _database, loggerFactory, out _property);
+        return _database is { IsInitialized: true }
+               && _propertyReference.TryGetProperty(Owner, in ctx, _database, loggerFactory, out _property);
     }
 
     /// <inheritdoc />

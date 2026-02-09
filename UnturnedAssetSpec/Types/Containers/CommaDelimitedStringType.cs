@@ -130,7 +130,7 @@ public sealed class CommaDelimitedStringType : ITypeFactory
             if (Json.TryGetProperty("MinimumCount"u8, out JsonElement element) && element.ValueKind != JsonValueKind.Null)
             {
                 TypeConverterParseArgs<int> parseArgs = new TypeConverterParseArgs<int>(Int32Type.Instance);
-                if (!TypeConverters.Get<int>().TryReadJson(in Json, out minValue, ref parseArgs))
+                if (!TypeConverters.Get<int>().TryReadJson(in element, out minValue, ref parseArgs))
                     throw new JsonException(string.Format(
                             Resources.JsonException_FailedToParseValue,
                             Int32Type.TypeId,
@@ -142,7 +142,7 @@ public sealed class CommaDelimitedStringType : ITypeFactory
             if (Json.TryGetProperty("MaximumCount"u8, out element) && element.ValueKind != JsonValueKind.Null)
             {
                 TypeConverterParseArgs<int> parseArgs = new TypeConverterParseArgs<int>(Int32Type.Instance);
-                if (!TypeConverters.Get<int>().TryReadJson(in Json, out minValue, ref parseArgs))
+                if (!TypeConverters.Get<int>().TryReadJson(in element, out minValue, ref parseArgs))
                     throw new JsonException(string.Format(
                             Resources.JsonException_FailedToParseValue,
                             Int32Type.TypeId,

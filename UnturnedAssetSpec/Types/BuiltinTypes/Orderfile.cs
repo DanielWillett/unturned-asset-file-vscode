@@ -192,6 +192,10 @@ internal sealed class OrderfileListElementType : BaseType<string, OrderfileListE
         ? _type is IDatTypeWithLocalizationProperties lcl ? lcl.LocalizationProperties : ImmutableArray<DatProperty>.Empty
         : _type is DatTypeWithProperties props ? props.Properties : ImmutableArray<DatProperty>.Empty;
 
+    private ImmutableArray<DatProperty>.Builder? RelevantPropertiesFallback => _isLocalization
+        ? _type is IDatTypeWithLocalizationProperties lcl ? lcl.LocalizationPropertiesBuilder : null
+        : _type is DatTypeWithProperties props ? props.PropertiesBuilder : null;
+
     /// <inheritdoc />
     public override string Id => "DanielWillett.UnturnedDataFileLspServer.Data.Types.OrderfileListElementType, UnturnedAssetSpec";
 
@@ -266,6 +270,9 @@ internal sealed class OrderfileListElementType : BaseType<string, OrderfileListE
                     _isLocalization
                         ? baseType is IDatTypeWithLocalizationProperties lcl ? lcl.LocalizationProperties : ImmutableArray<DatProperty>.Empty
                         : baseType.Properties,
+                    _isLocalization
+                        ? baseType is IDatTypeWithLocalizationProperties lcl2 ? lcl2.LocalizationPropertiesBuilder : null
+                        : baseType.PropertiesBuilder,
                     in pRef
                 );
             }
@@ -295,7 +302,7 @@ internal sealed class OrderfileListElementType : BaseType<string, OrderfileListE
         {
             strValue = StringHelper.Unescape(strValue);
             PropertyReference propRef = new PropertyReference(SpecPropertyContext.Unspecified, null, strValue);
-            property = FindProperty(_type, RelevantProperties, in propRef);
+            property = FindProperty(_type, RelevantProperties, RelevantPropertiesFallback, in propRef);
         }
 
         if (property == null)
@@ -310,7 +317,7 @@ internal sealed class OrderfileListElementType : BaseType<string, OrderfileListE
         return true;
     }
 
-    private static DatProperty? FindProperty(DatType type, ImmutableArray<DatProperty> properties, in PropertyReference propertyReference)
+    private static DatProperty? FindProperty(DatType type, ImmutableArray<DatProperty> properties, ImmutableArray<DatProperty>.Builder? fallbackProperties, in PropertyReference propertyReference)
     {
         if (propertyReference.TypeName != null && !type.TypeName.Equals(propertyReference.TypeName))
         {
@@ -322,6 +329,15 @@ internal sealed class OrderfileListElementType : BaseType<string, OrderfileListE
         {
             if (property.Key.Equals(propName, StringComparison.OrdinalIgnoreCase))
                 return property;
+        }
+
+        if (fallbackProperties != null)
+        {
+            foreach (DatProperty property in fallbackProperties)
+            {
+                if (property.Key.Equals(propName, StringComparison.OrdinalIgnoreCase))
+                    return property;
+            }
         }
 
         return null;

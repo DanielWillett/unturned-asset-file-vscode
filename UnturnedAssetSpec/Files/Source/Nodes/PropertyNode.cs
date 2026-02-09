@@ -121,7 +121,7 @@ internal class PropertyNode : AnySourceNode, IPropertySourceNode
         }
 
         using SourceNodeTokenizer t = new SourceNodeTokenizer(segment);
-        t.SkipToken(out FileRange range);
+        t.SkipToken(out FileRange range, src.ExpectedType);
         return range;
     }
 

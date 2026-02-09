@@ -747,7 +747,7 @@
                 "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Conditions that must be met to succesfully interact with this object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#conditions-and-rewards",
             "Variable": "interactabilityConditionsList",
@@ -809,7 +809,7 @@
                 "ElementType": "SDG.Unturned.INPCREward, Assembly-CSharp",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Rewards granted after succesfully interacting with this object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#conditions-and-rewards",
             "Variable": "interactabilityConditionsList",
@@ -861,7 +861,7 @@
         {
             "Key": "Interactability_Resource",
             "Type": "UInt16",
-            "DefaultValue": null,
+            "DefaultValue": 0,
             "Description": "Units of fuel or water that is stored in this object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Variable": "interactabilityResource",
@@ -2480,7 +2480,7 @@
                 "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Conditions that must be met for this object to be visible.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#conditions-and-rewards",
             "Variable": "visibilityConditionsList"
@@ -2845,7 +2845,7 @@
                 "SupportsNewLines": true,
                 "FormatArguments": 1
             },
-            "DefaultValue": null,
+            "DefaultValue": "",
             "Description": "Custom text when interacting with the object.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Required":

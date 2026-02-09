@@ -220,7 +220,7 @@
                 "Type": "List",
                 "ElementType": "SDG.Unturned.ItemSightAsset+DistanceMarker, Assembly-CSharp"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "List of accurate distance markers on the sight that account for the gun's bullet drop.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html#distancemarkers-list-of-distancemarker",
             "Variable": "distanceMarkers"

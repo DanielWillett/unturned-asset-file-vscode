@@ -454,6 +454,9 @@ public static class Value
                 return boolVal;
 
             case JsonValueKind.Array:
+                if (root.GetArrayLength() == 0)
+                    return NullValue.Instance;
+
                 if (valueType != null && SwitchValue.TryRead(in root, valueType, database, owner, out SwitchValue? value))
                 {
                     return value;
@@ -464,7 +467,8 @@ public static class Value
             case JsonValueKind.Null:
                 if (type != null)
                     return Null(type);
-                break;
+
+                return NullValue.Instance;
         }
 
         return null;

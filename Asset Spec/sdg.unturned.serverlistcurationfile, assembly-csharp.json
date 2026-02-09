@@ -32,6 +32,7 @@
                 "Type": "List",
                 "ElementType": "DanielWillett.UnturnedDataFileLspServer.Data.Types.ServerListCurationLabel, UnturnedAssetSpec"
             },
+            "DefaultValue": [ ],
             "Description": "Defines a list of labels that can be applied by rules.",
             "Variable": "labels",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html#labels-list-of-dictionaries"
@@ -124,7 +125,7 @@
                             }
                         ]
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "ExclusiveWith":
                     [
                         "Regex",
@@ -200,7 +201,7 @@
                             }
                         ]
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "ExclusiveWith":
                     [
                         "Filter",
@@ -280,7 +281,7 @@
                             }
                         ]
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "ExclusiveWith":
                     [
                         "Value",

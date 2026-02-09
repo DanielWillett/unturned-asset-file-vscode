@@ -26,7 +26,7 @@ internal sealed class ENPCLogicTypeConverter : ITypeConverter<DatEnumValue>
     public bool TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<DatEnumValue> args, [MaybeNullWhen(false)] out DatEnumValue parsedValue)
     {
         parsedValue = null;
-        if (text.Length < 2)
+        if (text.Length is < 1 or > 2)
             return false;
 
         int index;

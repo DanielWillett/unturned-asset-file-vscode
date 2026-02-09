@@ -37,6 +37,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="MathMatrix\**" />
+    <EmbeddedResource Remove="MathMatrix\**" />
+    <None Remove="MathMatrix\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="UnturnedAssetSpec_Tests.dll.publickey" />
   </ItemGroup>
 

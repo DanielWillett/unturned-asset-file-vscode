@@ -120,6 +120,10 @@
             "Key": "Wheel_Friction_Sideways",
             "Type": "SDG.Unturned.VehiclePhysicsProfileAsset+Friction, Assembly-CSharp",
             "DefaultValue": null,
+            "IncludedDefaultValue": 
+            {
+                "$udat-type": "SDG.Unturned.VehiclePhysicsProfileAsset+Friction, Assembly-CSharp"
+            },
             "Description": "Friction settings for wheels when moving sideways.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
             "Variable": "sidewaysFriction"
@@ -128,6 +132,10 @@
             "Key": "Wheel_Friction_Forward",
             "Type": "SDG.Unturned.VehiclePhysicsProfileAsset+Friction, Assembly-CSharp",
             "DefaultValue": null,
+            "IncludedDefaultValue": 
+            {
+                "$udat-type": "SDG.Unturned.VehiclePhysicsProfileAsset+Friction, Assembly-CSharp"
+            },
             "Description": "Friction settings for wheels when moving forwards/backwards.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-physics-profile-asset.html",
             "Variable": "forwardFriction"

@@ -16,7 +16,7 @@
                 "Mode": "LegacyList, ModernList",
                 "ElementType": "SDG.Unturned.SpawnTable, Assembly-CSharp"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Roots specify a list of other spawns where this spawn table will be inserted into with the given weight.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#roots"
         },
@@ -28,7 +28,7 @@
                 "Mode": "LegacyList, ModernList",
                 "ElementType": "SDG.Unturned.SpawnTable, Assembly-CSharp"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "A list of items or spawns that can be resolved from this spawn asset.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html#tables"
         }

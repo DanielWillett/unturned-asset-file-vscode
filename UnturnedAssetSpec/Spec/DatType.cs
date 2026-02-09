@@ -235,6 +235,8 @@ public abstract class DatType : BaseType<DatType>, IDatSpecificationObject
 /// </summary>
 public abstract class DatTypeWithProperties : DatType
 {
+    internal ImmutableArray<DatProperty>.Builder? PropertiesBuilder;
+
     /// <summary>
     /// List of all available properties that can be stored in this type of file.
     /// </summary>
@@ -261,6 +263,8 @@ public abstract class DatTypeWithProperties : DatType
 /// </summary>
 public interface IDatTypeWithLocalizationProperties
 {
+    internal ImmutableArray<DatProperty>.Builder? LocalizationPropertiesBuilder { get; }
+
     /// <summary>
     /// List of all available properties that can be stored in the localization file for this type of asset.
     /// </summary>
@@ -272,6 +276,8 @@ public interface IDatTypeWithLocalizationProperties
 /// </summary>
 public interface IDatTypeWithBundleAssets
 {
+    internal ImmutableArray<DatBundleAsset>.Builder? BundleAssetsBuilder { get; }
+
     /// <summary>
     /// List of all available Unity objects that can be in the bundle for this asset.
     /// </summary>
@@ -361,6 +367,10 @@ public class DatFileType : DatTypeWithProperties
 /// </summary>
 public class DatAssetFileType : DatFileType, IDatTypeWithLocalizationProperties, IDatTypeWithBundleAssets
 {
+    internal ImmutableArray<DatProperty>.Builder? LocalizationPropertiesBuilder { get; set; }
+
+    internal ImmutableArray<DatBundleAsset>.Builder? BundleAssetsBuilder { get; set; }
+
     /// <inheritdoc />
     public override DatSpecificationType Type => DatSpecificationType.AssetFile;
 
@@ -390,4 +400,9 @@ public class DatAssetFileType : DatFileType, IDatTypeWithLocalizationProperties,
         LocalizationProperties = ImmutableArray<DatProperty>.Empty;
         BundleAssets = ImmutableArray<DatBundleAsset>.Empty;
     }
+
+    ImmutableArray<DatProperty>.Builder? IDatTypeWithLocalizationProperties.LocalizationPropertiesBuilder
+        => LocalizationPropertiesBuilder;
+    ImmutableArray<DatBundleAsset>.Builder? IDatTypeWithBundleAssets.BundleAssetsBuilder
+        => BundleAssetsBuilder;
 }

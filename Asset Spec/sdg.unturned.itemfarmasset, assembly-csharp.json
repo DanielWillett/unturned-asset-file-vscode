@@ -114,7 +114,7 @@
                 "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Rewards applied when harvesting this item.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/farm-asset.html#farm-asset-properties",
             "Variable": "harvestRewardsList"

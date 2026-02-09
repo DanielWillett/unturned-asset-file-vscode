@@ -23,7 +23,7 @@
                 "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Conditions that must be met for this quest to be able to be turned in.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
             "Variable": "conditionsList"
@@ -36,7 +36,7 @@
                 "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Rewards granted when a player turns in this quest.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
             "Variable": "rewardsList"
@@ -49,7 +49,7 @@
                 "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Rewards granted when a player abandons the quest without completing it.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/quest-asset.html#conditions-and-rewards",
             "Variable": "abandonmentRewardsList"

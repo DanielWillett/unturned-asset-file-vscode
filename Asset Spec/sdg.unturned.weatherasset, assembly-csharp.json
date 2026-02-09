@@ -188,7 +188,7 @@
                 "Type": "List",
                 "ElementType": "SDG.Unturned.WeatherAsset+Effect, Assembly-CSharp"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Multiple effects can be instantiated while the weather is active.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#effect-properties",
             "Variable": "effects"

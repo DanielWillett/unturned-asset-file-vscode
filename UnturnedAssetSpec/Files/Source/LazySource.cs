@@ -50,7 +50,7 @@ internal struct LazySource
         GetTokenizer(diagnosticSink, out SourceNodeTokenizer tokenizer);
         try
         {
-            ISourceNode? node = tokenizer.ParseValue(false);
+            ISourceNode? node = tokenizer.ParseValue(false, valueType: ExpectedType);
             if (node is not IAnyValueSourceNode av || av.ValueType != ExpectedType)
                 return null;
 

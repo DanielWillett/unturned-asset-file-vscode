@@ -85,7 +85,10 @@ public class ComplexConditionalSwitchCase : ISwitchCase
         foreach (IValue<bool> value in Conditions)
         {
             if (!value.TryGetConcreteValue(out Optional<bool> v))
-                continue;
+            {
+                doesPassConditions = false;
+                return false;
+            }
             
             bool passesCondition = v.GetValueOrDefault(false);
 
@@ -111,8 +114,11 @@ public class ComplexConditionalSwitchCase : ISwitchCase
         foreach (IValue<bool> value in Conditions)
         {
             if (!value.TryEvaluateValue(out Optional<bool> v, in ctx))
-                continue;
-            
+            {
+                doesPassConditions = false;
+                return false;
+            }
+
             bool passesCondition = v.GetValueOrDefault(false);
 
             switch (Operation)

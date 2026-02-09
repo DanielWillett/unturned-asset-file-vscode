@@ -268,7 +268,7 @@
                 "DefaultValue": null,
                 "RequireKeyType": true
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Required":
             {
                 "Variable": "Speciality_Health_Override_Mode",

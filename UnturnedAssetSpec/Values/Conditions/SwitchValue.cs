@@ -117,12 +117,13 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
             if (typeSwitch != null)
             {
                 if (!typeSwitch.TryEvaluateMatchingSwitchCase(bldr, sc, out ISwitchCase? matchingCase)
-                    || matchingCase.Value is not IValue<IType> typeOfValue)
+                    || !matchingCase.Value.TryGetConcreteValueAs(out Optional<IType> typeValue)
+                    || typeValue.Value == null)
                 {
                     return false;
                 }
 
-                sc = SwitchCase.TryReadSwitchCase(typeOfValue.Type, database, owner, in item);
+                sc = SwitchCase.TryReadSwitchCase(typeValue.Value, database, owner, in item);
                 if (sc == null)
                     return false;
             }
@@ -534,7 +535,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
             }
 
             // shouldn't ever really get to this
-            if (falseCase is not ComplexConditionalValue falseConditional)
+            if (falseCase is not ComplexConditionalSwitchCase falseConditional)
                 continue;
 
             ImmutableArray<IValue<bool>> conditions = falseConditional.Conditions;

@@ -139,7 +139,7 @@ public sealed class DictionaryType : ITypeFactory
             if (Json.TryGetProperty("MinimumCount"u8, out JsonElement element) && element.ValueKind != JsonValueKind.Null)
             {
                 TypeConverterParseArgs<int> parseArgs = new TypeConverterParseArgs<int>(Int32Type.Instance);
-                if (!TypeConverters.Int32.TryReadJson(in Json, out minValue, ref parseArgs))
+                if (!TypeConverters.Int32.TryReadJson(in element, out minValue, ref parseArgs))
                     throw new JsonException(string.Format(
                             Resources.JsonException_FailedToParseValue,
                             Int32Type.TypeId,
@@ -151,7 +151,7 @@ public sealed class DictionaryType : ITypeFactory
             if (Json.TryGetProperty("MaximumCount"u8, out element) && element.ValueKind != JsonValueKind.Null)
             {
                 TypeConverterParseArgs<int> parseArgs = new TypeConverterParseArgs<int>(Int32Type.Instance);
-                if (!TypeConverters.Int32.TryReadJson(in Json, out minValue, ref parseArgs))
+                if (!TypeConverters.Int32.TryReadJson(in element, out minValue, ref parseArgs))
                     throw new JsonException(string.Format(
                             Resources.JsonException_FailedToParseValue,
                             Int32Type.TypeId,
@@ -160,10 +160,10 @@ public sealed class DictionaryType : ITypeFactory
                     );
             }
 
-            IValue? defaultValue = null;
+            IValue<TValueType>? defaultValue = null;
             if (Json.TryGetProperty("DefaultValue"u8, out element))
             {
-                defaultValue = Spec.ReadValue(in element, type, Owner, Context.Length == 0 ? "DefaultValue" : $"{Context}.DefaultValue");
+                defaultValue = Spec.ReadValue(in element, SubType, Owner, Context.Length == 0 ? "DefaultValue" : $"{Context}.DefaultValue");
             }
 
             bool requireKeyType = Json.TryGetProperty("RequireKeyType"u8, out element)
@@ -410,14 +410,9 @@ public class DictionaryType<TKeyType, TValueType>
                 {
                     args.DiagnosticSink?.UNT2004_NoDictionary(ref args, args.ParentNode);
                 }
-                else
+                else if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                 {
-                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
-                    {
-                        return defValue.TryGetValueAs(in ctx, out value);
-                    }
-
-                    return false;
+                    return defValue.TryGetValueAs(in ctx, out value);
                 }
                 break;
 
@@ -463,8 +458,15 @@ public class DictionaryType<TKeyType, TValueType>
                     if (!_valueType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TValueType> parsedValue)
                         || !parsedValue.TryGetValueOrNull(out TValueType? actualValue))
                     {
+                        if (_args.DefaultValue == null
+                            || !_args.DefaultValue.TryEvaluateValue(out Optional<TValueType> gottenValue, in ctx)
+                            || !gottenValue.TryGetValueOrNull(out TValueType? defaultValue))
+                        {
+                            defaultValue = default;
+                        }
+
                         allPassed = false;
-                        array[index] = new DictionaryPair<TValueType>(key, default);
+                        array[index] = new DictionaryPair<TValueType>(key, defaultValue);
                         ++index;
                         continue;
                     }
@@ -569,9 +571,9 @@ public readonly struct DictionaryTypeArgs<TValueType>
     public int? MaximumCount { get; init; }
 
     /// <summary>
-    /// The default value for missing legacy list elements.
+    /// The default value for keys with missing values.
     /// </summary>
-    public IValue? DefaultValue { get; init; }
+    public IValue<TValueType>? DefaultValue { get; init; }
 
     /// <summary>
     /// Whether or not it's an error to have a key that isn't part of the key type.

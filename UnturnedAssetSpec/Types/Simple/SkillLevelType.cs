@@ -75,7 +75,7 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
         _info = context.Information;
     }
 
-    public SkillLevelType(IValue skillValue, IDatSpecificationReadContext context) : this(context)
+    public SkillLevelType(IValue<SkillReference> skillValue, IDatSpecificationReadContext context) : this(context)
     {
         _skillValue = skillValue ?? throw new ArgumentNullException(nameof(skillValue));
     }
@@ -135,11 +135,11 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
 
         if (typeDefinition.TryGetProperty("Skill"u8, out element))
         {
-            IValue skill = spec.ReadValue(in element, new SkillType(SkillKind.BackwardsCompatibleBlueprintSkill, spec), owner, context, options: ValueReadOptions.Default | ValueReadOptions.AssumeProperty);
+            IValue<SkillReference> skill = spec.ReadValue(in element, new SkillType(SkillKind.BackwardsCompatibleBlueprintSkill, spec), owner, context, options: ValueReadOptions.Default | ValueReadOptions.AssumeProperty);
             return new SkillLevelType(skill, spec) { AllowNegatives = allowNegatives };
         }
 
-        IValue? specIndex = null, skillIndex = null;
+        IValue<int>? specIndex = null, skillIndex = null;
         if (typeDefinition.TryGetProperty("SpecialityIndex"u8, out element))
         {
             specIndex = spec.ReadValue(in element, Int32Type.Instance, owner, context, options: ValueReadOptions.Default | ValueReadOptions.AssumeProperty);

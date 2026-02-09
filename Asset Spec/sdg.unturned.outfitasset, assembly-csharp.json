@@ -19,7 +19,7 @@
                     "AssetType": "SDG.Unturned.ItemClothingAsset, Assembly-CSharp"
                 }
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/outfit-asset.html#outfit-properties",
             "Description": "List of clothing items to be worn in the preview image.",
             "Variable": "itemAssets"

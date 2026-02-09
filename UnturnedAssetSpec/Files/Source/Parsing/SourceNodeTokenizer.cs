@@ -384,7 +384,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
     /// </summary>
     /// <param name="isListValue">Whether or not the value is in a list, otherwise the value is parsed as if it's a property value.</param>
     /// <returns>The value, or null if no value is present.</returns>
-    public IAnyValueSourceNode? ParseValue(bool isListValue, int depth = 0, int index = -1, int childIndex = -1)
+    public IAnyValueSourceNode? ParseValue(bool isListValue, int depth = 0, int index = -1, int childIndex = -1, SourceValueType valueType = (SourceValueType)(-1))
     {
         Restart();
 
@@ -400,17 +400,17 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                 return null;
         }
 
-        return ParseValueIntl(depth, isListValue, index, childIndex, out _);
+        return ParseValueIntl(depth, isListValue, index, childIndex, out _, valueType);
     }
 
-    private IAnyValueSourceNode ParseValueIntl(int depth, bool isListValue, int index, int childIndex, out OneOrMore<Comment> unhandledComments)
+    private IAnyValueSourceNode ParseValueIntl(int depth, bool isListValue, int index, int childIndex, out OneOrMore<Comment> unhandledComments, SourceValueType valueType)
     {
         switch (_char)
         {
-            case '{':
+            case '{' when valueType != SourceValueType.Value:
                 return ParseListOrDictionary(depth, isListValue, isList: false, in RootInfo.None, index, childIndex, out unhandledComments);
 
-            case '[':
+            case '[' when valueType != SourceValueType.Value:
                 return ParseListOrDictionary(depth, isListValue, isList: true, in RootInfo.None, index, childIndex, out unhandledComments);
 
             case '"':
@@ -627,7 +627,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                                 TrySkipToListOrDictStart();
                             if (startLine == _position.Line || _char is '[' or '{')
                             {
-                                TryReadPropertyValue(depth + 1, out source, out comments);
+                                TryReadPropertyValue(depth + 1, startLine, out source, out comments);
                             }
                             else
                             {
@@ -705,7 +705,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
                                 TrySkipToListOrDictStart();
                             if (_char != '\0' && startLine == _position.Line || _char is '[' or '{')
                             {
-                                TryReadPropertyValue(depth + 1, out source, out comments);
+                                TryReadPropertyValue(depth + 1, startLine, out source, out comments);
                             }
                             else
                             {
@@ -858,8 +858,8 @@ public ref partial struct SourceNodeTokenizer : IDisposable
         range.End.Line += _positionOffset.Line;
     }
 
-    private void TryReadPropertyValue(
-        int propertyDepth,
+    private void TryReadPropertyValue(int propertyDepth,
+        int startLine,
         out LazySource lazySource,
         out OneOrMore<Comment> comments)
     {
@@ -873,13 +873,16 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             _ => SourceValueType.Value
         };
 
+        if (startLine == _position.Line)
+            type = SourceValueType.Value;
+
         if ((_options & SourceNodeTokenizerOptions.Lazy) != 0)
         {
             SourceNodeTokenizer topCommentReader = this;
 
             int startIndex = _index;
             FilePosition position = _position;
-            SkipToken(out _);
+            SkipToken(out _, type);
 
             comments = OneOrMore<Comment>.Null;
             FileRange r = default;
@@ -937,7 +940,7 @@ public ref partial struct SourceNodeTokenizer : IDisposable
             {
                 SourceValueType.List       => ParseListOrDictionary(propertyDepth, false, true, in RootInfo.None, -1, -1, out comments),
                 SourceValueType.Dictionary => ParseListOrDictionary(propertyDepth, false, false, in RootInfo.None, -1, -1, out comments),
-                _ => ParseValueIntl(propertyDepth, false, -1, -1, out comments)
+                _ => ParseValueIntl(propertyDepth, false, -1, -1, out comments, type)
             };
 
             lazySource = new LazySource(value, type);
@@ -1398,11 +1401,14 @@ public ref partial struct SourceNodeTokenizer : IDisposable
         return _char is not ('\0' or '\r');
     }
 
-    internal void SkipToken(out FileRange skipRange)
+    internal void SkipToken(out FileRange skipRange, SourceValueType valueType = (SourceValueType)(-1))
     {
         switch (_char)
         {
             case '/':
+                if (valueType == SourceValueType.Value)
+                    goto default;
+
                 SkipComment(out skipRange);
                 break;
             
@@ -1413,6 +1419,9 @@ public ref partial struct SourceNodeTokenizer : IDisposable
 
             case '[':
             case '{':
+                if (valueType == SourceValueType.Value)
+                    goto default;
+
                 skipRange = default;
                 skipRange.Start = _position;
                 SkipListOrDictionary(out skipRange.End);

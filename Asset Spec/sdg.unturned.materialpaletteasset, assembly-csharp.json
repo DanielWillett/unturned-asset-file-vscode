@@ -19,7 +19,7 @@
                     "BaseType": "UnityEngine.Material, UnityEngine.CoreModule"
                 }
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "List of available materials.",
             "Variable": "materials"
         }

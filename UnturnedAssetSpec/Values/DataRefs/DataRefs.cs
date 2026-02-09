@@ -59,7 +59,7 @@ public static class DataRefs
     public static bool TryReadDataRef<TValue>(string text, IType<TValue> type, [NotNullWhen(true)] out IDataRef? dataRef)
         where TValue : IEquatable<TValue>
     {
-        dataRef = SelfDataRef.Instance;
+        dataRef = IndexDataRef<TValue>.Instance;
         return true;
     }
 }

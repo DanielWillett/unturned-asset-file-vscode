@@ -315,7 +315,7 @@
                 "MinimumCount": 1,
                 "Mode": "LegacyList"
             },
-            "DefaultValue": [ "@Caliber" ],
+            "DefaultValue": "@Caliber",
             "Description": "Arbitrary IDs that must be also be present in magazines for them to be attachable to this gun.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#magazine-calibers-int32",
             "Variable": "magazineCalibers"
@@ -1212,7 +1212,7 @@
                 "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
                 "Mode": "LegacyList, ModernList"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "Rewards applied when the player fires a shot.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gun-asset.html#npc-rewards",
             "Variable": "shootQuestRewards"

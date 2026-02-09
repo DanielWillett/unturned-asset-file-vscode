@@ -1,11 +1,28 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using System.Collections.Immutable;
 
 namespace UnturnedAssetSpecTests.Nodes;
 
 public partial class SourceNodeTokenizerTests
 {
+    [Test]
+    public void ReadPropertyStartingWithSpecialCharacter([Values("{", "[")] string c, [Values(SourceNodeTokenizerOptions.Lazy, SourceNodeTokenizerOptions.Metadata, SourceNodeTokenizerOptions.Lazy | SourceNodeTokenizerOptions.Metadata, SourceNodeTokenizerOptions.None)] SourceNodeTokenizerOptions options)
+    {
+        string test = $"Property {c}_value";
+
+        using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, test, null, options);
+        ImmutableArray<IPropertySourceNode> properties = file.SourceFile.Properties;
+
+        Assert.That(properties, Has.Length.EqualTo(1));
+
+        IPropertySourceNode prop = properties[0];
+        Assert.That(prop.Key, Is.EqualTo("Property"));
+        Assert.That(prop.ValueKind, Is.EqualTo(SourceValueType.Value));
+        Assert.That(((IValueSourceNode?)prop.Value)?.Value, Is.EqualTo($"{c}_value"));
+        Assert.That(prop.KeyIsQuoted, Is.False);
+    }
+    
     [Test]
     public void ReadBasicNonQuotedString()
     {

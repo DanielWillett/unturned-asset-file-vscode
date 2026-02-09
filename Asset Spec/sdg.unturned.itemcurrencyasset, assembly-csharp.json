@@ -40,7 +40,7 @@
                 "Type": "List",
                 "ElementType": "SDG.Unturned.ItemCurrencyAsset+Entry, Assembly-CSharp"
             },
-            "DefaultValue": null,
+            "DefaultValue": [ ],
             "Description": "A list of all items with a value for this currency.",
             "Variable": "entries",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/currency-asset.html#asset-setup"

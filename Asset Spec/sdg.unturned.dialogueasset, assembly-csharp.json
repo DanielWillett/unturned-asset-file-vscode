@@ -117,7 +117,7 @@
                         "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
                         "Mode": "LegacyList, ModernList"
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Description": "Conditions that must be met for message #(Self.TemplateGroups[0]) to be shown.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "conditions"
@@ -130,7 +130,7 @@
                         "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
                         "Mode": "LegacyList, ModernList"
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Description": "Rewards applied before viewing message #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "rewards"
@@ -205,7 +205,7 @@
                         "ElementType": "SDG.Unturned.INPCCondition, Assembly-CSharp",
                         "Mode": "LegacyList, ModernList"
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Description": "Conditions that must be met for response #(Self.TemplateGroups[0]) to be shown.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "conditions"
@@ -218,7 +218,7 @@
                         "ElementType": "SDG.Unturned.INPCReward, Assembly-CSharp",
                         "Mode": "LegacyList, ModernList"
                     },
-                    "DefaultValue": null,
+                    "DefaultValue": [ ],
                     "Description": "Rewards applied before viewing response #(Self.TemplateGroups[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "rewards"

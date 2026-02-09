@@ -278,7 +278,7 @@
                         "ElementType": "SDG.Unturned.BrowserConfigData+Link, Assembly-CSharp"
                     },
                     "Description": "Buttons shown in the server lobby menu.",
-                    "DefaultValue": null
+                    "DefaultValue": [ ]
                 }
             ]
         },
