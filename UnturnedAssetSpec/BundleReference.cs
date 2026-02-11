@@ -46,6 +46,18 @@ public readonly struct BundleReference : IEquatable<BundleReference>, IComparabl
         return true;
     }
 
+    public static bool TryParse(ReadOnlySpan<char> str, out BundleReference bundleReference, BundleReferenceKind type = BundleReferenceKind.MasterBundleReferenceString)
+    {
+        if (!KnownTypeValueHelper.TryParseMasterBundleReference(str, out string? name, out string? path) || name == null || path == null)
+        {
+            bundleReference = default;
+            return false;
+        }
+
+        bundleReference = new BundleReference(name, path, type);
+        return true;
+    }
+
     /// <inheritdoc />
     public bool Equals(BundleReference other)
     {

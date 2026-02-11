@@ -302,6 +302,8 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             _initializeListeners = null;
         }
 
+        IsInitialized = true;
+
         if (initializeListeners != null)
         {
             Task[] initTasks = new Task[initializeListeners.Length];
@@ -312,8 +314,6 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
             await Task.WhenAll(initTasks).ConfigureAwait(false);
         }
-
-        IsInitialized = true;
 
         if (_cache != null)
         {

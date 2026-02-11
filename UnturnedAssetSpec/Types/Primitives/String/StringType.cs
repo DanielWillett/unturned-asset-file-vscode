@@ -54,21 +54,27 @@ public sealed class StringType : PrimitiveType<string, StringType>, ITypeParser<
     }
 
     public StringType(
-        int minCount,
-        int maxCount,
-        bool allowRichText,
-        bool allowLineBreakTag,
-        uint maxFormatArguments,
-        OneOrMore<Regex> extraRichTextTags
+        int minCount = -1,
+        int maxCount = -1,
+        bool allowRichText = false,
+        bool allowLineBreakTag = false,
+        uint maxFormatArguments = 0,
+        OneOrMore<Regex> extraRichTextTags = default
     ) : this()
     {
-        _minCount = minCount;
-        _maxCount = maxCount;
+        _minCount = minCount < 0 ? 0 : minCount;
+        _maxCount = maxCount < 0 ? int.MaxValue : maxCount;
 
         _allowRichText = allowRichText;
         _allowLineBreakTag = allowLineBreakTag;
-        _extraRichTextTags = extraRichTextTags;
         _maxFormatArguments = maxFormatArguments;
+
+        if (extraRichTextTags.Values == null && extraRichTextTags.Value == null)
+        {
+            extraRichTextTags = OneOrMore<Regex>.Null;
+        }
+
+        _extraRichTextTags = extraRichTextTags;
     }
 
     public bool TryParse(ref TypeParserArgs<string> args, in FileEvaluationContext ctx, out Optional<string> value)

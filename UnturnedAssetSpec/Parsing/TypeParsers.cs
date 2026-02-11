@@ -277,6 +277,8 @@ public static class TypeParsers
                     Parser = (ITypeParser<T>)Float128;
                 else if (typeof(T) == typeof(Guid))
                     Parser = (ITypeParser<T>)Guid;
+                else if (typeof(T) == typeof(GuidOrId))
+                    Parser = (ITypeParser<T>)GuidOrId;
                 else if (typeof(T) == typeof(DateTime))
                     Parser = (ITypeParser<T>)DateTime;
                 else if (typeof(T) == typeof(DateTimeOffset))

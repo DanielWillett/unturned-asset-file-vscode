@@ -381,7 +381,7 @@
                         {
                             "Case":
                             {
-                                "Variable": "Name",
+                                "Variable": "#This.AssetName",
                                 "Operation": "contains-i",
                                 "Comparand": "Seed"
                             },
@@ -390,7 +390,7 @@
                         {
                             "Case":
                             {
-                                "Variable": "Name",
+                                "Variable": "#This.AssetName",
                                 "Operation": "contains-i",
                                 "Comparand": "Metal"
                             },
@@ -547,7 +547,7 @@
                             "And":
                             [
                                 {
-                                    "Variable": "Name",
+                                    "Variable": "#This.AssetName",
                                     "Operation": "contains-i",
                                     "Comparand": "Bow"
                                 },
@@ -567,7 +567,7 @@
                         {
                             "Case":
                             {
-                                "Variable": "Name",
+                                "Variable": "#This.AssetName",
                                 "Operation": "contains-i",
                                 "Comparand": "Bow"
                             },
@@ -606,7 +606,7 @@
                         {
                             "Case":
                             {
-                                "Variable": "Name",
+                                "Variable": "#This.AssetName",
                                 "Operation": "contains-i",
                                 "Comparand": "Metal"
                             },

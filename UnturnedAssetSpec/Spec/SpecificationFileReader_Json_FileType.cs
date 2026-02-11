@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.Tracing;
 using System.Text.Json;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -37,6 +39,25 @@ partial class SpecificationFileReader
 
             if (_assetFiles != null && _assetFiles.TryGetValue(fileType, out JsonDocument? jsonDoc))
             {
+                _parsedFiles?.Add(fileType);
+                if (_readInformation != null)
+                {
+                    // read parent types
+                    InverseTypeHierarchy hierarchy = _readInformation.GetParentTypes(fileType);
+                    for (int i = hierarchy.ParentTypes.Length - 1; i >= 0; --i)
+                    {
+                        QualifiedType parentType = hierarchy.ParentTypes[i];
+
+                        if (_assetFiles == null || !_assetFiles.TryGetValue(fileType, out JsonDocument? parentJsonDoc))
+                            continue;
+
+                        if (_parsedFiles != null && !_parsedFiles.Add(parentType))
+                            continue;
+
+                        _ = ReadFileType(parentJsonDoc, parentType);
+                    }
+                }
+
                 return ReadFileType(jsonDoc, fileType);
             }
         }
@@ -87,7 +108,38 @@ partial class SpecificationFileReader
             _currentFiles.Add(type);
         try
         {
-            _fileTypeBuilder?[fileType] = type;
+            if (_fileTypeBuilder != null)
+            {
+                if (_fileTypeBuilder.TryGetValue(fileType, out DatFileType existing))
+                {
+                    _logger.LogError(
+                        "Duplicate file type name in specification: {0} and {1}.",
+                        existing.Id,
+                        type.Id
+                    );
+                }
+                else
+                {
+                    _fileTypeBuilder.Add(fileType, type);
+                }
+            }
+
+            if (_allTypeBuilder != null)
+            {
+                if (_allTypeBuilder.TryGetValue(fileType, out DatType existing))
+                {
+                    _logger.LogWarning(
+                        "Duplicate type name in specification: ({0} from {1}) and ({2}). They're not conflicting since they're defined in different files but may cause issues.",
+                        existing.Id,
+                        existing.Owner.TypeName,
+                        type.Id
+                    );
+                }
+                else
+                {
+                    _allTypeBuilder.Add(fileType, type);
+                }
+            }
 
             if (type is DatAssetFileType assetType)
             {

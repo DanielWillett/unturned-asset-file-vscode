@@ -381,50 +381,62 @@ public static class Value
                     return v;
                 }
 
-                ExpressionValueType defType = ParseDefType(options, ref str, out _, out _);
+                ExpressionValueType defType = ParseDefType(options, ref str, out _, out _, out ReadOnlySpan<char> data);
 
                 switch (defType)
                 {
                     case ExpressionValueType.Value:
-                        if (Guid.TryParse(str, out Guid guid))
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+                        // ReSharper disable once InlineTemporaryVariable
+                        ReadOnlySpan<char> strParsed = data;
+#else
+                        string strParsed = str.Length == data.Length ? str : data.ToString();
+#endif
+                        if (Guid.TryParse(strParsed, out Guid guid))
                         {
                             IValue<Guid> v = Create(guid, GuidType.Instance);
                             visitor.Accept(v);
                             return v;
                         }
-                        if (TimeSpan.TryParse(str, CultureInfo.InvariantCulture, out TimeSpan ts))
+                        if (TimeSpan.TryParse(strParsed, CultureInfo.InvariantCulture, out TimeSpan ts))
                         {
                             IValue<TimeSpan> v = Create(ts, TimeSpanType.Instance);
                             visitor.Accept(v);
                             return v;
                         }
-                        if (DateTime.TryParse(str, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime dt))
+                        if (DateTime.TryParse(strParsed, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime dt))
                         {
                             IValue<DateTime> v = Create(dt, DateTimeType.Instance);
                             visitor.Accept(v);
                             return v;
                         }
-                        if (DateTimeOffset.TryParse(str, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset dto))
+                        if (DateTimeOffset.TryParse(strParsed, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset dto))
                         {
                             IValue<DateTimeOffset> v = Create(dto, DateTimeOffsetType.Instance);
                             visitor.Accept(v);
                             return v;
                         }
-                        IValue<string> strVal = Create(str, StringType.Instance);
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+                        IValue<string> strVal = Create(str.Length == data.Length ? str : new string(data), StringType.Instance);
+#else
+                        IValue<string> strVal = Create(strParsed, StringType.Instance);
+#endif
                         visitor.Accept(strVal);
                         return strVal;
 
                     case ExpressionValueType.DataRef:
-                        return DataRefs.TryReadDataRef(str, type, out IDataRef? dataRef) ? dataRef : null;
+                        return DataRefs.TryReadDataRef(str.Length == data.Length ? str : data.ToString(), type, out IDataRef? dataRef) ? dataRef : null;
 
                     case ExpressionValueType.PropertyRef:
                         if (owner is not DatProperty propertyOwner)
                             return null;
                         PropertyReference pRef;
-                        if (str.Length > 0 && (options & ValueReadOptions.AllowExclamationSuffix) != 0 && str[^1] == '!')
-                            pRef = PropertyReference.Parse(str.AsSpan(0, str.Length - 1), null);
+                        if ((options & ValueReadOptions.AllowExclamationSuffix) != 0 && data.Length > 0 && data[^1] == '!')
+                            pRef = PropertyReference.Parse(data[..^1], null);
+                        else if (str.Length == data.Length)
+                            pRef = PropertyReference.Parse(data, str);
                         else
-                            pRef = PropertyReference.Parse(str, str);
+                            pRef = PropertyReference.Parse(data, null);
 
                         return pRef.CreateValue(propertyOwner, database);
 
@@ -435,7 +447,7 @@ public static class Value
                         }
 
                         ExpressionVisitor expressionVisitor;
-                        expressionVisitor.String = str;
+                        expressionVisitor.String = str.Length == data.Length ? str : data.ToString();
                         expressionVisitor.ExpressionValue = null;
                         concreteType.Visit(ref expressionVisitor);
                         return expressionVisitor.ExpressionValue;
@@ -508,14 +520,15 @@ public static class Value
                         : Null(valueType);
                 }
 
-                ExpressionValueType defType = ParseDefType(options, ref str, out bool hasPrefix, out bool hasEscapeSequences);
+                ExpressionValueType defType = ParseDefType(options, ref str, out bool hasPrefix, out bool hasEscapeSequences, out ReadOnlySpan<char> data);
 
                 switch (defType)
                 {
                     case ExpressionValueType.Value:
                         if (TryReadValueFromString(
                                 in root,
-                                !hasEscapeSequences ? hasPrefix ? str : null : StringHelper.Unescape(str),
+                                // when null, read from the original JSON object, allows calling ReadValueFromJson instead of the type converter
+                                hasPrefix || hasEscapeSequences ? str.Length == data.Length ? str : data.ToString() : null,
                                 valueType,
                                 out val))
                         {
@@ -525,16 +538,19 @@ public static class Value
                         return null;
 
                     case ExpressionValueType.DataRef:
-                        return DataRefs.TryReadDataRef(str, valueType, out IDataRef? dataRef) ? dataRef as IValue<TValue> : null;
+                        string stringVal = str.Length == data.Length ? str : data.ToString();
+                        return DataRefs.TryReadDataRef(stringVal, valueType, out IDataRef? dataRef) ? dataRef as IValue<TValue> : null;
 
                     case ExpressionValueType.PropertyRef:
                         if (owner is not DatProperty propertyOwner)
                             return null;
                         PropertyReference pRef;
-                        if (str.Length > 0 && (options & ValueReadOptions.AllowExclamationSuffix) != 0 && str[^1] == '!')
-                            pRef = PropertyReference.Parse(str.AsSpan(0, str.Length - 1), null);
+                        if ((options & ValueReadOptions.AllowExclamationSuffix) != 0 && data.Length > 0 && data[^1] == '!')
+                            pRef = PropertyReference.Parse(data[..^1], null);
+                        else if (str.Length == data.Length)
+                            pRef = PropertyReference.Parse(data, str);
                         else
-                            pRef = PropertyReference.Parse(str, str);
+                            pRef = PropertyReference.Parse(data, null);
 
                         return pRef.CreateValue(valueType, propertyOwner, database);
 
@@ -572,13 +588,15 @@ public static class Value
         return null;
     }
 
-    private static ExpressionValueType ParseDefType(ValueReadOptions options, ref string str, out bool hasPrefix, out bool hasEscapeSequences)
+    private static ExpressionValueType ParseDefType(ValueReadOptions options, ref string str, out bool hasPrefix, out bool hasEscapeSequences, out ReadOnlySpan<char> data)
     {
         ExpressionValueType defType = ExpressionValueType.Value;
         if ((options & ValueReadOptions.AssumeProperty) != 0)
             defType = ExpressionValueType.PropertyRef;
         else if ((options & ValueReadOptions.AssumeDataRef) != 0)
             defType = ExpressionValueType.DataRef;
+
+        data = str;
 
         hasPrefix = false;
         if (str[0] == '@')
@@ -608,17 +626,26 @@ public static class Value
             int valueEndIndex = StringHelper.NextUnescapedIndexOf(str.AsSpan(2), [ '(', ')', '\\' ], out hasEscapeSequences, useDepth: true);
             if (valueEndIndex == -1)
             {
+                data = str.AsSpan(1);
                 //hasParenthesis = false;
             }
             else
             {
-                str = str.Substring(2, valueEndIndex);
+                data = str.AsSpan(2, valueEndIndex);
             }
         }
         else
         {
             //hasParenthesis = false;
+            if (hasPrefix)
+                data = str.AsSpan(1);
             hasEscapeSequences = str.IndexOf('\\') >= 0;
+        }
+
+        if (hasEscapeSequences)
+        {
+            str = StringHelper.Unescape(data, [ '(', ')', '\\' ]);
+            data = str.AsSpan();
         }
 
         return defType;

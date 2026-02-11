@@ -139,6 +139,16 @@ public struct TypeConverterParseArgs<T> : IDiagnosticProvider where T : IEquatab
         return ValueRange;
     }
 
+    public FileRange GetRange()
+    {
+        return ValueRange;
+    }
+
+    public void RegisterFailureDiagnostic()
+    {
+        ShouldIgnoreFailureDiagnostic = true;
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
     internal readonly ReadOnlySpan<char> StringOrSpan(ReadOnlySpan<char> text) => text;

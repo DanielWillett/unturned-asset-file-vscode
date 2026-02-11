@@ -17,13 +17,13 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 /// </summary>
 public static class DiagnosticSinkExtensions
 {
-    // match any <[ ]br[ ][/][ ]>
+    // match any <[' ' or '\' or '/']*br[' ' or '\' or '/']*>
+    // - note only '<br>' is a valid line break but
+    //   this returns a wider range of tags that could be interpreted as a line break
     private static readonly Regex AnyLineBreakTagsMatcher =
-        new Regex(@"\<\s*br\s*\/{0,1}\s*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
-    // match any <[ ]br[ ]/[ ]>
-    private static readonly Regex InvalidLineBreakTagsMatcher =
-        new Regex(@"\<\s*br\s*\/\s*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        new Regex(@"\<[\s\\\/]*br[\s\\\/]*\>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    private const string ValidLineBreakTag = "<br>";
 
     private static readonly object Boxed999 = 999;
     private const int CachedMaxFormattingArg = 8;
@@ -73,6 +73,7 @@ public static class DiagnosticSinkExtensions
         else
         {
             // todo: args.DiagnosticSink!.CheckWhateverForInvalidRichTextTags(ref args, valueNode, extraRichTextTags)...
+            // todo: add test
         }
 
         // newlines
@@ -407,8 +408,8 @@ public static class DiagnosticSinkExtensions
                 if (crlfInd < 0)
                     break;
 
-                int startIndex = crlfInd > 0 && str[crlfInd - 1] == '\r' ? crlfInd - 1 : crlfInd;
-                int len = crlfInd - startIndex + 1;
+                int startIndex = crlfInd >= 2 && str[crlfInd - 2] == '\\' && str[crlfInd - 1] == 'r' ? crlfInd - 2 : crlfInd;
+                int len = startIndex == crlfInd ? 2 : 4;
 
                 FileRange range = node.Range;
                 range.Start.Character += startIndex;
@@ -423,8 +424,11 @@ public static class DiagnosticSinkExtensions
                 });
             }
 
-            foreach (Match match in InvalidLineBreakTagsMatcher.Matches(str))
+            foreach (Match match in AnyLineBreakTagsMatcher.Matches(str))
             {
+                if (string.Equals(match.Value, ValidLineBreakTag, StringComparison.Ordinal))
+                    continue;
+
                 FileRange range = node.Range;
                 range.Start.Character += match.Index;
                 if (node.IsQuoted)
@@ -546,7 +550,7 @@ public static class DiagnosticSinkExtensions
         {
             if (length < minCount)
                 diagnosticSink.UNT1024_LessString(ref provider, parentNode, minCount);
-            else if (length < maxCount)
+            else if (length > maxCount)
                 diagnosticSink.UNT1024_MoreString(ref provider, parentNode, maxCount);
         }
 
@@ -1268,4 +1272,6 @@ public interface IDiagnosticProvider
 {
     DatProperty? Property { get; }
     FileRange GetRangeAndRegisterDiagnostic();
+    FileRange GetRange();
+    void RegisterFailureDiagnostic();
 }

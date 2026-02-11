@@ -216,7 +216,7 @@ public static class KnownTypeValueHelper
     /// </summary>
     private static readonly Regex ContainsRichTextRegex =
         new Regex(
-            """\<\/{0,1}(?:(?:color=\"{0,1}[#a-z]{0,9}\"{0,1})|(?:color)|(?:#.{3,8})|(?:[ib]))\>""",
+            """\<\/{0,1}(?:(?:color=\"{0,1}[#a-z]{0,9}\"{0,1})|(?:color)|(?:#.{3,8})|(?:[ibu]))\>""",
             RegexOptions.IgnoreCase | RegexOptions.Compiled
         );
 
@@ -555,6 +555,24 @@ public static class KnownTypeValueHelper
         return !string.IsNullOrEmpty(path);
     }
     
+
+    public static bool TryParseMasterBundleReference(ReadOnlySpan<char> str, out string name, out string path)
+    {
+        int length = str.IndexOf(':');
+        if (length < 0)
+        {
+            name = string.Empty;
+            path = str.ToString();
+        }
+        else
+        {
+            name = str.Slice(0, length).ToString();
+            path = str.Slice(length + 1).ToString();
+        }
+
+        return !string.IsNullOrEmpty(path);
+    }
+    
     public static bool TryParseTranslationReference(ReadOnlySpan<char> str, [NotNullWhen(true)] out string? @namespace, [NotNullWhen(true)] out string? token)
     {
         @namespace = null;
@@ -593,23 +611,6 @@ public static class KnownTypeValueHelper
         @namespace = str.Slice(0, index).ToString();
         token = str.Slice(index + 2).ToString();
         return true;
-    }
-
-    public static bool TryParseMasterBundleReference(ReadOnlySpan<char> str, out string name, out string path)
-    {
-        int length = str.IndexOf(':');
-        if (length < 0)
-        {
-            name = string.Empty;
-            path = str.ToString();
-        }
-        else
-        {
-            name = str.Slice(0, length).ToString();
-            path = str.Slice(length + 1).ToString();
-        }
-
-        return !string.IsNullOrEmpty(path);
     }
 
     public static bool TryParseColorHex(ReadOnlySpan<char> str, out Color32 value, bool allowAlpha)

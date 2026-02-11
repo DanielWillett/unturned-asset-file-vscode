@@ -114,6 +114,11 @@ public static class TypeConverters
     public static ITypeConverter<QualifiedType> QualifiedType { get; } = new QualifiedTypeTypeConverter();
 
     /// <summary>
+    /// The type converter for <see cref="Data.BundleReference"/> values.
+    /// </summary>
+    public static ITypeConverter<BundleReference> BundleReference { get; } = new BundleReferenceTypeConverter();
+
+    /// <summary>
     /// The type converter for steam item def values.
     /// </summary>
     public static ITypeConverter<int> SteamItemDef => SteamItemDefType.Instance;
@@ -204,6 +209,8 @@ public static class TypeConverters
                     Converter = (ITypeConverter<T>)IPv4Filter;
                 else if (typeof(T) == typeof(QualifiedType))
                     Converter = (ITypeConverter<T>)QualifiedType;
+                else if (typeof(T) == typeof(BundleReference))
+                    Converter = (ITypeConverter<T>)BundleReference;
                 return;
             }
 

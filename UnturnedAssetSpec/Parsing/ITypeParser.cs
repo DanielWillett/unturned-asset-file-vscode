@@ -188,6 +188,16 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         ShouldIgnoreFailureDiagnostic = true;
         return ValueNode?.Range ?? ParentNode.Range;
     }
+
+    public FileRange GetRange()
+    {
+        return ValueNode?.Range ?? ParentNode.Range;
+    }
+
+    public void RegisterFailureDiagnostic()
+    {
+        ShouldIgnoreFailureDiagnostic = true;
+    }
 }
 
 /// <summary>

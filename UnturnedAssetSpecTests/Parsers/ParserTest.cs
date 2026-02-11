@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using System.Runtime.CompilerServices;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
@@ -47,7 +48,23 @@ public class ParserTest<T> : IDisposable, IDiagnosticSink, IReferencedPropertySi
             handleValue:
             (value, services) =>
             {
-                Assert.That(value, Is.EqualTo(expectedValue(services)));
+                Optional<T> expected = expectedValue(services);
+                Assert.That(value.HasValue, Is.EqualTo(expected.HasValue));
+                if (!value.HasValue)
+                    return;
+                
+                if (typeof(T) == typeof(float))
+                {
+                    Assert.That(MathMatrix.As<T, float>(value.Value), Is.EqualTo(MathMatrix.As<T?, float>(expected.Value)).Within(0.00001f));
+                }
+                else if (typeof(T) == typeof(double))
+                {
+                    Assert.That(MathMatrix.As<T, double>(value.Value), Is.EqualTo(MathMatrix.As<T?, double>(expected.Value)).Within(0.0000001f));
+                }
+                else
+                {
+                    Assert.That(value, Is.EqualTo(expected));
+                }
             },
             propertyName: property,
             type: type
@@ -65,7 +82,7 @@ public class ParserTest<T> : IDisposable, IDiagnosticSink, IReferencedPropertySi
             sourceFileFactory:
             s => StaticSourceFile.FromOtherFile(
                 filename,
-                string.IsNullOrEmpty(value) ? property : $"{property} {value}",
+                string.IsNullOrEmpty(value) ? property : $"{property} \"{value}\"",
                 s.Database).SourceFile,
             handleValue: null!,
             expectValue: false,
@@ -201,15 +218,28 @@ public class ParserTest<T> : IDisposable, IDiagnosticSink, IReferencedPropertySi
             return;
         }
 
+        DatDiagnosticMessage? potential = null;
         foreach (DatDiagnosticMessage diag in _diagnostics)
         {
             if (diag.Diagnostic != diagnostic.Diagnostic)
                 continue;
             if (diag.Range != diagnostic.Range)
+            {
+                potential = diag;
                 continue;
+            }
 
             messageValidation?.Invoke(diag.Message);
             return;
+        }
+
+        if (potential.HasValue)
+        {
+            Assert.That(
+                potential.Value.Range,
+                Is.EqualTo(diagnostic.Range),
+                message: $"Incorrect range for diagnostic {diagnostic.Diagnostic.ErrorId}."
+            );
         }
 
         Assert.Fail($"Expected diagnostic {diagnostic.Diagnostic} at {diagnostic.Range}.");
