@@ -761,7 +761,7 @@
                     "And":
                     [
                         {
-                            "Variable": "#Ballistic_Steps.Included{RequireValue=true}",
+                            "Variable": "#Ballistic_Steps.Included{\"RequireValue\":true}",
                             "Operation": "eq",
                             "Comparand": true
                         },
@@ -792,7 +792,7 @@
                 {
                     "When":
                     {
-                        "Variable": "#Ballistic_Drop.Included{RequireValue=true}",
+                        "Variable": "#Ballistic_Drop.Included{\"RequireValue\":true}",
                         "Operation": "eq",
                         "Comparand": true
                     },

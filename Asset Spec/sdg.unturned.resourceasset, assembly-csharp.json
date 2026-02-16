@@ -70,7 +70,7 @@
                 {
                     "Case":
                     {
-                        "Variable": "#Scale.Included{RequireValue=true}",
+                        "Variable": "#Scale.Included{\"RequireValue\":true}",
                         "Operation": "eq",
                         "Comparand": true
                     },
@@ -103,7 +103,7 @@
                 {
                     "Case":
                     {
-                        "Variable": "#Scale.Included{RequireValue=true}",
+                        "Variable": "#Scale.Included{\"RequireValue\":true}",
                         "Operation": "eq",
                         "Comparand": true
                     },

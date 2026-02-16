@@ -1,18 +1,33 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using System;
 using System.Runtime.CompilerServices;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 /// <summary>
 /// Converts the incoming value to <typeparamref name="TResult"/>.
 /// </summary>
-internal struct ConvertVisitor<TResult> : IGenericVisitor
+internal struct ConvertVisitor<TResult> : IGenericVisitor, IValueVisitor
     where TResult : IEquatable<TResult>
 {
     public TResult? Result;
     public bool WasSuccessful;
     public bool IsNull;
+
+    public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+    {
+        if (value.HasValue)
+        {
+            Accept(value.Value);
+        }
+        else
+        {
+            IsNull = true;
+            WasSuccessful = true;
+            Result = default;
+        }
+    }
 
     public void Accept<T>(T? value) where T : IEquatable<T>
     {

@@ -1,5 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -32,6 +33,25 @@ public sealed class ThisDataRef : RootDataRef<ThisDataRef>
         //       so better to just not support it.
 
         return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool AcceptProperty(in AssetNameProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    {
+        switch (ctx.File)
+        {
+            case ILocalizationSourceFile lcl:
+                value = lcl.Asset.AssetName;
+                return true;
+
+            case IAssetSourceFile asset:
+                value = asset.AssetName;
+                return true;
+
+            default:
+                value = null;
+                return false;
+        }
     }
 
     /// <inheritdoc />

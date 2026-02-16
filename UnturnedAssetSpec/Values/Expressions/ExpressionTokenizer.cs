@@ -88,13 +88,8 @@ internal ref struct ExpressionTokenizer
 
                     if (pInd >= 0 && remaining.Length > pInd)
                     {
-#if NET7_0_OR_GREATER
-                        ReadOnlySpan<char> valueEndIdentifiers = [ '(', ')', '\\' ];
-#else
-                        ReadOnlySpan<char> valueEndIdentifiers = stackalloc char[] { '(', ')', '\\' };
-#endif
                         valueStartIndex = pInd + 1;
-                        int valueEndIndex = StringHelper.NextUnescapedIndexOf(remaining.Slice(valueStartIndex), valueEndIdentifiers, out hadEscapeSequences, useDepth: true);
+                        int valueEndIndex = StringHelper.NextUnescapedIndexOfParenthesis(remaining.Slice(valueStartIndex), out hadEscapeSequences);
                         if (valueEndIndex < 0)
                         {
                             throw new FormatException(Resources.FormatException_Expression_ExpectedParenthesizedValueEnd);

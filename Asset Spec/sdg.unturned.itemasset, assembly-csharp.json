@@ -1318,7 +1318,7 @@
                                 "And":
                                 [
                                     {
-                                        "Variable": "#This.TemplateGroups[0]",
+                                        "Variable": "#This.Indicies[0]",
                                         "Operation": "eq",
                                         "Comparand": 0
                                     },
@@ -2243,7 +2243,7 @@
                 {
                     "Key": "Index",
                     "Type": "UInt8",
-                    "ValueTemplateGroupReference": "(SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).TemplateGroups[0]",
+                    "ValueTemplateGroupReference": "#(SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).Indices[0]",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-index-uint8-0",
                     "KeyLegacyExpansionFilter": "Legacy",
                     "Deprecated": true,
@@ -2252,7 +2252,7 @@
                         {
                             "Case":
                             {
-                                "Variable": "#Name.Included{RequireValue=true}",
+                                "Variable": "#Name.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             },
@@ -2269,7 +2269,7 @@
                 {
                     "Key": "Name",
                     "Type": "String",
-                    "ValueTemplateGroupReference": "(SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).Value{Property=Name}",
+                    "ValueTemplateGroupReference": "#(SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).Value{\"Property\":\"Name\"}",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-name-string",
                     "KeyLegacyExpansionFilter": "Legacy",
                     "DefaultValue": null,

@@ -1,8 +1,14 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
@@ -14,11 +20,13 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// </para>
 /// </summary>
 /// <typeparam name="TProperty">The type of property to use.</typeparam>
+[DebuggerDisplay("{GetExpressionString(true),nq}")]
 public class DataRefProperty<TProperty> : IDataRef, IEquatable<DataRefProperty<TProperty>>
     where TProperty : IDataRefProperty, IEquatable<TProperty>
 {
     internal string? EscapedPropertyName;
     private readonly TProperty _property;
+    private string? _propertiesString;
 
     public ref readonly TProperty Property => ref _property;
 
@@ -30,7 +38,6 @@ public class DataRefProperty<TProperty> : IDataRef, IEquatable<DataRefProperty<T
     /// <inheritdoc />
     public StringBuilder AppendExpressionString(StringBuilder sb, bool hash = true)
     {
-        int startIndex = sb.Length;
         if (hash)
             sb.Append('#');
 
@@ -39,9 +46,6 @@ public class DataRefProperty<TProperty> : IDataRef, IEquatable<DataRefProperty<T
         string propName = PropertyName;
 
         bool ws = StringHelper.ContainsWhitespace(propName) || propName.IndexOf('.') >= 0;
-        bool parenthesisWrap = ws || sb.Length - startIndex > (hash ? 1 : 0) && sb[startIndex + (hash ? 1 : 0)] == '(';
-        if (parenthesisWrap)
-            sb.Insert(startIndex + (hash ? 1 : 0), '(');
 
         sb.Append('.');
 
@@ -60,8 +64,48 @@ public class DataRefProperty<TProperty> : IDataRef, IEquatable<DataRefProperty<T
 
         if (ws)
             sb.Append(')');
-        if (parenthesisWrap)
-            sb.Append(')');
+
+        if (_property is IIndexableDataRefProperty indexable)
+        {
+            OneOrMore<int> indices = indexable.Indices;
+            sb.Append('[');
+            for (int i = 0; i < indices.Length; i++)
+            {
+                if (i != 0)
+                    sb.Append(',');
+                sb.Append(indices[i].ToString(CultureInfo.InvariantCulture));
+            }
+
+            sb.Append(']');
+        }
+
+        if (_property is IConfigurableDataRefProperty configurable)
+        {
+            if (_propertiesString == null)
+            {
+                OneOrMore<KeyValuePair<string, object>> properties = configurable.Options;
+                using MemoryStream ms = new MemoryStream();
+                using Utf8JsonWriter writer = new Utf8JsonWriter(ms, new JsonWriterOptions
+                {
+                    Indented = false,
+                    SkipValidation = true,
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                });
+
+                for (int i = 0; i < properties.Length; i++)
+                {
+                    KeyValuePair<string, object> property = properties[i];
+                    writer.WritePropertyName(property.Key);
+                    JsonHelper.WriteGenericValue(writer, property.Value);
+                }
+
+                writer.Flush();
+
+                _propertiesString = StringHelper.Utf8NoBom.GetString(ms.GetBuffer(), 0, checked((int)ms.Length));
+            }
+
+            sb.Append(_propertiesString);
+        }
 
         return sb;
     }
@@ -108,6 +152,15 @@ public class DataRefProperty<TProperty> : IDataRef, IEquatable<DataRefProperty<T
         return other is DataRefProperty<TProperty> prop && Equals(prop);
     }
 
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return obj is DataRefProperty<TProperty> prop && Equals(prop);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode() => _property.GetHashCode();
+
     public virtual bool Equals(DataRefProperty<TProperty>? other)
     {
         if (other == null)
@@ -119,4 +172,36 @@ public class DataRefProperty<TProperty> : IDataRef, IEquatable<DataRefProperty<T
     bool IValue.VisitConcreteValue<TVisitor>(ref TVisitor visitor) => false;
     IDataRef IDataRefExpressionNode.DataRef => this;
     bool IValue.IsNull => false;
+
+    /// <inheritdoc />
+    public override string ToString() => GetExpressionString(true);
+}
+
+public class DataRefProperty<TProperty, TValue> : DataRefProperty<TProperty>, IDataRef<TValue>
+    where TProperty : IDataRefProperty, IEquatable<TProperty>
+    where TValue : IEquatable<TValue>
+{
+    /// <inheritdoc />
+    public IType<TValue> Type { get; }
+
+    public DataRefProperty(IType<TValue> type, IDataRefTarget target, TProperty property) : base(target, property)
+    {
+        Type = type;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetConcreteValue(out Optional<TValue> value)
+    {
+        value = Optional<TValue>.Null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    public bool TryEvaluateValue(out Optional<TValue> value, in FileEvaluationContext ctx)
+    {
+        ConvertVisitor<TValue> conv = default;
+        VisitValue(ref conv, in ctx);
+        value = conv.IsNull ? Optional<TValue>.Null : new Optional<TValue>(conv.Result);
+        return conv.WasSuccessful;
+    }
 }

@@ -2473,7 +2473,7 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "#Leg_Regen_Ticks.Included{RequireValue=true}",
+                                "Variable": "#Leg_Regen_Ticks.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             }
@@ -2500,7 +2500,7 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "#Bleed_Regen_Ticks.Included{RequireValue=true}",
+                                "Variable": "#Bleed_Regen_Ticks.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             }
@@ -3003,7 +3003,7 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "#Airdrop_Frequency_Min.Included{RequireValue=true}",
+                                "Variable": "#Airdrop_Frequency_Min.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             }
@@ -3023,7 +3023,7 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "#Airdrop_Frequency_Max.Included{RequireValue=true}",
+                                "Variable": "#Airdrop_Frequency_Max.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             }
@@ -3043,7 +3043,7 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "#Airdrop_Speed.Included{RequireValue=true}",
+                                "Variable": "#Airdrop_Speed.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             }
@@ -3063,7 +3063,7 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "#Airdrop_Force.Included{RequireValue=true}",
+                                "Variable": "#Airdrop_Force.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             }
@@ -3403,7 +3403,7 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "#Timer_Leave_Group.Included{RequireValue=true}",
+                                "Variable": "#Timer_Leave_Group.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             }
@@ -3422,7 +3422,7 @@
                             "Value": false,
                             "Condition":
                             {
-                                "Variable": "#Max_Group_Members.Included{RequireValue=true}",
+                                "Variable": "#Max_Group_Members.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             }

@@ -878,7 +878,7 @@
                         "ElementType": "Int32"
                     },
                     "Description": "Comma-separated indexes of other conditions that must be met first before this condition will be visible in-game.",
-                    "ValueTemplateGroupReference": "This.TemplateGroups[0]{PreventSelfReference=true}",
+                    "ValueTemplateGroupReference": "#This.Indices[0]{\"PreventSelfReference\":true}",
                     "DefaultValue": [ ],
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "uiRequirementIndices"
@@ -3263,7 +3263,7 @@
                             "RequirementCondition": true,
                             "Condition":
                             {
-                                "Variable": "#CooldownId.Included{RequireValue=true}",
+                                "Variable": "#CooldownId.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             }

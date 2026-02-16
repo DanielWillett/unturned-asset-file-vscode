@@ -8,6 +8,18 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 internal static class StringHelper
 {
+    /// <inheritdoc cref="NextUnescapedIndexOf" />
+    public static int NextUnescapedIndexOfParenthesis(ReadOnlySpan<char> span, out bool hadEscapeSequences, bool useDepth = true)
+    {
+#if NET7_0_OR_GREATER
+        ReadOnlySpan<char> valueEndIdentifiers = [ '(', ')', '\\' ];
+#else
+        ReadOnlySpan<char> valueEndIdentifiers = stackalloc char[] { '(', ')', '\\' };
+#endif
+
+        return NextUnescapedIndexOf(span, valueEndIdentifiers, out hadEscapeSequences, useDepth);
+    }
+
     /// <summary>
     /// Find the next index of an unescaped character.
     /// </summary>
@@ -25,6 +37,8 @@ internal static class StringHelper
         int index = firstIndex;
         int escCount = 0;
         Span<int> depths = stackalloc int[stops.Length];
+        for (int i = 0; i < stops.Length; ++i)
+            depths[i] = 0;
         while (true)
         {
             char c = span[index];
@@ -64,7 +78,12 @@ internal static class StringHelper
 
             int nextIndex = span.Slice(index + 1).IndexOfAny(stops);
             if (nextIndex >= 0)
+            {
+                if (nextIndex > 0)
+                    escCount = 0;
                 index = nextIndex + index + 1;
+                
+            }
             else
                 return -1;
         }
@@ -908,4 +927,6 @@ internal static class StringHelper
 
         return maxValue;
     }
+
+    public static UTF8Encoding Utf8NoBom { get; } = new UTF8Encoding(false);
 }

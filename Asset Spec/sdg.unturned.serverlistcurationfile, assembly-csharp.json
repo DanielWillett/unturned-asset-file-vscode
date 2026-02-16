@@ -275,7 +275,7 @@
                                 "Comparand": "ServerID"
                             },
                             {
-                                "Variable": "#Value.Excluded",
+                                "Variable": "#\\Value.Excluded",
                                 "Operation": "eq",
                                 "Comparand": true
                             }
@@ -357,7 +357,7 @@
                     "Type": "String",
                     "ListReference": "SDG.Unturned.ServerListCurationFile, Assembly-CSharp::Labels!",
                     "Description": "The human-readable description of what this rule does. Not localizable.",
-                    "DefaultValue": "=CAT((Default description for rule at index ) #(Self.TemplateGroups[0]))",
+                    "DefaultValue": "=CAT((Default description for rule at index ) #(Self.Indices[0]))",
                     "Variable": "description"
                 },
                 {

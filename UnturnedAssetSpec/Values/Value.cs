@@ -311,17 +311,17 @@ public static class Value
     /// Parse a value from a JSON token.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static IValue? TryReadValueFromJson(in JsonElement root, ValueReadOptions options, IPropertyType? valueType, IAssetSpecDatabase database, IDatSpecificationObject owner)
+    public static IValue? TryReadValueFromJson(in JsonElement root, ValueReadOptions options, IPropertyType? valueType, IAssetSpecDatabase database, IDatSpecificationObject owner, IDataRefReadContext? dataRefContext = null)
     {
         NullReadValueVisitor v;
-        return TryReadValueFromJson(in root, options, ref v, valueType, database, owner);
+        return TryReadValueFromJson(in root, options, ref v, valueType, database, owner, dataRefContext);
     }
 
     /// <summary>
     /// Parse a value from a JSON token. The visitor will only be invoked if the value is strongly typed.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static unsafe IValue? TryReadValueFromJson<TVisitor>(in JsonElement root, ValueReadOptions options, ref TVisitor visitor, IPropertyType? valueType, IAssetSpecDatabase database, IDatSpecificationObject owner)
+    public static unsafe IValue? TryReadValueFromJson<TVisitor>(in JsonElement root, ValueReadOptions options, ref TVisitor visitor, IPropertyType? valueType, IAssetSpecDatabase database, IDatSpecificationObject owner, IDataRefReadContext? dataRefContext = null)
         where TVisitor : IReadValueVisitor
     {
         IType? type = valueType as IType;
@@ -425,10 +425,27 @@ public static class Value
                         return strVal;
 
                     case ExpressionValueType.DataRef:
-                        return DataRefs.TryReadDataRef(str.Length == data.Length ? str : data.ToString(), type, out IDataRef? dataRef) ? dataRef : null;
+                        DatProperty? propertyOwner = owner as DatProperty;
+                        if (propertyOwner == null
+                            || !DataRefs.TryReadDataRef(
+                                    str.Length == data.Length
+                                        ? str
+                                        : data.ToString(),
+                                    type,
+                                    propertyOwner,
+                                    out IDataRef? dataRef,
+                                    dataRefContext ?? type as IDataRefReadContext
+                                )
+                            )
+                        {
+                            return null;
+                        }
+
+                        return dataRef;
 
                     case ExpressionValueType.PropertyRef:
-                        if (owner is not DatProperty propertyOwner)
+                        propertyOwner = owner as DatProperty;
+                        if (propertyOwner == null)
                             return null;
                         PropertyReference pRef;
                         if ((options & ValueReadOptions.AllowExclamationSuffix) != 0 && data.Length > 0 && data[^1] == '!')
@@ -490,7 +507,7 @@ public static class Value
     /// Parse a value from a JSON token.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static IValue<TValue>? TryReadValueFromJson<TValue>(in JsonElement root, ValueReadOptions options, IType<TValue> valueType, IAssetSpecDatabase database, IDatSpecificationObject owner)
+    public static IValue<TValue>? TryReadValueFromJson<TValue>(in JsonElement root, ValueReadOptions options, IType<TValue> valueType, IAssetSpecDatabase database, IDatSpecificationObject owner, IDataRefReadContext? dataRefContext = null)
         where TValue : IEquatable<TValue>
     {
         switch (root.ValueKind)
@@ -538,11 +555,15 @@ public static class Value
                         return null;
 
                     case ExpressionValueType.DataRef:
+                        DatProperty? propertyOwner = owner as DatProperty;
+                        if (propertyOwner == null)
+                            return null;
                         string stringVal = str.Length == data.Length ? str : data.ToString();
-                        return DataRefs.TryReadDataRef(stringVal, valueType, out IDataRef? dataRef) ? dataRef as IValue<TValue> : null;
+                        return DataRefs.TryReadDataRef(stringVal, valueType, propertyOwner, out IDataRef? dataRef, dataRefContext) ? dataRef as IValue<TValue> : null;
 
                     case ExpressionValueType.PropertyRef:
-                        if (owner is not DatProperty propertyOwner)
+                        propertyOwner = owner as DatProperty;
+                        if (propertyOwner == null)
                             return null;
                         PropertyReference pRef;
                         if ((options & ValueReadOptions.AllowExclamationSuffix) != 0 && data.Length > 0 && data[^1] == '!')
@@ -620,10 +641,11 @@ public static class Value
             hasPrefix = true;
         }
 
-        bool hasParenthesis = hasPrefix && str.Length > 1 && str[1] == '(';
+        // DataRef parenthesis are handled differently
+        bool hasParenthesis = defType != ExpressionValueType.DataRef && hasPrefix && str.Length > 1 && str[1] == '(';
         if (hasParenthesis && str.Length > 2)
         {
-            int valueEndIndex = StringHelper.NextUnescapedIndexOf(str.AsSpan(2), [ '(', ')', '\\' ], out hasEscapeSequences, useDepth: true);
+            int valueEndIndex = StringHelper.NextUnescapedIndexOfParenthesis(str.AsSpan(2), out hasEscapeSequences);
             if (valueEndIndex == -1)
             {
                 data = str.AsSpan(1);

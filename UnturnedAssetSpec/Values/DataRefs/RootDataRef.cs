@@ -158,7 +158,7 @@ public abstract class RootDataRef<TSelf> : BaseDataRefTarget, IDataRef
     /// <inheritdoc />
     public override string ToString()
     {
-        return GetExpressionString(false);
+        return GetExpressionString(true);
     }
 
     bool IValue.IsNull => false;

@@ -112,20 +112,20 @@ internal static class JsonHelper
         return new Utf8JsonReader(mem.Span, options);
     }
     
-    public static bool TryReadGenericValue(ref Utf8JsonReader reader, out object? obj)
+    public static bool TryReadGenericValue(in JsonElement reader, out object? obj)
     {
         obj = null;
-        switch (reader.TokenType)
+        switch (reader.ValueKind)
         {
-            case JsonTokenType.Null:
+            case JsonValueKind.Null:
                 return true;
 
-            case JsonTokenType.True:
-            case JsonTokenType.False:
+            case JsonValueKind.True:
+            case JsonValueKind.False:
                 obj = reader.GetBoolean() ? BoxedPrimitives.True : BoxedPrimitives.False;
                 return true;
 
-            case JsonTokenType.Number:
+            case JsonValueKind.Number:
                 if (reader.TryGetInt32(out int int32))
                     obj = int32 switch
                     {
@@ -163,7 +163,7 @@ internal static class JsonHelper
 
                 return true;
 
-            case JsonTokenType.String:
+            case JsonValueKind.String:
                 DateTime dt;
                 // dont change this to TryGetGuid
                 if (reader.TryGetGuid(out Guid guid))
@@ -187,13 +187,13 @@ internal static class JsonHelper
                 }
                 return true;
 
-            case JsonTokenType.StartArray:
+            case JsonValueKind.Array:
                 ArrayList? list = null;
                 Type? listType = null;
                 bool hasNonNullDifferingTypeValue = false;
-                while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                foreach (JsonElement e in reader.EnumerateArray())
                 {
-                    if (!TryReadGenericValue(ref reader, out object? element))
+                    if (!TryReadGenericValue(in e, out object? element))
                         return false;
 
                     if (listType == null)

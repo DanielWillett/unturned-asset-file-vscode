@@ -2411,7 +2411,7 @@
                 "ValueTemplateGroupReference":
                 {
                     "$ref": "#/$defs/StringValue",
-                    "description": "A data-ref to another key's template group (such as ($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).TemplateGroups[0] ) to reference the blueprint ID of another item. Valid values will be the present indices in the other property's template groups."
+                    "description": "A data-ref to another key's template group (such as ($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).Indices[0] ) to reference the blueprint ID of another item. Valid values will be the present indices in the other property's template groups."
                 },
                 "AnimationComponentFindArgument":
                 {

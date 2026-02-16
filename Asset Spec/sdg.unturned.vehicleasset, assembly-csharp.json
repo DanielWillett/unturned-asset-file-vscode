@@ -420,7 +420,7 @@
                 {
                     "Case":
                     {
-                        "Variable": "#(($bndl$::Horn).Included{RequireValue=true})",
+                        "Variable": "#$bndl$::Horn.Included{\"RequireValue\":true}",
                         "Operation": "eq",
                         "Comparand": true
                     },
@@ -458,7 +458,7 @@
                 {
                     "Case":
                     {
-                        "Variable": "#Steer_Max.Included{RequireValue=true})",
+                        "Variable": "#Steer_Max.Included{\"RequireValue\":true}",
                         "Operation": "eq",
                         "Comparand": true
                     },
@@ -481,7 +481,7 @@
                 {
                     "Case":
                     {
-                        "Variable": "#Steering_Angle_Max.Included{RequireValue=true})",
+                        "Variable": "#Steering_Angle_Max.Included{\"RequireValue\":true}",
                         "Operation": "eq",
                         "Comparand": true
                     },
@@ -504,7 +504,7 @@
                 {
                     "Case":
                     {
-                        "Variable": "#Steer_Min.Included{RequireValue=true})",
+                        "Variable": "#Steer_Min.Included{\"RequireValue\":true}",
                         "Operation": "eq",
                         "Comparand": true
                     },
@@ -527,7 +527,7 @@
                 {
                     "Case":
                     {
-                        "Variable": "#Steering_Angle_FullSpeed_Factor.Included{RequireValue=true})",
+                        "Variable": "#Steering_Angle_FullSpeed_Factor.Included{\"RequireValue\":true}",
                         "Operation": "eq",
                         "Comparand": true
                     },
@@ -1939,7 +1939,7 @@
                     "Type": "UInt8",
                     "DefaultValue": 0,
                     "Required": true,
-                    "Description": "The zero-based index of the seat to mount turret #(Self.TemplateGroups[0]) to.",
+                    "Description": "The zero-based index of the seat to mount turret #(Self.Indices[0]) to.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-seat-index-uint8-0",
                     "Variable": "seatIndex"
                 },
@@ -1952,7 +1952,7 @@
                     },
                     "DefaultValue": 0,
                     "Required": true,
-                    "Description": "The gun asset to use for turret #(Self.TemplateGroups[0]).",
+                    "Description": "The gun asset to use for turret #(Self.Indices[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-item-id-uint16-0",
                     "Variable": "itemID"
                 },
@@ -1974,7 +1974,7 @@
                     "MaximumExclusive": 360,
                     "DefaultValue": 0.0,
                     "Required": true,
-                    "Description": "Minimum allowed rotation of turret #(Self.TemplateGroups[0]) through the azimuth, in degrees. If this is set to -360, it can rotate leftward forever.",
+                    "Description": "Minimum allowed rotation of turret #(Self.Indices[0]) through the azimuth, in degrees. If this is set to -360, it can rotate leftward forever.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#turret-yaw-max-float32-0",
                     "Variable": "yawMax"
                 },
@@ -2332,7 +2332,7 @@
                     "Minimum": 0,
                     "Except": [ -1 ],
                     "Version": "3.24.5.0",
-                    "ValueTemplateGroupReference": "#(SDG.Unturned.VehicleAsset, Assembly-CSharp::WheelConfiguration).TemplateGroups[0]{PreventSelfReference=true}",
+                    "ValueTemplateGroupReference": "#(SDG.Unturned.VehicleAsset, Assembly-CSharp::WheelConfiguration).Indices[0]{\"PreventSelfReference\":true}",
                     "Description": "If set, visual-only wheels without a collider (like the back wheels of the snowmobile) can copy RPM from a wheel that does have a collider.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#doc-assets-vehicle-wheelconfiguration-copycolliderrpmindex",
                     "Variable": "copyColliderRpmIndex",
@@ -2362,7 +2362,7 @@
                     "Minimum": 0,
                     "Except": [ -1 ],
                     "Version": "3.24.7.0",
-                    "ValueTemplateGroupReference": "#(SDG.Unturned.VehicleAsset, Assembly-CSharp::WheelConfiguration).TemplateGroups[0]",
+                    "ValueTemplateGroupReference": "#(SDG.Unturned.VehicleAsset, Assembly-CSharp::WheelConfiguration).Indices[0]",
                     "Description": "If set, wheel model uses this crawler track's speed (average RPM of wheels). Prevents wheel model from spinning out of sync with overall track.",
                     "Variable": "copyCrawlerTrackSpeedIndex",
                     "InclusiveWith":
@@ -2377,7 +2377,7 @@
                             },
                             "RequirementCondition":
                             {
-                                "Variable": "#CrawlerTrackTilingMaterials.Included{RequireValue=true})",
+                                "Variable": "#CrawlerTrackTilingMaterials.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             }
@@ -2453,7 +2453,7 @@
                         {
                             "Case":
                             {
-                                "Variable": "#IsColliderSteered.Included{RequireValue=true})",
+                                "Variable": "#IsColliderSteered.Included{\"RequireValue\":true}",
                                 "Operation": "eq",
                                 "Comparand": true
                             },

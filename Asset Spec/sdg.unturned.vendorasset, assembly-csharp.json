@@ -104,7 +104,7 @@
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": [ ],
-                    "Description": "Conditions that must be met for players to be able to sell item #(Self.TemplateGroups[0]).",
+                    "Description": "Conditions that must be met for players to be able to sell item #(Self.Indices[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "conditionsList"
                 },
@@ -117,7 +117,7 @@
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": [ ],
-                    "Description": "Rewards applied after the player sells item #(Self.TemplateGroups[0]).",
+                    "Description": "Rewards applied after the player sells item #(Self.Indices[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "rewardsList"
                 }
@@ -209,7 +209,7 @@
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": [ ],
-                    "Description": "Conditions that must be met for players to be able to buy listing #(Self.TemplateGroups[0]).",
+                    "Description": "Conditions that must be met for players to be able to buy listing #(Self.Indices[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/conditions.html",
                     "Variable": "conditionsList"
                 },
@@ -222,7 +222,7 @@
                         "Mode": "LegacyList, ModernList"
                     },
                     "DefaultValue": [ ],
-                    "Description": "Rewards applied after the player buys listing #(Self.TemplateGroups[0]).",
+                    "Description": "Rewards applied after the player buys listing #(Self.Indices[0]).",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards.html",
                     "Variable": "rewardsList"
                 },

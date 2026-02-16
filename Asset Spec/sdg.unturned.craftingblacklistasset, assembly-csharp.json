@@ -108,7 +108,7 @@
                     "Variable": "index",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
                     "FileCrossRef": "Item",
-                    "ValueTemplateGroupReference": "($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).TemplateGroups[0]",
+                    "ValueTemplateGroupReference": "#($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).Indices[0]",
                     "ExclusiveWith": [ "BlueprintName" ]
                 },
                 {
@@ -120,7 +120,7 @@
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html#crafting-blacklist-assets",
                     "Required": true,
                     "FileCrossRef": "Item",
-                    "ValueTemplateGroupReference": "($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).Value{Property=Name}",
+                    "ValueTemplateGroupReference": "#($cr$::SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).Value{\"Property\":\"Name\"}",
                     "ExclusiveWith": [ "Blueprint" ]
                 }
             ]

@@ -1,20 +1,23 @@
 # Data-Refs
 
-'Data-Refs' are a special type of property-ref that specifies a target and a property on that target. They are defined using the `#` character. Data-ref properties all inherit [DataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.DataRef.yml).
+'Data-Refs' are a special type of property-ref used to reference metadata about a target. They are defined using the `#` character.
 
-Indexable Data-Ref properties implement [IIndexableDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IIndexableDataRef.yml) and properties with settings implement [IPropertiesDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IPropertiesDataRef.yml).
+Data-ref properties all implement [IDataRefProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.IDataRefProperty.yml). Note that data-ref targets are not the same thing as data-ref properties. Indexable Data-Ref properties implement [IIndexableDataRefProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.IIndexableDataRefProperty.yml) and properties with settings implement [IConfigurableDataRefProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.IConfigurableDataRefProperty.yml).
 
 ## Targets
 
-All Data-Ref targets implement [IDataRefTarget](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IDataRefTarget.yml).
+All Data-Ref targets implement [IDataRefTarget](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.IDataRefTarget.yml).
 
-| Target   | Description                                    |
-| -------- | ---------------------------------------------- | 
-| `This`   | The object containing the current property.    |
-| `Self`   | The current property.                          |
-| Property | A Property Reference without the `@` symbol.   |
+| Target     | Description                                                |
+| ---------- | ---------------------------------------------------------- | 
+| `This`     | The object containing the current property.                |
+| `Self`     | The current property.                                      |
+| `Index`    | The current index when in `List` default value.            |
+| `Key`      | The current key when in `Dictionary` default value.        |
+| `Value`    | The string value when in a `StringDefaultValue` property.  |
+| Property   | A Property Reference without the `@` symbol.               |
 
-If a property is named 'This' or 'Self', it should be entered as `\This` or `\Self`.
+If a property is one of the reserved keywords, it should be escaped, such as `#\Value`.
 
 ## Properties
 
@@ -25,10 +28,9 @@ Data-Ref targets can use the following properties:
 | Excluded | Is the property excluded from the file? (opposite of Included) | any |
 | Included | Is the property included in the file? | any |
 | Key | The exact key given for this property. | any |
-| Value | The value given for this property. | any |
 | AssetName | The internal name of the asset. This is usually the file name. | `This` |
 | Difficulty | The contextual difficulty of the current file. | `This` |
-| KeyGroups | Array of key groups used for RegEx keys. | any |
+| Indices | Array of indices used to get the target's index within a list or it's key within a dictionary. | any |
 | IsLegacy | Whether or not the currently parsing property is being parsed in the legacy format (ex. with blueprints, spawn tables, etc using the v1 format). | `Self`, `@Property` |
 | ValueType | Which type of value this property provides: 'Value', 'List', or 'Dictionary' | `Self`, `@Property` |
 
@@ -39,7 +41,7 @@ Returns a boolean indicating whether or not the target is not included in the fi
 
 When used on `This` it targets the current property.
 
-Represented by the class: [ExcludedDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.ExcludedDataRef.yml).
+Represented by the class: [ExcludedProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.ExcludedProperty.yml).
 
 *No properties, not indexable*
 
@@ -48,7 +50,7 @@ Returns a boolean indicating whether or not the target is included in the file.
 
 When used on `This` it targets the current property.
 
-Represented by the class: [IncludedDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.IncludedDataRef.yml).
+Represented by the class: [IncludedProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.IncludedProperty.yml).
 
 *No properties, not indexable*
 
@@ -57,16 +59,7 @@ Returns the exact key used to specify this property, including aliases, casing, 
 
 When used on `This` it targets the current property.
 
-Represented by the class: [KeyDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.KeyDataRef.yml).
-
-*No properties, not indexable*
-
-### Value
-Returns the value specified in this property. For flags, the value will be `true` when they are included and `false` when they are excluded.
-
-When used on `This` it targets the current property.
-
-Represented by the class: [ValueDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.ValueDataRef.yml).
+Represented by the class: [KeyProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.KeyProperty.yml).
 
 *No properties, not indexable*
 
@@ -75,7 +68,7 @@ Returns the internal name of the currently opened asset (`Asset.name`), which is
 
 Not affected by the target, use `This` for consistancy.
 
-Represented by the class: [AssetNameDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.AssetNameDataRef.yml).
+Represented by the class: [AssetNameProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.AssetNameProperty.yml).
 
 *No properties, not indexable*
 
@@ -102,45 +95,45 @@ Note that the difficulty is usually cached and may not auto-update in some cases
 
 Not affected by the target, use `This` for consistancy.
 
-Represented by the class: [DifficultyDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.DifficultyDataRef.yml).
+Represented by the class: [DifficultyProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.DifficultyProperty.yml).
 
 *No properties, not indexable*
 
-### Template Groups
-Read more about key groups [here](./property-template-groups.md). Returns the value of the given template group for this object. Returns -1 if there are no template groups, otherwise returns which number the property is currently on.
+### Indices
+Returns the index of this object within it's parent lists and dictionaries.
 
-An index can be included to reference a single template group instead of the entire array. Indices must be a non-negative integer. The first '#' is index 0, the second is index 1, etc.
-
-The template group array contains all template group values in the current type hierarchy, from last to first, so if you have two nested keys such as in `Message_1_Page_2`, the array will be `[2, 1]`.
-
-Represented by the class: [TemplateGroupsDataRef](/api/DanielWillett.UnturnedDataFileLspServer.Data.Properties.TemplateGroupsDataRef.yml).
+An index can be included to reference a single index instead of the entire array. Indices must be a non-negative integer. The most-recent list is the first element (index 0), the second-most-recent is the second element, and so on. If the current object has no lists or dictionaries in it's hierarchy, or the index is out of range, an index access will return a null value.
 
 Example:
 ```properties
-Calibers 3
-Caliber_0 4
-Caliber_1 8
-Caliber_2 18346
-# this isn't a real property
-Caliber_2_Name Custom Bow
-```
-```json
-{
-    "Key": "Caliber_*",
-    "Template": true,
-    "Required": true,
-    "TemplateGroups": [ "calibers" ]
-},
-{
-    "Key": "Caliber_*_Name",
-    "Required": true,
-    "TemplateGroups": [ "calibers" ],
-    // defaults to the ID of the caliber, would complete to @Caliber_2
-    "DefaultValue": "@Caliber_#(Self.KeyGroups[0])"
-}
+# List.Type = List<Objects>
+List
+[
+  {
+
+  }
+  {
+    # Dictionary.Type = Dictionary<string, List<Object>>
+    Dictionary
+    {
+      Key
+      [
+        {
+          # Data-ref '#Property.Indices' returns '[ 0, "Key", 1 ]'
+          # Data-ref '#Property.Indices[0]' returns '0'
+          # Data-ref '#Property.Indices[1]' returns "Key"
+          # Data-ref '#Property.Indices[2]' returns '1'
+          Property 1
+        }
+      ]
+    }
+  }
+]
 ```
 
-Index can be used to reference a specific key group. Indexing is zero-based so 1 must be subtracted from the RegEx group number.
+Represented by the class: [IndicesProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.IndicesProperty.yml).
+
+*No properties, indexable with one argument*
 
 ### IsLegacy
 Equal to `true` if the target is in a type such as the `LegacyCompatibleList` and the legacy (v1) format is being used.
@@ -180,6 +173,10 @@ Tables
 ]
 ```
 
+Represented by the class: [IsLegacyProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.IsLegacyProperty.yml).
+
+*No properties, not indexable*
+
 ### ValueType
 Returns a string value indicating which type of value the property provides, which is one of the following: 'Value', 'List', or 'Dictionary'.
 
@@ -187,30 +184,23 @@ This property can not target cross-referenced properties or `#This`.
 
 By default 'Value' will be returned if the property isn't present or doesn't have any kind of value.
 
-#### Settings
-The following settings are available for `ValueType`:
-##### PreventSelfReference `bool`
-When used with the `ValueRegexGroupReference` property, makes auto-complete not include `#Self.KeyGroups[0]` in the results for the target's key groups. `INPCCondition.UI_Requirements` is a good example of this, preventing a quest condition from requiring itself to be visible on the UI. 
+Represented by the class: [ValueTypeProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.ValueTypeProperty.yml).
 
-```json
-{
-    "Key": "UI_Requirements",
-    // 'This' is the current condition in this case
-    "ValueRegexGroupReference": "#This.KeyGroups[0]{PreventSelfReference=true}",
-}
-```
+*No properties, not indexable*
 
 
 ## Format
 
-`#Target.Property[index]{Setting=value}`
+`#Target.Property[index]{\"Setting\"=value}`
 
 Do not include extra white space.
 
 Indices and settings are optional and their brackets should be excluded if they're not being used. Indicies must always come before settings if both are included.
 
+Data in the '{}' brackets is parsed as a JSON object.
+
 The index can be any integer, including negative numbers if supported by the property. 
 
-The target can either be `This`, `Self`, or a property name. If a property name is 'This' or 'Self', the name can be escaped using a backslash.
+The target can either be `This`, `Self`, or a property name. If a property name is 'This' or 'Self', the name can be escaped using a backslash. In some contexts, `#Index`, `#Key`, and `#Value` can be used as roots.
 
 Valid properties are hard-coded and listed above. More may be added in the future as needed.
