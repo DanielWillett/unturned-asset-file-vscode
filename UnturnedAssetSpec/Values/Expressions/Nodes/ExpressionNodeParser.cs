@@ -5,34 +5,84 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 
-internal ref struct ExpressionNodeParser : IDisposable
+internal unsafe ref struct ExpressionNodeParser<TDataRefReadContext> : IDisposable
+    where TDataRefReadContext : IDataRefReadContext?
 {
     private ExpressionTokenizer _tokenizer;
     private ExpressionNodeBuffer[]? _stack;
     private int _stackSize;
     private ExpressionNodeBuffer _current;
     private readonly int _flags;
+    private readonly DatProperty _owner;
+
+#if NET7_0_OR_GREATER
+    private readonly ref TDataRefReadContext _dataRefContext;
+#else
+    private readonly TDataRefReadContext* _dataRefContext;
+#endif
 
     public bool SimplifyConstantExpressions => (_flags & 1) != 0;
     public bool LeaveTokenizerOpen => (_flags & 2) != 0;
 
-    public ExpressionNodeParser(string expression, bool simplifyConstantExpressions = true)
+    public ExpressionNodeParser(string expression,
+        DatProperty owner,
+#if NET7_0_OR_GREATER
+        ref TDataRefReadContext dataRefContext,
+#else
+        TDataRefReadContext* dataRefContext,
+#endif
+        bool simplifyConstantExpressions = true)
     {
+#if NET7_0_OR_GREATER
+        _dataRefContext = ref dataRefContext;
+#else
+        _dataRefContext = dataRefContext;
+#endif
+        _owner = owner;
         _tokenizer = new ExpressionTokenizer(expression);
         _flags = simplifyConstantExpressions ? 1 : 0;
     }
 
-    public ExpressionNodeParser(ReadOnlySpan<char> expression, bool simplifyConstantExpressions = true)
+    public ExpressionNodeParser(ReadOnlySpan<char> expression,
+        DatProperty owner,
+#if NET7_0_OR_GREATER
+        ref TDataRefReadContext dataRefContext,
+#else
+        TDataRefReadContext* dataRefContext,
+#endif
+        bool simplifyConstantExpressions = true)
     {
+#if NET7_0_OR_GREATER
+        _dataRefContext = ref dataRefContext;
+#else
+        _dataRefContext = dataRefContext;
+#endif
+        _owner = owner;
         _tokenizer = new ExpressionTokenizer(expression);
         _flags = simplifyConstantExpressions ? 1 : 0;
     }
 
-    public ExpressionNodeParser(ExpressionTokenizer tokenizer, bool simplifyConstantExpressions = true, bool leaveOpen = false)
+    public ExpressionNodeParser(ExpressionTokenizer tokenizer,
+        DatProperty owner,
+#if NET7_0_OR_GREATER
+        ref TDataRefReadContext dataRefContext,
+#else
+        TDataRefReadContext* dataRefContext,
+#endif
+        bool simplifyConstantExpressions = true, bool leaveOpen = false)
     {
+#if NET7_0_OR_GREATER
+        _dataRefContext = ref dataRefContext;
+#else
+        _dataRefContext = dataRefContext;
+#endif
+        _owner = owner;
         _tokenizer = tokenizer;
         _flags = (simplifyConstantExpressions ? 1 : 0) | ((leaveOpen ? 1 : 0) * 2);
     }
@@ -185,7 +235,7 @@ internal ref struct ExpressionNodeParser : IDisposable
 
 #pragma warning disable CS8500
 
-    private unsafe IExpressionNode CreateValue(ref ExpressionToken token)
+    private IExpressionNode CreateValue(ref ExpressionToken token)
     {
         IType? idealType = _current.Function.GetIdealArgumentType(_current.Count);
         ReadOnlySpan<char> span = token.Content;
@@ -218,20 +268,25 @@ internal ref struct ExpressionNodeParser : IDisposable
                 return new PropertyReferenceExpressionNode(propRef);
             
             case ExpressionValueType.DataRef:
-                //if (!Values.TryParseDataRef(span, token.ContentAsString, out ISpecDynamicValue? val) || val is not DataRef dr)
-                //{
-                //    throw new FormatException($"Failed to parse data-ref: \"{token.GetContent()}\".");
-                //}
+                if (!DataRefs.TryReadDataRef(token.ContentAsString ?? span.ToString(), idealType, _owner, out IDataRef? dataRef,
+#if NET7_0_OR_GREATER
+                        ref _dataRefContext
+#else
+                        ref System.Runtime.CompilerServices.Unsafe.AsRef<TDataRefReadContext>(_dataRefContext)
+#endif
+                    ))
+                {
+                    throw new FormatException($"Failed to parse data-ref: \"{token.GetContent()}\".");
+                }
 
-                //return dr;
-                throw new NotImplementedException();
+                return dataRef;
 
             default:
                 throw new FormatException("Invalid value type, shouldn't happen.");
         }
     }
 
-    private unsafe struct ReadRawValueAsTypeVisitor : ITypeVisitor
+    private struct ReadRawValueAsTypeVisitor : ITypeVisitor
     {
         public IValue? Value;
         public ReadOnlySpan<char>* SpanAddr;

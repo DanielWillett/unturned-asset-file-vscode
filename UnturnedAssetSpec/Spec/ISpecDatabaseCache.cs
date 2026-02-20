@@ -9,7 +9,6 @@ public interface ISpecDatabaseCache
 {
     string? RootDirectory { get; }
 
-    bool IsUpToDateCache(string latestCommit);
     Task CacheNewFilesAsync(IAssetSpecDatabase database, CancellationToken token = default);
 
     Task<bool> ReadAssetAsync<TState>(QualifiedType type, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default);

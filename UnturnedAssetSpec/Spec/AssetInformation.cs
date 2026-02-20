@@ -16,11 +16,6 @@ public class AssetInformation
 {
     private int? _maxSkillLevelCached;
 
-    /// <summary>
-    /// The GitHub commit (SHA) where this information was taken from, if any. Note that some information may have been pulled from other places.
-    /// </summary>
-    public string? Commit { get; set; }
-
 #nullable disable
     public Dictionary<string, QualifiedType> AssetAliases { get; set; }
 

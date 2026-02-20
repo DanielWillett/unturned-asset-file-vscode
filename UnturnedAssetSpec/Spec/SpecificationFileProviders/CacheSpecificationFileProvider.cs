@@ -11,15 +11,13 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 public sealed class CacheSpecificationFileProvider : ISpecificationFileProvider
 {
     private readonly ISpecDatabaseCache? _cache;
-    private readonly string? _latestCommit;
 
     public int Priority => 2;
-    public bool IsEnabled => _cache != null && _latestCommit != null && _cache.IsUpToDateCache(_latestCommit);
+    public bool IsEnabled => _cache != null;
 
-    public CacheSpecificationFileProvider(ISpecDatabaseCache? cache, string? latestCommit)
+    public CacheSpecificationFileProvider(ISpecDatabaseCache? cache)
     {
         _cache = cache;
-        _latestCommit = latestCommit;
     }
 
     public Task<bool> ReadAssetAsync<TState>(QualifiedType type, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token)

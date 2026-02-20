@@ -1,5 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 using System.Text;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace UnturnedAssetSpecTests.Expressions;
 
@@ -34,9 +35,14 @@ public class ParserAndFormatterTests
     [TestCase(@"ABS((3u))")]
     [TestCase(@"ABS((3l))")]
     [TestCase(@"ABS((3))")]
-    public void ConsistancyTest(string input)
+    public unsafe void ConsistancyTest(string input)
     {
-        using ExpressionNodeParser parser = new ExpressionNodeParser(input, false);
+        DataRefs.NilDataRefContext c;
+#if NET7_0_OR_GREATER
+        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, ref c, false);
+#else
+        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, &c, false);
+#endif
 
         IExpressionNode node = parser.Parse<double>();
         Assert.That(node, Is.AssignableTo<IFunctionExpressionNode>());
@@ -49,7 +55,11 @@ public class ParserAndFormatterTests
         string str = sb.ToString();
         Console.WriteLine(str);
 
-        using ExpressionNodeParser parser2 = new ExpressionNodeParser(input, false);
+#if NET7_0_OR_GREATER
+        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser2 = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, ref c, false);
+#else
+        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser2 = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, &c, false);
+#endif
 
         IExpressionNode node2 = parser2.Parse<double>();
 

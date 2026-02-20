@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Encodings.Web;
@@ -249,9 +248,6 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         }
     }
 
-    [MemberNotNullWhen(true, "_cache")]
-    private bool IsCacheUpToDate { get; set; }
-
     public Task OnInitialize(Func<IAssetSpecDatabase, ILoggerFactory, Task> action)
     {
         OnInitializeState state;
@@ -278,8 +274,6 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
     public async Task InitializeAsync(CancellationToken token = default)
     {
-        IsCacheUpToDate = false;
-
         SpecificationReadResult result = await _fileReader.ReadSpecifications(this, token);
         _statusJson = result.StatusFile;
 
@@ -288,11 +282,6 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         AllTypes = result.AllTypes;
         Information = result.Information;
         LocalizationFileTypes = result.LocalizationFileTypes;
-
-        if (_cache != null && result.LatestCommit != null)
-        {
-            IsCacheUpToDate = _cache.IsUpToDateCache(result.LatestCommit);
-        }
 
         PopulateBlueprintSkills();
         PopulateStatusInformation();
@@ -325,9 +314,9 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
     private void PopulateBlueprintSkills()
     {
-        BlueprintSkills = null;
         if (!AllTypes.TryGetValue(new QualifiedType(SkillType.BlueprintSkillEnumType, true), out DatType? blueprintSkillType) || blueprintSkillType is not DatEnumType bpSkillEnumType)
         {
+            BlueprintSkills = ImmutableDictionary<string, SkillReference>.Empty;
             return;
         }
 
@@ -353,7 +342,10 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     private void PopulateStatusInformation()
     {
         if (_statusJson == null || _statusJson.RootElement.ValueKind != JsonValueKind.Object)
+        {
+            NPCAchievementIds = Array.Empty<string>();
             return;
+        }
 
         if (_statusJson.RootElement.TryGetProperty("Game"u8, out JsonElement element)
             && element.ValueKind == JsonValueKind.Object

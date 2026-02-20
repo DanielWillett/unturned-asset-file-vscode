@@ -16,7 +16,6 @@ internal class EnvironmentCache : ISpecDatabaseCache
     private const int LatestVersion = 1;
 
     private readonly ILogger<EnvironmentCache> _logger;
-    private readonly JsonSerializerOptions _jsonOptions;
     private readonly string _cacheDir;
     private readonly string _cacheMetaFile;
     private readonly string _informationFile;
@@ -29,10 +28,9 @@ internal class EnvironmentCache : ISpecDatabaseCache
 
     public string RootDirectory => _cacheDir;
 
-    public EnvironmentCache(ILogger<EnvironmentCache> logger, JsonSerializerOptions jsonOptions)
+    public EnvironmentCache(ILogger<EnvironmentCache> logger)
     {
         _logger = logger;
-        _jsonOptions = jsonOptions;
         
         if (Environment.GetEnvironmentVariable(EnvVarSpecCacheFolder) is { Length: > 0 } str)
         {
@@ -113,91 +111,16 @@ internal class EnvironmentCache : ISpecDatabaseCache
         _cacheMetadataInfo = cacheMetadataInfo ?? new CacheMetadata { Version = LatestVersion };
     }
 
-    private void WriteCacheMetadata()
-    {
-        CacheMetadata m = _cacheMetadataInfo.Clone();
-        m.Version = LatestVersion;
-
-        try
-        {
-            Directory.CreateDirectory(_cacheDir);
-            using FileStream fs = new FileStream(_cacheMetaFile, FileMode.Create, FileAccess.Write, FileShare.Read, 8192);
-
-            JsonSerializer.Serialize(fs, m, typeof(CacheMetadata), EnvironmentCacheGeneratedSerializerContext.Default);
-        }
-        catch (JsonException ex)
-        {
-            _logger.LogWarning(ex, "Failed to write cache file {0}.", _cacheMetaFile);
-        }
-        catch (IOException ex)
-        {
-            _logger.LogWarning(ex, "Failed to access cache file {0}.", _cacheMetaFile);
-        }
-    }
-
     /// <inheritdoc />
-    public bool IsUpToDateCache(string latestCommit)
+    public Task CacheNewFilesAsync(IAssetSpecDatabase database, CancellationToken token = default)
     {
-        return string.Equals(_cacheMetadataInfo.LatestCommit, latestCommit, StringComparison.Ordinal);
-    }
+        // note: moved to using 304 Not Modified for caches instead of pulling the commit hash from the API
+        //       not sure if this is better or not but I think it will be more consistant
+        //       and simpler from a developer standpoint
 
-    /// <inheritdoc />
-    public async Task CacheNewFilesAsync(IAssetSpecDatabase database, CancellationToken token = default)
-    {
-        string? commit = database.Information.Commit;
+        // ill leave this function here in case I need it in the future
 
-        bool hasNewCommit = !string.Equals(_cacheMetadataInfo.LatestCommit, commit, StringComparison.Ordinal);
-        if (hasNewCommit)
-        {
-            // delete all old files that could be from an older commit
-            _cacheMetadataInfo.LatestCommit = commit;
-            Thread.BeginCriticalRegion();
-            try
-            {
-                WriteCacheMetadata();
-
-                foreach (string file in Directory.EnumerateFiles(_cacheDir, "*.json", SearchOption.TopDirectoryOnly))
-                {
-                    if (Path.GetFileName(file.AsSpan()).Equals(CacheMetaName, StringComparison.Ordinal))
-                        continue;
-
-                    try
-                    {
-                        File.Delete(file);
-                    }
-                    catch (IOException)
-                    {
-                        _logger.LogInformation("Failed to delete old file.");
-                    }
-                }
-            }
-            finally
-            {
-                Thread.EndCriticalRegion();
-            }
-
-            _logger.LogInformation("Caching new files from commit {0}.", commit);
-        }
-
-        JsonSerializerOptions options = database.Options ?? _jsonOptions;
-
-        if (string.Equals(database.Information.Commit, commit, StringComparison.Ordinal))
-        {
-            if (hasNewCommit || !File.Exists(_informationFile))
-            {
-                await WriteCacheFileAsync(_informationFile, database.Information, options, token).ConfigureAwait(false);
-            }
-        }
-
-        foreach (DatType t in database.AllTypes.Values)
-        {
-            string path = GetFileName(t.TypeName);
-
-            if (!hasNewCommit && File.Exists(path))
-                continue;
-
-            await WriteCacheFileAsync(path, t, options, token).ConfigureAwait(false);
-        }
+        return Task.CompletedTask;
     }
 
     private string GetFileName(QualifiedType type)
@@ -222,40 +145,6 @@ internal class EnvironmentCache : ISpecDatabaseCache
                 return Task.FromResult(false);
         }
     }
-
-    //private async Task<T?> ReadCacheFileAsync<T>(string file, CancellationToken token = default) where T : class
-    //{
-    //    T? cacheValue = null;
-    //    try
-    //    {
-    //        FileInfo fileInfo = new FileInfo(file);
-    //        if (fileInfo.Length > 524288)
-    //        {
-    //            cacheValue = null;
-    //            _logger.LogWarning("Cache file too long: {0}. Files > 512 KB ignored.", file);
-    //        }
-    //        else
-    //        {
-    //            using FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 8192, FileOptions.SequentialScan);
-    //            cacheValue = await JsonSerializer.DeserializeAsync<T>(fs, _jsonOptions, token);
-    //            if (cacheValue == null)
-    //            {
-    //                _logger.LogWarning("Failed to read cache file {0}, null value.", file);
-    //            }
-    //        }
-    //    }
-    //    catch (JsonException ex)
-    //    {
-    //        _logger.LogWarning(ex, "Failed to read cache file {0}.", file);
-    //    }
-    //    catch (FileNotFoundException) { }
-    //    catch (IOException ex)
-    //    {
-    //        _logger.LogWarning(ex, "Failed to access cache file {0}.", file);
-    //    }
-    //
-    //    return cacheValue;
-    //}
 
     private async Task<bool> ReadFileAsync<TState>(
         string file,
@@ -284,43 +173,6 @@ internal class EnvironmentCache : ISpecDatabaseCache
             return false;
         }
     }
-
-    private async Task WriteCacheFileAsync<T>(string file, T value, JsonSerializerOptions options, CancellationToken token = default)
-    {
-        try
-        {
-            Directory.CreateDirectory(_cacheDir);
-            await using FileStream fs = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.Read);
-
-            await JsonSerializer.SerializeAsync(fs, value, options, token).ConfigureAwait(false);
-        }
-        catch (JsonException ex)
-        {
-            _logger.LogWarning(ex, "Failed to write cache file {0}.", _cacheMetaFile);
-        }
-        catch (IOException ex)
-        {
-            _logger.LogWarning(ex, "Failed to access cache file {0}.", _cacheMetaFile);
-        }
-    }
-
-    //private async Task WriteFileAsync<TState>(
-    //    string file,
-    //    TState state,
-    //    Func<Stream, TState, CancellationToken, Task> action,
-    //    CancellationToken token = default
-    //)
-    //{
-    //    using FileStream fs = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.Read, 8192, FileOptions.SequentialScan);
-    //    try
-    //    {
-    //        await action(fs, state, token).ConfigureAwait(false);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogWarning(ex, "Failed to write cache file {0}.", file);
-    //    }
-    //}
 
     public class CacheMetadata
     {

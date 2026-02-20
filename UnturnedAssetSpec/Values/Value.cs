@@ -241,6 +241,30 @@ public static class Value
         return new ConcreteValue<IType>(type, TypeOfType.Factory);
     }
 
+    /// <inheritdoc cref="FromExpression{TResult,TDataRefReadContext}(IType{TResult},string,DatProperty,ref TDataRefReadContext,bool)"/>
+    public static IValue<TResult> FromExpression<TResult>(
+        IType<TResult> resultType,
+        string expression,
+        DatProperty owner,
+        bool simplifyConstantExpressions = true
+    ) where TResult : IEquatable<TResult>
+    {
+        DataRefs.NilDataRefContext c;
+        return FromExpression(resultType, expression, owner, ref c, simplifyConstantExpressions);
+    }
+
+    /// <inheritdoc cref="FromExpression{TResult,TDataRefReadContext}(IType{TResult},string,DatProperty,ref TDataRefReadContext,bool)"/>
+    public static IValue<TResult> FromExpression<TResult>(
+        IType<TResult> resultType,
+        ReadOnlySpan<char> expression,
+        DatProperty owner,
+        bool simplifyConstantExpressions = true
+    ) where TResult : IEquatable<TResult>
+    {
+        DataRefs.NilDataRefContext c;
+        return FromExpression(resultType, expression, owner, ref c, simplifyConstantExpressions);
+    }
+
     /// <summary>
     /// Creates a new expression value from an expression string.
     /// </summary>
@@ -253,20 +277,46 @@ public static class Value
     /// The type of value to create.
     /// If the expression can be simplified it will be simplified into a value of this type, otherwise the expression will return this type when evaluated.
     /// </typeparam>
-    public static IValue<TResult> FromExpression<TResult>(IType<TResult> resultType, string expression, bool simplifyConstantExpressions = true)
-        where TResult : IEquatable<TResult>
+    /// <typeparam name="TDataRefReadContext">
+    /// Context used to read data-refs.
+    /// </typeparam>
+    public static unsafe IValue<TResult> FromExpression<TResult, TDataRefReadContext>(
+        IType<TResult> resultType,
+        string expression,
+        DatProperty owner,
+        ref TDataRefReadContext dataRefContext,
+        bool simplifyConstantExpressions = true
+    ) where TResult : IEquatable<TResult>
+      where TDataRefReadContext : IDataRefReadContext?
     {
         // trim '='
         if (expression.Length > 0 && expression[0] == '=')
         {
-            return FromExpression(resultType, expression.AsSpan(1));
+            return FromExpression(resultType, expression.AsSpan(1), owner, ref dataRefContext, simplifyConstantExpressions);
         }
 
         IExpressionNode rootNode;
-        using (ExpressionNodeParser parser = new ExpressionNodeParser(expression, simplifyConstantExpressions))
+#if !NET7_0_OR_GREATER
+        fixed (TDataRefReadContext* dataRefContextPtr = &dataRefContext)
+        {
+#endif
+        using (ExpressionNodeParser<TDataRefReadContext> parser = new ExpressionNodeParser<TDataRefReadContext>(
+                   expression,
+                   owner,
+#if NET7_0_OR_GREATER
+                   ref dataRefContext,
+#else
+                   dataRefContextPtr,
+#endif
+                   simplifyConstantExpressions
+        ))
         {
             rootNode = parser.Parse<TResult>();
         }
+
+#if !NET7_0_OR_GREATER
+        }
+#endif
 
         if (simplifyConstantExpressions && rootNode is IValue<TResult> value)
         {
@@ -276,19 +326,42 @@ public static class Value
         return new ExpressionValue<TResult>(resultType, (IFunctionExpressionNode)rootNode);
     }
 
-    /// <inheritdoc cref="FromExpression{TResult}(IType{TResult},string,bool)"/>
-    public static IValue<TResult> FromExpression<TResult>(IType<TResult> resultType, ReadOnlySpan<char> expression, bool simplifyConstantExpressions = true)
-        where TResult : IEquatable<TResult>
+    /// <inheritdoc cref="FromExpression{TResult,TDataRefReadContext}(IType{TResult},string,DatProperty,ref TDataRefReadContext,bool)"/>
+    public static unsafe IValue<TResult> FromExpression<TResult, TDataRefReadContext>(
+        IType<TResult> resultType,
+        ReadOnlySpan<char> expression,
+        DatProperty owner,
+        ref TDataRefReadContext dataRefContext,
+        bool simplifyConstantExpressions = true
+    ) where TResult : IEquatable<TResult>
+      where TDataRefReadContext : IDataRefReadContext?
     {
         // trim '='
         if (!expression.IsEmpty && expression[0] == '=')
             expression = expression.Slice(1);
-
+        
         IExpressionNode rootNode;
-        using (ExpressionNodeParser parser = new ExpressionNodeParser(expression, simplifyConstantExpressions))
+#if !NET7_0_OR_GREATER
+        fixed (TDataRefReadContext* dataRefContextPtr = &dataRefContext)
+        {
+#endif
+        using (ExpressionNodeParser<TDataRefReadContext> parser = new ExpressionNodeParser<TDataRefReadContext>(
+                   expression,
+                   owner,
+#if NET7_0_OR_GREATER
+                   ref dataRefContext,
+#else
+                   dataRefContextPtr,
+#endif
+                   simplifyConstantExpressions
+        ))
         {
             rootNode = parser.Parse<TResult>();
         }
+
+#if !NET7_0_OR_GREATER
+        }
+#endif
 
         if (simplifyConstantExpressions && rootNode is IValue<TResult> value)
         {
@@ -512,10 +585,19 @@ public static class Value
                             break;
                         }
 
-                        ExpressionVisitor expressionVisitor;
+                        propertyOwner = owner as DatProperty;
+                        if (propertyOwner == null)
+                            return null;
+
+                        ExpressionVisitor<TDataRefReadContext> expressionVisitor;
                         expressionVisitor.String = str.Length == data.Length ? str : data.ToString();
                         expressionVisitor.ExpressionValue = null;
-                        concreteType.Visit(ref expressionVisitor);
+                        expressionVisitor.Property = propertyOwner;
+                        fixed (TDataRefReadContext* dataRefContextPtr = &dataRefContext)
+                        {
+                            expressionVisitor.DataRefContext = dataRefContextPtr;
+                            concreteType.Visit(ref expressionVisitor);
+                        }
                         return expressionVisitor.ExpressionValue;
                 }
 
@@ -645,9 +727,12 @@ public static class Value
                         return pRef.CreateValue(valueType, propertyOwner, database);
 
                     case ExpressionValueType.Expression:
+                        propertyOwner = owner as DatProperty;
+                        if (propertyOwner == null)
+                            return null;
                         try
                         {
-                            return FromExpression(valueType, str);
+                            return FromExpression(valueType, str, propertyOwner, ref dataRefContext);
                         }
                         catch
                         {
@@ -805,14 +890,17 @@ public static class Value
         return false;
     }
 
-    private struct ExpressionVisitor : ITypeVisitor
+    private unsafe struct ExpressionVisitor<TDataRefReadContext> : ITypeVisitor
+        where TDataRefReadContext : IDataRefReadContext?
     {
         public string String;
         public IValue? ExpressionValue;
+        public DatProperty Property;
+        public TDataRefReadContext* DataRefContext;
 
         public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
         {
-            ExpressionValue = FromExpression(type, String);
+            ExpressionValue = FromExpression(type, String, Property, ref Unsafe.AsRef<TDataRefReadContext>(DataRefContext));
         }
     }
 

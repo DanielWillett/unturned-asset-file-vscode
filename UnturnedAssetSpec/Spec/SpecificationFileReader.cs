@@ -43,9 +43,6 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 
     public bool AllowInternet { get; }
 
-    public string? LatestCommitHash { get; private set; }
-    
-    private bool IsCacheUpToDate { get; set; }
 
     /// <inheritdoc />
     public AssetInformation Information => _readInformation ?? throw new InvalidOperationException("Not yet read.");
@@ -116,19 +113,6 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
     private async Task<SpecificationReadResult> ReadSpecificationsIntl(CancellationToken token)
     {
         using HttpClient client = new HttpClient();
-        IsCacheUpToDate = false;
-        if (AllowInternet && Cache != null)
-        {
-            //LatestCommitHash = await GetLatestCommitAsync(client, token).ConfigureAwait(false);
-            if (LatestCommitHash != null)
-            {
-                IsCacheUpToDate = Cache.IsUpToDateCache(LatestCommitHash);
-            }
-            else
-            {
-                _logger.LogWarning(Resources.Log_FailedToReadCommitHashFromRepo);
-            }
-        }
 
         Task generateLocalizationFiles = Task.Run(() => GenerateLocalizationFiles(token), token);
 
@@ -169,11 +153,6 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
             _readInformation.AssetCategories ??= new Dictionary<QualifiedType, string>(0);
             _readInformation.KnownFileNames ??= new Dictionary<string, QualifiedType>(0);
             _ = _readInformation.ParentTypes;
-
-            if (LatestCommitHash != null)
-            {
-                _readInformation.Commit = LatestCommitHash;
-            }
 
             await Task.WhenAll(
                 new Task[]
@@ -306,8 +285,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
             FileTypes = fileTypes,
             StatusFile = _statusFile ?? JsonDocument.Parse("{}"),
             ActionButtons = _actionButtons ?? ImmutableDictionary<string, ActionButton>.Empty,
-            LocalizationFileTypes = _localizationFiles ?? ImmutableDictionary<string, DatFileType>.Empty,
-            LatestCommit = LatestCommitHash
+            LocalizationFileTypes = _localizationFiles ?? ImmutableDictionary<string, DatFileType>.Empty
         };
     }
 
@@ -602,5 +580,4 @@ public class SpecificationReadResult
     public required ImmutableDictionary<string, DatFileType> LocalizationFileTypes { get; init; }
     public required ImmutableDictionary<string, ActionButton> ActionButtons { get; init; }
     public required JsonDocument StatusFile { get; init; }
-    public required string? LatestCommit { get; init; }
 }

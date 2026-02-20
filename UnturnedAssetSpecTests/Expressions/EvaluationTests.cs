@@ -15,7 +15,7 @@ public class EvaluationTests
     [TestCase("=TAU", Math.PI * 2d)]
     public void TestValueConstants(string constant, double expectedValue)
     {
-        IValue<double> value = Value.FromExpression(Float64Type.Instance, constant, simplifyConstantExpressions: false);
+        IValue<double> value = Value.FromExpression(Float64Type.Instance, constant, null!, simplifyConstantExpressions: false);
 
         Assert.That(value.TryGetConcreteValue(out Optional<double> result), Is.True);
         Assert.That(result.HasValue);
@@ -25,7 +25,7 @@ public class EvaluationTests
     [Test]
     public void TestNullConstant()
     {
-        IValue<double> value = Value.FromExpression(Float64Type.Instance, "=NULL", simplifyConstantExpressions: false);
+        IValue<double> value = Value.FromExpression(Float64Type.Instance, "=NULL", null!, simplifyConstantExpressions: false);
 
         Assert.That(value.TryGetConcreteValue(out Optional<double> result), Is.True);
         Assert.That(result.HasValue, Is.False);
@@ -96,7 +96,7 @@ public class EvaluationTests
         where TResult : IEquatable<TResult>
     {
         IType<TResult> type = TypeConverters.Get<TResult>().DefaultType;
-        IValue<TResult> value = Value.FromExpression(type, expr, simplifyConstantExpressions: false);
+        IValue<TResult> value = Value.FromExpression(type, expr, null!, simplifyConstantExpressions: false);
 
         Assert.That(value.TryGetConcreteValue(out Optional<TResult> result), Is.True);
         Assert.That(result.HasValue);
@@ -152,7 +152,7 @@ public class EvaluationTests
             expectedValue = default;
 
         IType<TResult> type = TypeConverters.Get<TResult>().DefaultType;
-        IValue<TResult> value = Value.FromExpression(type, expr, simplifyConstantExpressions: true);
+        IValue<TResult> value = Value.FromExpression(type, expr, null!, simplifyConstantExpressions: true);
 
         Assert.That(value.TryGetConcreteValue(out Optional<TResult> result), Is.True);
         Assert.That(result.HasValue, Is.EqualTo(expectedValue != null));
@@ -185,7 +185,7 @@ public class EvaluationTests
         ExpressionFunctions.RegisterFunction(producer);
         try
         {
-            IValue<int> value = Value.FromExpression(Int32Type.Instance, "=__CONSUME__(=__PRODUCE__)", simplifyConstantExpressions: false);
+            IValue<int> value = Value.FromExpression(Int32Type.Instance, "=__CONSUME__(=__PRODUCE__)", null!, simplifyConstantExpressions: false);
 
             Assert.That(value.TryGetConcreteValue(out Optional<int> v), Is.True);
             Assert.That(v.HasValue, Is.True);
