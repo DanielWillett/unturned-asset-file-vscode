@@ -9,9 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -21,6 +23,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class ListType : ITypeFactory
 {
     public const string TypeId = "List";
+
+    /// <summary>
+    /// Shared index local used by <see cref="IndexDataRef{TCountType}"/>.
+    /// </summary>
+    internal static readonly ThreadLocal<long> Index = new ThreadLocal<long>(false);
 
     /// <summary>
     /// Factory used to create <see cref="ListType{TCountType,TElementType}"/> values from JSON.
@@ -38,12 +45,12 @@ public sealed class ListType : ITypeFactory
     /// <param name="args">Parameters for how the list should be parsed.</param>
     /// <param name="subType">The element type of the list.</param>
     public static ListType<TCountType, TElementType> Create<TCountType, TElementType>(
-        ListTypeArgs<TCountType, TElementType> args,
+        in ListTypeArgs<TCountType, TElementType> args,
         IType<TElementType> subType)
         where TElementType : IEquatable<TElementType>
         where TCountType : unmanaged, IConvertible, IComparable<TCountType>, IEquatable<TCountType>
     {
-        return new ListType<TCountType, TElementType>(args, subType);
+        return new ListType<TCountType, TElementType>(in args, subType);
     }
 
     /// <summary>
@@ -53,11 +60,11 @@ public sealed class ListType : ITypeFactory
     /// <param name="args">Parameters for how the list should be parsed.</param>
     /// <param name="subType">The element type of the list.</param>
     public static ListType<int, TElementType> Create<TElementType>(
-        ListTypeArgs<int, TElementType> args,
+        in ListTypeArgs<int, TElementType> args,
         IType<TElementType> subType)
         where TElementType : IEquatable<TElementType>
     {
-        return new ListType<int, TElementType>(args, subType);
+        return new ListType<int, TElementType>(in args, subType);
     }
 
     /// <summary>
@@ -209,13 +216,30 @@ public sealed class ListType : ITypeFactory
             }
 
             IValue<TElementType>? defaultValue = null, includedDefaultValue = null;
+
+            IndexDataRefContext<TCountType> c;
+            c.Target = null;
+            c.IndexType = type;
+
             if (Json.TryGetProperty("LegacyDefaultElementTypeValue"u8, out element))
             {
-                defaultValue = Spec.ReadValue(in element, SubType, Owner, Context.Length == 0 ? "LegacyDefaultElementTypeValue" : $"{Context}.LegacyDefaultElementTypeValue");
+                defaultValue = Spec.ReadValue(
+                    in element, 
+                    SubType,
+                    Owner,
+                    ref c,
+                    Context.Length == 0 ? "LegacyDefaultElementTypeValue" : $"{Context}.LegacyDefaultElementTypeValue"
+                );
             }
             if (Json.TryGetProperty("LegacyIncludedDefaultElementTypeValue"u8, out element))
             {
-                includedDefaultValue = Spec.ReadValue(in element, SubType, Owner, Context.Length == 0 ? "LegacyIncludedDefaultElementTypeValue" : $"{Context}.LegacyIncludedDefaultElementTypeValue");
+                includedDefaultValue = Spec.ReadValue(
+                    in element,
+                    SubType,
+                    Owner,
+                    ref c,
+                    Context.Length == 0 ? "LegacyIncludedDefaultElementTypeValue" : $"{Context}.LegacyIncludedDefaultElementTypeValue"
+                );
             }
 
             string? legacySingleKey = null, legacySingularKey = null;
@@ -246,6 +270,44 @@ public sealed class ListType : ITypeFactory
             }, SubType);
         }
     }
+    private struct IndexDataRefContext<TCountType> : IDataRefReadContext, ITypeVisitor
+        where TCountType : IEquatable<TCountType>
+    {
+        public IDataRefTarget? Target;
+        public IType<TCountType> IndexType;
+
+        public bool TryReadTarget(ReadOnlySpan<char> root, IType? type, DatProperty owner, [NotNullWhen(true)] out IDataRefTarget? target)
+        {
+            ReadOnlySpan<char> index = "Index";
+            if (!root.Equals(index, StringComparison.OrdinalIgnoreCase))
+            {
+                target = null;
+                return false;
+            }
+
+            if (type is IType<TCountType> valueType)
+            {
+                target = new IndexDataRef<TCountType>(valueType);
+                return true;
+            }
+
+            type?.Visit(ref this);
+            if (Target != null)
+            {
+                target = Target;
+                return true;
+            }
+
+            target = new IndexDataRef<TCountType>(IndexType);
+            return true;
+        }
+
+        public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
+        {
+            Target = new IndexDataRef<TValue>(type);
+        }
+    }
+
 }
 
 /// <summary>
@@ -316,7 +378,7 @@ public class ListType<TCountType, TElementType>
     /// <summary>
     /// Use the factory methods in <see cref="ListType"/> to create a list type.
     /// </summary>
-    internal ListType(ListTypeArgs<TCountType, TElementType> args, IType<TElementType> subType)
+    internal ListType(in ListTypeArgs<TCountType, TElementType> args, IType<TElementType> subType)
     {
         _args = args;
         _subType = subType;
@@ -395,7 +457,12 @@ public class ListType<TCountType, TElementType>
         writer.WriteEndObject();
     }
 
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<EquatableArray<TElementType>> value, IType<EquatableArray<TElementType>> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<EquatableArray<TElementType>> value,
+        IType<EquatableArray<TElementType>> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         value = Optional<EquatableArray<TElementType>>.Null;
         switch (json.ValueKind)
@@ -411,7 +478,7 @@ public class ListType<TCountType, TElementType>
                 for (int i = 0; i < len; ++i)
                 {
                     JsonElement element = json[i];
-                    if (!_subType.Parser.TryReadValueFromJson(in element, out o, _subType) || !o.HasValue)
+                    if (!_subType.Parser.TryReadValueFromJson(in element, out o, _subType, ref dataRefContext) || !o.HasValue)
                     {
                         return false;
                     }
@@ -423,7 +490,7 @@ public class ListType<TCountType, TElementType>
                 return true;
 
             default:
-                if (!_subType.Parser.TryReadValueFromJson(in json, out o, _subType) || !o.HasValue)
+                if (!_subType.Parser.TryReadValueFromJson(in json, out o, _subType, ref dataRefContext) || !o.HasValue)
                 {
                     return false;
                 }
@@ -518,7 +585,7 @@ public class ListType<TCountType, TElementType>
 
                 args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, singularProperty.Value, args.ParentNode, _subType, PropertyResolutionContext.Modern);
 
-                if (!_subType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> element))
+                if (!TryParseWithIndex(0, ref parseArgs, in ctx, out Optional<TElementType> element))
                 {
                     if (!parseArgs.ShouldIgnoreFailureDiagnostic)
                         args.DiagnosticSink?.UNT2004_Generic(ref args, singularProperty.Value == null ? "-" : singularProperty.Value.ToString()!, _subType);
@@ -591,7 +658,7 @@ public class ListType<TCountType, TElementType>
 
                     args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, v, listNode, _subType, PropertyResolutionContext.Modern);
 
-                    if (!_subType.Parser.TryParse(ref elementParseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
+                    if (!TryParseWithIndex(0, ref elementParseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
                     {
                         if (!elementParseArgs.ShouldIgnoreFailureDiagnostic)
                         {
@@ -713,7 +780,7 @@ public class ListType<TCountType, TElementType>
                                 args.ReferencedPropertySink?.AcceptReferencedProperty(property);
                                 args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, property.Value, property, _subType, PropertyResolutionContext.Modern);
 
-                                if (!_subType.Parser.TryParse(ref elementParseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
+                                if (!TryParseWithIndex(i, ref elementParseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
                                 {
                                     if (!elementParseArgs.ShouldIgnoreFailureDiagnostic)
                                     {
@@ -743,17 +810,18 @@ public class ListType<TCountType, TElementType>
                             if (defaultValue == null)
                                 continue;
 
-                            // todo: index needs to work better, use some kind of contextual `#Index = e` global setting
-                            if (defaultValue is IndexDataRef<TElementType>
-                                && ConvertVisitor<TElementType>.TryConvert(i, out TElementType? e))
-                            {
-                                array[i] = e;
-                            }
-
                             DefaultValueVisitor v;
                             v.Array = array;
                             v.Index = i;
-                            defaultValue.VisitValue(ref v, in ctx);
+                            ListType.Index.Value = i;
+                            try
+                            {
+                                defaultValue.VisitValue(ref v, in ctx);
+                            }
+                            finally
+                            {
+                                ListType.Index.Value = -1;
+                            }
                         }
 
                         value = new EquatableArray<TElementType>(array!);
@@ -770,7 +838,7 @@ public class ListType<TCountType, TElementType>
                 {
                     args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, args.ValueNode, args.ParentNode, _subType, PropertyResolutionContext.Modern);
 
-                    if (!_subType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> element))
+                    if (!TryParseWithIndex(0, ref parseArgs, in ctx, out Optional<TElementType> element))
                     {
                         if (!parseArgs.ShouldIgnoreFailureDiagnostic)
                             args.DiagnosticSink?.UNT2004_Generic(ref args, valueNode.Value, _subType);
@@ -793,6 +861,12 @@ public class ListType<TCountType, TElementType>
         }
 
         return false;
+    }
+
+    private bool TryParseWithIndex(int index, ref TypeParserArgs<TElementType> parseArgs, in FileEvaluationContext ctx, out Optional<TElementType> element)
+    {
+        _ = index; // todo probably will use this in the future
+        return _subType.Parser.TryParse(ref parseArgs, in ctx, out element);
     }
 
     private static void CheckUniqueValue(ref TypeParserArgs<TElementType> args, ISourceNode node, TElementType?[] array, int index)
@@ -941,11 +1015,13 @@ public readonly struct ListTypeArgs<TCountType, TElementType>
     /// <summary>
     /// The default value for missing legacy list elements.
     /// </summary>
+    /// <remarks>Values can use the '#Index' data-ref to refer to the index of the element being filled in for.</remarks>
     public IValue<TElementType>? LegacyDefaultElementTypeValue { get; init; }
 
     /// <summary>
     /// The default value for legacy list elements missing a value.
     /// </summary>
+    /// <remarks>Values can use the '#Index' data-ref to refer to the index of the element being filled in for.</remarks>
     public IValue<TElementType>? LegacyIncludedDefaultElementTypeValue { get; init; }
 
     /// <summary>

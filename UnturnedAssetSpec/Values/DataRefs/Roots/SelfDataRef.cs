@@ -1,4 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -8,12 +10,14 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 public sealed class SelfDataRef : RootDataRef<SelfDataRef>
 {
     /// <summary>
-    /// Singleton instance of <see cref="SelfDataRef"/>.
+    /// The property being referred to by this data-ref.
     /// </summary>
-    public static readonly SelfDataRef Instance = new SelfDataRef();
+    public DatProperty Owner { get; }
 
-    static SelfDataRef() { }
-    private SelfDataRef() { }
+    public SelfDataRef(DatProperty owner)
+    {
+        Owner = owner;
+    }
 
     /// <inheritdoc />
     public override string PropertyName => "Self";
@@ -27,6 +31,44 @@ public sealed class SelfDataRef : RootDataRef<SelfDataRef>
         //       since that's what's being evaluated in this function.
 
         return false;
+    }
+
+    protected override bool AcceptProperty(in IncludedProperty property, in FileEvaluationContext ctx, out bool value)
+    {
+        value = Owner.IsIncluded(property.RequireValue, in ctx);
+        return true;
+    }
+
+    protected override bool AcceptProperty(in ExcludedProperty property, in FileEvaluationContext ctx, out bool value)
+    {
+        value = Owner.IsExcluded(in ctx);
+        return true;
+    }
+
+    protected override bool AcceptProperty(in KeyProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    {
+        value = PropertyDataRef.GetPropertyKey(Owner, in ctx);
+        return value != null;
+    }
+
+    protected override bool AcceptProperty<TVisitor>(in IndicesProperty property, in FileEvaluationContext ctx, ref TVisitor visitor)
+    {
+        // todo
+        return false;
+    }
+
+    protected override bool AcceptProperty(in IsLegacyProperty property, in FileEvaluationContext ctx, out bool value)
+    {
+        // todo
+        value = false;
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool AcceptProperty(in ValueTypeProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    {
+        value = ValueTypeProperty.GetTypeName(Owner.GetValueType(in ctx));
+        return true;
     }
 
     /// <inheritdoc />

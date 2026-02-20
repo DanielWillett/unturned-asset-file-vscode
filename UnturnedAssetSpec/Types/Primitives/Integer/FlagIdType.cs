@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -47,9 +47,14 @@ public sealed class FlagIdType : PrimitiveType<ushort, FlagIdType>, ITypeParser<
     }
 
     /// <inheritdoc />
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<ushort> value, IType<ushort> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<ushort> value,
+        IType<ushort> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.UInt16.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.UInt16.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     /// <inheritdoc />

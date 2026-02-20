@@ -174,7 +174,7 @@ partial class SpecificationFileReader
 
         if (root.TryGetProperty("DefaultValue"u8, out element))
         {
-            property.DefaultValue = ReadValue(in element, type, property, $"{owner.FullName}.{key}.DefaultValue");
+            property.DefaultValue = this.ReadValue(in element, type, property, $"{owner.FullName}.{key}.DefaultValue");
         }
         else if (property.Type is FlagType)
         {
@@ -183,7 +183,7 @@ partial class SpecificationFileReader
 
         if (root.TryGetProperty("IncludedDefaultValue"u8, out element))
         {
-            property.IncludedDefaultValue = ReadValue(in element, type, property, $"{owner.FullName}.{key}.IncludedDefaultValue");
+            property.IncludedDefaultValue = this.ReadValue(in element, type, property, $"{owner.FullName}.{key}.IncludedDefaultValue");
         }
         else if (property.Type is FlagType or BooleanOrFlagType)
         {
@@ -347,9 +347,16 @@ partial class SpecificationFileReader
         throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type", context.Length == 0 ? property.FullName : $"{property.FullName}.{context}"));
     }
 
-    public IValue ReadValue(in JsonElement root, IPropertyType valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default)
+    public IValue ReadValue<TDataRefReadContext>(
+        in JsonElement root,
+        IPropertyType valueType,
+        IDatSpecificationObject readObject,
+        ref TDataRefReadContext dataRefContext,
+        string context = "",
+        ValueReadOptions options = ValueReadOptions.Default
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        if (Value.TryReadValueFromJson(in root, options, valueType, Database, readObject) is { } value)
+        if (Value.TryReadValueFromJson(in root, options, valueType, Database, readObject, ref dataRefContext) is { } value)
         {
             return value;
         }
@@ -357,10 +364,17 @@ partial class SpecificationFileReader
         throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, valueType, context.Length == 0 ? readObject.FullName : $"{readObject.FullName}.{context}"));
     }
 
-    public IValue<T> ReadValue<T>(in JsonElement root, IType<T> valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default)
-        where T : IEquatable<T>
+    public IValue<TValue> ReadValue<TValue, TDataRefReadContext>(
+        in JsonElement root,
+        IType<TValue> valueType,
+        IDatSpecificationObject readObject,
+        ref TDataRefReadContext dataRefContext,
+        string context = "",
+        ValueReadOptions options = ValueReadOptions.Default
+    ) where TValue : IEquatable<TValue>
+      where TDataRefReadContext : IDataRefReadContext?
     {
-        if (Value.TryReadValueFromJson(in root, options, valueType, Database, readObject) is { } value)
+        if (Value.TryReadValueFromJson(in root, options, valueType, Database, readObject, ref dataRefContext) is { } value)
         {
             return value;
         }
@@ -384,7 +398,8 @@ partial class SpecificationFileReader
         for (int i = 0; i < cases; ++i)
         {
             JsonElement caseObj = root[i];
-            if (SwitchCase.TryReadSwitchCase(switchType, Database, owner, in caseObj) is not { } sw)
+            DataRefs.NilDataRefContext c;
+            if (SwitchCase.TryReadSwitchCase(switchType, Database, owner, in caseObj, ref c) is not { } sw)
             {
                 throw new JsonException(string.Format(Resources.JsonException_FailedToReadValue, "Type", $"{owner.FullName}.{key}.Type[{i}]"));
             }

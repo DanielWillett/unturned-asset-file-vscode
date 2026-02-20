@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Text.Json;
 
@@ -84,7 +85,12 @@ public class TypeConverterParser<T>(ITypeConverter<T> typeConverter)
     }
 
     /// <inheritdoc />
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<T> value, IType<T> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<T> value,
+        IType<T> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         TypeConverterParseArgs<T> parseArgs = new TypeConverterParseArgs<T>(valueType);
         return _typeConverter.TryReadJson(in json, out value, ref parseArgs);

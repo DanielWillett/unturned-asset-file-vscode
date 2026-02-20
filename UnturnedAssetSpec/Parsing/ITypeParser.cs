@@ -1,11 +1,12 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -27,12 +28,35 @@ public interface ITypeParser<T> where T : IEquatable<T>
     /// <summary>
     /// Attempts to read a value of this type from a <see cref="Utf8JsonReader"/>.
     /// </summary>
-    bool TryReadValueFromJson(in JsonElement json, out Optional<T> value, IType<T> valueType);
+    bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<T> value,
+        IType<T> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?;
 
     /// <summary>
     /// Write a value to a <see cref="Utf8JsonWriter"/>.
     /// </summary>
     void WriteValueToJson(Utf8JsonWriter writer, T value, IType<T> valueType, JsonSerializerOptions options);
+}
+
+public static class TypeParserExtensions
+{
+    extension<T>(ITypeParser<T> typeParser) where T : IEquatable<T>
+    {
+        /// <summary>
+        /// Attempts to read a value of this type from a <see cref="Utf8JsonReader"/>.
+        /// </summary>
+        public bool TryReadValueFromJson(
+            in JsonElement json,
+            out Optional<T> value,
+            IType<T> valueType)
+        {
+            DataRefs.NilDataRefContext c;
+            return typeParser.TryReadValueFromJson(in json, out value, valueType, ref c);
+        }
+    }
 }
 
 /// <summary>

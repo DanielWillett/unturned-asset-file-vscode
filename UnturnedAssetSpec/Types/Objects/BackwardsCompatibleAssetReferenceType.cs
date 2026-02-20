@@ -279,9 +279,14 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
 
     #region JSON
 
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<GuidOrId> value, IType<GuidOrId> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<GuidOrId> value,
+        IType<GuidOrId> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.GuidOrId.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.GuidOrId.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     public void WriteValueToJson(Utf8JsonWriter writer, GuidOrId value, IType<GuidOrId> valueType, JsonSerializerOptions options)

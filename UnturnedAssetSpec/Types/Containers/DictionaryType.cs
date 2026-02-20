@@ -8,8 +8,10 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -19,6 +21,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 public sealed class DictionaryType : ITypeFactory
 {
     public const string TypeId = "Dictionary";
+
+    /// <summary>
+    /// Shared index local used by <see cref="KeyDataRef{TKey}"/>.
+    /// </summary>
+    internal static readonly ThreadLocal<string?> Key = new ThreadLocal<string?>(false);
 
     /// <summary>
     /// Factory used to create <see cref="DictionaryType{TKeyType,TValueType}"/> values from JSON.
@@ -35,11 +42,11 @@ public sealed class DictionaryType : ITypeFactory
     /// <param name="args">Parameters for how the list should be parsed.</param>
     /// <param name="valueType">The value type of the dictionary.</param>
     public static DictionaryType<string, TValueType> Create<TValueType>(
-        DictionaryTypeArgs<TValueType> args,
+        in DictionaryTypeArgs<TValueType> args,
         IType<TValueType> valueType)
         where TValueType : IEquatable<TValueType>
     {
-        return new DictionaryType<string, TValueType>(args, StringType.Instance, valueType);
+        return new DictionaryType<string, TValueType>(in args, StringType.Instance, valueType);
     }
 
     /// <summary>
@@ -51,13 +58,13 @@ public sealed class DictionaryType : ITypeFactory
     /// <param name="keyType">The key type of the dictionary.</param>
     /// <param name="valueType">The value type of the dictionary.</param>
     public static DictionaryType<TKeyType, TValueType> Create<TKeyType, TValueType>(
-        DictionaryTypeArgs<TValueType> args,
+        in DictionaryTypeArgs<TValueType> args,
         IType<TKeyType> keyType,
         IType<TValueType> valueType)
         where TKeyType : IEquatable<TKeyType>
         where TValueType : IEquatable<TValueType>
     {
-        return new DictionaryType<TKeyType, TValueType>(args, keyType, valueType);
+        return new DictionaryType<TKeyType, TValueType>(in args, keyType, valueType);
     }
 
     IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
@@ -163,7 +170,10 @@ public sealed class DictionaryType : ITypeFactory
             IValue<TValueType>? defaultValue = null;
             if (Json.TryGetProperty("DefaultValue"u8, out element))
             {
-                defaultValue = Spec.ReadValue(in element, SubType, Owner, Context.Length == 0 ? "DefaultValue" : $"{Context}.DefaultValue");
+                DictionaryDataRefContext<TKeyType> c = default;
+                c.KeyType = type;
+
+                defaultValue = Spec.ReadValue(in element, SubType, Owner, ref c, Context.Length == 0 ? "DefaultValue" : $"{Context}.DefaultValue");
             }
 
             bool requireKeyType = Json.TryGetProperty("RequireKeyType"u8, out element)
@@ -177,6 +187,60 @@ public sealed class DictionaryType : ITypeFactory
                 DefaultValue = defaultValue,
                 RequireKeyType = requireKeyType
             }, type, SubType);
+        }
+    }
+    private struct DictionaryDataRefContext<TKeyType> : IDataRefReadContext, ITypeVisitor
+        where TKeyType: IEquatable<TKeyType>
+    {
+        public IDataRefTarget? Target;
+        public IType<TKeyType> KeyType;
+        public bool IsIndex;
+
+        public bool TryReadTarget(ReadOnlySpan<char> root, IType? type, DatProperty owner, [NotNullWhen(true)] out IDataRefTarget? target)
+        {
+            ReadOnlySpan<char> index = "Index", key = "Key";
+            if (root.Equals(index, StringComparison.OrdinalIgnoreCase))
+            {
+                IsIndex = true;
+                type?.Visit(ref this);
+                if (Target != null)
+                {
+                    target = Target;
+                    return true;
+                }
+
+                target = new IndexDataRef<int>(Int32Type.Instance);
+                return true;
+            }
+            
+            if (root.Equals(key, StringComparison.OrdinalIgnoreCase))
+            {
+                IsIndex = false;
+                type?.Visit(ref this);
+                if (Target != null)
+                {
+                    target = Target;
+                    return true;
+                }
+
+                target = new KeyDataRef<TKeyType>(KeyType);
+                return true;
+            }
+            
+            target = null;
+            return false;
+        }
+
+        public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
+        {
+            if (IsIndex)
+            {
+                Target = new IndexDataRef<TValue>(type);
+            }
+            else
+            {
+                Target = new KeyDataRef<TValue>(type);
+            }
         }
     }
 }
@@ -234,7 +298,7 @@ public class DictionaryType<TKeyType, TValueType>
     /// <summary>
     /// Use the factory methods in <see cref="DictionaryType"/> to create a list type.
     /// </summary>
-    internal DictionaryType(DictionaryTypeArgs<TValueType> args, IType<TKeyType> keyType, IType<TValueType> valueType)
+    internal DictionaryType(in DictionaryTypeArgs<TValueType> args, IType<TKeyType> keyType, IType<TValueType> valueType)
     {
         _args = args;
         _valueType = valueType;
@@ -286,7 +350,12 @@ public class DictionaryType<TKeyType, TValueType>
         writer.WriteEndObject();
     }
 
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<EquatableArray<DictionaryPair<TValueType>>> value, IType<EquatableArray<DictionaryPair<TValueType>>> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<EquatableArray<DictionaryPair<TValueType>>> value,
+        IType<EquatableArray<DictionaryPair<TValueType>>> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         value = Optional<EquatableArray<DictionaryPair<TValueType>>>.Null;
         switch (json.ValueKind)
@@ -306,7 +375,7 @@ public class DictionaryType<TKeyType, TValueType>
                         || !element.TryGetProperty("Key"u8, out JsonElement keyElement)
                         || keyElement.ValueKind != JsonValueKind.String
                         || !element.TryGetProperty("Value"u8, out JsonElement valueElement)
-                        || !_valueType.Parser.TryReadValueFromJson(in valueElement, out o, _valueType)
+                        || !_valueType.Parser.TryReadValueFromJson(in valueElement, out o, _valueType, ref dataRefContext)
                         || !o.TryGetValueOrNull(out TValueType? parsedValue))
                     {
                         return false;
@@ -324,7 +393,7 @@ public class DictionaryType<TKeyType, TValueType>
                 foreach (JsonProperty property in objectEnumerator)
                 {
                     JsonElement v = property.Value;
-                    if (!_valueType.Parser.TryReadValueFromJson(in v, out o, _valueType)
+                    if (!_valueType.Parser.TryReadValueFromJson(in v, out o, _valueType, ref dataRefContext)
                      || !o.TryGetValueOrNull(out TValueType? parsedValue))
                     {
                         return false;
@@ -458,11 +527,23 @@ public class DictionaryType<TKeyType, TValueType>
                     if (!_valueType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TValueType> parsedValue)
                         || !parsedValue.TryGetValueOrNull(out TValueType? actualValue))
                     {
-                        if (_args.DefaultValue == null
-                            || !_args.DefaultValue.TryEvaluateValue(out Optional<TValueType> gottenValue, in ctx)
-                            || !gottenValue.TryGetValueOrNull(out TValueType? defaultValue))
+                        TValueType? defaultValue = default;
+                        if (_args.DefaultValue != null)
                         {
-                            defaultValue = default;
+                            DictionaryType.Key.Value = key;
+                            ListType.Index.Value = index;
+                            try
+                            {
+                                if (_args.DefaultValue.TryEvaluateValue(out Optional<TValueType> gottenValue, in ctx))
+                                {
+                                    defaultValue = gottenValue.Value;
+                                }
+                            }
+                            finally
+                            {
+                                ListType.Index.Value = -1;
+                                DictionaryType.Key.Value = null;
+                            }
                         }
 
                         allPassed = false;
@@ -533,7 +614,7 @@ public class DictionaryType<TKeyType, TValueType>
             props.LastCharacterIndex = property.LastCharacterIndex;
             ValueNode fakeNode = ValueNode.Create(key, property.KeyIsQuoted, Comment.None, in props);
 
-            args.CreateSubTypeParserArgs(out TypeParserArgs<TKeyType> parseArgs, fakeNode, args.ParentNode, _keyType, PropertyResolutionContext.Unknown /* todo: ctx.PropertyContext */);
+            args.CreateSubTypeParserArgs(out TypeParserArgs<TKeyType> parseArgs, fakeNode, args.ParentNode, _keyType, PropertyResolutionContext.Modern);
 
             if (parser.TryParse(ref parseArgs, in ctx, out parsedKey))
             {
@@ -573,6 +654,7 @@ public readonly struct DictionaryTypeArgs<TValueType>
     /// <summary>
     /// The default value for keys with missing values.
     /// </summary>
+    /// <remarks>Values can use the '#Key' data-ref to refer to the key for the value being filled in for, or the '#Index' data-ref to refer to the index of the key/value pair being filled in for.</remarks>
     public IValue<TValueType>? DefaultValue { get; init; }
 
     /// <summary>

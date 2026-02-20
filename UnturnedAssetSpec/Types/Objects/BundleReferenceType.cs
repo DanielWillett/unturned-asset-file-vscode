@@ -285,9 +285,14 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
 
     #region JSON
 
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<BundleReference> value, IType<BundleReference> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<BundleReference> value,
+        IType<BundleReference> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        if (TypeParsers.String.TryReadValueFromJson(in json, out Optional<string> strValue, StringType.Instance))
+        if (TypeParsers.String.TryReadValueFromJson(in json, out Optional<string> strValue, StringType.Instance, ref dataRefContext))
         {
             if (!strValue.HasValue)
             {

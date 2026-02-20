@@ -120,7 +120,12 @@ internal class TypeOfType : BaseType<IType, TypeOfType>, ITypeParser<IType>, ITy
     }
 
     /// <inheritdoc />
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<IType> value, IType<IType> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<IType> value,
+        IType<IType> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         if (_context == null || _owner == null)
         {

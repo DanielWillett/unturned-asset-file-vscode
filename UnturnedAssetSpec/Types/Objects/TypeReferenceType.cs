@@ -258,9 +258,14 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
 
     #region JSON
 
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<QualifiedType> value, IType<QualifiedType> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<QualifiedType> value,
+        IType<QualifiedType> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.QualifiedType.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.QualifiedType.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     public void WriteValueToJson(Utf8JsonWriter writer, QualifiedType value, IType<QualifiedType> valueType, JsonSerializerOptions options)

@@ -57,28 +57,34 @@ internal static class SwitchCase
     /// <param name="switchType">The type of value to read.</param>
     /// <param name="root">The JSON object of the case.</param>
     /// <returns>The case, if it was successfully parsed.</returns>
-    public static ISwitchCase<TResult>? TryReadSwitchCase<TResult>(IType<TResult> switchType, IAssetSpecDatabase database, IDatSpecificationObject owner, in JsonElement root)
-        where TResult : IEquatable<TResult>
+    public static ISwitchCase<TResult>? TryReadSwitchCase<TResult, TDataRefReadContext>(
+        IType<TResult> switchType,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        in JsonElement root,
+        ref TDataRefReadContext dataRefContext
+    ) where TResult : IEquatable<TResult>
+      where TDataRefReadContext : IDataRefReadContext?
     {
         IValue<TResult>? value;
 
         if (root.ValueKind != JsonValueKind.Object)
         {
-            return switchType.TryReadFromJson(in root, database, owner, out value)
+            return switchType.TryReadFromJson(in root, database, owner, out value, ref dataRefContext)
                 ? new DefaultSwitchCase<TResult>(value)
                 : null;
         }
 
         if (root.TryGetProperty("Cases"u8, out JsonElement element))
         {
-            if (!SwitchValue.TryRead(in element, switchType, database, owner, out SwitchValue<TResult>? switchValue))
+            if (!SwitchValue.TryRead(in element, switchType, database, owner, out SwitchValue<TResult>? switchValue, ref dataRefContext))
                 return null;
 
             value = switchValue;
         }
         else if (root.TryGetProperty("Value"u8, out element))
         {
-            value = Value.TryReadValueFromJson(in element, ValueReadOptions.Default, switchType, database, owner);
+            value = Value.TryReadValueFromJson(in element, ValueReadOptions.Default, switchType, database, owner, ref dataRefContext);
             if (value == null)
                 return null;
         }
@@ -92,7 +98,7 @@ internal static class SwitchCase
             ConditionToConditionalSwitchCaseVisitor<TResult> visitor;
             visitor.Case = null;
             visitor.Value = value;
-            if (!Conditions.TryReadConditionFromJson(in element, database, owner, ref visitor) || visitor.Case == null)
+            if (!Conditions.TryReadConditionFromJson(in element, database, owner, ref visitor, ref dataRefContext) || visitor.Case == null)
                 return null;
 
             return visitor.Case;
@@ -100,7 +106,7 @@ internal static class SwitchCase
 
         if (root.TryGetProperty("Case"u8, out element))
         {
-            if (!Conditions.TryReadConditionFromJson(in element, database, owner, out IValue<bool>? condition))
+            if (!Conditions.TryReadConditionFromJson(in element, database, owner, out IValue<bool>? condition, ref dataRefContext))
                 return null;
 
             return new ComplexConditionalSwitchCase<TResult>(ImmutableArray.Create(condition), JointConditionOperation.Or, value);
@@ -117,7 +123,7 @@ internal static class SwitchCase
             for (int i = 0; i < cases; ++i)
             {
                 JsonElement item = element[i];
-                if (!Conditions.TryReadConditionFromJson(in item, database, owner, out IValue<bool>? condition))
+                if (!Conditions.TryReadConditionFromJson(in item, database, owner, out IValue<bool>? condition, ref dataRefContext))
                     return null;
 
                 bldr.Add(condition);
@@ -151,18 +157,26 @@ internal static class SwitchCase
     /// <param name="switchType">If <see langword="null"/>, indicates that the value should be skipped, otherwise the type of value to read.</param>
     /// <param name="root">The JSON object of the case.</param>
     /// <returns>The case, if it was successfully parsed.</returns>
-    internal static unsafe ISwitchCase? TryReadSwitchCase(IType? switchType, IAssetSpecDatabase database, IDatSpecificationObject owner, in JsonElement root)
+    internal static unsafe ISwitchCase? TryReadSwitchCase<TDataRefReadContext>(
+        IType? switchType,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        in JsonElement root,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         if (switchType != null)
         {
-            CreateTypedSwitchCaseVisitor v;
+            CreateTypedSwitchCaseVisitor<TDataRefReadContext> v;
             v.Visited = false;
             v.Created = null;
             v.Database = database;
             v.Owner = owner;
             fixed (JsonElement* elementPtr = &root)
+            fixed (TDataRefReadContext* readCtx = &dataRefContext)
             {
                 v.Element = elementPtr;
+                v.DataRefReadContext = readCtx;
                 switchType.Visit(ref v);
             }
 
@@ -176,7 +190,7 @@ internal static class SwitchCase
         {
             if (root.TryGetProperty("Cases"u8, out element))
             {
-                if (!SwitchValue.TryRead(in element, switchType, database, owner, out SwitchValue? switchValue))
+                if (!SwitchValue.TryRead(in element, switchType, database, owner, out SwitchValue? switchValue, ref dataRefContext))
                     return null;
 
                 value = switchValue;
@@ -196,7 +210,7 @@ internal static class SwitchCase
             ConditionToConditionalSwitchCaseVisitor visitor;
             visitor.Case = null;
             visitor.Value = value;
-            if (!Conditions.TryReadConditionFromJson(in element, database, owner, ref visitor) || visitor.Case == null)
+            if (!Conditions.TryReadConditionFromJson(in element, database, owner, ref visitor, ref dataRefContext) || visitor.Case == null)
                 return null;
 
             return visitor.Case;
@@ -204,7 +218,7 @@ internal static class SwitchCase
 
         if (root.TryGetProperty("Case"u8, out element))
         {
-            if (!Conditions.TryReadConditionFromJson(in element, database, owner, out IValue<bool>? condition))
+            if (!Conditions.TryReadConditionFromJson(in element, database, owner, out IValue<bool>? condition, ref dataRefContext))
                 return null;
 
             return new ComplexConditionalSwitchCase(ImmutableArray.Create(condition), JointConditionOperation.Or, value);
@@ -221,7 +235,7 @@ internal static class SwitchCase
             for (int i = 0; i < cases; ++i)
             {
                 JsonElement item = element[i];
-                if (!Conditions.TryReadConditionFromJson(in item, database, owner, out IValue<bool>? condition))
+                if (!Conditions.TryReadConditionFromJson(in item, database, owner, out IValue<bool>? condition, ref dataRefContext))
                     return null;
 
                 bldr.Add(condition);
@@ -237,17 +251,19 @@ internal static class SwitchCase
         return new DefaultSwitchCase(value);
     }
 
-    private unsafe struct CreateTypedSwitchCaseVisitor : ITypeVisitor
+    private unsafe struct CreateTypedSwitchCaseVisitor<TDataRefReadContext> : ITypeVisitor
+        where TDataRefReadContext : IDataRefReadContext?
     {
         public ISwitchCase? Created;
         public bool Visited;
         public JsonElement* Element;
+        public TDataRefReadContext* DataRefReadContext;
         public IAssetSpecDatabase Database;
         public IDatSpecificationObject Owner;
         public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
         {
             Visited = true;
-            Created = TryReadSwitchCase(type, Database, Owner, in Unsafe.AsRef<JsonElement>(Element));
+            Created = TryReadSwitchCase(type, Database, Owner, in Unsafe.AsRef<JsonElement>(Element), ref Unsafe.AsRef<TDataRefReadContext>(DataRefReadContext));
         }
     }
 

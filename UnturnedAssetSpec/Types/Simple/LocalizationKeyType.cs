@@ -315,9 +315,14 @@ public sealed class LocalizationKeyType : BaseType<string, LocalizationKeyType>,
     }
 
 
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<string> value, IType<string> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<string> value,
+        IType<string> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.String.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.String.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     public void WriteValueToJson(Utf8JsonWriter writer, string value, IType<string> valueType, JsonSerializerOptions options)

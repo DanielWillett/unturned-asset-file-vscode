@@ -141,9 +141,14 @@ public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetRefer
 
     #region JSON
 
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<ushort> value, IType<ushort> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<ushort> value,
+        IType<ushort> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.UInt16.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.UInt16.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     public void WriteValueToJson(Utf8JsonWriter writer, ushort value, IType<ushort> valueType, JsonSerializerOptions options)

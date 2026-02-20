@@ -45,11 +45,55 @@ public interface IDatSpecificationReadContext
     /// <summary>
     /// Reads a property value from a JSON object or string.
     /// </summary>
-    IValue ReadValue(in JsonElement root, IPropertyType valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default);
+    IValue ReadValue<TDataRefReadContext>(
+        in JsonElement root,
+        IPropertyType valueType,
+        IDatSpecificationObject readObject,
+        ref TDataRefReadContext dataRefContext,
+        string context = "",
+        ValueReadOptions options = ValueReadOptions.Default
+    ) where TDataRefReadContext : IDataRefReadContext?;
 
     /// <summary>
     /// Reads a value from a JSON object or string.
     /// </summary>
-    IValue<T> ReadValue<T>(in JsonElement root, IType<T> valueType, IDatSpecificationObject readObject, string context = "", ValueReadOptions options = ValueReadOptions.Default)
-        where T : IEquatable<T>;
+    IValue<TValue> ReadValue<TValue, TDataRefReadContext>(
+        in JsonElement root,
+        IType<TValue> valueType,
+        IDatSpecificationObject readObject,
+        ref TDataRefReadContext dataRefContext,
+        string context = "",
+        ValueReadOptions options = ValueReadOptions.Default
+    ) where TValue : IEquatable<TValue>
+      where TDataRefReadContext : IDataRefReadContext?;
+}
+
+public static class DatSpecificationReadContextExtensions
+{
+    extension(IDatSpecificationReadContext ctx)
+    {
+        public IValue ReadValue(
+            in JsonElement root,
+            IPropertyType valueType,
+            IDatSpecificationObject readObject,
+            string context = "",
+            ValueReadOptions options = ValueReadOptions.Default
+        )
+        {
+            DataRefs.NilDataRefContext c;
+            return ctx.ReadValue(in root, valueType, readObject, ref c, context, options);
+        }
+
+        public IValue<TValue> ReadValue<TValue>(
+            in JsonElement root,
+            IType<TValue> valueType,
+            IDatSpecificationObject readObject,
+            string context = "",
+            ValueReadOptions options = ValueReadOptions.Default
+        ) where TValue : IEquatable<TValue>
+        {
+            DataRefs.NilDataRefContext c;
+            return ctx.ReadValue(in root, valueType, readObject, ref c, context, options);
+        }
+    }
 }

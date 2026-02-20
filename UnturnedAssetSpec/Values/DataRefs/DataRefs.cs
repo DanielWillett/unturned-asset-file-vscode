@@ -17,7 +17,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// </summary>
 public static class DataRefs
 {
-    public delegate IDataRefTarget DataRefRootFactory(IType? type);
+    public delegate IDataRefTarget DataRefRootFactory(IType? type, DatProperty owner);
 
     /// <summary>
     /// Read-only, case-insensitive set of all reserved keywords for data-refs.
@@ -49,8 +49,8 @@ public static class DataRefs
         ImmutableDictionary<string, DataRefRootFactory>.Builder roots
             = ImmutableDictionary.CreateBuilder<string, DataRefRootFactory>(StringComparer.OrdinalIgnoreCase);
 
-        roots["This"] = _ => ThisDataRef.Instance;
-        roots["Self"] = _ => SelfDataRef.Instance;
+        roots["This"] = (_, owner) => new ThisDataRef(owner);
+        roots["Self"] = (_, owner) => new SelfDataRef(owner);
 
         Roots = roots.ToImmutable();
 
@@ -73,8 +73,19 @@ public static class DataRefs
         string text,
         IType? type,
         DatProperty owner,
+        [NotNullWhen(true)] out IDataRef? dataRef)
+    {
+        NilDataRefContext c;
+        return TryReadDataRef(text, type, owner, out dataRef, ref c);
+    }
+
+    public static bool TryReadDataRef<TDataRefReadContext>(
+        string text,
+        IType? type,
+        DatProperty owner,
         [NotNullWhen(true)] out IDataRef? dataRef,
-        IDataRefReadContext? context = null)
+        ref TDataRefReadContext context
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         dataRef = null;
 
@@ -96,11 +107,15 @@ public static class DataRefs
                 if (!root.Equals(factoryPair.Key, StringComparison.OrdinalIgnoreCase))
                     continue;
 
-                target = factoryPair.Value(type);
+                target = factoryPair.Value(type, owner);
                 break;
             }
 
-            context?.TryReadTarget(root, type, out target);
+            if (context != null)
+            {
+                if (context.TryReadTarget(root, type, owner, out IDataRefTarget? target2))
+                    target = target2;
+            }
         }
 
         if (target == null)
@@ -201,6 +216,16 @@ public static class DataRefs
 
         dataRef = propFactory.CreateDataRef(target, indexList, propertyList);
         return true;
+    }
+
+    internal struct NilDataRefContext : IDataRefReadContext
+    {
+        public bool TryReadTarget(ReadOnlySpan<char> root, IType? type, DatProperty owner,
+            [NotNullWhen(true)] out IDataRefTarget? target)
+        {
+            target = null;
+            return false;
+        }
     }
 
     private struct PropertyTypeVisitor : ITypeVisitor
@@ -440,5 +465,5 @@ public static class DataRefs
 
 public interface IDataRefReadContext
 {
-    bool TryReadTarget(ReadOnlySpan<char> root, IType? type, [NotNullWhen(true)] out IDataRefTarget? target);
+    bool TryReadTarget(ReadOnlySpan<char> root, IType? type, DatProperty owner, [NotNullWhen(true)] out IDataRefTarget? target);
 }

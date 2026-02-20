@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -215,9 +216,14 @@ public sealed class Steam64IdType : BaseType<ulong, Steam64IdType>, ITypeParser<
 
     #region JSON
 
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<ulong> value, IType<ulong> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<ulong> value,
+        IType<ulong> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.UInt64.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.UInt64.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     public void WriteValueToJson(Utf8JsonWriter writer, ulong value, IType<ulong> valueType, JsonSerializerOptions options)

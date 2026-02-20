@@ -194,7 +194,20 @@ public abstract class BaseVectorType<TVector, TSelf> :
         return false;
     }
 
-    public virtual bool TryReadValueFromJson(in JsonElement json, out Optional<TVector> value, IType<TVector> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<TVector> value,
+        IType<TVector> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
+    {
+        return TryReadValueFromJson(in json, out value, valueType);
+    }
+
+    public virtual bool TryReadValueFromJson(
+        in JsonElement json,
+        out Optional<TVector> value,
+        IType<TVector> valueType)
     {
         if (json.ValueKind == JsonValueKind.Null)
         {

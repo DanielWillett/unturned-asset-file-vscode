@@ -307,22 +307,71 @@ public static class Value
         }
     }
 
+    /// <inheritdoc cref="TryReadValueFromJson{TDataRefReadContext}(in JsonElement,ValueReadOptions,IPropertyType,IAssetSpecDatabase,IDatSpecificationObject,ref TDataRefReadContext)"/>
+    public static IValue? TryReadValueFromJson(
+        in JsonElement root,
+        ValueReadOptions options,
+        IPropertyType? valueType,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner
+    )
+    {
+        NullReadValueVisitor v;
+        DataRefs.NilDataRefContext c;
+        return TryReadValueFromJson(in root, options, ref v, valueType, database, owner, ref c);
+    }
+
     /// <summary>
     /// Parse a value from a JSON token.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static IValue? TryReadValueFromJson(in JsonElement root, ValueReadOptions options, IPropertyType? valueType, IAssetSpecDatabase database, IDatSpecificationObject owner, IDataRefReadContext? dataRefContext = null)
+    public static IValue? TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement root,
+        ValueReadOptions options,
+        IPropertyType? valueType,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         NullReadValueVisitor v;
-        return TryReadValueFromJson(in root, options, ref v, valueType, database, owner, dataRefContext);
+        return TryReadValueFromJson(in root, options, ref v, valueType, database, owner, ref dataRefContext);
+    }
+
+    /// <inheritdoc cref="TryReadValueFromJson{TVisitor,TDataRefReadContext}(in JsonElement,ValueReadOptions,ref TVisitor,IPropertyType,IAssetSpecDatabase,IDatSpecificationObject,ref TDataRefReadContext)"/>
+    public static IValue? TryReadValueFromJson<TVisitor>(
+        in JsonElement root,
+        ValueReadOptions options,
+        ref TVisitor visitor,
+        IPropertyType? valueType,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner
+    ) where TVisitor : IReadValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        DataRefs.NilDataRefContext c;
+        return TryReadValueFromJson(in root, options, ref visitor, valueType, database, owner, ref c);
     }
 
     /// <summary>
     /// Parse a value from a JSON token. The visitor will only be invoked if the value is strongly typed.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static unsafe IValue? TryReadValueFromJson<TVisitor>(in JsonElement root, ValueReadOptions options, ref TVisitor visitor, IPropertyType? valueType, IAssetSpecDatabase database, IDatSpecificationObject owner, IDataRefReadContext? dataRefContext = null)
+    public static unsafe IValue? TryReadValueFromJson<TVisitor, TDataRefReadContext>(
+        in JsonElement root,
+        ValueReadOptions options,
+        ref TVisitor visitor,
+        IPropertyType? valueType,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
         where TVisitor : IReadValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         IType? type = valueType as IType;
         if (type != null)
@@ -434,7 +483,7 @@ public static class Value
                                     type,
                                     propertyOwner,
                                     out IDataRef? dataRef,
-                                    dataRefContext ?? type as IDataRefReadContext
+                                    ref dataRefContext
                                 )
                             )
                         {
@@ -486,7 +535,7 @@ public static class Value
                 if (root.GetArrayLength() == 0)
                     return NullValue.Instance;
 
-                if (valueType != null && SwitchValue.TryRead(in root, valueType, database, owner, out SwitchValue? value))
+                if (valueType != null && SwitchValue.TryRead(in root, valueType, database, owner, out SwitchValue? value, ref dataRefContext))
                 {
                     return value;
                 }
@@ -503,12 +552,32 @@ public static class Value
         return null;
     }
 
+    /// <inheritdoc cref="TryReadValueFromJson{TValue,TDataRefReadContext}(in JsonElement,ValueReadOptions,IType{TValue},IAssetSpecDatabase,IDatSpecificationObject,ref TDataRefReadContext)"/>
+    public static IValue<TValue>? TryReadValueFromJson<TValue>(
+        in JsonElement root,
+        ValueReadOptions options,
+        IType<TValue> valueType,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner
+    ) where TValue : IEquatable<TValue>
+    {
+        DataRefs.NilDataRefContext c;
+        return TryReadValueFromJson(in root, options, valueType, database, owner, ref c);
+    }
+
     /// <summary>
     /// Parse a value from a JSON token.
     /// </summary>
     /// <returns>The parsed value, or <see langword="null"/> if the value couldn't be parsed.</returns>
-    public static IValue<TValue>? TryReadValueFromJson<TValue>(in JsonElement root, ValueReadOptions options, IType<TValue> valueType, IAssetSpecDatabase database, IDatSpecificationObject owner, IDataRefReadContext? dataRefContext = null)
-        where TValue : IEquatable<TValue>
+    public static IValue<TValue>? TryReadValueFromJson<TValue, TDataRefReadContext>(
+        in JsonElement root,
+        ValueReadOptions options,
+        IType<TValue> valueType,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        ref TDataRefReadContext dataRefContext
+    ) where TValue : IEquatable<TValue>
+      where TDataRefReadContext : IDataRefReadContext?
     {
         switch (root.ValueKind)
         {
@@ -516,7 +585,7 @@ public static class Value
             case JsonValueKind.False:
             case JsonValueKind.Number:
             case JsonValueKind.Object:
-                if (valueType.TryReadFromJson(in root, database, owner, out IValue<TValue>? val))
+                if (valueType.TryReadFromJson(in root, database, owner, out IValue<TValue>? val, ref dataRefContext))
                 {
                     return val;
                 }
@@ -532,7 +601,7 @@ public static class Value
                         return null;
                     }
 
-                    return valueType.TryReadFromJson(in root, database, owner, out val)
+                    return valueType.TryReadFromJson(in root, database, owner, out val, ref dataRefContext)
                         ? val
                         : Null(valueType);
                 }
@@ -559,7 +628,7 @@ public static class Value
                         if (propertyOwner == null)
                             return null;
                         string stringVal = str.Length == data.Length ? str : data.ToString();
-                        return DataRefs.TryReadDataRef(stringVal, valueType, propertyOwner, out IDataRef? dataRef, dataRefContext) ? dataRef as IValue<TValue> : null;
+                        return DataRefs.TryReadDataRef(stringVal, valueType, propertyOwner, out IDataRef? dataRef, ref dataRefContext) ? dataRef as IValue<TValue> : null;
 
                     case ExpressionValueType.PropertyRef:
                         propertyOwner = owner as DatProperty;
@@ -592,11 +661,11 @@ public static class Value
                 break;
 
             case JsonValueKind.Array:
-                if (SwitchValue.TryRead(in root, valueType, database, owner, out SwitchValue<TValue>? value))
+                if (SwitchValue.TryRead(in root, valueType, database, owner, out SwitchValue<TValue>? value, ref dataRefContext))
                 {
                     return value;
                 }
-                if (valueType.TryReadFromJson(in root, database, owner, out val))
+                if (valueType.TryReadFromJson(in root, database, owner, out val, ref dataRefContext))
                 {
                     return val;
                 }
@@ -675,6 +744,9 @@ public static class Value
 
     private unsafe struct ReadStronglyTypedValueVisitor<TVisitor> : ITypeVisitor
         where TVisitor : IReadValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         public IValue? Value;
         public TVisitor* Visitor;

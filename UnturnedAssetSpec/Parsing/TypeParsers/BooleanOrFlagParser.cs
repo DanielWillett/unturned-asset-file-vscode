@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Text.Json;
 
@@ -31,9 +32,14 @@ internal sealed class BooleanOrFlagParser : ITypeParser<bool>
         return true;
     }
 
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<bool> value, IType<bool> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<bool> value,
+        IType<bool> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.Boolean.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.Boolean.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     public void WriteValueToJson(Utf8JsonWriter writer, bool value, IType<bool> valueType, JsonSerializerOptions options)

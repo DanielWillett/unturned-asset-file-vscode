@@ -32,11 +32,31 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
         Cases = cases.IsDefault ? ImmutableArray<ISwitchCase>.Empty : cases;
     }
 
+    /// <inheritdoc cref="TryRead{TResult,TDataRefReadContext}(in JsonElement,IType{TResult},IAssetSpecDatabase,IDatSpecificationObject,out SwitchValue{TResult},ref TDataRefReadContext)"/>
+    public static bool TryRead<TResult>(
+        in JsonElement element,
+        IType<TResult> type,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        [NotNullWhen(true)] out SwitchValue<TResult>? value
+    ) where TResult : IEquatable<TResult>
+    {
+        DataRefs.NilDataRefContext c;
+        return TryRead(in element, type, database, owner, out value, ref c);
+    }
+
     /// <summary>
     /// Attempts to read a switch value from a JSON array.
     /// </summary>
-    public static bool TryRead<TResult>(in JsonElement element, IType<TResult> type, IAssetSpecDatabase database, IDatSpecificationObject owner, [NotNullWhen(true)] out SwitchValue<TResult>? value)
-        where TResult : IEquatable<TResult>
+    public static bool TryRead<TResult, TDataRefReadContext>(
+        in JsonElement element,
+        IType<TResult> type,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        [NotNullWhen(true)] out SwitchValue<TResult>? value,
+        ref TDataRefReadContext dataRefContext
+    ) where TResult : IEquatable<TResult>
+      where TDataRefReadContext : IDataRefReadContext?
     {
         value = null;
         if (element.ValueKind != JsonValueKind.Array)
@@ -50,7 +70,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
         for (int i = 0; i < cases; ++i)
         {
             JsonElement obj = element[i];
-            if (SwitchCase.TryReadSwitchCase(type, database, owner, in obj) is not { } sc)
+            if (SwitchCase.TryReadSwitchCase(type, database, owner, in obj, ref dataRefContext) is not { } sc)
             {
                 for (int j = 0; j < i; ++j)
                 {
@@ -68,21 +88,43 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
         return true;
     }
 
+    /// <inheritdoc cref="TryRead{TDataRefReadContext}(in JsonElement,IPropertyType,IAssetSpecDatabase,IDatSpecificationObject,out SwitchValue,ref TDataRefReadContext)"/>
+    public static bool TryRead(
+        in JsonElement element,
+        IPropertyType type,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        [NotNullWhen(true)] out SwitchValue? value
+    )
+    {
+        DataRefs.NilDataRefContext c;
+        return TryRead(in element, type, database, owner, out value, ref c);
+    }
+
     /// <summary>
     /// Attempts to read an untyped switch value from a JSON array.
     /// </summary>
-    public static unsafe bool TryRead(in JsonElement element, IPropertyType type, IAssetSpecDatabase database, IDatSpecificationObject owner, [NotNullWhen(true)] out SwitchValue? value)
+    public static unsafe bool TryRead<TDataRefReadContext>(
+        in JsonElement element,
+        IPropertyType type,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        [NotNullWhen(true)] out SwitchValue? value,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         if (type.TryGetConcreteType(out IType? actualType))
         {
-            CreateTypedSwitchValueVisitor v;
+            CreateTypedSwitchValueVisitor<TDataRefReadContext> v;
             v.Visited = false;
             v.Created = null;
             v.Database = database;
             v.Owner = owner;
             fixed (JsonElement* elementPtr = &element)
+            fixed (TDataRefReadContext* contextPtr = &dataRefContext)
             {
                 v.Element = elementPtr;
+                v.DataRefReadContext = contextPtr;
                 actualType.Visit(ref v);
             }
 
@@ -110,7 +152,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
         {
             JsonElement item = element[i];
 
-            ISwitchCase? sc = SwitchCase.TryReadSwitchCase(actualType, database, owner, in item);
+            ISwitchCase? sc = SwitchCase.TryReadSwitchCase(actualType, database, owner, in item, ref dataRefContext);
             if (sc == null)
                 return false;
 
@@ -123,7 +165,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
                     return false;
                 }
 
-                sc = SwitchCase.TryReadSwitchCase(typeValue.Value, database, owner, in item);
+                sc = SwitchCase.TryReadSwitchCase(typeValue.Value, database, owner, in item, ref dataRefContext);
                 if (sc == null)
                     return false;
             }
@@ -135,17 +177,19 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
         return true;
     }
 
-    private unsafe struct CreateTypedSwitchValueVisitor : ITypeVisitor
+    private unsafe struct CreateTypedSwitchValueVisitor<TDataRefReadContext> : ITypeVisitor
+        where TDataRefReadContext : IDataRefReadContext?
     {
         public SwitchValue? Created;
         public bool Visited;
         public JsonElement* Element;
+        public TDataRefReadContext* DataRefReadContext;
         public IAssetSpecDatabase Database;
         public IDatSpecificationObject Owner;
         public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
         {
             Visited = true;
-            if (TryRead(in Unsafe.AsRef<JsonElement>(Element), type, Database, Owner, out SwitchValue<TValue>? value))
+            if (TryRead(in Unsafe.AsRef<JsonElement>(Element), type, Database, Owner, out SwitchValue<TValue>? value, ref Unsafe.AsRef<TDataRefReadContext>(DataRefReadContext)))
             {
                 Created = value;
             }

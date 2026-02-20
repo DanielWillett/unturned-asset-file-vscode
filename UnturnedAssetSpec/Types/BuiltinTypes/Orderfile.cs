@@ -12,6 +12,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -344,9 +345,14 @@ internal sealed class OrderfileListElementType : BaseType<string, OrderfileListE
     }
 
     /// <inheritdoc />
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<string> value, IType<string> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<string> value,
+        IType<string> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.String.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.String.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     /// <inheritdoc />

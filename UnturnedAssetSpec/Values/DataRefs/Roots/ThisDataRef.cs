@@ -10,12 +10,14 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 public sealed class ThisDataRef : RootDataRef<ThisDataRef>
 {
     /// <summary>
-    /// Singleton instance of <see cref="ThisDataRef"/>.
+    /// The property being defining this data-ref.
     /// </summary>
-    public static readonly ThisDataRef Instance = new ThisDataRef();
+    public DatProperty Owner { get; }
 
-    static ThisDataRef() { }
-    private ThisDataRef() { }
+    public ThisDataRef(DatProperty owner)
+    {
+        Owner = owner;
+    }
 
     /// <inheritdoc />
     public override string PropertyName => "This";
@@ -35,7 +37,27 @@ public sealed class ThisDataRef : RootDataRef<ThisDataRef>
         return false;
     }
 
-    /// <inheritdoc />
+    protected override bool AcceptProperty(in IncludedProperty property, in FileEvaluationContext ctx, out bool value)
+    {
+        // TODO: check if object is included instead
+        value = Owner.IsIncluded(property.RequireValue, in ctx);
+        return true;
+    }
+
+    protected override bool AcceptProperty(in ExcludedProperty property, in FileEvaluationContext ctx, out bool value)
+    {
+        // TODO: check if object is excluded instead
+        value = Owner.IsExcluded(in ctx);
+        return true;
+    }
+
+    protected override bool AcceptProperty(in KeyProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    {
+        // TODO: get object key
+        value = PropertyDataRef.GetPropertyKey(Owner, in ctx);
+        return value != null;
+    }
+
     protected override bool AcceptProperty(in AssetNameProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         switch (ctx.File)
@@ -52,6 +74,24 @@ public sealed class ThisDataRef : RootDataRef<ThisDataRef>
                 value = null;
                 return false;
         }
+    }
+
+    protected override bool AcceptProperty(in DifficultyProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    {
+        if (!DifficultyProperty.TryGetFileDifficultyContext(in ctx, out ServerDifficulty diff))
+        {
+            value = null;
+            return false;
+        }
+
+        value = DifficultyProperty.GetDifficultyName(diff);
+        return true;
+    }
+
+    protected override bool AcceptProperty<TVisitor>(in IndicesProperty property, in FileEvaluationContext ctx, ref TVisitor visitor)
+    {
+        // todo
+        return false;
     }
 
     /// <inheritdoc />

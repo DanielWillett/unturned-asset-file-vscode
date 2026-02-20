@@ -24,6 +24,9 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
     private bool _hasStringParser;
     private bool _stringParserNoFallback;
 
+    internal static readonly ThreadLocal<TypeParserArgs<DatObjectValue>> ValueParseInfo
+        = new ThreadLocal<TypeParserArgs<DatObjectValue>>();
+
     /// <summary>
     /// The null value for this type of object.
     /// </summary>
@@ -169,6 +172,26 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
                     }
                 }
 
+                if (StringDefaultValue != null)
+                {
+                    ValueParseInfo.Value = args;
+                    try
+                    {
+                        if (StringDefaultValue.TryEvaluateValue(out value, in ctx))
+                        {
+                            return true;
+                        }
+
+                        args.DiagnosticSink?.UNT2004_Generic(ref args, valueNode.Value, Owner);
+                        return false;
+
+                    }
+                    finally
+                    {
+                        ValueParseInfo.Value = default;
+                    }
+                }
+
                 if (!maybeLegacy)
                 {
                     if (maybeModern)
@@ -222,13 +245,30 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
     #region JSON
 
     /// <inheritdoc />
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<DatObjectValue> value, IType<DatObjectValue> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<DatObjectValue> value,
+        IType<DatObjectValue> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         if (!StringParseableType.IsNull && StringParser is { } stringParser)
         {
             TypeConverterParseArgs<DatObjectValue> parseArgs = new TypeConverterParseArgs<DatObjectValue>(this);
             if (stringParser.TryReadJson(in json, out value, ref parseArgs))
                 return true;
+        }
+
+        if (json.ValueKind == JsonValueKind.Null)
+        {
+            value = Optional<DatObjectValue>.Null;
+            return true;
+        }
+
+        if (json.ValueKind != JsonValueKind.Object)
+        {
+            value = Optional<DatObjectValue>.Null;
+            return false;
         }
 
         int capacity = Properties.Length;
@@ -248,13 +288,13 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
         ImmutableArray<DatObjectPropertyValue>.Builder propertyArrayBuilder = ImmutableArray.CreateBuilder<DatObjectPropertyValue>(capacity);
 
         value = Optional<DatObjectValue>.Null;
-        if (!TryReadAllProperties(Properties, in json, propertyArrayBuilder))
+        if (!TryReadAllProperties(Properties, in json, propertyArrayBuilder, ref dataRefContext))
         {
             return false;
         }
 
         if (localizationProperties.ValueKind == JsonValueKind.Object
-            && !TryReadAllProperties(assetType!.LocalizationProperties, in localizationProperties, propertyArrayBuilder))
+            && !TryReadAllProperties(assetType!.LocalizationProperties, in localizationProperties, propertyArrayBuilder, ref dataRefContext))
         {
             return false;
         }
@@ -262,7 +302,12 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
         return true;
     }
 
-    private bool TryReadAllProperties(ImmutableArray<DatProperty> properties, in JsonElement root, ImmutableArray<DatObjectPropertyValue>.Builder propertyArrayBuilder)
+    private bool TryReadAllProperties<TDataRefReadContext>(
+        ImmutableArray<DatProperty> properties,
+        in JsonElement root,
+        ImmutableArray<DatObjectPropertyValue>.Builder propertyArrayBuilder,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         foreach (DatProperty property in properties)
         {
@@ -272,11 +317,19 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
             IValue? value;
             if (!property.Type.TryGetConcreteType(out IType? type))
             {
-                value = new UnresolvedNonConcreteTypeObjectPropertyValue(element, property.Type, property);
+                if (typeof(TDataRefReadContext) == typeof(DataRefs.NilDataRefContext)
+                    || dataRefContext == null)
+                {
+                    value = new UnresolvedNonConcreteTypeObjectPropertyValue(element, property.Type, property);
+                }
+                else
+                {
+                    value = new UnresolvedNonConcreteTypeObjectPropertyValue<TDataRefReadContext>(element, property.Type, property, dataRefContext);
+                }
             }
             else
             {
-                value = Value.TryReadValueFromJson(in root, ValueReadOptions.Default, type, Context.Database, property);
+                value = Value.TryReadValueFromJson(in root, ValueReadOptions.Default, type, Context.Database, property, ref dataRefContext);
                 if (value == null)
                     return false;
             }
@@ -341,31 +394,54 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
 
     private class UnresolvedNonConcreteTypeObjectPropertyValue : IValue
     {
-        private readonly JsonElement _element;
-        private readonly IPropertyType _propertyType;
-        private readonly DatProperty _owner;
+        protected readonly JsonElement Element;
+        protected readonly IPropertyType PropertyType;
+        protected readonly DatProperty Owner;
 
         public UnresolvedNonConcreteTypeObjectPropertyValue(JsonElement element, IPropertyType propertyType, DatProperty owner)
         {
-            _element = element;
-            _propertyType = propertyType;
-            _owner = owner;
+            Element = element;
+            PropertyType = propertyType;
+            Owner = owner;
         }
 
-        public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        public virtual bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
             where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            IValue? value = Value.TryReadValueFromJson(in _element, ValueReadOptions.Default, _propertyType, ctx.Services.Database, _owner);
+            IValue? value = Value.TryReadValueFromJson(in Element, ValueReadOptions.Default, PropertyType, ctx.Services.Database, Owner);
             return value != null && value.VisitValue(ref visitor, in ctx);
         }
 
         bool IValue.IsNull => false;
-        void IValue.WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options) => _element.WriteTo(writer);
+        void IValue.WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options) => Element.WriteTo(writer);
         bool IEquatable<IValue?>.Equals(IValue? other) => (object)this == other;
         bool IValue.VisitConcreteValue<TVisitor>(ref TVisitor visitor) => false;
+    }
+
+    private class UnresolvedNonConcreteTypeObjectPropertyValue<TDataRefReadContext> : UnresolvedNonConcreteTypeObjectPropertyValue
+        where TDataRefReadContext : IDataRefReadContext?
+    {
+        private readonly TDataRefReadContext _context;
+
+        public UnresolvedNonConcreteTypeObjectPropertyValue(
+            JsonElement element,
+            IPropertyType propertyType,
+            DatProperty owner,
+            TDataRefReadContext context
+        ) : base(element, propertyType, owner)
+        {
+            _context = context;
+        }
+
+        public override bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        {
+            TDataRefReadContext context = _context;
+            IValue? value = Value.TryReadValueFromJson(in Element, ValueReadOptions.Default, PropertyType, ctx.Services.Database, Owner, ref context);
+            return value != null && value.VisitValue(ref visitor, in ctx);
+        }
     }
 }
 

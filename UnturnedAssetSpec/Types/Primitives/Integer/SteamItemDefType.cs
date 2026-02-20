@@ -105,9 +105,14 @@ public sealed class SteamItemDefType : PrimitiveType<int, SteamItemDefType>, ITy
         return TypeConverters.Int32.TryReadJson(in json, out value, ref args);
     }
 
-    bool ITypeParser<int>.TryReadValueFromJson(in JsonElement json, out Optional<int> value, IType<int> valueType)
+    bool ITypeParser<int>.TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<int> value,
+        IType<int> valueType,
+        ref TDataRefReadContext dataRefContext
+    )
     {
-        return TypeParsers.Int32.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.Int32.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     void ITypeParser<int>.WriteValueToJson(Utf8JsonWriter writer, int value, IType<int> valueType, JsonSerializerOptions options)

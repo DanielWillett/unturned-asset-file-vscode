@@ -265,9 +265,14 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
     }
 
     /// <inheritdoc />
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<int> value, IType<int> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<int> value,
+        IType<int> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.Int32.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.Int32.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     /// <inheritdoc />

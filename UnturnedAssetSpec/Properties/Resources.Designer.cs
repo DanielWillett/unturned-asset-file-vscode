@@ -394,6 +394,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; can not be defined with &quot;{1}&quot;..
+        /// </summary>
+        internal static string JsonException_UnexpectedProperty {
+            get {
+                return ResourceManager.GetString("JsonException_UnexpectedProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to download internet resource at &quot;{0}&quot;..
         /// </summary>
         internal static string Log_FailedToDownloadInternetResource {

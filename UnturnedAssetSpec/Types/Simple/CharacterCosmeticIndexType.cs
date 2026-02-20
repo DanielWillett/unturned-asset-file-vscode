@@ -8,6 +8,7 @@ using System;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -113,9 +114,14 @@ internal class CharacterCosmeticIndexType : BaseType<byte, CharacterCosmeticInde
     }
 
     /// <inheritdoc />
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<byte> value, IType<byte> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<byte> value,
+        IType<byte> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.UInt8.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.UInt8.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     /// <inheritdoc />

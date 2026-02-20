@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -194,6 +195,9 @@ file static class UnixInstallDirUtility
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
+#if NET5_0_OR_GREATER
+    [UnsupportedOSPlatform("windows")]
+#endif
     public static bool TryFindSteamInstallDirectory(out string libraryVcf, Action<string>? log)
     {
         libraryVcf = null!;
@@ -267,6 +271,9 @@ file static class WindowsInstallDirUtility
     static WindowsInstallDirUtility() { }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+#endif
     public static bool TryFindSteamInstallDirectory(out string libraryVcf, Action<string>? log)
     {
         libraryVcf = null!;

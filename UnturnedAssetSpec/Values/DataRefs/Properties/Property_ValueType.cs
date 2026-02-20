@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -63,5 +64,15 @@ public readonly struct ValueTypeProperty : IDataRefProperty, IEquatable<ValueTyp
     ) where TValue : IEquatable<TValue>
     {
         return new DataRefProperty<ValueTypeProperty, TValue>(type, target, default);
+    }
+
+    internal static string GetTypeName(SourceValueType valueType)
+    {
+        return valueType switch
+        {
+            SourceValueType.Dictionary => "Dictionary",
+            SourceValueType.List => "List",
+            _ => "Value"
+        };
     }
 }

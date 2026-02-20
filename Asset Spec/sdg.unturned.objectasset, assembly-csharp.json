@@ -324,7 +324,7 @@
                     "SupportsNewLines": true
                 },
                 "ElementContext": "Localization",
-                "LegacyDefaultElementTypeValue": "#Self.Key"
+                "LegacyDefaultElementTypeValue": "=CAT(Interactability_Text_Line_ #Index)"
             },
             "DefaultValue": [ ],
             "Description": "Total number of lines to display on a note when it's interacted with.",

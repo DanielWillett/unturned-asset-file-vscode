@@ -146,10 +146,24 @@ public static class DatPropertyExtensions
     /// </summary>
     /// <param name="property">The property to evaluate.</param>
     /// <param name="ctx">Workspace context for the operation.</param>
-    /// <param name="keyFilter">The current object context (modern/legacy).</param>
     public static bool IsExcluded(this DatProperty property, in FileEvaluationContext ctx)
     {
         return !ctx.File.TryGetProperty(property, in ctx, out _);
+    }
+
+    /// <summary>
+    /// Gets the kind of value for a property, falling back to <see cref="SourceValueType.Value"/> if the property isn't included.
+    /// </summary>
+    /// <param name="property">The property to evaluate.</param>
+    /// <param name="ctx">Workspace context for the operation.</param>
+    public static SourceValueType GetValueType(this DatProperty property, in FileEvaluationContext ctx)
+    {
+        if (!ctx.File.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode))
+        {
+            return SourceValueType.Value;
+        }
+
+        return propertyNode.ValueKind;
     }
 
     /// <summary>

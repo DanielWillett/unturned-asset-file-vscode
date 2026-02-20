@@ -291,7 +291,13 @@ public static class Conditions
     /// Attempt to read a condition from a JSON object and return it as a boolean value.
     /// </summary>
     /// <remarks>Some values returned may not be a <see cref="Condition{TComparand}"/> object. For example, a boolean token results in a <see cref="BooleanType"/> value.</remarks>
-    public static bool TryReadConditionFromJson(in JsonElement root, IAssetSpecDatabase database, IDatSpecificationObject owner, [NotNullWhen(true)] out IValue<bool>? condition)
+    public static bool TryReadConditionFromJson<TDataRefReadContext>(
+        in JsonElement root,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        [NotNullWhen(true)] out IValue<bool>? condition,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         switch (root.ValueKind)
         {
@@ -310,7 +316,7 @@ public static class Conditions
 
         BoxConditionVisitor visitor;
         visitor.Condition = null;
-        if (!TryReadConditionFromJson(in root, database, owner, ref visitor))
+        if (!TryReadConditionFromJson(in root, database, owner, ref visitor, ref dataRefContext))
         {
             condition = null;
             return false;
@@ -332,8 +338,14 @@ public static class Conditions
     /// <summary>
     /// Attempt to read a condition from a JSON object and report it to a <see cref="IConditionVisitor"/>.
     /// </summary>
-    public static unsafe bool TryReadConditionFromJson<TVisitor>(in JsonElement root, IAssetSpecDatabase database, IDatSpecificationObject owner, ref TVisitor visitor)
-        where TVisitor : IConditionVisitor
+    public static unsafe bool TryReadConditionFromJson<TVisitor, TDataRefReadContext>(
+        in JsonElement root,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        ref TVisitor visitor,
+        ref TDataRefReadContext dataRefContext
+    ) where TVisitor : IConditionVisitor
+      where TDataRefReadContext : IDataRefReadContext?
     {
         switch (root.ValueKind)
         {
@@ -377,7 +389,7 @@ public static class Conditions
         {
             valueVisitor.Visitor = visitorPtr;
             valueVisitor.Element = elementPtr;
-            variable = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeProperty | ValueReadOptions.Default, ref valueVisitor, valueType: null, database, owner);
+            variable = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeProperty | ValueReadOptions.Default, ref valueVisitor, valueType: null, database, owner, ref dataRefContext);
             if (variable == null)
                 return false;
             
@@ -399,7 +411,7 @@ public static class Conditions
         fixed (TVisitor* visitorPtr = &visitor)
         {
             v.Visitor = visitorPtr;
-            IValue? comparand = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeValue, ref v, null, database, owner);
+            IValue? comparand = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeValue, ref v, null, database, owner, ref dataRefContext);
             if (comparand == null)
                 return false;
 
@@ -458,14 +470,32 @@ public static class Conditions
         }
     }
 
+    /// <inheritdoc cref="TryReadComplexOrBasicConditionFromJson{TDataRefReadContext}"/>
+    public static bool TryReadComplexOrBasicConditionFromJson(
+        in JsonElement root,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        [NotNullWhen(true)] out IValue<bool>? condition
+    )
+    {
+        DataRefs.NilDataRefContext c;
+        return TryReadComplexOrBasicConditionFromJson(in root, database, owner, out condition, ref c);
+    }
+
     /// <summary>
     /// Attempts to read either a <see cref="Condition{TComparand}"/> or a <see cref="ComplexConditionalValue"/> from a JSON object.
     /// </summary>
     /// <returns>Whether or not the value could be read.</returns>
-    public static bool TryReadComplexOrBasicConditionFromJson(in JsonElement root, IAssetSpecDatabase database, IDatSpecificationObject owner, [NotNullWhen(true)] out IValue<bool>? condition)
+    public static bool TryReadComplexOrBasicConditionFromJson<TDataRefReadContext>(
+        in JsonElement root,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        [NotNullWhen(true)] out IValue<bool>? condition,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         condition = null;
-        if (TryReadConditionFromJson(in root, database, owner, out IValue<bool>? cond))
+        if (TryReadConditionFromJson(in root, database, owner, out IValue<bool>? cond, ref dataRefContext))
         {
             condition = cond;
             return true;
@@ -478,7 +508,7 @@ public static class Conditions
 
         if (root.TryGetProperty("Case"u8, out JsonElement element))
         {
-            if (!TryReadComplexOrBasicConditionFromJson(in element, database, owner, out cond))
+            if (!TryReadComplexOrBasicConditionFromJson(in element, database, owner, out cond, ref dataRefContext))
                 return false;
 
             condition = new ComplexConditionalValue(ImmutableArray.Create(cond), JointConditionOperation.Or);
@@ -498,7 +528,7 @@ public static class Conditions
         for (int i = 0; i < cases; ++i)
         {
             JsonElement item = element[i];
-            if (!TryReadComplexOrBasicConditionFromJson(in item, database, owner, out cond))
+            if (!TryReadComplexOrBasicConditionFromJson(in item, database, owner, out cond, ref dataRefContext))
                 return false;
 
             bldr.Add(cond);

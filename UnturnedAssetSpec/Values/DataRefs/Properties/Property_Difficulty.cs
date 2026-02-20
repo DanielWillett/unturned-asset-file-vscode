@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -61,5 +62,69 @@ public readonly struct DifficultyProperty : IDataRefProperty, IEquatable<Difficu
     ) where TValue : IEquatable<TValue>
     {
         return new DataRefProperty<DifficultyProperty, TValue>(type, target, default);
+    }
+
+
+    /// <summary>
+    /// Attempt to get a contextual difficulty from an opened file.
+    /// </summary>
+    public static bool TryGetFileDifficultyContext(in FileEvaluationContext ctx, out ServerDifficulty difficulty)
+    {
+        ISourceFile sourceFile = ctx.File;
+
+        if (sourceFile.TryGetAdditionalProperty(Comment.DifficultyAdditionalProperty, out string? diffStr) && !string.IsNullOrEmpty(diffStr))
+        {
+            switch (diffStr[0])
+            {
+                case 'e':
+                case 'E':
+                    if (diffStr.Length == 4 && diffStr.Equals("easy", StringComparison.OrdinalIgnoreCase))
+                    {
+                        difficulty = ServerDifficulty.Easy;
+                        return true;
+                    }
+
+                    break;
+
+                case 'n':
+                case 'N':
+                    if (diffStr.Length == 6 && diffStr.Equals("normal", StringComparison.OrdinalIgnoreCase))
+                    {
+                        difficulty = ServerDifficulty.Normal;
+                        return true;
+                    }
+
+                    break;
+
+                case 'h':
+                case 'H':
+                    if (diffStr.Length == 4 && diffStr.Equals("hard", StringComparison.OrdinalIgnoreCase))
+                    {
+                        difficulty = ServerDifficulty.Hard;
+                        return true;
+                    }
+
+                    break;
+            }
+        }
+
+        if (ctx.Services != null)
+        {
+            return ctx.Services.Workspace.TryGetFileDifficulty(sourceFile.WorkspaceFile.File, out difficulty);
+        }
+
+        difficulty = 0;
+        return false;
+    }
+
+    internal static string GetDifficultyName(ServerDifficulty difficulty)
+    {
+        return difficulty switch
+        {
+            ServerDifficulty.Easy => "EASY",
+            ServerDifficulty.Normal => "NORMAL",
+            ServerDifficulty.Hard => "HARD",
+            _ => "ANY"
+        };
     }
 }

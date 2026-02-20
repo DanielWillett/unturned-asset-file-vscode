@@ -207,9 +207,14 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
 
     #region JSON
 
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<Guid> value, IType<Guid> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<Guid> value,
+        IType<Guid> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.Guid.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.Guid.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     public void WriteValueToJson(Utf8JsonWriter writer, Guid value, IType<Guid> valueType, JsonSerializerOptions options)

@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -45,9 +46,14 @@ public sealed class ZombieTableIdType : PrimitiveType<byte, ZombieTableIdType>, 
     }
 
     /// <inheritdoc />
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<byte> value, IType<byte> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<byte> value,
+        IType<byte> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
-        return TypeParsers.UInt8.TryReadValueFromJson(in json, out value, valueType);
+        return TypeParsers.UInt8.TryReadValueFromJson(in json, out value, valueType, ref dataRefContext);
     }
 
     /// <inheritdoc />

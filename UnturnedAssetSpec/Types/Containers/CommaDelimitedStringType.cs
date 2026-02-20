@@ -6,6 +6,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -261,7 +262,12 @@ public class CommaDelimitedStringType<TElementType>
         writer.WriteEndObject();
     }
 
-    public bool TryReadValueFromJson(in JsonElement json, out Optional<EquatableArray<TElementType>> value, IType<EquatableArray<TElementType>> valueType)
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<EquatableArray<TElementType>> value,
+        IType<EquatableArray<TElementType>> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
     {
         value = Optional<EquatableArray<TElementType>>.Null;
         switch (json.ValueKind)
@@ -277,7 +283,7 @@ public class CommaDelimitedStringType<TElementType>
                 for (int i = 0; i < len; ++i)
                 {
                     JsonElement element = json[i];
-                    if (!_subType.Parser.TryReadValueFromJson(in element, out o, _subType) || !o.HasValue)
+                    if (!_subType.Parser.TryReadValueFromJson(in element, out o, _subType, ref dataRefContext) || !o.HasValue)
                     {
                         return false;
                     }
@@ -289,7 +295,7 @@ public class CommaDelimitedStringType<TElementType>
                 return true;
 
             default:
-                if (!_subType.Parser.TryReadValueFromJson(in json, out o, _subType) || !o.HasValue)
+                if (!_subType.Parser.TryReadValueFromJson(in json, out o, _subType, ref dataRefContext) || !o.HasValue)
                 {
                     return false;
                 }

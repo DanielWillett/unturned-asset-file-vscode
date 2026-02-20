@@ -57,7 +57,9 @@ Represented by the class: [IncludedProperty](/api/DanielWillett.UnturnedDataFile
 ### Key
 Returns the exact key used to specify this property, including aliases, casing, etc. This doens't include quotes.
 
-When used on `This` it targets the current property.
+When used with `This` as a target, refers to the current object's key.
+
+`#This.Key` can be used as a key to specify an empty key name, which is used for properties in legacy objects which are the same as the base property. For example, the localization property for dialogue responses use this because the key is just `Response_#`, as opposed to a property that may be `Response_#_Dialogue`.
 
 Represented by the class: [KeyProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.KeyProperty.yml).
 
@@ -66,7 +68,7 @@ Represented by the class: [KeyProperty](/api/DanielWillett.UnturnedDataFileLspSe
 ### AssetName
 Returns the internal name of the currently opened asset (`Asset.name`), which is usually the file name without it's extension. Returns `null` if the current file isn't an asset file or hasn't been completed enough to be recognizable as one.
 
-Not affected by the target, use `This` for consistancy.
+Only valid with `This` as a target, which targets the current file.
 
 Represented by the class: [AssetNameProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.AssetNameProperty.yml).
 

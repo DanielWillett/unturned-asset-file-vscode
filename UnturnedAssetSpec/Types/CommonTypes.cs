@@ -298,13 +298,19 @@ public static class CommonTypes
     /// Attempts to read a value of the given <paramref name="type"/> from a JSON <paramref name="element"/>.
     /// </summary>
     /// <returns>Whether or not the value was successfully parsed.</returns>
-    public static bool TryReadFromJson<TValue>(this IType<TValue> type, in JsonElement element, IAssetSpecDatabase database, IDatSpecificationObject owner, [NotNullWhen(true)] out IValue<TValue>? value)
-        where TValue : IEquatable<TValue>
-
+    public static bool TryReadFromJson<TValue, TDataRefReadContext>(
+        this IType<TValue> type,
+        in JsonElement element,
+        IAssetSpecDatabase database,
+        IDatSpecificationObject owner,
+        [NotNullWhen(true)] out IValue<TValue>? value,
+        ref TDataRefReadContext dataRefContext
+    ) where TValue : IEquatable<TValue>
+      where TDataRefReadContext : IDataRefReadContext?
     {
         if (element.ValueKind == JsonValueKind.Object)
         {
-            if (typeof(TValue) == typeof(bool) && Conditions.TryReadComplexOrBasicConditionFromJson(in element, database, owner, out IValue<bool>? condition))
+            if (typeof(TValue) == typeof(bool) && Conditions.TryReadComplexOrBasicConditionFromJson(in element, database, owner, out IValue<bool>? condition, ref dataRefContext))
             {
                 value = Unsafe.As<IValue<bool>, IValue<TValue>>(ref condition);
                 return true;

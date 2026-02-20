@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
@@ -194,17 +195,24 @@ partial class SpecificationFileReader
         // StringParseableType
         if (root.TryGetProperty("StringParseableType"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
-            QualifiedType type = new QualifiedType(element.GetString(), true);
+            QualifiedType type = new QualifiedType(element.GetString()!, true);
 
             if (parsedType is DatEnumType enumType)
                 enumType.StringParseableType = type;
             else if (parsedType is DatCustomType customType)
                 customType.StringParseableType = type;
+
+            if (root.TryGetProperty("StringDefaultValue"u8, out element))
+            {
+                throw new JsonException(string.Format(Resources.JsonException_UnexpectedProperty, "StringDefaultValue", "StringParseableType"));
+            }
         }
         // StringDefaultValue
         else if (parsedType is DatCustomType ct && root.TryGetProperty("StringDefaultValue"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
-            IValue<DatObjectValue>? value = Value.TryReadValueFromJson(in root, ValueReadOptions.AllowConditionals, ct, Database, ct);
+            StringDefaultValueDataRefContext c;
+            c.Target = null;
+            IValue<DatObjectValue>? value = Value.TryReadValueFromJson(in root, ValueReadOptions.AllowConditionals, ct, Database, ct, ref c);
             if (value == null)
             {
                 throw new JsonException(
@@ -284,5 +292,36 @@ partial class SpecificationFileReader
             parsedValue.Version = Version.Parse(element.GetString()!);
 
         return parsedValue;
+    }
+
+
+    private struct StringDefaultValueDataRefContext : IDataRefReadContext, ITypeVisitor
+    {
+        public IDataRefTarget? Target;
+
+        public bool TryReadTarget(ReadOnlySpan<char> root, IType? type, DatProperty owner, [NotNullWhen(true)] out IDataRefTarget? target)
+        {
+            ReadOnlySpan<char> value = "Value";
+            if (!root.Equals(value, StringComparison.OrdinalIgnoreCase))
+            {
+                target = null;
+                return false;
+            }
+
+            type?.Visit(ref this);
+            if (Target != null)
+            {
+                target = Target;
+                return true;
+            }
+
+            target = new ValueDataRef<string>(StringType.Instance);
+            return true;
+        }
+
+        public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
+        {
+            Target = new ValueDataRef<TValue>(type);
+        }
     }
 }

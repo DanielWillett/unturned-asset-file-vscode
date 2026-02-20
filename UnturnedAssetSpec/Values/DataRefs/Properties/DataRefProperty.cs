@@ -84,24 +84,34 @@ public class DataRefProperty<TProperty> : IDataRef, IEquatable<DataRefProperty<T
             if (_propertiesString == null)
             {
                 OneOrMore<KeyValuePair<string, object>> properties = configurable.Options;
-                using MemoryStream ms = new MemoryStream();
-                using Utf8JsonWriter writer = new Utf8JsonWriter(ms, new JsonWriterOptions
+                if (properties.Length <= 0)
                 {
-                    Indented = false,
-                    SkipValidation = true,
-                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                });
-
-                for (int i = 0; i < properties.Length; i++)
-                {
-                    KeyValuePair<string, object> property = properties[i];
-                    writer.WritePropertyName(property.Key);
-                    JsonHelper.WriteGenericValue(writer, property.Value);
+                    _propertiesString = string.Empty;
                 }
+                else
+                {
+                    using MemoryStream ms = new MemoryStream();
+                    using Utf8JsonWriter writer = new Utf8JsonWriter(ms, new JsonWriterOptions
+                    {
+                        Indented = false,
+                        SkipValidation = true,
+                        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                    });
 
-                writer.Flush();
+                    writer.WriteStartObject();
+                    for (int i = 0; i < properties.Length; i++)
+                    {
+                        KeyValuePair<string, object> property = properties[i];
+                        writer.WritePropertyName(property.Key);
+                        JsonHelper.WriteGenericValue(writer, property.Value);
+                    }
 
-                _propertiesString = StringHelper.Utf8NoBom.GetString(ms.GetBuffer(), 0, checked((int)ms.Length));
+                    writer.WriteEndObject();
+
+                    writer.Flush();
+
+                    _propertiesString = StringHelper.Utf8NoBom.GetString(ms.GetBuffer(), 0, checked((int)ms.Length));
+                }
             }
 
             sb.Append(_propertiesString);
