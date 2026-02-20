@@ -21,6 +21,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer;
 
@@ -112,10 +114,13 @@ internal sealed class UnturnedAssetFileLspServer
                         .AddSingleton<DiagnosticsManager>()
                         .AddSingleton<GlobalCodeFixes>()
                         .AddSingleton<LspInstallationEnvironment>()
+                        .AddSingleton<FileRelationalModelProvider>()
+                        .AddSingleton(new InstallDirUtility("Unturned", "304930"))
                         .AddSingleton<EnvironmentCache>()
                         .AddTransient<ISpecDatabaseCache, EnvironmentCache>(sp => sp.GetRequiredService<EnvironmentCache>())
                         .AddTransient<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
                         .AddTransient<IWorkspaceEnvironment>(sp => sp.GetRequiredService<LspWorkspaceEnvironment>())
+                        .AddTransient<IFileRelationalModelProvider>(sp => sp.GetRequiredService<FileRelationalModelProvider>())
                         .AddSingleton<IParsingServices, ParsingServiceProvider>(sp => new ParsingServiceProvider(sp))
                         .AddSingleton(new JsonSerializerOptions
                         {

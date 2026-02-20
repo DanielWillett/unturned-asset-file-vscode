@@ -1,7 +1,6 @@
 using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -27,6 +26,8 @@ internal class EnvironmentCache : ISpecDatabaseCache
     private const string CacheMetaName = "_cache.json";
 
     public string? LatestCommit => _cacheMetadataInfo.LatestCommit;
+
+    public string RootDirectory => _cacheDir;
 
     public EnvironmentCache(ILogger<EnvironmentCache> logger, JsonSerializerOptions jsonOptions)
     {
@@ -190,8 +191,7 @@ internal class EnvironmentCache : ISpecDatabaseCache
 
         foreach (DatType t in database.AllTypes.Values)
         {
-            string path = Path.Combine(_cacheDir, t.TypeName.Normalized.Type.ToLowerInvariant() + ".json");
-
+            string path = GetFileName(t.TypeName);
 
             if (!hasNewCommit && File.Exists(path))
                 continue;
@@ -200,20 +200,89 @@ internal class EnvironmentCache : ISpecDatabaseCache
         }
     }
 
+    private string GetFileName(QualifiedType type)
+    {
+        return Path.Combine(_cacheDir, type.Normalized.Type.ToLowerInvariant() + ".json");
+    }
+
     public Task<bool> ReadAssetAsync<TState>(QualifiedType type, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default)
     {
-        string path = Path.Combine(_cacheDir, type.Normalized.Type.ToLowerInvariant() + ".json");
+        string path = GetFileName(type);
         return ReadFileAsync(path, state, action, token);
     }
 
     public Task<bool> ReadKnownFileAsync<TState>(KnownConfigurationFile file, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default)
     {
-        if (file != KnownConfigurationFile.Assets)
+        switch (file)
         {
-            return Task.FromResult(false);
+            case KnownConfigurationFile.Assets:
+                return ReadFileAsync(_informationFile, state, action, token);
+
+            default:
+                return Task.FromResult(false);
+        }
+    }
+
+    //private async Task<T?> ReadCacheFileAsync<T>(string file, CancellationToken token = default) where T : class
+    //{
+    //    T? cacheValue = null;
+    //    try
+    //    {
+    //        FileInfo fileInfo = new FileInfo(file);
+    //        if (fileInfo.Length > 524288)
+    //        {
+    //            cacheValue = null;
+    //            _logger.LogWarning("Cache file too long: {0}. Files > 512 KB ignored.", file);
+    //        }
+    //        else
+    //        {
+    //            using FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 8192, FileOptions.SequentialScan);
+    //            cacheValue = await JsonSerializer.DeserializeAsync<T>(fs, _jsonOptions, token);
+    //            if (cacheValue == null)
+    //            {
+    //                _logger.LogWarning("Failed to read cache file {0}, null value.", file);
+    //            }
+    //        }
+    //    }
+    //    catch (JsonException ex)
+    //    {
+    //        _logger.LogWarning(ex, "Failed to read cache file {0}.", file);
+    //    }
+    //    catch (FileNotFoundException) { }
+    //    catch (IOException ex)
+    //    {
+    //        _logger.LogWarning(ex, "Failed to access cache file {0}.", file);
+    //    }
+    //
+    //    return cacheValue;
+    //}
+
+    private async Task<bool> ReadFileAsync<TState>(
+        string file,
+        TState state,
+        Func<Stream, TState, CancellationToken, Task> action,
+        CancellationToken token = default,
+        int maxSize = 524288  /* 512 KiB */
+    )
+    {
+        FileInfo fileInfo = new FileInfo(file);
+        if (fileInfo.Length > maxSize)
+        {
+            _logger.LogWarning("Cache file too long: {0}. Files > {1} B ignored.", file, maxSize);
+            return false;
         }
 
-        return ReadFileAsync(_informationFile, state, action, token);
+        using FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 8192, FileOptions.SequentialScan);
+        try
+        {
+            await action(fs, state, token).ConfigureAwait(false);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to read cache file {0}.", file);
+            return false;
+        }
     }
 
     private async Task WriteCacheFileAsync<T>(string file, T value, JsonSerializerOptions options, CancellationToken token = default)
@@ -235,61 +304,23 @@ internal class EnvironmentCache : ISpecDatabaseCache
         }
     }
 
-    private async Task<T?> ReadCacheFileAsync<T>(string file, CancellationToken token = default) where T : class
-    {
-        T? cacheValue = null;
-        try
-        {
-            FileInfo fileInfo = new FileInfo(file);
-            if (fileInfo.Length > 524288)
-            {
-                cacheValue = null;
-                _logger.LogWarning("Cache file too long: {0}. Files > 512 KB ignored.", file);
-            }
-            else
-            {
-                using FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 8192, FileOptions.SequentialScan);
-                cacheValue = await JsonSerializer.DeserializeAsync<T>(fs, _jsonOptions, token);
-                if (cacheValue == null)
-                {
-                    _logger.LogWarning("Failed to read cache file {0}, null value.", file);
-                }
-            }
-        }
-        catch (JsonException ex)
-        {
-            _logger.LogWarning(ex, "Failed to read cache file {0}.", file);
-        }
-        catch (FileNotFoundException) { }
-        catch (IOException ex)
-        {
-            _logger.LogWarning(ex, "Failed to access cache file {0}.", file);
-        }
-
-        return cacheValue;
-    }
-
-    private async Task<bool> ReadFileAsync<TState>(string file, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default)
-    {
-        FileInfo fileInfo = new FileInfo(file);
-        if (fileInfo.Length > 524288)
-        {
-            _logger.LogWarning("Cache file too long: {0}. Files > 512 KB ignored.", file);
-            return false;
-        }
-
-        using FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 8192, FileOptions.SequentialScan);
-        try
-        {
-            await action(fs, state, token).ConfigureAwait(false);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to read cache file {0}, null value.", file);
-            return false;
-        }
-    }
+    //private async Task WriteFileAsync<TState>(
+    //    string file,
+    //    TState state,
+    //    Func<Stream, TState, CancellationToken, Task> action,
+    //    CancellationToken token = default
+    //)
+    //{
+    //    using FileStream fs = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.Read, 8192, FileOptions.SequentialScan);
+    //    try
+    //    {
+    //        await action(fs, state, token).ConfigureAwait(false);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogWarning(ex, "Failed to write cache file {0}.", file);
+    //    }
+    //}
 
     public class CacheMetadata
     {

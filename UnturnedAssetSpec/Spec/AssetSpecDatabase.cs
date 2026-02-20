@@ -183,7 +183,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         }
     }
 
-    public static AssetSpecDatabase FromOffline(bool useInstallDir = false, ILoggerFactory? loggerFactory = null, JsonSerializerOptions? defaultJsonOptions = null)
+    public static AssetSpecDatabase FromOffline(bool useInstallDir = false, ILoggerFactory? loggerFactory = null, JsonSerializerOptions? defaultJsonOptions = null, ISpecDatabaseCache? cache = null)
     {
         loggerFactory ??= NullLoggerFactory.Instance;
         return new AssetSpecDatabase(
@@ -195,7 +195,8 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                 new InstallDirUtility(
                     useInstallDir ? "Unturned" : "\0",
                     useInstallDir ? "304930" : "\0"
-                )
+                ),
+                cache: cache
             ),
             loggerFactory
         )
@@ -205,7 +206,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     }
     
 
-    public static AssetSpecDatabase FromOnline(bool useInstallDir = true, ILoggerFactory? loggerFactory = null, JsonSerializerOptions? defaultJsonOptions = null)
+    public static AssetSpecDatabase FromOnline(bool useInstallDir = true, ILoggerFactory? loggerFactory = null, JsonSerializerOptions? defaultJsonOptions = null, ISpecDatabaseCache? cache = null)
     {
         loggerFactory ??= NullLoggerFactory.Instance;
         return new AssetSpecDatabase(
@@ -217,7 +218,8 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                 new InstallDirUtility(
                     useInstallDir ? "Unturned" : "\0",
                     useInstallDir ? "304930" : "\0"
-                )
+                ),
+                cache: cache
             ),
             loggerFactory
         )

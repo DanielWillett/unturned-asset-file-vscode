@@ -78,8 +78,8 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
         _fileProviderFactory = fileProviderFactory ?? (static reader =>
         [
             new UnturnedInstallationFileProvider(reader.InstallDirUtility, reader._loggerFactory.CreateLogger<UnturnedInstallationFileProvider>()),
-            new CacheSpecificationFileProvider(reader.Cache, reader.LatestCommitHash),
-            new GitHubSpecificationFileProvider(reader._loggerFactory.CreateLogger<GitHubSpecificationFileProvider>(), reader._httpClientFactory, reader.AllowInternet, () => reader._readInformation),
+            //new CacheSpecificationFileProvider(reader.Cache, reader.LatestCommitHash),
+            new GitHubSpecificationFileProvider(reader._loggerFactory.CreateLogger<GitHubSpecificationFileProvider>(), reader._httpClientFactory, reader.AllowInternet, reader.Cache, () => reader._readInformation),
             new EmbeddedResourceSpecificationFileProvider(reader._loggerFactory.CreateLogger<EmbeddedResourceSpecificationFileProvider>())
         ]);
     }
@@ -119,7 +119,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
         IsCacheUpToDate = false;
         if (AllowInternet && Cache != null)
         {
-            LatestCommitHash = await GetLatestCommitAsync(client, token).ConfigureAwait(false);
+            //LatestCommitHash = await GetLatestCommitAsync(client, token).ConfigureAwait(false);
             if (LatestCommitHash != null)
             {
                 IsCacheUpToDate = Cache.IsUpToDateCache(LatestCommitHash);
@@ -545,11 +545,11 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
         {
             using (HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, getLatestCommitUrl))
             {
-                msg.Version = HttpVersionUtility.LatestVersion;
+                msg.Version = HttpHelper.LatestVersion;
 
                 msg.Headers.Add("Accept", "application/vnd.github+json");
                 msg.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
-                msg.Headers.Add("User-Agent", $"unturned-asset-file-vscode/{Assembly.GetExecutingAssembly().GetName().Version!.ToString(3)}");
+                HttpHelper.AddUserAgentHeader(msg);
 
                 using (HttpResponseMessage response = await httpClient.SendAsync(msg, HttpCompletionOption.ResponseContentRead, token))
                 {

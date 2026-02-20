@@ -7,9 +7,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 public interface ISpecDatabaseCache
 {
+    string? RootDirectory { get; }
+
     bool IsUpToDateCache(string latestCommit);
     Task CacheNewFilesAsync(IAssetSpecDatabase database, CancellationToken token = default);
 
     Task<bool> ReadAssetAsync<TState>(QualifiedType type, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default);
     Task<bool> ReadKnownFileAsync<TState>(KnownConfigurationFile file, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default);
+
 }

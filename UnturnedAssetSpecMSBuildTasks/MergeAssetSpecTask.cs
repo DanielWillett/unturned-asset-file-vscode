@@ -69,8 +69,6 @@ public class MergeAssetSpecTask : Task
 
         string outputFilePath = Path.GetFullPath(OutputFile);
 
-        maxFileNameSize -= folder.Length + 1;
-
         int headerSize = 17 + 18 * allFiles.Count + totalFileNameSize;
 
         // hdr:        [version:4B][maxFileNameSize:4B][fileCt:4B][hdrSize:4B][\n]

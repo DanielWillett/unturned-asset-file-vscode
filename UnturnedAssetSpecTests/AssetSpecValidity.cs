@@ -1,57 +1,36 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using Microsoft.Extensions.Logging;
+#if TEST_LSP
+using DanielWillett.UnturnedDataFileLspServer.Files;
+using System.Text.Json;
+#endif
 
 namespace UnturnedAssetSpecTests;
 
 public class AssetSpecValidity
 {
-    private static bool _hasRanIntoError;
-
-    [Test, NonParallelizable]
+    [Test]
     public async Task CheckSpecValidity()
     {
-        _hasRanIntoError = false;
+        ILoggerFactory loggerFactory = LoggerFactory.Create(l => l.AddConsole());
+#if TEST_LSP
+        EnvironmentCache cache = new EnvironmentCache(loggerFactory.CreateLogger<EnvironmentCache>(), JsonSerializerOptions.Default);
+#else
+        ISpecDatabaseCache? cache = null;
+#endif
+        AssetSpecDatabase db = AssetSpecDatabase.FromOnline(
+            false,
+            loggerFactory,
+            cache: cache
+        );
 
-        InstallDirUtility util = new InstallDirUtility("NotUnturned", "999999");
+        await db.InitializeAsync();
 
-        util.TryGetInstallDirectory(out _);
-
-        Console.WriteLine();
-        Console.WriteLine();
-        Console.WriteLine();
-
-        //TestAssetSpecDatabase db = new TestAssetSpecDatabase(util)
-        //{
-        //    UseInternet = false
-        //};
-
-        // todo await db.InitializeAsync();
-
-        //Console.WriteLine(db.FileTypes.Values.SelectMany(x => x.Properties.Where(x => !x.IsOverride)).Count());
-        //Console.WriteLine(db.FileTypes.Values.SelectMany(x => x.Types.SelectMany(x => x.GetProperties(SpecPropertyContext.Property).Where(x => !x.IsOverride))).Count());
-
-        Assert.That(_hasRanIntoError, Is.False);
-
-        _hasRanIntoError = false;
+        Assert.That(db.AllTypes,                Is.Not.Empty);
+        Assert.That(db.FileTypes,               Is.Not.Empty);
+        Assert.That(db.LocalizationFileTypes,   Is.Not.Empty);
+        Assert.That(db.BlueprintSkills,         Is.Not.Empty);
+        Assert.That(db.NPCAchievementIds,       Is.Not.Empty);
+        Assert.That(db.ValidActionButtons,      Is.Not.Empty);
     }
-
-    //private class TestAssetSpecDatabase : AssetSpecDatabase
-    //{
-    //    public TestAssetSpecDatabase(InstallDirUtility installDir) : base(installDir)
-    //    {
-    //
-    //    }
-    //
-    //    protected override void Log(string msg)
-    //    {
-    //        if (!(msg.Contains("internet disabled") || msg.StartsWith("InstallDirUtility >>")))
-    //        {
-    //            _hasRanIntoError = true;
-    //        }
-    //
-    //        Console.WriteLine(msg);
-    //    }
-    //}
 }

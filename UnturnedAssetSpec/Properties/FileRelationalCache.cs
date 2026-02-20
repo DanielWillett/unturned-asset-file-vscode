@@ -17,7 +17,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 /// <summary>
 /// Handles keeping track of objects and property definitions.
 /// </summary>
-internal class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
+public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
 {
     private readonly StringDictionary<Entry> _entries;
     private readonly IParsingServices _services;
