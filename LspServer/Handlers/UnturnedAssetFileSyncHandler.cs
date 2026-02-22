@@ -1,3 +1,4 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using DanielWillett.UnturnedDataFileLspServer.Protocol;
 using MediatR;
@@ -10,11 +11,13 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers;
+
 internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
 {
     private readonly OpenedFileTracker _fileTracker;
     private readonly ILanguageServerFacade _langServer;
     private readonly ILogger<UnturnedAssetFileSyncHandler> _logger;
+    private readonly FileRelationalCacheProvider _cacheProvider;
 
     private readonly TextDocumentChangeRegistrationOptions _changeRegistrationOptions;
     private readonly TextDocumentOpenRegistrationOptions _openRegistrationOptions;
@@ -25,13 +28,18 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
     public event Action<OpenedFile>? FileAdded;
     public event Action<OpenedFile>? FileRemoved;
 
-    public UnturnedAssetFileSyncHandler(OpenedFileTracker fileTracker, ILanguageServerFacade langServer, ILogger<UnturnedAssetFileSyncHandler> logger)
+    public UnturnedAssetFileSyncHandler(
+        OpenedFileTracker fileTracker,
+        ILanguageServerFacade langServer,
+        ILogger<UnturnedAssetFileSyncHandler> logger,
+        FileRelationalCacheProvider cacheProvider)
     {
         const TextDocumentSyncKind syncKind = TextDocumentSyncKind.Incremental;
 
         _fileTracker = fileTracker;
         _langServer = langServer;
         _logger = logger;
+        _cacheProvider = cacheProvider;
         _changeRegistrationOptions = new TextDocumentChangeRegistrationOptions
         {
             DocumentSelector = UnturnedAssetFileLspServer.AssetFileSelector,
@@ -193,6 +201,7 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
         if (_fileTracker.Files.Remove(request.TextDocument.Uri, out OpenedFile? file))
         {
             file.Dispose();
+            _cacheProvider.RemoveModel(file.File);
             FileRemoved?.Invoke(file);
         }
         return Unit.Task;

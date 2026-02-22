@@ -82,6 +82,14 @@ public abstract class BaseDataRefTarget : IDataRefTarget
             valueVisitor.Accept(valueType == null ? Optional<string>.Null : new Optional<string>(valueType));
             return true;
         }
+        if (typeof(TProperty) == typeof(CountProperty))
+        {
+            if (!AcceptProperty(in Unsafe.As<TProperty, CountProperty>(ref Unsafe.AsRef(in property)), in ctx, out int count))
+                return false;
+
+            valueVisitor.Accept(new Optional<int>(count));
+            return true;
+        }
 
         return AcceptUnknownProperty(in property, ref valueVisitor, in ctx);
     }
@@ -180,6 +188,16 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     protected virtual bool AcceptProperty(in ValueTypeProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         value = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Invoked when a <see cref="CountProperty"/> is accessed on this target.
+    /// </summary>
+    /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
+    protected virtual bool AcceptProperty(in CountProperty property, in FileEvaluationContext ctx, out int value)
+    {
+        value = 0;
         return false;
     }
 

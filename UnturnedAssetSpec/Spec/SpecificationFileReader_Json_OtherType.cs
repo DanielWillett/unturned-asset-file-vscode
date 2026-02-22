@@ -178,8 +178,41 @@ partial class SpecificationFileReader
             if (root.TryGetProperty("OverridableProperties"u8, out element) && element.ValueKind != JsonValueKind.Null)
                 customType.OverridableProperties = element.GetBoolean();
 
+            if (root.TryGetProperty("Properties"u8, out element) && element.ValueKind != JsonValueKind.Null)
+            {
+                AssertValueKind(in element, fileType, JsonValueKind.Array);
+                int propertyCount = element.GetArrayLength();
 
-            // todo: properties, localization
+                ImmutableArray<DatProperty>.Builder propertyBuilder = ImmutableArray.CreateBuilder<DatProperty>(propertyCount);
+                customType.PropertiesBuilder = propertyBuilder;
+
+                for (int i = 0; i < propertyCount; ++i)
+                {
+                    JsonElement prop = element[i];
+                    ReadPropertyFirstPass(in prop, i, "Properties", t => t.Properties, propertyBuilder, SpecPropertyContext.Property, customType);
+                }
+
+                customType.Properties = propertyBuilder.ToImmutable();
+                customType.PropertiesBuilder = null;
+            }
+
+            if (customType is DatCustomAssetType assetType && root.TryGetProperty("Localization"u8, out element) && element.ValueKind != JsonValueKind.Null)
+            {
+                AssertValueKind(in element, fileType, JsonValueKind.Array);
+                int propertyCount = element.GetArrayLength();
+
+                ImmutableArray<DatProperty>.Builder propertyBuilder = ImmutableArray.CreateBuilder<DatProperty>(propertyCount);
+                assetType.LocalizationPropertiesBuilder = propertyBuilder;
+
+                for (int i = 0; i < propertyCount; ++i)
+                {
+                    JsonElement prop = element[i];
+                    ReadPropertyFirstPass(in prop, i, "Localization", t => t.LocalizationProperties, propertyBuilder, SpecPropertyContext.Localization, assetType);
+                }
+
+                assetType.LocalizationProperties = propertyBuilder.ToImmutable();
+                assetType.LocalizationPropertiesBuilder = null;
+            }
         }
 
 

@@ -138,6 +138,11 @@ public static class TypeParsers
     public static ITypeParser<int> SteamItemDef => SteamItemDefType.Instance;
 
     /// <summary>
+    /// The type parser for <see cref="System.Version"/> values.
+    /// </summary>
+    public static ITypeParser<Version> Version => VersionType.Instance;
+
+    /// <summary>
     /// Gets the type parser for the given type.
     /// </summary>
     /// <typeparam name="T">The type to convert.</typeparam>
@@ -295,6 +300,8 @@ public static class TypeParsers
 
             if (typeof(T) == typeof(string))
                 Parser = (ITypeParser<T>)String;
+            else if (typeof(T) == typeof(Version))
+                Parser = (ITypeParser<T>)Version;
             else goto err;
             return;
 

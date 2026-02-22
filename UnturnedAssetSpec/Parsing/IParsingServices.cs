@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using Microsoft.Extensions.Logging;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
@@ -16,6 +17,8 @@ public interface IParsingServices : IServiceProvider
     ILoggerFactory LoggerFactory { get; }
 
     IWorkspaceEnvironment Workspace { get; }
+    
+    IFileRelationalModelProvider RelationalModelProvider { get; }
     
     InstallDirUtility GameDirectory { get; }
 

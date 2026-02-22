@@ -1330,6 +1330,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Version Number.
+        /// </summary>
+        internal static string Type_Name_Version {
+            get {
+                return ResourceManager.GetString("Type_Name_Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Zombie Cooldown ID.
         /// </summary>
         internal static string Type_Name_ZombieCooldownId {

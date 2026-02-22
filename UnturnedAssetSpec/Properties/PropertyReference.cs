@@ -1,14 +1,14 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
-using Microsoft.Extensions.Logging;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -122,6 +122,24 @@ public struct PropertyReference : IEquatable<PropertyReference>
         {
             return new LocalPropertyReference<TValue>(in this, owner, database, type);
         }
+    }
+
+    /// <summary>
+    /// Checks if this reference could possibly reference the given <paramref name="property"/>, assuming they have the same context.
+    /// </summary>
+    public readonly bool IsReferenceTo(DatProperty property)
+    {
+        if (Context != SpecPropertyContext.Unspecified && property.Context != Context || !Breadcrumbs.IsRoot)
+        {
+            return false;
+        }
+
+        if (TypeName != null && !QualifiedType.TypesEqual(TypeName, property.Owner.TypeName, true))
+        {
+            return false;
+        }
+
+        return string.Equals(property.Key, PropertyName, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

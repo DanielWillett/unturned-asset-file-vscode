@@ -2220,7 +2220,7 @@
                     "Description": "Wheel does not affect steering."
                 },
                 {
-                    "Value": "BothDirections",
+                    "Value": "SteeringAngle",
                     "Description": "Set WheelCollider steering angle according to @(SDG.Unturned.VehicleAsset, Assembly-CSharp::Steer_Min) and @(SDG.Unturned.VehicleAsset, Assembly-CSharp::Steer_Max)."
                 },
                 {

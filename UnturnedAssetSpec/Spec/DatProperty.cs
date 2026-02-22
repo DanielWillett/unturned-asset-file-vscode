@@ -85,7 +85,7 @@ public class DatProperty : IDatSpecificationObject
     /// <summary>
     /// Description of how this property works in markdown.
     /// </summary>
-    /// <remarks>Corresponds to the <c>MarkdownDescription</c> property.</remarks>
+    /// <remarks>Corresponds to the <c>Markdown</c> property.</remarks>
     public IValue<string>? MarkdownDescription { get; internal set; }
 
     /// <summary>
@@ -131,6 +131,34 @@ public class DatProperty : IDatSpecificationObject
     public IValue? AvailableValuesTarget { get; internal set; }
 
     /// <summary>
+    /// Minimum value of this property.
+    /// </summary>
+    /// <remarks>Corresponds to the <c>Minimum</c> or <c>MinimumExclusive</c> properties.</remarks>
+    public IValue? Minimum { get; internal set; }
+
+    /// <summary>
+    /// Maximum value of this property.
+    /// </summary>
+    /// <remarks>Corresponds to the <c>Maximum</c> or <c>MaximumExclusive</c> properties.</remarks>
+    public IValue? Maximum { get; internal set; }
+
+    /// <summary>
+    /// Whether or not <see cref="Minimum"/> is exclusive.
+    /// </summary>
+    public bool MinimumIsExclusive { get; internal set; }
+
+    /// <summary>
+    /// Whether or not <see cref="Maximum"/> is exclusive.
+    /// </summary>
+    public bool MaximumIsExclusive { get; internal set; }
+
+    /// <summary>
+    /// Exceptions to the minimum/maximum range if specified, otherwise a value blacklist.
+    /// </summary>
+    /// <remarks>Corresponds to the <c>Except</c> property.</remarks>
+    public ImmutableArray<IValue> Exceptions { get; internal set; }
+
+    /// <summary>
     /// When <see cref="AvailableValuesTarget"/> is set, indicates that it's an error to not reference a value from that target.
     /// </summary>
     /// <remarks>Corresponds to whether or not the <c>ListReference</c> property ends in an exclamation point.</remarks>
@@ -147,6 +175,25 @@ public class DatProperty : IDatSpecificationObject
     /// </summary>
     /// <remarks>Corresponds to the <c>DefaultValue</c> property.</remarks>
     public IValue? DefaultValue { get; internal set; }
+
+    /// <summary>
+    /// Indicates that the value of **this property** should change this object's type based on this property in the enum.
+    /// The specified type should be a subtype of the current type.
+    /// </summary>
+    /// <remarks>Corresponds to the <c>SubtypeSwitch</c> property.</remarks>
+    public string? SubtypeSwitchPropertyName { get; internal set; }
+
+    /// <summary>
+    /// Properties that can't exist with this property.
+    /// </summary>
+    /// <remarks>Corresponds to the <c>ExclusiveWith</c> property.</remarks>
+    public ImmutableArray<IExclusionCondition> ExclusionConditions { get; internal set; }
+
+    /// <summary>
+    /// Properties that should exist with this property.
+    /// </summary>
+    /// <remarks>Corresponds to the <c>InclusiveWith</c> property.</remarks>
+    public ImmutableArray<IInclusionCondition> InclusionConditions { get; internal set; }
 
     internal IValue? GetIncludedDefaultValue() => IncludedDefaultValue ?? DefaultValue;
     internal IValue? GetIncludedDefaultValue(bool hasProperty) => hasProperty ? IncludedDefaultValue ?? DefaultValue : DefaultValue;

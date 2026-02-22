@@ -364,6 +364,11 @@ public static class Conditions
                 return false;
         }
 
+        if (root.TryGetProperty("$udat-type"u8, out _))
+        {
+            return false;
+        }
+
         if (!root.TryGetProperty("Operation"u8, out JsonElement element)
             || element.ValueKind != JsonValueKind.String
             || !ConditionOperations.TryGetOperation(element.GetString(), out IConditionOperation? operation))
@@ -390,9 +395,40 @@ public static class Conditions
             valueVisitor.Visitor = visitorPtr;
             valueVisitor.Element = elementPtr;
             variable = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeProperty | ValueReadOptions.Default, ref valueVisitor, valueType: null, database, owner, ref dataRefContext);
+            if (variable == null && element.ValueKind == JsonValueKind.String && element.GetString() is [ '=', .. ])
+            {
+                // guess value type from comparand for expressions, since they require a target type
+                if (!root.TryGetProperty("Comparand"u8, out element))
+                {
+                    return false;
+                }
+
+                IType? type = element.ValueKind switch
+                {
+                    JsonValueKind.Null => StringType.Instance,
+                    JsonValueKind.True or JsonValueKind.False => BooleanType.Instance,
+                    JsonValueKind.Number => element.TryGetInt32(out _)
+                        ? Int32Type.Instance
+                        : element.TryGetInt64(out _)
+                            ? Int64Type.Instance
+                            : element.TryGetDouble(out _)
+                                ? Float64Type.Instance
+                                : Float128Type.Instance,
+                    JsonValueKind.String => StringType.Instance,
+                    _ => null
+                };
+
+                if (type != null)
+                {
+                    variable = Value.TryReadValueFromJson(element, ValueReadOptions.AssumeProperty | ValueReadOptions.Default, ref valueVisitor, valueType: type, database, owner, ref dataRefContext);
+                }
+            }
+
             if (variable == null)
+            {
                 return false;
-            
+            }
+
             if (valueVisitor.DidFullyParseCondition)
                 return true;
         }
@@ -502,6 +538,11 @@ public static class Conditions
         }
 
         if (root.ValueKind != JsonValueKind.Object)
+        {
+            return false;
+        }
+
+        if (root.TryGetProperty("$udat-type"u8, out _))
         {
             return false;
         }

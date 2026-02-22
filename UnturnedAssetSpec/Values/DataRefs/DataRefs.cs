@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Reflection;
 using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
@@ -65,6 +64,7 @@ public static class DataRefs
         properties["Indices"]    = new DataRefPropertyFactory<IndicesProperty>();
         properties["IsLegacy"]   = new DataRefPropertyFactory<IsLegacyProperty>();
         properties["ValueType"]  = new DataRefPropertyFactory<ValueTypeProperty>();
+        properties["Count"]      = new DataRefPropertyFactory<CountProperty>();
 
         Properties = properties.ToImmutable();
     }
@@ -242,7 +242,7 @@ public static class DataRefs
         }
     }
 
-    private static bool TryParseDataRef(
+    internal static bool TryParseDataRef(
         ReadOnlySpan<char> text,
         out ReadOnlySpan<char> root,
         out bool isRootEscaped,

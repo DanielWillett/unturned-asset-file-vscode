@@ -80,6 +80,14 @@ public class EvaluationTests
     [TestCase("=MIN(3.1 4.2)", 3.1d)]
     [TestCase("=MAX(-3.1 3.5)", 3.5d)]
     [TestCase("=POW(3 3)", 27d)]
+    [TestCase("=CMP(3 1)", 1)]
+    [TestCase("=CMP(1 3)", -1)]
+    [TestCase("=CMP(1 1)", 0)]
+    [TestCase("=CMP(7ed29f91-01ae-4523-a3b2-e389414b7bd9 7ed29f91-01ae-4523-a3b2-e389414b7bd9)", 0)]
+    [TestCase("=CMP(8ed29f91-01ae-4523-a3b2-e389414b7bd9 7ed29f91-01ae-4523-a3b2-e389414b7bd9)", 1)]
+    [TestCase("=CMP(6ed29f91-01ae-4523-a3b2-e389414b7bd9 7ed29f91-01ae-4523-a3b2-e389414b7bd9)", -1)]
+    [TestCase("=CMP(HELLO hello)", -1)]
+    [TestCase("=CMP_IC(HELLO hello)", 0)]
 
     // 3 args
     [TestCase("=CAT((a b) ( c) d)", "a b cd")]

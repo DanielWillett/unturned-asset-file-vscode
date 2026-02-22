@@ -1,8 +1,10 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
@@ -11,6 +13,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 /// </summary>
 public class ParsingServiceProvider : IParsingServices, IDisposable
 {
+    private IFileRelationalModelProvider? _relationalModelProvider;
+
     /// <summary>
     /// The service provider given in <see cref="ParsingServiceProvider(IServiceProvider)"/>, or <see langword="null"/> if one was not provided.
     /// </summary>
@@ -24,6 +28,30 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
 
     /// <inheritdoc />
     public IWorkspaceEnvironment Workspace { get; }
+
+    /// <inheritdoc />
+    /// <exception cref="InvalidOperationException">Service not found.</exception>
+    public IFileRelationalModelProvider RelationalModelProvider
+    {
+        get
+        {
+            if (_relationalModelProvider != null)
+                return _relationalModelProvider;
+            
+            lock (ServiceProvider!)
+            {
+                if (_relationalModelProvider != null)
+                    return _relationalModelProvider;
+
+                IFileRelationalModelProvider provider = (IFileRelationalModelProvider?)ServiceProvider!.GetService(typeof(IFileRelationalModelProvider))
+                                                            ?? throw new InvalidOperationException($"Service not found: {nameof(IFileRelationalModelProvider)}.");
+                Thread.MemoryBarrier();
+                _relationalModelProvider = provider;
+            }
+
+            return _relationalModelProvider;
+        }
+    }
 
     /// <inheritdoc />
     public InstallDirUtility GameDirectory { get; }
@@ -40,13 +68,15 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
         ILoggerFactory loggerFactory,
         IWorkspaceEnvironment workspace,
         InstallDirUtility installDirUtility,
-        InstallationEnvironment installation)
+        InstallationEnvironment installation,
+        IFileRelationalModelProvider? relationalModelProvider = null)
     {
-        Database      = database          ?? throw new ArgumentNullException(nameof(database));
-        LoggerFactory = loggerFactory     ?? throw new ArgumentNullException(nameof(loggerFactory));
-        Workspace     = workspace         ?? throw new ArgumentNullException(nameof(workspace));
-        GameDirectory = installDirUtility ?? throw new ArgumentNullException(nameof(installDirUtility));
-        Installation  = installation      ?? throw new ArgumentNullException(nameof(installation));
+        Database                 = database                ?? throw new ArgumentNullException(nameof(database));
+        LoggerFactory            = loggerFactory           ?? throw new ArgumentNullException(nameof(loggerFactory));
+        Workspace                = workspace               ?? throw new ArgumentNullException(nameof(workspace));
+        GameDirectory            = installDirUtility       ?? throw new ArgumentNullException(nameof(installDirUtility));
+        Installation             = installation            ?? throw new ArgumentNullException(nameof(installation));
+        _relationalModelProvider = relationalModelProvider ?? new FileRelationalCacheProvider(this);
     }
 
     /// <summary>
@@ -91,7 +121,7 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
     }
 
     /// <summary>
-    /// Fallback if service provider is not provided, usually by calling <see cref="ParsingServiceProvider(IAssetSpecDatabase,ILoggerFactory,IWorkspaceEnvironment,InstallDirUtility,InstallationEnvironment)"/>.
+    /// Fallback if service provider is not provided, usually by calling <see cref="ParsingServiceProvider(IAssetSpecDatabase,ILoggerFactory,IWorkspaceEnvironment,IFileRelationalModelProvider,InstallDirUtility,InstallationEnvironment)"/>.
     /// </summary>
     /// <inheritdoc cref="IServiceProvider.GetService"/>
     protected virtual object? GetServiceByType(Type serviceType)
@@ -104,6 +134,9 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
 
         if (typeof(IWorkspaceEnvironment) == serviceType)
             return Workspace;
+
+        if (typeof(IFileRelationalModelProvider) == serviceType)
+            return RelationalModelProvider;
 
         if (typeof(InstallDirUtility) == serviceType)
             return GameDirectory;
@@ -132,6 +165,7 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
         (Database as IDisposable)?.Dispose();
         LoggerFactory.Dispose();
         (Workspace as IDisposable)?.Dispose();
+        (_relationalModelProvider as IDisposable)?.Dispose();
         (GameDirectory as IDisposable)?.Dispose();
         Installation.Dispose();
     }

@@ -1,4 +1,5 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
@@ -16,6 +17,11 @@ public struct FileEvaluationContext
         Services = services;
         File = sourceFile;
         FileType = AssetFileType.FromFile(sourceFile, services.Database);
+    }
+
+    public readonly IFileRelationalModel GetRelationalModel(SpecPropertyContext context = SpecPropertyContext.Property)
+    {
+        return Services.RelationalModelProvider.GetProvider(File, context);
     }
 
     public readonly bool TryGetRelevantMap([NotNullWhen(true)] out RelevantMapInfo? mapInfo)

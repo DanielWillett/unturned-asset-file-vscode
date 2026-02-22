@@ -432,4 +432,40 @@
   <data name="UNT2005_Property" xml:space="preserve">
     <value>Type can not be determined for property '{0}'.</value>
   </data>
+  <data name="UNT2014_File" xml:space="preserve">
+    <value>Required property '{0}' is not supplied.</value>
+  </data>
+  <data name="UNT2014_Object" xml:space="preserve">
+    <value>Required property '{0}' is not supplied in "{1}".</value>
+  </data>
+  <data name="UNT2004_CanNotDetermineType" xml:space="preserve">
+    <value>Unable to determine the type of property '{0}'. This is likely a bug in the asset specification.</value>
+  </data>
+  <data name="UNT1031_More_Major" xml:space="preserve">
+    <value>Major version {0} is too large. Value should not exceed {1}.</value>
+  </data>
+  <data name="UNT1031_More_Minor" xml:space="preserve">
+    <value>Minor version {0} is too large. Value should not exceed {1}.</value>
+  </data>
+  <data name="UNT1031_More_Build" xml:space="preserve">
+    <value>Build version {0} is too large. Value should not exceed {1}.</value>
+  </data>
+  <data name="UNT1031_More_Revision" xml:space="preserve">
+    <value>Revision version {0} is too large. Value should not exceed {1}.</value>
+  </data>
+  <data name="UNT1031_Less_Major" xml:space="preserve">
+    <value>Major version {0} is too small. Value should not be less than {1}.</value>
+  </data>
+  <data name="UNT1031_Less_Minor" xml:space="preserve">
+    <value>Minor version {0} is too small. Value should not be less than {1}.</value>
+  </data>
+  <data name="UNT1031_Less_Build" xml:space="preserve">
+    <value>Build version {0} is too small. Value should not be less than {1}.</value>
+  </data>
+  <data name="UNT1031_Less_Revision" xml:space="preserve">
+    <value>Revision version {0} is too small. Value should not be less than {1}.</value>
+  </data>
+  <data name="UNT1031_Digits" xml:space="preserve">
+    <value>This version has {0} digits, where it should have exactly {1} digits.</value>
+  </data>
 </root>

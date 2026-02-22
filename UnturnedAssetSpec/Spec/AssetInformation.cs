@@ -2,6 +2,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -15,6 +16,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 public class AssetInformation
 {
     private int? _maxSkillLevelCached;
+
+    internal ImmutableDictionary<string, SkillReference>? SkillCache;
 
 #nullable disable
     public Dictionary<string, QualifiedType> AssetAliases { get; set; }

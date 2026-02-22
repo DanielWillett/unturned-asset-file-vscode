@@ -64,6 +64,12 @@ public interface ITypeConverter<T> where T : IEquatable<T>
     /// <summary>
     /// Reads a value from a <see cref="JsonElement"/>.
     /// </summary>
+    /// <remarks>
+    /// If writing a converter for <see cref="DatCustomType.StringParseableType"/>,
+    /// this should always return <see langword="false"/> unless adding special logic.
+    /// Do NOT call the type's <see cref="ITypeParser{T}.TryReadValueFromJson{TDataRefReadContext}"/> function,
+    /// as this can cause a stack overflow.
+    /// </remarks>
     bool TryReadJson(in JsonElement json, out Optional<T> value, ref TypeConverterParseArgs<T> args);
 }
 

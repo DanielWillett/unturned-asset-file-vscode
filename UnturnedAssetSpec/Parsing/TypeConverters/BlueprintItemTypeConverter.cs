@@ -144,6 +144,7 @@ internal class BlueprintItemTypeConverter : ITypeConverter<DatObjectValue>
 
     public bool TryReadJson(in JsonElement json, out Optional<DatObjectValue> value, ref TypeConverterParseArgs<DatObjectValue> args)
     {
-        return ((ITypeParser<DatObjectValue>)_type).TryReadValueFromJson(in json, out value, _type);
+        value = Optional<DatObjectValue>.Null;
+        return false;
     }
 }

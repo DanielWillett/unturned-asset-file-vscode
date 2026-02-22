@@ -84,7 +84,7 @@ public static class CommonTypes
         knownTypes["MapName"]                           = () => StringType.Instance;    // todo
         knownTypes["ActionKey"]                         = () => ActionKeyType.Instance;
         knownTypes["LocalizableString"]                 = () => LocalizableStringType.Factory;
-        knownTypes["LocalizableTargetString"]           = () => LocalizationKeyType.Factory;
+        knownTypes["LocalizationKey"]                   = () => LocalizationKeyType.Factory;
         knownTypes["SkillLevel"]                        = () => SkillLevelType.Factory;
         knownTypes["Skill"]                             = () => SkillType.Factory;
         knownTypes["BlueprintSkill"]                    = () => SkillType.Factory;
@@ -99,6 +99,7 @@ public static class CommonTypes
         knownTypes["Url"]                               = () => StringType.Instance;    // todo
         knownTypes["Path"]                              = () => StringType.Instance;    // todo
         knownTypes[NullType.TypeId]                     = () => NullType.Instance;
+        knownTypes[VersionType.TypeId]                  = () => VersionType.Instance;
 
         knownTypes[AssetCategory.TypeId]                = () => AssetCategory.Instance;
 
@@ -290,55 +291,6 @@ public static class CommonTypes
             return false;
         }
 
-
-        return true;
-    }
-
-    /// <summary>
-    /// Attempts to read a value of the given <paramref name="type"/> from a JSON <paramref name="element"/>.
-    /// </summary>
-    /// <returns>Whether or not the value was successfully parsed.</returns>
-    public static bool TryReadFromJson<TValue, TDataRefReadContext>(
-        this IType<TValue> type,
-        in JsonElement element,
-        IAssetSpecDatabase database,
-        IDatSpecificationObject owner,
-        [NotNullWhen(true)] out IValue<TValue>? value,
-        ref TDataRefReadContext dataRefContext
-    ) where TValue : IEquatable<TValue>
-      where TDataRefReadContext : IDataRefReadContext?
-    {
-        if (element.ValueKind == JsonValueKind.Object)
-        {
-            if (typeof(TValue) == typeof(bool) && Conditions.TryReadComplexOrBasicConditionFromJson(in element, database, owner, out IValue<bool>? condition, ref dataRefContext))
-            {
-                value = Unsafe.As<IValue<bool>, IValue<TValue>>(ref condition);
-                return true;
-            }
-        }
-
-        if (type.Parser.TryReadValueFromJson(in element, out Optional<TValue> optionalValue, type))
-        {
-            value = type.CreateValue(optionalValue);
-        }
-        else if (TypeConverters.TryGet<TValue>() is { } typeConverter)
-        {
-            TypeConverterParseArgs<TValue> args = default;
-            args.Type = type;
-
-            if (!typeConverter.TryReadJson(in element, out optionalValue, ref args))
-            {
-                value = null;
-                return false;
-            }
-
-            value = type.CreateValue(optionalValue);
-        }
-        else
-        {
-            value = null;
-            return false;
-        }
 
         return true;
     }

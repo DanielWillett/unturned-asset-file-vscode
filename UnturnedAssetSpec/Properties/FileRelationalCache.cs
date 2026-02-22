@@ -412,7 +412,7 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
 
         private void ProcessBundleAsset(DatBundleAsset bundleAsset, IType propertyType)
         {
-            
+            // todo: bundle assets
         }
 
         private struct ValueVisitor : ITypeVisitor

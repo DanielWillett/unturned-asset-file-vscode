@@ -14,6 +14,7 @@ Conditions are represented by the [SpecCondition](../api/DanielWillett.UnturnedD
     // A value to compare 'Variable' to. Can be string, number, boolean, null, etc.
     // These are NOT dynamic values and can only be basic concrete values.
     // The comparand can also be an array of basic concrete values.
+    // If you need to do a comparison between two dynamic values, use the '=CMP' or '=CMP_IC' expressions as the Variable.
     "Comparand": "value"
 }
 ```
@@ -44,10 +45,7 @@ if (this.Property == "value")
 | `ends-with-i`     | String Ends With (case-insensitive)   | String                   |
 | `assignable-to`   | Type Assignable To                    | Fully Qualified CLR Type |
 | `assignable-from` | Type Assignable From                  | Fully Qualified CLR Type |
-| `included`        | Property Included                     | - not used -             |
 | `is-type`*        | Value is of Type                      | Fully Qualified CLR Type |
-| `value-included`  | Property & Value Included             | - not used -             |
-| `excluded`        | Property Not Included                 | - not used -             |
 
 > [!TIP]
 > <b>Fully Qualified CLR Type</b> refers to a type in the following format:

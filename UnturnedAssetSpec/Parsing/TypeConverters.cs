@@ -124,6 +124,11 @@ public static class TypeConverters
     public static ITypeConverter<int> SteamItemDef => SteamItemDefType.Instance;
 
     /// <summary>
+    /// The type converter for <see cref="System.Version"/> values.
+    /// </summary>
+    public static ITypeConverter<Version> Version { get; } = new VersionTypeConverter();
+
+    /// <summary>
     /// Gets the type converter for the given type.
     /// </summary>
     /// <typeparam name="T">The type to convert.</typeparam>
@@ -211,13 +216,20 @@ public static class TypeConverters
                     Converter = (ITypeConverter<T>)QualifiedType;
                 else if (typeof(T) == typeof(BundleReference))
                     Converter = (ITypeConverter<T>)BundleReference;
-                return;
             }
-
-            if (typeof(T) == typeof(string))
+            else
             {
-                Converter = (ITypeConverter<T>)String;
-                return;
+                if (typeof(T) == typeof(string))
+                {
+                    Converter = (ITypeConverter<T>)String;
+                    return;
+                }
+
+                if (typeof(T) == typeof(Version))
+                {
+                    Converter = (ITypeConverter<T>)Version;
+                    return;
+                }
             }
 
             if (VectorTypes.TryGetProvider<T>() is { } vectorProvider)

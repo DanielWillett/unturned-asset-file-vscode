@@ -663,11 +663,26 @@ public static class Value
     {
         switch (root.ValueKind)
         {
+            case JsonValueKind.Object:
+                if (typeof(TValue) == typeof(bool))
+                {
+                    if ((options & ValueReadOptions.AllowComplexConditions) == ValueReadOptions.AllowComplexConditions
+                        && Conditions.TryReadComplexOrBasicConditionFromJson(in root, database, owner, out IValue<bool>? conditionValue, ref dataRefContext))
+                    {
+                        return (IValue<TValue>)conditionValue;
+                    }
+                    if ((options & ValueReadOptions.AllowCondition) != 0
+                        && Conditions.TryReadConditionFromJson(in root, database, owner, out conditionValue, ref dataRefContext))
+                    {
+                        return (IValue<TValue>)conditionValue;
+                    }
+                }
+                goto case JsonValueKind.True;
+
             case JsonValueKind.True:
             case JsonValueKind.False:
             case JsonValueKind.Number:
-            case JsonValueKind.Object:
-                if (valueType.TryReadFromJson(in root, database, owner, out IValue<TValue>? val, ref dataRefContext))
+                if (TryReadFromJsonIntl(valueType, in root, out IValue<TValue>? val, ref dataRefContext))
                 {
                     return val;
                 }
@@ -683,7 +698,7 @@ public static class Value
                         return null;
                     }
 
-                    return valueType.TryReadFromJson(in root, database, owner, out val, ref dataRefContext)
+                    return TryReadFromJsonIntl(valueType, in root, out val, ref dataRefContext)
                         ? val
                         : Null(valueType);
                 }
@@ -746,11 +761,12 @@ public static class Value
                 break;
 
             case JsonValueKind.Array:
-                if (SwitchValue.TryRead(in root, valueType, database, owner, out SwitchValue<TValue>? value, ref dataRefContext))
+                if ((options & ValueReadOptions.AllowSwitch) != 0
+                    && SwitchValue.TryRead(in root, valueType, database, owner, out SwitchValue<TValue>? value, ref dataRefContext))
                 {
                     return value;
                 }
-                if (valueType.TryReadFromJson(in root, database, owner, out val, ref dataRefContext))
+                if (TryReadFromJsonIntl(valueType, in root, out val, ref dataRefContext))
                 {
                     return val;
                 }
@@ -761,6 +777,44 @@ public static class Value
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Attempts to read a value of the given <paramref name="type"/> from a JSON <paramref name="element"/>.
+    /// </summary>
+    /// <returns>Whether or not the value was successfully parsed.</returns>
+    private static bool TryReadFromJsonIntl<TValue, TDataRefReadContext>(
+        IType<TValue> type,
+        in JsonElement element,
+        [NotNullWhen(true)] out IValue<TValue>? value,
+        ref TDataRefReadContext dataRefContext
+    ) where TValue : IEquatable<TValue>
+      where TDataRefReadContext : IDataRefReadContext?
+    {
+        if (type.Parser.TryReadValueFromJson(in element, out Optional<TValue> optionalValue, type, ref dataRefContext))
+        {
+            value = type.CreateValue(optionalValue);
+        }
+        else if (TypeConverters.TryGet<TValue>() is { } typeConverter)
+        {
+            TypeConverterParseArgs<TValue> args = default;
+            args.Type = type;
+
+            if (!typeConverter.TryReadJson(in element, out optionalValue, ref args))
+            {
+                value = null;
+                return false;
+            }
+
+            value = type.CreateValue(optionalValue);
+        }
+        else
+        {
+            value = null;
+            return false;
+        }
+
+        return true;
     }
 
     private static ExpressionValueType ParseDefType(ValueReadOptions options, ref string str, out bool hasPrefix, out bool hasEscapeSequences, out ReadOnlySpan<char> data)
@@ -943,24 +997,24 @@ public enum ValueReadOptions
     AssumeDataRef = 2,
 
     /// <summary>
-    /// Allows for a switch-case object (<see cref="SpecDynamicSwitchCaseValue"/>) to be supplied.
+    /// Allows for a condition object (<see cref="Condition{TComparand}"/>) to be supplied.
     /// </summary>
-    AllowSwitchCase = 4,
+    AllowCondition = 4,
 
     /// <summary>
-    /// Allows for a condition object (<see cref="SpecCondition"/>) to be supplied.
+    /// Allows for a complex-conditional object (<see cref="ComplexConditionalValue"/>) or a <see cref="Condition{TComparand}"/> to be supplied.
     /// </summary>
-    AllowCondition = 8,
+    AllowComplexConditions = 8 | AllowCondition,
 
     /// <summary>
-    /// Allows for a switch expression (<see cref="SpecDynamicSwitchValue"/>) to be supplied.
+    /// Allows for a switch expression (<see cref="SwitchValue"/>) to be supplied.
     /// </summary>
     AllowSwitch = 16,
 
     /// <summary>
-    /// Allows all conditional objects (switch-case, switches, and conditions).
+    /// Allows all conditional objects (complex-conditionals, switches, and conditions).
     /// </summary>
-    AllowConditionals = AllowSwitchCase | AllowSwitch | AllowCondition,
+    AllowConditionals = AllowComplexConditions | AllowSwitch | AllowCondition,
 
     /// <summary>
     /// The default options for parsing values.

@@ -9,43 +9,45 @@ Operators (like `+`, `-`, etc) are <b>NOT</b> supported, all math has to be done
 
 The following functions are available:
 
-| Function | Description                              | Signature                        |
-| -------- | ---------------------------------------- | -------------------------------- |
-| PI       | Value of PI                              | `PI -> number`                   |
-| TAU      | Value of PI * 2                          | `TAU -> number`                  |
-| E        | Value of E (euler's number)              | `E -> number`                    |
-| NULL     | Null value                               | `NULL -> null`                   |
-| ABS      | Absolute Value                           | `ABS(number) -> number`          |
-| ROUND    | Round to nearest integer                 | `ROUND(number) -> integer`       |
-| FLOOR    | Round to closest integer &lt;= value     | `FLOOR(number) -> integer`       |
-| CEIL     | Round to closest integer &gt;= value     | `CEIL(number) -> integer`        |
-| SINR     | Sine (radians)                           | `SINR(number) -> number`         |
-| SIND     | Sine (degrees)                           | `SIND(number) -> number`         |
-| COSR     | Cosine (radians)                         | `COSR(number) -> number`         |
-| COSD     | Cosine (degrees)                         | `COSD(number) -> number`         |
-| TANR     | Tangent (radians)                        | `TANR(number) -> number`         |
-| TAND     | Tangent (degrees)                        | `TAND(number) -> number`         |
-| ASINR    | Arcsine (radians)                        | `ASINR(number) -> number`        |
-| ASIND    | Arcsine (degrees)                        | `ASIND(number) -> number`        |
-| ACOSR    | Arccosine (radians)                      | `ACOSR(number) -> number`        |
-| ACOSD    | Arccosine (degrees)                      | `ACOSD(number) -> number`        |
-| ATANR    | Arctangent (radians)                     | `ATANR(number) -> number`        |
-| ATANR    | Arctangent (radians) (x, y)              | `ATANR(number number) -> number` |
-| ATAND    | Arctangent (degrees)                     | `ATAND(number) -> number`        |
-| ATAND    | Arctangent (degrees) (x, y)              | `ATAND(number number) -> number` |
-| SQRT     | Square root                              | `SQRT(number) -> number`         |
-| ADD      | Add                                      | `ADD(number number) -> number`   |
-| SUB      | Subtract                                 | `SUB(number number) -> number`   |
-| MUL      | Multiply                                 | `MUL(number number) -> number`   |
-| DIV      | Divide                                   | `DIV(number number) -> number`   |
-| MOD      | Modulo (remainder)                       | `MOD(number number) -> number`   |
-| MIN      | Minimum                                  | `MIN(number number) -> number`   |
-| MAX      | Maximum                                  | `MAX(number number) -> number`   |
-| POW      | Exponent (arg1 ^ arg2)                   | `POW(number number) -> number`   |
-| CAT      | Concatenate (convert to string)          | `CAT(any) -> string`             |
-| CAT      | Concatenate (combine two strings)        | `CAT(any any) -> string`         |
-| CAT      | Concatenate (combine three strings)      | `CAT(any any any) -> string`     |
-| REP      | Replace (all "arg2" -> "arg3" in "arg1") | `REP(any any any) -> string`     |
+| Function | Description                                           | Signature                         |
+| -------- | ----------------------------------------------------- | --------------------------------- |
+| PI       | Value of PI                                           | `PI -> number`                    |
+| TAU      | Value of PI * 2                                       | `TAU -> number`                   |
+| E        | Value of E (euler's number)                           | `E -> number`                     |
+| NULL     | Null value                                            | `NULL -> null`                    |
+| ABS      | Absolute Value                                        | `ABS(number) -> number`           |
+| ROUND    | Round to nearest integer                              | `ROUND(number) -> integer`        |
+| FLOOR    | Round to closest integer &lt;= value                  | `FLOOR(number) -> integer`        |
+| CEIL     | Round to closest integer &gt;= value                  | `CEIL(number) -> integer`         |
+| SINR     | Sine (radians)                                        | `SINR(number) -> number`          |
+| SIND     | Sine (degrees)                                        | `SIND(number) -> number`          |
+| COSR     | Cosine (radians)                                      | `COSR(number) -> number`          |
+| COSD     | Cosine (degrees)                                      | `COSD(number) -> number`          |
+| TANR     | Tangent (radians)                                     | `TANR(number) -> number`          |
+| TAND     | Tangent (degrees)                                     | `TAND(number) -> number`          |
+| ASINR    | Arcsine (radians)                                     | `ASINR(number) -> number`         |
+| ASIND    | Arcsine (degrees)                                     | `ASIND(number) -> number`         |
+| ACOSR    | Arccosine (radians)                                   | `ACOSR(number) -> number`         |
+| ACOSD    | Arccosine (degrees)                                   | `ACOSD(number) -> number`         |
+| ATANR    | Arctangent (radians)                                  | `ATANR(number) -> number`         |
+| ATANR    | Arctangent (radians) (x, y)                           | `ATANR(number number) -> number`  |
+| ATAND    | Arctangent (degrees)                                  | `ATAND(number) -> number`         |
+| ATAND    | Arctangent (degrees) (x, y)                           | `ATAND(number number) -> number`  |
+| SQRT     | Square root                                           | `SQRT(number) -> number`          |
+| ADD      | Add                                                   | `ADD(number number) -> number`    |
+| SUB      | Subtract                                              | `SUB(number number) -> number`    |
+| MUL      | Multiply                                              | `MUL(number number) -> number`    |
+| DIV      | Divide                                                | `DIV(number number) -> number`    |
+| MOD      | Modulo (remainder)                                    | `MOD(number number) -> number`    |
+| MIN      | Minimum                                               | `MIN(number number) -> number`    |
+| MAX      | Maximum                                               | `MAX(number number) -> number`    |
+| POW      | Exponent (arg1 ^ arg2)                                | `POW(number number) -> number`    |
+| CAT      | Concatenate (convert to string)                       | `CAT(any) -> string`              |
+| CAT      | Concatenate (combine two strings)                     | `CAT(any any) -> string`          |
+| CAT      | Concatenate (combine three strings)                   | `CAT(any any any) -> string`      |
+| REP      | Replace (all "arg2" -> "arg3" in "arg1")              | `REP(any any any) -> string`      |
+| CMP      | Compare two values `sign(arg1 - arg2)`                | `CMP(any any) -> -1 \| 0 \| 1`    |
+| CMP_IC   | Compare two values, ignoring case `sign(arg1 - arg2)` | `CMP_IC(any any) -> -1 \| 0 \| 1` |
 
 ## Format
 All expressions start with an equal sign, then are followed with a function name.

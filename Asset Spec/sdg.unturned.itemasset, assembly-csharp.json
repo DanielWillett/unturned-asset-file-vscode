@@ -1318,7 +1318,7 @@
                                 "And":
                                 [
                                     {
-                                        "Variable": "#This.Indicies[0]",
+                                        "Variable": "#This.Indices[0]",
                                         "Operation": "eq",
                                         "Comparand": 0
                                     },
@@ -1453,9 +1453,9 @@
                             [
                                 {
                                     "$udat-type": "SDG.Unturned.BlueprintOutput, Assembly-CSharp",
-                                    "ID": "@Product",
-                                    "Amount": "@Products",
-                                    "Origin": "@Origin"
+                                    "ID": "@SDG.Unturned.Blueprint, Assembly-CSharp::Product",
+                                    "Amount": "@SDG.Unturned.Blueprint, Assembly-CSharp::Products",
+                                    "Origin": "@SDG.Unturned.Blueprint, Assembly-CSharp::Origin"
                                 }
                             ]
                         },
@@ -1474,7 +1474,7 @@
                         "Type": "LegacyAssetReference",
                         "AssetType": "SDG.Unturned.ItemAsset, Assembly-CSharp"
                     },
-                    "DefaultValue": "@ID",
+                    "DefaultValue": "@SDG.Unturned.ItemAsset, Assembly-CSharp::ID",
                     "KeyLegacyExpansionFilter": "Legacy",
                     "Description": "Defines a single output item, defaulting to this file's item.",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#blueprint-product-uint16",
@@ -1482,10 +1482,10 @@
                     "ExclusiveWith":
                     [
                         {
-                            "Key": "Outputs",
+                            "Key": "OutputItems",
                             "Condition":
                             {
-                                "Variable": "Outputs",
+                                "Variable": "#OutputItems.Count",
                                 "Operation": "gt",
                                 "Comparand": 0
                             }
@@ -1504,10 +1504,10 @@
                     "ExclusiveWith":
                     [
                         {
-                            "Key": "Outputs",
+                            "Key": "OutputItems",
                             "Condition":
                             {
-                                "Variable": "Outputs",
+                                "Variable": "#OutputItems.Count",
                                 "Operation": "gt",
                                 "Comparand": 0
                             }
@@ -1525,10 +1525,10 @@
                     "ExclusiveWith":
                     [
                         {
-                            "Key": "Outputs",
+                            "Key": "OutputItems",
                             "Condition":
                             {
-                                "Variable": "Outputs",
+                                "Variable": "#OutputItems.Count",
                                 "Operation": "gt",
                                 "Comparand": 0
                             }
@@ -1887,17 +1887,17 @@
                                     "Comparand": "None"
                                 },
                                 {
-                                    "Variable": "InputItems",
+                                    "Variable": "#InputItems.Count",
                                     "Operation": "eq",
-                                    "Comparand": "1"
+                                    "Comparand": 1
                                 },
                                 {
-                                    "Variable": "InputItems[0].ID",
+                                    "Variable": "=CMP(@(SDG.Unturned.BlueprintSupply, Assembly-CSharp::InputItems[0].ID) @(SDG.Unturned.ItemAsset, Assembly-CSharp::GUID))",
                                     "Operation": "eq",
-                                    "Comparand": "@GUID"
+                                    "Comparand": 0
                                 }
                             ],
-                            "Value": "7ed29f9101ae4523a3b2e389414b7bd9"
+                            "Value": "7ed29f91-01ae-4523-a3b2-e389414b7bd9"
                         },
                         {
                             "Case":
@@ -1906,7 +1906,7 @@
                                 "Operation": "eq",
                                 "Comparand": "TOOL"
                             },
-                            "Value": "ad1804b6945145f3b308738b0b8ea447"
+                            "Value": "ad1804b6-9451-45f3-b308-738b0b8ea447"
                         },
                         {
                             "Case":
@@ -1915,7 +1915,7 @@
                                 "Operation": "eq",
                                 "Comparand": "APPAREL"
                             },
-                            "Value": "ebe755533bdd42d1871c3ac66b89530f"
+                            "Value": "ebe75553-3bdd-42d1-871c-3ac66b89530f"
                         },
                         {
                             "Case":
@@ -1924,7 +1924,7 @@
                                 "Operation": "eq",
                                 "Comparand": "SUPPLY"
                             },
-                            "Value": "d089feb7e43f40c5a7dfcefc36998cfb"
+                            "Value": "d089feb7-e43f-40c5-a7df-cefc36998cfb"
                         },
                         {
                             "Case":
@@ -1933,7 +1933,7 @@
                                 "Operation": "eq",
                                 "Comparand": "GEAR"
                             },
-                            "Value": "cdb2df24b76d4c6e9d8411c940d8337f"
+                            "Value": "cdb2df24-b76d-4c6e-9d84-11c940d8337f"
                         },
                         {
                             "Case":
@@ -1942,7 +1942,7 @@
                                 "Operation": "eq",
                                 "Comparand": "AMMO"
                             },
-                            "Value": "d739926736374e5ba34b4ac6ffbb5c8f"
+                            "Value": "d7399267-3637-4e5b-a34b-4ac6ffbb5c8f"
                         },
                         {
                             "Case":
@@ -1951,7 +1951,7 @@
                                 "Operation": "eq",
                                 "Comparand": "BARRICADE"
                             },
-                            "Value": "31a59b5fec3f4ec5b2887b1ce4acb029"
+                            "Value": "31a59b5f-ec3f-4ec5-b288-7b1ce4acb029"
                         },
                         {
                             "Case":
@@ -1960,7 +1960,7 @@
                                 "Operation": "eq",
                                 "Comparand": "STRUCTURE"
                             },
-                            "Value": "71d9e182c18b4aad8e87778e4f621995"
+                            "Value": "71d9e182-c18b-4aad-8e87-778e4f621995"
                         },
                         {
                             "Case":
@@ -1969,7 +1969,7 @@
                                 "Operation": "eq",
                                 "Comparand": "UTILITIES"
                             },
-                            "Value": "bfac6026305f4737a95fd275ebff65a6"
+                            "Value": "bfac6026-305f-4737-a95f-d275ebff65a6"
                         },
                         {
                             "Case":
@@ -1978,7 +1978,7 @@
                                 "Operation": "eq",
                                 "Comparand": "FURNITURE"
                             },
-                            "Value": "b0c6cc0a8b4346be89aef697ecdb8e46"
+                            "Value": "b0c6cc0a-8b43-46be-89ae-f697ecdb8e46"
                         },
                         {
                             "Case":
@@ -1987,7 +1987,7 @@
                                 "Operation": "eq",
                                 "Comparand": "REPAIR"
                             },
-                            "Value": "732ee6ffeb18418985cf4f9fde33dd11"
+                            "Value": "732ee6ff-eb18-4189-85cf-4f9fde33dd11"
                         },
                         {
                             "Value": "00000000-0000-0000-0000-000000000000"
@@ -2222,8 +2222,8 @@
                             [
                                 {
                                     "$udat-type": "SDG.Unturned.ActionBlueprint, Assembly-CSharp",
-                                    "Name": "@BlueprintName",
-                                    "Link": "@BlueprintLink"
+                                    "Name": "@SDG.Unturned.Action, Assembly-CSharp::BlueprintName",
+                                    "Link": "@SDG.Unturned.Action, Assembly-CSharp::BlueprintLink"
                                 }
                             ]
                         }
@@ -2242,11 +2242,13 @@
             [
                 {
                     "Key": "Index",
-                    "Type": "UInt8",
+                    "Type": "Int32",
+                    "Minimum": 0,
+                    "Maximum": 255,
                     "ValueTemplateGroupReference": "#(SDG.Unturned.ItemAsset, Assembly-CSharp::Blueprints).Indices[0]",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/actions.html#action-blueprint-index-uint8-0",
                     "KeyLegacyExpansionFilter": "Legacy",
-                    "Deprecated": true,
+                    "Deprecated": "=SUB(1 #Self.IsLegacy)",
                     "DefaultValue":
                     [
                         {

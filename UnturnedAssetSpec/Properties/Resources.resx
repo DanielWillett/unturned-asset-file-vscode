@@ -546,4 +546,7 @@
   <data name="JsonException_UnexpectedProperty" xml:space="preserve">
     <value>Property "{0}" can not be defined with "{1}".</value>
   </data>
+  <data name="Type_Name_Version" xml:space="preserve">
+    <value>Version Number</value>
+  </data>
 </root>

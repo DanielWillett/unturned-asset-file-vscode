@@ -114,13 +114,13 @@ internal sealed class UnturnedAssetFileLspServer
                         .AddSingleton<DiagnosticsManager>()
                         .AddSingleton<GlobalCodeFixes>()
                         .AddSingleton<LspInstallationEnvironment>()
-                        .AddSingleton<FileRelationalModelProvider>()
+                        .AddSingleton<FileRelationalCacheProvider>()
                         .AddSingleton(new InstallDirUtility("Unturned", "304930"))
                         .AddSingleton<EnvironmentCache>()
                         .AddTransient<ISpecDatabaseCache, EnvironmentCache>(sp => sp.GetRequiredService<EnvironmentCache>())
                         .AddTransient<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
                         .AddTransient<IWorkspaceEnvironment>(sp => sp.GetRequiredService<LspWorkspaceEnvironment>())
-                        .AddTransient<IFileRelationalModelProvider>(sp => sp.GetRequiredService<FileRelationalModelProvider>())
+                        .AddTransient<IFileRelationalModelProvider>(sp => sp.GetRequiredService<FileRelationalCacheProvider>())
                         .AddSingleton<IParsingServices, ParsingServiceProvider>(sp => new ParsingServiceProvider(sp))
                         .AddSingleton(new JsonSerializerOptions
                         {

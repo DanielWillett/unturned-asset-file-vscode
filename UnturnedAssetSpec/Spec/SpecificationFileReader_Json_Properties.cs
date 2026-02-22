@@ -1,5 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Immutable;
@@ -28,6 +29,24 @@ partial class SpecificationFileReader
 
         string key = element.GetString()!;
         bool isImport = string.IsNullOrWhiteSpace(key);
+        if (!isImport && key[0] == '#')
+        {
+            // #This.Key = ""
+            if (DataRefs.TryParseDataRef(key,
+                    out ReadOnlySpan<char> dataRefRoot,
+                    out bool isRootEscaped,
+                    out ReadOnlySpan<char> dataRefProperty,
+                    out ReadOnlySpan<char> _,
+                    out ReadOnlySpan<char> _)
+                && !isRootEscaped
+                && dataRefRoot.Equals("This", StringComparison.OrdinalIgnoreCase)
+                && dataRefProperty.Equals("Key", StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                key = string.Empty;
+            }
+        }
+
         DatProperty? overriding = null;
         if (!isImport && (!root.TryGetProperty("PreventOverride"u8, out element) || element.ValueKind != JsonValueKind.True))
         {
@@ -148,6 +167,7 @@ partial class SpecificationFileReader
             property.Keys = ImmutableArray<DatPropertyKey>.Empty;
         }
 
+        // FileCrossRef
         if (root.TryGetProperty("FileCrossRef"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
             property.CrossReferenceTarget = Value.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty, null, Database, property);
@@ -159,6 +179,7 @@ partial class SpecificationFileReader
             }
         }
 
+        // ListReference
         if (root.TryGetProperty("ListReference"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
             property.AvailableValuesTarget = Value.TryReadValueFromJson(in element, ValueReadOptions.AssumeProperty | ValueReadOptions.AllowExclamationSuffix, null, Database, property);
@@ -172,24 +193,19 @@ partial class SpecificationFileReader
             property.AvailableValuesTargetIsRequired = element.ValueKind == JsonValueKind.String && element.GetString()!.EndsWith("!", StringComparison.Ordinal);
         }
 
-        if (root.TryGetProperty("DefaultValue"u8, out element))
+        // SubtypeSwitch
+        if (root.TryGetProperty("SubtypeSwitch"u8, out element) && element.ValueKind != JsonValueKind.String)
         {
-            property.DefaultValue = this.ReadValue(in element, type, property, $"{owner.FullName}.{key}.DefaultValue");
-        }
-        else if (property.Type is FlagType)
-        {
-            property.DefaultValue = Value.False;
+            property.SubtypeSwitchPropertyName = element.GetString();
         }
 
-        if (root.TryGetProperty("IncludedDefaultValue"u8, out element))
+        // Required
+        if (root.TryGetProperty("Required"u8, out element) && element.ValueKind is not JsonValueKind.False and not JsonValueKind.Null)
         {
-            property.IncludedDefaultValue = this.ReadValue(in element, type, property, $"{owner.FullName}.{key}.IncludedDefaultValue");
-        }
-        else if (property.Type is FlagType or BooleanOrFlagType)
-        {
-            property.IncludedDefaultValue = Value.True;
+            property.Required = this.ReadValue(in element, BooleanType.Instance, property, $"{owner.FullName}.{key}.Required");
         }
 
+        // AssetPosition
         if (root.TryGetProperty("AssetPosition"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
             if (!Enum.TryParse(element.GetString(), out AssetDatPropertyPositionExpectation assetPosition))
@@ -202,7 +218,166 @@ partial class SpecificationFileReader
             property.AssetPosition = assetPosition;
         }
 
-        // todo
+        // DefaultValue
+        if (root.TryGetProperty("DefaultValue"u8, out element))
+        {
+            property.DefaultValue = this.ReadValue(in element, type, property, $"{owner.FullName}.{key}.DefaultValue");
+        }
+        else if (property.Type is FlagType)
+        {
+            property.DefaultValue = Value.False;
+        }
+
+        // IncludedDefaultValue
+        if (root.TryGetProperty("IncludedDefaultValue"u8, out element))
+        {
+            property.IncludedDefaultValue = this.ReadValue(in element, type, property, $"{owner.FullName}.{key}.IncludedDefaultValue");
+        }
+        else if (property.Type is FlagType or BooleanOrFlagType)
+        {
+            property.IncludedDefaultValue = Value.True;
+        }
+
+        // Description
+        if (root.TryGetProperty("Description"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.Description = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Description");
+        }
+
+        // Markdown
+        if (root.TryGetProperty("Markdown"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.MarkdownDescription = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Markdown");
+        }
+
+        // Variable
+        if (root.TryGetProperty("Variable"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.Variable = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Variable");
+        }
+
+        // Version
+        if (root.TryGetProperty("Version"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.Version = this.ReadValue(in element, VersionType.PackableInstance, property, $"{owner.FullName}.{key}.Version");
+        }
+
+        // Docs
+        if (root.TryGetProperty("Docs"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.Docs = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Docs");
+        }
+
+        // Minimum[Exclusive]
+        if (root.TryGetProperty("Minimum"u8, out element))
+        {
+            property.Minimum = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Minimum");
+        }
+        else if (root.TryGetProperty("MinimumExclusive"u8, out element))
+        {
+            property.Minimum = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.MinimumExclusive");
+            property.MinimumIsExclusive = true;
+        }
+
+        // Maximum[Exclusive]
+        if (root.TryGetProperty("Maximum"u8, out element))
+        {
+            property.Maximum = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Maximum");
+        }
+        else if (root.TryGetProperty("MaximumExclusive"u8, out element))
+        {
+            property.Maximum = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.MaximumExclusive");
+            property.MaximumIsExclusive = true;
+        }
+
+        // Except
+        if (root.TryGetProperty("Except"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            int exceptCt = element.GetArrayLength();
+            ImmutableArray<IValue>.Builder bldr = ImmutableArray.CreateBuilder<IValue>(exceptCt);
+            for (int i = 0; i < exceptCt; ++i)
+            {
+                JsonElement except = element[i];
+                bldr.Add(this.ReadValue(in except, type, property, $"{owner.FullName}.{key}.Except[{i}]"));
+            }
+
+            property.Exceptions = bldr.MoveToImmutableOrCopy();
+        }
+
+        // ExclusiveWith
+        if (root.TryGetProperty("ExclusiveWith"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            if (element.ValueKind == JsonValueKind.Object)
+            {
+                if (!ExclusionCondition.TryReadFromJson(in element, property, Database, out IExclusionCondition? condition))
+                {
+                    throw new JsonException($"Failed to read exclusion condition from \"{owner.FullName}.{key}.ExclusiveWith\".");
+                }
+
+                property.ExclusionConditions = ImmutableArray.Create(condition);
+            }
+            else
+            {
+                int conditionCt = element.GetArrayLength();
+                ImmutableArray<IExclusionCondition>.Builder bldr = ImmutableArray.CreateBuilder<IExclusionCondition>(conditionCt);
+                for (int i = 0; i < conditionCt; ++i)
+                {
+                    JsonElement cond = element[i];
+                    if (!ExclusionCondition.TryReadFromJson(in cond, property, Database, out IExclusionCondition? condition))
+                    {
+                        throw new JsonException($"Failed to read exclusion condition from \"{owner.FullName}.{key}.ExclusiveWith[{i}]\".");
+                    }
+
+                    bldr.Add(condition);
+                }
+
+                property.ExclusionConditions = bldr.MoveToImmutableOrCopy();
+            }
+        }
+
+        // InclusiveWith
+        if (root.TryGetProperty("InclusiveWith"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            if (element.ValueKind == JsonValueKind.Object)
+            {
+                if (!InclusionCondition.TryReadFromJson(in element, property, Database, out IInclusionCondition? condition))
+                {
+                    throw new JsonException($"Failed to read exclusion condition from \"{owner.FullName}.{key}.InclusiveWith\".");
+                }
+
+                property.InclusionConditions = ImmutableArray.Create(condition);
+            }
+            else
+            {
+                int conditionCt = element.GetArrayLength();
+                ImmutableArray<IInclusionCondition>.Builder bldr = ImmutableArray.CreateBuilder<IInclusionCondition>(conditionCt);
+                for (int i = 0; i < conditionCt; ++i)
+                {
+                    JsonElement cond = element[i];
+                    if (!InclusionCondition.TryReadFromJson(in cond, property, Database, out IInclusionCondition? condition))
+                    {
+                        throw new JsonException($"Failed to read exclusion condition from \"{owner.FullName}.{key}.InclusiveWith[{i}]\".");
+                    }
+
+                    bldr.Add(condition);
+                }
+
+                property.InclusionConditions = bldr.MoveToImmutableOrCopy();
+            }
+        }
+
+        // Deprecated
+        if (root.TryGetProperty("Deprecated"u8, out element) && element.ValueKind is not JsonValueKind.False and not JsonValueKind.Null)
+        {
+            property.Deprecated = this.ReadValue(in element, BooleanType.Instance, property, $"{owner.FullName}.{key}.Deprecated");
+        }
+
+        // Experimental
+        if (root.TryGetProperty("Experimental"u8, out element) && element.ValueKind is not JsonValueKind.False and not JsonValueKind.Null)
+        {
+            property.Experimental = this.ReadValue(in element, BooleanType.Instance, property, $"{owner.FullName}.{key}.Experimental");
+        }
+
         properties.Add(property);
     }
 
@@ -321,19 +496,20 @@ partial class SpecificationFileReader
                     return file;
                 }
 
-                if (file.Types.TryGetValue(qualType, out DatType? newType))
+                IType? newType = GetOrReadType(file, type);
+                if (newType is DatType dt)
                 {
-                    return newType;
+                    return dt;
                 }
             }
 
-            Type clrType = Type.GetType(type, throwOnError: false, ignoreCase: false)!;
-            if (clrType != null && typeof(ITypeFactory).IsAssignableFrom(clrType))
-            {
-                ITypeFactory factory = (ITypeFactory?)Activator.CreateInstance(clrType, true)!;
-                IType newType = factory.CreateType(in root, type, this, property, key);
-                return newType;
-            }
+            //Type clrType = Type.GetType(type, throwOnError: false, ignoreCase: false)!;
+            //if (clrType != null && typeof(ITypeFactory).IsAssignableFrom(clrType))
+            //{
+            //    ITypeFactory factory = (ITypeFactory?)Activator.CreateInstance(clrType, true)!;
+            //    IType newType = factory.CreateType(in root, type, this, property, key);
+            //    return newType;
+            //}
         }
         
         throw new JsonException(string.Format(Resources.JsonException_PropertyTypeNotFound, type, $"{owner.FullName}.{key}.Type"));

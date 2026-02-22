@@ -1,10 +1,6 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Diagnostics.CodeAnalysis;
@@ -16,9 +12,6 @@ internal class FileEvaluationContextFactory
 {
     private readonly OpenedFileTracker _fileTracker;
     private readonly IParsingServices _services;
-    private readonly IAssetSpecDatabase _specDatabase;
-    private readonly IWorkspaceEnvironment _workspaceEnvironment;
-    private readonly InstallationEnvironment _installationEnvironment;
 
     public FileEvaluationContextFactory(
         OpenedFileTracker fileTracker,
@@ -46,7 +39,8 @@ internal class FileEvaluationContextFactory
 
         ctx = new FileEvaluationContext(
             _services,
-            sourceFile);
+            sourceFile
+        );
         return true;
         // todo: remove this
 #if false
@@ -151,26 +145,26 @@ internal class FileEvaluationContextFactory
 #endif
     }
 
-    private static void GetRelationalNodes(ISourceNode? node, out IAnyValueSourceNode? valueNode, out IPropertySourceNode? propertyNode)
-    {
-        switch (node)
-        {
-            case IPropertySourceNode kvp:
-                propertyNode = kvp;
-                valueNode = kvp.Value;
-                break;
-
-            case null:
-                propertyNode = null;
-                valueNode = null;
-                break;
-
-            default:
-                ISourceNode parent = node.Parent;
-                for (; !ReferenceEquals(parent, parent.File) && parent is not IPropertySourceNode; parent = parent.Parent) ;
-                propertyNode = parent as IPropertySourceNode;
-                valueNode = node as IAnyValueSourceNode;
-                break;
-        }
-    }
+    //private static void GetRelationalNodes(ISourceNode? node, out IAnyValueSourceNode? valueNode, out IPropertySourceNode? propertyNode)
+    //{
+    //    switch (node)
+    //    {
+    //        case IPropertySourceNode kvp:
+    //            propertyNode = kvp;
+    //            valueNode = kvp.Value;
+    //            break;
+    //
+    //        case null:
+    //            propertyNode = null;
+    //            valueNode = null;
+    //            break;
+    //
+    //        default:
+    //            ISourceNode parent = node.Parent;
+    //            for (; !ReferenceEquals(parent, parent.File) && parent is not IPropertySourceNode; parent = parent.Parent) ;
+    //            propertyNode = parent as IPropertySourceNode;
+    //            valueNode = node as IAnyValueSourceNode;
+    //            break;
+    //    }
+    //}
 }

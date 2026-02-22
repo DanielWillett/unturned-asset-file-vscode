@@ -14,7 +14,7 @@ partial class MathMatrix
     {
         if (typeof(TInY) == typeof(string))
         {
-            visitor.Accept(string.Compare(inValX, As<TInY, string>(inValY), caseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
+            visitor.Accept(Math.Sign(string.Compare(inValX, As<TInY, string>(inValY), caseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)));
             return true;
         }
 
@@ -35,7 +35,7 @@ partial class MathMatrix
     {
         if (typeof(TInX) == typeof(string))
         {
-            visitor.Accept(string.Compare(As<TInX, string>(inValX), inValY, caseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
+            visitor.Accept(Math.Sign(string.Compare(As<TInX, string>(inValX), inValY, caseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)));
             return true;
         }
 
@@ -408,14 +408,14 @@ partial class MathMatrix
     /// <inheritdoc cref="Compare{TInX,TInY,TVisitor}"/>
     public static bool Compare<TVisitor>(ushort inValX, ushort inValY, ref TVisitor visitor) where TVisitor : IGenericVisitor
     {
-        visitor.Accept(inValX.CompareTo(inValY));
+        visitor.Accept(Math.Sign(inValX.CompareTo(inValY)));
         return true;
     }
     
     /// <inheritdoc cref="Compare{TInX,TInY,TVisitor}"/>
     public static bool Compare<TVisitor>(ushort inValX, byte inValY, ref TVisitor visitor) where TVisitor : IGenericVisitor
     {
-        visitor.Accept(inValX.CompareTo(inValY));
+        visitor.Accept(Math.Sign(inValX.CompareTo(inValY)));
         return true;
     }
     
@@ -445,7 +445,7 @@ partial class MathMatrix
         if (inValY < 0)
             visitor.Accept(1);
         else
-            visitor.Accept(inValX.CompareTo((ushort)inValY));
+            visitor.Accept(Math.Sign(inValX.CompareTo((ushort)inValY)));
         return true;
     }
 
@@ -455,7 +455,7 @@ partial class MathMatrix
         if (inValY < 0)
             visitor.Accept(1);
         else
-            visitor.Accept(inValX.CompareTo((ushort)inValY));
+            visitor.Accept(Math.Sign(inValX.CompareTo((ushort)inValY)));
         return true;
     }
 
@@ -548,14 +548,14 @@ partial class MathMatrix
     /// <inheritdoc cref="Compare{TInX,TInY,TVisitor}"/>
     public static bool Compare<TVisitor>(byte inValX, ushort inValY, ref TVisitor visitor) where TVisitor : IGenericVisitor
     {
-        visitor.Accept(((ushort)inValX).CompareTo(inValY));
+        visitor.Accept(Math.Sign(((ushort)inValX).CompareTo(inValY)));
         return true;
     }
     
     /// <inheritdoc cref="Compare{TInX,TInY,TVisitor}"/>
     public static bool Compare<TVisitor>(byte inValX, byte inValY, ref TVisitor visitor) where TVisitor : IGenericVisitor
     {
-        visitor.Accept(inValX.CompareTo(inValY));
+        visitor.Accept(Math.Sign(inValX.CompareTo(inValY)));
         return true;
     }
     
@@ -585,7 +585,7 @@ partial class MathMatrix
         if (inValY < 0)
             visitor.Accept(1);
         else
-            visitor.Accept(((ushort)inValX).CompareTo((ushort)inValY));
+            visitor.Accept(Math.Sign(((ushort)inValX).CompareTo((ushort)inValY)));
         return true;
     }
 
@@ -595,7 +595,7 @@ partial class MathMatrix
         if (inValY < 0)
             visitor.Accept(1);
         else
-            visitor.Accept(inValX.CompareTo((byte)inValY));
+            visitor.Accept(Math.Sign(inValX.CompareTo((byte)inValY)));
         return true;
     }
 
@@ -981,7 +981,7 @@ partial class MathMatrix
         if (inValX < 0)
             visitor.Accept(-1);
         else
-            visitor.Accept(((ushort)inValX).CompareTo(inValY));
+            visitor.Accept(Math.Sign(((ushort)inValX).CompareTo(inValY)));
         return true;
     }
 
@@ -991,7 +991,7 @@ partial class MathMatrix
         if (inValX < 0)
             visitor.Accept(-1);
         else
-            visitor.Accept(((ushort)inValX).CompareTo(inValY));
+            visitor.Accept(Math.Sign(((ushort)inValX).CompareTo(inValY)));
         return true;
     }
 
@@ -1012,14 +1012,14 @@ partial class MathMatrix
     /// <inheritdoc cref="Compare{TInX,TInY,TVisitor}"/>
     public static bool Compare<TVisitor>(short inValX, short inValY, ref TVisitor visitor) where TVisitor : IGenericVisitor
     {
-        visitor.Accept(inValX.CompareTo(inValY));
+        visitor.Accept(Math.Sign(inValX.CompareTo(inValY)));
         return true;
     }
 
     /// <inheritdoc cref="Compare{TInX,TInY,TVisitor}"/>
     public static bool Compare<TVisitor>(short inValX, sbyte inValY, ref TVisitor visitor) where TVisitor : IGenericVisitor
     {
-        visitor.Accept(inValX.CompareTo(inValY));
+        visitor.Accept(Math.Sign(inValX.CompareTo(inValY)));
         return true;
     }
 
@@ -1123,7 +1123,7 @@ partial class MathMatrix
         if (inValX < 0)
             visitor.Accept(-1);
         else
-            visitor.Accept(((ushort)inValX).CompareTo(inValY));
+            visitor.Accept(Math.Sign(((ushort)inValX).CompareTo(inValY)));
         return true;
     }
 
@@ -1133,7 +1133,7 @@ partial class MathMatrix
         if (inValX < 0)
             visitor.Accept(-1);
         else
-            visitor.Accept(((byte)inValX).CompareTo(inValY));
+            visitor.Accept(Math.Sign(((byte)inValX).CompareTo(inValY)));
         return true;
     }
 
@@ -1154,14 +1154,14 @@ partial class MathMatrix
     /// <inheritdoc cref="Compare{TInX,TInY,TVisitor}"/>
     public static bool Compare<TVisitor>(sbyte inValX, short inValY, ref TVisitor visitor) where TVisitor : IGenericVisitor
     {
-        visitor.Accept(((short)inValX).CompareTo(inValY));
+        visitor.Accept(Math.Sign(((short)inValX).CompareTo(inValY)));
         return true;
     }
 
     /// <inheritdoc cref="Compare{TInX,TInY,TVisitor}"/>
     public static bool Compare<TVisitor>(sbyte inValX, sbyte inValY, ref TVisitor visitor) where TVisitor : IGenericVisitor
     {
-        visitor.Accept(inValX.CompareTo(inValY));
+        visitor.Accept(Math.Sign(inValX.CompareTo(inValY)));
         return true;
     }
 

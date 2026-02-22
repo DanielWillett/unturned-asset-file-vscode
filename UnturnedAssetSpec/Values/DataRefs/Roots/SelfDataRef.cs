@@ -64,11 +64,17 @@ public sealed class SelfDataRef : RootDataRef<SelfDataRef>
         return false;
     }
 
-    /// <inheritdoc />
     protected override bool AcceptProperty(in ValueTypeProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         value = ValueTypeProperty.GetTypeName(Owner.GetValueType(in ctx));
         return true;
+    }
+
+    protected override bool AcceptProperty(in CountProperty property, in FileEvaluationContext ctx, out int value)
+    {
+        // todo
+        value = 0;
+        return false;
     }
 
     /// <inheritdoc />

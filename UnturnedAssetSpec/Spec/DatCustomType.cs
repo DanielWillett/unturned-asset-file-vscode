@@ -225,9 +225,45 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
 
     private bool TryParseModernObject(ref TypeParserArgs<DatObjectValue> args, in FileEvaluationContext ctx, out Optional<DatObjectValue> value, IDictionarySourceNode dictionary)
     {
-        // todo
-        value = Optional<DatObjectValue>.Null;
-        return false;
+        bool failure = false;
+        ImmutableArray<DatObjectPropertyValue>.Builder properties = ImmutableArray.CreateBuilder<DatObjectPropertyValue>();
+        bool shouldIgnoreError = args.ShouldIgnoreFailureDiagnostic;
+        foreach (DatProperty property in Properties)
+        {
+            if (!dictionary.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode, PropertyResolutionContext.Modern))
+            {
+                // missing required property
+                if (property.Required != null && property.Required.TryEvaluateValue(out Optional<bool> isRequired, in ctx) && isRequired.Value)
+                {
+                    args.DiagnosticSink?.UNT2014_Object(ref args, property.Key, DisplayName /* todo: get breadcrumbs instead */);
+                    failure = true;
+                    shouldIgnoreError = true;
+                }
+
+                continue;
+            }
+
+            if (!property.Type.TryEvaluateType(out IType? propertyType, in ctx))
+            {
+                args.DiagnosticSink?.UNT2004_CanNotDetermineType(ref args, property.Key);
+                failure = true;
+                shouldIgnoreError = true;
+                continue;
+            }
+
+            //propertyType.Parser
+        }
+
+        args.ShouldIgnoreFailureDiagnostic = shouldIgnoreError;
+
+        if (failure)
+        {
+            value = Optional<DatObjectValue>.Null;
+            return false;
+        }
+
+        value = new Optional<DatObjectValue>(new DatObjectValue(this, properties.MoveToImmutableOrCopy()));
+        return true;
     }
 
     private bool TryParseLegacyObject(ref TypeParserArgs<DatObjectValue> args, in FileEvaluationContext ctx, out Optional<DatObjectValue> value, IDictionarySourceNode dictionary)
@@ -299,6 +335,7 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
             return false;
         }
 
+        value = new Optional<DatObjectValue>(new DatObjectValue(this, propertyArrayBuilder.MoveToImmutableOrCopy()));
         return true;
     }
 
@@ -329,7 +366,7 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
             }
             else
             {
-                value = Value.TryReadValueFromJson(in root, ValueReadOptions.Default, type, Context.Database, property, ref dataRefContext);
+                value = Value.TryReadValueFromJson(in element, ValueReadOptions.Default, type, Context.Database, property, ref dataRefContext);
                 if (value == null)
                     return false;
             }

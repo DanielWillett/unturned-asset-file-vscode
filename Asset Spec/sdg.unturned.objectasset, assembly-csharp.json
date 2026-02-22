@@ -2824,7 +2824,7 @@
                 {
                     "Case":
                     {
-                        "Variable": "Type",
+                        "Variable": "$prop$::Type",
                         "Operation": "eq",
                         "Comparand": "NPC"
                     },
@@ -2850,25 +2850,25 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#interactables",
             "Required":
             {
-                "Variable": "Interactability",
+                "Variable": "$prop$::Interactability",
                 "Operation": "eq",
                 "Comparand": "QUEST"
             },
             "InclusiveWith":
             [
                 {
-                    "Key": "Interactability_Hint",
+                    "Key": "$prop$::Interactability_Hint",
                     "Value": "CUSTOM"
                 }
             ],
             "ExclusiveWith":
             [
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "DECAL"
                 },
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "NPC"
                 }
             ]
@@ -2881,18 +2881,18 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html#localization",
             "Required":
             {
-                "Variable": "Interactability",
+                "Variable": "$prop$::Interactability",
                 "Operation": "eq",
                 "Comparand": "DIALOGUE"
             },
             "ExclusiveWith":
             [
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "DECAL"
                 },
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "NPC"
                 }
             ],

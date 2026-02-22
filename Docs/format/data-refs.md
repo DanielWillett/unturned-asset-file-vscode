@@ -32,7 +32,8 @@ Data-Ref targets can use the following properties:
 | Difficulty | The contextual difficulty of the current file. | `This` |
 | Indices | Array of indices used to get the target's index within a list or it's key within a dictionary. | any |
 | IsLegacy | Whether or not the currently parsing property is being parsed in the legacy format (ex. with blueprints, spawn tables, etc using the v1 format). | `Self`, `@Property` |
-| ValueType | Which type of value this property provides: 'Value', 'List', or 'Dictionary' | `Self`, `@Property` |
+| ValueType | Which type of value this property provides: 'Value', 'List', or 'Dictionary'. | `Self`, `@Property` |
+| Count | Number of elements in a list or dictionary. | `Self`, `@Property` |
 
 Properties are currently hard-coded and can't be extended.
 
@@ -187,6 +188,15 @@ This property can not target cross-referenced properties or `#This`.
 By default 'Value' will be returned if the property isn't present or doesn't have any kind of value.
 
 Represented by the class: [ValueTypeProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.ValueTypeProperty.yml).
+
+*No properties, not indexable*
+
+### Count
+Returns the number of elements in a list or dictionary.
+
+This property can not target `#This`.
+
+Represented by the class: [CountProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.CountProperty.yml).
 
 *No properties, not indexable*
 

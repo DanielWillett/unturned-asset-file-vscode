@@ -68,11 +68,9 @@ internal static class SwitchCase
     {
         IValue<TResult>? value;
 
-        if (root.ValueKind != JsonValueKind.Object)
+        if (root.ValueKind != JsonValueKind.Object || root.TryGetProperty("$udat-type"u8, out _))
         {
-            return switchType.TryReadFromJson(in root, database, owner, out value, ref dataRefContext)
-                ? new DefaultSwitchCase<TResult>(value)
-                : null;
+            return null;
         }
 
         if (root.TryGetProperty("Cases"u8, out JsonElement element))

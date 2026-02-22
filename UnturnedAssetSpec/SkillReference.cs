@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data;
@@ -94,17 +95,25 @@ public readonly struct SkillReference : IEquatable<SkillReference>, IComparable<
     /// <param name="skill">The parsed skill.</param>
     /// <param name="ignoreCase">Whether or not character casing should be ignored.</param>
     /// <returns>Whether or not a valid skill could be found.</returns>
-    public static bool TryParse(ReadOnlySpan<char> str, AssetInformation information, out SkillReference skill, bool ignoreCase = true)
+    public static bool TryParse(string str, AssetInformation information, out SkillReference skill, bool ignoreCase = true)
     {
-        // todo: using a dictionary for this would probably be preferrable
+        if (information.SkillCache != null)
+        {
+            return information.SkillCache.TryGetValue(str, out skill);
+        }
+
         skill = None;
         str = str.Trim();
         SpecialityInfo?[]? specialities = information.Specialities;
-        if (str.IsEmpty || specialities == null)
+        if (string.IsNullOrEmpty(str) || specialities == null || specialities.Length == 0)
             return false;
+
+        ImmutableDictionary<string, SkillReference>.Builder bldr =
+            ImmutableDictionary.CreateBuilder<string, SkillReference>(StringComparer.OrdinalIgnoreCase);
 
         StringComparison comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
+        bool found = false;
         for (int specialityIndex = 0; specialityIndex < specialities.Length; ++specialityIndex)
         {
             SpecialityInfo? specialityInfo = specialities[specialityIndex];
@@ -115,15 +124,21 @@ public readonly struct SkillReference : IEquatable<SkillReference>, IComparable<
             for (int skillIndex = 0; skillIndex < skills.Length; ++skillIndex)
             {
                 SkillInfo? skillInfo = skills[skillIndex];
-                if (skillInfo == null || !str.Equals(skillInfo.Skill, comparison))
+                if (skillInfo == null)
                     continue;
 
-                skill = new SkillReference(specialityIndex, skillIndex);
-                return true;
+                if (!found && str.Equals(skillInfo.Skill, comparison))
+                {
+                    skill = new SkillReference(specialityIndex, skillIndex);
+                    found = true;
+                }
+
+                bldr[skillInfo.Skill] = new SkillReference(specialityIndex, skillIndex);
             }
         }
 
-        return false;
+        information.SkillCache = bldr.ToImmutable();
+        return found;
     }
 
     /// <summary>

@@ -23,6 +23,22 @@ internal struct ComparerVisitor<TValue> : IValueVisitor, IGenericVisitor
     /// </summary>
     public TValue? Value;
 
+    /// <summary>
+    /// Try comparing two values using the <see cref="ComparerVisitor{TValue}"/>.
+    /// </summary>
+    public static bool TryCompare<TIn2>(TValue in1, TIn2 in2, bool caseInsensitive, out int cmp)
+        where TIn2 : IEquatable<TIn2>
+    {
+        ComparerVisitor<TValue> v = default;
+        v.Value = in1;
+        v.CaseInsensitive = caseInsensitive;
+
+        v.Accept(new Optional<TIn2>(in2));
+
+        cmp = v.Comparison;
+        return v.Success;
+    }
+
     public void Accept<TOtherValue>(Optional<TOtherValue> optVal)
         where TOtherValue : IEquatable<TOtherValue>
     {

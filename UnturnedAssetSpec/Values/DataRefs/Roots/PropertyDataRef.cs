@@ -194,4 +194,11 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
         value = ValueTypeProperty.GetTypeName(k);
         return true;
     }
+
+    protected override bool AcceptProperty(in CountProperty property, in FileEvaluationContext ctx, out int value)
+    {
+        // todo
+        value = 0;
+        return false;
+    }
 }

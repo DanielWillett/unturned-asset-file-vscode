@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Globalization;
+using System.Runtime.CompilerServices;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
@@ -101,6 +102,9 @@ public class ParserTest<T> : IDisposable, IDiagnosticSink, IReferencedPropertySi
         bool expectValue = true,
         bool requireInit = true)
     {
+        // avoid localization issues in diagnostics checks
+        Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+
         _sourceFileFactory = sourceFileFactory;
         _handleValue = handleValue;
         _propertyName = propertyName;

@@ -1495,6 +1495,49 @@
                     "additionalProperties": false
                 },
                 {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "Version",
+                            "title": "A version number."
+                        },
+                        "Digits":
+                        {
+                            "type": [ "integer", "null" ],
+                            "description": "Required digit count. Defaults to null (meaning 2, 3, or 4 digits)."
+                        },
+                        "MaximumValue":
+                        {
+                            "type": [ "integer", "null" ],
+                            "description": "Maximum value of any one component. Defaults to int32 max value."
+                        },
+                        "MaximumValues":
+                        {
+                            "$ref": "#/$defs/Version",
+                            "description": "Maximum value of all components."
+                        },
+                        "MinimumValue":
+                        {
+                            "type": [ "integer", "null" ],
+                            "description": "Minimum value of any one component. Defaults to int32 min value."
+                        },
+                        "MinimumValues":
+                        {
+                            "$ref": "#/$defs/Version",
+                            "description": "Minimum value of all components."
+                        },
+                        "StrictFormatting":
+                        {
+                            "type": [ "boolean", "null" ],
+                            "description": "Any issue with the bounds or digit counts is considered a failure to parse."
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
                     "const": "Flag",
                     "title": "A flag which does not have a value."
                 },
@@ -1960,11 +2003,6 @@
                     "$ref": "#/$defs/ComplexOrBasicCondition",
                     "description": "A condition that must be met to use the key."
                 },
-                "SingleKeyOverride":
-                {
-                    "$ref": "#/$defs/StringValue",
-                    "description": "If 'Template', the singular version of the key which would not be a template (ex. Blade for Blade_#)."
-                },
                 "FileCrossRef":
                 {
                     "$ref": "#/$defs/StringValue",
@@ -2091,16 +2129,6 @@
                 {
                     "$ref": "#/$defs/ValueAllowConditionals",
                     "description": "Exclusive maximum value of the property."
-                },
-                "MinimumCount":
-                {
-                    "$ref": "#/$defs/IntegerValueAllowConditionals",
-                    "description": "Inclusive minimum for this property's list element count or string character count."
-                },
-                "MaximumCount":
-                {
-                    "$ref": "#/$defs/IntegerValueAllowConditionals",
-                    "description": "Inclusive maximum for this property's list element count or string character count."
                 },
                 "Except":
                 {

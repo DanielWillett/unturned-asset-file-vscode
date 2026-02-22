@@ -40,47 +40,47 @@ public static class ExpressionFunctions
     /// Drop the sign from a negative value, or leave a positive value as-is.
     /// </summary>
     /// <remarks><c>ABS(number) → number</c></remarks>
-    public const string Absolute        = "ABS";
+    public const string Absolute          = "ABS";
     /// <summary>
     /// Get the nearest integer, rounding up for 0.5.
     /// </summary>
     /// <remarks><c>ROUND(number) → number</c></remarks>
-    public const string Round           = "ROUND";
+    public const string Round             = "ROUND";
     /// <summary>
     /// Get the highest integer &lt;= to a value.
     /// </summary>
     /// <remarks><c>FLOOR(number) → number</c></remarks>
-    public const string Floor           = "FLOOR";
+    public const string Floor             = "FLOOR";
     /// <summary>
     /// Get the lowest integer &gt;= to a value.
     /// </summary>
     /// <remarks><c>CEIL(number) → number</c></remarks>
-    public const string Ceiling         = "CEIL";
+    public const string Ceiling           = "CEIL";
     /// <summary>
     /// Take the sine of an angle in radians.
     /// </summary>
     /// <remarks><c>SINR(number) → number</c></remarks>
-    public const string SineRad         = "SINR";
+    public const string SineRad           = "SINR";
     /// <summary>
     /// Take the cosine of an angle in radians.
     /// </summary>
     /// <remarks><c>COSR(number) → number</c></remarks>
-    public const string CosineRad       = "COSR";
+    public const string CosineRad         = "COSR";
     /// <summary>
     /// Take the tangent of an angle in radians.
     /// </summary>
     /// <remarks><c>TANR(number) → number</c></remarks>
-    public const string TangentRad      = "TANR";
+    public const string TangentRad        = "TANR";
     /// <summary>
     /// Take the inverse sine of a number, returning the value in radians.
     /// </summary>
     /// <remarks><c>ASINR(number) → number</c></remarks>
-    public const string ArcSineRad      = "ASINR";
+    public const string ArcSineRad        = "ASINR";
     /// <summary>
     /// Take the inverse cosine of a number, returning the value in radians.
     /// </summary>
     /// <remarks><c>ACOSR(number) → number</c></remarks>
-    public const string ArcCosineRad    = "ACOSR";
+    public const string ArcCosineRad      = "ACOSR";
     /// <summary>
     /// Take the inverse tangent of a number, returning the value in radians.
     /// </summary>
@@ -88,32 +88,32 @@ public static class ExpressionFunctions
     /// <c>ATANR(number) → number</c><br/>
     /// <c>ATANR(number[X] number[Y]) → number</c>
     /// </remarks>
-    public const string ArcTangentRad   = "ATANR";
+    public const string ArcTangentRad     = "ATANR";
     /// <summary>
     /// Take the sine of an angle in degrees.
     /// </summary>
     /// <remarks><c>SIND(number) → number</c></remarks>
-    public const string SineDeg         = "SIND";
+    public const string SineDeg           = "SIND";
     /// <summary>
     /// Take the cosine of an angle in degrees.
     /// </summary>
     /// <remarks><c>COSD(number) → number</c></remarks>
-    public const string CosineDeg       = "COSD";
+    public const string CosineDeg         = "COSD";
     /// <summary>
     /// Take the tangent of an angle in degrees.
     /// </summary>
     /// <remarks><c>TAND(number) → number</c></remarks>
-    public const string TangentDeg      = "TAND";
+    public const string TangentDeg        = "TAND";
     /// <summary>
     /// Take the inverse sine of a number, returning the value in degrees.
     /// </summary>
     /// <remarks><c>ASIND(number) → number</c></remarks>
-    public const string ArcSineDeg      = "ASIND";
+    public const string ArcSineDeg        = "ASIND";
     /// <summary>
     /// Take the inverse cosine of a number, returning the value in degrees.
     /// </summary>
     /// <remarks><c>ACOSD(number) → number</c></remarks>
-    public const string ArcCosineDeg    = "ACOSD";
+    public const string ArcCosineDeg      = "ACOSD";
     /// <summary>
     /// Take the inverse tangent of a number, returning the value in degrees.
     /// </summary>
@@ -121,12 +121,12 @@ public static class ExpressionFunctions
     /// <c>ATAND(number) → number</c><br/>
     /// <c>ATAND(number[X] number[Y]) → number</c>
     /// </remarks>
-    public const string ArcTangentDeg   = "ATAND";
+    public const string ArcTangentDeg     = "ATAND";
     /// <summary>
     /// Take the square-root of a number.
     /// </summary>
     /// <remarks><c>SQRT(number) → number</c></remarks>
-    public const string SquareRoot      = "SQRT";
+    public const string SquareRoot        = "SQRT";
 
 
     /* 2-arg */
@@ -134,42 +134,42 @@ public static class ExpressionFunctions
     /// Add two values.
     /// </summary>
     /// <remarks><c>ADD(number number) → number</c></remarks>
-    public const string Add             = "ADD";
+    public const string Add               = "ADD";
     /// <summary>
     /// Subtract two values.
     /// </summary>
     /// <remarks><c>SUB(number number) → number</c></remarks>
-    public const string Subtract        = "SUB";
+    public const string Subtract          = "SUB";
     /// <summary>
     /// Multiply two values.
     /// </summary>
     /// <remarks><c>MUL(number number) → number</c></remarks>
-    public const string Multiply        = "MUL";
+    public const string Multiply          = "MUL";
     /// <summary>
     /// Divide two values.
     /// </summary>
     /// <remarks><c>DIV(number number) → number</c></remarks>
-    public const string Divide          = "DIV";
+    public const string Divide            = "DIV";
     /// <summary>
     /// Get the remainder of the division of two values.
     /// </summary>
     /// <remarks><c>MOD(number number) → number</c></remarks>
-    public const string Modulo          = "MOD";
+    public const string Modulo            = "MOD";
     /// <summary>
     /// Get the lowest of two values.
     /// </summary>
     /// <remarks><c>MIN(number number) → number</c></remarks>
-    public const string Minimum         = "MIN";
+    public const string Minimum           = "MIN";
     /// <summary>
     /// Get the highest of two values.
     /// </summary>
     /// <remarks><c>MAX(number number) → number</c></remarks>
-    public const string Maximum         = "MAX";
+    public const string Maximum           = "MAX";
     /// <summary>
     /// Raise a number to the exponent of another.
     /// </summary>
     /// <remarks><c>POW(number number) → number</c></remarks>
-    public const string Power           = "POW";
+    public const string Power             = "POW";
     /// <summary>
     /// Combine two values together as strings.
     /// </summary>
@@ -178,7 +178,21 @@ public static class ExpressionFunctions
     /// <c>CAT(any any) → string</c><br/>
     /// <c>CAT(any any any) → string</c>
     /// </remarks>
-    public const string Concatenate     = "CAT";
+    public const string Concatenate       = "CAT";
+    /// <summary>
+    /// Compare two values (case-sensitive).
+    /// </summary>
+    /// <remarks>
+    /// <c>EQUALS(any any) → boolean</c><br/>
+    /// </remarks>
+    public const string Compare           = "CMP";
+    /// <summary>
+    /// Compare two values (case-insensitive).
+    /// </summary>
+    /// <remarks>
+    /// <c>EQUALS(any any) → boolean</c><br/>
+    /// </remarks>
+    public const string CompareIgnoreCase = "CMP_IC";
 
 
     /* 3-arg */
@@ -186,7 +200,7 @@ public static class ExpressionFunctions
     /// Replace all instances of <c>Replaced</c> with <c>NewValue</c> in <c>Base</c>.
     /// </summary>
     /// <remarks><c>REP(any[Base] any[Replaced] any[NewValue]) → string</c></remarks>
-    public const string Replace         = "REP";
+    public const string Replace           = "REP";
 
     /// <summary>
     /// Custom implementation for the <c>Bullet_Gravity_Multiplier</c> property in <see cref="T:SDG.Unturned.ItemGunAsset"/>.
@@ -233,6 +247,8 @@ public static class ExpressionFunctions
         RegisterFunction(Expressions.Maximum.Instance);
         RegisterFunction(Expressions.Power.Instance);
         RegisterFunction(Expressions.Concatenate.Instance);
+        RegisterFunction(Expressions.Compare.CaseSensitiveInstance);
+        RegisterFunction(Expressions.Compare.CaseInsensitiveInstance);
 
         RegisterFunction(Expressions.Replace.Instance);
         RegisterFunction(Expressions.BallisticGravityMultiplierCalculation.Instance);

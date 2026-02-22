@@ -1140,7 +1140,7 @@
                             "Value": true,
                             "Condition":
                             {
-                                "Variable": "#Self.Value",
+                                "Variable": "Logic",
                                 "Operation": "neq",
                                 "Comparand": "GREATER_THAN_OR_EQUAL_TO"
                             }
