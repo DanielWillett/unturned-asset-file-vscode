@@ -146,9 +146,9 @@ public static class DatPropertyExtensions
     /// </summary>
     /// <param name="property">The property to evaluate.</param>
     /// <param name="ctx">Workspace context for the operation.</param>
-    public static bool IsExcluded(this DatProperty property, in FileEvaluationContext ctx)
+    public static bool IsExcluded(this DatProperty property, ref FileEvaluationContext ctx)
     {
-        return !ctx.File.TryGetProperty(property, in ctx, out _);
+        return !ctx.File.TryGetProperty(property, ref ctx, out _);
     }
 
     /// <summary>
@@ -156,9 +156,9 @@ public static class DatPropertyExtensions
     /// </summary>
     /// <param name="property">The property to evaluate.</param>
     /// <param name="ctx">Workspace context for the operation.</param>
-    public static SourceValueType GetValueType(this DatProperty property, in FileEvaluationContext ctx)
+    public static SourceValueType GetValueType(this DatProperty property, ref FileEvaluationContext ctx)
     {
-        if (!ctx.File.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode))
+        if (!ctx.File.TryGetProperty(property, ref ctx, out IPropertySourceNode? propertyNode))
         {
             return SourceValueType.Value;
         }
@@ -173,9 +173,9 @@ public static class DatPropertyExtensions
     /// <param name="requireValue">Whether or not a valid value must also be present to be considered included.</param>
     /// <param name="ctx">Workspace context for the operation.</param>
     /// <param name="keyFilter">The current object context (modern/legacy).</param>
-    public static unsafe bool IsIncluded(this DatProperty property, bool requireValue, in FileEvaluationContext ctx)
+    public static unsafe bool IsIncluded(this DatProperty property, bool requireValue, ref FileEvaluationContext ctx)
     {
-        if (!ctx.File.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode))
+        if (!ctx.File.TryGetProperty(property, ref ctx, out IPropertySourceNode? propertyNode))
         {
             return false;
         }
@@ -185,7 +185,7 @@ public static class DatPropertyExtensions
             return true;
         }
         
-        if (!property.Type.TryEvaluateType(out IType? propertyType, in ctx))
+        if (!property.Type.TryEvaluateType(out IType? propertyType, ref ctx))
         {
             return false;
         }
@@ -220,6 +220,54 @@ public static class DatPropertyExtensions
         }
     }
 
+    /// <inheritdoc cref="VisitValue{TVisitor}(DatProperty,ref TVisitor,ref FileEvaluationContext,PropertyBreadcrumbs,IDiagnosticSink?,IReferencedPropertySink?,TypeParserMissingValueBehavior)"/>
+    public static unsafe bool VisitValue<TVisitor>(
+        this DatProperty property,
+        ref TVisitor visitor,
+        ref FileEvaluationContext ctx,
+        IDiagnosticSink? diagnosticSink = null,
+        IReferencedPropertySink? referencedPropertySink = null,
+        TypeParserMissingValueBehavior missingValueBahvior = TypeParserMissingValueBehavior.ErrorIfValueOrPropertyNotProvided)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        if (!property.Type.TryEvaluateType(out IType? propertyType, ref ctx))
+        {
+            return false;
+        }
+
+        if (!ctx.TryGetTargetDictionary(out IDictionarySourceNode? targetDictionary, out _))
+        {
+            return false;
+        }
+
+        if (!targetDictionary.TryGetProperty(property, ref ctx, out IPropertySourceNode? propertyNode))
+        {
+            IValue? defaultValue = property.DefaultValue;
+            return defaultValue != null && defaultValue.VisitValue(ref visitor, ref ctx);
+        }
+
+        VisitValueTypeVisitor<TVisitor> v;
+        v.Property = property;
+        v.ValueNode = propertyNode.Value;
+        v.ParentNode = propertyNode;
+        v.Visited = false;
+        v.DiagnosticSink = diagnosticSink;
+        v.ReferencedPropertySink = referencedPropertySink;
+        v.MissingValueBehavior = missingValueBahvior;
+        fixed (FileEvaluationContext* evalCtxPtr = &ctx)
+        fixed (TVisitor* visitorPtr = &visitor)
+        {
+            v.EvaluationContext = evalCtxPtr;
+            v.Visitor = visitorPtr;
+            propertyType.Visit(ref v);
+        }
+
+        return v.Visited;
+    }
+
 
     /// <summary>
     /// Invokes a visitor with the current value of the given property.
@@ -230,29 +278,54 @@ public static class DatPropertyExtensions
     /// <param name="property">The property to evaluate.</param>
     /// <param name="visitor">A visitor to invoke <see cref="IValueVisitor.Accept{TValue}"/> on.</param>
     /// <param name="ctx">Workspace context for the operation.</param>
+    /// <param name="breadcrumbs">Breadcrumbs to the property within a file.</param>
     /// <param name="diagnosticSink">Object which will receive any parse diagnostics.</param>
     /// <param name="referencedPropertySink">Object which will receive any other referenced properties.</param>
     /// <returns>Whether or not the visitor was invoked.</returns>
     public static unsafe bool VisitValue<TVisitor>(
         this DatProperty property,
         ref TVisitor visitor,
-        in FileEvaluationContext ctx,
+        ref FileEvaluationContext ctx,
+        PropertyBreadcrumbs breadcrumbs,
         IDiagnosticSink? diagnosticSink = null,
-        IReferencedPropertySink? referencedPropertySink = null)
+        IReferencedPropertySink? referencedPropertySink = null,
+        TypeParserMissingValueBehavior missingValueBahvior = TypeParserMissingValueBehavior.ErrorIfValueOrPropertyNotProvided)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        if (!ctx.File.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode))
-        {
-            IValue? defaultValue = property.DefaultValue;
-            return defaultValue != null && defaultValue.VisitValue(ref visitor, in ctx);
-        }
-
-        if (!property.Type.TryEvaluateType(out IType? propertyType, in ctx))
+        if (!property.Type.TryEvaluateType(out IType? propertyType, ref ctx))
         {
             return false;
+        }
+
+        IDictionarySourceNode? startingDictionary;
+        DatTypeWithProperties? type;
+        if (breadcrumbs.Length > 0 && "~".Equals(breadcrumbs[0].Property))
+        {
+            if (!ctx.TryGetTargetRoot(out startingDictionary))
+            {
+                return false;
+            }
+
+            type = ctx.FileType.Information;
+        }
+        else if (!ctx.TryGetTargetDictionary(out startingDictionary, out type))
+        {
+            return false;
+        }
+
+        if (!breadcrumbs.TryTraceRelativeTo(startingDictionary, type, out IAnyValueSourceNode? targetValue, out _, ref ctx)
+            || targetValue is not IDictionarySourceNode targetDictionary)
+        {
+            return false;
+        }
+
+        if (!targetDictionary.TryGetProperty(property, ref ctx, out IPropertySourceNode? propertyNode))
+        {
+            IValue? defaultValue = property.DefaultValue;
+            return defaultValue != null && defaultValue.VisitValue(ref visitor, ref ctx);
         }
 
         VisitValueTypeVisitor<TVisitor> v;
@@ -262,7 +335,7 @@ public static class DatPropertyExtensions
         v.Visited = false;
         v.DiagnosticSink = diagnosticSink;
         v.ReferencedPropertySink = referencedPropertySink;
-        v.MissingValueBehavior = TypeParserMissingValueBehavior.FallbackToDefaultValue;
+        v.MissingValueBehavior = missingValueBahvior;
         fixed (FileEvaluationContext* evalCtxPtr = &ctx)
         fixed (TVisitor* visitorPtr = &visitor)
         {
@@ -304,7 +377,7 @@ public static class DatPropertyExtensions
                 MissingValueBehavior = MissingValueBehavior
             };
 
-            if (type.Parser.TryParse(ref parseArgs, in Unsafe.AsRef<FileEvaluationContext>(EvaluationContext), out Optional<TValue> value))
+            if (type.Parser.TryParse(ref parseArgs, ref Unsafe.AsRef<FileEvaluationContext>(EvaluationContext), out Optional<TValue> value))
             {
                 Visitor->Accept(value);
                 Visited = true;

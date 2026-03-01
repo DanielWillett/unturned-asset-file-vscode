@@ -25,7 +25,7 @@ public sealed class ThisDataRef : RootDataRef<ThisDataRef>
     protected override bool IsPropertyNameKeyword => true;
 
     /// <inheritdoc />
-    public override bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public override bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
     {
         // NOTE: while we could return the 'this' object (created from DatCustomType),
         //       that could create an infinite loop when trying to resolve
@@ -37,28 +37,28 @@ public sealed class ThisDataRef : RootDataRef<ThisDataRef>
         return false;
     }
 
-    protected override bool AcceptProperty(in IncludedProperty property, in FileEvaluationContext ctx, out bool value)
+    protected override bool AcceptProperty(in IncludedProperty property, ref FileEvaluationContext ctx, out bool value)
     {
         // TODO: check if object is included instead
-        value = Owner.IsIncluded(property.RequireValue, in ctx);
+        value = Owner.IsIncluded(property.RequireValue, ref ctx);
         return true;
     }
 
-    protected override bool AcceptProperty(in ExcludedProperty property, in FileEvaluationContext ctx, out bool value)
+    protected override bool AcceptProperty(in ExcludedProperty property, ref FileEvaluationContext ctx, out bool value)
     {
         // TODO: check if object is excluded instead
-        value = Owner.IsExcluded(in ctx);
+        value = Owner.IsExcluded(ref ctx);
         return true;
     }
 
-    protected override bool AcceptProperty(in KeyProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    protected override bool AcceptProperty(in KeyProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         // TODO: get object key
-        value = PropertyDataRef.GetPropertyKey(Owner, in ctx);
+        value = PropertyDataRef.GetPropertyKey(Owner, ref ctx);
         return value != null;
     }
 
-    protected override bool AcceptProperty(in AssetNameProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    protected override bool AcceptProperty(in AssetNameProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         switch (ctx.File)
         {
@@ -76,9 +76,9 @@ public sealed class ThisDataRef : RootDataRef<ThisDataRef>
         }
     }
 
-    protected override bool AcceptProperty(in DifficultyProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    protected override bool AcceptProperty(in DifficultyProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
-        if (!DifficultyProperty.TryGetFileDifficultyContext(in ctx, out ServerDifficulty diff))
+        if (!DifficultyProperty.TryGetFileDifficultyContext(ref ctx, out ServerDifficulty diff))
         {
             value = null;
             return false;
@@ -88,7 +88,7 @@ public sealed class ThisDataRef : RootDataRef<ThisDataRef>
         return true;
     }
 
-    protected override bool AcceptProperty<TVisitor>(in IndicesProperty property, in FileEvaluationContext ctx, ref TVisitor visitor)
+    protected override bool AcceptProperty<TVisitor>(in IndicesProperty property, ref FileEvaluationContext ctx, ref TVisitor visitor)
     {
         // todo
         return false;

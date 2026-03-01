@@ -27,7 +27,7 @@ public interface IExclusionCondition : IInclusionExclusionCondition
     /// <param name="result">The result of the condition evaluation.</param>
     /// <param name="ctx">Workspace context.</param>
     /// <returns>Whether or not the condition could be evaluated. If there is not a condition a result of <see langword="true"/> will be returned.</returns>
-    bool TryEvaluateCondition(out bool result, in FileEvaluationContext ctx);
+    bool TryEvaluateCondition(out bool result, ref FileEvaluationContext ctx);
 }
 
 /// <summary>
@@ -96,7 +96,7 @@ public class ExclusionCondition : IExclusionCondition
     }
 
     /// <inheritdoc />
-    public virtual bool TryEvaluateCondition(out bool result, in FileEvaluationContext ctx)
+    public virtual bool TryEvaluateCondition(out bool result, ref FileEvaluationContext ctx)
     {
         if (FilterCondition == null)
         {
@@ -104,7 +104,7 @@ public class ExclusionCondition : IExclusionCondition
             return true;
         }
 
-        if (!FilterCondition.TryEvaluateValue(out Optional<bool> value, in ctx))
+        if (!FilterCondition.TryEvaluateValue(out Optional<bool> value, ref ctx))
         {
             result = false;
             return false;

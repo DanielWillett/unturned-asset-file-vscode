@@ -33,7 +33,7 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
         IParsingServices parsingServices)
         : base(DatDiagnostics.UNT101, modelProvider, parsingServices)
     {
-        parsingServices.Database.OnInitialize((database, _) =>
+        parsingServices.Database.OnInitialize(services =>
         {
             //AssetFileType assetFileType =
             //    AssetFileType.FromType(
@@ -71,7 +71,7 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
         IType propertyType,
         DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
-        in FileEvaluationContext ctx)
+        ref FileEvaluationContext ctx)
     {
         state = default;
         range = default;

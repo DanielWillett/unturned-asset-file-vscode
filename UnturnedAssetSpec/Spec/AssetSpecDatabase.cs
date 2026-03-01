@@ -13,6 +13,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -98,7 +102,7 @@ public interface IAssetSpecDatabase
     /// <summary>
     /// Invokes a task when initialization finishes.
     /// </summary>
-    Task OnInitialize(Func<IAssetSpecDatabase, ILoggerFactory, Task> action);
+    Task OnInitialize(Func<IParsingServices, Task> action);
 }
 
 public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
@@ -113,6 +117,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     private JsonDocument? _statusJson;
     private List<OnInitializeState>? _initializeListeners = new List<OnInitializeState>();
     private readonly object _initLock = new object();
+    private readonly Lazy<IParsingServices> _parsingServices;
 
     public ICollection<string>? NPCAchievementIds { get; private set; }
 
@@ -184,55 +189,71 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
     public static AssetSpecDatabase FromOffline(bool useInstallDir = false, ILoggerFactory? loggerFactory = null, JsonSerializerOptions? defaultJsonOptions = null, ISpecDatabaseCache? cache = null)
     {
-        loggerFactory ??= NullLoggerFactory.Instance;
-        return new AssetSpecDatabase(
-            new SpecificationFileReader(
-                allowInternet: false,
-                loggerFactory,
-                new Lazy<HttpClient>(() => new HttpClient()),
-                GetJsonOptions(defaultJsonOptions),
-                new InstallDirUtility(
-                    useInstallDir ? "Unturned" : "\0",
-                    useInstallDir ? "304930" : "\0"
-                ),
-                cache: cache
-            ),
-            loggerFactory
-        )
-        {
-            UseInternet = false
-        };
+        return CreateSimple(false, useInstallDir, loggerFactory, defaultJsonOptions, cache);
     }
     
-
     public static AssetSpecDatabase FromOnline(bool useInstallDir = true, ILoggerFactory? loggerFactory = null, JsonSerializerOptions? defaultJsonOptions = null, ISpecDatabaseCache? cache = null)
     {
+        return CreateSimple(true, useInstallDir, loggerFactory, defaultJsonOptions, cache);
+    }
+
+    private static AssetSpecDatabase CreateSimple(bool allowInternet, bool useInstallDir, ILoggerFactory? loggerFactory, JsonSerializerOptions? defaultJsonOptions, ISpecDatabaseCache? cache)
+    {
         loggerFactory ??= NullLoggerFactory.Instance;
-        return new AssetSpecDatabase(
+
+        InstallDirUtility installDirUtility = new InstallDirUtility(
+            useInstallDir ? "Unturned" : "\0",
+            useInstallDir ? "304930" : "\0"
+        );
+        IParsingServices? parsingServices = null;
+
+        AssetSpecDatabase database = new AssetSpecDatabase(
             new SpecificationFileReader(
-                allowInternet: true,
+                allowInternet: allowInternet,
                 loggerFactory,
                 new Lazy<HttpClient>(() => new HttpClient()),
                 GetJsonOptions(defaultJsonOptions),
-                new InstallDirUtility(
-                    useInstallDir ? "Unturned" : "\0",
-                    useInstallDir ? "304930" : "\0"
-                ),
+                installDirUtility,
                 cache: cache
             ),
-            loggerFactory
+            new Lazy<IParsingServices>(
+                () => parsingServices
+                      ?? throw new InvalidOperationException("Parsing servies not initialized yet.")
+            )
         )
         {
-            UseInternet = true
+            UseInternet = allowInternet
         };
+
+        InstallationEnvironment installation = new InstallationEnvironment(database);
+        if (useInstallDir && installDirUtility.TryGetInstallDirectory(out GameInstallDir installDir))
+        {
+            installation.AddUnturnedSearchableDirectories(
+                installDir,
+                new UnturnedInstallationEnvironmentExtensions.UnturnedDirectorySearchOptions
+                {
+                    EnableSandbox = true
+                }
+            );
+        }
+
+        IWorkspaceEnvironment environment = new StaticSourceFileWorkspaceEnvironment(
+            cache != null,
+            database,
+            installationEnvironment: installation
+        );
+
+        parsingServices = new ParsingServiceProvider(database, loggerFactory, environment, installDirUtility, installation);
+        return database;
     }
-    
-    public AssetSpecDatabase(SpecificationFileReader fileReader, ILoggerFactory? loggerFactory = null)
+
+    public AssetSpecDatabase(SpecificationFileReader fileReader, Lazy<IParsingServices> parsingServices, ILoggerFactory? loggerFactory = null)
     {
         _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         _fileReader = fileReader;
         Options = fileReader.JsonOptions;
         _cache = fileReader.Cache;
+        _parsingServices = parsingServices;
         UnturnedInstallDirectory = fileReader.InstallDirUtility ?? new InstallDirUtility(UnturnedName, UnturnedAppId);
 
         AllTypes = ImmutableDictionary<QualifiedType, DatType>.Empty;
@@ -248,7 +269,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         }
     }
 
-    public Task OnInitialize(Func<IAssetSpecDatabase, ILoggerFactory, Task> action)
+    public Task OnInitialize(Func<IParsingServices, Task> action)
     {
         OnInitializeState state;
         state.Callback = action;
@@ -257,7 +278,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         {
             if (_initializeListeners == null)
             {
-                return state.Callback(this, _loggerFactory);
+                return state.Callback(_parsingServices.Value);
             }
 
             state.Task = new TaskCompletionSource<int>();
@@ -268,7 +289,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
     private struct OnInitializeState
     {
-        public Func<IAssetSpecDatabase, ILoggerFactory, Task> Callback;
+        public Func<IParsingServices, Task> Callback;
         public TaskCompletionSource<int> Task;
     }
 
@@ -300,7 +321,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             Task[] initTasks = new Task[initializeListeners.Length];
             for (int i = 0; i < initializeListeners.Length; ++i)
             {
-                initTasks[i] = initializeListeners[i].Callback(this, _loggerFactory);
+                initTasks[i] = initializeListeners[i].Callback(_parsingServices.Value);
             }
 
             await Task.WhenAll(initTasks).ConfigureAwait(false);

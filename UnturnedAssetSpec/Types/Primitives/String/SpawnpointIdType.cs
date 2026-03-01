@@ -26,14 +26,14 @@ public sealed class SpawnpointIdType : PrimitiveType<string, SpawnpointIdType>, 
     public override int GetHashCode() => 839766959;
 
     /// <inheritdoc />
-    public bool TryParse(ref TypeParserArgs<string> args, in FileEvaluationContext ctx, out Optional<string> value)
+    public bool TryParse(ref TypeParserArgs<string> args, ref FileEvaluationContext ctx, out Optional<string> value)
     {
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }
 
-        if (!TypeParsers.String.TryParse(ref args, in ctx, out value))
+        if (!TypeParsers.String.TryParse(ref args, ref ctx, out value))
             return false;
 
         if (args.DiagnosticSink == null || !ctx.TryGetRelevantMap(out _))

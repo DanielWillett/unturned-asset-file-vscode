@@ -37,10 +37,10 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
     }
 
     /// <inheritdoc />
-    public override bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public override bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
     {
         EnsureValueExists(ctx.Services.Database);
-        return _value.VisitValue(ref visitor, in ctx);
+        return _value.VisitValue(ref visitor, ref ctx);
     }
 
     protected override bool Equals(PropertyDataRef other)
@@ -54,35 +54,12 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
         return ~_propReference.GetHashCode();
     }
 
-    protected override bool AcceptProperty(in IncludedProperty property, in FileEvaluationContext ctx, out bool value)
+    protected override bool AcceptProperty(in IncludedProperty property, ref FileEvaluationContext ctx, out bool value)
     {
         EnsureValueExists(ctx.Services.Database);
         if (_value is ICrossedPropertyReference cr)
         {
-            if (!cr.TryResolveReference(in ctx, out FileEvaluationContext crContext, out DatProperty? crProperty))
-            {
-                value = false;
-                return false;
-            }
-
-            value = crProperty.IsIncluded(property.RequireValue, in crContext);
-        }
-        else
-        {
-            DatProperty prop = _value.Property;
-            value = prop.IsIncluded(property.RequireValue, in ctx);
-        }
-
-        return true;
-    }
-
-    protected override bool AcceptProperty(in ExcludedProperty property, in FileEvaluationContext ctx, out bool value)
-    {
-        EnsureValueExists(ctx.Services.Database);
-        DatProperty prop = _value.Property;
-        if (_value is ICrossedPropertyReference cr)
-        {
-            if (!cr.TryResolveReference(in ctx, out FileEvaluationContext crContext, out _))
+            if (!cr.TryResolveReference(ref ctx, out FileEvaluationContext crContext, out DatProperty? crProperty))
             {
                 value = false;
                 return false;
@@ -90,30 +67,59 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
 
             try
             {
-                value = prop.IsExcluded(in crContext);
+                value = crProperty.IsIncluded(property.RequireValue, ref crContext);
             }
             finally
             {
-                cr.DisposeContext(in crContext);
+                cr.DisposeContext(ref crContext);
             }
         }
         else
         {
-            value = prop.IsExcluded(in ctx);
+            DatProperty prop = _value.Property;
+            value = prop.IsIncluded(property.RequireValue, ref ctx);
+        }
+
+        return true;
+    }
+
+    protected override bool AcceptProperty(in ExcludedProperty property, ref FileEvaluationContext ctx, out bool value)
+    {
+        EnsureValueExists(ctx.Services.Database);
+        if (_value is ICrossedPropertyReference cr)
+        {
+            if (!cr.TryResolveReference(ref ctx, out FileEvaluationContext crContext, out DatProperty? prop))
+            {
+                value = false;
+                return false;
+            }
+
+            try
+            {
+                value = prop.IsExcluded(ref crContext);
+            }
+            finally
+            {
+                cr.DisposeContext(ref crContext);
+            }
+        }
+        else
+        {
+            DatProperty prop = _value.Property;
+            value = prop.IsExcluded(ref ctx);
         }
 
         return true;
     }
 
     /// <inheritdoc />
-    protected override bool AcceptProperty(in KeyProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    protected override bool AcceptProperty(in KeyProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         EnsureValueExists(ctx.Services.Database);
-        DatProperty prop = _value.Property;
         string? k;
         if (_value is ICrossedPropertyReference cr)
         {
-            if (!cr.TryResolveReference(in ctx, out FileEvaluationContext crContext, out _))
+            if (!cr.TryResolveReference(ref ctx, out FileEvaluationContext crContext, out DatProperty? prop))
             {
                 value = null;
                 return false;
@@ -121,36 +127,37 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
 
             try
             {
-                k = GetPropertyKey(prop, in crContext);
+                k = GetPropertyKey(prop, ref crContext);
             }
             finally
             {
-                cr.DisposeContext(in crContext);
+                cr.DisposeContext(ref crContext);
             }
         }
         else
         {
-            k = GetPropertyKey(prop, in ctx);
+            DatProperty prop = _value.Property;
+            k = GetPropertyKey(prop, ref ctx);
         }
 
         value = k;
         return k != null;
     }
 
-    internal static string GetPropertyKey(DatProperty property, in FileEvaluationContext ctx)
+    internal static string GetPropertyKey(DatProperty property, ref FileEvaluationContext ctx)
     {
-        return !ctx.File.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode)
+        return !ctx.File.TryGetProperty(property, ref ctx, out IPropertySourceNode? propertyNode)
             ? property.Key
             : propertyNode.Key;
     }
 
-    protected override bool AcceptProperty<TVisitor>(in IndicesProperty property, in FileEvaluationContext ctx, ref TVisitor visitor)
+    protected override bool AcceptProperty<TVisitor>(in IndicesProperty property, ref FileEvaluationContext ctx, ref TVisitor visitor)
     {
         // todo
         return false;
     }
 
-    protected override bool AcceptProperty(in IsLegacyProperty property, in FileEvaluationContext ctx, out bool value)
+    protected override bool AcceptProperty(in IsLegacyProperty property, ref FileEvaluationContext ctx, out bool value)
     {
         if (_propReference.IsCrossReference)
         {
@@ -164,14 +171,13 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
         return false;
     }
 
-    protected override bool AcceptProperty(in ValueTypeProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    protected override bool AcceptProperty(in ValueTypeProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         EnsureValueExists(ctx.Services.Database);
-        DatProperty prop = _value.Property;
         SourceValueType k;
         if (_value is ICrossedPropertyReference cr)
         {
-            if (!cr.TryResolveReference(in ctx, out FileEvaluationContext crContext, out _))
+            if (!cr.TryResolveReference(ref ctx, out FileEvaluationContext crContext, out DatProperty? prop))
             {
                 value = null;
                 return false;
@@ -179,23 +185,24 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
 
             try
             {
-                k = prop.GetValueType(in crContext);
+                k = prop.GetValueType(ref crContext);
             }
             finally
             {
-                cr.DisposeContext(in crContext);
+                cr.DisposeContext(ref crContext);
             }
         }
         else
         {
-            k = prop.GetValueType(in ctx);
+            DatProperty prop = _value.Property;
+            k = prop.GetValueType(ref ctx);
         }
 
         value = ValueTypeProperty.GetTypeName(k);
         return true;
     }
 
-    protected override bool AcceptProperty(in CountProperty property, in FileEvaluationContext ctx, out int value)
+    protected override bool AcceptProperty(in CountProperty property, ref FileEvaluationContext ctx, out int value)
     {
         // todo
         value = 0;

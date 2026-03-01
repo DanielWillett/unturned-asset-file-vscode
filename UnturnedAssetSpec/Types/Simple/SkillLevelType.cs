@@ -159,14 +159,14 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
     }
 
     /// <inheritdoc />
-    public bool TryParse(ref TypeParserArgs<int> args, in FileEvaluationContext ctx, out Optional<int> value)
+    public bool TryParse(ref TypeParserArgs<int> args, ref FileEvaluationContext ctx, out Optional<int> value)
     {
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }
 
-        if (!TypeParsers.Int32.TryParse(ref args, in ctx, out value))
+        if (!TypeParsers.Int32.TryParse(ref args, ref ctx, out value))
         {
             return false;
         }
@@ -181,7 +181,7 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
         SkillInfo? skillInfo = null;
         if (args.DiagnosticSink != null && value.Value >= 0)
         {
-            if (TryGetCurrentSkillReference(in ctx, out SkillReference currentSkillRef)
+            if (TryGetCurrentSkillReference(ref ctx, out SkillReference currentSkillRef)
                 && currentSkillRef.TryGetSkillInfo(_info, out skillInfo))
             {
                 maxValue = skillInfo.MaximumLevel;
@@ -212,7 +212,7 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
         return true;
     }
 
-    private bool TryGetCurrentSkillReference(in FileEvaluationContext ctx, out SkillReference skillRef)
+    private bool TryGetCurrentSkillReference(ref FileEvaluationContext ctx, out SkillReference skillRef)
     {
         skillRef = SkillReference.None;
 
@@ -223,7 +223,7 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
             v.Information = ctx.Services.Database;
             v.Success = false;
 
-            if (!_skillValue.VisitValue(ref v, in ctx) || !v.Success)
+            if (!_skillValue.VisitValue(ref v, ref ctx) || !v.Success)
                 return false;
 
             skillRef = v.Value;
@@ -231,8 +231,8 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
         }
 
         if (_specialityIndexValue != null && _skillIndexValue != null
-            && _specialityIndexValue.TryGetValueAs(in ctx, out Optional<int> specialityIndex) && specialityIndex.HasValue
-            && _skillIndexValue.TryGetValueAs(in ctx, out Optional<int> skillIndex) && skillIndex.HasValue)
+            && _specialityIndexValue.TryGetValueAs(ref ctx, out Optional<int> specialityIndex) && specialityIndex.HasValue
+            && _skillIndexValue.TryGetValueAs(ref ctx, out Optional<int> skillIndex) && skillIndex.HasValue)
         {
             skillRef = new SkillReference(specialityIndex.Value, skillIndex.Value);
             return true;

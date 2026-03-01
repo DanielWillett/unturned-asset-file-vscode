@@ -58,7 +58,7 @@ public sealed class ConcreteValue<TValue>
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<TValue> value, in FileEvaluationContext ctx)
+    public bool TryEvaluateValue(out Optional<TValue> value, ref FileEvaluationContext ctx)
     {
         return TryGetConcreteValue(out value);
     }
@@ -75,7 +75,7 @@ public sealed class ConcreteValue<TValue>
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct

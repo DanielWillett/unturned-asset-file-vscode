@@ -2,11 +2,11 @@ using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System.Collections.Immutable;
 using System.Numerics;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace UnturnedAssetSpecTests;
 
@@ -24,7 +24,7 @@ public class MatchingSwitches
                 new ComplexConditionalSwitchCase<IType>(
                     ImmutableArray.Create<IValue<bool>>
                     (
-                        new Condition<bool>(new LocalPropertyReference(in pref, null!, offline),
+                        new Condition<bool>(new LocalPropertyReferenceValue(in pref, null!, offline),
                             DanielWillett.UnturnedDataFileLspServer.Data.Values.Operations.Equal.Instance, true, false)
                     ),
                     JointConditionOperation.Or,
@@ -33,7 +33,8 @@ public class MatchingSwitches
                 new DefaultSwitchCase<IType>(
                     Value.Type(new Vector3Type(Vector3Kind.Scale, VectorTypeOptions.Default))
                 )
-            )
+            ),
+            PropertySearchTrimmingBehavior.ExactPropertyOnly
         );
 
         DatProperty owner = DatProperty.Create(

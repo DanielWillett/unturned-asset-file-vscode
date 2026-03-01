@@ -4,15 +4,13 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -39,11 +37,11 @@ public sealed class Orderfile : DatFileType
 
         if (database.IsInitialized)
         {
-            GenerateProperties(database, NullLoggerFactory.Instance);
+            GenerateProperties(database);
         }
         else
         {
-            database.OnInitialize(GenerateProperties);
+            database.OnInitialize(services => GenerateProperties(services.Database));
         }
     }
 
@@ -65,7 +63,7 @@ public sealed class Orderfile : DatFileType
     }
 
     // set up auto-generated auto-complete for the Orderfile file type
-    private Task GenerateProperties(IAssetSpecDatabase database, ILoggerFactory loggerFactory)
+    private Task GenerateProperties(IAssetSpecDatabase database)
     {
         ImmutableArray<DatProperty>.Builder properties = ImmutableArray.CreateBuilder<DatProperty>(database.FileTypes.Count);
         int firstCustomTypeIndex = 0;
@@ -229,14 +227,14 @@ internal sealed class OrderfileListElementType : BaseType<string, OrderfileListE
     }
 
     /// <inheritdoc />
-    public bool TryParse(ref TypeParserArgs<string> args, in FileEvaluationContext ctx, out Optional<string> value)
+    public bool TryParse(ref TypeParserArgs<string> args, ref FileEvaluationContext ctx, out Optional<string> value)
     {
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }
 
-        if (!TypeParsers.String.TryParse(ref args, in ctx, out value))
+        if (!TypeParsers.String.TryParse(ref args, ref ctx, out value))
         {
             return false;
         }

@@ -6,9 +6,9 @@ Property references are represented by the [PropertyRef](/api/DanielWillett.Untu
 
 ## Format
 
-Fully qualified properties contain their category, type, and name.
+Fully qualified properties contain their category, type, name, and any breadcrumbs to the property.
 
-`@([$xx$::][owning type::]Property)`
+`@([$xx$::][owning type::][breadcrumbs.]Property)`
 
 Most property references will just look like this, however:
 
@@ -17,6 +17,25 @@ Most property references will just look like this, however:
 By default, the property will be searched for in the current type and every child type in the hierarchy. If the property is in another type or a parent type, it should be explicitly specified.
 
 `@SDG.Unturned.ItemBarrelAsset, Assembly-CSharp::Silenced`
+
+If a localization property is referring to a normal property, or some situation like that, a category tag will have to be put on the front.
+
+`@$prop$::TextId` or `@$prop$::SDG.Unturned.ActionBlueprint, Assembly-CSharp::TextId`
+
+Breadcrumbs can be supplied for advanced situations where a property needs to be accessed through an array. Breadcrumbs can access properties or indices. For example:
+
+`@SDG.Unturned.BlueprintSupply, Assembly-CSharp::InputItems[0].ID`
+
+> [!TIP]
+> The property being referenced here is `ID`, so the type in front needs to point to the owner of `ID`, not `InputItems` (which would be `Blueprint` in that case).
+> 
+> This syntax is a little misleading in this case. but we're saying access `BlueprintSupply.ID` by navigating through `InputItems[0]`.
+
+Other breadcrumb examples:
+
+* `"Property[0][1]."` -> `Property[0]/[1]/` - Property is a list of lists, access the first element of property then the first element of that list.
+* `"Dictionary.Property."` -> `Dictionary/Property/` - Dictionary is a dictionary/object, access Property in Dictionary
+* `"List\[2][3].Property\.Name."` -> `List[2][3]/Property.Name/` - 'List[2]' is the key of a list, access element 3 in 'List[2]', then get the 'Property.Name' property from that dictionary.
 
 | Category     | Description                                                                             |
 | ------------ | --------------------------------------------------------------------------------------- |
@@ -29,7 +48,7 @@ By default, the property will be searched for in the current type and every chil
 | `$bndl$`     | Unity asset property, found in the `BundleAssets` list.                                 |
 
 ### Cross-referenced properties
-A cross-referenced property references a property in a different type on a different object. This object is determined by the value of the `FileCrossRef`, which is the name of a property. This property should be a Guid, AssetReference, Id, GuidOrId, or similar type which references another asset file.
+A cross-referenced property references a property in a different type on a different object. This object is determined by the value of the `FileCrossRef`, which is the name of a property. This property should be an AssetReference, LegacyAssetReference, BackwardsCompatibleAssetReference, or similar type which references another asset file.
 
 For example:
 ```json
@@ -42,7 +61,7 @@ For example:
     "Key": "Is_Gun_Silenced",
     "Type": "Boolean",
     "FileCrossRef": "BarrelID",
-    // this.DefaultValue = BarrelID != 0 && ((ItemBarrelAsset)Assets.find(EAssetType.ITEM, BarrelID)).isSilenced
+    // DefaultValue = BarrelID != 0 && ((ItemBarrelAsset)Assets.find(EAssetType.ITEM, BarrelID)).isSilenced
     "DefaultValue":
     [
         {

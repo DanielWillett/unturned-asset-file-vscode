@@ -4,9 +4,11 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -45,6 +47,11 @@ public class DatProperty : IDatSpecificationObject
     /// <remarks>Corresponds to the <c>HideInherited</c> property.</remarks>
     [MemberNotNullWhen(true, nameof(OverriddenProperty))]
     public bool HideOverridden { get; internal set; }
+
+    /// <summary>
+    /// Whether or not this property imports properties from <see cref="Type"/>.
+    /// </summary>
+    public bool IsImport { get; internal set; }
 
     /// <summary>
     /// The expected location of this property when it's in an asset.
@@ -211,6 +218,22 @@ public class DatProperty : IDatSpecificationObject
         DataRoot = element;
         Context = context;
         Type = null!;
+    }
+
+    /// <summary>
+    /// Attempt to get the import type for this property.
+    /// </summary>
+    /// <returns><see langword="true"/> if this property is an import property and the type could be resolved to a concrete <see cref="DatTypeWithProperties"/>, otherwise <see langword="false"/>.</returns>
+    public bool TryGetImportType([NotNullWhen(true)] out DatTypeWithProperties? importType)
+    {
+        if (!IsImport || !Type.TryGetConcreteType(out IType? type))
+        {
+            importType = null;
+            return false;
+        }
+
+        importType = type as DatTypeWithProperties;
+        return importType != null;
     }
 
     /// <inheritdoc cref="Create(string,IPropertyType,DatTypeWithProperties,JsonElement,SpecPropertyContext)("/>
@@ -547,7 +570,7 @@ public enum AssetDatPropertyPosition
     /// </code>
     /// </example>
     /// </summary>
-    /// <remarks>All properties use this value in non-asset files.</remarks>
+    /// <remarks>All properties use this value in non-asset files or custom types.</remarks>
     Root,
 
     /// <summary>
@@ -575,4 +598,59 @@ public enum AssetDatPropertyPosition
     /// </example>
     /// </summary>
     Metadata
+}
+
+public static class AssetDatPropertyPositionExtensions
+{
+    extension(AssetDatPropertyPositionExpectation expectation)
+    {
+        /// <summary>
+        /// Checks whether a property with this expectation could be possibly satisfied by a node at <paramref name="position"/>.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="assetFile">The file to check in.</param>
+        /// <exception cref="InvalidEnumArgumentException">Invalid expectation or position.</exception>
+        public bool IsValidPosition(AssetDatPropertyPosition position, IAssetSourceFile assetFile)
+        {
+            return expectation.IsValidPosition(position, assetFile.GetAssetDataDictionary() != null, assetFile.GetMetadataDictionary() != null);
+        }
+
+        /// <summary>
+        /// Checks whether a property with this expectation could be possibly satisfied by a node at <paramref name="position"/>.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="hasAssetSection">Whether or not the asset file contains a 'Asset' section.</param>
+        /// <param name="hasMetadataSection">Whether or not the asset file contains a 'Metadata' section.</param>
+        /// <exception cref="InvalidEnumArgumentException">Invalid expectation or position.</exception>
+        public bool IsValidPosition(AssetDatPropertyPosition position, bool hasAssetSection, bool hasMetadataSection)
+        {
+            if (position is < AssetDatPropertyPosition.Root or > AssetDatPropertyPosition.Metadata)
+                throw new InvalidEnumArgumentException(nameof(position), (int)position, typeof(AssetDatPropertyPosition));
+
+            return expectation switch
+            {
+                AssetDatPropertyPositionExpectation.AssetData
+                    => position == AssetDatPropertyPosition.Asset || (!hasAssetSection && position == AssetDatPropertyPosition.Root),
+                AssetDatPropertyPositionExpectation.MetadataOnlyIfExistsOtherwiseRoot
+                    => position == AssetDatPropertyPosition.Metadata || (!hasMetadataSection && position == AssetDatPropertyPosition.Root),
+                AssetDatPropertyPositionExpectation.MetadataOnlyIfExistsOtherwiseAssetData
+                    => position switch
+                    {
+                        AssetDatPropertyPosition.Asset => !hasMetadataSection,
+                        AssetDatPropertyPosition.Root => !hasAssetSection && !hasMetadataSection,
+                        _ /* Metadata */ => true 
+                    },
+                AssetDatPropertyPositionExpectation.MetadataOrAssetData
+                    => true,
+                AssetDatPropertyPositionExpectation.Root
+                    => position == AssetDatPropertyPosition.Root,
+                AssetDatPropertyPositionExpectation.Metadata
+                    => position == AssetDatPropertyPosition.Metadata,
+                AssetDatPropertyPositionExpectation.Asset
+                    => position == AssetDatPropertyPosition.Asset,
+                _
+                    => throw new InvalidEnumArgumentException(nameof(expectation), (int)expectation, typeof(AssetDatPropertyPositionExpectation))
+            };
+        }
+    }
 }

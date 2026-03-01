@@ -90,9 +90,9 @@ public sealed class VersionType : PrimitiveType<Version, VersionType>, ITypePars
         _strictFormatting = strictFormatting;
     }
 
-    public bool TryParse(ref TypeParserArgs<Version> args, in FileEvaluationContext ctx, out Optional<Version> value)
+    public bool TryParse(ref TypeParserArgs<Version> args, ref FileEvaluationContext ctx, out Optional<Version> value)
     {
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }

@@ -23,6 +23,8 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
     internal readonly IDatSpecificationReadContext Context;
     private bool _hasStringParser;
     private bool _stringParserNoFallback;
+    private PropertySearchTrimmingBehavior _trimmingBehavior = PropertySearchTrimmingBehavior.CreatesOtherPropertiesInLinkedFiles;
+    private bool _hasTrimmingBehavior;
 
     internal static readonly ThreadLocal<TypeParserArgs<DatObjectValue>> ValueParseInfo
         = new ThreadLocal<TypeParserArgs<DatObjectValue>>();
@@ -43,7 +45,16 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
     public ITypeParser<DatObjectValue> Parser => this;
 
     /// <inheritdoc />
-    public override PropertySearchTrimmingBehavior TrimmingBehavior => PropertySearchTrimmingBehavior.CreatesOtherPropertiesInLinkedFiles;
+    public override PropertySearchTrimmingBehavior TrimmingBehavior
+    {
+        get
+        {
+            if (!_hasTrimmingBehavior)
+                CalculateTrimmingBehavior();
+
+            return _trimmingBehavior;
+        }
+    }
 
     /// <inheritdoc />
     public override DatFileType Owner { get; }
@@ -126,14 +137,14 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
     }
 
     /// <inheritdoc />
-    public bool TryParse(ref TypeParserArgs<DatObjectValue> args, in FileEvaluationContext ctx, out Optional<DatObjectValue> value)
+    public bool TryParse(ref TypeParserArgs<DatObjectValue> args, ref FileEvaluationContext ctx, out Optional<DatObjectValue> value)
     {
         value = Optional<DatObjectValue>.Null;
 
         IDictionarySourceNode? legacyParentDictionary = (args.ParentNode as IPropertySourceNode)?.Parent as IDictionarySourceNode;
 
-        bool maybeModern = args.KeyFilter != PropertyResolutionContext.Legacy;
-        bool maybeLegacy = args.KeyFilter != PropertyResolutionContext.Modern;
+        bool maybeModern = args.KeyFilter != LegacyExpansionFilter.Legacy;
+        bool maybeLegacy = args.KeyFilter != LegacyExpansionFilter.Modern;
         maybeLegacy &= legacyParentDictionary != null;
         switch (args.ValueNode)
         {
@@ -148,14 +159,14 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
                     {
                         if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                         {
-                            return defValue.TryGetValueAs(in ctx, out value);
+                            return defValue.TryGetValueAs(ref ctx, out value);
                         }
 
                         return false;
                     }
                 }
 
-                return maybeLegacy && TryParseLegacyObject(ref args, in ctx, out value, legacyParentDictionary!);
+                return maybeLegacy && TryParseLegacyObject(ref args, ref ctx, out value, legacyParentDictionary!);
 
             case IValueSourceNode valueNode:
                 if (StringParser is { } stringParser)
@@ -177,7 +188,7 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
                     ValueParseInfo.Value = args;
                     try
                     {
-                        if (StringDefaultValue.TryEvaluateValue(out value, in ctx))
+                        if (StringDefaultValue.TryEvaluateValue(out value, ref ctx))
                         {
                             return true;
                         }
@@ -202,7 +213,7 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
                     return false;
                 }
 
-                return TryParseLegacyObject(ref args, in ctx, out value, legacyParentDictionary!);
+                return TryParseLegacyObject(ref args, ref ctx, out value, legacyParentDictionary!);
 
             case IListSourceNode listNode:
                 if (maybeModern)
@@ -218,24 +229,24 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
                     return false;
                 }
 
-                return TryParseModernObject(ref args, in ctx, out value, dictNode);
+                return TryParseModernObject(ref args, ref ctx, out value, dictNode);
 
         }
     }
 
-    private bool TryParseModernObject(ref TypeParserArgs<DatObjectValue> args, in FileEvaluationContext ctx, out Optional<DatObjectValue> value, IDictionarySourceNode dictionary)
+    private bool TryParseModernObject(ref TypeParserArgs<DatObjectValue> args, ref FileEvaluationContext ctx, out Optional<DatObjectValue> value, IDictionarySourceNode dictionary)
     {
         bool failure = false;
         ImmutableArray<DatObjectPropertyValue>.Builder properties = ImmutableArray.CreateBuilder<DatObjectPropertyValue>();
         bool shouldIgnoreError = args.ShouldIgnoreFailureDiagnostic;
         foreach (DatProperty property in Properties)
         {
-            if (!dictionary.TryGetProperty(property, in ctx, out IPropertySourceNode? propertyNode, PropertyResolutionContext.Modern))
+            if (!dictionary.TryGetProperty(property, ref ctx, out IPropertySourceNode? propertyNode, LegacyExpansionFilter.Modern))
             {
                 // missing required property
-                if (property.Required != null && property.Required.TryEvaluateValue(out Optional<bool> isRequired, in ctx) && isRequired.Value)
+                if (property.Required != null && property.Required.TryEvaluateValue(out Optional<bool> isRequired, ref ctx) && isRequired.Value)
                 {
-                    args.DiagnosticSink?.UNT2014_Object(ref args, property.Key, DisplayName /* todo: get breadcrumbs instead */);
+                    args.DiagnosticSink?.UNT2014_Object(ref args, property.Key, ctx.RootBreadcrumbs.ToString(false));
                     failure = true;
                     shouldIgnoreError = true;
                 }
@@ -243,7 +254,7 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
                 continue;
             }
 
-            if (!property.Type.TryEvaluateType(out IType? propertyType, in ctx))
+            if (!property.Type.TryEvaluateType(out IType? propertyType, ref ctx))
             {
                 args.DiagnosticSink?.UNT2004_CanNotDetermineType(ref args, property.Key);
                 failure = true;
@@ -266,7 +277,7 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
         return true;
     }
 
-    private bool TryParseLegacyObject(ref TypeParserArgs<DatObjectValue> args, in FileEvaluationContext ctx, out Optional<DatObjectValue> value, IDictionarySourceNode dictionary)
+    private bool TryParseLegacyObject(ref TypeParserArgs<DatObjectValue> args, ref FileEvaluationContext ctx, out Optional<DatObjectValue> value, IDictionarySourceNode dictionary)
     {
         // todo
         value = Optional<DatObjectValue>.Null;
@@ -422,6 +433,30 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
 
     #endregion
 
+    private void CalculateTrimmingBehavior()
+    {
+        if (this is DatCustomAssetType assetType && assetType.LocalizationProperties.Length > 0)
+        {
+            _trimmingBehavior = PropertySearchTrimmingBehavior.CreatesOtherPropertiesInLinkedFiles;
+            _hasTrimmingBehavior = true;
+            return;
+        }
+
+        if (PropertiesBuilder != null)
+        {
+            return;
+        }
+
+        PropertySearchTrimmingBehavior behavior = PropertySearchTrimmingBehavior.CreatesOtherPropertiesInSameFileAtSameLevel;
+        foreach (DatProperty property in Properties)
+        {
+            behavior = TypeOfType.MergeTrimmingBehavior(behavior, property.Type.TrimmingBehavior);
+        }
+
+        _trimmingBehavior = behavior;
+        _hasTrimmingBehavior = true;
+    }
+
     /// <inheritdoc />
     public void Dispose()
     {
@@ -442,14 +477,14 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
             Owner = owner;
         }
 
-        public virtual bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        public virtual bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
             where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
             IValue? value = Value.TryReadValueFromJson(in Element, ValueReadOptions.Default, PropertyType, ctx.Services.Database, Owner);
-            return value != null && value.VisitValue(ref visitor, in ctx);
+            return value != null && value.VisitValue(ref visitor, ref ctx);
         }
 
         bool IValue.IsNull => false;
@@ -473,11 +508,11 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
             _context = context;
         }
 
-        public override bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        public override bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         {
             TDataRefReadContext context = _context;
             IValue? value = Value.TryReadValueFromJson(in Element, ValueReadOptions.Default, PropertyType, ctx.Services.Database, Owner, ref context);
-            return value != null && value.VisitValue(ref visitor, in ctx);
+            return value != null && value.VisitValue(ref visitor, ref ctx);
         }
     }
 }

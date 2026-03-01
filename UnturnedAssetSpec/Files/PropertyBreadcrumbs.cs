@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
@@ -433,6 +434,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     /// </summary>
     public static PropertyBreadcrumbs FromNode(ISourceNode node)
     {
+        // must be a property or value in a list
         if (node is not IPropertySourceNode && node.Parent is not IListSourceNode)
             throw new ArgumentException("Expected either a property or element in a list.");
 
@@ -474,21 +476,27 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
             PropertyBreadcrumbSection[] sections = new PropertyBreadcrumbSection[sectionCt];
 
             int lastIndex = node.Index;
-            ISourceNode parent = node.Parent;
+            IParentSourceNode parent = node.Parent;
             for (int i = 0; i < parentCt; ++i)
             {
                 switch (parent)
                 {
                     case IListSourceNode list:
-                        ISourceNode n = list.Parent as IPropertySourceNode ?? (ISourceNode)list;
-                        sections[--sectionCt] = new PropertyBreadcrumbSection(n, PropertyResolutionContext.Modern, lastIndex);
+                        if (list.Parent is IPropertySourceNode propertyNode)
+                        {
+                            sections[--sectionCt] = new PropertyBreadcrumbSection(propertyNode, PropertyResolutionContext.Modern, lastIndex, propertyNode.Key);
+                        }
+                        else
+                        {
+                            sections[--sectionCt] = new PropertyBreadcrumbSection(list, PropertyResolutionContext.Modern, lastIndex, null);
+                        }
                         lastIndex = parent.Index;
                         break;
 
                     case IDictionarySourceNode dict:
                         if (dict.Parent is IPropertySourceNode prop)
                         {
-                            sections[--sectionCt] = new PropertyBreadcrumbSection(prop, PropertyResolutionContext.Modern);
+                            sections[--sectionCt] = new PropertyBreadcrumbSection(prop, PropertyResolutionContext.Modern, prop.Key);
                             lastIndex = -1;
                             break;
                         }
@@ -505,178 +513,213 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     }
 
     /// <summary>
-    /// Try to find the property in <paramref name="file"/> in the dictionary this breadcrumb points to.
+    /// Find the parent dictionary and value type of a value node referred to by breadcrumbs.
     /// </summary>
-    public bool TryGetProperty(ISourceFile file, DatProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, ICollection<ISourceNode>? nodePath = null)
+    /// <param name="root">The root dictionary to search from.</param>
+    /// <param name="rootType">The object type of the root dictionary.</param>
+    /// <param name="dictionaryOrValue">The value being referred to by these breadcrumbs. This is usually a dictionary.</param>
+    /// <param name="valueType">The type of object represented by <paramref name="dictionaryOrValue"/>.</param>
+    /// <param name="ctx">Evaluation context.</param>
+    /// <param name="context">The type of properties to search for.</param>
+    /// <returns>Whether or not the breadcrumbs could be fully traced.</returns>
+    /// <exception cref="ArgumentNullException"/>
+    /// <exception cref="InvalidEnumArgumentException">Invalid property context. Expected 'Property', 'Localization', or 'BundleAsset'.</exception>
+    public bool TryTraceRelativeTo(
+        IDictionarySourceNode root,
+        DatTypeWithProperties rootType,
+        [NotNullWhen(true)] out IAnyValueSourceNode? dictionaryOrValue,
+        [NotNullWhen(true)] out IType? valueType,
+        ref FileEvaluationContext ctx,
+        SpecPropertyContext context = SpecPropertyContext.Property
+    )
     {
-        lock (file.TreeSync)
-        {
-            if (IsRoot)
-            {
-                return file.TryResolveProperty(property, in ctx, out propertyNode, PropertyResolutionContext.Modern);
-            }
+        if (root == null)
+            throw new ArgumentNullException(nameof(root));
+        if (rootType == null)
+            throw new ArgumentNullException(nameof(rootType));
+        if (ctx.Services == null)
+            throw new ArgumentNullException(nameof(ctx));
 
-            AssetFileType fileType = default;
-            if (!TryGetDictionaryAndTypeIntl(file, out IDictionarySourceNode? dictionary, in ctx, null, in fileType, out _, nodePath))
-            {
-                propertyNode = null;
-                return false;
-            }
-
-            return dictionary.TryGetProperty(property, in ctx, out propertyNode, PropertyResolutionContext.Modern);
-        }
-    }
-
-    /// <summary>
-    /// Try to find the the object type this breadcrumb points to.
-    /// </summary>
-    public bool TryGetDictionaryAndType(ISourceFile file, in AssetFileType fileType, IAssetSpecDatabase database, in FileEvaluationContext ctx, [NotNullWhen(true)] out IDictionarySourceNode? dictionary, [MaybeNullWhen(false)] out DatType type, ICollection<ISourceNode>? nodePath = null)
-    {
-        if (database == null)
-            throw new ArgumentNullException(nameof(database));
-        lock (file.TreeSync)
-        {
-            return TryGetDictionaryAndTypeIntl(file, out dictionary, in ctx, database, in fileType, out type, nodePath) && type != null;
-        }
-    }
-
-    /// <summary>
-    /// Try to find the the dictionary this breadcrumb points to.
-    /// </summary>
-    public bool TryGetDictionary(ISourceFile file, [NotNullWhen(true)] out IDictionarySourceNode? dictionary, in FileEvaluationContext ctx, ICollection<ISourceNode>? nodePath = null)
-    {
-        lock (file.TreeSync)
-        {
-            AssetFileType type = default;
-            return TryGetDictionaryAndTypeIntl(file, out dictionary, in ctx, null, in type, out _, nodePath);
-        }
-    }
-
-    private bool TryGetDictionaryAndTypeIntl(ISourceFile file, [NotNullWhen(true)] out IDictionarySourceNode? referencedDictionary, in FileEvaluationContext ctx, IAssetSpecDatabase? database, in AssetFileType fileType, out DatType? type, ICollection<ISourceNode>? nodePath)
-    {
-        type = null;
+        dictionaryOrValue = null;
+        valueType = null;
         if (IsRoot)
         {
-            referencedDictionary = file;
-            if (database != null)
-            {
-                type = fileType.Information;
-            }
+            dictionaryOrValue = root;
+            valueType = rootType;
             return true;
         }
 
-        SpecPropertyContext context = file is ILocalizationSourceFile
-            ? SpecPropertyContext.Localization
-            : SpecPropertyContext.Property;
-
-        ref PropertyBreadcrumbSection lastSection = ref _sections[^1];
-        if (database == null && nodePath == null && lastSection.ParentNode != null)
+        int sectionIndex = 0;
+        if (_sections.Length > 0 && _sections[0].IsRootReference)
         {
-            referencedDictionary = lastSection.GetValueNode() as IDictionarySourceNode;
-            return referencedDictionary != null;
-        }
-
-        int startIndex = 0;
-        if (database == null && nodePath == null)
-        {
-            for (int i = _sections.Length - 1; i >= 0; --i)
+            sectionIndex = 1;
+            if (root.File != root)
             {
-                ISourceNode? node = _sections[i].ParentNode;
-                if (node != null && ReferenceEquals(node.Parent, file))
+                root = root.File;
+                QualifiedType actualType = root.File.ActualType;
+
+                // rootType = root.File.Type;
+                if (actualType.IsNull
+                    || !ctx.Services.Database.TryFindType(actualType, out DatType? datType)
+                    || (rootType = (datType as DatTypeWithProperties)!) == null
+                   )
                 {
-                    startIndex = i;
-                    break;
+                    return false;
                 }
             }
-        }
-        
-        IAnyChildrenSourceNode? dictionary = file;
-        if (dictionary is IAssetSourceFile a)
-            dictionary = a.AssetData;
 
-        DatType? typeOwner = fileType.Information;
-        int skipType = 0;
-
-        for (int i = startIndex; i < _sections.Length; ++i)
-        {
-            ref PropertyBreadcrumbSection section = ref _sections[i];
-            if (database != null && typeOwner != null && skipType <= 0)
+            if (_sections.Length == 1)
             {
-                DatProperty? property = section.Property as DatProperty;
-                if (property == null && section.ParentNode is IPropertySourceNode propNode)
-                {
-                    // todo property = database.FindPropertyInfoByKey(propNode.Key, typeOwner, PropertyResolutionContext.Modern, requireCanBeInMetadata: false, context).Property;
-                }
+                dictionaryOrValue = root;
+                valueType = rootType;
+                return true;
+            }
+        }
 
-                if (property == null)
-                    typeOwner = null;
-                else
-                {
-                    IPropertyType? typeOrListType = property.Type;
-                    skipType = 0;
-                    typeOwner = null;
-                    while (typeOrListType != null)
+        IDictionarySourceNode current = root;
+        DatTypeWithProperties? dictionaryType = rootType;
+
+        // an actual Dictionary<,> value, not just an object that uses a dictionary.
+        IDictionaryType? lastDictionaryType = null;
+
+        // a list value that doesn't have a property, such as a list in a list.
+        IListSourceNode? lastListValue = null;
+
+        IType? previousResolvedType = null;
+
+        for (; sectionIndex < _sections.Length; ++sectionIndex)
+        {
+            ref PropertyBreadcrumbSection section = ref _sections[sectionIndex];
+
+            bool alreadyAppliedIndex = false;
+
+            DatProperty? property;
+            IPropertyType? propertyType;
+
+            IPropertySourceNode? propertyNode;
+            IAnyValueSourceNode? valueNode;
+
+            switch (section.Property)
+            {
+                case string propertyName:
+                    if (lastDictionaryType != null)
                     {
-                        switch (typeOrListType)
+                        if (!current.TryGetProperty(propertyName, out propertyNode))
                         {
-                            case DatType t:
-                                typeOwner = t;
-                                break;
-
-                            case IListType list:
-                                IType? innerType = list.ElementType;
-                                if (innerType == null)
-                                    break;
-                                ++skipType;
-                                typeOrListType = innerType;
-                                continue;
-
-                            case IDictionaryType dict:
-                                innerType = dict.ValueType;
-                                if (innerType == null)
-                                    break;
-                                ++skipType;
-                                typeOrListType = innerType;
-                                continue;
+                            return false;
                         }
 
+                        valueNode = propertyNode.Value;
+                        propertyType = lastDictionaryType.ValueType;
+                        lastDictionaryType = null;
                         break;
                     }
-                }
-            }
-            else if (skipType > 0)
-            {
-                --skipType;
+
+                    if (dictionaryType.TryFindProperty(propertyName, context, out property))
+                    {
+                        goto propLbl;
+                    }
+
+                    return false;
+                    
+                case DatProperty prop:
+                    if (lastDictionaryType != null || lastListValue != null)
+                    {
+                        return false;
+                    }
+
+                    property = prop;
+
+                    propLbl:
+                    propertyType = property.Type;
+                    if (!current.TryGetProperty(property, ref ctx, out propertyNode))
+                    {
+                        return false;
+                    }
+
+                    valueNode = propertyNode.Value;
+                    break;
+
+                case null when previousResolvedType is IListType listType:
+                    if (lastListValue == null
+                        || !lastListValue.TryGetElement(section.Index, out valueNode))
+                    {
+                        return false;
+                    }
+
+                    propertyType = listType.ElementType;
+                    alreadyAppliedIndex = true;
+                    break;
+
+                default:
+                    return false;
             }
 
-            dictionary = section.GetValueNode(dictionary, in ctx);
-            if (dictionary == null)
+            if (!propertyType.TryEvaluateType(out IType? type, ref ctx))
             {
-                referencedDictionary = null;
                 return false;
             }
 
-            if (skipType > 0 && dictionary is IDictionarySourceNode { Parent: IListSourceNode })
-                --skipType;
-
-            if (nodePath != null)
+            if (!alreadyAppliedIndex)
             {
-                if (dictionary.Parent is IListSourceNode l)
+                if (section.Index >= 0)
                 {
-                    if (l.Parent is IPropertySourceNode prop)
-                        nodePath.Add(prop);
-                    nodePath.Add(dictionary);
+                    if (type is not IListType listType)
+                    {
+                        return false;
+                    }
+
+                    type = listType.ElementType;
+                    if (valueNode is not IListSourceNode listNode || !listNode.TryGetElement(section.Index, out valueNode))
+                    {
+                        return false;
+                    }
                 }
-                else if (dictionary.Parent is IPropertySourceNode prop)
-                    nodePath.Add(prop);
-                else
-                    nodePath.Add(dictionary);
+                else if (valueNode is IListSourceNode)
+                {
+                    return false;
+                }
+            }
+
+            lastListValue = null;
+
+            if (sectionIndex == _sections.Length - 1)
+            {
+                dictionaryOrValue = valueNode;
+                valueType = type;
+                return valueNode != null;
+            }
+
+            previousResolvedType = type;
+
+            switch (valueNode)
+            {
+                case IDictionarySourceNode dict:
+                    if (type is IDictionaryType dictType)
+                    {
+                        lastDictionaryType = dictType;
+                        previousResolvedType = dictType.ValueType;
+                    }
+                    else
+                    {
+                        dictionaryType = type as DatTypeWithProperties;
+                    }
+
+                    current = dict;
+                    if (dictionaryType == null)
+                        return false;
+                    break;
+
+                case IListSourceNode list:
+                    lastListValue = list;
+                    break;
+
+                default:
+                    return false;
             }
         }
 
-        type = skipType > 0 ? null : typeOwner;
-        referencedDictionary = dictionary as IDictionarySourceNode;
-        return referencedDictionary != null;
+        throw new InvalidProgramException("Unreachable");
     }
 
     /// <inheritdoc />
@@ -773,6 +816,12 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
     
     public readonly PropertyResolutionContext Context;
 
+    /// <summary>
+    /// Whether or not this section is a 'root' reference, as in it's instructs the path to start at the root of the file.
+    /// </summary>
+    // ReSharper disable once MergeIntoPattern
+    public readonly bool IsRootReference => Property is string { Length: 1 } str && str[0] == '~';
+    
     internal PropertyBreadcrumbSection(in PropertyBreadcrumbSection other, object? newProperty)
     {
         Index = other.Index;
@@ -815,18 +864,20 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
         Index = index;
     }
 
-    public PropertyBreadcrumbSection(ISourceNode parentNode, PropertyResolutionContext context)
+    public PropertyBreadcrumbSection(ISourceNode parentNode, PropertyResolutionContext context, string? propertyName)
     {
         ParentNode = parentNode;
         Context = context;
         Index = -1;
+        Property = propertyName;
     }
 
-    public PropertyBreadcrumbSection(ISourceNode parentNode, PropertyResolutionContext context, int index)
+    public PropertyBreadcrumbSection(ISourceNode parentNode, PropertyResolutionContext context, int index, string? propertyName)
     {
         ParentNode = parentNode;
         Context = context;
         Index = index;
+        Property = propertyName;
     }
 
     internal readonly IAnyChildrenSourceNode? GetValueNode()
@@ -855,7 +906,7 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
         return value as IAnyChildrenSourceNode;
     }
 
-    internal readonly IAnyChildrenSourceNode? GetValueNode(IAnyChildrenSourceNode parentNode, in FileEvaluationContext ctx)
+    internal readonly IAnyChildrenSourceNode? GetValueNode(IAnyChildrenSourceNode parentNode, ref FileEvaluationContext ctx)
     {
         if (ParentNode != null && ReferenceEquals(parentNode.File, ParentNode.File))
             return GetValueNode();
@@ -876,7 +927,7 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
                         break;
 
                     case DatProperty prop:
-                        if (!dict.TryGetProperty(prop, in ctx, out propSrc, PropertyResolutionContext.Modern))
+                        if (!dict.TryGetProperty(prop, ref ctx, out propSrc, LegacyExpansionFilter.Modern))
                             return null;
                         break;
                 }

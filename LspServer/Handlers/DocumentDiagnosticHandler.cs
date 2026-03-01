@@ -119,12 +119,12 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
         protected override void AcceptResolvedProperty(
             DatProperty property,
             IType propertyType,
-            in FileEvaluationContext ctx,
+            ref FileEvaluationContext ctx,
             IPropertySourceNode node,
             in PropertyBreadcrumbs breadcrumbs)
         {
             // todo SpecPropertyTypeParseContext ctx = parseCtx.WithDiagnostics(Diagnostics);
-            // todo propertyType.TryParseValue(in ctx, out _);
+            // todo propertyType.TryParseValue(ref ctx, out _);
         }
 
         /// <inheritdoc />

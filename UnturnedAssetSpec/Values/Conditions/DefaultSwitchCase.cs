@@ -41,13 +41,13 @@ public class DefaultSwitchCase : ISwitchCase
         return Value.VisitConcreteValue(ref visitor);
     }
 
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        return Value.VisitValue(ref visitor, in ctx);
+        return Value.VisitValue(ref visitor, ref ctx);
     }
 
 
@@ -80,7 +80,7 @@ public class DefaultSwitchCase : ISwitchCase
         doesPassConditions = true;
         return true;
     }
-    bool ISwitchCase.TryCheckConditions(in FileEvaluationContext ctx, out bool doesPassConditions)
+    bool ISwitchCase.TryCheckConditions(ref FileEvaluationContext ctx, out bool doesPassConditions)
     {
         doesPassConditions = true;
         return true;
@@ -112,9 +112,9 @@ public class DefaultSwitchCase<TResult> : DefaultSwitchCase, ISwitchCase<TResult
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<TResult> value, in FileEvaluationContext ctx)
+    public bool TryEvaluateValue(out Optional<TResult> value, ref FileEvaluationContext ctx)
     {
-        return Value.TryEvaluateValue(out value, in ctx);
+        return Value.TryEvaluateValue(out value, ref ctx);
     }
 
     /// <inheritdoc />

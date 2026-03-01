@@ -84,7 +84,7 @@ internal class FileEvaluationContextFactory
         );
 
         ctx =
- SpecPropertyTypeParseContext.FromFileEvaluationContext(in ctx, breadcrumbs, property, parentNode, valueNode, diagnosticSink);
+ SpecPropertyTypeParseContext.FromFileEvaluationContext(ref ctx, breadcrumbs, property, parentNode, valueNode, diagnosticSink);
         return property != null;
 #endif
     }

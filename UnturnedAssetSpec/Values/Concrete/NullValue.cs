@@ -31,7 +31,7 @@ public sealed class NullValue : IValue
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -85,7 +85,7 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T>, IValueExpressionNod
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<T> value, in FileEvaluationContext ctx)
+    public bool TryEvaluateValue(out Optional<T> value, ref FileEvaluationContext ctx)
     {
         value = Optional<T>.Null;
         return true;
@@ -103,7 +103,7 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T>, IValueExpressionNod
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct

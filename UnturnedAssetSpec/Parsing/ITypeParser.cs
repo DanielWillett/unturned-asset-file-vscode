@@ -23,7 +23,7 @@ public interface ITypeParser<T> where T : IEquatable<T>
     /// <param name="ctx">Workspace context.</param>
     /// <param name="value">The parsed value wrapped in an <see cref="Optional{T}"/> object.</param>
     /// <returns>Whether or not the value could be parsed successfully.</returns>
-    bool TryParse(ref TypeParserArgs<T> args, in FileEvaluationContext ctx, out Optional<T> value);
+    bool TryParse(ref TypeParserArgs<T> args, ref FileEvaluationContext ctx, out Optional<T> value);
 
     /// <summary>
     /// Attempts to read a value of this type from a <see cref="Utf8JsonReader"/>.
@@ -98,7 +98,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
     /// <summary>
     /// The filter currently active based on the key used.
     /// </summary>
-    public PropertyResolutionContext KeyFilter;
+    public LegacyExpansionFilter KeyFilter;
 
     /// <summary>
     /// The behavior parsers should follow when a value is not provided but one is expected.
@@ -127,7 +127,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         IAnyValueSourceNode? valueNode,
         IParentSourceNode parentNode,
         IType<TElementType> type,
-        PropertyResolutionContext filter)
+        LegacyExpansionFilter filter)
         where TElementType : IEquatable<TElementType>
     {
         args.ValueNode = valueNode;

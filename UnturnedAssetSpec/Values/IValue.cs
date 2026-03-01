@@ -36,7 +36,7 @@ public interface IValue : IEquatable<IValue?>
     /// <summary>
     /// Attempts to invoke <see cref="IValueVisitor.Accept"/> on the current value, evaluating with context if necessary.
     /// </summary>
-    bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -62,7 +62,7 @@ public interface IValue<TValue> : IValue where TValue : IEquatable<TValue>
     /// <summary>
     /// Attempts to evaluate the current value of this <see cref="IValue{TValue}"/>.
     /// </summary>
-    bool TryEvaluateValue(out Optional<TValue> value, in FileEvaluationContext ctx);
+    bool TryEvaluateValue(out Optional<TValue> value, ref FileEvaluationContext ctx);
 }
 
 /// <summary>
@@ -115,7 +115,7 @@ public static class ValueExtensions
         /// <param name="visitor">Visitor which will accept the result.</param>
         /// <param name="ctx">Workspace context.</param>
         /// <returns><see langword="false"/> if the visitor didn't get invoked, otherwise <see langword="true"/>.</returns>
-        public unsafe bool VisitValueGeneric<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+        public unsafe bool VisitValueGeneric<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
             where TVisitor : IGenericVisitor
         {
             if (value == null)
@@ -128,7 +128,7 @@ public static class ValueExtensions
             fixed (TVisitor* visitorPtr = &visitor)
             {
                 v.Visitor = visitorPtr;
-                v.Visited &= value.VisitValue(ref v, in ctx);
+                v.Visited &= value.VisitValue(ref v, ref ctx);
             }
 
             return v.Visited;
@@ -162,11 +162,11 @@ public static class ValueExtensions
         /// <param name="ctx">Workspace context.</param>
         /// <param name="result">Converted value.</param>
         /// <returns>Whether or not the value could be determined and converted.</returns>
-        public bool TryGetValueAs<TResult>(in FileEvaluationContext ctx, out Optional<TResult> result) where TResult : IEquatable<TResult>
+        public bool TryGetValueAs<TResult>(ref FileEvaluationContext ctx, out Optional<TResult> result) where TResult : IEquatable<TResult>
         {
             ValueConvertVisitor<TResult> v = default;
 
-            if (value == null || !value.VisitValue(ref v, in ctx))
+            if (value == null || !value.VisitValue(ref v, ref ctx))
             {
                 result = Optional<TResult>.Null;
                 return false;

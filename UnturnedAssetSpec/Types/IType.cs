@@ -5,6 +5,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -22,11 +23,6 @@ public interface IType : IPropertyType, IEquatable<IType?>
     /// Localized user-facing display name.
     /// </summary>
     string DisplayName { get; }
-
-    /// <summary>
-    /// How this type may expand to other properties.
-    /// </summary>
-    PropertySearchTrimmingBehavior TrimmingBehavior { get; }
 
     /// <summary>
     /// Calls <see cref="ITypeVisitor.Accept"/> on the <paramref name="visitor"/> for this type if it's strongly typed.
@@ -111,6 +107,17 @@ public interface IReferencingType : IType
     /// Types that are referenced by this type.
     /// </summary>
     OneOrMore<IType> ReferencedTypes { get; }
+}
+
+/// <summary>
+/// A type that references an asset reference.
+/// </summary>
+public interface IAssetReferenceType : IType
+{
+    /// <summary>
+    /// List of available base asset types.
+    /// </summary>
+    OneOrMore<QualifiedType> BaseTypes { get; }
 }
 
 public interface ITypeVisitor

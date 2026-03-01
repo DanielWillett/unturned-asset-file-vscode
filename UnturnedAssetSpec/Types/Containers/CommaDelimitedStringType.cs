@@ -349,9 +349,9 @@ public class CommaDelimitedStringType<TElementType>
         }
     }
 
-    public bool TryParse(ref TypeParserArgs<EquatableArray<TElementType>> args, in FileEvaluationContext ctx, out Optional<EquatableArray<TElementType>> value)
+    public bool TryParse(ref TypeParserArgs<EquatableArray<TElementType>> args, ref FileEvaluationContext ctx, out Optional<EquatableArray<TElementType>> value)
     {
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }
@@ -430,9 +430,9 @@ public class CommaDelimitedStringType<TElementType>
                 props.LastCharacterIndex = valueNodeLastCharacterIndex + offset + length - 1;
                 ValueNode fakeNode = ValueNode.Create(span.ToString(), false, Comment.None, in props);
 
-                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, fakeNode, args.ParentNode, _subType, PropertyResolutionContext.Unknown /* todo: ctx.PropertyContext */);
+                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, fakeNode, args.ParentNode, _subType, args.KeyFilter);
 
-                if (parser.TryParse(ref parseArgs, in ctx, out Optional<TElementType> optionalValue)
+                if (parser.TryParse(ref parseArgs, ref ctx, out Optional<TElementType> optionalValue)
                     && optionalValue.TryGetValueOrNull(out array[i]))
                 {
                     continue;

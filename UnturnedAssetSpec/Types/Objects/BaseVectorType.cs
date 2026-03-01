@@ -58,7 +58,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
 
     protected abstract IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context = "");
 
-    public bool TryParse(ref TypeParserArgs<TVector> args, in FileEvaluationContext ctx, out Optional<TVector> value)
+    public bool TryParse(ref TypeParserArgs<TVector> args, ref FileEvaluationContext ctx, out Optional<TVector> value)
     {
         value = Optional<TVector>.Null;
         TVector parsed;
@@ -111,7 +111,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
                 {
                     if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                     {
-                        return defValue.TryGetValueAs(in ctx, out value);
+                        return defValue.TryGetValueAs(ref ctx, out value);
                     }
 
                     return false;

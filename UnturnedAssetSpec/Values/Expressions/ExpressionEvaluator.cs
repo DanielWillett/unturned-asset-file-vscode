@@ -21,7 +21,7 @@ internal struct ExpressionEvaluator
         _arg = arg;
     }
 
-    public unsafe bool Evaluate<TIdealOut, TVisitor>(ref TVisitor resultVisitor, bool concreteOnly, in FileEvaluationContext ctx)
+    public unsafe bool Evaluate<TIdealOut, TVisitor>(ref TVisitor resultVisitor, bool concreteOnly, ref FileEvaluationContext ctx)
         where TIdealOut : IEquatable<TIdealOut>
         where TVisitor : IGenericVisitor
     {
@@ -44,7 +44,7 @@ internal struct ExpressionEvaluator
                 fixed (ExpressionEvaluator* e = &this)
                 {
                     v.Evaluator = e;
-                    EvaluateArgument(ref v, concreteOnly, in ctx);
+                    EvaluateArgument(ref v, concreteOnly, ref ctx);
                 }
             }
         }
@@ -52,7 +52,7 @@ internal struct ExpressionEvaluator
         return v.WasSuccessful;
     }
 
-    private unsafe bool EvaluateArgument<TArgVisitor>(ref TArgVisitor argVisitor, bool concreteOnly, in FileEvaluationContext ctx)
+    private unsafe bool EvaluateArgument<TArgVisitor>(ref TArgVisitor argVisitor, bool concreteOnly, ref FileEvaluationContext ctx)
         where TArgVisitor : IGenericVisitor
     {
         switch (_root[_arg])
@@ -62,7 +62,7 @@ internal struct ExpressionEvaluator
                 if (idealType is NumericAnyType or null)
                 {
                     ExpressionEvaluator evaluator = new ExpressionEvaluator(function);
-                    return evaluator.Evaluate<double, TArgVisitor>(ref argVisitor, concreteOnly, in ctx);
+                    return evaluator.Evaluate<double, TArgVisitor>(ref argVisitor, concreteOnly, ref ctx);
                 }
 
                 TypeEvaluateVisitor<TArgVisitor> evalVisitor;
@@ -84,7 +84,7 @@ internal struct ExpressionEvaluator
             case IValueExpressionNode simpleValue:
                 return concreteOnly
                     ? simpleValue.VisitConcreteValueGeneric(ref argVisitor)
-                    : simpleValue.VisitValueGeneric(ref argVisitor, in ctx);
+                    : simpleValue.VisitValueGeneric(ref argVisitor, ref ctx);
 
             case IPropertyReferenceExpressionNode propRef:
                 if (concreteOnly)
@@ -113,10 +113,10 @@ internal struct ExpressionEvaluator
 
         public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
         {
-            ref readonly FileEvaluationContext ctx = ref Unsafe.AsRef<FileEvaluationContext>(EvalCtx);
+            ref FileEvaluationContext ctx = ref Unsafe.AsRef<FileEvaluationContext>(EvalCtx);
 
             ExpressionEvaluator evaluator = new ExpressionEvaluator(Function);
-            Visited = evaluator.Evaluate<TValue, TVisitor>(ref Unsafe.AsRef<TVisitor>(Visitor), ConcreteOnly, in ctx);
+            Visited = evaluator.Evaluate<TValue, TVisitor>(ref Unsafe.AsRef<TVisitor>(Visitor), ConcreteOnly, ref ctx);
         }
     }
 
@@ -173,7 +173,7 @@ internal struct ExpressionEvaluator
                 v.EvalCtx = EvalCtx;
                 v.Arg0 = value;
                 Evaluator->_arg = 1;
-                Evaluator->EvaluateArgument(ref v, ConcreteOnly, in Unsafe.AsRef<FileEvaluationContext>(EvalCtx));
+                Evaluator->EvaluateArgument(ref v, ConcreteOnly, ref Unsafe.AsRef<FileEvaluationContext>(EvalCtx));
                 WasSuccessful = v.WasSuccessful;
             }
         }
@@ -235,7 +235,7 @@ internal struct ExpressionEvaluator
                 v.Arg0 = Arg0;
                 v.Arg1 = value;
                 Evaluator->_arg = 2;
-                Evaluator->EvaluateArgument(ref v, ConcreteOnly, in Unsafe.AsRef<FileEvaluationContext>(EvalCtx));
+                Evaluator->EvaluateArgument(ref v, ConcreteOnly, ref Unsafe.AsRef<FileEvaluationContext>(EvalCtx));
                 WasSuccessful = v.WasSuccessful;
             }
         }

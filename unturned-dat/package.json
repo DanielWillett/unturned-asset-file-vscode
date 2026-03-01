@@ -38,7 +38,7 @@
     "license": "GPL-3.0-only",
     "engines":
     {
-        "vscode": "^1.97.0"
+        "vscode": "^1.106.0"
     },
     "categories":
     [
@@ -158,11 +158,18 @@
             "title": "Unturned Data File",
             "properties":
             {
+                "unturned-data-file-lsp.dotnetLocation":
+                {
+                    "type": "string",
+                    "scope": "machine-overridable",
+                    "markdownDescription": "Path to the dotnet executable used to run the language server. Specify 'dotnet' to pull from the `PATH` environment variable. Not required on Windows. Reload the extension to take effect.",
+                    "default": ""
+                },
                 "unturned-data-file-lsp.registerFileAssociations":
                 {
                     "type": "boolean",
                     "scope": "application",
-                    "descriptionMarkdown": "On Windows only, indicates whether or not `.dat`, `.asset`, `.udat`, and `.udatproj` files will be registered for the current user on startup.",
+                    "markdownDescription": "On Windows only, indicates whether or not `.dat`, `.asset`, `.udat`, and `.udatproj` files will be registered for the current user on startup.",
                     "default": false
                 },
                 "unturned-data-file-lsp.u3dsInstallDir":
@@ -170,30 +177,27 @@
                     "type": "string",
                     "scope": "machine-overridable",
                     "description": "If set, overrides the absolute path to U3DS. If not set this will be automatically detected.",
-                    "default": "",
-                    "format": "uri"
+                    "default": ""
                 },
                 "unturned-data-file-lsp.unturnedInstallDir":
                 {
                     "type": "string",
                     "scope": "machine-overridable",
                     "description": "If set, overrides the absolute path to the Unturned client. If not set this will be automatically detected.",
-                    "default": "",
-                    "format": "uri"
+                    "default": ""
                 },
                 "unturned-data-file-lsp.globalProjectFile":
                 {
                     "type": "string",
                     "scope": "machine-overridable",
                     "description": "If set, specifies the path to a global project file which will contain the default settings for all projects. Most LSP-specific settings should be configured here. It is valid to put an absolute file path or even a URL here as long as it can be accessed without any authorization and returns plain-text.",
-                    "default": "",
-                    "format": "uri"
+                    "default": ""
                 },
                 "unturned-data-file-lsp.guidStyle":
                 {
                     "type": "string",
                     "scope": "resource",
-                    "descriptionMarkdown": "If set, overrides the default GUID/UUID style for GUID generation tools. This should be some value from the format specifier table on [this page](https://learn.microsoft.com/en-us/dotnet/api/system.guid.tostring?view=net-10.0#system-guid-tostring%28system-string%29). Lowercase values indicate a lowercase GUID, uppercase values indicate an uppercase GUID.",
+                    "markdownDescription": "If set, overrides the default GUID/UUID style for GUID generation tools. This should be some value from the format specifier table on [this page](https://learn.microsoft.com/en-us/dotnet/api/system.guid.tostring?view=net-10.0#system-guid-tostring%28system-string%29). Lowercase values indicate a lowercase GUID, uppercase values indicate an uppercase GUID.",
                     "default": "n",
                     "enumItemLabels":
                     [
@@ -252,7 +256,7 @@
     "devDependencies":
     {
         "@types/node": "20.x",
-        "@types/vscode": "^1.97.0",
+        "@types/vscode": "^1.106.0",
         "@typescript-eslint/eslint-plugin": "^8.22.0",
         "@typescript-eslint/parser": "^8.22.0",
         "esbuild": "^0.25.0",
@@ -262,7 +266,7 @@
     },
     "dependencies":
     {
-        "vscode-jsonrpc": "^8.2.1",
-        "vscode-languageclient": "^9.0.1"
+        "vscode-jsonrpc": "^9.0.0-next.11",
+        "vscode-languageclient": "^10.0.0-next.20"
     }
 }

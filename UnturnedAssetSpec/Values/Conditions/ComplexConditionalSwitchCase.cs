@@ -109,11 +109,11 @@ public class ComplexConditionalSwitchCase : ISwitchCase
     }
 
     /// <inheritdoc />
-    public bool TryCheckConditions(in FileEvaluationContext ctx, out bool doesPassConditions)
+    public bool TryCheckConditions(ref FileEvaluationContext ctx, out bool doesPassConditions)
     {
         foreach (IValue<bool> value in Conditions)
         {
-            if (!value.TryEvaluateValue(out Optional<bool> v, in ctx))
+            if (!value.TryEvaluateValue(out Optional<bool> v, ref ctx))
             {
                 doesPassConditions = false;
                 return false;
@@ -151,16 +151,16 @@ public class ComplexConditionalSwitchCase : ISwitchCase
     }
 
     /// <inheritdoc />
-    public virtual bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public virtual bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        if (!TryCheckConditions(in ctx, out bool v) || !v)
+        if (!TryCheckConditions(ref ctx, out bool v) || !v)
             return false;
 
-        return Value.VisitValue(ref visitor, in ctx);
+        return Value.VisitValue(ref visitor, ref ctx);
     }
 
     /// <inheritdoc />
@@ -245,15 +245,15 @@ public class ComplexConditionalSwitchCase<TResult> : ComplexConditionalSwitchCas
     }
 
     /// <inheritdoc />
-    public virtual bool TryEvaluateValue(out Optional<TResult> value, in FileEvaluationContext ctx)
+    public virtual bool TryEvaluateValue(out Optional<TResult> value, ref FileEvaluationContext ctx)
     {
-        if (!TryCheckConditions(in ctx, out bool v) || !v)
+        if (!TryCheckConditions(ref ctx, out bool v) || !v)
         {
             value = Optional<TResult>.Null;
             return false;
         }
 
-        return Value.TryEvaluateValue(out value, in ctx);
+        return Value.TryEvaluateValue(out value, ref ctx);
     }
 
     /// <inheritdoc />
@@ -280,9 +280,9 @@ public class ComplexConditionalValue : ComplexConditionalSwitchCase<bool>
         : base(conditions, operation, Values.Value.True) { }
 
     /// <inheritdoc />
-    public override bool TryEvaluateValue(out Optional<bool> value, in FileEvaluationContext ctx)
+    public override bool TryEvaluateValue(out Optional<bool> value, ref FileEvaluationContext ctx)
     {
-        if (!TryCheckConditions(in ctx, out bool doesPassConditions))
+        if (!TryCheckConditions(ref ctx, out bool doesPassConditions))
         {
             value = Optional<bool>.Null;
             return false;
@@ -316,9 +316,9 @@ public class ComplexConditionalValue : ComplexConditionalSwitchCase<bool>
     }
 
     /// <inheritdoc />
-    public override bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public override bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
     {
-        if (!TryCheckConditions(in ctx, out bool doesPassConditions))
+        if (!TryCheckConditions(ref ctx, out bool doesPassConditions))
             return false;
 
         visitor.Accept(new Optional<bool>(doesPassConditions));

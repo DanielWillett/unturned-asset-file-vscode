@@ -69,7 +69,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
     protected virtual void AcceptResolvedProperty(
         DatProperty property,
         IType propertyType,
-        in FileEvaluationContext ctx,
+        ref FileEvaluationContext ctx,
         IPropertySourceNode node,
         in PropertyBreadcrumbs breadcrumbs) { }
 
@@ -128,7 +128,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
 
         FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, node.File);
 
-        if (!property.Type.TryEvaluateType(out IType? type, in ctx))
+        if (!property.Type.TryEvaluateType(out IType? type, ref ctx))
             return;
 
         // todo
@@ -142,7 +142,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         //}
         //else
         //{
-            AcceptResolvedProperty(property, type, in ctx, node, in breadcrumbs);
+            AcceptResolvedProperty(property, type, ref ctx, node, in breadcrumbs);
         //}
     }
 }

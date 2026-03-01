@@ -165,7 +165,7 @@ internal class FileAssociationUtility
             CreateProgramFileAssociation(ProjectProgId, projectCommand);
 
             projIdKey?.SetValue(dataVersionValueName, FileAssocVersion, RegistryValueKind.DWord);
-
+            _logger.LogInformation("Created file extension associations.");
             return true;
         }
         finally

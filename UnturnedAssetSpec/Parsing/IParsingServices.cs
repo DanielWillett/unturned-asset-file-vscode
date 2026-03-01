@@ -24,3 +24,24 @@ public interface IParsingServices : IServiceProvider
 
     InstallationEnvironment Installation { get; }
 }
+
+public static class ParsingServicesExtensions
+{
+    extension(IParsingServices parsingServices)
+    {
+        public ILogger<T> CreateLogger<T>() where T : notnull
+        {
+            return parsingServices.LoggerFactory.CreateLogger<T>();
+        }
+
+        public ILogger CreateLogger(string categoryName)
+        {
+            return parsingServices.LoggerFactory.CreateLogger(categoryName);
+        }
+
+        public ILogger CreateLogger(Type type)
+        {
+            return parsingServices.LoggerFactory.CreateLogger(type);
+        }
+    }
+}

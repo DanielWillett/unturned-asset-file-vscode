@@ -23,7 +23,7 @@ public enum PropertySearchTrimmingBehavior
     CreatesSiblingPropertiesInSameFile,
 
     /// <summary>
-    /// This type may create other properties at the same level as this property, but only if the property exists.
+    /// This type may create other properties at the same level as this property, even if this property doesn't exist.
     /// <code>
     /// Prop_X 3
     /// Prop_Y 4

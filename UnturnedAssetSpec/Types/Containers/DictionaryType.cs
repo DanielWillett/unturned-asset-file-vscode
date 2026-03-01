@@ -263,7 +263,10 @@ public sealed class DictionaryType : ITypeFactory
 /// <typeparam name="TKeyType">The type of value to read from the keys of the dictionary. Defaults to <see cref="string"/>.</typeparam>
 /// <typeparam name="TValueType">The type of value to read from the values of the dictionary.</typeparam>
 public class DictionaryType<TKeyType, TValueType>
-    : BaseType<EquatableArray<DictionaryPair<TValueType>>, DictionaryType<TKeyType, TValueType>>, ITypeParser<EquatableArray<DictionaryPair<TValueType>>>, IReferencingType
+    : BaseType<EquatableArray<DictionaryPair<TValueType>>, DictionaryType<TKeyType, TValueType>>,
+        ITypeParser<EquatableArray<DictionaryPair<TValueType>>>,
+        IReferencingType,
+        IDictionaryType
     where TKeyType : IEquatable<TKeyType>
     where TValueType : IEquatable<TValueType>
 {
@@ -280,6 +283,9 @@ public class DictionaryType<TKeyType, TValueType>
     public override ITypeParser<EquatableArray<DictionaryPair<TValueType>>> Parser => this;
 
     public override PropertySearchTrimmingBehavior TrimmingBehavior => (PropertySearchTrimmingBehavior)Math.Max((int)_keyType.TrimmingBehavior, (int)_valueType.TrimmingBehavior);
+
+    IType IDictionaryType.KeyType => _keyType;
+    IType IDictionaryType.ValueType => _valueType;
 
     /// <inheritdoc />
     public OneOrMore<IType> ReferencedTypes
@@ -466,7 +472,7 @@ public class DictionaryType<TKeyType, TValueType>
         }
     }
 
-    public bool TryParse(ref TypeParserArgs<EquatableArray<DictionaryPair<TValueType>>> args, in FileEvaluationContext ctx, out Optional<EquatableArray<DictionaryPair<TValueType>>> value)
+    public bool TryParse(ref TypeParserArgs<EquatableArray<DictionaryPair<TValueType>>> args, ref FileEvaluationContext ctx, out Optional<EquatableArray<DictionaryPair<TValueType>>> value)
     {
         value = Optional<EquatableArray<DictionaryPair<TValueType>>>.Null;
         
@@ -481,7 +487,7 @@ public class DictionaryType<TKeyType, TValueType>
                 }
                 else if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                 {
-                    return defValue.TryGetValueAs(in ctx, out value);
+                    return defValue.TryGetValueAs(ref ctx, out value);
                 }
                 break;
 
@@ -511,7 +517,7 @@ public class DictionaryType<TKeyType, TValueType>
                     if (args.DiagnosticSink != null
                         && _keyType != null
                         && _args.RequireKeyType
-                        && !TryParseKey(property, ref args, in ctx, out _))
+                        && !TryParseKey(property, ref args, ref ctx, out _))
                     {
                         allPassed = false;
                     }
@@ -521,10 +527,10 @@ public class DictionaryType<TKeyType, TValueType>
                          valueNode,
                          property,
                          _valueType,
-                         PropertyResolutionContext.Modern
+                         LegacyExpansionFilter.Modern
                     );
 
-                    if (!_valueType.Parser.TryParse(ref parseArgs, in ctx, out Optional<TValueType> parsedValue)
+                    if (!_valueType.Parser.TryParse(ref parseArgs, ref ctx, out Optional<TValueType> parsedValue)
                         || !parsedValue.TryGetValueOrNull(out TValueType? actualValue))
                     {
                         TValueType? defaultValue = default;
@@ -534,7 +540,7 @@ public class DictionaryType<TKeyType, TValueType>
                             ListType.Index.Value = index;
                             try
                             {
-                                if (_args.DefaultValue.TryEvaluateValue(out Optional<TValueType> gottenValue, in ctx))
+                                if (_args.DefaultValue.TryEvaluateValue(out Optional<TValueType> gottenValue, ref ctx))
                                 {
                                     defaultValue = gottenValue.Value;
                                 }
@@ -574,7 +580,7 @@ public class DictionaryType<TKeyType, TValueType>
     private bool TryParseKey(
         IPropertySourceNode property,
         ref TypeParserArgs<EquatableArray<DictionaryPair<TValueType>>> args,
-        in FileEvaluationContext ctx,
+        ref FileEvaluationContext ctx,
         out Optional<TKeyType> parsedKey
     )
     {
@@ -614,9 +620,9 @@ public class DictionaryType<TKeyType, TValueType>
             props.LastCharacterIndex = property.LastCharacterIndex;
             ValueNode fakeNode = ValueNode.Create(key, property.KeyIsQuoted, Comment.None, in props);
 
-            args.CreateSubTypeParserArgs(out TypeParserArgs<TKeyType> parseArgs, fakeNode, args.ParentNode, _keyType, PropertyResolutionContext.Modern);
+            args.CreateSubTypeParserArgs(out TypeParserArgs<TKeyType> parseArgs, fakeNode, args.ParentNode, _keyType, LegacyExpansionFilter.Modern);
 
-            if (parser.TryParse(ref parseArgs, in ctx, out parsedKey))
+            if (parser.TryParse(ref parseArgs, ref ctx, out parsedKey))
             {
                 return true;
             }

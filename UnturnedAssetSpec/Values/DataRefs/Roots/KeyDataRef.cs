@@ -27,9 +27,9 @@ public sealed class KeyDataRef<TKey> : RootDataRef<KeyDataRef<TKey>>, IValue<TKe
 
 
     /// <inheritdoc />
-    public override bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public override bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
     {
-        if (!TryEvaluateValue(out Optional<TKey> value, in ctx))
+        if (!TryEvaluateValue(out Optional<TKey> value, ref ctx))
         {
             return false;
         }
@@ -63,7 +63,7 @@ public sealed class KeyDataRef<TKey> : RootDataRef<KeyDataRef<TKey>>, IValue<TKe
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<TKey> value, in FileEvaluationContext ctx)
+    public bool TryEvaluateValue(out Optional<TKey> value, ref FileEvaluationContext ctx)
     {
         string? key = DictionaryType.Key.Value;
         if (key != null)

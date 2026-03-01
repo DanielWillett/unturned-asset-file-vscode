@@ -37,7 +37,7 @@ public class TypeConverterParser<T>(ITypeConverter<T> typeConverter)
     /// <param name="ctx">Workspace context.</param>
     /// <param name="value">The parsed value wrapped in an <see cref="Optional{T}"/> object.</param>
     /// <returns>Whether or not the value could be parsed successfully.</returns>
-    protected virtual bool TryParseValueNode(IValueSourceNode v, ref TypeParserArgs<T> args, in FileEvaluationContext ctx, out Optional<T> value)
+    protected virtual bool TryParseValueNode(IValueSourceNode v, ref TypeParserArgs<T> args, ref FileEvaluationContext ctx, out Optional<T> value)
     {
         args.CreateTypeConverterParseArgs(out TypeConverterParseArgs<T> parseArgs, v.Value);
 
@@ -57,9 +57,9 @@ public class TypeConverterParser<T>(ITypeConverter<T> typeConverter)
     }
 
     /// <inheritdoc />
-    public bool TryParse(ref TypeParserArgs<T> args, in FileEvaluationContext ctx, out Optional<T> value)
+    public bool TryParse(ref TypeParserArgs<T> args, ref FileEvaluationContext ctx, out Optional<T> value)
     {
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }
@@ -70,7 +70,7 @@ public class TypeConverterParser<T>(ITypeConverter<T> typeConverter)
             return false;
         }
 
-        if (TryParseValueNode(v, ref args, in ctx, out value))
+        if (TryParseValueNode(v, ref args, ref ctx, out value))
         {
             return true;
         }

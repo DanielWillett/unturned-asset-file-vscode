@@ -6,7 +6,6 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
-using System.Threading.Tasks;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 
@@ -33,11 +32,7 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
         : base(DatDiagnostics.UNT107, modelProvider, parsingServices)
     {
         _parsingServices = parsingServices;
-        parsingServices.Database.OnInitialize((_, _) =>
-        {
-            ValidTypes = [ GuidType.Instance ];
-            return Task.CompletedTask;
-        });
+        ValidTypes = [ GuidType.Instance ];
     }
 
     public override bool TryApplyToProperty(
@@ -48,7 +43,7 @@ internal class GenerateNewGuid : PerPropertyCodeFix<GenerateNewGuid.GenerateNewG
         IType propertyType,
         DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
-        in FileEvaluationContext ctx)
+        ref FileEvaluationContext ctx)
     {
         state = default;
         range = default;

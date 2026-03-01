@@ -34,7 +34,7 @@ public interface IInclusionCondition : IInclusionExclusionCondition
     /// <param name="ctx">Workspace context.</param>
     /// <exception cref="InvalidEnumArgumentException">Invalid value for <paramref name="condition"/>.</exception>
     /// <returns>Whether or not the condition could be evaluated. If there is not a condition a result of <see langword="true"/> will be returned.</returns>
-    bool TryEvaluateCondition(InclusionCondition.ConditionBehavior condition, out bool result, in FileEvaluationContext ctx);
+    bool TryEvaluateCondition(InclusionCondition.ConditionBehavior condition, out bool result, ref FileEvaluationContext ctx);
 }
 
 /// <summary>
@@ -172,7 +172,7 @@ public class InclusionCondition : IInclusionCondition
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateCondition(ConditionBehavior condition, out bool result, in FileEvaluationContext ctx)
+    public bool TryEvaluateCondition(ConditionBehavior condition, out bool result, ref FileEvaluationContext ctx)
     {
         bool success;
         Optional<bool> value;
@@ -184,7 +184,7 @@ public class InclusionCondition : IInclusionCondition
                     result = true;
                     return true;
                 }
-                success = FilterCondition.TryEvaluateValue(out value, in ctx);
+                success = FilterCondition.TryEvaluateValue(out value, ref ctx);
                 break;
 
             case ConditionBehavior.Requirement:
@@ -193,7 +193,7 @@ public class InclusionCondition : IInclusionCondition
                     result = true;
                     return true;
                 }
-                success = RequirementCondition.TryEvaluateValue(out value, in ctx);
+                success = RequirementCondition.TryEvaluateValue(out value, ref ctx);
                 break;
 
             default:

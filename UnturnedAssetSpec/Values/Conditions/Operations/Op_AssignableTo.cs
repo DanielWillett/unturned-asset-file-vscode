@@ -31,7 +31,7 @@ internal sealed class AssignableTo : ConditionOperation<AssignableTo>
         return false;
     }
 
-    protected override bool TryEvaluate<TValue, TComparand>(TValue value, TComparand comparand, in FileEvaluationContext ctx, out bool result)
+    protected override bool TryEvaluate<TValue, TComparand>(TValue value, TComparand comparand, ref FileEvaluationContext ctx, out bool result)
     {
         result = false;
         if (!ConditionOperations.TryGetType(ref comparand, out QualifiedType comparandType, out bool comparandIsAlias)

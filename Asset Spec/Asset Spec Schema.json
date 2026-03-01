@@ -2008,6 +2008,11 @@
                     "$ref": "#/$defs/StringValue",
                     "description": "Designates a property that selects the cross-ref file for any properties starting with \"$cr$::\"."
                 },
+                "FileCrossRefCategory":
+                {
+                    "$ref": "#/$defs/EAssetType",
+                    "description": " If 'FileCrossRef' is an advanced value, defines the type of category to use for legacy IDs. This is only required if the target is a backwards-compatible or legacy asset reference and the category can't be determined from the target property type."
+                },
                 "ListReference":
                 {
                     "$ref": "#/$defs/StringValue",

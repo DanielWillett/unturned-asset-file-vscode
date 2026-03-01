@@ -26,14 +26,14 @@ public sealed class FlagIdType : PrimitiveType<ushort, FlagIdType>, ITypeParser<
     public override int GetHashCode() => 1882775473;
 
     /// <inheritdoc />
-    public bool TryParse(ref TypeParserArgs<ushort> args, in FileEvaluationContext ctx, out Optional<ushort> value)
+    public bool TryParse(ref TypeParserArgs<ushort> args, ref FileEvaluationContext ctx, out Optional<ushort> value)
     {
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }
 
-        if (!TypeParsers.UInt16.TryParse(ref args, in ctx, out value))
+        if (!TypeParsers.UInt16.TryParse(ref args, ref ctx, out value))
             return false;
 
         if (args.DiagnosticSink == null || !ctx.TryGetRelevantMap(out _))

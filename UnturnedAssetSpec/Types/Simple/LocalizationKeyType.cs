@@ -83,7 +83,7 @@ public sealed class LocalizationKeyType : BaseType<string, LocalizationKeyType>,
         _valueExtraTags = extraTags.Where(x => x != null)!;
     }
 
-    public bool TryParse(ref TypeParserArgs<string> args, in FileEvaluationContext ctx, out Optional<string> value)
+    public bool TryParse(ref TypeParserArgs<string> args, ref FileEvaluationContext ctx, out Optional<string> value)
     {
         string key;
 
@@ -101,7 +101,7 @@ public sealed class LocalizationKeyType : BaseType<string, LocalizationKeyType>,
 
             if (defaultValue == null
                 || defaultValue.IsNull
-                || !defaultValue.TryGetValueAs(in ctx, out Optional<string> result)
+                || !defaultValue.TryGetValueAs(ref ctx, out Optional<string> result)
                 || !result.HasValue
                 || string.IsNullOrEmpty(result.Value))
             {
@@ -114,7 +114,7 @@ public sealed class LocalizationKeyType : BaseType<string, LocalizationKeyType>,
         }
         else
         {
-            if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+            if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
             {
                 return rtn;
             }

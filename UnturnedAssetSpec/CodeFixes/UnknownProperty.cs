@@ -42,7 +42,7 @@ internal class UnknownProperty : PerPropertyCodeFix<UnknownProperty.UnknownPrope
         IType propertyType,
         DatProperty property,
         in PropertyBreadcrumbs breadcrumbs,
-        in FileEvaluationContext ctx)
+        ref FileEvaluationContext ctx)
     {
         state = default;
         range = default;

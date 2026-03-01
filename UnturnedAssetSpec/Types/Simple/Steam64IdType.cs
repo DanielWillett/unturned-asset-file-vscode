@@ -179,14 +179,14 @@ public sealed class Steam64IdType : BaseType<ulong, Steam64IdType>, ITypeParser<
 #endif
     }
 
-    public bool TryParse(ref TypeParserArgs<ulong> args, in FileEvaluationContext ctx, out Optional<ulong> value)
+    public bool TryParse(ref TypeParserArgs<ulong> args, ref FileEvaluationContext ctx, out Optional<ulong> value)
     {
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }
 
-        if (!TypeParsers.UInt64.TryParse(ref args, in ctx, out value) || !value.HasValue)
+        if (!TypeParsers.UInt64.TryParse(ref args, ref ctx, out value) || !value.HasValue)
         {
             value = Optional<ulong>.Null;
             return false;

@@ -92,18 +92,18 @@ internal class SkillType : BaseType<SkillReference, SkillType>, ITypeParser<Skil
     }
 
     /// <inheritdoc />
-    public bool TryParse(ref TypeParserArgs<SkillReference> args, in FileEvaluationContext ctx, out Optional<SkillReference> value)
+    public bool TryParse(ref TypeParserArgs<SkillReference> args, ref FileEvaluationContext ctx, out Optional<SkillReference> value)
     {
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }
 
         value = Optional<SkillReference>.Null;
 
-        args.CreateSubTypeParserArgs(out TypeParserArgs<string> stringParseArgs, args.ValueNode, args.ParentNode, StringType.Instance, PropertyResolutionContext.Unknown);
+        args.CreateSubTypeParserArgs(out TypeParserArgs<string> stringParseArgs, args.ValueNode, args.ParentNode, StringType.Instance, args.KeyFilter);
         
-        if (!TypeParsers.String.TryParse(ref stringParseArgs, in ctx, out Optional<string> valueAsString) || string.IsNullOrEmpty(valueAsString.Value))
+        if (!TypeParsers.String.TryParse(ref stringParseArgs, ref ctx, out Optional<string> valueAsString) || string.IsNullOrEmpty(valueAsString.Value))
         {
             return false;
         }

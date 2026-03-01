@@ -60,8 +60,14 @@ public static class SourceNodeExtensions
         /// <summary>
         /// Try to get a property by it's key or alias.
         /// </summary>
-        public bool TryGetProperty(DatProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+        public bool TryGetProperty(DatProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, LegacyExpansionFilter filter = LegacyExpansionFilter.Either)
         {
+            if (ctx.CachedProperty == property && ctx.CachedPropertyNode != null)
+            {
+                propertyNode = ctx.CachedPropertyNode;
+                return true;
+            }
+
             if (property.Keys.IsDefaultOrEmpty)
             {
                 if (node.TryGetProperty(property.Key, out propertyNode))
@@ -71,10 +77,10 @@ public static class SourceNodeExtensions
             {
                 foreach (DatPropertyKey key in property.Keys)
                 {
-                    if (!FilterMatches(key.Filter, context))
+                    if (!FilterMatches(key.Filter, filter))
                         continue;
 
-                    if (key.Condition != null && !key.Condition.TryEvaluateValue(out Optional<bool> passesCondition, in ctx) && !passesCondition.GetValueOrDefault(false))
+                    if (key.Condition != null && !key.Condition.TryEvaluateValue(out Optional<bool> passesCondition, ref ctx) && !passesCondition.GetValueOrDefault(false))
                         continue;
 
                     if (node.TryGetProperty(key.Key, out propertyNode))
@@ -90,19 +96,19 @@ public static class SourceNodeExtensions
         /// Gets a property of this asset from the root level of the asset data. This properly handles 'Metadata' properties.
         /// </summary>
         /// <remarks>Also will look for localization properties in the corresponding localization files, and vice versa with asset properties.</remarks>
-        public bool TryResolveProperty(DatProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+        public bool TryResolveProperty(DatProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out IPropertySourceNode? propertyNode, LegacyExpansionFilter context = LegacyExpansionFilter.Either)
         {
             if (node is ILocalizationSourceFile local && property.Context != SpecPropertyContext.Localization)
                 node = local.Asset;
 
             if (node is not IAssetSourceFile asset)
-                return node.TryGetProperty(property, in ctx, out propertyNode, context);
+                return node.TryGetProperty(property, ref ctx, out propertyNode, context);
 
             if (property.Context == SpecPropertyContext.Localization)
             {
                 foreach (ILocalizationSourceFile localFile in asset.Localization)
                 {
-                    if (localFile.TryResolveProperty(property, in ctx, out propertyNode, context))
+                    if (localFile.TryResolveProperty(property, ref ctx, out propertyNode, context))
                         return true;
                 }
 
@@ -115,35 +121,35 @@ public static class SourceNodeExtensions
             switch (property.AssetPosition)
             {
                 default:
-                    return (assetData ?? asset).TryGetProperty(property, in ctx, out propertyNode, context);
+                    return (assetData ?? asset).TryGetProperty(property, ref ctx, out propertyNode, context);
 
                 case AssetDatPropertyPositionExpectation.MetadataOnlyIfExistsOtherwiseRoot:
-                    return (metadata ?? asset).TryGetProperty(property, in ctx, out propertyNode, context);
+                    return (metadata ?? asset).TryGetProperty(property, ref ctx, out propertyNode, context);
                 
                 case AssetDatPropertyPositionExpectation.MetadataOnlyIfExistsOtherwiseAssetData:
-                    return (metadata ?? (assetData ?? asset)).TryGetProperty(property, in ctx, out propertyNode, context);
+                    return (metadata ?? (assetData ?? asset)).TryGetProperty(property, ref ctx, out propertyNode, context);
 
                 case AssetDatPropertyPositionExpectation.MetadataOrAssetData:
-                    if (metadata != null && metadata.TryGetProperty(property, in ctx, out propertyNode, context))
+                    if (metadata != null && metadata.TryGetProperty(property, ref ctx, out propertyNode, context))
                     {
                         return true;
                     }
 
-                    return (assetData ?? asset).TryGetProperty(property, in ctx, out propertyNode, context);
+                    return (assetData ?? asset).TryGetProperty(property, ref ctx, out propertyNode, context);
                 
                 case AssetDatPropertyPositionExpectation.Root:
-                    return asset.TryGetProperty(property, in ctx, out propertyNode, context);
+                    return asset.TryGetProperty(property, ref ctx, out propertyNode, context);
 
                 case AssetDatPropertyPositionExpectation.Asset:
                     if (assetData != null)
-                        return assetData.TryGetProperty(property, in ctx, out propertyNode, context);
+                        return assetData.TryGetProperty(property, ref ctx, out propertyNode, context);
 
                     propertyNode = null;
                     return false;
 
                 case AssetDatPropertyPositionExpectation.Metadata:
                     if (metadata != null)
-                        return metadata.TryGetProperty(property, in ctx, out propertyNode, context);
+                        return metadata.TryGetProperty(property, ref ctx, out propertyNode, context);
 
                     propertyNode = null;
                     return false;
@@ -186,6 +192,37 @@ public static class SourceNodeExtensions
             }
 
             return r;
+        }
+
+        /// <summary>
+        /// Gets which root dictionary this property is in, including sub-properties.
+        /// </summary>
+        public AssetDatPropertyPosition GetRootPosition()
+        {
+            if (property.File is not IAssetSourceFile)
+                return AssetDatPropertyPosition.Root;
+
+            for (IParentSourceNode node = property.Parent;; node = node.Parent)
+            {
+                if (node == node.File)
+                {
+                    return AssetDatPropertyPosition.Root;
+                }
+
+                // Root > "Asset" > { }
+                if (node.Parent is not IPropertySourceNode propertyNode || propertyNode.Parent != propertyNode.File)
+                    continue;
+
+                if (propertyNode.Key.Equals("Asset", StringComparison.OrdinalIgnoreCase))
+                {
+                    return AssetDatPropertyPosition.Asset;
+                }
+
+                if (propertyNode.Key.Equals("Metadata", StringComparison.OrdinalIgnoreCase))
+                {
+                    return AssetDatPropertyPosition.Metadata;
+                }
+            }
         }
     }
 
@@ -247,6 +284,7 @@ public static class SourceNodeExtensions
         /// <returns>The position, or 'Other' if it's not a recognized node.</returns>
         public RootDictionaryPosition GetRootAssetNode(out IDictionarySourceNode? rootDictionary)
         {
+            // todo: revisit
             IPropertySourceNode? prop;
 
             switch (root)
@@ -343,6 +381,13 @@ public static class SourceNodeExtensions
             PropertyResolutionContext.Legacy => filter != LegacyExpansionFilter.Modern,
             _ => filter != LegacyExpansionFilter.Legacy
         };
+    }
+
+    internal static bool FilterMatches(LegacyExpansionFilter filter, LegacyExpansionFilter context)
+    {
+        return filter == LegacyExpansionFilter.Either
+               || context == LegacyExpansionFilter.Either
+               || filter == context;
     }
 
     private class GetNodeFromIndexVisitor(int index, bool ignoreMetadata) : OrderedNodeVisitor

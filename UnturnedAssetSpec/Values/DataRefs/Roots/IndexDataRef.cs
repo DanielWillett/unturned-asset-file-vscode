@@ -28,9 +28,9 @@ public sealed class IndexDataRef<TCountType> : RootDataRef<IndexDataRef<TCountTy
 
 
     /// <inheritdoc />
-    public override bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public override bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
     {
-        if (!TryEvaluateValue(out Optional<TCountType> value, in ctx))
+        if (!TryEvaluateValue(out Optional<TCountType> value, ref ctx))
         {
             return false;
         }
@@ -64,7 +64,7 @@ public sealed class IndexDataRef<TCountType> : RootDataRef<IndexDataRef<TCountTy
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<TCountType> value, in FileEvaluationContext ctx)
+    public bool TryEvaluateValue(out Optional<TCountType> value, ref FileEvaluationContext ctx)
     {
         long index = ListType.Index.Value;
         if (index < 0)

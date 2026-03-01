@@ -68,7 +68,7 @@ public readonly struct DifficultyProperty : IDataRefProperty, IEquatable<Difficu
     /// <summary>
     /// Attempt to get a contextual difficulty from an opened file.
     /// </summary>
-    public static bool TryGetFileDifficultyContext(in FileEvaluationContext ctx, out ServerDifficulty difficulty)
+    public static bool TryGetFileDifficultyContext(ref FileEvaluationContext ctx, out ServerDifficulty difficulty)
     {
         ISourceFile sourceFile = ctx.File;
 

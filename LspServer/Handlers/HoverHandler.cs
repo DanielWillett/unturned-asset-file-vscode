@@ -49,23 +49,23 @@ internal class HoverHandler : IHoverHandler
         SpecProperty? prop = ctx.EvaluationContext.Self;
         if (prop == null)
         {
-            builder.UnknownProperty(in ctx);
+            builder.UnknownProperty(ref ctx);
         }
         else
         {
-            ISpecPropertyType? type = prop.Type.GetType(in ctx.EvaluationContext);
+            ISpecPropertyType? type = prop.Type.GetType(ref ctx.EvaluationContext);
             bool hasValue = ctx.TryParse(out ISpecDynamicValue? propValue);
             ValueHoverProviderResult? result = null;
             if (hasValue && propValue != null && hoverNode is IValueSourceNode && type is IValueHoverProviderSpecPropertyType valueHoverProvider)
-                result = valueHoverProvider.GetDescription(in ctx, propValue);
+                result = valueHoverProvider.GetDescription(ref ctx, propValue);
 
             if (result?.DisplayName != null)
             {
-                builder.Value(prop, result, in ctx);
+                builder.Value(prop, result, ref ctx);
             }
             else
             {
-                builder.Property(prop, in ctx, type, propValue, hasValue);
+                builder.Property(prop, ref ctx, type, propValue, hasValue);
             }
         }
 
@@ -170,7 +170,7 @@ public readonly struct HoverMarkdownBuilder
 
         _hov.Append("### ").Append(rootProperty.Owner.DisplayName).Append(" → ").Append(rootProperty.Key);
         if (prop.Variable != null
-            && prop.Variable.TryEvaluateValue(in ctx.EvaluationContext, out string? variable, out bool isNull)
+            && prop.Variable.TryEvaluateValue(ref ctx.EvaluationContext, out string? variable, out bool isNull)
             && !isNull
             && !string.IsNullOrEmpty(variable))
         {
@@ -187,7 +187,7 @@ public readonly struct HoverMarkdownBuilder
         }
 
         if (prop.Description != null
-            && prop.Description.TryEvaluateValue(in ctx.EvaluationContext, out string? description, out isNull)
+            && prop.Description.TryEvaluateValue(ref ctx.EvaluationContext, out string? description, out isNull)
             && !isNull
             && !string.IsNullOrEmpty(description)
            )
@@ -197,7 +197,7 @@ public readonly struct HoverMarkdownBuilder
         }
 
         if (prop.Docs != null
-            && prop.Docs.TryEvaluateValue(in ctx.EvaluationContext, out string? docsLink, out isNull)
+            && prop.Docs.TryEvaluateValue(ref ctx.EvaluationContext, out string? docsLink, out isNull)
             && !isNull
             && !string.IsNullOrEmpty(docsLink))
         {

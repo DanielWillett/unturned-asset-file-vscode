@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
@@ -71,6 +72,7 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
         InstallationEnvironment installation,
         IFileRelationalModelProvider? relationalModelProvider = null)
     {
+        loggerFactory.CreateLogger<ParsingServiceProvider>().LogError(new StackTrace(0).ToString());
         Database                 = database                ?? throw new ArgumentNullException(nameof(database));
         LoggerFactory            = loggerFactory           ?? throw new ArgumentNullException(nameof(loggerFactory));
         Workspace                = workspace               ?? throw new ArgumentNullException(nameof(workspace));

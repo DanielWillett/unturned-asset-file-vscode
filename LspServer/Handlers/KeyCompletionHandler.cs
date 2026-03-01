@@ -126,13 +126,13 @@ internal class KeyCompletionHandler : ICompletionHandler
             PropertyResolutionContext.Modern
         );
 
-        ISpecPropertyType? type = property.Type.GetType(in ctx);
+        ISpecPropertyType? type = property.Type.GetType(ref ctx);
 
         string? description = null, markdown = null;
-        property.Description?.TryEvaluateValue(in ctx, out description, out _);
-        property.Markdown?.TryEvaluateValue(in ctx, out markdown, out _);
+        property.Description?.TryEvaluateValue(ref ctx, out description, out _);
+        property.Markdown?.TryEvaluateValue(ref ctx, out markdown, out _);
 
-        property.Deprecated.TryEvaluateValue(in ctx, out bool deprecated, out _);
+        property.Deprecated.TryEvaluateValue(ref ctx, out bool deprecated, out _);
 
         CompletionItem item = new CompletionItem
         {
@@ -216,7 +216,7 @@ internal class KeyCompletionHandler : ICompletionHandler
                 PropertyResolutionContext.Modern
             );
 
-            ISpecPropertyType? type = property.Type.GetType(in ctx);
+            ISpecPropertyType? type = property.Type.GetType(ref ctx);
             if (type is not IAutoCompleteSpecPropertyType autoComplete)
                 return new CompletionList();
 
@@ -231,7 +231,7 @@ internal class KeyCompletionHandler : ICompletionHandler
                 file
             );
 
-            AutoCompleteResult[] results = await autoComplete.GetAutoCompleteResults(in p, in ctx);
+            AutoCompleteResult[] results = await autoComplete.GetAutoCompleteResults(in p, ref ctx);
             List<CompletionItem> completions = new List<CompletionItem>(results.Length);
             CompletionItemKind kind = type.GetCompletionItemKind();
             for (int i = 0; i < results.Length; i++)

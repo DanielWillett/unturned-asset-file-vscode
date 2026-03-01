@@ -18,7 +18,7 @@ public interface IDataRefTarget : IEquatable<IDataRefTarget?>, IDataRefExpressio
     /// <param name="valueVisitor">The visitor to invoke with the value.</param>
     /// <param name="ctx">Workspace context.</param>
     /// <returns>Whether or not the operation succeeded.</returns>
-    bool AcceptProperty<TProperty, TVisitor>(in TProperty property, ref TVisitor valueVisitor, in FileEvaluationContext ctx)
+    bool AcceptProperty<TProperty, TVisitor>(in TProperty property, ref TVisitor valueVisitor, ref FileEvaluationContext ctx)
         where TProperty : IDataRefProperty
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER

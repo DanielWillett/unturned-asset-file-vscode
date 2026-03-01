@@ -1,38 +1,46 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using Microsoft.Extensions.Logging;
+using System.Collections.Immutable;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace UnturnedAssetSpecTests.Nodes;
 
 [TestFixture]
 public class PropertyBreadcrumbsTests
 {
-    #if false
-    private ILoggerFactory _loggerFactory;
-    private IAssetSpecDatabase _database;
+    private IParsingServices _parsingServices;
 
     [SetUp]
     public async Task SetUp()
     {
-        _loggerFactory = LoggerFactory.Create(l => l.AddSimpleConsole());
-        _database = AssetSpecDatabase.FromOffline();
-        await _database.InitializeAsync();
+        ILoggerFactory loggerFactory = LoggerFactory.Create(l => l.AddSimpleConsole());
+        IAssetSpecDatabase database = AssetSpecDatabase.FromOffline(loggerFactory: loggerFactory);
+
+        _parsingServices = new ParsingServiceProvider(
+            database,
+            loggerFactory,
+            new StaticSourceFileWorkspaceEnvironment(false, database),
+            database.UnturnedInstallDirectory,
+            new InstallationEnvironment(database)
+        );
+
+        await database.InitializeAsync();
     }
 
     [TearDown]
     public void TearDown()
     {
-        _loggerFactory.Dispose();
-        if (_database is IDisposable d)
-            d.Dispose();
+        (_parsingServices as IDisposable)?.Dispose();
     }
 
     [Test]
-    public void RootNode([Values(true, false)] bool withPath, [Values(true, false)] bool withType)
+    public void RootNode()
     {
         const string fileContents = """
                                     GUID 7ae3737efae940999dc51919ce558ec4
@@ -43,49 +51,43 @@ public class PropertyBreadcrumbsTests
         using StaticSourceFile openedFile = StaticSourceFile.FromAssetFile(
             "./test.dat",
             fileContents.AsMemory(),
-            _database,
+            _parsingServices.Database,
             SourceNodeTokenizerOptions.None
         );
 
-        ISourceFile sourceFile = openedFile.SourceFile;
+        IAssetSourceFile sourceFile = (IAssetSourceFile)openedFile.SourceFile;
+
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile);
 
         PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.Root;
+        DatFileType? assetType = AssetFileType.AssetBaseType(_parsingServices.Database).Information;
+        Assert.That(assetType, Is.Not.Null);
 
-        SpecProperty? testProperty = _database.FindPropertyInfo("ID", AssetFileType.AssetBaseType(_database));
+        Assert.That(assetType.TryFindProperty("ID", SpecPropertyContext.Property, out DatProperty? testProperty));
         Assert.That(testProperty, Is.Not.Null);
 
-        List<ISourceNode>? path = withPath ? new List<ISourceNode>() : null;
-        Assert.That(breadcrumbs.TryGetProperty(sourceFile, testProperty, out IPropertySourceNode? sourceNode, path));
+        ctx.RootBreadcrumbs = breadcrumbs;
+        Assert.That(ctx.TryGetTargetPropertyNodeForProperty(testProperty, out IPropertySourceNode? sourceNode));
 
         Assert.That(sourceNode, Is.Not.Null);
         Assert.That(sourceNode.Key, Is.EqualTo("ID"));
         Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("2001"));
 
-        if (withType)
-        {
-            AssetFileType ft = AssetFileType.FromFile(sourceFile, _database);
-            Assert.That(ft.Information, Is.Not.Null);
+        Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
+        Assert.That(breadcrumbs.TryTraceRelativeTo(targetRoot!, assetType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+        Assert.That(dictionary, Is.SameAs(sourceFile));
+        Assert.That(valueType, Is.SameAs(assetType));
 
-            path?.Clear();
-            Assert.That(breadcrumbs.TryGetDictionaryAndType(sourceFile, in ft, _database, out _, out ISpecType? type, path));
-            Assert.That(type, Is.SameAs(ft.Information));
+        PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("ID", out string propertyName);
+        Assert.That(bc.IsRoot);
+        Assert.That(propertyName, Is.EqualTo("ID"));
 
-            PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("ID", out string propertyName);
-            Assert.That(bc.IsRoot);
-            Assert.That(propertyName, Is.EqualTo("ID"));
-
-            bc.ResolveFromPropertyRef(ft.Information, _database);
-            Assert.That(bc.IsRoot);
-        }
-
-        if (withPath)
-        {
-            Assert.That(path, Is.Empty);
-        }
+        bc.ResolveFromPropertyRef(assetType, _parsingServices.Database);
+        Assert.That(bc.IsRoot);
     }
 
     [Test]
-    public void RootNodeInAsset([Values(true, false)] bool withPath, [Values(true, false)] bool withType)
+    public void RootNodeInAsset()
     {
         const string fileContents = """
                                     Metadata
@@ -102,50 +104,43 @@ public class PropertyBreadcrumbsTests
         using StaticSourceFile openedFile = StaticSourceFile.FromAssetFile(
             "./test.dat",
             fileContents.AsMemory(),
-            _database,
+            _parsingServices.Database,
             SourceNodeTokenizerOptions.None
         );
 
-        ISourceFile sourceFile = openedFile.SourceFile;
+        IAssetSourceFile sourceFile = (IAssetSourceFile)openedFile.SourceFile;
+
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile, AssetDatPropertyPosition.Asset);
 
         PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.Root;
+        DatFileType? assetType = AssetFileType.AssetBaseType(_parsingServices.Database).Information;
+        Assert.That(assetType, Is.Not.Null);
 
-
-        SpecProperty? testProperty = _database.FindPropertyInfo("ID", AssetFileType.AssetBaseType(_database));
+        Assert.That(assetType.TryFindProperty("ID", SpecPropertyContext.Property, out DatProperty? testProperty));
         Assert.That(testProperty, Is.Not.Null);
 
-        List<ISourceNode>? path = withPath ? new List<ISourceNode>() : null;
-        Assert.That(breadcrumbs.TryGetProperty(sourceFile, testProperty, out IPropertySourceNode? sourceNode, path));
+        ctx.RootBreadcrumbs = breadcrumbs;
+        Assert.That(ctx.TryGetTargetPropertyNodeForProperty(testProperty, out IPropertySourceNode? sourceNode));
 
         Assert.That(sourceNode, Is.Not.Null);
         Assert.That(sourceNode.Key, Is.EqualTo("ID"));
         Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("2001"));
+        
+        Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
+        Assert.That(breadcrumbs.TryTraceRelativeTo(targetRoot!, assetType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+        Assert.That(dictionary, Is.SameAs(sourceFile.GetAssetDataDictionary()));
+        Assert.That(valueType, Is.SameAs(assetType));
 
-        if (withType)
-        {
-            AssetFileType ft = AssetFileType.FromFile(sourceFile, _database);
-            Assert.That(ft.Information, Is.Not.Null);
+        PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("ID", out string propertyName);
+        Assert.That(bc.IsRoot);
+        Assert.That(propertyName, Is.EqualTo("ID"));
 
-            path?.Clear();
-            Assert.That(breadcrumbs.TryGetDictionaryAndType(sourceFile, in ft, _database, out _, out ISpecType? type, path));
-            Assert.That(type, Is.SameAs(ft.Information));
-
-            PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("ID", out string propertyName);
-            Assert.That(bc.IsRoot);
-            Assert.That(propertyName, Is.EqualTo("ID"));
-
-            bc.ResolveFromPropertyRef(ft.Information, _database);
-            Assert.That(bc.IsRoot);
-        }
-
-        if (withPath)
-        {
-            Assert.That(path, Is.Empty);
-        }
+        bc.ResolveFromPropertyRef(assetType, _parsingServices.Database);
+        Assert.That(bc.IsRoot);
     }
 
     [Test]
-    public void RootNodeInMetadata([Values(true, false)] bool withPath, [Values(true, false)] bool withType)
+    public void RootNodeInMetadata()
     {
         const string fileContents = """
                                     Metadata
@@ -162,70 +157,58 @@ public class PropertyBreadcrumbsTests
         using StaticSourceFile openedFile = StaticSourceFile.FromAssetFile(
             "./test.dat",
             fileContents.AsMemory(),
-            _database,
+            _parsingServices.Database,
             SourceNodeTokenizerOptions.None
         );
 
-        ISourceFile sourceFile = openedFile.SourceFile;
+        IAssetSourceFile sourceFile = (IAssetSourceFile)openedFile.SourceFile;
+
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile, AssetDatPropertyPosition.Metadata);
 
         PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.Root;
+        DatFileType? assetType = AssetFileType.AssetBaseType(_parsingServices.Database).Information;
+        Assert.That(assetType, Is.Not.Null);
 
-
-        SpecProperty? testProperty = _database.FindPropertyInfo("GUID", AssetFileType.AssetBaseType(_database));
+        Assert.That(assetType.TryFindProperty("GUID", SpecPropertyContext.Property, out DatProperty? testProperty));
         Assert.That(testProperty, Is.Not.Null);
 
-        List<ISourceNode>? path = withPath ? new List<ISourceNode>() : null;
-        Assert.That(breadcrumbs.TryGetProperty(sourceFile, testProperty, out IPropertySourceNode? sourceNode, path));
+        ctx.RootBreadcrumbs = breadcrumbs;
+        Assert.That(ctx.TryGetTargetPropertyNodeForProperty(testProperty, out IPropertySourceNode? sourceNode));
 
         Assert.That(sourceNode, Is.Not.Null);
         Assert.That(sourceNode.Key, Is.EqualTo("GUID"));
         Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("7ae3737efae940999dc51919ce558ec4"));
 
-        if (withType)
-        {
-            AssetFileType ft = AssetFileType.FromFile(sourceFile, _database);
-            Assert.That(ft.Information, Is.Not.Null);
+        Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
+        Assert.That(breadcrumbs.TryTraceRelativeTo(targetRoot!, assetType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+        Assert.That(dictionary, Is.SameAs(sourceFile.GetMetadataDictionary()));
+        Assert.That(valueType, Is.SameAs(assetType));
 
-            path?.Clear();
-            Assert.That(breadcrumbs.TryGetDictionaryAndType(sourceFile, in ft, _database, out _, out ISpecType? type, path));
-            Assert.That(type, Is.SameAs(ft.Information));
+        PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("GUID", out string propertyName);
+        Assert.That(bc.IsRoot);
+        Assert.That(propertyName, Is.EqualTo("GUID"));
 
-            PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("GUID", out string propertyName);
-            Assert.That(bc.IsRoot);
-            Assert.That(propertyName, Is.EqualTo("GUID"));
-
-            bc.ResolveFromPropertyRef(ft.Information, _database);
-            Assert.That(bc.IsRoot);
-        }
-
-        if (withPath)
-        {
-            Assert.That(path, Is.Empty);
-        }
+        bc.ResolveFromPropertyRef(assetType, _parsingServices.Database);
+        Assert.That(bc.IsRoot);
     }
 
-    private static CustomSpecType CreateCustomTestType(AssetSpecType assetType, SpecProperty nestedProperty)
+    private DatCustomAssetType CreateCustomTestType(DatAssetFileType assetType, Func<DatCustomType, DatProperty> nestedProperty)
     {
-        CustomSpecType ct = new CustomSpecType
-        {
-            Parent = QualifiedType.None,
-            Owner = assetType,
-            Properties =
-            [
-                nestedProperty
-            ],
-            DisplayName = "Test Config Type",
-            Type = assetType.Type.GetFullTypeName() + "+TestConfigType, Assembly-CSharp",
-            Docs = null,
-            AdditionalProperties = OneOrMore<KeyValuePair<string, object?>>.Null,
-            LocalizationProperties = Array.Empty<SpecProperty>()
-        };
-        nestedProperty.Owner = ct;
-        return ct;
+        DatCustomType ct = DatCustomType.CreateCustomType(
+            assetType.TypeName.GetFullTypeName() + "+TestConfigType, Assembly-CSharp",
+            default,
+            null,
+            assetType,
+            _parsingServices.Database.ReadContext
+        );
+
+        ct.DisplayNameIntl = "Test Config Type";
+        ct.Properties = ImmutableArray.Create(nestedProperty(ct));
+        return (DatCustomAssetType)ct;
     }
 
     [Test]
-    public void SinglePropertyNode([Values(true, false)] bool withPath, [Values(true, false)] bool withType)
+    public void SinglePropertyNode()
     {
         const string fileContents = """
                                     GUID 7ae3737efae940999dc51919ce558ec4
@@ -241,33 +224,37 @@ public class PropertyBreadcrumbsTests
         using StaticSourceFile openedFile = StaticSourceFile.FromAssetFile(
             "./test.dat",
             fileContents.AsMemory(),
-            _database,
+            _parsingServices.Database,
             SourceNodeTokenizerOptions.None
         );
 
         ISourceFile sourceFile = openedFile.SourceFile;
 
-        AssetSpecType? supplyType = (AssetSpecType?)_database.FindType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", default);
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile, AssetDatPropertyPosition.Root);
+
+        DatAssetFileType? supplyType = (DatAssetFileType)AssetFileType.FromType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", _parsingServices.Database).Information;
         Assert.That(supplyType, Is.Not.Null);
 
-        SpecProperty nestedProperty = new SpecProperty
-        {
-            Key = "A",
-            Type = new PropertyTypeOrSwitch(KnownTypes.Int32)
-        };
-        SpecProperty testProperty = new SpecProperty
-        {
-            Key = "Config",
-            Type = new PropertyTypeOrSwitch(CreateCustomTestType(supplyType, nestedProperty)),
-            Owner = supplyType
-        };
 
-        using IDisposable addProp = supplyType.AddRootPropertyForTest(SpecPropertyContext.Property, testProperty);
+        DatProperty testProperty = DatProperty.Create("Config", supplyType, default, SpecPropertyContext.Property);
+
+        DatProperty? nestedProperty = null;
+        testProperty.Type = CreateCustomTestType(supplyType, ct =>
+        {
+            nestedProperty = DatProperty.Create("A", ct, default, SpecPropertyContext.Property);
+            nestedProperty.Type = Int32Type.Instance;
+            return nestedProperty;
+        });
+
+        Assert.That(nestedProperty, Is.Not.Null);
+
+        using IDisposable addProp = AddRootPropertyForTest(supplyType, SpecPropertyContext.Property, testProperty);
 
         // "/Config/"
-        Assert.That(sourceFile.TryGetProperty(testProperty, out IPropertySourceNode? sn1));
+        Assert.That(sourceFile.TryGetProperty(testProperty, ref ctx, out IPropertySourceNode? sn1));
         Assert.That(sn1!.Value is IDictionarySourceNode);
-        Assert.That(((IDictionarySourceNode)sn1.Value!).TryGetProperty(nestedProperty, out IPropertySourceNode? prop));
+        IDictionarySourceNode expectedDictionary = (IDictionarySourceNode)sn1.Value!;
+        Assert.That(expectedDictionary.TryGetProperty(nestedProperty, ref ctx, out IPropertySourceNode? prop));
 
         PropertyBreadcrumbs autoBreadcrumbs = PropertyBreadcrumbs.FromNode(prop!);
 
@@ -278,7 +265,7 @@ public class PropertyBreadcrumbsTests
         PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config.A", out string propertyName);
         Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(1));
         Assert.That(propertyName, Is.EqualTo("A"));
-        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _database);
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
 
         PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
 
@@ -286,33 +273,22 @@ public class PropertyBreadcrumbsTests
         {
             Assert.That(breadcrumb.ToString(), Is.EqualTo("/Config/"));
 
-            List<ISourceNode>? path = withPath ? new List<ISourceNode>() : null;
-            Assert.That(breadcrumb.TryGetProperty(sourceFile, nestedProperty, out IPropertySourceNode? sourceNode, path));
+            ctx.RootBreadcrumbs = breadcrumb;
+            Assert.That(ctx.TryGetTargetPropertyNodeForProperty(nestedProperty, out IPropertySourceNode? sourceNode));
 
             Assert.That(sourceNode, Is.Not.Null);
             Assert.That(sourceNode.Key, Is.EqualTo("A"));
             Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("1"));
 
-            if (withType)
-            {
-                AssetFileType ft = AssetFileType.FromFile(sourceFile, _database);
-                Assert.That(ft.Information, Is.Not.Null);
-
-                path?.Clear();
-                Assert.That(breadcrumb.TryGetDictionaryAndType(sourceFile, in ft, _database, out _, out ISpecType? type, path));
-                Assert.That(type, Is.SameAs(nestedProperty.Owner));
-            }
-
-            if (withPath)
-            {
-                Assert.That(path, Has.Count.EqualTo(1));
-                Assert.That(path[0], Is.SameAs(sn1));
-            }
+            Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+            Assert.That(dictionary, Is.SameAs(expectedDictionary));
+            Assert.That(valueType, Is.SameAs(nestedProperty.Owner));
         }
     }
 
     [Test]
-    public void MultiplePropertyNodes([Values(true, false)] bool withPath, [Values(true, false)] bool withType)
+    public void MultiplePropertyNodes()
     {
         const string fileContents = """
                                     GUID 7ae3737efae940999dc51919ce558ec4
@@ -331,40 +307,45 @@ public class PropertyBreadcrumbsTests
         using StaticSourceFile openedFile = StaticSourceFile.FromAssetFile(
             "./test.dat",
             fileContents.AsMemory(),
-            _database,
+            _parsingServices.Database,
             SourceNodeTokenizerOptions.None
         );
 
         ISourceFile sourceFile = openedFile.SourceFile;
 
-        AssetSpecType? supplyType = (AssetSpecType?)_database.FindType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", default);
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile, AssetDatPropertyPosition.Root);
+
+        DatAssetFileType? supplyType = (DatAssetFileType)AssetFileType.FromType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", _parsingServices.Database).Information;
         Assert.That(supplyType, Is.Not.Null);
 
-        SpecProperty nestedProperty2 = new SpecProperty
-        {
-            Key = "A",
-            Type = new PropertyTypeOrSwitch(KnownTypes.Int32)
-        };
-        SpecProperty nestedProperty1 = new SpecProperty
-        {
-            Key = "NestedConfig",
-            Type = new PropertyTypeOrSwitch(CreateCustomTestType(supplyType, nestedProperty2))
-        };
-        SpecProperty testProperty = new SpecProperty
-        {
-            Key = "Config",
-            Type = new PropertyTypeOrSwitch(CreateCustomTestType(supplyType, nestedProperty1)),
-            Owner = supplyType
-        };
+        DatProperty? nestedProperty1 = null, nestedProperty2 = null;
+        DatProperty testProperty = DatProperty.Create("Config", supplyType, default, SpecPropertyContext.Property);
 
-        using IDisposable addProp = supplyType.AddRootPropertyForTest(SpecPropertyContext.Property, testProperty);
+        testProperty.Type = CreateCustomTestType(supplyType, ct =>
+        {
+            nestedProperty1 = DatProperty.Create("NestedConfig", ct, default, SpecPropertyContext.Property);
+            nestedProperty1.Type = CreateCustomTestType(supplyType, ct =>
+            {
+                nestedProperty2 = DatProperty.Create("A", ct, default, SpecPropertyContext.Property);
+                nestedProperty2.Type = Int32Type.Instance;
+                return nestedProperty2;
+            });
+
+            return nestedProperty1;
+        });
+
+        Assert.That(nestedProperty1, Is.Not.Null);
+        Assert.That(nestedProperty2, Is.Not.Null);
+
+        using IDisposable addProp = AddRootPropertyForTest(supplyType, SpecPropertyContext.Property, testProperty);
 
         // "/Config/NestedConfig/"
-        Assert.That(sourceFile.TryGetProperty(testProperty, out IPropertySourceNode? sn1));
+        Assert.That(sourceFile.TryGetProperty(testProperty, ref ctx, out IPropertySourceNode? sn1));
         Assert.That(sn1!.Value is IDictionarySourceNode);
-        Assert.That(((IDictionarySourceNode)sn1.Value!).TryGetProperty(nestedProperty1, out IPropertySourceNode? sn2));
+        Assert.That(((IDictionarySourceNode)sn1.Value!).TryGetProperty(nestedProperty1, ref ctx, out IPropertySourceNode? sn2));
         Assert.That(sn2!.Value is IDictionarySourceNode);
-        Assert.That(((IDictionarySourceNode)sn2.Value!).TryGetProperty(nestedProperty2, out IPropertySourceNode? prop));
+        IDictionarySourceNode expectedDictionary = ((IDictionarySourceNode)sn2.Value!);
+        Assert.That(expectedDictionary.TryGetProperty(nestedProperty2, ref ctx, out IPropertySourceNode? prop));
 
         PropertyBreadcrumbs autoBreadcrumbs = PropertyBreadcrumbs.FromNode(prop!);
 
@@ -376,7 +357,7 @@ public class PropertyBreadcrumbsTests
         PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config.NestedConfig.A", out string propertyName);
         Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(2));
         Assert.That(propertyName, Is.EqualTo("A"));
-        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _database);
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
 
         PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
 
@@ -384,34 +365,22 @@ public class PropertyBreadcrumbsTests
         {
             Assert.That(breadcrumb.ToString(), Is.EqualTo("/Config/NestedConfig/"));
 
-            List<ISourceNode>? path = withPath ? new List<ISourceNode>() : null;
-            Assert.That(breadcrumb.TryGetProperty(sourceFile, nestedProperty2, out IPropertySourceNode? sourceNode, path));
+            ctx.RootBreadcrumbs = breadcrumb;
+            Assert.That(ctx.TryGetTargetPropertyNodeForProperty(nestedProperty2, out IPropertySourceNode? sourceNode));
 
             Assert.That(sourceNode, Is.Not.Null);
             Assert.That(sourceNode.Key, Is.EqualTo("A"));
             Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("1"));
 
-            if (withType)
-            {
-                AssetFileType ft = AssetFileType.FromFile(sourceFile, _database);
-                Assert.That(ft.Information, Is.Not.Null);
-
-                path?.Clear();
-                Assert.That(breadcrumb.TryGetDictionaryAndType(sourceFile, in ft, _database, out _, out ISpecType? type, path));
-                Assert.That(type, Is.SameAs(nestedProperty2.Owner));
-            }
-
-            if (withPath)
-            {
-                Assert.That(path, Has.Count.EqualTo(2));
-                Assert.That(path[0], Is.SameAs(sn1));
-                Assert.That(path[1], Is.SameAs(sn2));
-            }
+            Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+            Assert.That(dictionary, Is.SameAs(expectedDictionary));
+            Assert.That(valueType, Is.SameAs(nestedProperty2.Owner));
         }
     }
 
     [Test]
-    public void MultiplePropertyAndListNodes([Values(true, false)] bool withPath, [Values(true, false)] bool withType)
+    public void MultiplePropertyAndListNodes()
     {
         const string fileContents = """
                                     GUID 7ae3737efae940999dc51919ce558ec4
@@ -445,51 +414,63 @@ public class PropertyBreadcrumbsTests
         using StaticSourceFile openedFile = StaticSourceFile.FromAssetFile(
             "./test.dat",
             fileContents.AsMemory(),
-            _database,
+            _parsingServices.Database,
             SourceNodeTokenizerOptions.None
         );
 
         ISourceFile sourceFile = openedFile.SourceFile;
 
-        AssetSpecType? supplyType = (AssetSpecType?)_database.FindType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", default);
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile, AssetDatPropertyPosition.Root);
+
+        DatAssetFileType? supplyType = (DatAssetFileType)AssetFileType.FromType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", _parsingServices.Database).Information;
         Assert.That(supplyType, Is.Not.Null);
 
-        SpecProperty nestedProperty3 = new SpecProperty
-        {
-            Key = "A",
-            Type = new PropertyTypeOrSwitch(KnownTypes.Int32)
-        };
-        SpecProperty nestedProperty2 = new SpecProperty
-        {
-            Key = "List",
-            Type = new PropertyTypeOrSwitch(KnownTypes.List(KnownTypes.Dictionary(_database, CreateCustomTestType(supplyType, nestedProperty3)), false))
-        };
-        SpecProperty nestedProperty1 = new SpecProperty
-        {
-            Key = "NestedConfig",
-            Type = new PropertyTypeOrSwitch(CreateCustomTestType(supplyType, nestedProperty2))
-        };
-        SpecProperty testProperty = new SpecProperty
-        {
-            Key = "Config",
-            Type = new PropertyTypeOrSwitch(CreateCustomTestType(supplyType, nestedProperty1)),
-            Owner = supplyType
-        };
+        DatProperty? nestedProperty1 = null, nestedProperty2 = null, nestedProperty3 = null;
+        DatProperty testProperty = DatProperty.Create("Config", supplyType, default, SpecPropertyContext.Property);
 
-        using IDisposable addProp = supplyType.AddRootPropertyForTest(SpecPropertyContext.Property, testProperty);
+        testProperty.Type = CreateCustomTestType(supplyType, ct =>
+        {
+            nestedProperty1 = DatProperty.Create("NestedConfig", ct, default, SpecPropertyContext.Property);
+            nestedProperty1.Type = CreateCustomTestType(supplyType, ct =>
+            {
+                nestedProperty2 = DatProperty.Create("List", ct, default, SpecPropertyContext.Property);
+                nestedProperty2.Type = ListType.Create(
+                    DictionaryType.Create(
+                        new DictionaryTypeArgs<DatObjectValue>(),
+                        CreateCustomTestType(supplyType, ct =>
+                        {
+                            nestedProperty3 = DatProperty.Create("A", ct, default, SpecPropertyContext.Property);
+                            nestedProperty3.Type = Int32Type.Instance;
+                            return nestedProperty3;
+                        })
+                    )
+                );
+
+                return nestedProperty2;
+            });
+
+            return nestedProperty1;
+        });
+
+        Assert.That(nestedProperty1, Is.Not.Null);
+        Assert.That(nestedProperty2, Is.Not.Null);
+        Assert.That(nestedProperty3, Is.Not.Null);
+
+        using IDisposable addProp = AddRootPropertyForTest(supplyType, SpecPropertyContext.Property, testProperty);
 
         // "/Config/NestedConfig/List[1]/Entry2/"
-        Assert.That(sourceFile.TryGetProperty(testProperty, out IPropertySourceNode? sn1));
+        Assert.That(sourceFile.TryGetProperty(testProperty, ref ctx, out IPropertySourceNode? sn1));
         Assert.That(sn1!.Value is IDictionarySourceNode);
-        Assert.That(((IDictionarySourceNode)sn1.Value!).TryGetProperty(nestedProperty1, out IPropertySourceNode? sn2));
+        Assert.That(((IDictionarySourceNode)sn1.Value!).TryGetProperty(nestedProperty1, ref ctx, out IPropertySourceNode? sn2));
         Assert.That(sn2!.Value is IDictionarySourceNode);
-        Assert.That(((IDictionarySourceNode)sn2.Value!).TryGetProperty(nestedProperty2, out IPropertySourceNode? sn3));
+        Assert.That(((IDictionarySourceNode)sn2.Value!).TryGetProperty(nestedProperty2, ref ctx, out IPropertySourceNode? sn3));
         Assert.That(sn3!.Value is IListSourceNode);
         Assert.That(((IListSourceNode)sn3.Value!).TryGetElement(1, out IAnyValueSourceNode? sn4));
         Assert.That(sn4 is IDictionarySourceNode);
         Assert.That(((IDictionarySourceNode)sn4!).TryGetProperty("Entry2", out IPropertySourceNode? sn5));
         Assert.That(sn5!.Value is IDictionarySourceNode);
-        Assert.That(((IDictionarySourceNode)sn5.Value!).TryGetProperty(nestedProperty3, out IPropertySourceNode? prop));
+        IDictionarySourceNode expectedDictionary = (IDictionarySourceNode)sn5.Value!;
+        Assert.That(expectedDictionary.TryGetProperty(nestedProperty3, ref ctx, out IPropertySourceNode? prop));
 
         PropertyBreadcrumbs autoBreadcrumbs = PropertyBreadcrumbs.FromNode(prop!);
 
@@ -503,7 +484,7 @@ public class PropertyBreadcrumbsTests
         PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config.NestedConfig.List[1].Entry2.A", out string propertyName);
         Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(4));
         Assert.That(propertyName, Is.EqualTo("A"));
-        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _database);
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
 
         PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
 
@@ -511,37 +492,22 @@ public class PropertyBreadcrumbsTests
         {
             Assert.That(breadcrumb.ToString(), Is.EqualTo("/Config/NestedConfig/List[1]/Entry2/"));
 
-            List<ISourceNode>? path = withPath ? new List<ISourceNode>() : null;
-            Assert.That(breadcrumb.TryGetProperty(sourceFile, nestedProperty3, out IPropertySourceNode? sourceNode, path));
+            ctx.RootBreadcrumbs = breadcrumb;
+            Assert.That(ctx.TryGetTargetPropertyNodeForProperty(nestedProperty3, out IPropertySourceNode? sourceNode));
 
             Assert.That(sourceNode, Is.Not.Null);
             Assert.That(sourceNode.Key, Is.EqualTo("A"));
             Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("1"));
 
-            if (withType)
-            {
-                AssetFileType ft = AssetFileType.FromFile(sourceFile, _database);
-                Assert.That(ft.Information, Is.Not.Null);
-
-                path?.Clear();
-                Assert.That(breadcrumb.TryGetDictionaryAndType(sourceFile, in ft, _database, out _, out ISpecType? type, path));
-                Assert.That(type, Is.SameAs(nestedProperty3.Owner));
-            }
-
-            if (withPath)
-            {
-                Assert.That(path, Has.Count.EqualTo(5));
-                Assert.That(path[0], Is.SameAs(sn1));
-                Assert.That(path[1], Is.SameAs(sn2));
-                Assert.That(path[2], Is.SameAs(sn3));
-                Assert.That(path[3], Is.SameAs(sn4));
-                Assert.That(path[4], Is.SameAs(sn5));
-            }
+            Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+            Assert.That(dictionary, Is.SameAs(expectedDictionary));
+            Assert.That(valueType, Is.SameAs(nestedProperty3.Owner));
         }
     }
 
     [Test]
-    public void NestedLists([Values(true, false)] bool withPath, [Values(true, false)] bool withType)
+    public void NestedLists()
     {
         const string fileContents = """
                                     GUID 7ae3737efae940999dc51919ce558ec4
@@ -565,37 +531,44 @@ public class PropertyBreadcrumbsTests
         using StaticSourceFile openedFile = StaticSourceFile.FromAssetFile(
             "./test.dat",
             fileContents.AsMemory(),
-            _database,
+            _parsingServices.Database,
             SourceNodeTokenizerOptions.None
         );
 
         ISourceFile sourceFile = openedFile.SourceFile;
 
-        AssetSpecType? supplyType = (AssetSpecType?)_database.FindType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", default);
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile, AssetDatPropertyPosition.Root);
+
+        DatAssetFileType? supplyType = (DatAssetFileType)AssetFileType.FromType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", _parsingServices.Database).Information;
         Assert.That(supplyType, Is.Not.Null);
 
-        SpecProperty nestedProperty1 = new SpecProperty
-        {
-            Key = "A",
-            Type = new PropertyTypeOrSwitch(KnownTypes.Int32)
-        };
-        SpecProperty testProperty = new SpecProperty
-        {
-            Key = "Config",
-            Type = new PropertyTypeOrSwitch(KnownTypes.List(KnownTypes.List(CreateCustomTestType(supplyType, nestedProperty1), false), false)),
-            Owner = supplyType
-        };
+        DatProperty testProperty = DatProperty.Create("Config", supplyType, default, SpecPropertyContext.Property);
 
-        using IDisposable addProp = supplyType.AddRootPropertyForTest(SpecPropertyContext.Property, testProperty);
+        DatProperty? nestedProperty = null;
+        testProperty.Type = ListType.Create(
+            ListType.Create(
+                CreateCustomTestType(supplyType, ct =>
+                {
+                    nestedProperty = DatProperty.Create("A", ct, default, SpecPropertyContext.Property);
+                    nestedProperty.Type = Int32Type.Instance;
+                    return nestedProperty;
+                })
+            )
+        );
+
+        Assert.That(nestedProperty, Is.Not.Null);
+
+        using IDisposable addProp = AddRootPropertyForTest(supplyType, SpecPropertyContext.Property, testProperty);
 
         // "/Config[1]/[1]/"
-        Assert.That(sourceFile.TryGetProperty(testProperty, out IPropertySourceNode? sn1));
+        Assert.That(sourceFile.TryGetProperty(testProperty, ref ctx, out IPropertySourceNode? sn1));
         Assert.That(sn1!.Value is IListSourceNode);
         Assert.That(((IListSourceNode)sn1.Value!).TryGetElement(1, out IAnyValueSourceNode? sn2));
         Assert.That(sn2 is IListSourceNode);
         Assert.That(((IListSourceNode)sn2!).TryGetElement(1, out IAnyValueSourceNode? sn3));
         Assert.That(sn3 is IDictionarySourceNode);
-        Assert.That(((IDictionarySourceNode)sn3!).TryGetProperty(nestedProperty1, out IPropertySourceNode? prop));
+        IDictionarySourceNode expectedDictionary = (IDictionarySourceNode)sn3!;
+        Assert.That(expectedDictionary.TryGetProperty(nestedProperty, ref ctx, out IPropertySourceNode? prop));
 
         PropertyBreadcrumbs autoBreadcrumbs = PropertyBreadcrumbs.FromNode(prop!);
 
@@ -607,7 +580,7 @@ public class PropertyBreadcrumbsTests
         PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config[1][1].A", out string propertyName);
         Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(2));
         Assert.That(propertyName, Is.EqualTo("A"));
-        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _database);
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
 
         PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
 
@@ -615,35 +588,23 @@ public class PropertyBreadcrumbsTests
         {
             Assert.That(breadcrumb.ToString(), Is.EqualTo("/Config[1]/[1]/"));
 
-            List<ISourceNode>? path = withPath ? new List<ISourceNode>() : null;
-            Assert.That(breadcrumb.TryGetProperty(sourceFile, nestedProperty1, out IPropertySourceNode? sourceNode, path));
+            ctx.RootBreadcrumbs = breadcrumb;
+            Assert.That(ctx.TryGetTargetPropertyNodeForProperty(nestedProperty, out IPropertySourceNode? sourceNode));
 
             Assert.That(sourceNode, Is.Not.Null);
             Assert.That(sourceNode.Key, Is.EqualTo("A"));
             Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("1"));
 
-            if (withType)
-            {
-                AssetFileType ft = AssetFileType.FromFile(sourceFile, _database);
-                Assert.That(ft.Information, Is.Not.Null);
-
-                path?.Clear();
-                Assert.That(breadcrumb.TryGetDictionaryAndType(sourceFile, in ft, _database, out _, out ISpecType? type, path));
-                Assert.That(type, Is.SameAs(nestedProperty1.Owner));
-            }
-
-            if (withPath)
-            {
-                Assert.That(path, Has.Count.EqualTo(3));
-                Assert.That(path[0], Is.SameAs(sn1));
-                Assert.That(path[1], Is.SameAs(sn2));
-                Assert.That(path[2], Is.SameAs(sn3));
-            }
+            Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+            Assert.That(dictionary, Is.SameAs(expectedDictionary));
+            Assert.That(valueType, Is.SameAs(nestedProperty.Owner));
+            
         }
     }
 
     [Test]
-    public void NestedLists3([Values(true, false)] bool withPath, [Values(true, false)] bool withType)
+    public void NestedLists3()
     {
         const string fileContents = """
                                     GUID 7ae3737efae940999dc51919ce558ec4
@@ -667,31 +628,39 @@ public class PropertyBreadcrumbsTests
         using StaticSourceFile openedFile = StaticSourceFile.FromAssetFile(
             "./test.dat",
             fileContents.AsMemory(),
-            _database,
+            _parsingServices.Database,
             SourceNodeTokenizerOptions.None
         );
 
         ISourceFile sourceFile = openedFile.SourceFile;
 
-        AssetSpecType? supplyType = (AssetSpecType?)_database.FindType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", default);
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile, AssetDatPropertyPosition.Root);
+
+        DatAssetFileType? supplyType = (DatAssetFileType)AssetFileType.FromType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", _parsingServices.Database).Information;
         Assert.That(supplyType, Is.Not.Null);
 
-        SpecProperty nestedProperty1 = new SpecProperty
-        {
-            Key = "A",
-            Type = new PropertyTypeOrSwitch(KnownTypes.Int32)
-        };
-        SpecProperty testProperty = new SpecProperty
-        {
-            Key = "Config",
-            Type = new PropertyTypeOrSwitch(KnownTypes.List(KnownTypes.List(CreateCustomTestType(supplyType, nestedProperty1), false), false)),
-            Owner = supplyType
-        };
+        DatProperty testProperty = DatProperty.Create("Config", supplyType, default, SpecPropertyContext.Property);
 
-        using IDisposable addProp = supplyType.AddRootPropertyForTest(SpecPropertyContext.Property, testProperty);
+        DatProperty? nestedProperty = null;
+        testProperty.Type = ListType.Create(
+            ListType.Create(
+                ListType.Create(
+                    CreateCustomTestType(supplyType, ct =>
+                    {
+                        nestedProperty = DatProperty.Create("A", ct, default, SpecPropertyContext.Property);
+                        nestedProperty.Type = Int32Type.Instance;
+                        return nestedProperty;
+                    })
+                )
+            )
+        );
+
+        Assert.That(nestedProperty, Is.Not.Null);
+
+        using IDisposable addProp = AddRootPropertyForTest(supplyType, SpecPropertyContext.Property, testProperty);
 
         // "/Config[1]/[0]/[0]/"
-        Assert.That(sourceFile.TryGetProperty(testProperty, out IPropertySourceNode? sn1));
+        Assert.That(sourceFile.TryGetProperty(testProperty, ref ctx, out IPropertySourceNode? sn1));
         Assert.That(sn1!.Value is IListSourceNode);
         Assert.That(((IListSourceNode)sn1.Value!).TryGetElement(1, out IAnyValueSourceNode? sn2));
         Assert.That(sn2 is IListSourceNode);
@@ -699,7 +668,8 @@ public class PropertyBreadcrumbsTests
         Assert.That(sn3 is IListSourceNode);
         Assert.That(((IListSourceNode)sn3!).TryGetElement(0, out IAnyValueSourceNode? sn4));
         Assert.That(sn4 is IDictionarySourceNode);
-        Assert.That(((IDictionarySourceNode)sn4!).TryGetProperty(nestedProperty1, out IPropertySourceNode? prop));
+        IDictionarySourceNode expectedDictionary = (IDictionarySourceNode)sn4!;
+        Assert.That(expectedDictionary.TryGetProperty(nestedProperty, ref ctx, out IPropertySourceNode? prop));
 
         PropertyBreadcrumbs autoBreadcrumbs = PropertyBreadcrumbs.FromNode(prop!);
 
@@ -712,7 +682,7 @@ public class PropertyBreadcrumbsTests
         PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config[1][0][0].A", out string propertyName);
         Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(3));
         Assert.That(propertyName, Is.EqualTo("A"));
-        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _database);
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
 
         PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
 
@@ -720,31 +690,17 @@ public class PropertyBreadcrumbsTests
         {
             Assert.That(breadcrumb.ToString(), Is.EqualTo("/Config[1]/[0]/[0]/"));
 
-            List<ISourceNode>? path = withPath ? new List<ISourceNode>() : null;
-            Assert.That(breadcrumb.TryGetProperty(sourceFile, nestedProperty1, out IPropertySourceNode? sourceNode, path));
+            ctx.RootBreadcrumbs = breadcrumb;
+            Assert.That(ctx.TryGetTargetPropertyNodeForProperty(nestedProperty, out IPropertySourceNode? sourceNode));
 
             Assert.That(sourceNode, Is.Not.Null);
             Assert.That(sourceNode.Key, Is.EqualTo("A"));
             Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("1"));
 
-            if (withType)
-            {
-                AssetFileType ft = AssetFileType.FromFile(sourceFile, _database);
-                Assert.That(ft.Information, Is.Not.Null);
-
-                path?.Clear();
-                Assert.That(breadcrumb.TryGetDictionaryAndType(sourceFile, in ft, _database, out _, out ISpecType? type, path));
-                Assert.That(type, Is.SameAs(nestedProperty1.Owner));
-            }
-
-            if (withPath)
-            {
-                Assert.That(path, Has.Count.EqualTo(4));
-                Assert.That(path[0], Is.SameAs(sn1));
-                Assert.That(path[1], Is.SameAs(sn2));
-                Assert.That(path[2], Is.SameAs(sn3));
-                Assert.That(path[3], Is.SameAs(sn4));
-            }
+            Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+            Assert.That(dictionary, Is.SameAs(expectedDictionary));
+            Assert.That(valueType, Is.SameAs(nestedProperty.Owner));
         }
     }
 
@@ -764,5 +720,71 @@ public class PropertyBreadcrumbsTests
         Assert.That(crumbs.ToString(rootSlash: false), Is.EqualTo(expectedBreadcrumbs));
         Assert.That(propertyName, Is.EqualTo(expectedProperty));
     }
-#endif
+
+    private static IDisposable AddRootPropertyForTest(DatTypeWithProperties type, SpecPropertyContext context, DatProperty testProperty)
+    {
+        ImmutableArray<DatProperty> oldArray = type.GetPropertyArray(context);
+        ImmutableArray<DatProperty>.Builder bldr = ImmutableArray.CreateBuilder<DatProperty>(oldArray.Length + 1);
+        bldr.AddRange(oldArray);
+        bldr.Add(testProperty);
+        switch (context)
+        {
+            case SpecPropertyContext.Property:
+            case SpecPropertyContext.CrossReferenceProperty:
+                type.Properties = bldr.ToImmutable();
+                break;
+            case SpecPropertyContext.Localization:
+            case SpecPropertyContext.CrossReferenceLocalization:
+                switch (type)
+                {
+                    case DatAssetFileType af:
+                        af.LocalizationProperties = bldr.ToImmutable();
+                        break;
+                    case DatCustomAssetType at:
+                        at.LocalizationProperties = bldr.ToImmutable();
+                        break;
+                }
+                break;
+        }
+
+        return new UndoAddProperty(oldArray, type, context);
+    }
+
+
+    private class UndoAddProperty : IDisposable
+    {
+        private readonly ImmutableArray<DatProperty> _oldArray;
+        private readonly DatTypeWithProperties _type;
+        private readonly SpecPropertyContext _context;
+
+        public UndoAddProperty(ImmutableArray<DatProperty> oldArray, DatTypeWithProperties type, SpecPropertyContext context)
+        {
+            _oldArray = oldArray;
+            _type = type;
+            _context = context;
+        }
+
+        public void Dispose()
+        {
+            switch (_context)
+            {
+                case SpecPropertyContext.Property:
+                case SpecPropertyContext.CrossReferenceProperty:
+                    _type.Properties = _oldArray;
+                    break;
+                case SpecPropertyContext.Localization:
+                case SpecPropertyContext.CrossReferenceLocalization:
+                    switch (_type)
+                    {
+                        case DatAssetFileType af:
+                            af.LocalizationProperties = _oldArray;
+                            break;
+                        case DatCustomAssetType at:
+                            at.LocalizationProperties = _oldArray;
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
 }

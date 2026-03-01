@@ -50,7 +50,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// If an amount is supppled (i.e. "102 x 3") a warning will be logged.
 /// </para>
 /// </summary>
-public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, BackwardsCompatibleAssetReferenceType>, ITypeParser<GuidOrId>, ITypeFactory
+public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, BackwardsCompatibleAssetReferenceType>, ITypeParser<GuidOrId>, ITypeFactory, IAssetReferenceType
 {
     private static readonly BackwardsCompatibleAssetReferenceType?[] DefaultInstances = new BackwardsCompatibleAssetReferenceType?[(int)BackwardsCompatibleAssetReferenceKind.BcAssetReferenceString + 1];
 
@@ -113,6 +113,7 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
 
     public bool SupportsThis { get; }
     public bool PreventSelfReference { get; }
+    public OneOrMore<QualifiedType> BaseTypes => _baseTypes;
 
     /// <summary>
     /// The default category used to parse ID strings, if any.
@@ -147,7 +148,7 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
         _defaultCategory = AssetReferenceHelper.GetDefaultCategory(baseTypes, spec);
     }
 
-    public bool TryParse(ref TypeParserArgs<GuidOrId> args, in FileEvaluationContext ctx, out Optional<GuidOrId> value)
+    public bool TryParse(ref TypeParserArgs<GuidOrId> args, ref FileEvaluationContext ctx, out Optional<GuidOrId> value)
     {
         value = Optional<GuidOrId>.Null;
 
@@ -162,7 +163,7 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
                 {
                     if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                     {
-                        return defValue.TryGetValueAs(in ctx, out value);
+                        return defValue.TryGetValueAs(ref ctx, out value);
                     }
 
                     return false;
@@ -212,8 +213,8 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
                     // Parse GUID dictionary
                     args.ReferencedPropertySink?.AcceptReferencedProperty(guidNode);
 
-                    args.CreateSubTypeParserArgs(out TypeParserArgs<Guid> guidArgs, guidNode.Value, guidNode, GuidType.Instance, PropertyResolutionContext.Modern);
-                    if (!TypeParsers.Guid.TryParse(ref guidArgs, in ctx, out Optional<Guid> guid))
+                    args.CreateSubTypeParserArgs(out TypeParserArgs<Guid> guidArgs, guidNode.Value, guidNode, GuidType.Instance, LegacyExpansionFilter.Modern);
+                    if (!TypeParsers.Guid.TryParse(ref guidArgs, ref ctx, out Optional<Guid> guid))
                     {
                         return false;
                     }
@@ -237,8 +238,8 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
                         // Parse Type + ID dictionary
                         args.ReferencedPropertySink?.AcceptReferencedProperty(idNode!);
 
-                        args.CreateSubTypeParserArgs(out TypeParserArgs<string> guidArgs, typeNode!.Value, typeNode, StringType.Instance, PropertyResolutionContext.Modern);
-                        if (!TypeParsers.String.TryParse(ref guidArgs, in ctx, out Optional<string> typeString))
+                        args.CreateSubTypeParserArgs(out TypeParserArgs<string> guidArgs, typeNode!.Value, typeNode, StringType.Instance, LegacyExpansionFilter.Modern);
+                        if (!TypeParsers.String.TryParse(ref guidArgs, ref ctx, out Optional<string> typeString))
                         {
                             return false;
                         }
@@ -249,8 +250,8 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
                             categoryIndex = -1;
                         }
 
-                        args.CreateSubTypeParserArgs(out TypeParserArgs<ushort> ushortArgs, idNode!.Value, idNode, UInt16Type.Instance, PropertyResolutionContext.Modern);
-                        if (!TypeParsers.UInt16.TryParse(ref ushortArgs, in ctx, out Optional<ushort> id) || categoryIndex < 0 || !id.HasValue)
+                        args.CreateSubTypeParserArgs(out TypeParserArgs<ushort> ushortArgs, idNode!.Value, idNode, UInt16Type.Instance, LegacyExpansionFilter.Modern);
+                        if (!TypeParsers.UInt16.TryParse(ref ushortArgs, ref ctx, out Optional<ushort> id) || categoryIndex < 0 || !id.HasValue)
                         {
                             return false;
                         }

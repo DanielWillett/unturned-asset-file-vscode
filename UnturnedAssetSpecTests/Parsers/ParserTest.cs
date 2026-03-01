@@ -1,14 +1,13 @@
-﻿using System.Globalization;
-using System.Runtime.CompilerServices;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace UnturnedAssetSpecTests.Parsers;
 
@@ -19,7 +18,7 @@ public class ParserTest<T> : IDisposable, IDiagnosticSink, IReferencedPropertySi
     private readonly Action<Optional<T>, IParsingServices> _handleValue;
     private readonly string _propertyName;
     private readonly Func<IParsingServices, IType<T>> _type;
-    private readonly PropertyResolutionContext _keyFilter;
+    private readonly LegacyExpansionFilter _keyFilter;
     private readonly IParsingServices _parsingServices;
     private readonly TypeParserMissingValueBehavior _missingValueBahvior;
     private readonly bool _expectValue;
@@ -97,7 +96,7 @@ public class ParserTest<T> : IDisposable, IDiagnosticSink, IReferencedPropertySi
         Action<Optional<T>, IParsingServices> handleValue,
         string propertyName,
         Func<IParsingServices, IType<T>> type,
-        PropertyResolutionContext keyFilter = PropertyResolutionContext.Unknown,
+        LegacyExpansionFilter keyFilter = LegacyExpansionFilter.Either,
         TypeParserMissingValueBehavior missingValueBahvior = TypeParserMissingValueBehavior.ErrorIfValueOrPropertyNotProvided,
         bool expectValue = true,
         bool requireInit = true)
@@ -163,7 +162,7 @@ public class ParserTest<T> : IDisposable, IDiagnosticSink, IReferencedPropertySi
 
         FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile);
 
-        if (!parserArgs.Type.Parser.TryParse(ref parserArgs, in ctx, out Optional<T> value))
+        if (!parserArgs.Type.Parser.TryParse(ref parserArgs, ref ctx, out Optional<T> value))
         {
             if (_expectValue)
                 Assert.Fail("Expected a value but parser failed.");

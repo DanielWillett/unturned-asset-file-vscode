@@ -38,7 +38,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </list>
 /// </para>
 /// </summary>
-public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITypeParser<Guid>, ITypeFactory
+public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITypeParser<Guid>, ITypeFactory, IAssetReferenceType
 {
     private static readonly AssetReferenceType?[] DefaultInstances = new AssetReferenceType?[(int)AssetReferenceKind.Object];
 
@@ -97,6 +97,7 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
 
     public bool SupportsThis { get; }
     public bool PreventSelfReference { get; }
+    public OneOrMore<QualifiedType> BaseTypes => _baseTypes;
 
     public AssetReferenceType() : this(AssetReferenceKind.Object) { }
 
@@ -124,7 +125,7 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
         DisplayName = AssetReferenceHelper.GetDisplayName(baseTypes, DisplayNames[(int)kind], DisplayNamesFormattable[(int)kind]);
     }
 
-    public bool TryParse(ref TypeParserArgs<Guid> args, in FileEvaluationContext ctx, out Optional<Guid> value)
+    public bool TryParse(ref TypeParserArgs<Guid> args, ref FileEvaluationContext ctx, out Optional<Guid> value)
     {
         value = Optional<Guid>.Null;
 
@@ -139,7 +140,7 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
                 {
                     if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                     {
-                        return defValue.TryGetValueAs(in ctx, out value);
+                        return defValue.TryGetValueAs(ref ctx, out value);
                     }
 
                     return false;
@@ -175,7 +176,7 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
 
                 args.ReferencedPropertySink?.AcceptReferencedProperty(guidNode);
 
-                args.CreateSubTypeParserArgs(out TypeParserArgs<Guid> guidArgs, guidNode.Value, guidNode, this, PropertyResolutionContext.Modern);
+                args.CreateSubTypeParserArgs(out TypeParserArgs<Guid> guidArgs, guidNode.Value, guidNode, this, LegacyExpansionFilter.Modern);
                 switch (guidNode.Value)
                 {
                     default:

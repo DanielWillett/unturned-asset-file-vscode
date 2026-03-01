@@ -789,7 +789,7 @@ public class DatEnumValue : IValue<DatEnumValue>, IEquatable<DatEnumValue>, IDat
         return true;
     }
 
-    bool IValue<DatEnumValue>.TryEvaluateValue(out Optional<DatEnumValue> value, in FileEvaluationContext ctx)
+    bool IValue<DatEnumValue>.TryEvaluateValue(out Optional<DatEnumValue> value, ref FileEvaluationContext ctx)
     {
         value = new Optional<DatEnumValue>(this);
         return true;
@@ -807,7 +807,7 @@ public class DatEnumValue : IValue<DatEnumValue>, IEquatable<DatEnumValue>, IDat
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -939,7 +939,7 @@ public class DatFlagEnumValue : DatEnumValue, IValue<DatFlagEnumValue>, IEquatab
         return true;
     }
 
-    bool IValue<DatFlagEnumValue>.TryEvaluateValue(out Optional<DatFlagEnumValue> value, in FileEvaluationContext ctx)
+    bool IValue<DatFlagEnumValue>.TryEvaluateValue(out Optional<DatFlagEnumValue> value, ref FileEvaluationContext ctx)
     {
         value = new Optional<DatFlagEnumValue>(this);
         return true;

@@ -15,6 +15,7 @@ public interface IPropertyReferenceValue : IValue
     /// The property being referenced.
     /// </summary>
     /// <remarks>Shouldn't usually be accessed on cross-reference properties.</remarks>
+    /// <exception cref="NotSupportedException">Accessing the property using this property isn't supported for cross-referenced properties.</exception>
     DatProperty Property { get; }
 
     /// <summary>
@@ -32,12 +33,12 @@ public interface ICrossedPropertyReference : IPropertyReferenceValue
     /// Attempts to create a new <see cref="FileEvaluationContext"/> for the cross-referenced file.
     /// Callers of this method must always call <see cref="DisposeContext"/> after they're done using it.
     /// </summary>
-    bool TryResolveReference(in FileEvaluationContext oldContext, [UnscopedRef] out FileEvaluationContext newContext, [NotNullWhen(true)] out DatProperty? property);
+    bool TryResolveReference(ref FileEvaluationContext oldContext, [UnscopedRef] out FileEvaluationContext newContext, [NotNullWhen(true)] out DatProperty? property);
 
     /// <summary>
     /// Disposes a context created from <see cref="TryResolveReference"/> after the caller is done with it.
     /// </summary>
-    void DisposeContext(in FileEvaluationContext newContext);
+    void DisposeContext(ref FileEvaluationContext newContext);
 }
 
 /// <summary>

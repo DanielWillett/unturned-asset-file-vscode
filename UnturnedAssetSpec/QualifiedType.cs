@@ -429,6 +429,7 @@ public readonly struct QualifiedOrAliasedType : IEquatable<QualifiedOrAliasedTyp
     }
 
     public static implicit operator QualifiedOrAliasedType(QualifiedType type) => new QualifiedOrAliasedType(type);
+    public static implicit operator QualifiedOrAliasedType(string type) => new QualifiedOrAliasedType(new QualifiedType(type, true));
 
     public bool Equals(QualifiedOrAliasedType other)
     {

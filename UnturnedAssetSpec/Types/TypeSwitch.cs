@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using System;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -28,7 +29,14 @@ public class TypeSwitch : SwitchValue<IType>, IPropertyType
     /// </summary>
     public const string ValueTypeId = "DanielWillett.UnturnedDataFileLspServer.Data.Types.TypeOfType, UnturnedAssetSpec";
 
-    public TypeSwitch(IType<IType> type, ImmutableArray<ISwitchCase<IType>> cases) : base(type, cases) { }
+    /// <inheritdoc />
+    public PropertySearchTrimmingBehavior TrimmingBehavior { get; }
+
+    public TypeSwitch(IType<IType> type, ImmutableArray<ISwitchCase<IType>> cases, PropertySearchTrimmingBehavior maxTrimmingBehavior)
+        : base(type, cases)
+    {
+        TrimmingBehavior = maxTrimmingBehavior;
+    }
 
     /// <inheritdoc />
     public bool TryGetConcreteType([NotNullWhen(true)] out IType? type)
@@ -51,7 +59,7 @@ public class TypeSwitch : SwitchValue<IType>, IPropertyType
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateType([NotNullWhen(true)] out IType? type, in FileEvaluationContext ctx)
+    public bool TryEvaluateType([NotNullWhen(true)] out IType? type, ref FileEvaluationContext ctx)
     {
         if (_concreteValue != null)
         {
@@ -59,7 +67,7 @@ public class TypeSwitch : SwitchValue<IType>, IPropertyType
             return true;
         }
 
-        if (!TryEvaluateValue(out Optional<IType> typeOptional, in ctx) || !typeOptional.HasValue)
+        if (!TryEvaluateValue(out Optional<IType> typeOptional, ref ctx) || !typeOptional.HasValue)
         {
             type = null;
             return false;
@@ -85,6 +93,8 @@ internal class TypeOfType : BaseType<IType, TypeOfType>, ITypeParser<IType>, ITy
     private readonly DatProperty? _owner;
     private readonly string? _contextString;
 
+    internal PropertySearchTrimmingBehavior MaximumTrimmingBehavior;
+
     internal static readonly TypeOfType Factory = new TypeOfType();
     static TypeOfType() { }
 
@@ -94,6 +104,7 @@ internal class TypeOfType : BaseType<IType, TypeOfType>, ITypeParser<IType>, ITy
         _context = context;
         _owner = owner;
         _contextString = contextString;
+        MaximumTrimmingBehavior = PropertySearchTrimmingBehavior.ExactPropertyOnly;
     }
 
     public override string Id => TypeSwitch.ValueTypeId;
@@ -113,7 +124,7 @@ internal class TypeOfType : BaseType<IType, TypeOfType>, ITypeParser<IType>, ITy
     }
 
     /// <inheritdoc />
-    public bool TryParse(ref TypeParserArgs<IType> args, in FileEvaluationContext ctx, out Optional<IType> value)
+    public bool TryParse(ref TypeParserArgs<IType> args, ref FileEvaluationContext ctx, out Optional<IType> value)
     {
         value = Optional<IType>.Null;
         return false;
@@ -133,7 +144,15 @@ internal class TypeOfType : BaseType<IType, TypeOfType>, ITypeParser<IType>, ITy
             return false;
         }
 
-        value = new Optional<IType>(_context.ReadType(in json, _owner, _contextString ?? string.Empty));
+        IType readType = _context.ReadType(in json, _owner, _contextString ?? string.Empty);
+
+        PropertySearchTrimmingBehavior trimBehavior = readType.TrimmingBehavior;
+        if (trimBehavior != PropertySearchTrimmingBehavior.ExactPropertyOnly)
+        {
+            MaximumTrimmingBehavior = MergeTrimmingBehavior(MaximumTrimmingBehavior, trimBehavior);
+        }
+
+        value = new Optional<IType>(readType);
         return true;
     }
 
@@ -141,5 +160,10 @@ internal class TypeOfType : BaseType<IType, TypeOfType>, ITypeParser<IType>, ITy
     public void WriteValueToJson(Utf8JsonWriter writer, IType value, IType<IType> valueType, JsonSerializerOptions options)
     {
         value.WriteToJson(writer, options);
+    }
+
+    internal static PropertySearchTrimmingBehavior MergeTrimmingBehavior(PropertySearchTrimmingBehavior a, PropertySearchTrimmingBehavior b)
+    {
+        return (PropertySearchTrimmingBehavior)Math.Max((int)a, (int)b);
     }
 }

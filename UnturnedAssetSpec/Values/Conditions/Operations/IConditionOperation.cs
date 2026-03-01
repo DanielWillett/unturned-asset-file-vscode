@@ -62,7 +62,7 @@ public interface IConditionOperation : IEquatable<IConditionOperation?>
     /// </summary>
     /// <typeparam name="TValue">The type of value being compared against.</typeparam>
     /// <returns>Whether or not this operation evaluates to <see langword="true"/>.</returns>
-    bool TryEvaluate<TValue, TComparand>(TValue value, TComparand comparand, bool concreteOnly, in FileEvaluationContext ctx, out bool result)
+    bool TryEvaluate<TValue, TComparand>(TValue value, TComparand comparand, bool concreteOnly, ref FileEvaluationContext ctx, out bool result)
         where TValue : IEquatable<TValue>
         where TComparand : IEquatable<TComparand>;
 }
@@ -107,7 +107,7 @@ internal abstract class ConditionOperation<TSelf> : IConditionOperation
         where TValue : IEquatable<TValue>
         where TComparand : IEquatable<TComparand>;
     
-    protected virtual bool TryEvaluate<TValue, TComparand>(TValue value, TComparand comparand, in FileEvaluationContext ctx, out bool result)
+    protected virtual bool TryEvaluate<TValue, TComparand>(TValue value, TComparand comparand, ref FileEvaluationContext ctx, out bool result)
         where TValue : IEquatable<TValue>
         where TComparand : IEquatable<TComparand>
     {
@@ -118,13 +118,13 @@ internal abstract class ConditionOperation<TSelf> : IConditionOperation
         TValue value,
         TComparand comparand,
         bool concreteOnly,
-        in FileEvaluationContext ctx,
+        ref FileEvaluationContext ctx,
         out bool result)
         where TValue : IEquatable<TValue>
         where TComparand : IEquatable<TComparand>
     {
         return concreteOnly
             ? TryEvaluateConcrete(value, comparand, out result)
-            : TryEvaluate(value, comparand, in ctx, out result);
+            : TryEvaluate(value, comparand, ref ctx, out result);
     }
 }

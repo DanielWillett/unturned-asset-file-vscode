@@ -673,7 +673,7 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -681,13 +681,13 @@ public class SwitchValue : IValue, IEquatable<SwitchValue?>
     {
         foreach (ISwitchCase c in Cases)
         {
-            if (!c.TryCheckConditions(in ctx, out bool doesPassConditions))
+            if (!c.TryCheckConditions(ref ctx, out bool doesPassConditions))
                 return false;
 
             if (!doesPassConditions)
                 continue;
 
-            c.Value.VisitValue(ref visitor, in ctx);
+            c.Value.VisitValue(ref visitor, ref ctx);
             return true;
         }
 
@@ -803,12 +803,12 @@ public class SwitchValue<TResult> : SwitchValue, IValue<TResult>, IEquatable<Swi
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<TResult> value, in FileEvaluationContext ctx)
+    public bool TryEvaluateValue(out Optional<TResult> value, ref FileEvaluationContext ctx)
     {
         // ReSharper disable once PossibleInvalidCastExceptionInForeachLoop
         foreach (ISwitchCase<TResult> c in Cases)
         {
-            if (!c.TryCheckConditions(in ctx, out bool doesPassConditions))
+            if (!c.TryCheckConditions(ref ctx, out bool doesPassConditions))
             {
                 value = Optional<TResult>.Null;
                 return false;
@@ -817,7 +817,7 @@ public class SwitchValue<TResult> : SwitchValue, IValue<TResult>, IEquatable<Swi
             if (!doesPassConditions)
                 continue;
 
-            return c.Value.TryEvaluateValue(out value, in ctx);
+            return c.Value.TryEvaluateValue(out value, ref ctx);
         }
 
         value = Optional<TResult>.Null;

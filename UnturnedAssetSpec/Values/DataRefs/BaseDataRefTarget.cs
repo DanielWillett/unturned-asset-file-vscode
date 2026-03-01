@@ -15,7 +15,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     protected abstract IDataRef DataRef { get; }
 
     /// <inheritdoc />
-    public bool AcceptProperty<TProperty, TVisitor>(in TProperty property, ref TVisitor valueVisitor, in FileEvaluationContext ctx)
+    public bool AcceptProperty<TProperty, TVisitor>(in TProperty property, ref TVisitor valueVisitor, ref FileEvaluationContext ctx)
         where TProperty : IDataRefProperty
         where TVisitor : IValueVisitor
     #if NET9_0_OR_GREATER
@@ -24,7 +24,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     {
         if (typeof(TProperty) == typeof(ExcludedProperty))
         {
-            if (!AcceptProperty(in Unsafe.As<TProperty, ExcludedProperty>(ref Unsafe.AsRef(in property)), in ctx, out bool isExcluded))
+            if (!AcceptProperty(in Unsafe.As<TProperty, ExcludedProperty>(ref Unsafe.AsRef(in property)), ref ctx, out bool isExcluded))
                 return false;
 
             valueVisitor.Accept(new Optional<bool>(isExcluded));
@@ -32,7 +32,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
         }
         if (typeof(TProperty) == typeof(IncludedProperty))
         {
-            if (!AcceptProperty(in Unsafe.As<TProperty, IncludedProperty>(ref Unsafe.AsRef(in property)), in ctx, out bool isIncluded))
+            if (!AcceptProperty(in Unsafe.As<TProperty, IncludedProperty>(ref Unsafe.AsRef(in property)), ref ctx, out bool isIncluded))
                 return false;
 
             valueVisitor.Accept(new Optional<bool>(isIncluded));
@@ -40,7 +40,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
         }
         if (typeof(TProperty) == typeof(KeyProperty))
         {
-            if (!AcceptProperty(in Unsafe.As<TProperty, KeyProperty>(ref Unsafe.AsRef(in property)), in ctx, out string? key))
+            if (!AcceptProperty(in Unsafe.As<TProperty, KeyProperty>(ref Unsafe.AsRef(in property)), ref ctx, out string? key))
                 return false;
 
             valueVisitor.Accept(key == null ? Optional<string>.Null : new Optional<string>(key));
@@ -48,7 +48,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
         }
         if (typeof(TProperty) == typeof(AssetNameProperty))
         {
-            if (!AcceptProperty(in Unsafe.As<TProperty, AssetNameProperty>(ref Unsafe.AsRef(in property)), in ctx, out string? assetName))
+            if (!AcceptProperty(in Unsafe.As<TProperty, AssetNameProperty>(ref Unsafe.AsRef(in property)), ref ctx, out string? assetName))
                 return false;
 
             valueVisitor.Accept(assetName == null ? Optional<string>.Null : new Optional<string>(assetName));
@@ -56,7 +56,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
         }
         if (typeof(TProperty) == typeof(DifficultyProperty))
         {
-            if (!AcceptProperty(in Unsafe.As<TProperty, DifficultyProperty>(ref Unsafe.AsRef(in property)), in ctx, out string? difficulty))
+            if (!AcceptProperty(in Unsafe.As<TProperty, DifficultyProperty>(ref Unsafe.AsRef(in property)), ref ctx, out string? difficulty))
                 return false;
 
             valueVisitor.Accept(difficulty == null ? Optional<string>.Null : new Optional<string>(difficulty));
@@ -64,11 +64,11 @@ public abstract class BaseDataRefTarget : IDataRefTarget
         }
         if (typeof(TProperty) == typeof(IndicesProperty))
         {
-            return AcceptProperty(in Unsafe.As<TProperty, IndicesProperty>(ref Unsafe.AsRef(in property)), in ctx, ref valueVisitor);
+            return AcceptProperty(in Unsafe.As<TProperty, IndicesProperty>(ref Unsafe.AsRef(in property)), ref ctx, ref valueVisitor);
         }
         if (typeof(TProperty) == typeof(IsLegacyProperty))
         {
-            if (!AcceptProperty(in Unsafe.As<TProperty, IsLegacyProperty>(ref Unsafe.AsRef(in property)), in ctx, out bool isLegacy))
+            if (!AcceptProperty(in Unsafe.As<TProperty, IsLegacyProperty>(ref Unsafe.AsRef(in property)), ref ctx, out bool isLegacy))
                 return false;
 
             valueVisitor.Accept(new Optional<bool>(isLegacy));
@@ -76,7 +76,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
         }
         if (typeof(TProperty) == typeof(ValueTypeProperty))
         {
-            if (!AcceptProperty(in Unsafe.As<TProperty, ValueTypeProperty>(ref Unsafe.AsRef(in property)), in ctx, out string? valueType))
+            if (!AcceptProperty(in Unsafe.As<TProperty, ValueTypeProperty>(ref Unsafe.AsRef(in property)), ref ctx, out string? valueType))
                 return false;
 
             valueVisitor.Accept(valueType == null ? Optional<string>.Null : new Optional<string>(valueType));
@@ -84,21 +84,21 @@ public abstract class BaseDataRefTarget : IDataRefTarget
         }
         if (typeof(TProperty) == typeof(CountProperty))
         {
-            if (!AcceptProperty(in Unsafe.As<TProperty, CountProperty>(ref Unsafe.AsRef(in property)), in ctx, out int count))
+            if (!AcceptProperty(in Unsafe.As<TProperty, CountProperty>(ref Unsafe.AsRef(in property)), ref ctx, out int count))
                 return false;
 
             valueVisitor.Accept(new Optional<int>(count));
             return true;
         }
 
-        return AcceptUnknownProperty(in property, ref valueVisitor, in ctx);
+        return AcceptUnknownProperty(in property, ref valueVisitor, ref ctx);
     }
 
     /// <summary>
     /// Invoked when a property that isn't already given a known virtual method (see other methods in <see cref="BaseDataRefTarget"/>) is accessed on this target.
     /// </summary>
     /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
-    protected virtual bool AcceptUnknownProperty<TProperty, TVisitor>(in TProperty property, ref TVisitor valueVisitor, in FileEvaluationContext ctx)
+    protected virtual bool AcceptUnknownProperty<TProperty, TVisitor>(in TProperty property, ref TVisitor valueVisitor, ref FileEvaluationContext ctx)
         where TProperty : IDataRefProperty
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
@@ -112,7 +112,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     /// Invoked when a <see cref="ExcludedProperty"/> is accessed on this target.
     /// </summary>
     /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
-    protected virtual bool AcceptProperty(in ExcludedProperty property, in FileEvaluationContext ctx, out bool value)
+    protected virtual bool AcceptProperty(in ExcludedProperty property, ref FileEvaluationContext ctx, out bool value)
     {
         value = false;
         return false;
@@ -122,7 +122,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     /// Invoked when a <see cref="IncludedProperty"/> is accessed on this target.
     /// </summary>
     /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
-    protected virtual bool AcceptProperty(in IncludedProperty property, in FileEvaluationContext ctx, out bool value)
+    protected virtual bool AcceptProperty(in IncludedProperty property, ref FileEvaluationContext ctx, out bool value)
     {
         value = false;
         return false;
@@ -132,7 +132,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     /// Invoked when a <see cref="KeyProperty"/> is accessed on this target.
     /// </summary>
     /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
-    protected virtual bool AcceptProperty(in KeyProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    protected virtual bool AcceptProperty(in KeyProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         value = null;
         return false;
@@ -142,7 +142,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     /// Invoked when a <see cref="AssetNameProperty"/> is accessed on this target.
     /// </summary>
     /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
-    protected virtual bool AcceptProperty(in AssetNameProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    protected virtual bool AcceptProperty(in AssetNameProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         value = null;
         return false;
@@ -152,7 +152,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     /// Invoked when a <see cref="DifficultyProperty"/> is accessed on this target.
     /// </summary>
     /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
-    protected virtual bool AcceptProperty(in DifficultyProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    protected virtual bool AcceptProperty(in DifficultyProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         value = null;
         return false;
@@ -162,7 +162,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     /// Invoked when a <see cref="IndicesProperty"/> is accessed on this target.
     /// </summary>
     /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
-    protected virtual bool AcceptProperty<TVisitor>(in IndicesProperty property, in FileEvaluationContext ctx, ref TVisitor visitor)
+    protected virtual bool AcceptProperty<TVisitor>(in IndicesProperty property, ref FileEvaluationContext ctx, ref TVisitor visitor)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -175,7 +175,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     /// Invoked when a <see cref="IsLegacyProperty"/> is accessed on this target.
     /// </summary>
     /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
-    protected virtual bool AcceptProperty(in IsLegacyProperty property, in FileEvaluationContext ctx, out bool value)
+    protected virtual bool AcceptProperty(in IsLegacyProperty property, ref FileEvaluationContext ctx, out bool value)
     {
         value = false;
         return false;
@@ -185,7 +185,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     /// Invoked when a <see cref="ValueTypeProperty"/> is accessed on this target.
     /// </summary>
     /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
-    protected virtual bool AcceptProperty(in ValueTypeProperty property, in FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
+    protected virtual bool AcceptProperty(in ValueTypeProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         value = null;
         return false;
@@ -195,7 +195,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     /// Invoked when a <see cref="CountProperty"/> is accessed on this target.
     /// </summary>
     /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
-    protected virtual bool AcceptProperty(in CountProperty property, in FileEvaluationContext ctx, out int value)
+    protected virtual bool AcceptProperty(in CountProperty property, ref FileEvaluationContext ctx, out int value)
     {
         value = 0;
         return false;

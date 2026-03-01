@@ -25,7 +25,7 @@ public abstract class RootDataRef<TSelf> : BaseDataRefTarget, IDataRef
     protected override IDataRef DataRef => this;
 
     /// <inheritdoc />
-    public abstract bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public abstract bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -180,12 +180,12 @@ public abstract class RootDataRef<TValue, TSelf> : RootDataRef<TSelf>
     /// <param name="ctx">Workspace context.</param>
     /// <param name="value">The evaluated value.</param>
     /// <returns>Whether or not a value could be determined.</returns>
-    public abstract bool TryEvaluateValue(in FileEvaluationContext ctx, out Optional<TValue> value);
+    public abstract bool TryEvaluateValue(ref FileEvaluationContext ctx, out Optional<TValue> value);
 
     /// <inheritdoc />
-    public override bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public override bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
     {
-        if (!TryEvaluateValue(in ctx, out Optional<TValue> value))
+        if (!TryEvaluateValue(ref ctx, out Optional<TValue> value))
         {
             return false;
         }

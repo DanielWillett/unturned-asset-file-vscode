@@ -11,6 +11,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 public interface IPropertyType : IEquatable<IPropertyType?>
 {
     /// <summary>
+    /// How this type may expand to other properties.
+    /// </summary>
+    PropertySearchTrimmingBehavior TrimmingBehavior { get; }
+
+    /// <summary>
     /// Attempts to resolve the property's current type without context.
     /// </summary>
     /// <returns>Whether or not the type could be resolved successfully without context.</returns>
@@ -20,5 +25,5 @@ public interface IPropertyType : IEquatable<IPropertyType?>
     /// Attempts to resolve the property's current type with context.
     /// </summary>
     /// <returns>Whether or not the type could be resolved successfully.</returns>
-    bool TryEvaluateType([NotNullWhen(true)] out IType? type, in FileEvaluationContext ctx);
+    bool TryEvaluateType([NotNullWhen(true)] out IType? type, ref FileEvaluationContext ctx);
 }

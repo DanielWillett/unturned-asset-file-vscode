@@ -1,10 +1,10 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -16,7 +16,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <summary>
 /// A weakly-typed reference to a property within the same file as the referencing property.
 /// </summary>
-public class LocalPropertyReference : IPropertyReferenceValue
+public class LocalPropertyReferenceValue : IPropertyReferenceValue
 {
     private PropertyReference _propertyReference;
     private readonly IAssetSpecDatabase? _database;
@@ -30,18 +30,15 @@ public class LocalPropertyReference : IPropertyReferenceValue
         {
             if (_property != null)
                 return _property;
-            
-            if (_propertyReference.IsCrossReference || !TryCacheProperty(NullLoggerFactory.Instance, in FileEvaluationContext.None))
-                throw new InvalidOperationException("Unable to cache property at this moment.");
 
-            return _property;
+            throw new InvalidOperationException("Unable to cache property at this moment.");
         }
     }
 
     /// <inheritdoc />
     public DatProperty Owner { get; }
 
-    public LocalPropertyReference(in PropertyReference pref, DatProperty owner, IAssetSpecDatabase database)
+    public LocalPropertyReferenceValue(in PropertyReference pref, DatProperty owner, IAssetSpecDatabase database)
     {
         Owner = owner;
         _propertyReference = pref;
@@ -50,14 +47,15 @@ public class LocalPropertyReference : IPropertyReferenceValue
         if (_propertyReference.IsCrossReference || _database == null)
             return;
 
-        _database.OnInitialize((_, loggerFactory) =>
+        _database.OnInitialize(parsingServices =>
         {
             if (_property != null)
                 return Task.CompletedTask;
 
-            if (!TryCacheProperty(loggerFactory, in FileEvaluationContext.None))
+            FileEvaluationContext ctx = new FileEvaluationContext(parsingServices, null!);
+            if (!TryCacheProperty(ref ctx))
             {
-                loggerFactory.CreateLogger<LocalPropertyReference>().LogError(
+                parsingServices.CreateLogger<LocalPropertyReferenceValue>().LogError(
                     "Failed to resolve property reference \"{0}\" from property \"{1}\".", _propertyReference.ToString(), ((IDatSpecificationObject)Owner).FullName
                 );
             }
@@ -67,10 +65,10 @@ public class LocalPropertyReference : IPropertyReferenceValue
     }
 
     [MemberNotNullWhen(true, nameof(_property))]
-    private bool TryCacheProperty(ILoggerFactory loggerFactory, in FileEvaluationContext ctx)
+    private bool TryCacheProperty(ref FileEvaluationContext ctx)
     {
         return _database is { IsInitialized: true }
-               && _propertyReference.TryGetProperty(Owner, in ctx, _database, loggerFactory, out _property);
+               && _propertyReference.TryGetProperty(Owner, ref ctx, out _property);
     }
 
     /// <inheritdoc />
@@ -79,30 +77,35 @@ public class LocalPropertyReference : IPropertyReferenceValue
         _propertyReference.WriteToJson(writer);
     }
 
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        if ((_property == null || _propertyReference.IsCrossReference) && !TryCacheProperty(NullLoggerFactory.Instance, in ctx))
+        if ((_property == null || _propertyReference.IsCrossReference) && !TryCacheProperty(ref ctx))
         {
             return false;
         }
 
-        return _property.VisitValue(ref visitor, in ctx);
+        return _property.VisitValue(
+            ref visitor,
+            ref ctx,
+            _propertyReference.Breadcrumbs,
+            missingValueBahvior: TypeParserMissingValueBehavior.FallbackToDefaultValue
+        );
     }
 
     /// <inheritdoc />
     public virtual bool Equals(IValue? other)
     {
-        return other is LocalPropertyReference r && r._propertyReference.Equals(_propertyReference);
+        return other is LocalPropertyReferenceValue r && r._propertyReference.Equals(_propertyReference);
     }
 
     /// <inheritdoc />
     public override bool Equals(object? obj)
     {
-        return obj is LocalPropertyReference r && Equals(r);
+        return obj is LocalPropertyReferenceValue r && Equals(r);
     }
 
     /// <inheritdoc />
@@ -119,26 +122,26 @@ public class LocalPropertyReference : IPropertyReferenceValue
 /// A strongly-typed reference to a property within the same file as the referencing property.
 /// </summary>
 /// <typeparam name="TReferencedValue">The type of value being referenced.</typeparam>
-public class LocalPropertyReference<TReferencedValue> : LocalPropertyReference, IPropertyReferenceValue<TReferencedValue>
+public class PropertyReferenceValue<TReferencedValue> : LocalPropertyReferenceValue, IPropertyReferenceValue<TReferencedValue>
     where TReferencedValue : IEquatable<TReferencedValue>
 {
     /// <inheritdoc />
     public IType<TReferencedValue> Type { get; }
 
-    public LocalPropertyReference(in PropertyReference pref, DatProperty owner, IAssetSpecDatabase database, IType<TReferencedValue> type)
+    public PropertyReferenceValue(in PropertyReference pref, DatProperty owner, IAssetSpecDatabase database, IType<TReferencedValue> type)
         : base(in pref, owner, database)
     {
         Type = type;
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<TReferencedValue> value, in FileEvaluationContext ctx)
+    public bool TryEvaluateValue(out Optional<TReferencedValue> value, ref FileEvaluationContext ctx)
     {
         ValueVisitor visitor;
         visitor.Value = Optional<TReferencedValue>.Null;
         visitor.Success = false;
 
-        VisitValue(ref visitor, in ctx);
+        VisitValue(ref visitor, ref ctx);
         if (visitor.Success)
         {
             value = visitor.Value;
@@ -152,7 +155,7 @@ public class LocalPropertyReference<TReferencedValue> : LocalPropertyReference, 
     /// <inheritdoc />
     public override bool Equals(IValue? other)
     {
-        return other is LocalPropertyReference<TReferencedValue> v && Type.Equals(v.Type) && base.Equals(other);
+        return other is PropertyReferenceValue<TReferencedValue> v && Type.Equals(v.Type) && base.Equals(other);
     }
 
     /// <inheritdoc />

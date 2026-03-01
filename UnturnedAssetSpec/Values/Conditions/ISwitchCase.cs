@@ -34,7 +34,7 @@ public interface ISwitchCase : IValue
     /// <param name="ctx">Evaluation context.</param>
     /// <param name="doesPassConditions">Whether or not this case's value can be used.</param>
     /// <returns>Whether or not the result of the conditions was able to be determined successfully.</returns>
-    bool TryCheckConditions(in FileEvaluationContext ctx, out bool doesPassConditions);
+    bool TryCheckConditions(ref FileEvaluationContext ctx, out bool doesPassConditions);
 }
 
 /// <summary>

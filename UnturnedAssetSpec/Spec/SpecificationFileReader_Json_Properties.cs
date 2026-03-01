@@ -82,6 +82,7 @@ partial class SpecificationFileReader
         }
 
         DatProperty property = DatProperty.Create(key, owner, element, context);
+        property.IsImport = isImport;
 
         // Type
         IPropertyType type;
@@ -583,6 +584,13 @@ partial class SpecificationFileReader
             caseArrayBuilder.Add(sw);
         }
 
-        return new TypeSwitch(switchType, caseArrayBuilder.MoveToImmutable());
+        PropertySearchTrimmingBehavior maxTrimmingBehavior = PropertySearchTrimmingBehavior.ExactPropertyOnly;
+
+        if (switchType is TypeOfType t)
+        {
+            maxTrimmingBehavior = t.MaximumTrimmingBehavior;
+        }
+
+        return new TypeSwitch(switchType, caseArrayBuilder.MoveToImmutable(), maxTrimmingBehavior);
     }
 }

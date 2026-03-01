@@ -516,7 +516,7 @@ internal unsafe ref struct ExpressionNodeParser<TDataRefReadContext> : IDisposab
                 FileEvaluationContext ctx = default;
 #endif
                 ExpressionEvaluator evaluator = new ExpressionEvaluator(expr);
-                if (evaluator.Evaluate<double, ExpressionSimplifier<TResult>>(ref v, concreteOnly: true, in ctx) && v.Node != null)
+                if (evaluator.Evaluate<double, ExpressionSimplifier<TResult>>(ref v, concreteOnly: true, ref ctx) && v.Node != null)
                     return v.Node;
 
                 return expr;
@@ -536,7 +536,7 @@ internal unsafe ref struct ExpressionNodeParser<TDataRefReadContext> : IDisposab
             if (CommonTypes.TryGetDefaultValueType<TResult>() is { } resultType)
             {
                 v.Type = resultType;
-                if (!evaluator.Evaluate<TResult, ExpressionSimplifier<TResult>>(ref v, concreteOnly: true, in ctx))
+                if (!evaluator.Evaluate<TResult, ExpressionSimplifier<TResult>>(ref v, concreteOnly: true, ref ctx))
                     v.Node = null;
             }
         }
@@ -585,7 +585,7 @@ internal unsafe ref struct ExpressionNodeParser<TDataRefReadContext> : IDisposab
             FileEvaluationContext ctx = default;
 #endif
             ExpressionEvaluator evaluator = new ExpressionEvaluator((IFunctionExpressionNode)Node!);
-            if (!evaluator.Evaluate<double, ExpressionSimplifier<TResult>>(ref this, concreteOnly: true, in ctx))
+            if (!evaluator.Evaluate<double, ExpressionSimplifier<TResult>>(ref this, concreteOnly: true, ref ctx))
             {
                 Node = null;
             }

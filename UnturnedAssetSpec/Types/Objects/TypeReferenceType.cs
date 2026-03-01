@@ -100,7 +100,7 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
         }
     }
 
-    public bool TryParse(ref TypeParserArgs<QualifiedType> args, in FileEvaluationContext ctx, out Optional<QualifiedType> value)
+    public bool TryParse(ref TypeParserArgs<QualifiedType> args, ref FileEvaluationContext ctx, out Optional<QualifiedType> value)
     {
         value = Optional<QualifiedType>.Null;
 
@@ -115,7 +115,7 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
                 {
                     if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                     {
-                        return defValue.TryGetValueAs(in ctx, out value);
+                        return defValue.TryGetValueAs(ref ctx, out value);
                     }
 
                     return false;
@@ -127,7 +127,7 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
                 break;
 
             case IValueSourceNode v:
-                if (!TryParseTypeRefValue(ref args, in ctx, v.Value, out QualifiedType type))
+                if (!TryParseTypeRefValue(ref args, ref ctx, v.Value, out QualifiedType type))
                 {
                     args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
                     return false;
@@ -151,7 +151,7 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
 
                 args.ReferencedPropertySink?.AcceptReferencedProperty(guidNode);
 
-                args.CreateSubTypeParserArgs(out TypeParserArgs<QualifiedType> typeArgs, guidNode.Value, guidNode, this, PropertyResolutionContext.Modern);
+                args.CreateSubTypeParserArgs(out TypeParserArgs<QualifiedType> typeArgs, guidNode.Value, guidNode, this, LegacyExpansionFilter.Modern);
                 switch (guidNode.Value)
                 {
                     default:
@@ -167,7 +167,7 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
                         return false;
 
                     case IValueSourceNode typeValue:
-                        if (!TryParseTypeRefValue(ref typeArgs, in ctx, typeValue.Value, out type))
+                        if (!TryParseTypeRefValue(ref typeArgs, ref ctx, typeValue.Value, out type))
                         {
                             args.DiagnosticSink?.UNT2004_Generic(ref typeArgs, typeValue.Value, args.Type);
                             return false;
@@ -184,7 +184,7 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
     private static readonly char[] InvalidTypeChars = [ '\\', ':', '/' ];
 
 #pragma warning disable CS8500
-    private bool TryParseTypeRefValue(ref TypeParserArgs<QualifiedType> args, in FileEvaluationContext ctx, string value, out QualifiedType type)
+    private bool TryParseTypeRefValue(ref TypeParserArgs<QualifiedType> args, ref FileEvaluationContext ctx, string value, out QualifiedType type)
     {
         QualifiedType.ExtractParts(value.AsSpan(), out ReadOnlySpan<char> typeName, out ReadOnlySpan<char> asmName);
 

@@ -28,7 +28,7 @@ internal sealed class NullType : IType, ITypeFactory
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateType([NotNullWhen(true)] out IType? type, in FileEvaluationContext ctx)
+    public bool TryEvaluateType([NotNullWhen(true)] out IType? type, ref FileEvaluationContext ctx)
     {
         type = this;
         return true;
@@ -40,7 +40,7 @@ internal sealed class NullType : IType, ITypeFactory
         writer.WriteStringValue(TypeId);
     }
 
-    PropertySearchTrimmingBehavior IType.TrimmingBehavior => PropertySearchTrimmingBehavior.ExactPropertyOnly;
+    PropertySearchTrimmingBehavior IPropertyType.TrimmingBehavior => PropertySearchTrimmingBehavior.ExactPropertyOnly;
 
     public bool Equals(IType? other) => other is NullType;
     public bool Equals(IPropertyType? other) => other is NullType;

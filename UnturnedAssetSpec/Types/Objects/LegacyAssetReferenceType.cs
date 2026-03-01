@@ -30,7 +30,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </list>
 /// </para>
 /// </summary>
-public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetReferenceType>, ITypeParser<ushort>, ITypeFactory
+public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetReferenceType>, ITypeParser<ushort>, ITypeFactory, IAssetReferenceType
 {
     /// <summary>
     /// Gets the default instance for a <see cref="LegacyAssetReferenceType"/>.
@@ -61,6 +61,7 @@ public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetRefer
 
     public bool SupportsThis { get; }
     public bool PreventSelfReference { get; }
+    public OneOrMore<QualifiedType> BaseTypes => _baseTypes;
 
     /// <summary>
     /// The default category used to parse ID strings, if any.
@@ -89,7 +90,7 @@ public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetRefer
         _defaultCategory = AssetReferenceHelper.GetDefaultCategory(baseTypes, spec);
     }
 
-    public bool TryParse(ref TypeParserArgs<ushort> args, in FileEvaluationContext ctx, out Optional<ushort> value)
+    public bool TryParse(ref TypeParserArgs<ushort> args, ref FileEvaluationContext ctx, out Optional<ushort> value)
     {
         value = Optional<ushort>.Null;
 
@@ -104,7 +105,7 @@ public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetRefer
                 {
                     if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                     {
-                        return defValue.TryGetValueAs(in ctx, out value);
+                        return defValue.TryGetValueAs(ref ctx, out value);
                     }
 
                     return false;

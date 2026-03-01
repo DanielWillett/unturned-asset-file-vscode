@@ -246,7 +246,7 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
         private IDictionarySourceNode _rootNode;
         private IPropertySourceNode? _ignore;
         private DatTypeWithProperties _type;
-        private PropertyResolutionContext _keyFilter;
+        private LegacyExpansionFilter _keyFilter;
         private List<IPropertySourceNode>? _referencedPropertyNodeBufferForThisProperty;
 
         public ValueProcessor(
@@ -260,7 +260,7 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
             _queue = new Queue<DatProperty>();
             _processed = new HashSet<DatProperty>();
             _referencedProperties = new HashSet<IPropertySourceNode>();
-            _keyFilter = PropertyResolutionContext.Unknown;
+            _keyFilter = LegacyExpansionFilter.Either;
             Setup(dictionary, ignore, type, root);
         }
 
@@ -277,7 +277,7 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
 
         public void Return()
         {
-            _keyFilter = PropertyResolutionContext.Unknown;
+            _keyFilter = LegacyExpansionFilter.Either;
             _queue.Clear();
             _referencedProperties.Clear();
             _currentProperty = null;
@@ -324,13 +324,13 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
 
         private IPropertySourceNode? FindDirectDescendantPropertyNode(DatProperty property)
         {
-            _rootNode.TryResolveProperty(property, in _parent._evalCtx, out IPropertySourceNode? propertyNode, _keyFilter);
+            _rootNode.TryResolveProperty(property, ref _parent._evalCtx, out IPropertySourceNode? propertyNode, _keyFilter);
             return propertyNode;
         }
 
         public void ProcessProperty(DatProperty property)
         {
-            if (!property.Type.TryEvaluateType(out IType? propertyType, in _parent._evalCtx))
+            if (!property.Type.TryEvaluateType(out IType? propertyType, ref _parent._evalCtx))
             {
                 if (_parent.CollectDiagnostics)
                 {
@@ -439,7 +439,7 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
                 args.Property = Property;
                 args.MissingValueBehavior = TypeParserMissingValueBehavior.FallbackToDefaultValue;
 
-                if (!type.Parser.TryParse(ref args, in cache._evalCtx, out Optional<TValue> optionalValue))
+                if (!type.Parser.TryParse(ref args, ref cache._evalCtx, out Optional<TValue> optionalValue))
                 {
                     return;
                 }

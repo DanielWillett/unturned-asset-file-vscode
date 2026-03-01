@@ -54,14 +54,14 @@ public sealed class SteamItemDefType : PrimitiveType<int, SteamItemDefType>, ITy
         return true;
     }
 
-    bool ITypeParser<int>.TryParse(ref TypeParserArgs<int> args, in FileEvaluationContext ctx, out Optional<int> value)
+    bool ITypeParser<int>.TryParse(ref TypeParserArgs<int> args, ref FileEvaluationContext ctx, out Optional<int> value)
     {
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }
 
-        if (!TypeParsers.Int32.TryParse(ref args, in ctx, out value) || !value.HasValue)
+        if (!TypeParsers.Int32.TryParse(ref args, ref ctx, out value) || !value.HasValue)
             return false;
 
         switch (value.Value)

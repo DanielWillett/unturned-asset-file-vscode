@@ -85,9 +85,9 @@ public class ConditionalSwitchCase<TComparand> : IConditionalSwitchCase
     }
 
     /// <inheritdoc />
-    public bool TryCheckConditions(in FileEvaluationContext ctx, out bool doesPassConditions)
+    public bool TryCheckConditions(ref FileEvaluationContext ctx, out bool doesPassConditions)
     {
-        if (!Condition.TryEvaluateValue(out Optional<bool> v, in ctx))
+        if (!Condition.TryEvaluateValue(out Optional<bool> v, ref ctx))
         {
             doesPassConditions = false;
             return false;
@@ -111,16 +111,16 @@ public class ConditionalSwitchCase<TComparand> : IConditionalSwitchCase
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        if (!Condition.TryEvaluateValue(out Optional<bool> v, in ctx) || !v.GetValueOrDefault(false))
+        if (!Condition.TryEvaluateValue(out Optional<bool> v, ref ctx) || !v.GetValueOrDefault(false))
             return false;
 
-        return Value.VisitValue(ref visitor, in ctx);
+        return Value.VisitValue(ref visitor, ref ctx);
     }
 
     /// <inheritdoc />
@@ -188,15 +188,15 @@ public class ConditionalSwitchCase<TResult, TComparand> : ConditionalSwitchCase<
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<TResult> value, in FileEvaluationContext ctx)
+    public bool TryEvaluateValue(out Optional<TResult> value, ref FileEvaluationContext ctx)
     {
-        if (!Condition.TryEvaluateValue(out Optional<bool> v, in ctx) || !v.GetValueOrDefault(false))
+        if (!Condition.TryEvaluateValue(out Optional<bool> v, ref ctx) || !v.GetValueOrDefault(false))
         {
             value = Optional<TResult>.Null;
             return false;
         }
 
-        return Value.TryEvaluateValue(out value, in ctx);
+        return Value.TryEvaluateValue(out value, ref ctx);
     }
 
     /// <inheritdoc />

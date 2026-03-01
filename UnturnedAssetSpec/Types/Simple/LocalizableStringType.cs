@@ -88,7 +88,7 @@ public sealed class LocalizableStringType : BaseType<string, LocalizableStringTy
         _keyOverride = keyOverride;
     }
 
-    public bool TryParse(ref TypeParserArgs<string> args, in FileEvaluationContext ctx, out Optional<string> value)
+    public bool TryParse(ref TypeParserArgs<string> args, ref FileEvaluationContext ctx, out Optional<string> value)
     {
         // value not given
         if (args.ValueNode == null || _preferLocalizationValue)
@@ -103,7 +103,7 @@ public sealed class LocalizableStringType : BaseType<string, LocalizableStringTy
             ISourceFile file = args.ParentNode.File;
             if (file is not IAssetSourceFile assetFile || assetFile.GetDefaultLocalizationFile() is not { } localFile)
             {
-                if (args.Property?.Required != null && args.Property.Required.TryEvaluateValue(out Optional<bool> isRequired, in ctx) && isRequired.Value)
+                if (args.Property?.Required != null && args.Property.Required.TryEvaluateValue(out Optional<bool> isRequired, ref ctx) && isRequired.Value)
                 {
                     args.DiagnosticSink?.UNT1030_Property(ref args, args.ReferenceNode);
                 }
@@ -121,7 +121,7 @@ public sealed class LocalizableStringType : BaseType<string, LocalizableStringTy
             return false;
         }
 
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }

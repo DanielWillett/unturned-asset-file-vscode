@@ -178,7 +178,7 @@ public static class TypeParsers
         return false;
     }
 
-    internal static bool TryApplyMissingValueBehavior<T>(ref TypeParserArgs<T> args, in FileEvaluationContext ctx, out Optional<T> value, out bool returnValue)
+    internal static bool TryApplyMissingValueBehavior<T>(ref TypeParserArgs<T> args, ref FileEvaluationContext ctx, out Optional<T> value, out bool returnValue)
         where T : IEquatable<T>
     {
         DatProperty? property = args.Property;
@@ -204,7 +204,7 @@ public static class TypeParsers
                     }
                     else
                     {
-                        returnValue = property.DefaultValue.TryGetValueAs(in ctx, out value);
+                        returnValue = property.DefaultValue.TryGetValueAs(ref ctx, out value);
                     }
 
                     return true;
@@ -224,7 +224,7 @@ public static class TypeParsers
                     }
                     else
                     {
-                        returnValue = defaultValue.TryGetValueAs(in ctx, out value);
+                        returnValue = defaultValue.TryGetValueAs(ref ctx, out value);
                     }
 
                     return true;

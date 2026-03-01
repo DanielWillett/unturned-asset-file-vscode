@@ -122,7 +122,7 @@ public class DatObjectValue :
         value = this;
         return true;
     }
-    bool IValue<DatObjectValue>.TryEvaluateValue(out Optional<DatObjectValue> value, in FileEvaluationContext ctx)
+    bool IValue<DatObjectValue>.TryEvaluateValue(out Optional<DatObjectValue> value, ref FileEvaluationContext ctx)
     {
         value = this;
         return true;
@@ -132,7 +132,7 @@ public class DatObjectValue :
         visitor.Accept(new Optional<DatObjectValue>(this));
         return true;
     }
-    bool IValue.VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    bool IValue.VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
     {
         visitor.Accept(new Optional<DatObjectValue>(this));
         return true;

@@ -129,13 +129,13 @@ public class DataRefProperty<TProperty> : IDataRef, IEquatable<DataRefProperty<T
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        return Target.AcceptProperty(in _property, ref visitor, in ctx);
+        return Target.AcceptProperty(in _property, ref visitor, ref ctx);
     }
 
     public DataRefProperty(IDataRefTarget target, TProperty property)
@@ -207,10 +207,10 @@ public class DataRefProperty<TProperty, TValue> : DataRefProperty<TProperty>, ID
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<TValue> value, in FileEvaluationContext ctx)
+    public bool TryEvaluateValue(out Optional<TValue> value, ref FileEvaluationContext ctx)
     {
         ConvertVisitor<TValue> conv = default;
-        VisitValue(ref conv, in ctx);
+        VisitValue(ref conv, ref ctx);
         value = conv.IsNull ? Optional<TValue>.Null : new Optional<TValue>(conv.Result);
         return conv.WasSuccessful;
     }

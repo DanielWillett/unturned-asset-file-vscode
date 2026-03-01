@@ -251,7 +251,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
         protected override void AcceptResolvedProperty(
             DatProperty property,
             IType propertyType,
-            in FileEvaluationContext ctx,
+            ref FileEvaluationContext ctx,
             IPropertySourceNode node,
             in PropertyBreadcrumbs breadcrumbs)
         {
@@ -264,7 +264,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
                 if (!codeFix.PassesTypeCheck(propertyType))
                     continue;
 
-                CodeFixInstance? instance = codeFix.TryApplyToProperty(node, propertyType, property, in breadcrumbs, in ctx);
+                CodeFixInstance? instance = codeFix.TryApplyToProperty(node, propertyType, property, in breadcrumbs, ref ctx);
                 if (instance == null)
                     continue;
 

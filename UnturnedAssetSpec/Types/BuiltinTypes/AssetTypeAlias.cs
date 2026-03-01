@@ -1,10 +1,10 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -15,7 +15,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </summary>
 [SpecificationType(FactoryMethod = nameof(Create))]
 #if NET5_0_OR_GREATER
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicMethods)]
+[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicMethods)]
 #endif
 public sealed class AssetTypeAlias : DatEnumType
 {
@@ -55,14 +55,14 @@ public sealed class AssetTypeAlias : DatEnumType
         context.Database.OnInitialize(UpdateDescriptionsOnDatabaseInitialize);
     }
 
-    private Task UpdateDescriptionsOnDatabaseInitialize(IAssetSpecDatabase database, ILoggerFactory loggerFactory)
+    private Task UpdateDescriptionsOnDatabaseInitialize(IParsingServices services)
     {
         ILogger<AssetTypeAlias>? logger = null;
         foreach (DatEnumValue value in Values)
         {
-            if (!database.FileTypes.TryGetValue(value.CorrespondingType, out DatFileType? type))
+            if (!services.Database.FileTypes.TryGetValue(value.CorrespondingType, out DatFileType? type))
             {
-                logger ??= loggerFactory.CreateLogger<AssetTypeAlias>();
+                logger ??= services.LoggerFactory.CreateLogger<AssetTypeAlias>();
                 logger.LogError("Unknown asset type {0} configured for asset alias {1}.", value.CorrespondingType.Type, value.Value);
                 continue;
             }

@@ -28,9 +28,9 @@ public sealed class ValueDataRef<TValueType> : RootDataRef<ValueDataRef<TValueTy
 
 
     /// <inheritdoc />
-    public override bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public override bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
     {
-        if (!TryEvaluateValue(out Optional<TValueType> value, in ctx))
+        if (!TryEvaluateValue(out Optional<TValueType> value, ref ctx))
         {
             return false;
         }
@@ -64,7 +64,7 @@ public sealed class ValueDataRef<TValueType> : RootDataRef<ValueDataRef<TValueTy
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<TValueType> value, in FileEvaluationContext ctx)
+    public bool TryEvaluateValue(out Optional<TValueType> value, ref FileEvaluationContext ctx)
     {
         TypeParserArgs<DatObjectValue> args = DatCustomType.ValueParseInfo.Value;
         if (args.Type == null)
@@ -106,7 +106,7 @@ public sealed class ValueDataRef<TValueType> : RootDataRef<ValueDataRef<TValueTy
                 args.KeyFilter
             );
 
-            if (typeParser.TryParse(ref parseArgs, in ctx, out value))
+            if (typeParser.TryParse(ref parseArgs, ref ctx, out value))
             {
                 return true;
             }

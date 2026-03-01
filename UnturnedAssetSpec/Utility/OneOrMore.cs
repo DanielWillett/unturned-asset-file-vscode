@@ -1202,7 +1202,7 @@ public static class OneOrMoreExtensions
                 comparer = EqualityComparer<T>.Default;
                 return comparer.Equals(span[0], span[1])
                     ? new OneOrMore<T>(span[0])
-                    : new OneOrMore<T>([ span[0], span[1] ]);
+                    : OneOrMore<T>.CreateUnsafe([ span[0], span[1] ], default);
         }
 
         comparer = EqualityComparer<T>.Default;
@@ -1228,7 +1228,7 @@ public static class OneOrMoreExtensions
 
         if (count == span.Length)
         {
-            return new OneOrMore<T>(span.ToArray());
+            return OneOrMore<T>.CreateUnsafe(span.ToArray(), default);
         }
 
         if (count == 1)
@@ -1247,7 +1247,7 @@ public static class OneOrMoreExtensions
             newArray[++count] = span[i];
         }
 
-        return new OneOrMore<T>(newArray);
+        return OneOrMore<T>.CreateUnsafe(newArray, default);
     }
 
     /// <summary>

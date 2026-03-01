@@ -54,7 +54,7 @@ public abstract class BaseType<TSelf> : IType
         type = this;
         return true;
     }
-    bool IPropertyType.TryEvaluateType(out IType type, in FileEvaluationContext ctx)
+    bool IPropertyType.TryEvaluateType(out IType type, ref FileEvaluationContext ctx)
     {
         type = this;
         return true;

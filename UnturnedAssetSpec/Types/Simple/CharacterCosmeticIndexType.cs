@@ -93,14 +93,14 @@ internal class CharacterCosmeticIndexType : BaseType<byte, CharacterCosmeticInde
     }
 
     /// <inheritdoc />
-    public bool TryParse(ref TypeParserArgs<byte> args, in FileEvaluationContext ctx, out Optional<byte> value)
+    public bool TryParse(ref TypeParserArgs<byte> args, ref FileEvaluationContext ctx, out Optional<byte> value)
     {
-        if (TypeParsers.TryApplyMissingValueBehavior(ref args, in ctx, out value, out bool rtn))
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
         {
             return rtn;
         }
 
-        if (!TypeParsers.UInt8.TryParse(ref args, in ctx, out value))
+        if (!TypeParsers.UInt8.TryParse(ref args, ref ctx, out value))
         {
             return false;
         }

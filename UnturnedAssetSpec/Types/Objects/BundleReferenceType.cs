@@ -130,7 +130,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
         _baseTypes = baseTypes;
     }
 
-    public bool TryParse(ref TypeParserArgs<BundleReference> args, in FileEvaluationContext ctx, out Optional<BundleReference> value)
+    public bool TryParse(ref TypeParserArgs<BundleReference> args, ref FileEvaluationContext ctx, out Optional<BundleReference> value)
     {
         value = Optional<BundleReference>.Null;
 
@@ -145,7 +145,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                 {
                     if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                     {
-                        return defValue.TryGetValueAs(in ctx, out value);
+                        return defValue.TryGetValueAs(ref ctx, out value);
                     }
 
                     return false;

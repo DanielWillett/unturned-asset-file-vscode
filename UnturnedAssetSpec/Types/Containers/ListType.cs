@@ -334,7 +334,11 @@ public sealed class ListType : ITypeFactory
 /// <typeparam name="TElementType">The type of values to read from the elements of the list.</typeparam>
 /// <typeparam name="TCountType">The data-type of the count of the list.</typeparam>
 public class ListType<TCountType, TElementType>
-    : BaseType<EquatableArray<TElementType>, ListType<TCountType, TElementType>>, ITypeParser<EquatableArray<TElementType>>, IReferencingType
+    : BaseType<EquatableArray<TElementType>,
+        ListType<TCountType, TElementType>>,
+        ITypeParser<EquatableArray<TElementType>>,
+        IReferencingType,
+        IListType
     where TElementType : IEquatable<TElementType>
     where TCountType : IEquatable<TCountType>
 {
@@ -345,6 +349,8 @@ public class ListType<TCountType, TElementType>
     private readonly int? _minCount;
     private readonly int? _maxCount;
 
+    IType IListType.ElementType => _subType;
+
     public override string Id => ListType.TypeId;
 
     public override string DisplayName { get; }
@@ -354,7 +360,7 @@ public class ListType<TCountType, TElementType>
     {
         get
         {
-            PropertySearchTrimmingBehavior behavior = (_args.Mode & ListMode.Legacy) != 0 ? PropertySearchTrimmingBehavior.CreatesSiblingPropertiesInSameFile : PropertySearchTrimmingBehavior.ExactPropertyOnly;
+            PropertySearchTrimmingBehavior behavior = (_args.Mode & ListMode.Legacy) != 0 ? PropertySearchTrimmingBehavior.CreatesOtherPropertiesInSameFileAtSameLevel : PropertySearchTrimmingBehavior.ExactPropertyOnly;
             return (PropertySearchTrimmingBehavior)Math.Max((int)behavior, (int)_subType.TrimmingBehavior);
         }
     }
@@ -544,11 +550,11 @@ public class ListType<TCountType, TElementType>
         }
     }
 
-    public bool TryParse(ref TypeParserArgs<EquatableArray<TElementType>> args, in FileEvaluationContext ctx, out Optional<EquatableArray<TElementType>> value)
+    public bool TryParse(ref TypeParserArgs<EquatableArray<TElementType>> args, ref FileEvaluationContext ctx, out Optional<EquatableArray<TElementType>> value)
     {
         value = Optional<EquatableArray<TElementType>>.Null;
-        bool legacy = (_args.Mode & ListMode.Legacy) != 0 && args.KeyFilter != PropertyResolutionContext.Modern;
-        bool modern = (_args.Mode & ListMode.Modern) != 0 && args.KeyFilter != PropertyResolutionContext.Legacy;
+        bool legacy = (_args.Mode & ListMode.Legacy) != 0 && args.KeyFilter != LegacyExpansionFilter.Modern;
+        bool modern = (_args.Mode & ListMode.Modern) != 0 && args.KeyFilter != LegacyExpansionFilter.Legacy;
         if (!modern && !legacy) modern = true;
 
         TElementType?[] array;
@@ -583,9 +589,9 @@ public class ListType<TCountType, TElementType>
             {
                 args.ReferencedPropertySink?.AcceptReferencedProperty(singularProperty);
 
-                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, singularProperty.Value, args.ParentNode, _subType, PropertyResolutionContext.Modern);
+                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, singularProperty.Value, args.ParentNode, _subType, LegacyExpansionFilter.Modern);
 
-                if (!TryParseWithIndex(0, ref parseArgs, in ctx, out Optional<TElementType> element))
+                if (!TryParseWithIndex(0, ref parseArgs, ref ctx, out Optional<TElementType> element))
                 {
                     if (!parseArgs.ShouldIgnoreFailureDiagnostic)
                         args.DiagnosticSink?.UNT2004_Generic(ref args, singularProperty.Value == null ? "-" : singularProperty.Value.ToString()!, _subType);
@@ -619,7 +625,7 @@ public class ListType<TCountType, TElementType>
                 }
                 else if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
                 {
-                    return defValue.TryGetValueAs(in ctx, out value);
+                    return defValue.TryGetValueAs(ref ctx, out value);
                 }
 
                 break;
@@ -656,9 +662,9 @@ public class ListType<TCountType, TElementType>
                     if (node is not IAnyValueSourceNode v)
                         continue;
 
-                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, v, listNode, _subType, PropertyResolutionContext.Modern);
+                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, v, listNode, _subType, LegacyExpansionFilter.Modern);
 
-                    if (!TryParseWithIndex(0, ref elementParseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
+                    if (!TryParseWithIndex(0, ref elementParseArgs, ref ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
                     {
                         if (!elementParseArgs.ShouldIgnoreFailureDiagnostic)
                         {
@@ -681,8 +687,8 @@ public class ListType<TCountType, TElementType>
                 return !allFailed;
 
             case IValueSourceNode valueNode:
-                bool couldBeModernSingle = modern && (_args.Mode & ListMode.ModernSingle) == ListMode.ModernSingle && args.KeyFilter != PropertyResolutionContext.Legacy;
-                bool couldBeLegacyCount = legacy && (_args.Mode & ListMode.LegacyList) == ListMode.LegacyList && args.KeyFilter != PropertyResolutionContext.Modern;
+                bool couldBeModernSingle = modern && (_args.Mode & ListMode.ModernSingle) == ListMode.ModernSingle && args.KeyFilter != LegacyExpansionFilter.Either;
+                bool couldBeLegacyCount = legacy && (_args.Mode & ListMode.LegacyList) == ListMode.LegacyList && args.KeyFilter != LegacyExpansionFilter.Modern;
                 if (!couldBeLegacyCount && !couldBeModernSingle)
                 {
                     args.DiagnosticSink?.UNT2004_ValueInsteadOfList(ref args, valueNode, this);
@@ -778,9 +784,9 @@ public class ListType<TCountType, TElementType>
                             {
                                 wasIncluded = true;
                                 args.ReferencedPropertySink?.AcceptReferencedProperty(property);
-                                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, property.Value, property, _subType, PropertyResolutionContext.Modern);
+                                args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> elementParseArgs, property.Value, property, _subType, LegacyExpansionFilter.Modern);
 
-                                if (!TryParseWithIndex(i, ref elementParseArgs, in ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
+                                if (!TryParseWithIndex(i, ref elementParseArgs, ref ctx, out Optional<TElementType> elementType) || !elementType.HasValue)
                                 {
                                     if (!elementParseArgs.ShouldIgnoreFailureDiagnostic)
                                     {
@@ -816,7 +822,7 @@ public class ListType<TCountType, TElementType>
                             ListType.Index.Value = i;
                             try
                             {
-                                defaultValue.VisitValue(ref v, in ctx);
+                                defaultValue.VisitValue(ref v, ref ctx);
                             }
                             finally
                             {
@@ -836,9 +842,9 @@ public class ListType<TCountType, TElementType>
 
                 if (couldBeModernSingle)
                 {
-                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, args.ValueNode, args.ParentNode, _subType, PropertyResolutionContext.Modern);
+                    args.CreateSubTypeParserArgs(out TypeParserArgs<TElementType> parseArgs, args.ValueNode, args.ParentNode, _subType, LegacyExpansionFilter.Modern);
 
-                    if (!TryParseWithIndex(0, ref parseArgs, in ctx, out Optional<TElementType> element))
+                    if (!TryParseWithIndex(0, ref parseArgs, ref ctx, out Optional<TElementType> element))
                     {
                         if (!parseArgs.ShouldIgnoreFailureDiagnostic)
                             args.DiagnosticSink?.UNT2004_Generic(ref args, valueNode.Value, _subType);
@@ -863,10 +869,10 @@ public class ListType<TCountType, TElementType>
         return false;
     }
 
-    private bool TryParseWithIndex(int index, ref TypeParserArgs<TElementType> parseArgs, in FileEvaluationContext ctx, out Optional<TElementType> element)
+    private bool TryParseWithIndex(int index, ref TypeParserArgs<TElementType> parseArgs, ref FileEvaluationContext ctx, out Optional<TElementType> element)
     {
         _ = index; // todo probably will use this in the future
-        return _subType.Parser.TryParse(ref parseArgs, in ctx, out element);
+        return _subType.Parser.TryParse(ref parseArgs, ref ctx, out element);
     }
 
     private static void CheckUniqueValue(ref TypeParserArgs<TElementType> args, ISourceNode node, TElementType?[] array, int index)

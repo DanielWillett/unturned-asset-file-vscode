@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 internal sealed class BooleanOrFlagParser : ITypeParser<bool>
 {
-    public bool TryParse(ref TypeParserArgs<bool> args, in FileEvaluationContext ctx, out Optional<bool> value)
+    public bool TryParse(ref TypeParserArgs<bool> args, ref FileEvaluationContext ctx, out Optional<bool> value)
     {
         if (args.ValueNode is IValueSourceNode v)
         {

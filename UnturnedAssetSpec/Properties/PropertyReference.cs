@@ -1,5 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -7,6 +8,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
 
@@ -99,29 +101,23 @@ public struct PropertyReference : IEquatable<PropertyReference>
     /// <param name="database">The asset database to be associated with this property reference value.</param>
     public readonly IPropertyReferenceValue CreateValue(DatProperty owner, IAssetSpecDatabase database)
     {
-        PropertyBreadcrumbs breadcrumbs = Breadcrumbs;
         if (IsCrossReference)
         {
-            throw new NotImplementedException();
+            return new CrossedPropertyReferenceValue(in this, owner);
         }
-        else
-        {
-            return new LocalPropertyReference(in this, owner, database);
-        }
+
+        return new LocalPropertyReferenceValue(in this, owner, database);
     }
 
     public readonly IPropertyReferenceValue<TValue> CreateValue<TValue>(IType<TValue> type, DatProperty owner, IAssetSpecDatabase database)
         where TValue : IEquatable<TValue>
     {
-        PropertyBreadcrumbs breadcrumbs = Breadcrumbs;
         if (IsCrossReference)
         {
-            throw new NotImplementedException();
+            return new CrossedPropertyReferenceValue<TValue>(in this, owner, type);
         }
-        else
-        {
-            return new LocalPropertyReference<TValue>(in this, owner, database, type);
-        }
+
+        return new PropertyReferenceValue<TValue>(in this, owner, database, type);
     }
 
     /// <summary>
@@ -363,7 +359,7 @@ public struct PropertyReference : IEquatable<PropertyReference>
     /// <param name="file">The found file.</param>
     /// <returns>Whether or not a file was found.</returns>
     /// <exception cref="InvalidOperationException">This <see cref="PropertyReference"/> is not a cross-reference property reference.</exception>
-    public bool TryGetCrossReferencedTarget(DatProperty owner, in FileEvaluationContext ctx, IAssetSpecDatabase database, [NotNullWhen(true)] out DiscoveredDatFile? file)
+    public bool TryGetCrossReferencedTarget(DatProperty owner, ref FileEvaluationContext ctx, IAssetSpecDatabase database, [NotNullWhen(true)] out DiscoveredDatFile? file)
     {
         if (!IsCrossReference)
             throw new InvalidOperationException("This property-reference is not a cross-referencing property.");
@@ -372,13 +368,17 @@ public struct PropertyReference : IEquatable<PropertyReference>
 
         DiscoveredDatFile? target = _crTargetCache;
 
-        if (owner.CrossReferenceTarget == null || !owner.CrossReferenceTarget.TryGetValueAs(in ctx, out Optional<GuidOrId> guidOrId) || !guidOrId.HasValue || guidOrId.Value.IsNull)
+        FileCrossRefVisitor v;
+        v.Services = ctx.Services;
+        v.Owner = owner;
+        v.Id = GuidOrId.Empty;
+
+        if (owner.CrossReferenceTarget == null || !owner.CrossReferenceTarget.VisitValue(ref v, ref ctx) || v.Id.IsNull)
             return false;
 
-        GuidOrId idVal = guidOrId.Value;
-        if (target == null || target.IsRemoved || (idVal.IsId ? target.Id != idVal.Id || target.Category != idVal.Category : target.Guid != idVal.Guid))
+        if (target == null || target.IsRemoved || (v.Id.IsId ? target.Id != v.Id.Id || target.Category != v.Id.Category : target.Guid != v.Id.Guid))
         {
-            OneOrMore<DiscoveredDatFile> files = ctx.Services.Installation.FindFile(idVal);
+            OneOrMore<DiscoveredDatFile> files = ctx.Services.Installation.FindFile(v.Id);
             if (!files.IsSingle)
                 return false;
 
@@ -396,11 +396,15 @@ public struct PropertyReference : IEquatable<PropertyReference>
     /// </summary>
     /// <param name="owner">The property this reference is defined in.</param>
     /// <param name="ctx">Workspace context.</param>
-    /// <param name="database">Specification database.</param>
-    /// <param name="loggerFactory">An optional error logger.</param>
     /// <param name="property">The resolved property.</param>
     /// <returns>Whether or not a property was found.</returns>
-    public bool TryGetProperty(DatProperty owner, in FileEvaluationContext ctx, IAssetSpecDatabase database, ILoggerFactory? loggerFactory, [NotNullWhen(true)] out DatProperty? property)
+    public bool TryGetProperty(DatProperty owner, ref FileEvaluationContext ctx, [NotNullWhen(true)] out DatProperty? property)
+    {
+        return TryGetProperty(owner, ref ctx, out property, null);
+    }
+
+    /// <inheritdoc cref="TryGetProperty(DatProperty,ref FileEvaluationContext,out DatProperty)"/>
+    internal bool TryGetProperty(DatProperty owner, ref FileEvaluationContext ctx, [NotNullWhen(true)] out DatProperty? property, DatFileType? crossRefFileType)
     {
         DatTypeWithProperties objectOwner = owner.Owner;
         IDatSpecificationObject contextObject = owner;
@@ -408,21 +412,29 @@ public struct PropertyReference : IEquatable<PropertyReference>
 
         if (IsCrossReference)
         {
-            if (!TryGetCrossReferencedTarget(owner, in ctx, database, out DiscoveredDatFile? target))
+            if (crossRefFileType == null)
             {
-                property = null;
-                return false;
-            }
+                if (!TryGetCrossReferencedTarget(owner, ref ctx, ctx.Services.Database, out DiscoveredDatFile? target))
+                {
+                    property = null;
+                    return false;
+                }
 
-            QualifiedType type = target.Type;
-            if (!database.FileTypes.TryGetValue(type, out DatFileType? fileType))
+                QualifiedType type = target.Type;
+                if (!ctx.Services.Database.FileTypes.TryGetValue(type, out DatFileType? fileType))
+                {
+                    property = null;
+                    return false;
+                }
+
+                objectOwner = fileType;
+                contextObject = fileType;
+            }
+            else
             {
-                property = null;
-                return false;
+                objectOwner = crossRefFileType;
+                contextObject = crossRefFileType;
             }
-
-            objectOwner = fileType;
-            contextObject = fileType;
 
             context = context switch
             {
@@ -434,10 +446,10 @@ public struct PropertyReference : IEquatable<PropertyReference>
 
         if (TypeName != null)
         {
-            if (!database.TryFindType(new QualifiedType(TypeName, true), out DatType? type, contextObject)
+            if (!ctx.Services.Database.TryFindType(new QualifiedType(TypeName, true), out DatType? type, contextObject)
                 || type is not DatTypeWithProperties props)
             {
-                loggerFactory?.CreateLogger<LocalPropertyReference>().LogError(
+                ctx.Services.LoggerFactory.CreateLogger<LocalPropertyReferenceValue>().LogError(
                     "Unknown type name in property reference \"{0}\" from property \"{1}\".",
                     ToString(),
                     ((IDatSpecificationObject)owner).FullName
@@ -452,6 +464,76 @@ public struct PropertyReference : IEquatable<PropertyReference>
         if (context is not SpecPropertyContext.BundleAsset and not SpecPropertyContext.Localization and not SpecPropertyContext.Property)
             context = owner.Context;
 
-        return objectOwner.TryFindProperty(PropertyName, context, out property);
+        if (!objectOwner.TryFindProperty(PropertyName, context, out property))
+        {
+            return false;
+        }
+
+        Breadcrumbs.ResolveFromPropertyRef(IsCrossReference ? objectOwner : owner.Owner, ctx.Services.Database, context);
+        return true;
+    }
+
+    private struct FileCrossRefVisitor : IValueVisitor
+    {
+        public IParsingServices Services;
+        public GuidOrId Id;
+        public DatProperty Owner;
+
+        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        {
+            if (!value.HasValue)
+            {
+                return;
+            }
+
+            if (typeof(TValue) == typeof(Guid))
+            {
+                Guid guid = Unsafe.As<Optional<TValue>, Optional<Guid>>(ref value).Value;
+                Id = new GuidOrId(guid);
+                return;
+            }
+
+            AssetCategoryValue category = AssetCategoryValue.None;
+
+            if (Owner.CrossReferenceTarget is IPropertyReferenceValue pref)
+            {
+                DatProperty referencedProperty = pref.Owner;
+                if (referencedProperty.Type is IAssetReferenceType arType)
+                {
+                    arType.TryGetTargetCategory(Services.Database, out category);
+                }
+            }
+            else if (Owner.DataRoot.ValueKind == JsonValueKind.Object
+                     && Owner.DataRoot.TryGetProperty("FileCrossRefCategory"u8, out JsonElement element)
+                     && element.ValueKind == JsonValueKind.String
+                     && AssetCategory.TryParse(element.GetString(), out int categoryIndex))
+            {
+                category = new AssetCategoryValue(categoryIndex);
+            }
+
+            if (typeof(TValue) == typeof(GuidOrId))
+            {
+                GuidOrId guidOrId = Unsafe.As<Optional<TValue>, Optional<GuidOrId>>(ref value).Value;
+                if (guidOrId.IsNull)
+                    return;
+
+                if (!guidOrId.IsId || guidOrId.Category != 0)
+                {
+                    Id = guidOrId;
+                    return;
+                }
+
+                if (category.Index == 0)
+                    return;
+
+                Id = new GuidOrId(guidOrId.Id, category);
+                return;
+            }
+
+            if (category.Index == 0 || !ConvertVisitor<ushort>.TryConvert(value.Value, out ushort id) || id == 0)
+                return;
+
+            Id = new GuidOrId(id, category);
+        }
     }
 }

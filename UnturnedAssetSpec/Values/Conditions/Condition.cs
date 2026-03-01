@@ -174,7 +174,7 @@ public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>
     }
 
     /// <inheritdoc />
-    public unsafe bool TryEvaluateValue(out Optional<bool> value, in FileEvaluationContext ctx)
+    public unsafe bool TryEvaluateValue(out Optional<bool> value, ref FileEvaluationContext ctx)
     {
         EvaluateVisitor v;
         v.Visited = false;
@@ -186,7 +186,7 @@ public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>
         {
             v.Condition = ptr;
             v.Context = ctxPtr;
-            success = Variable.VisitValue(ref v, in ctx);
+            success = Variable.VisitValue(ref v, ref ctx);
         }
 
         if (!success || !v.Visited)
@@ -214,13 +214,13 @@ public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        if (!TryEvaluateValue(out Optional<bool> v, in ctx) || !v.HasValue)
+        if (!TryEvaluateValue(out Optional<bool> v, ref ctx) || !v.HasValue)
             return false;
 
         visitor.Accept(v);
@@ -256,7 +256,7 @@ public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>
                 value.Value,
                 comparand.Value,
                 ConcreteOnly,
-                in Unsafe.AsRef<FileEvaluationContext>(Context),
+                ref Unsafe.AsRef<FileEvaluationContext>(Context),
                 out IsConditionMet
             );
         }

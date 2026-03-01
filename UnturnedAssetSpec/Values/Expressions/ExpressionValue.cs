@@ -32,13 +32,13 @@ public class ExpressionValue<TResult> : IValue<TResult>, IEquatable<ExpressionVa
     public bool TryGetConcreteValue(out Optional<TResult> value)
     {
         FileEvaluationContext ctx = default;
-        return TryEvaluate(out value, true, in ctx);
+        return TryEvaluate(out value, true, ref ctx);
     }
 
     /// <inheritdoc />
-    public bool TryEvaluateValue(out Optional<TResult> value, in FileEvaluationContext ctx)
+    public bool TryEvaluateValue(out Optional<TResult> value, ref FileEvaluationContext ctx)
     {
-        return TryEvaluate(out value, false, in ctx);
+        return TryEvaluate(out value, false, ref ctx);
     }
 
     /// <inheritdoc />
@@ -67,13 +67,13 @@ public class ExpressionValue<TResult> : IValue<TResult>, IEquatable<ExpressionVa
     }
 
     /// <inheritdoc />
-    public bool VisitValue<TVisitor>(ref TVisitor visitor, in FileEvaluationContext ctx)
+    public bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
         where TVisitor : IValueVisitor
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        if (!TryEvaluateValue(out Optional<TResult> r, in ctx))
+        if (!TryEvaluateValue(out Optional<TResult> r, ref ctx))
             return false;
 
         visitor.Accept(r);
@@ -82,7 +82,7 @@ public class ExpressionValue<TResult> : IValue<TResult>, IEquatable<ExpressionVa
 
     bool IValue.IsNull => false;
 
-    private bool TryEvaluate(out Optional<TResult> value, bool isConcreteOnly, in FileEvaluationContext ctx)
+    private bool TryEvaluate(out Optional<TResult> value, bool isConcreteOnly, ref FileEvaluationContext ctx)
     {
         ExpressionEvaluator evaluator = new ExpressionEvaluator(Root);
 
@@ -91,7 +91,7 @@ public class ExpressionValue<TResult> : IValue<TResult>, IEquatable<ExpressionVa
         v.WasSuccessful = false;
         v.IsNull = false;
 
-        if (evaluator.Evaluate<TResult, ConvertVisitor<TResult>>(ref v, isConcreteOnly, in ctx))
+        if (evaluator.Evaluate<TResult, ConvertVisitor<TResult>>(ref v, isConcreteOnly, ref ctx))
         {
             value = v.IsNull ? Optional<TResult>.Null : v.Result!;
             return true;
