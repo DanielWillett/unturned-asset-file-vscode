@@ -11,7 +11,14 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Project;
 using FileSystemWatcher = OmniSharp.Extensions.LanguageServer.Protocol.Models.FileSystemWatcher;
 // ReSharper disable InconsistentlySynchronizedField
 
@@ -22,6 +29,7 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
     private readonly OpenedFileTracker _tracker;
     private readonly UnturnedAssetFileSyncHandler? _fileSync;
     private readonly ILogger<LspWorkspaceEnvironment> _logger;
+    private readonly Lazy<IParsingServices> _parsingServices;
     private readonly IAssetSpecDatabase _database;
     private readonly ILanguageServerFacade? _languageServer;
     private readonly IDisposable? _workspaceFoldersUnsubscriber;
@@ -43,12 +51,18 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
     public event Action<WorkspaceFolderTracker, string, string>? FileRenamed;
     public event Action<WorkspaceFolderTracker, string>? FileCreated;
 
-    public IEnumerable<WorkspaceFolderTracker> WorkspaceFolders => _folderTrackers.Values;
+    public event Action<WorkspaceFolderTracker, LspProjectFile>? ProjectFileUpdated;
+    public event Action<WorkspaceFolderTracker, LspProjectFile>? ProjectFileDeleted;
+    public event Action<WorkspaceFolderTracker, string, LspProjectFile>? ProjectFileMoved;
+    public event Action<WorkspaceFolderTracker, LspProjectFile>? ProjectFileCreated;
+
+    public IReadOnlyDictionary<DocumentUri, WorkspaceFolderTracker> WorkspaceFolders { get; }
 
     public LspWorkspaceEnvironment(
         OpenedFileTracker tracker,
         UnturnedAssetFileSyncHandler? fileSync,
         ILogger<LspWorkspaceEnvironment> logger,
+        Lazy<IParsingServices> parsingServices,
         IAssetSpecDatabase database,
         ILanguageServerFacade? languageServer,
         ILanguageServerWorkspaceFolderManager? workspaceFolderManager)
@@ -57,8 +71,11 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         _tracker = tracker;
         _fileSync = fileSync;
         _logger = logger;
+        _parsingServices = parsingServices;
         _database = database;
         _languageServer = languageServer;
+
+        WorkspaceFolders = new ReadOnlyDictionary<DocumentUri, WorkspaceFolderTracker>(_folderTrackers);
 
         if (fileSync != null)
         {
@@ -152,6 +169,14 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         folder.FileDeleted += OnFileDeleted;
         folder.FileUpdated += OnFileUpdated;
         folder.FileRenamed += OnFileRenamed;
+
+        if (!_database.IsInitialized)
+            return;
+        
+        lock (folder.ProjectFileLock)
+        {
+            CreateProjectFiles(folder);
+        }
     }
 
     //private void OnFileOpened(OpenedFile obj)
@@ -167,18 +192,33 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
     private void OnFileCreated(WorkspaceFolderTracker tracker, string fullPath)
     {
         FileCreated?.Invoke(tracker, fullPath);
+        TryUpdateProjectFile(fullPath, tracker);
     }
     private void OnFileDeleted(WorkspaceFolderTracker tracker, string fullPath)
     {
         FileDeleted?.Invoke(tracker, fullPath);
+        TryUpdateProjectFile(fullPath, tracker);
     }
     private void OnFileUpdated(WorkspaceFolderTracker tracker, string fullPath)
     {
         FileUpdated?.Invoke(tracker, fullPath);
+        TryUpdateProjectFile(fullPath, tracker);
     }
     private void OnFileRenamed(WorkspaceFolderTracker tracker, string oldFullPath, string newFullPath)
     {
         FileRenamed?.Invoke(tracker, oldFullPath, newFullPath);
+        TryUpdateProjectFile(newFullPath, tracker, oldFullPath);
+    }
+    
+    private void TryUpdateProjectFile(string fullPath, WorkspaceFolderTracker tracker, string? oldFullPath = null)
+    {
+        if (!OSPathHelper.IsExtension(fullPath, ".udatproj"))
+            return;
+
+        lock (tracker.ProjectFileLock)
+        {
+            UpdateProjectFile(fullPath, tracker, oldFullPath);
+        }
     }
 
     private DocumentUri? GetBestRootUri(DocumentUri other)
@@ -231,10 +271,11 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
 
             _logger.LogTrace("Client reported change for file \"{0}\" in root URI \"{1}\".", change.Uri, rootUri);
 
-            if (_folderTrackers.TryGetValue(rootUri, out WorkspaceFolderTracker? tracker))
-            {
-                tracker.ConsumeChange(Path.GetFullPath(change.Uri.GetFileSystemPath()), change.Type);
-            }
+            if (!_folderTrackers.TryGetValue(rootUri, out WorkspaceFolderTracker? tracker))
+                continue;
+
+            string filePath = Path.GetFullPath(change.Uri.GetFileSystemPath());
+            tracker.ConsumeChange(filePath, change.Type);
         }
 
         return Unit.Task;
@@ -322,6 +363,237 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         {
             Watchers = Container.From(watchedPatterns)
         };
+    }
+
+    internal void CreateAllProjectFiles()
+    {
+        foreach (WorkspaceFolderTracker tracker in _folderTrackers.Values)
+        {
+            lock (tracker.ProjectFileLock)
+            {
+                CreateProjectFiles(tracker);
+            }
+        }
+    }
+
+    private static int IndexOfProjectFile(string fileName, WorkspaceFolderTracker tracker)
+    {
+        // assume: lock (tracker.ProjectFileLock) {
+
+        ImmutableArray<LspProjectFile> projectFiles = tracker.ProjectFiles;
+        int index = -1;
+        for (int i = 0; i < projectFiles.Length; i++)
+        {
+            LspProjectFile file = projectFiles[i];
+            if (!string.Equals(file.FilePath, fileName, OSPathHelper.PathComparison))
+                continue;
+
+            index = i;
+            break;
+        }
+
+        return index;
+    }
+
+    internal void UpdateProjectFile(string fileName, WorkspaceFolderTracker tracker, string? oldFullPath = null)
+    {
+        // assume: lock (tracker.ProjectFileLock) {
+
+        string existingFileName = oldFullPath ?? fileName;
+
+        int index = IndexOfProjectFile(existingFileName, tracker);
+        if (oldFullPath != null && index < 0)
+        {
+            index = IndexOfProjectFile(fileName, tracker);
+        }
+
+        ImmutableArray<LspProjectFile> projectFiles = tracker.ProjectFiles;
+        LspProjectFile? pjFile = index >= 0 ? projectFiles[index] : null;
+
+        bool deleted = false;
+
+        bool hasLock = false;
+        object? @lock = null;
+        IDisposable? disposable = null;
+        bool success = false;
+        try
+        {
+            if (!File.Exists(fileName))
+            {
+                deleted = true;
+                success = false;
+            }
+            else
+            {
+                ISourceFile sourceFile;
+                if (_tracker.Files.TryGetValue(DocumentUri.File(fileName), out OpenedFile? openedFile))
+                {
+                    Monitor.Enter(@lock = openedFile.UpdateLock, ref hasLock);
+                    sourceFile = openedFile.SourceFile;
+                }
+                else
+                {
+                    StaticSourceFile wsFile = StaticSourceFile.FromOtherFile(fileName, _parsingServices.Value.Database);
+                    disposable = wsFile;
+                    sourceFile = wsFile.SourceFile;
+                }
+
+                FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices.Value, sourceFile, AssetDatPropertyPosition.Root);
+                bool isType = ctx.FileType.Type.Equals(ProjectFileType.TypeId);
+
+                if (isType)
+                {
+                    pjFile ??= new LspProjectFile(fileName, Path.GetDirectoryName(fileName)!);
+                    success = pjFile.TryUpdateFromFile(ref ctx);
+                }
+
+                if (success && oldFullPath != null)
+                {
+                    pjFile!.FilePath = fileName;
+                    pjFile.FolderPath = Path.GetDirectoryName(fileName)!;
+                }
+                
+            }
+        }
+        catch (IOException)
+        {
+            deleted = true;
+            success = false;
+        }
+        finally
+        {
+            if (hasLock)
+                Monitor.Exit(@lock!);
+
+            disposable?.Dispose();
+        }
+
+
+        if (success)
+        {
+            if (index < 0)
+            {
+                tracker.ProjectFiles = projectFiles.Add(pjFile!);
+            }
+        }
+        else
+        {
+            if (index >= 0)
+            {
+                tracker.ProjectFiles = projectFiles.Length == 1
+                    ? ImmutableArray<LspProjectFile>.Empty
+                    : projectFiles.RemoveAt(index);
+            }
+
+            deleted = true;
+        }
+
+        if (pjFile == null)
+            return;
+
+        if (deleted)
+        {
+            InvokeProjectFileDeleted(tracker, pjFile);
+        }
+        else if (index < 0)
+        {
+            InvokeProjectFileCreated(tracker, pjFile);
+        }
+        else if (oldFullPath != null)
+        {
+            InvokeProjectFileMoved(tracker, oldFullPath, pjFile);
+        }
+        else
+        {
+            InvokeProjectFileUpdated(tracker, pjFile);
+        }
+    }
+
+    internal void CreateProjectFiles(WorkspaceFolderTracker tracker)
+    {
+        // assume: lock (tracker.ProjectFileLock) {
+        if (!tracker.ProjectFiles.IsDefault)
+        {
+            return;
+        }
+
+        if (!tracker.IsActive)
+        {
+            tracker.ProjectFiles = ImmutableArray<LspProjectFile>.Empty;
+            return;
+        }
+
+        ImmutableArray<LspProjectFile>.Builder files = ImmutableArray.CreateBuilder<LspProjectFile>();
+        IParsingServices parsingServices = _parsingServices.Value;
+        foreach (string file in tracker.EnumerateFiles("*.udatproj"))
+        {
+            bool hasLock = false;
+            object? @lock = null;
+            IDisposable? disposable = null;
+            try
+            {
+                ISourceFile sourceFile;
+                if (_tracker.Files.TryGetValue(DocumentUri.File(file), out OpenedFile? openedFile))
+                {
+                    Monitor.Enter(@lock = openedFile.UpdateLock, ref hasLock);
+                    sourceFile = openedFile.SourceFile;
+                }
+                else
+                {
+                    StaticSourceFile wsFile = StaticSourceFile.FromOtherFile(file, parsingServices.Database);
+                    disposable = wsFile;
+                    sourceFile = wsFile.SourceFile;
+                }
+
+                FileEvaluationContext ctx = new FileEvaluationContext(parsingServices, sourceFile, AssetDatPropertyPosition.Root);
+                if (!ctx.FileType.Type.Equals(ProjectFileType.TypeId))
+                    continue;
+
+                LspProjectFile pjFile = new LspProjectFile(file, Path.GetDirectoryName(file)!);
+                if (!pjFile.TryUpdateFromFile(ref ctx))
+                    continue;
+
+                files.Add(pjFile);
+            }
+            finally
+            {
+                if (hasLock)
+                    Monitor.Exit(@lock!);
+
+                disposable?.Dispose();
+            }
+        }
+
+        tracker.ProjectFiles = files.MoveToImmutableOrCopy();
+
+        foreach (LspProjectFile file in tracker.ProjectFiles)
+        {
+            InvokeProjectFileCreated(tracker, file);
+        }
+    }
+
+    private void InvokeProjectFileUpdated(WorkspaceFolderTracker tracker, LspProjectFile pjFile)
+    {
+        _logger.LogDebug("Project file updated: {0}.", pjFile.FilePath);
+        ProjectFileUpdated?.Invoke(tracker, pjFile);
+    }
+
+    private void InvokeProjectFileDeleted(WorkspaceFolderTracker tracker, LspProjectFile pjFile)
+    {
+        _logger.LogDebug("Project file stopped tracking: {0}.", pjFile.FilePath);
+        ProjectFileDeleted?.Invoke(tracker, pjFile);
+    }
+
+    private void InvokeProjectFileMoved(WorkspaceFolderTracker tracker, string oldFileName, LspProjectFile pjFile)
+    {
+        _logger.LogDebug("Project file moved: {0} -> {1}.", oldFileName, pjFile.FilePath);
+        ProjectFileMoved?.Invoke(tracker, oldFileName, pjFile);
+    }
+
+    private void InvokeProjectFileCreated(WorkspaceFolderTracker tracker, LspProjectFile pjFile)
+    {
+        _logger.LogDebug("Project file started tracking: {0}.", pjFile.FilePath);
+        ProjectFileCreated?.Invoke(tracker, pjFile);
     }
 
     public IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath)

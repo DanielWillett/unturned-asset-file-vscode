@@ -99,6 +99,114 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     }
 
     /// <summary>
+    /// Creates new breadcrumbs with the given key appended to the current breadcrumbs.
+    /// </summary>
+    /// <param name="key">The key of a dictionary or name of a property.</param>
+    /// <param name="index">Index of the list this key leads to, or -1.</param>
+    /// <returns>The new breadcrumbs.</returns>
+    /// <exception cref="ArgumentNullException"/>
+    public PropertyBreadcrumbs Combine(string key, int index = -1, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+    {
+        if (key == null)
+            throw new ArgumentNullException(nameof(key));
+
+        return Combine(new PropertyBreadcrumbSection(key, context, Math.Max(-1, index)));
+    }
+
+    /// <summary>
+    /// Creates new breadcrumbs with the given property appended to the current breadcrumbs.
+    /// </summary>
+    /// <param name="property">The property to evaluate next.</param>
+    /// <param name="index">Index of the list this property evaluates to, or -1.</param>
+    /// <returns>The new breadcrumbs.</returns>
+    /// <exception cref="ArgumentNullException"/>
+    public PropertyBreadcrumbs Combine(DatProperty property, int index = -1, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+    {
+        if (property == null)
+            throw new ArgumentNullException(nameof(property));
+
+        return Combine(new PropertyBreadcrumbSection(property, context, Math.Max(-1, index)));
+    }
+
+    /// <summary>
+    /// Creates new breadcrumbs with the given list value index appended to the current breadcrumbs.
+    /// </summary>
+    /// <param name="index">Index within the previous value's list.</param>
+    /// <returns>The new breadcrumbs.</returns>
+    public PropertyBreadcrumbs Combine(int index, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+    {
+        if (index < 0)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
+        return Combine(new PropertyBreadcrumbSection(context, index));
+    }
+
+    /// <summary>
+    /// Creates new breadcrumbs with the given node appended to the current breadcrumbs.
+    /// </summary>
+    /// <param name="node">The property or list element to evaluate next.</param>
+    /// <param name="index">Index of the list this property evaluates to, or -1.</param>
+    /// <returns>The new breadcrumbs.</returns>
+    /// <exception cref="ArgumentException"><paramref name="node"/> must be either a <see cref="IPropertySourceNode"/> or be the direct child of a list.</exception>
+    /// <exception cref="ArgumentNullException"/>
+    public PropertyBreadcrumbs Combine(ISourceNode node, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+    {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
+        // must be a property or value in a list
+        IListSourceNode? listParent = node.Parent as IListSourceNode;
+        if (node is not IPropertySourceNode && listParent == null)
+            throw new ArgumentException("Expected either a property or element in a list.", nameof(node));
+
+        if (_sections == null || _sections.Length == 0)
+        {
+            PropertyBreadcrumbSection section = listParent == null
+                ? new PropertyBreadcrumbSection(node, context, ((IPropertySourceNode)node).Key)
+                : new PropertyBreadcrumbSection(node, context, node.Index, null);
+
+            return new PropertyBreadcrumbs(section);
+        }
+
+        if (listParent == null)
+        {
+            return Combine(new PropertyBreadcrumbSection(node, context, ((IPropertySourceNode)node).Key));
+        }
+
+        ref PropertyBreadcrumbSection previous = ref _sections[^1];
+        if ((object?)previous.ParentNode == listParent.Parent && previous.Index < 0 && context == previous.Context)
+        {
+            // previous node is parent of current node
+            PropertyBreadcrumbSection[] sections = new PropertyBreadcrumbSection[_sections.Length];
+            Array.Copy(_sections, sections, sections.Length);
+            sections[^1] = new PropertyBreadcrumbSection(in previous, node.Index);
+            return new PropertyBreadcrumbs(sections);
+        }
+
+        // Property [ Element ]
+        if (node.Parent.Parent is IPropertySourceNode nodeParentProperty)
+        {
+            return Combine(new PropertyBreadcrumbSection(nodeParentProperty, context, node.Index, nodeParentProperty.Key));
+        }
+
+        // Property [ [ Element ] ]
+        return Combine(new PropertyBreadcrumbSection(node.Parent, context, node.Index, null));
+    }
+
+    private PropertyBreadcrumbs Combine(PropertyBreadcrumbSection crumb)
+    {
+        if (_sections == null || _sections.Length == 0)
+        {
+            return new PropertyBreadcrumbs(crumb);
+        }
+
+        PropertyBreadcrumbSection[] sections = new PropertyBreadcrumbSection[_sections.Length + 1];
+        Array.Copy(_sections, 0, sections, 0, _sections.Length);
+        sections[^1] = crumb;
+        return new PropertyBreadcrumbs(sections);
+    }
+
+    /// <summary>
     /// Parses a property with it's optional breadcrumbs from a string such as 'Blueprints[3].InputItems[0].Id'.
     /// </summary>
     /// <remarks>The value returned by this method needs to be further resolved using <see cref="ResolveFromPropertyRef"/> before it can function properly.</remarks>
@@ -432,11 +540,12 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     /// <summary>
     /// Create breadcrums from a specific property or list value node.
     /// </summary>
+    /// <exception cref="ArgumentException"><paramref name="node"/> must be either a <see cref="IPropertySourceNode"/> or be the direct child of a list.</exception>
     public static PropertyBreadcrumbs FromNode(ISourceNode node)
     {
         // must be a property or value in a list
         if (node is not IPropertySourceNode && node.Parent is not IListSourceNode)
-            throw new ArgumentException("Expected either a property or element in a list.");
+            throw new ArgumentException("Expected either a property or element in a list.", nameof(node));
 
         lock (node.File.TreeSync)
         {
@@ -826,6 +935,14 @@ public struct PropertyBreadcrumbSection : IEquatable<PropertyBreadcrumbSection>
     {
         Index = other.Index;
         Property = newProperty;
+        ParentNode = other.ParentNode;
+        Context = other.Context;
+    }
+    
+    internal PropertyBreadcrumbSection(in PropertyBreadcrumbSection other, int newIndex)
+    {
+        Index = newIndex;
+        Property = other.Property;
         ParentNode = other.ParentNode;
         Context = other.Context;
     }

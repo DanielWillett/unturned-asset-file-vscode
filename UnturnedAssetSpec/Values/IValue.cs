@@ -2,6 +2,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 #pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 
@@ -162,7 +163,8 @@ public static class ValueExtensions
         /// <param name="ctx">Workspace context.</param>
         /// <param name="result">Converted value.</param>
         /// <returns>Whether or not the value could be determined and converted.</returns>
-        public bool TryGetValueAs<TResult>(ref FileEvaluationContext ctx, out Optional<TResult> result) where TResult : IEquatable<TResult>
+        public bool TryGetValueAs<TResult>(ref FileEvaluationContext ctx, out Optional<TResult> result)
+            where TResult : IEquatable<TResult>
         {
             ValueConvertVisitor<TResult> v = default;
 
@@ -174,6 +176,20 @@ public static class ValueExtensions
 
             result = v.Result;
             return v.Visited;
+        }
+
+        /// <inheritdoc cref="ValueExtensions.TryGetValueAs{TResult}(IValue?,ref FileEvaluationContext,out Optional{TResult})"/>
+        public bool TryGetValueAs<TResult>(ref FileEvaluationContext ctx, out TResult? result)
+            where TResult : class, IEquatable<TResult>
+        {
+            if (!value.TryGetValueAs(ref ctx, out Optional<TResult> r))
+            {
+                result = null;
+                return false;
+            }
+
+            result = r.HasValue ? r.Value : null;
+            return true;
         }
     }
 

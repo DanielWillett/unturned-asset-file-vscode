@@ -1,10 +1,10 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Diagnostics;
 using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
@@ -60,6 +60,9 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
     /// <inheritdoc />
     public InstallationEnvironment Installation { get; }
 
+    /// <inheritdoc />
+    public IProjectFileProvider ProjectFileProvider { get; }
+
     /// <summary>
     /// Create an <see cref="IParsingServices"/> from the given services.
     /// </summary>
@@ -70,15 +73,16 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
         IWorkspaceEnvironment workspace,
         InstallDirUtility installDirUtility,
         InstallationEnvironment installation,
+        IProjectFileProvider projectFileProvider,
         IFileRelationalModelProvider? relationalModelProvider = null)
     {
-        loggerFactory.CreateLogger<ParsingServiceProvider>().LogError(new StackTrace(0).ToString());
         Database                 = database                ?? throw new ArgumentNullException(nameof(database));
         LoggerFactory            = loggerFactory           ?? throw new ArgumentNullException(nameof(loggerFactory));
         Workspace                = workspace               ?? throw new ArgumentNullException(nameof(workspace));
         GameDirectory            = installDirUtility       ?? throw new ArgumentNullException(nameof(installDirUtility));
         Installation             = installation            ?? throw new ArgumentNullException(nameof(installation));
-        _relationalModelProvider = relationalModelProvider ?? new FileRelationalCacheProvider(this);
+        ProjectFileProvider      = projectFileProvider     ?? throw new ArgumentNullException(nameof(projectFileProvider));
+        _relationalModelProvider = relationalModelProvider ?? new FileRelationalCacheProvider(LazyUtil.CreatePredefinedInstance<IParsingServices>(this));
     }
 
     /// <summary>
@@ -106,6 +110,9 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
         Installation =
             (InstallationEnvironment?)serviceProvider.GetService(typeof(InstallationEnvironment))
                 ?? throw new InvalidOperationException($"Service not found: {nameof(InstallationEnvironment)}.");
+        ProjectFileProvider =
+            (IProjectFileProvider?)serviceProvider.GetService(typeof(IProjectFileProvider))
+                ?? throw new InvalidOperationException($"Service not found: {nameof(IProjectFileProvider)}.");
 
         ServiceProvider = serviceProvider;
     }
@@ -146,6 +153,9 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
         if (typeof(InstallationEnvironment) == serviceType)
             return Installation;
 
+        if (typeof(IProjectFileProvider) == serviceType)
+            return ProjectFileProvider;
+
         if (serviceType == typeof(IParsingServices) || serviceType == typeof(IServiceProvider) || serviceType == typeof(ParsingServiceProvider))
             return this;
 
@@ -169,6 +179,7 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
         (Workspace as IDisposable)?.Dispose();
         (_relationalModelProvider as IDisposable)?.Dispose();
         (GameDirectory as IDisposable)?.Dispose();
+        (ProjectFileProvider as IDisposable)?.Dispose();
         Installation.Dispose();
     }
 }

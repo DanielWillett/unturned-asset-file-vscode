@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System.Collections.Immutable;
 using System.IO;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
@@ -63,6 +64,10 @@ internal class RootDictionaryNode : DictionaryNode, ISourceFile
             else if (database.Information.KnownFileNames.TryGetValue(Path.GetFileName(file.File), out QualifiedType t) && !t.IsNull)
             {
                 ActualType = t.CaseInsensitive;
+            }
+            else if (OSPathHelper.IsExtension(file.File, ".udatproj"))
+            {
+                ActualType = ProjectFileType.TypeId;
             }
         }
 

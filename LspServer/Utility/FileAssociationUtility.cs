@@ -31,11 +31,13 @@ internal class FileAssociationUtility
     {
         const string dataVersionValueName = "LspServer_AssocDataVersion";
 
+        string projIdKeyPath = $@"Software\Classes\{AssetProgId}";
+
         int version = 0;
         RegistryKey? projIdKey = null;
         try
         {
-            projIdKey = Registry.CurrentUser.CreateSubKey($@"Software\Classes\{AssetProgId}");
+            projIdKey = Registry.CurrentUser.CreateSubKey(projIdKeyPath);
             object? obj = projIdKey.GetValue(dataVersionValueName);
             if (obj is IConvertible conv)
             {
@@ -91,6 +93,7 @@ internal class FileAssociationUtility
             string args = $@"/n /s /i:user ""{Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, @"UnturnedAssetFileIconHandler.dll")}""";
             try
             {
+                _logger.LogDebug($"EXECUTE: '\"{regsvr32}\" {args}'");
                 Process? process = Process.Start(new ProcessStartInfo(regsvr32, args)
                 {
                     UseShellExecute = false,
@@ -119,6 +122,7 @@ internal class FileAssociationUtility
                     _logger.LogError(string.Format(Properties.Resources.Error_RegSvr32Timeout, regsvr32 + " " + args));
                 }
 
+                _logger.LogDebug($"         Exit code: {process.ExitCode}");
                 if (process.ExitCode != 0)
                 {
                     _logger.LogError(string.Format(Properties.Resources.Error_RegSvr32Exception, regsvr32 + " " + args, process.ExitCode));
@@ -164,6 +168,7 @@ internal class FileAssociationUtility
             CreateProgramFileAssociation(AssetProgId, assetCommand);
             CreateProgramFileAssociation(ProjectProgId, projectCommand);
 
+            _logger.LogDebug($"SET: {projIdKeyPath} {{ {dataVersionValueName} = {FileAssocVersion} }}");
             projIdKey?.SetValue(dataVersionValueName, FileAssocVersion, RegistryValueKind.DWord);
             _logger.LogInformation("Created file extension associations.");
             return true;
@@ -180,8 +185,11 @@ internal class FileAssociationUtility
 
         try
         {
+            _logger.LogDebug($"DELETE: {key}UserChoice");
             Registry.CurrentUser.DeleteSubKey(key + "UserChoice", throwOnMissingSubKey: false);
+            _logger.LogDebug($@"DELETE: {key}UserChoiceLatest\ProgId");
             Registry.CurrentUser.DeleteSubKey(key + @"UserChoiceLatest\ProgId", throwOnMissingSubKey: false);
+            _logger.LogDebug($"DELETE: {key}UserChoiceLatest");
             Registry.CurrentUser.DeleteSubKey(key + @"UserChoiceLatest", throwOnMissingSubKey: false);
         }
         catch (Exception ex)
@@ -197,6 +205,7 @@ internal class FileAssociationUtility
         RegistryKey? cmdKey = null;
         try
         {
+            _logger.LogDebug($"CREATE: {key}");
             cmdKey = Registry.CurrentUser.CreateSubKey(key);
             if (cmdKey == null)
             {
@@ -204,6 +213,7 @@ internal class FileAssociationUtility
                 return;
             }
 
+            _logger.LogDebug($"SET: {key} {{ (Default) = {cmd} }}");
             cmdKey.SetValue(null, cmd);
         }
         catch (Exception ex)
@@ -238,6 +248,10 @@ internal class FileAssociationUtility
                 process.Dispose();
             }
 
+            if (fn != null)
+            {
+                _logger.LogDebug($"Found current VSCode instance at: \"{fn}\".");
+            }
             return fn;
         }
         catch (Exception ex)

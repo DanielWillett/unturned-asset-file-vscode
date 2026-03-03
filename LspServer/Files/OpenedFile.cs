@@ -371,7 +371,7 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
 
     private bool SetFullTextIntl(ReadOnlySpan<char> text, string? annotationId = null)
     {
-        if (text.SequenceEqual(_contentSegment.AsSpan()))
+        if (text.Length > 0 && text.SequenceEqual(_contentSegment.AsSpan()))
         {
             return false;
         }

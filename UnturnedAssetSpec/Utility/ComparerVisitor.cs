@@ -9,7 +9,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 /// <summary>
 /// Compares one value with another of a different type and determines if one is greater than/less than the other.
 /// </summary>
-internal struct ComparerVisitor<TValue> : IValueVisitor, IGenericVisitor
+public struct ComparerVisitor<TValue> : IValueVisitor, IGenericVisitor
     where TValue : IEquatable<TValue>
 {
     public int Comparison;

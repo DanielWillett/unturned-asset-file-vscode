@@ -8,11 +8,11 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 public class FileRelationalCacheProvider : IFileRelationalModelProvider
 {
-    private readonly IParsingServices _parsingServices;
+    private readonly Lazy<IParsingServices> _parsingServices;
 
     private readonly ConcurrentDictionary<string, IFileRelationalModel>?[] _cachedModels;
 
-    public FileRelationalCacheProvider(IParsingServices parsingServices)
+    public FileRelationalCacheProvider(Lazy<IParsingServices> parsingServices)
     {
         _parsingServices = parsingServices;
         _cachedModels =
@@ -65,7 +65,7 @@ public class FileRelationalCacheProvider : IFileRelationalModelProvider
         state.Context = context;
         return dict.GetOrAdd(fp, _valueFactory, state);
 #else
-        return dict.GetOrAdd(fp, _ => new FileRelationalCache(file, false, _parsingServices, context));
+        return dict.GetOrAdd(fp, _ => new FileRelationalCache(file, false, _parsingServices.Value, context));
 #endif
     }
 
@@ -73,7 +73,7 @@ public class FileRelationalCacheProvider : IFileRelationalModelProvider
     private readonly Func<string, GetOrAddFileState, IFileRelationalModel> _valueFactory;
     private IFileRelationalModel ValueFactory(string fp, GetOrAddFileState state)
     {
-        return new FileRelationalCache(state.File, false, _parsingServices, state.Context);
+        return new FileRelationalCache(state.File, false, _parsingServices.Value, state.Context);
     }
 
     private struct GetOrAddFileState

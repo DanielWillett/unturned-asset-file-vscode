@@ -1,4 +1,8 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using Microsoft.Extensions.Logging;
@@ -13,12 +17,15 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+
+/// <summary>
+/// Used with <see cref="IAssetSpecDatabase.OnFinalizingTypes"/> to inject hard-coded types before the lists are finalized.
+/// </summary>
+/// <param name="readContext">Context about the current read, including necessary services.</param>
+/// <param name="types">Collection to add new types to.</param>
+public delegate void FinalizingTypesHandler(IDatSpecificationReadContext readContext, ICollection<DatType> types);
 
 public interface IAssetSpecDatabase
 {
@@ -32,6 +39,11 @@ public interface IAssetSpecDatabase
     /// If the database finished initializing.
     /// </summary>
     bool IsInitialized { get; }
+
+    /// <summary>
+    /// The default global orderfile.
+    /// </summary>
+    PropertyOrderFile GlobalOrderFile { get; }
 
     /// <summary>
     /// JSON options used to read files.
@@ -93,11 +105,16 @@ public interface IAssetSpecDatabase
     /// List of custom and file type definitions by their type name.
     /// </summary>
     IDictionary<QualifiedType, DatType> AllTypes { get; }
-    
+
+    /// <summary>
+    /// Invoked when types are being finalized, allowing callers to add other types.
+    /// </summary>
+    event FinalizingTypesHandler? OnFinalizingTypes;
+
     /// <summary>
     /// Initialize the database.
     /// </summary>
-    Task InitializeAsync(CancellationToken token = default);
+    Task InitializeAsync(CancellationToken token = default, Action<float, string?>? progressReport = null, float maxProgress = 1f);
 
     /// <summary>
     /// Invokes a task when initialization finishes.
@@ -108,6 +125,9 @@ public interface IAssetSpecDatabase
 public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 {
     private readonly SpecificationFileReader _fileReader;
+    private bool _startedInit;
+
+    internal bool ReadOrderfile = true;
 
     public const string UnturnedName = "Unturned";
     public const string UnturnedAppId = "304930";
@@ -118,6 +138,9 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     private List<OnInitializeState>? _initializeListeners = new List<OnInitializeState>();
     private readonly object _initLock = new object();
     private readonly Lazy<IParsingServices> _parsingServices;
+
+    /// <inheritdoc />
+    public PropertyOrderFile GlobalOrderFile { get => field ?? throw new InvalidOperationException("Not initialized."); private set; }
 
     public ICollection<string>? NPCAchievementIds { get; private set; }
 
@@ -137,7 +160,18 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     /// <summary>
     /// Allow downloading the latest version of files from the internet instead of using a possibly outdated embedded version.
     /// </summary>
-    public bool UseInternet { get; set; }
+    public bool UseInternet
+    {
+        get;
+        set
+        {
+            if (_startedInit || field == value)
+                return;
+
+            field = value;
+            _fileReader.AllowInternet = value;
+        }
+    }
     public bool IsInitialized { get; private set; }
 
     public IDictionary<string, ActionButton>? ValidActionButtons { get; private set; }
@@ -154,6 +188,12 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     };
 
     public JsonSerializerOptions? Options { get; set; }
+
+    event FinalizingTypesHandler? IAssetSpecDatabase.OnFinalizingTypes
+    {
+        add => _fileReader.OnFinalizingTypes += value;
+        remove => _fileReader.OnFinalizingTypes -= value;
+    }
 
     private static JsonSerializerOptions GetJsonOptions(JsonSerializerOptions? defaultOptions = null)
     {
@@ -243,7 +283,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             installationEnvironment: installation
         );
 
-        parsingServices = new ParsingServiceProvider(database, loggerFactory, environment, installDirUtility, installation);
+        parsingServices = new ParsingServiceProvider(database, loggerFactory, environment, installDirUtility, installation, NilProjectFileProvider.Instance);
         return database;
     }
 
@@ -259,14 +299,18 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         AllTypes = ImmutableDictionary<QualifiedType, DatType>.Empty;
         FileTypes = ImmutableDictionary<QualifiedType, DatFileType>.Empty;
         LocalizationFileTypes = ImmutableDictionary<string, DatFileType>.Empty;
+
+        _fileReader.OnFinalizingTypes += BuiltinTypeRegistrar.OnFinalizingTypes;
     }
     
     protected virtual void Dispose(bool disposing)
     {
-        if (disposing)
-        {
-            Interlocked.Exchange(ref _statusJson, null)?.Dispose();
-        }
+        Interlocked.Exchange(ref _statusJson, null)?.Dispose();
+
+        if (!disposing)
+            return;
+
+        _fileReader.OnFinalizingTypes -= BuiltinTypeRegistrar.OnFinalizingTypes;
     }
 
     public Task OnInitialize(Func<IParsingServices, Task> action)
@@ -293,43 +337,77 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         public TaskCompletionSource<int> Task;
     }
 
-    public async Task InitializeAsync(CancellationToken token = default)
+    public async Task InitializeAsync(CancellationToken token = default, Action<float, string?>? progressReport = null, float maxProgress = 1f)
     {
-        SpecificationReadResult result = await _fileReader.ReadSpecifications(this, token);
-        _statusJson = result.StatusFile;
-
-        FileTypes = result.FileTypes;
-        ValidActionButtons = result.ActionButtons;
-        AllTypes = result.AllTypes;
-        Information = result.Information;
-        LocalizationFileTypes = result.LocalizationFileTypes;
-
-        PopulateBlueprintSkills();
-        PopulateStatusInformation();
-
-        OnInitializeState[]? initializeListeners;
-        lock (_initLock)
+        _startedInit = true;
+        try
         {
-            initializeListeners = _initializeListeners?.ToArray();
-            _initializeListeners = null;
-        }
-
-        IsInitialized = true;
-
-        if (initializeListeners != null)
-        {
-            Task[] initTasks = new Task[initializeListeners.Length];
-            for (int i = 0; i < initializeListeners.Length; ++i)
+            _fileReader.ProgressReport = progressReport;
+            _fileReader.MaxProgress = maxProgress * 0.95f;
+            SpecificationReadResult result = await _fileReader.ReadSpecifications(this, token);
+            try
             {
-                initTasks[i] = initializeListeners[i].Callback(_parsingServices.Value);
+                _statusJson = result.StatusFile;
+
+                FileTypes = result.FileTypes;
+                ValidActionButtons = result.ActionButtons;
+                AllTypes = result.AllTypes;
+                Information = result.Information;
+                LocalizationFileTypes = result.LocalizationFileTypes;
+
+                progressReport?.Invoke(0.96f * maxProgress, "Populating blueprint skills");
+                PopulateBlueprintSkills();
+                progressReport?.Invoke(0.97f * maxProgress, "Populating status information");
+                PopulateStatusInformation();
+
+                progressReport?.Invoke(0.98f * maxProgress, UseInternet ? "Downloading default orderfile" : "Loading default orderfile");
+
+                if (ReadOrderfile)
+                {
+                    GlobalOrderFile = await _fileReader.ReadGlobalOrderfile(this, token);
+                }
+                else
+                {
+                    GlobalOrderFile = new PropertyOrderFile(SpecificationFileReader.GlobalOrderfileName);
+                }
+            }
+            finally
+            {
+                _fileReader.DisposeProviders();
             }
 
-            await Task.WhenAll(initTasks).ConfigureAwait(false);
-        }
+            OnInitializeState[]? initializeListeners;
+            lock (_initLock)
+            {
+                initializeListeners = _initializeListeners?.ToArray();
+                _initializeListeners = null;
+            }
 
-        if (_cache != null)
+            IsInitialized = true;
+
+            if (initializeListeners != null)
+            {
+                progressReport?.Invoke(0.98f * maxProgress, "Performing second pass");
+                Task[] initTasks = new Task[initializeListeners.Length];
+                for (int i = 0; i < initializeListeners.Length; ++i)
+                {
+                    initTasks[i] = initializeListeners[i].Callback(_parsingServices.Value);
+                }
+
+                await Task.WhenAll(initTasks).ConfigureAwait(false);
+            }
+
+            if (_cache != null)
+            {
+                progressReport?.Invoke(0.99f * maxProgress, "Caching new files");
+                await _cache.CacheNewFilesAsync(this, token);
+            }
+
+            progressReport?.Invoke(maxProgress, "File data initialized");
+        }
+        finally
         {
-            await _cache.CacheNewFilesAsync(this, token);
+            _startedInit = false;
         }
     }
 
@@ -403,12 +481,6 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
         {
             NPCAchievementIds = null;
         }
-    }
-
-    protected virtual void Log(string msg)
-    {
-        Console.Write("AssetSpecDatabase >> ");
-        Console.WriteLine(msg);
     }
 
     /// <inheritdoc />

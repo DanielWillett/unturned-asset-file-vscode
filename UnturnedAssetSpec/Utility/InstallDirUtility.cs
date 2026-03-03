@@ -81,7 +81,7 @@ public class InstallDirUtility
     /// <summary>
     /// Attempts to automatically locate the installation location of the game and workshop folders.
     /// </summary>
-    public bool TryGetInstallDirectory(out GameInstallDir installDir)
+    public virtual bool TryGetInstallDirectory(out GameInstallDir installDir)
     {
         if (_installDirectory.BaseFolder != null)
         {

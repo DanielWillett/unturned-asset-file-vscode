@@ -50,5 +50,10 @@ public enum KnownConfigurationFile
     /// <summary>
     /// <c>Unturned/Localization/English/Player/PlayerDashboardSkills.dat</c> file.
     /// </summary>
-    SkillsLocalization
+    SkillsLocalization,
+
+    /// <summary>
+    /// Default Orderfile.udatproj.
+    /// </summary>
+    Orderfile
 }

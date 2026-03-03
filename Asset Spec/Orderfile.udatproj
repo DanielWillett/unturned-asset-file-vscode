@@ -1,7 +1,8 @@
 // udat-type: DanielWillett.UnturnedDataFileLspServer.Data.Types.Orderfile, UnturnedAssetSpec
 
 // Format:
-//   Each type has a list of property names. An '_' indicates a blank line.
+//   Each type has a list of property names. An unqoted '_' indicates a blank line.
+//   A quoted "_" will reference a property named '_'.
 //
 //   An empty line indicates the end of that block of properties.
 //
@@ -11,8 +12,6 @@
 //   There can not be more than one property reference in a block of properties.
 //
 //   Any types not specified will fall back to the default order.
-//   
-//   Lines starting with a '$' are imports for all properties from another type and its base types.
 //   
 // Example:
 //   "SDG.Unturned.Asset, Assembly-CSharp"
@@ -55,7 +54,7 @@
 [
     Asset_Bundle_Name
     Asset_Prefix
-    Asset_Bundle_Version
+    Master_Bundle_Version
 ]
 
 // Shared properties between a web and asset server list curation
@@ -79,7 +78,6 @@
     Ignore_TexRW
     Ignore_NPOT
     _
-    Bypass_ID_Limit
     Bundle_Path_Include_Filename
     Asset_Bundle_Version
     Master_Bundle_Override
@@ -137,7 +135,7 @@
 "SDG.Framework.Foliage.FoliageResourceInfoAsset, Assembly-CSharp"
 [
     @Max_Scale
-    Object
+    Resource
     Obstruction_Radius
     Legacy_Rotation_and_Scale
 ]
@@ -152,7 +150,7 @@
 // Airdrop asset
 "SDG.Unturned.AirdropAsset, Assembly-CSharp"
 [
-    @Max_Scale
+    @ID
     Landed_Barricade
     Carepackage_Prefab
 ]
@@ -199,6 +197,9 @@
     Glance_Anim_Variants
     Startle_Anim_Variants
     Eat_Anim_Variants
+
+    Bypass_ID_Limit
+    @Bundle_Path_Include_Filename
 ]
 
 // Crafting Blueprint List asset
@@ -226,6 +227,9 @@
     Messages
     _
     Responses
+
+    Bypass_ID_Limit
+    @Bundle_Path_Include_Filename
 ]
 
 // Effect asset
@@ -259,6 +263,9 @@
     _
     Is_Music
     Static
+
+    Bypass_ID_Limit
+    @Bundle_Path_Include_Filename
 ]
 
 // base Item asset
@@ -334,6 +341,9 @@
     InspectAudioDef
     InventoryAudio
 
+    Bypass_ID_Limit
+    @Bundle_Path_Include_Filename
+
     @Exclude_From_Master_Bundle
     Bypass_Hash_Verification
 ]
@@ -342,13 +352,6 @@
 "SDG.Unturned.ItemArrestEndAsset, Assembly-CSharp"
 [
     Recover
-    @Backward
-]
-
-// Arrest_Start item asset
-"SDG.Unturned.ItemArrestStartAsset, Assembly-CSharp"
-[
-    Strength
     @Backward
 ]
 
@@ -636,6 +639,9 @@
     Min_Items_Recovered_On_Salvage
     Max_Items_Recovered_On_Salvage
     SalvageItem
+    Items_Recovered_On_Salvage_Full_Health
+    Max_Items_Recovered_On_Salvage_Full_Health
+    SalvageItem_FullHealth
     Items_Dropped_On_Destroy
     Min_Items_Dropped_On_Destroy
     Max_Items_Dropped_On_Destroy
@@ -828,11 +834,13 @@
 
     @Locked
     _
+    Delete_Contained_Items_On_Destroy
     Default_Contained_Items
 
     @Actions
     _
     Should_Close_When_Outside_Range
+    Can_Players_Open
 ]
 
 // Sentry storage barricade item asset
@@ -1023,11 +1031,6 @@
 
 // Water consumable item asset
 "SDG.Unturned.ItemWaterAsset, Assembly-CSharp"
-[
-]
-
-// Medical consumable item asset
-"SDG.Unturned.ItemMedicalAsset, Assembly-CSharp"
 [
 ]
 
@@ -1437,6 +1440,7 @@
     CloudOverride_ParticleSystems
     Dropship
     Airdrop
+    Tags
     Crafting_Blacklists
     Global_Weather_Mask
     Perpetual_Weather_Asset
@@ -1449,14 +1453,7 @@
 ]
 
 // Material Palette asset
-"SDG.Unturned.LevelAsset, Assembly-CSharp"
-[
-    @ID
-    Materials
-]
-
-// Material Palette asset
-"SDG.Unturned.LevelAsset, Assembly-CSharp"
+"SDG.Unturned.MaterialPaletteAsset, Assembly-CSharp"
 [
     @ID
     Materials
@@ -1472,6 +1469,9 @@
     @ID
     _
     Body_Cosmetics_Use_System_Area
+
+    Bypass_ID_Limit
+    @Bundle_Path_Include_Filename
 ]
 
 // Condition/Reward list asset
@@ -1499,7 +1499,7 @@
     _
     Conditions
     _
-    Interactability_Text_Line_#
+    Interactability_Text_Lines
     _
     Interactability_Conditions
     _
@@ -1613,6 +1613,12 @@
     Has_Editor_Prefab
     _
     Is_Clutter
+]
+
+"$local$::SDG.Unturned.ObjectNPCAsset, Assembly-CSharp"
+[
+    Character
+    @Dialogue_Name
 ]
 
 // NPC object asset
@@ -1729,6 +1735,9 @@
     Rewards
     _
     AbandonmentRewards
+
+    Bypass_ID_Limit
+    @Bundle_Path_Include_Filename
 ]
 
 // Redirector asset
@@ -1752,7 +1761,6 @@
     @ID
     _
     Health
-    Radius
     Scale
     RandomUniformScale_Min
     RandomUniformScale_Max
@@ -1793,6 +1801,9 @@
     Holiday_Restriction
     Exclude_From_Level_Batching
     Has_Clip_Prefab
+
+    Bypass_ID_Limit
+    @Bundle_Path_Include_Filename
 ]
 
 // Road asset
@@ -1826,10 +1837,13 @@
 [
     @ID
     _
-    $SDG.Unturned.ServerListCurationFile, Assembly-CSharp
-
-    @IconURL
+    Name
+    IconURL
     IconAssetPath
+    _
+    Labels
+    _
+    Rules
 ]
 
 // Skin asset
@@ -1854,6 +1868,9 @@
     Override_Meshes
     _
     SpecialAudioOverrideDef
+
+    Bypass_ID_Limit
+    @Bundle_Path_Include_Filename
 ]
 
 // Spawn asset
@@ -2055,7 +2072,7 @@
     _
     DefaultPaintColor_Mode
     DefaultPaintColors
-    DefaultPaintColor_Configuration 
+    DefaultPaintColor_Configuration
     _
     ExplosionBurnMaterialSections
     _
@@ -2675,7 +2692,7 @@
 // Dialogue Message
 "$local$::SDG.Unturned.DialogueMessage, Assembly-CSharp"
 [
-    Page_#
+    Pages
     _
     Conditions
     _
@@ -2769,8 +2786,8 @@
 // Actions
 "$local$::SDG.Unturned.Action, Assembly-CSharp"
 [
-    Text
-    Tooltip
+    TextId
+    TooltipId
 ]
 "SDG.Unturned.Action, Assembly-CSharp"
 [
@@ -2863,10 +2880,6 @@
 
 /* === SERVER BROWSER CURATION === */
 // Server curation label
-"$local$::DanielWillett.UnturnedDataFileLspServer.Data.Types.ServerListCurationLabel, UnturnedAssetSpec"
-[
-    Text
-]
 "DanielWillett.UnturnedDataFileLspServer.Data.Types.ServerListCurationLabel, UnturnedAssetSpec"
 [
     Name
@@ -2951,6 +2964,17 @@
     IdleVolume
     MaxPitch
     MaxVolume
+]
+
+/* === VEHICLE PHYSICS PROFILES === */
+// Friction
+"SDG.Unturned.VehiclePhysicsProfileAsset+Friction, Assembly-CSharp"
+[
+    Extremum_Slip
+    Extremum_Value
+    Asymptote_Slip
+    Asymptote_Value
+    Stiffness
 ]
 
 /* === VENDORS === */

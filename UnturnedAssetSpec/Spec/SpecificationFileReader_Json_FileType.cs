@@ -224,6 +224,8 @@ partial class SpecificationFileReader
                     ReadPropertyFirstPass(in prop, i, "Properties", t => t.Properties, propertyBuilder, SpecPropertyContext.Property, type);
                 }
 
+                ApplyImports(propertyBuilder);
+
                 type.Properties = propertyBuilder.ToImmutable();
                 type.PropertiesBuilder = null;
             }
@@ -241,6 +243,8 @@ partial class SpecificationFileReader
                     JsonElement prop = element[i];
                     ReadPropertyFirstPass(in prop, i, "Localization", t => t.LocalizationProperties, propertyBuilder, SpecPropertyContext.Localization, assetFile);
                 }
+
+                ApplyImports(propertyBuilder);
 
                 assetFile.LocalizationProperties = propertyBuilder.ToImmutable();
                 assetFile.LocalizationPropertiesBuilder = null;
@@ -260,5 +264,38 @@ partial class SpecificationFileReader
             return;
         
         throw new JsonException(string.Format(Resources.JsonException_InvalidJsonToken, element.ValueKind, kind, type.GetFullTypeName()));
+    }
+
+    private static void ApplyImports(ImmutableArray<DatProperty>.Builder propertyBuilder, int start = 0, int len = -1)
+    {
+        if (len < 0)
+            len = propertyBuilder.Count;
+        else
+            len += start;
+
+        for (int i = start; i < len; ++i)
+        {
+            DatProperty property = propertyBuilder[i];
+            if (!property.TryGetImportType(out DatTypeWithProperties? importType))
+                continue;
+
+            ImmutableArray<DatProperty> imported = importType.GetPropertyArray(property.Context);
+            if (imported.Length == 0)
+            {
+                propertyBuilder.RemoveAt(i);
+                --i;
+                continue;
+            }
+
+            propertyBuilder[i] = imported[0];
+            for (int j = 1; j < imported.Length; ++j)
+            {
+                propertyBuilder.Insert(i + j, imported[j]);
+            }
+
+            ApplyImports(propertyBuilder, i, imported.Length);
+
+            i += imported.Length - 1;
+        }
     }
 }

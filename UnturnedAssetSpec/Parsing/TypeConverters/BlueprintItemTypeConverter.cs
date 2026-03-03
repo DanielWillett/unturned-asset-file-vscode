@@ -68,8 +68,8 @@ internal class BlueprintItemTypeConverter : ITypeConverter<DatObjectValue>
         }
 
         ImmutableArray<DatObjectPropertyValue>.Builder bldr = ImmutableArray.CreateBuilder<DatObjectPropertyValue>(2);
-        bldr.Add(new DatObjectPropertyValue(Value.Create(assetRef, _idType), _idProperty));
-        bldr.Add(new DatObjectPropertyValue(Value.Create(amount, Int32Type.Instance), _amtProperty));
+        bldr.Add(new DatObjectPropertyValue(Value.Create(assetRef, _idType), _idProperty, args.ValueNode));
+        bldr.Add(new DatObjectPropertyValue(Value.Create(amount, Int32Type.Instance), _amtProperty, args.ValueNode));
         parsedValue = new DatObjectValue(_type, bldr.MoveToImmutableOrCopy());
         return true;
     }

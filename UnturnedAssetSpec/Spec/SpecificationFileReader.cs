@@ -9,11 +9,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -23,6 +23,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 public partial class SpecificationFileReader : IDatSpecificationReadContext
 {
     private readonly Func<SpecificationFileReader, ISpecificationFileProvider[]> _fileProviderFactory;
+
+    internal const string GlobalOrderfileName = "__orderfile";
 
     private readonly ILoggerFactory _loggerFactory;
     private readonly Lazy<HttpClient> _httpClientFactory;
@@ -40,8 +42,12 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
     private ImmutableDictionary<string, DatFileType>? _localizationFiles;
     private HashSet<QualifiedType>? _parsedFiles;
     private IAssetSpecDatabase? _database;
+    internal Action<float, string?>? ProgressReport;
+    internal float MaxProgress = 1f;
+    private ISpecificationFileProvider[]? _providers;
+    private bool[]? _providersEnabled;
 
-    public bool AllowInternet { get; }
+    public bool AllowInternet { get; set; }
 
 
     /// <inheritdoc />
@@ -50,9 +56,13 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
     /// <inheritdoc />
     public IAssetSpecDatabase Database => _database ?? throw new InvalidOperationException("Not yet initialized.");
 
+    /// <inheritdoc />
     public ILoggerFactory LoggerFactory => _loggerFactory;
 
     public JsonSerializerOptions JsonOptions { get; }
+
+    /// <inheritdoc />
+    public event FinalizingTypesHandler? OnFinalizingTypes;
 
     public SpecificationFileReader(
         bool allowInternet,
@@ -79,6 +89,11 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
             new GitHubSpecificationFileProvider(reader._loggerFactory.CreateLogger<GitHubSpecificationFileProvider>(), reader._httpClientFactory, reader.AllowInternet, reader.Cache, () => reader._readInformation),
             new EmbeddedResourceSpecificationFileProvider(reader._loggerFactory.CreateLogger<EmbeddedResourceSpecificationFileProvider>())
         ]);
+    }
+
+    private void ReportProgress(float progress, string? step)
+    {
+        ProgressReport?.Invoke(progress * MaxProgress, step);
     }
 
     public async Task<SpecificationReadResult> ReadSpecifications(IAssetSpecDatabase database, CancellationToken token)
@@ -112,6 +127,7 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 
     private async Task<SpecificationReadResult> ReadSpecificationsIntl(CancellationToken token)
     {
+        ReportProgress(0f, AllowInternet ? "Downloading live configuration" : "Loading configuration");
         using HttpClient client = new HttpClient();
 
         Task generateLocalizationFiles = Task.Run(() => GenerateLocalizationFiles(token), token);
@@ -120,163 +136,199 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
         ImmutableDictionary<QualifiedType, DatType> allTypes;
 
         ISpecificationFileProvider[] providers = _fileProviderFactory(this);
+
+        Array.Sort(providers, (a, b) => b.Priority.CompareTo(a.Priority));
+
+        bool[] enabled = new bool[providers.Length];
+
+        _providers = providers;
+        _providersEnabled = enabled;
+
+        await ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.Assets, static async (stream, reader, token) =>
+        {
+            reader._readInformation = await JsonSerializer.DeserializeAsync<AssetInformation>(
+                stream,
+                reader.JsonOptions,
+                token
+            ).ConfigureAwait(false);
+        }, isFirst: true, token).ConfigureAwait(false);
+
+        ReportProgress(0.2f, AllowInternet ? "Downloading miscellaneous files" : "Loading miscellaneous files");
+
+        if (_readInformation == null)
+        {
+            _logger.LogWarning(Resources.Log_UnableToReadFile, "Assets.json");
+            _readInformation = new AssetInformation();
+        }
+
+        _readInformation.Types ??= new Dictionary<QualifiedType, TypeHierarchy>(0);
+
+        // custom type converter can't read property name
+        foreach (KeyValuePair<QualifiedType, TypeHierarchy> type in _readInformation.Types)
+        {
+            type.Value.Type = new QualifiedType(type.Key, isCaseInsensitive: true);
+        }
+
+        _readInformation.AssetAliases ??= new Dictionary<string, QualifiedType>(0);
+        _readInformation.AssetCategories ??= new Dictionary<QualifiedType, string>(0);
+        _readInformation.KnownFileNames ??= new Dictionary<string, QualifiedType>(0);
+        _ = _readInformation.ParentTypes;
+
+        await Task.WhenAll(
+            new Task[]
+            {
+                // Read Status.json file which includes some needed properties like game version and NPC-assignable achievements.
+                ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.GameStatus, static async (stream, reader, token) =>
+                {
+                    reader._statusFile = await JsonDocument.ParseAsync(stream, new JsonDocumentOptions
+                    {
+                        AllowTrailingCommas = true,
+                        CommentHandling = JsonCommentHandling.Skip,
+                        MaxDepth = 12
+                    }, token).ConfigureAwait(false);
+                }, token: token),
+
+                // Read item actions from inventory localization file
+                ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.InventoryLocalization, static async (stream, reader, token) =>
+                {
+                    string allText = await ReadAllTextAsync(stream, token).ConfigureAwait(false);
+                    using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), reader.Database, SourceNodeTokenizerOptions.Lazy);
+                    reader.ReadActionLabels(file.SourceFile);
+                }, token: token),
+
+                // Read skill names and descriptions from skills localization file.
+                ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.SkillsLocalization, static async (stream, reader, token) =>
+                {
+                    string allText = await ReadAllTextAsync(stream, token).ConfigureAwait(false);
+                    using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), reader.Database, SourceNodeTokenizerOptions.Lazy);
+                    reader.ReadSkills(file.SourceFile);
+                }, token: token),
+
+                // Read skillset names from character menu localization file
+                ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.CharacterLocalization, static async (stream, reader, token) =>
+                {
+                    string allText = await ReadAllTextAsync(stream, token).ConfigureAwait(false);
+                    using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), reader.Database, SourceNodeTokenizerOptions.Lazy);
+                    reader.ReadSkillsets(file.SourceFile);
+                }, token: token)
+            }
+        );
+
+        ReportProgress(0.3f, AllowInternet ? "Downloading live file data" : "Loading file data");
+
+        // BFS to read asset files in the correct order (lowest type to highest type, ex. Asset -> ItemAsset -> ItemWeaponAsset -> ItemGunAsset).
+        Queue<TypeHierarchy> types = new Queue<TypeHierarchy>(_readInformation.ParentTypes.Count);
+        foreach (TypeHierarchy baseType in _readInformation.Types.Values.Where(x => x.HasDataFiles))
+        {
+            types.Enqueue(baseType);
+        }
+
+        _assetFiles = new Dictionary<QualifiedType, JsonDocument>(_readInformation.ParentTypes.Count);
+        List<QualifiedType> typeReadOrder = new List<QualifiedType>(_readInformation.ParentTypes.Count);
         try
         {
-            Array.Sort(providers, (a, b) => b.Priority.CompareTo(a.Priority));
-
-            bool[] enabled = new bool[providers.Length];
-
-            await ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.Assets, static async (stream, reader, token) =>
+            while (types.Count > 0)
             {
-                reader._readInformation = await JsonSerializer.DeserializeAsync<AssetInformation>(
-                    stream,
-                    reader.JsonOptions,
-                    token
-                ).ConfigureAwait(false);
-            }, isFirst: true, token).ConfigureAwait(false);
+                TypeHierarchy type = types.Dequeue();
 
-            if (_readInformation == null)
-            {
-                _logger.LogWarning(Resources.Log_UnableToReadFile, "Assets.json");
-                _readInformation = new AssetInformation();
-            }
+                _currentType = type.Type;
 
-            _readInformation.Types ??= new Dictionary<QualifiedType, TypeHierarchy>(0);
+                ReportProgress(
+                    0.3f + (float)typeReadOrder.Count / _readInformation.ParentTypes.Count * 0.3f,
+                    AllowInternet ? $"Downloading {_currentType.GetTypeName()} data" : $"Loading {_currentType.GetTypeName()}"
+                );
 
-            // custom type converter can't read property name
-            foreach (KeyValuePair<QualifiedType, TypeHierarchy> type in _readInformation.Types)
-            {
-                type.Value.Type = new QualifiedType(type.Key, isCaseInsensitive: true);
-            }
-
-            _readInformation.AssetAliases ??= new Dictionary<string, QualifiedType>(0);
-            _readInformation.AssetCategories ??= new Dictionary<QualifiedType, string>(0);
-            _readInformation.KnownFileNames ??= new Dictionary<string, QualifiedType>(0);
-            _ = _readInformation.ParentTypes;
-
-            await Task.WhenAll(
-                new Task[]
+                if (!await ReadAssetFileAsync(providers, enabled, type.Type, static async (stream, reader, token) =>
+                    {
+                        reader._assetFiles![reader._currentType] = await JsonDocument.ParseAsync(stream,
+                            new JsonDocumentOptions
+                            {
+                                AllowTrailingCommas = true,
+                                CommentHandling = JsonCommentHandling.Skip,
+                                MaxDepth = 16
+                            }, token);
+                    }, token: token))
                 {
-                    // Read Status.json file which includes some needed properties like game version and NPC-assignable achievements.
-                    ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.GameStatus, static async (stream, reader, token) =>
-                    {
-                        reader._statusFile = await JsonDocument.ParseAsync(stream, new JsonDocumentOptions
-                        {
-                            AllowTrailingCommas = true,
-                            CommentHandling = JsonCommentHandling.Skip,
-                            MaxDepth = 12
-                        }, token).ConfigureAwait(false);
-                    }, token: token),
-
-                    // Read item actions from inventory localization file
-                    ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.InventoryLocalization, static async (stream, reader, token) =>
-                    {
-                        string allText = await ReadAllTextAsync(stream, token).ConfigureAwait(false);
-                        using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), reader.Database, SourceNodeTokenizerOptions.Lazy);
-                        reader.ReadActionLabels(file.SourceFile);
-                    }, token: token),
-
-                    // Read skill names and descriptions from skills localization file.
-                    ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.SkillsLocalization, static async (stream, reader, token) =>
-                    {
-                        string allText = await ReadAllTextAsync(stream, token).ConfigureAwait(false);
-                        using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), reader.Database, SourceNodeTokenizerOptions.Lazy);
-                        reader.ReadSkills(file.SourceFile);
-                    }, token: token),
-
-                    // Read skillset names from character menu localization file
-                    ReadKnownFileAsync(providers, enabled, KnownConfigurationFile.CharacterLocalization, static async (stream, reader, token) =>
-                    {
-                        string allText = await ReadAllTextAsync(stream, token).ConfigureAwait(false);
-                        using StaticSourceFile file = StaticSourceFile.FromOtherFile(string.Empty, allText.AsMemory(), reader.Database, SourceNodeTokenizerOptions.Lazy);
-                        reader.ReadSkillsets(file.SourceFile);
-                    }, token: token)
-                }
-            );
-
-            // BFS to read asset files in the correct order (lowest type to highest type, ex. Asset -> ItemAsset -> ItemWeaponAsset -> ItemGunAsset).
-            Queue<TypeHierarchy> types = new Queue<TypeHierarchy>(_readInformation.ParentTypes.Count);
-            foreach (TypeHierarchy baseType in _readInformation.Types.Values.Where(x => x.HasDataFiles))
-            {
-                types.Enqueue(baseType);
-            }
-
-            _assetFiles = new Dictionary<QualifiedType, JsonDocument>(_readInformation.ParentTypes.Count);
-            List<QualifiedType> typeReadOrder = new List<QualifiedType>(_readInformation.ParentTypes.Count);
-            try
-            {
-                while (types.Count > 0)
-                {
-                    TypeHierarchy type = types.Dequeue();
-
-                    _currentType = type.Type;
-
-                    if (!await ReadAssetFileAsync(providers, enabled, type.Type, static async (stream, reader, token) =>
-                        {
-                            reader._assetFiles![reader._currentType] = await JsonDocument.ParseAsync(stream,
-                                new JsonDocumentOptions
-                                {
-                                    AllowTrailingCommas = true,
-                                    CommentHandling = JsonCommentHandling.Skip,
-                                    MaxDepth = 16
-                                }, token);
-                        }, token: token))
-                    {
-                        _logger.LogWarning(Resources.Log_FailedToReadAssetFile, type.Type.GetFullTypeName());
-                        continue;
-                    }
-
-                    typeReadOrder.Add(_currentType);
-
-                    foreach (TypeHierarchy hierarchy in type.ChildTypes.Values.Where(x => x.HasDataFiles))
-                    {
-                        types.Enqueue(hierarchy);
-                    }
+                    _logger.LogWarning(Resources.Log_FailedToReadAssetFile, type.Type.GetFullTypeName());
+                    continue;
                 }
 
-                _currentType = QualifiedType.None;
+                typeReadOrder.Add(_currentType);
 
-                _fileTypeBuilder = ImmutableDictionary.CreateBuilder<QualifiedType, DatFileType>();
-                _allTypeBuilder = ImmutableDictionary.CreateBuilder<QualifiedType, DatType>();
-
-                _parsedFiles = new HashSet<QualifiedType>();
-
-                foreach (QualifiedType type in typeReadOrder)
+                foreach (TypeHierarchy hierarchy in type.ChildTypes.Values.Where(x => x.HasDataFiles))
                 {
-                    if (!_parsedFiles.Add(type))
-                        continue;
-
-                    ReadFileType(_assetFiles[type], type.CaseInsensitive);
+                    types.Enqueue(hierarchy);
                 }
-
-                _parsedFiles = null;
-                _currentFiles = null;
-
-                fileTypes = _fileTypeBuilder.ToImmutable();
-                allTypes = _allTypeBuilder.ToImmutable();
             }
-            catch
+
+            _currentType = QualifiedType.None;
+
+            _fileTypeBuilder = ImmutableDictionary.CreateBuilder<QualifiedType, DatFileType>();
+            _allTypeBuilder = ImmutableDictionary.CreateBuilder<QualifiedType, DatType>();
+
+
+
+            _parsedFiles = new HashSet<QualifiedType>();
+
+            for (int i = 0; i < typeReadOrder.Count; i++)
             {
-                foreach (JsonDocument doc in _assetFiles.Values)
+                QualifiedType type = typeReadOrder[i];
+                if (!_parsedFiles.Add(type))
+                    continue;
+
+                ReportProgress(
+                    0.6f + (float)i / _readInformation.ParentTypes.Count * 0.3f,
+                    $"Reading {type.GetTypeName()} data"
+                );
+
+                ReadFileType(_assetFiles[type], type.CaseInsensitive);
+            }
+
+            _parsedFiles = null;
+            _currentFiles = null;
+
+            if (OnFinalizingTypes != null)
+            {
+                List<DatType> tempTypes = new List<DatType>(16);
+                OnFinalizingTypes?.Invoke(this, tempTypes);
+
+                foreach (DatType type in tempTypes)
                 {
-                    doc.Dispose();
-                }
+                    QualifiedType typeName = type.TypeName.CaseInsensitive;
+                    if (_allTypeBuilder.ContainsKey(typeName))
+                        _logger.LogWarning("Duplicate type {0} supplied from OnFinalizingTypes. Replacing existing.", typeName);
+                        
+                    if (type is DatFileType fileType)
+                        _fileTypeBuilder[typeName] = fileType;
 
-                throw;
+                    _allTypeBuilder[typeName] = type;
+                }
             }
-            finally
+
+            fileTypes = _fileTypeBuilder.ToImmutable();
+            allTypes = _allTypeBuilder.ToImmutable();
+        }
+        catch
+        {
+            foreach (JsonDocument doc in _assetFiles.Values)
             {
-                _assetFiles = null;
-                _fileTypeBuilder = null;
-                _allTypeBuilder = null;
+                doc.Dispose();
             }
+
+            throw;
         }
         finally
         {
-            Array.ForEach(providers, p => (p as IDisposable)?.Dispose());
+            _assetFiles = null;
+            _fileTypeBuilder = null;
+            _allTypeBuilder = null;
         }
 
+        ReportProgress(0.95f, "Generating localization file data");
+
         await generateLocalizationFiles;
+
+        ReportProgress(1f, null);
 
         return new SpecificationReadResult
         {
@@ -287,6 +339,53 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
             ActionButtons = _actionButtons ?? ImmutableDictionary<string, ActionButton>.Empty,
             LocalizationFileTypes = _localizationFiles ?? ImmutableDictionary<string, DatFileType>.Empty
         };
+    }
+
+    public async Task<PropertyOrderFile> ReadGlobalOrderfile(IAssetSpecDatabase database, CancellationToken token)
+    {
+        if (_providers == null)
+            throw new InvalidOperationException();
+
+        PropertyOrderFile? orderfile = null;
+
+        await ReadKnownFileAsync(_providers, _providersEnabled!, KnownConfigurationFile.Orderfile, async (stream, _, _) =>
+        {
+            string fileContents;
+            using (StreamReader sr = new StreamReader(stream, Encoding.UTF8))
+            {
+                fileContents = await sr.ReadToEndAsync();
+            }
+
+            using StaticSourceFile srcFile = StaticSourceFile.FromOtherFile(
+                GlobalOrderfileName,
+                fileContents,
+                database,
+                SourceNodeTokenizerOptions.Metadata
+            );
+
+            if (!PropertyOrderFile.TryReadFromFile(database, srcFile.SourceFile, out orderfile))
+            {
+                orderfile = null;
+            }
+
+        }, token: token);
+
+        if (orderfile == null)
+        {
+            orderfile = new PropertyOrderFile(GlobalOrderfileName);
+            _logger.LogWarning("Failed to read global orderfile.");
+        }
+
+        return orderfile;
+    }
+
+    internal void DisposeProviders()
+    {
+        if (_providers == null)
+            return;
+
+        Array.ForEach(_providers, p => (p as IDisposable)?.Dispose());
+        _providers = null;
     }
 
     private async Task GenerateLocalizationFiles(CancellationToken token)
@@ -300,6 +399,8 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 
         foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
         {
+            token.ThrowIfCancellationRequested();
+
             string ext = Path.GetExtension(file);
             if (!string.Equals(ext, ".txt", StringComparison.OrdinalIgnoreCase)
                 && !string.Equals(ext, ".dat", StringComparison.OrdinalIgnoreCase)

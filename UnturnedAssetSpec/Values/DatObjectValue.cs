@@ -145,7 +145,7 @@ public class DatObjectValue :
 /// A key-value pair for a property and it's value.
 /// </summary>
 [DebuggerDisplay("{ToString(),nq}")]
-public readonly struct DatObjectPropertyValue(IValue value, DatProperty property) : IEquatable<DatObjectPropertyValue>
+public readonly struct DatObjectPropertyValue(IValue value, DatProperty property, ISourceNode? node = null) : IEquatable<DatObjectPropertyValue>
 {
     /// <summary>
     /// The value of the property.
@@ -156,6 +156,12 @@ public readonly struct DatObjectPropertyValue(IValue value, DatProperty property
     /// The property that was evaluated.
     /// </summary>
     public DatProperty Property { get; } = property;
+
+    /// <summary>
+    /// The node given for this property.
+    /// </summary>
+    /// <remarks>Usually a <see cref="IPropertySourceNode"/> unless this object was parsed from a string, in which case it'll be a <see cref="IValueSourceNode"/>.</remarks>
+    public ISourceNode? Node { get; } = node;
 
     /// <inheritdoc />
     public bool Equals(DatObjectPropertyValue other)

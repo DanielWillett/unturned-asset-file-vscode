@@ -187,6 +187,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Defines properties for the behavior of the Unturned Data File Language Server..
+        /// </summary>
+        internal static string Description_ProjectFile {
+            get {
+                return ResourceManager.GetString("Description_ProjectFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected function name at beginning of expression..
         /// </summary>
         internal static string FormatException_Expression_ExpectedFunctionName {
@@ -993,6 +1002,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         internal static string Type_Name_OverlapVolumeId {
             get {
                 return ResourceManager.GetString("Type_Name_OverlapVolumeId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Project File.
+        /// </summary>
+        internal static string Type_Name_ProjectFile {
+            get {
+                return ResourceManager.GetString("Type_Name_ProjectFile", resourceCulture);
             }
         }
         

@@ -51,7 +51,7 @@ public class DatProperty : IDatSpecificationObject
     /// <summary>
     /// Whether or not this property imports properties from <see cref="Type"/>.
     /// </summary>
-    public bool IsImport { get; internal set; }
+    internal bool IsImport { get; set; }
 
     /// <summary>
     /// The expected location of this property when it's in an asset.
@@ -224,7 +224,7 @@ public class DatProperty : IDatSpecificationObject
     /// Attempt to get the import type for this property.
     /// </summary>
     /// <returns><see langword="true"/> if this property is an import property and the type could be resolved to a concrete <see cref="DatTypeWithProperties"/>, otherwise <see langword="false"/>.</returns>
-    public bool TryGetImportType([NotNullWhen(true)] out DatTypeWithProperties? importType)
+    internal bool TryGetImportType([NotNullWhen(true)] out DatTypeWithProperties? importType)
     {
         if (!IsImport || !Type.TryGetConcreteType(out IType? type))
         {

@@ -52,6 +52,11 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
     /// <inheritdoc />
     public QualifiedType StringParseableType { get; internal set; }
 
+    /// <summary>
+    /// Whether or not the enum values are case-sensitive. Defaults to <see langword="false"/>.
+    /// </summary>
+    public bool CaseSensitive { get; internal set; }
+
     internal DatEnumType(QualifiedType type, JsonElement element, DatFileType owner, IDatSpecificationReadContext context) : base(type, null, element)
     {
         Context = context;
@@ -209,7 +214,7 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
             }
         }
 
-        return TryParse(text, out parsedValue);
+        return TryParse(text, out parsedValue, !CaseSensitive);
     }
 
     string ITypeConverter<DatEnumValue>.Format(DatEnumValue value, ref TypeConverterFormatArgs args)
@@ -600,6 +605,9 @@ public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConver
 
     private static int PopCount(ulong value)
     {
+#if NETCOREAPP3_0_OR_GREATER
+        return System.Numerics.BitOperations.PopCount(value);
+#else
         // from https://github.com/dotnet/runtime/blob/e2005d178d14ea5816a3b58fc06aacc2b4a7983b/src/libraries/System.Private.CoreLib/src/System/Numerics/BitOperations.cs#L492
         const ulong c1 = 0x_55555555_55555555ul;
         const ulong c2 = 0x_33333333_33333333ul;
@@ -611,6 +619,7 @@ public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConver
         value = (((value + (value >> 4)) & c3) * c4) >> 56;
 
         return (int)value;
+#endif
     }
 
     IValue<DatFlagEnumValue> IType<DatFlagEnumValue>.CreateValue(Optional<DatFlagEnumValue> value) => value.Value ?? Null;
@@ -618,7 +627,7 @@ public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConver
 
     bool ITypeConverter<DatFlagEnumValue>.TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<DatFlagEnumValue> args, [MaybeNullWhen(false)] out DatFlagEnumValue parsedValue)
     {
-        return TryParse(text, out parsedValue);
+        return TryParse(text, out parsedValue, !CaseSensitive);
     }
 
     string ITypeConverter<DatFlagEnumValue>.Format(DatFlagEnumValue value, ref TypeConverterFormatArgs args)

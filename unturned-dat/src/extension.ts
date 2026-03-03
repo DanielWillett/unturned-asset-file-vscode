@@ -14,17 +14,19 @@ import { refreshAssetProperties } from './commands/refresh-asset-properties';
 
 // request handlers
 import { GetDocumentText, handleGetDocumentText } from './jsonrpc/get-document-text';
+import { Ready } from './jsonrpc/ready';
 import { getEnvironmentData } from 'worker_threads';
 import { Trace } from "vscode-jsonrpc";
 
 
 export const languageId = "unturned-dat";
 export const configSection = "unturned-data-file-lsp";
-export const fileMatcher = "{**/*.dat,**/*.asset,**/Config_*Difficulty.txt,**/Config.txt}";
+export const fileMatcher = "{**/*.dat,**/*.asset,**/*.udatproj,**/Config_*Difficulty.txt,**/Config.txt}";
 export const dotnetVersion = 10;
 
 let client: LanguageClient | undefined;
 let output: LogOutputChannel | undefined;
+let isReady: boolean;
 
 let registrations: Disposable[] = [];
 
@@ -32,13 +34,29 @@ let assetPropertiesViewProvider: AssetPropertiesViewProvider | undefined;
 
 export function getClient(): LanguageClient
 {
-    if (client === undefined)
+    if (!client)
     {
         throw new Error("Uninitialized.");
     }
 
     return client;
 }
+
+export function getOutputChannel(): LogOutputChannel
+{
+    if (!output)
+    {
+        throw new Error("Uninitialized.");
+    }
+
+    return output;
+}
+
+export function getIsReady(): boolean
+{
+    return isReady;
+}
+
 export function getAssetPropertiesViewProvider(): AssetPropertiesViewProvider
 {
     if (assetPropertiesViewProvider === undefined)
@@ -75,10 +93,6 @@ export async function activate(context: ExtensionContext): Promise<void>
 
     output = window.createOutputChannel("unturned-dat", { log: true });
     registrations.push(output);
-
-    // temp
-    let traceOutput = window.createOutputChannel("unturned-dat-trace", { log: true });
-    registrations.push(traceOutput);
 
     output.info("Unturned Data File (Full) by DanielWillett loading...");
     output.info("Repository: https://github.com/DanielWillett/unturned-asset-file-vscode");
@@ -203,7 +217,6 @@ export async function activate(context: ExtensionContext): Promise<void>
             },
             stdioEncoding: 'utf8',
             outputChannel: output,
-            traceOutputChannel: traceOutput,
             markdown: {
                 isTrusted: true,
                 supportHtml: true
@@ -249,6 +262,12 @@ export async function activate(context: ExtensionContext): Promise<void>
             }
 
             output?.info("Language server is running.");
+        }));
+
+        registrations.push(client.onNotification(Ready, async event =>
+        {
+            output?.info("Language server is ready.");
+            isReady = true;
             await commands.executeCommand("unturnedDataFile.assetProperties.refreshAssetProperties");
         }));
 
@@ -275,4 +294,6 @@ export async function deactivate(): Promise<void>
     {
         assetPropertiesViewProvider = undefined;
     }
+
+    isReady = false;
 }

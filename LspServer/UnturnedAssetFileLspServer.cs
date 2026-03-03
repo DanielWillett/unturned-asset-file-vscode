@@ -1,6 +1,15 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Files;
+using DanielWillett.UnturnedDataFileLspServer.Handlers;
+using DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
+using DanielWillett.UnturnedDataFileLspServer.Project;
 using DanielWillett.UnturnedDataFileLspServer.Protocol;
 using DanielWillett.UnturnedDataFileLspServer.Utility;
 using Microsoft.Extensions.Configuration;
@@ -12,11 +21,10 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.WorkDone;
 using OmniSharp.Extensions.LanguageServer.Server;
 using System.Diagnostics;
-using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using OmniSharp.Extensions.LanguageServer.Protocol.General;
+using System.Text.Json;
 
 namespace DanielWillett.UnturnedDataFileLspServer;
 
@@ -32,7 +40,7 @@ internal sealed class UnturnedAssetFileLspServer
 
     private static Timer? _closeTimer;
 
-    public const string FileWatcherGlobPattern = "{**/*.dat,**/*.asset,**/Config_*Difficulty.txt}";
+    public const string FileWatcherGlobPattern = "{**/*.dat,**/*.asset,**/*.udatproj,**/Config_*Difficulty.txt,**/Config.txt}";
 
     public static readonly Matcher FileWatcherMatcher = new Matcher().AddInclude("**/*.asset").AddInclude("**/*.dat");
 
@@ -42,22 +50,42 @@ internal sealed class UnturnedAssetFileLspServer
         Pattern = FileWatcherGlobPattern
     });
 
+#nullable disable
+
     private static ILanguageServer _server;
 
-    public static string DebugPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "UnturnedDatLSP");
+#if DEBUG
+    public static string DebugPath { get; private set; }
+#endif
+
+#nullable restore
+
 
     private static async Task Main()
     {
 #if DEBUG
-        string logPath = Path.Combine(DebugPath, "log.txt");
-        if (File.Exists(logPath))
-            File.WriteAllBytes(logPath, ReadOnlySpan<byte>.Empty);
+        bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        if (windows || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            DebugPath = Path.Combine(
+                Environment.GetFolderPath(
+                    windows
+                        ? Environment.SpecialFolder.CommonApplicationData
+                        : Environment.SpecialFolder.InternetCache),
+                "UnturnedAssetFileLsp", "Debug"
+            );
+        }
         else
-            Directory.CreateDirectory(DebugPath);
+        {
+            // Linux, FreeBSD
+            DebugPath = "/var/cache/UnturnedAssetFileLsp/Debug";
+        }
+
+        Directory.CreateDirectory(DebugPath);
 #endif
 
 #if DEBUG
-        if (Environment.GetEnvironmentVariable("UNTURNED_LSP_DEBUG") == "1")
+        if (EnvironmentHelper.ParseBooleanEnvironmentVariable("UNTURNED_LSP_DEBUG"))
         {
             Debugger.Launch();
         }
@@ -66,12 +94,20 @@ internal sealed class UnturnedAssetFileLspServer
         _server = await LanguageServer.From(bldr =>
         {
 #if DEBUG
-            bldr.OnSetTrace(_ =>
+            bldr.OnSetTrace(trace =>
             {
-                object loggingManager = _server.GetType().GetField("_languageServerLoggingManager", BindingFlags.NonPublic | BindingFlags.Instance)!
-                    .GetValue(_server)!;
-                loggingManager.GetType().GetMethod("SetTrace", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!
-                    .Invoke(loggingManager, [InitializeTrace.Verbose]);
+                if (trace.Value == InitializeTrace.Verbose)
+                {
+                    _logger.LogTrace("Trace changed to verbose.");
+                }
+                else
+                {
+                    _logger.LogWarning("Requested trace change to {0} ignored.", trace.Value);
+                    object loggingManager = _server.GetType().GetField("_languageServerLoggingManager", BindingFlags.NonPublic | BindingFlags.Instance)!
+                        .GetValue(_server)!;
+                    loggingManager.GetType().GetMethod("SetTrace", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!
+                        .Invoke(loggingManager, [ InitializeTrace.Verbose ]);
+                }
             });
 #endif
 
@@ -80,15 +116,16 @@ internal sealed class UnturnedAssetFileLspServer
             bldr.ConfigureLogging(logr =>
                 {
                     logr.AddLanguageProtocolLogging()
-                        .SetMinimumLevel(LogLevel.Trace);
+                        .SetMinimumLevel(LogLevel.Trace)
+                        .AddFilter((s, lvl) => lvl > LogLevel.Debug || s == null || !s.StartsWith("OmniSharp"));
                 })
                 .WithOutput(Console.OpenStandardOutput())
                 .WithInput(Console.OpenStandardInput())
                 // .WithHandler<UnturnedAssetFileSyncHandler>()
-                // .WithHandler<HoverHandler>()
+                .WithHandler<HoverHandler>()
                 // .WithHandler<DocumentSymbolHandler>()
                 // .WithHandler<KeyCompletionHandler>()
-                // todo: .WithHandler<DiscoverAssetPropertiesHandler>()
+                .WithHandler<DiscoverAssetPropertiesHandler>()
                 // .WithHandler<LspWorkspaceEnvironment>()
                 // todo: .WithHandler<GetAssetPropertyAddLocationHandler>()
                 // .WithHandler<CodeActionRequestHandler>()
@@ -103,31 +140,32 @@ internal sealed class UnturnedAssetFileLspServer
                 .WithSerializer(new UnturnedLspSerializer())
                 .WithServices(serv =>
                 {
-                    //serv//.AddSingleton<UnturnedAssetFileSyncHandler>()
+                    serv.AddSingleton<UnturnedAssetFileSyncHandler>()
                         //.AddSingleton<KeyCompletionHandler>()
                         //.AddSingleton<DocumentSymbolHandler>()
                         //.AddSingleton<HoverHandler>()
-                        //.AddSingleton<OpenedFileTracker>()
-                        //.AddSingleton<FileEvaluationContextFactory>()
-                        //.AddSingleton<IAssetSpecDatabase, LspAssetSpecDatabase>()
-                        //.AddSingleton<LspWorkspaceEnvironment>()
-                        //.AddSingleton<DiagnosticsManager>()
-                        //.AddSingleton<GlobalCodeFixes>()
-                        //.AddSingleton<LspInstallationEnvironment>()
-                        //.AddSingleton<FileRelationalCacheProvider>()
-                        //.AddSingleton(new InstallDirUtility("Unturned", "304930"))
-                        //.AddSingleton<EnvironmentCache>()
-                        //.AddTransient<ISpecDatabaseCache, EnvironmentCache>(sp => sp.GetRequiredService<EnvironmentCache>())
-                        //.AddTransient<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
-                        //.AddTransient<IWorkspaceEnvironment>(sp => sp.GetRequiredService<LspWorkspaceEnvironment>())
-                        //.AddTransient<IFileRelationalModelProvider>(sp => sp.GetRequiredService<FileRelationalCacheProvider>())
-                        //.AddSingleton<IParsingServices, ParsingServiceProvider>(sp => new ParsingServiceProvider(sp))
-                        //.AddSingleton(new JsonSerializerOptions
-                        //{
-                        //    WriteIndented = true
-                        //})
-                        //.AddSingleton(typeof(JsonReaderOptions), new JsonReaderOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip })
-                        //.AddSingleton(typeof(JsonWriterOptions), new JsonWriterOptions { Indented = true });
+                        .AddSingleton<OpenedFileTracker>()
+                        .AddSingleton<FileEvaluationContextFactory>()
+                        .AddSingleton<IAssetSpecDatabase, LspAssetSpecDatabase>()
+                        .AddSingleton<IProjectFileProvider, LspProjectFileProvider>()
+                        .AddSingleton<LspWorkspaceEnvironment>()
+                        .AddSingleton<DiagnosticsManager>()
+                        .AddSingleton<GlobalCodeFixes>()
+                        .AddSingleton<LspInstallationEnvironment>()
+                        .AddSingleton<FileRelationalCacheProvider>()
+                        .AddSingleton(new InstallDirUtility("Unturned", "304930"))
+                        .AddSingleton<EnvironmentCache>()
+                        .AddTransient<ISpecDatabaseCache, EnvironmentCache>(sp => sp.GetRequiredService<EnvironmentCache>())
+                        .AddTransient<InstallationEnvironment>(sp => sp.GetRequiredService<LspInstallationEnvironment>())
+                        .AddTransient<IWorkspaceEnvironment>(sp => sp.GetRequiredService<LspWorkspaceEnvironment>())
+                        .AddTransient<IFileRelationalModelProvider>(sp => sp.GetRequiredService<FileRelationalCacheProvider>())
+                        .AddSingleton<IParsingServices, ParsingServiceProvider>(sp => new ParsingServiceProvider(sp))
+                        .AddSingleton(new JsonSerializerOptions
+                        {
+                            WriteIndented = true
+                        })
+                        .AddSingleton(typeof(JsonReaderOptions), new JsonReaderOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip })
+                        .AddSingleton(typeof(JsonWriterOptions), new JsonWriterOptions { Indented = true });
                 })
                 .OnInitialize(async (server, request, token) =>
                 {
@@ -144,11 +182,8 @@ internal sealed class UnturnedAssetFileLspServer
 
                     _logger = server.Services.GetRequiredService<ILogger<UnturnedAssetFileLspServer>>();
                 })
-                .OnInitialized(async (server, _, _, _) =>
+                .OnInitialized((server, _, _, _) =>
                 {
-                    // warmup services
-                    // todo: _ = server.Services.GetRequiredService<DiagnosticsManager>();
-
 #if DEBUG
                     _logger.LogInformation("LSP initialized, client PID: {0}, server PID: {1} ({2}).", ClientProcessId, Environment.ProcessId, Environment.CommandLine);
 #else
@@ -170,6 +205,8 @@ internal sealed class UnturnedAssetFileLspServer
                             Environment.Exit(0);
                         }, server, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
                     }
+
+                    return Task.CompletedTask;
                 });
         });
 
@@ -216,50 +253,87 @@ internal sealed class UnturnedAssetFileLspServer
             _initObserver = null;
         }
 
-        _logger.LogInformation("Language server fully started.");
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
+        _logger.LogInformation($"Language server fully started. Memory usage: {GC.GetTotalMemory(false) / 1048576m:F2} MiB.");
+
+        // warm up services
+        _ = _server.Services.GetRequiredService<DiagnosticsManager>();
+
+        _server.SendNotification("unturnedDataFile/ready");
     }
 
     private static async Task HandleConfigurationReady(IConfigurationSection config, CancellationToken token)
     {
+#if DEBUG
+        const bool useInternet = false;
+#else
+        bool useInternet = !EnvironmentHelper.ParseBooleanEnvironmentVariable("UDAT_OFFLINE_SPEC")
+                         && !_server.Configuration.GetValue<bool>($"{ConfigurationSectionId}:offlineOnly");
+#endif
+
+        ApplyDirectoriesFromConfig();
+
+        if (_server.Services.GetRequiredService<InstallDirUtility>().TryGetInstallDirectory(out GameInstallDir loc))
+        {
+            _logger.LogInformation("Game install directory: \"{0}\"", loc.BaseFolder);
+            _logger.LogInformation("Game workshop directory: \"{0}\"", loc.WorkshopFolder);
+        }
+        else
+        {
+            _logger.LogWarning("Failed to find Unturned's installation folder. It's possible it just isn't installed. If this isn't the case, configure the install directory in your extension options.");
+        }
+
         IWorkDoneObserver workDoneManager = await _server.WorkDoneManager.Create(
             new ProgressToken(Guid.NewGuid().ToString()),
             new WorkDoneProgressBegin
             {
                 Title = "Start Unturned Data File Language Server",
-                Message = "Downloading Unturned Asset Specs",
-                Percentage = 10
+                Percentage = 0
             },
-            onComplete: () => new WorkDoneProgressEnd { Message = "Language Server Started." },
+            onComplete: () => new WorkDoneProgressEnd { Message = "Language server started." },
             cancellationToken: token
         );
 
+        IAssetSpecDatabase db = _server.Services.GetRequiredService<IAssetSpecDatabase>();
+
+        db.UseInternet = useInternet;
+
         _initObserver = workDoneManager;
 
-        //IAssetSpecDatabase db = await InitializeAssetSpecDatabaseAsync(server.Services, token);
+        int previous = 0;
+        await db.InitializeAsync(
+            token,
+            (progress, str) =>
+            {
+                int p = (int)Math.Round(progress * 100);
+                if (p == previous)
+                    return;
 
-        //workDoneManager.OnNext(new WorkDoneProgressReport
-        //{
-        //    Message = $"Found {db.Information.ParentTypes.Count} asset types",
-        //    Percentage = 25
-        //});
-
-        await Task.Delay(500, token);
+                previous = p;
+                _initObserver.OnNext(new WorkDoneProgressReport
+                {
+                    Message = str,
+                    Percentage = p
+                });
+            },
+            0.25f
+        );
 
         workDoneManager.OnNext(new WorkDoneProgressReport
         {
-            Message = "Discovering Existing Assets",
+            Message = "Discovering existing assets",
             Percentage = 35
         });
 
-        //LspInstallationEnvironment env = InitializeInstallEnvironment(server.Services, token);
+        InitializeInstallEnvironment(token);
 
-        //workDoneManager.OnNext(new WorkDoneProgressReport
-        //{
-        //    Message = $"Found {env.FileCount} file(s)",
-        //    Percentage = 70
-        //});
+        workDoneManager.OnNext(new WorkDoneProgressReport
+        {
+            Message = "Loading workspaces",
+            Percentage = 90
+        });
 
-        await Task.Delay(500, token);
+        InitializeWorkspaceEnvironment();
 
         bool registerFileAssociations = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && config.GetValue<bool>("registerFileAssociations");
 
@@ -280,7 +354,7 @@ internal sealed class UnturnedAssetFileLspServer
             FileAssociationUtility util = ActivatorUtilities.CreateInstance<FileAssociationUtility>(_server.Services);
             try
             {
-                await util.AssociateFileTypesAsync(force: Environment.GetEnvironmentVariable("UNTURNED_LSP_RESET_FILE_ASSOC") == "1");
+                await util.AssociateFileTypesAsync(force: EnvironmentHelper.ParseBooleanEnvironmentVariable("UNTURNED_LSP_RESET_FILE_ASSOC"));
             }
             finally
             {
@@ -291,6 +365,58 @@ internal sealed class UnturnedAssetFileLspServer
         else
         {
             _logger.LogTrace("Skipping registering file associations.");
+        }
+    }
+
+    private static void ApplyDirectoriesFromConfig()
+    {
+        string? u3dsDirectory = _server.Configuration.GetValue<string>($"{ConfigurationSectionId}:u3dsInstallDir");
+        string? gameDirectory = _server.Configuration.GetValue<string>($"{ConfigurationSectionId}:unturnedInstallDir");
+        string? wshpDirectory = _server.Configuration.GetValue<string>($"{ConfigurationSectionId}:unturnedWorkshopDirectory");
+
+        if (!string.IsNullOrEmpty(u3dsDirectory) && !(Path.IsPathRooted(u3dsDirectory) && Directory.Exists(u3dsDirectory)))
+        {
+            _logger.LogError("Defined U3DS directory, \"{0}\", does not exist.", u3dsDirectory);
+        }
+
+        if (!string.IsNullOrEmpty(wshpDirectory) && !(Path.IsPathRooted(wshpDirectory) && Directory.Exists(wshpDirectory)))
+        {
+            _logger.LogError("Defined Unturned client workshop directory, \"{0}\", does not exist.", wshpDirectory);
+            wshpDirectory = null;
+        }
+
+        if (string.IsNullOrEmpty(gameDirectory))
+            return;
+
+        if (!Path.IsPathRooted(gameDirectory) || !Directory.Exists(gameDirectory))
+        {
+            _logger.LogError("Defined Unturned client directory, \"{0}\", does not exist.", gameDirectory);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(wshpDirectory))
+        {
+            wshpDirectory = Path.Combine(gameDirectory, "..", "..", "workshop", "content", "304930");
+            try
+            {
+                wshpDirectory = Path.GetFullPath(wshpDirectory);
+                if (!Directory.Exists(wshpDirectory))
+                {
+                    _logger.LogError("Automatically determined workshop folder, \"{0}\", does not exist.", wshpDirectory);
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Failed to automatically determine the workshop folder from the game folder, \"{0}\".", wshpDirectory);
+                wshpDirectory = null;
+            }
+        }
+
+        InstallDirUtility installDir = _server.Services.GetRequiredService<InstallDirUtility>();
+
+        if (wshpDirectory != null && gameDirectory != null)
+        {
+            installDir.OverrideInstallDirectory = new GameInstallDir(gameDirectory, wshpDirectory);
         }
     }
 
@@ -312,33 +438,27 @@ internal sealed class UnturnedAssetFileLspServer
 
     private static IWorkDoneObserver? _initObserver;
 
-    private static async Task<IAssetSpecDatabase> InitializeAssetSpecDatabaseAsync(IServiceProvider serviceProvider, CancellationToken token = default)
+    private static void InitializeInstallEnvironment(CancellationToken token = default)
     {
-        IAssetSpecDatabase db = serviceProvider.GetRequiredService<IAssetSpecDatabase>();
-
-#if DEBUG
-        db.UseInternet = false;
-#else
-        db.UseInternet = Environment.GetEnvironmentVariable("UDAT_OFFLINE_SPEC") != "1";
-#endif
-
-        _logger.LogInformation("Initializing asset specs...");
-        await db.InitializeAsync(token).ConfigureAwait(false);
-        _logger.LogInformation("AssetSpecDatabase initialized.");
-
-        //_logger.LogInformation(JsonSerializer.Serialize(db.Information, db.Options));
-
-        return db;
-    }
-
-    private static LspInstallationEnvironment InitializeInstallEnvironment(IServiceProvider serviceProvider, CancellationToken token = default)
-    {
-        LspInstallationEnvironment env = serviceProvider.GetRequiredService<LspInstallationEnvironment>();
+        LspInstallationEnvironment env = _server.Services.GetRequiredService<LspInstallationEnvironment>();
 
         _logger.LogInformation("Initializing installation environment...");
-        env.Discover(token);
-        _logger.LogInformation("Installation environment initialized; {0} file(s) found.", env.FileCount);
+        
+        env.Init();
 
-        return env;
+        env.Discover(token);
+        
+        _logger.LogInformation("Installation environment initialized; {0} file(s) found.", env.FileCount);
+    }
+
+    private static void InitializeWorkspaceEnvironment()
+    {
+        LspWorkspaceEnvironment env = _server.Services.GetRequiredService<LspWorkspaceEnvironment>();
+
+        _logger.LogInformation("Initializing workspace environment...");
+
+        env.CreateAllProjectFiles();
+
+        _logger.LogInformation("Workspace environment initialized; {0} workspace(s) opened.", env.WorkspaceFolders.Count);
     }
 }

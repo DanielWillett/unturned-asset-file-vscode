@@ -27,6 +27,7 @@ public sealed class GitHubSpecificationFileProvider : ISpecificationFileProvider
 
     internal const string ThisProjectRepository = "DanielWillett/unturned-asset-file-vscode";
     internal const string MergedFileUrl = "https://raw.githubusercontent.com/" + ThisProjectRepository + "/refs/heads/master/Asset%20Spec/asset-spec.g.bin";
+    internal const string OrderFileUrl = "https://raw.githubusercontent.com/" + ThisProjectRepository + "/refs/heads/master/Asset%20Spec/Orderfile.udatproj";
 
     private MemoryStream? _mergedFile;
     private int _tries;
@@ -42,11 +43,7 @@ public sealed class GitHubSpecificationFileProvider : ISpecificationFileProvider
         bool allowInternet,
         ISpecDatabaseCache? cache,
         Func<AssetInformation?> getAssetInfo) : this(logger,
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER
-        new Lazy<HttpClient>(httpClient),
-#else
-        new Lazy<HttpClient>(() => httpClient),
-#endif
+        LazyUtil.CreatePredefinedInstance(httpClient),
         allowInternet,
         cache,
         getAssetInfo
@@ -90,6 +87,7 @@ public sealed class GitHubSpecificationFileProvider : ISpecificationFileProvider
                     KnownConfigurationFile.SkillsLocalization => info.SkillsLocalizationFallbackUrl,
                     KnownConfigurationFile.CharacterLocalization => info.SkillsetsLocalizationFallbackUrl,
                     KnownConfigurationFile.InventoryLocalization => info.PlayerDashboardInventoryLocalizationFallbackUrl,
+                    KnownConfigurationFile.Orderfile => OrderFileUrl,
                     _ => null
                 },
                 file switch
@@ -98,6 +96,7 @@ public sealed class GitHubSpecificationFileProvider : ISpecificationFileProvider
                     KnownConfigurationFile.SkillsLocalization => "localization-skills.cache.bin",
                     KnownConfigurationFile.CharacterLocalization => "localization-character.cache.bin",
                     KnownConfigurationFile.InventoryLocalization => "localization-inventory.cache.bin",
+                    KnownConfigurationFile.Orderfile => "Orderfile.udatproj",
                     _ => file + ".bin"
                 },
                 state,

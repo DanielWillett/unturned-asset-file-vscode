@@ -192,6 +192,8 @@ partial class SpecificationFileReader
                     ReadPropertyFirstPass(in prop, i, "Properties", t => t.Properties, propertyBuilder, SpecPropertyContext.Property, customType);
                 }
 
+                ApplyImports(propertyBuilder);
+
                 customType.Properties = propertyBuilder.ToImmutable();
                 customType.PropertiesBuilder = null;
             }
@@ -209,6 +211,8 @@ partial class SpecificationFileReader
                     JsonElement prop = element[i];
                     ReadPropertyFirstPass(in prop, i, "Localization", t => t.LocalizationProperties, propertyBuilder, SpecPropertyContext.Localization, assetType);
                 }
+
+                ApplyImports(propertyBuilder);
 
                 assetType.LocalizationProperties = propertyBuilder.ToImmutable();
                 assetType.LocalizationPropertiesBuilder = null;

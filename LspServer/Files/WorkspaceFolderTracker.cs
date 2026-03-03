@@ -1,5 +1,7 @@
-﻿using OmniSharp.Extensions.LanguageServer.Protocol;
+﻿using DanielWillett.UnturnedDataFileLspServer.Project;
+using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using System.Collections.Immutable;
 using FileSystemWatcher = System.IO.FileSystemWatcher;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Files;
@@ -7,12 +9,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 internal class WorkspaceFolderTracker : IDisposable
 {
     private FileSystemWatcher? _watcher;
+    internal Lock ProjectFileLock;
 
     public string Name { get; }
     public string FilePath { get; }
     public DocumentUri Uri { get; }
     public WorkspaceFolder? Folder { get; }
     public bool IsActive { get; }
+
+    public ImmutableArray<LspProjectFile> ProjectFiles { get; internal set; }
 
     internal bool IsWatchedByClient { get; set; }
 
@@ -23,13 +28,14 @@ internal class WorkspaceFolderTracker : IDisposable
 
     public WorkspaceFolderTracker(DocumentUri uri, WorkspaceFolder? folder, bool isWatchedByClient)
     {
+        ProjectFileLock = new Lock();
         Folder = folder;
         Uri = uri;
         IsActive = string.Equals(uri.Scheme, "file", StringComparison.OrdinalIgnoreCase);
         FilePath = IsActive ? Path.GetFullPath(uri.GetFileSystemPath()) : uri.ToUnencodedString();
         Name = folder?.Name ?? Path.GetFileName(FilePath);
         IsWatchedByClient = isWatchedByClient;
-
+        
         if (isWatchedByClient)
             return;
 

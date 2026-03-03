@@ -9,7 +9,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 /// <summary>
 /// Compares one value with another of a different type.
 /// </summary>
-internal struct EqualityVisitor<TValue> : IValueVisitor, IGenericVisitor
+public struct EqualityVisitor<TValue> : IValueVisitor, IGenericVisitor
     where TValue : IEquatable<TValue>
 {
     public bool IsEqual;

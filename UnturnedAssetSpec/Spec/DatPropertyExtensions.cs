@@ -197,10 +197,13 @@ public static class DatPropertyExtensions
         v.Property = property;
         v.ValueNode = propertyNode.Value;
         v.ParentNode = propertyNode;
+        v.KeyFilter = ctx.GetKeyFilter();
         v.Visited = false;
         v.DiagnosticSink = null;
         v.ReferencedPropertySink = null;
         v.MissingValueBehavior = TypeParserMissingValueBehavior.ErrorIfValueOrPropertyNotProvided;
+        v.GetValue = false;
+        v.Value = null;
         fixed (FileEvaluationContext* evalCtxPtr = &ctx)
         {
             v.EvaluationContext = evalCtxPtr;
@@ -257,6 +260,9 @@ public static class DatPropertyExtensions
         v.DiagnosticSink = diagnosticSink;
         v.ReferencedPropertySink = referencedPropertySink;
         v.MissingValueBehavior = missingValueBahvior;
+        v.KeyFilter = ctx.GetKeyFilter();
+        v.GetValue = false;
+        v.Value = null;
         fixed (FileEvaluationContext* evalCtxPtr = &ctx)
         fixed (TVisitor* visitorPtr = &visitor)
         {
@@ -301,6 +307,7 @@ public static class DatPropertyExtensions
         }
 
         IDictionarySourceNode? startingDictionary;
+        LegacyExpansionFilter filter;
         DatTypeWithProperties? type;
         if (breadcrumbs.Length > 0 && "~".Equals(breadcrumbs[0].Property))
         {
@@ -310,10 +317,15 @@ public static class DatPropertyExtensions
             }
 
             type = ctx.FileType.Information;
+            filter = breadcrumbs[^1].Context.ToKeyFilter();
         }
         else if (!ctx.TryGetTargetDictionary(out startingDictionary, out type))
         {
             return false;
+        }
+        else
+        {
+            filter = ctx.GetKeyFilter();
         }
 
         if (!breadcrumbs.TryTraceRelativeTo(startingDictionary, type, out IAnyValueSourceNode? targetValue, out _, ref ctx)
@@ -336,6 +348,9 @@ public static class DatPropertyExtensions
         v.DiagnosticSink = diagnosticSink;
         v.ReferencedPropertySink = referencedPropertySink;
         v.MissingValueBehavior = missingValueBahvior;
+        v.KeyFilter = filter;
+        v.GetValue = false;
+        v.Value = null;
         fixed (FileEvaluationContext* evalCtxPtr = &ctx)
         fixed (TVisitor* visitorPtr = &visitor)
         {
@@ -345,6 +360,159 @@ public static class DatPropertyExtensions
         }
 
         return v.Visited;
+    }
+
+    /// <inheritdoc cref="VisitValue(DatProperty,ref FileEvaluationContext,PropertyBreadcrumbs, out IValue?,out IPropertySourceNode?,IDiagnosticSink?,IReferencedPropertySink?,TypeParserMissingValueBehavior)"/>
+    public static unsafe bool TryGetValue(
+        this DatProperty property,
+        ref FileEvaluationContext ctx,
+        [NotNullWhen(true)] out IValue? value,
+        out IPropertySourceNode? propertyNode,
+        IDiagnosticSink? diagnosticSink = null,
+        IReferencedPropertySink? referencedPropertySink = null,
+        TypeParserMissingValueBehavior missingValueBahvior = TypeParserMissingValueBehavior.ErrorIfValueOrPropertyNotProvided)
+    {
+        value = null;
+        propertyNode = null;
+
+        if (!property.Type.TryEvaluateType(out IType? propertyType, ref ctx))
+        {
+            return false;
+        }
+
+        if (!ctx.TryGetTargetDictionary(out IDictionarySourceNode? targetDictionary, out _))
+        {
+            return false;
+        }
+
+        if (!targetDictionary.TryGetProperty(property, ref ctx, out propertyNode))
+        {
+            value = property.DefaultValue;
+            propertyNode = null;
+            return value != null;
+        }
+
+        VisitValueTypeVisitor<SuccessVisitor> v;
+        v.Property = property;
+        v.ValueNode = propertyNode.Value;
+        v.ParentNode = propertyNode;
+        v.Visited = false;
+        v.DiagnosticSink = diagnosticSink;
+        v.ReferencedPropertySink = referencedPropertySink;
+        v.MissingValueBehavior = missingValueBahvior;
+        v.KeyFilter = ctx.GetKeyFilter();
+        v.GetValue = true;
+        v.Value = null;
+        v.Visitor = null;
+        fixed (FileEvaluationContext* evalCtxPtr = &ctx)
+        {
+            v.EvaluationContext = evalCtxPtr;
+            propertyType.Visit(ref v);
+        }
+
+        if (v.Value == null)
+        {
+            value = null;
+            return false;
+        }
+
+        value = v.Value;
+        return true;
+    }
+
+
+    /// <summary>
+    /// Invokes a visitor with the current value of the given property.
+    /// If the property is not included the <see cref="DatProperty.DefaultValue"/> will be visited instead.
+    /// If the property has no value the <see cref="DatProperty.IncludedDefaultValue"/> will be visited.
+    /// </summary>
+    /// <typeparam name="TVisitor">A visitor type to invoke <see cref="IValueVisitor.Accept{TValue}"/> on.</typeparam>
+    /// <param name="property">The property to evaluate.</param>
+    /// <param name="visitor">A visitor to invoke <see cref="IValueVisitor.Accept{TValue}"/> on.</param>
+    /// <param name="ctx">Workspace context for the operation.</param>
+    /// <param name="breadcrumbs">Breadcrumbs to the property within a file.</param>
+    /// <param name="diagnosticSink">Object which will receive any parse diagnostics.</param>
+    /// <param name="referencedPropertySink">Object which will receive any other referenced properties.</param>
+    /// <returns>Whether or not the visitor was invoked.</returns>
+    public static unsafe bool VisitValue(
+        this DatProperty property,
+        ref FileEvaluationContext ctx,
+        PropertyBreadcrumbs breadcrumbs,
+        [NotNullWhen(true)] out IValue? value,
+        out IPropertySourceNode? propertyNode,
+        IDiagnosticSink? diagnosticSink = null,
+        IReferencedPropertySink? referencedPropertySink = null,
+        TypeParserMissingValueBehavior missingValueBahvior = TypeParserMissingValueBehavior.ErrorIfValueOrPropertyNotProvided)
+    {
+        value = null;
+        propertyNode = null;
+
+        if (!property.Type.TryEvaluateType(out IType? propertyType, ref ctx))
+        {
+            return false;
+        }
+
+        IDictionarySourceNode? startingDictionary;
+        LegacyExpansionFilter filter;
+        DatTypeWithProperties? type;
+        if (breadcrumbs.Length > 0 && "~".Equals(breadcrumbs[0].Property))
+        {
+            if (!ctx.TryGetTargetRoot(out startingDictionary))
+            {
+                return false;
+            }
+
+            type = ctx.FileType.Information;
+            filter = breadcrumbs[^1].Context.ToKeyFilter();
+        }
+        else if (!ctx.TryGetTargetDictionary(out startingDictionary, out type))
+        {
+            return false;
+        }
+        else
+        {
+            filter = ctx.GetKeyFilter();
+        }
+
+        if (!breadcrumbs.TryTraceRelativeTo(startingDictionary, type, out IAnyValueSourceNode? targetValue, out _, ref ctx)
+            || targetValue is not IDictionarySourceNode targetDictionary)
+        {
+            return false;
+        }
+
+        if (!targetDictionary.TryGetProperty(property, ref ctx, out propertyNode))
+        {
+            value = property.DefaultValue;
+            propertyNode = null;
+            return value != null;
+        }
+
+        VisitValueTypeVisitor<SuccessVisitor> v;
+        v.Property = property;
+        v.ValueNode = propertyNode.Value;
+        v.ParentNode = propertyNode;
+        v.Visited = false;
+        v.DiagnosticSink = diagnosticSink;
+        v.ReferencedPropertySink = referencedPropertySink;
+        v.MissingValueBehavior = missingValueBahvior;
+        v.KeyFilter = filter;
+        v.GetValue = true;
+        v.Value = null;
+        v.Visitor = null;
+        fixed (FileEvaluationContext* evalCtxPtr = &ctx)
+        {
+            v.EvaluationContext = evalCtxPtr;
+            propertyType.Visit(ref v);
+        }
+
+        if (v.Value == null)
+        {
+            value = null;
+            return false;
+        }
+
+        value = v.Value;
+        return true;
     }
 
     private unsafe struct VisitValueTypeVisitor<TVisitor> : ITypeVisitor
@@ -361,7 +529,10 @@ public static class DatPropertyExtensions
         public IDiagnosticSink? DiagnosticSink;
         public IReferencedPropertySink? ReferencedPropertySink;
         public TypeParserMissingValueBehavior MissingValueBehavior;
+        public LegacyExpansionFilter KeyFilter;
         public bool Visited;
+        public bool GetValue;
+        public IValue? Value;
 
         public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
         {
@@ -369,7 +540,7 @@ public static class DatPropertyExtensions
             {
                 DiagnosticSink = DiagnosticSink,
                 ReferencedPropertySink = ReferencedPropertySink,
-                // todo: KeyFilter = EvaluationContext->PropertyContext.ToKeyFilter(),
+                KeyFilter = KeyFilter,
                 Property = Property,
                 ValueNode = ValueNode,
                 ParentNode = ParentNode,
@@ -379,7 +550,14 @@ public static class DatPropertyExtensions
 
             if (type.Parser.TryParse(ref parseArgs, ref Unsafe.AsRef<FileEvaluationContext>(EvaluationContext), out Optional<TValue> value))
             {
-                Visitor->Accept(value);
+                if (GetValue)
+                {
+                    Value = type.CreateValue(value);
+                }
+                else
+                {
+                    Visitor->Accept(value);
+                }
                 Visited = true;
             }
             else

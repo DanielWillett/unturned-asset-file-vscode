@@ -257,23 +257,23 @@ public static class DatTypeExtensions
                     }
                 }
 
-                ImmutableArray<DatProperty> allProperties = type.GetPropertyArray(SpecPropertyContext.Property);
-                foreach (DatProperty property in allProperties)
-                {
-                    if (!property.TryGetImportType(out DatTypeWithProperties? propType))
-                        continue;
-
-                    IEnumerator<PropertySearchCandidate> enumerator = propType.EnumeratePropertyCandidatesIntl(
-                        propertyNode, context, filter, args, step
-                    );
-
-                    while (enumerator.MoveNext())
-                    {
-                        yield return enumerator.Current;
-                    }
-
-                    enumerator.Dispose();
-                }
+                //ImmutableArray<DatProperty> allProperties = type.GetPropertyArray(SpecPropertyContext.Property);
+                //foreach (DatProperty property in allProperties)
+                //{
+                //    if (!property.TryGetImportType(out DatTypeWithProperties? propType))
+                //        continue;
+                //
+                //    IEnumerator<PropertySearchCandidate> enumerator = propType.EnumeratePropertyCandidatesIntl(
+                //        propertyNode, context, filter, args, step
+                //    );
+                //
+                //    while (enumerator.MoveNext())
+                //    {
+                //        yield return enumerator.Current;
+                //    }
+                //
+                //    enumerator.Dispose();
+                //}
             }
             else
             {
@@ -309,23 +309,23 @@ public static class DatTypeExtensions
                     yield return new PropertySearchCandidate(property, isKeyMatch: false);
                 }
 
-                ImmutableArray<DatProperty> allProperties = type.GetPropertyArray(SpecPropertyContext.Property);
-                foreach (DatProperty property in allProperties)
-                {
-                    if (!property.TryGetImportType(out DatTypeWithProperties? propType))
-                        continue;
-
-                    IEnumerator<PropertySearchCandidate> enumerator = propType.EnumeratePropertyCandidatesIntl(
-                        propertyNode, context, filter, args, step
-                    );
-
-                    while (enumerator.MoveNext())
-                    {
-                        yield return enumerator.Current;
-                    }
-
-                    enumerator.Dispose();
-                }
+                //ImmutableArray<DatProperty> allProperties = type.GetPropertyArray(SpecPropertyContext.Property);
+                //foreach (DatProperty property in allProperties)
+                //{
+                //    if (!property.TryGetImportType(out DatTypeWithProperties? propType))
+                //        continue;
+                //
+                //    IEnumerator<PropertySearchCandidate> enumerator = propType.EnumeratePropertyCandidatesIntl(
+                //        propertyNode, context, filter, args, step
+                //    );
+                //
+                //    while (enumerator.MoveNext())
+                //    {
+                //        yield return enumerator.Current;
+                //    }
+                //
+                //    enumerator.Dispose();
+                //}
             }
 
             if (step is < 0 or 2)

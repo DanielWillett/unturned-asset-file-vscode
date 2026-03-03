@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
@@ -26,6 +27,11 @@ public interface IDatSpecificationReadContext
     /// Allows readers to create loggers to log non-critical errors.
     /// </summary>
     ILoggerFactory LoggerFactory { get; }
+
+    /// <summary>
+    /// Invoked when types are being finalized, allowing callers to add other types.
+    /// </summary>
+    event FinalizingTypesHandler? OnFinalizingTypes;
 
     /// <summary>
     /// Finds an already read file type or reads it from the current context.

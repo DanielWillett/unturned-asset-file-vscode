@@ -8,7 +8,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 /// <summary>
 /// Converts the incoming value to <typeparamref name="TResult"/>.
 /// </summary>
-internal struct ConvertVisitor<TResult> : IGenericVisitor, IValueVisitor
+public struct ConvertVisitor<TResult> : IGenericVisitor, IValueVisitor
     where TResult : IEquatable<TResult>
 {
     public TResult? Result;

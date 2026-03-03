@@ -1,3 +1,4 @@
+using System;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -22,6 +23,11 @@ public struct FileEvaluationContext
     public readonly IParsingServices Services;
     public readonly ISourceFile File;
     public readonly AssetFileType FileType;
+    public readonly SpecPropertyContext PropertyContext;
+
+    private bool _hasDictCache;
+    private bool _hasAssetDict;
+    private bool _hasMetadataDict;
 
     public PropertyBreadcrumbs RootBreadcrumbs
     {
@@ -44,8 +50,37 @@ public struct FileEvaluationContext
             _targetDictionary = null;
             _targetDictionaryType = null;
             _rootPosition = value;
-            _targetRoot = null;
+            _targetDictionaryType = null;
             _targetDictionary = null;
+            _targetRoot = null;
+        }
+    }
+
+    /// <summary>
+    /// Whether or not <see cref="File"/> has an "Asset" dictionary.
+    /// </summary>
+    public bool FileHasAssetDictionary
+    {
+        get
+        {
+            if (!_hasDictCache)
+                CacheAssetDictionaries();
+
+            return _hasAssetDict;
+        }
+    }
+    /// <summary>
+    /// Whether or not <see cref="File"/> has a "Metadata" dictionary.
+    /// </summary>
+
+    public bool FileHasMetadataDictionary
+    {
+        get
+        {
+            if (!_hasDictCache)
+                CacheAssetDictionaries();
+
+            return _hasMetadataDict;
         }
     }
 
@@ -53,16 +88,78 @@ public struct FileEvaluationContext
     {
         Services = services;
         File = sourceFile;
-        FileType = sourceFile == null ? default : AssetFileType.FromFile(sourceFile, services.Database);
         _rootPosition = root;
         _rootBreadcrumbs = PropertyBreadcrumbs.Root;
+
+        if (sourceFile == null)
+            return;
+
+        FileType = AssetFileType.FromFile(sourceFile, services.Database);
+        PropertyContext = sourceFile.GetPropertyContext();
+    }
+
+    public void CreateSubContext([UnscopedRef] out FileEvaluationContext ctx, DatProperty property, int index = -1, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+    {
+        CreateSubContextIntl(out ctx, index, property, context, static (bc, property, index, context) => bc.Combine(property, index, context));
+    }
+
+    public void CreateRootContext([UnscopedRef] out FileEvaluationContext ctx)
+    {
+        if (_rootBreadcrumbs.IsRoot)
+        {
+            ctx = this;
+            return;
+        }
+
+        CreateSubContextIntl<DatProperty?>(out ctx, 0, null, PropertyResolutionContext.Unknown, static (_, _, _, _) => PropertyBreadcrumbs.Root);
+    }
+
+    public void CreateSubContext([UnscopedRef] out FileEvaluationContext ctx, string key, int index = -1, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+    {
+        CreateSubContextIntl(out ctx, index, key, context, static (bc, key, index, context) => bc.Combine(key, index, context));
+    }
+
+    public void CreateSubContext([UnscopedRef] out FileEvaluationContext ctx, int index, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+    {
+        CreateSubContextIntl<DatProperty?>(out ctx, index, null, context, static (bc, _, index, context) => bc.Combine(index, context));
+    }
+
+    public void CreateSubContext([UnscopedRef] out FileEvaluationContext ctx, ISourceNode node, PropertyResolutionContext context = PropertyResolutionContext.Modern)
+    {
+        CreateSubContextIntl(out ctx, 0, node, context, static (bc, node, _, context) => bc.Combine(node, context));
+    }
+
+    private void CreateSubContextIntl<TState>(
+        [UnscopedRef] out FileEvaluationContext ctx,
+        int index,
+        TState state,
+        PropertyResolutionContext context,
+        Func<PropertyBreadcrumbs, TState, int, PropertyResolutionContext, PropertyBreadcrumbs> transformer
+    )
+    {
+        ctx = new FileEvaluationContext(Services, File, RootPosition)
+        {
+            _targetRoot = _targetRoot,
+            _rootBreadcrumbs = transformer(_rootBreadcrumbs, state, index, context),
+            _hasAssetDict = _hasAssetDict,
+            _hasMetadataDict = _hasMetadataDict,
+            _hasDictCache = _hasDictCache
+        };
+    }
+
+    /// <summary>
+    /// Gets the key filter in effect for the current breadcrumbs.
+    /// </summary>
+    public LegacyExpansionFilter GetKeyFilter()
+    {
+        return _rootBreadcrumbs.Length == 0 ? LegacyExpansionFilter.Either : _rootBreadcrumbs[^1].Context.ToKeyFilter();
     }
 
     /// <summary>
     /// Gets the root dictionary being targeted for this evaluation context based on <see cref="RootPosition"/>.
     /// This will always be one of the root dictionaries (the root, <c>Asset</c>, or <c>Metadata</c>).
     /// </summary>
-    public readonly bool TryGetTargetRoot([NotNullWhen(true)] out IDictionarySourceNode? targetRoot)
+    public bool TryGetTargetRoot([NotNullWhen(true)] out IDictionarySourceNode? targetRoot)
     {
         IDictionarySourceNode? cachedTargetRoot = _targetRoot;
         if (cachedTargetRoot != null)
@@ -103,6 +200,7 @@ public struct FileEvaluationContext
         }
 
         targetRoot = rootDictionary;
+        _targetRoot = rootDictionary;
         return true;
     }
 
@@ -160,6 +258,17 @@ public struct FileEvaluationContext
         return true;
     }
 
+    private void CacheAssetDictionaries()
+    {
+        if (File is IAssetSourceFile a)
+        {
+            _hasAssetDict = a.GetAssetDataDictionary() != null;
+            _hasMetadataDict = a.GetMetadataDictionary() != null;
+        }
+
+        _hasDictCache = true;
+    }
+
     /// <summary>
     /// Gets the target node to read the given property.
     /// </summary>
@@ -172,6 +281,17 @@ public struct FileEvaluationContext
         {
             propertyNode = CachedPropertyNode;
             return true;
+        }
+
+        if (!_hasDictCache)
+        {
+            CacheAssetDictionaries();
+        }
+
+        if (!property.AssetPosition.IsValidPosition(RootPosition, _hasAssetDict, _hasMetadataDict))
+        {
+            propertyNode = null;
+            return false;
         }
 
         if (!TryGetTargetDictionary(out IDictionarySourceNode? dictionary, out _))

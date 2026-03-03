@@ -7,6 +7,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using Microsoft.Extensions.Logging;
 using System.Collections.Immutable;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace UnturnedAssetSpecTests.Nodes;
@@ -27,7 +28,8 @@ public class PropertyBreadcrumbsTests
             loggerFactory,
             new StaticSourceFileWorkspaceEnvironment(false, database),
             database.UnturnedInstallDirectory,
-            new InstallationEnvironment(database)
+            new InstallationEnvironment(database),
+            NilProjectFileProvider.Instance
         );
 
         await database.InitializeAsync();
@@ -263,11 +265,15 @@ public class PropertyBreadcrumbsTests
         );
 
         PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config.A", out string propertyName);
+
         Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(1));
         Assert.That(propertyName, Is.EqualTo("A"));
         parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
 
-        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
+        PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config");
+        PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1);
+
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs, combinedBreadcrumbsString, combinedBreadcrumbsNode ];
 
         foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
         {
@@ -359,7 +365,10 @@ public class PropertyBreadcrumbsTests
         Assert.That(propertyName, Is.EqualTo("A"));
         parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
 
-        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
+        PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config").Combine("NestedConfig");
+        PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1).Combine(sn2);
+
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs, combinedBreadcrumbsString, combinedBreadcrumbsNode ];
 
         foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
         {
@@ -486,7 +495,10 @@ public class PropertyBreadcrumbsTests
         Assert.That(propertyName, Is.EqualTo("A"));
         parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
 
-        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
+        PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config").Combine("NestedConfig").Combine("List", index: 1).Combine("Entry2");
+        PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1).Combine(sn2).Combine(sn4).Combine(sn5);
+
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs, combinedBreadcrumbsString, combinedBreadcrumbsNode ];
 
         foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
         {
@@ -582,7 +594,10 @@ public class PropertyBreadcrumbsTests
         Assert.That(propertyName, Is.EqualTo("A"));
         parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
 
-        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
+        PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config", index: 1).Combine(index: 1);
+        PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1).Combine(sn2).Combine(sn3);
+
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs, combinedBreadcrumbsString, combinedBreadcrumbsNode ];
 
         foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
         {
@@ -684,7 +699,10 @@ public class PropertyBreadcrumbsTests
         Assert.That(propertyName, Is.EqualTo("A"));
         parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
 
-        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs ];
+        PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config", index: 1).Combine(index: 0).Combine(index: 0);
+        PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1).Combine(sn2).Combine(sn3).Combine(sn4!);
+
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs, combinedBreadcrumbsString, combinedBreadcrumbsNode ];
 
         foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
         {

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
-internal struct ContainedVisitor<TSuperset> : IGenericVisitor, IEquatableArrayVisitor
+public struct ContainedVisitor<TSuperset> : IGenericVisitor, IEquatableArrayVisitor
     where TSuperset : IEquatable<TSuperset>
 {
     public TSuperset? Superset;

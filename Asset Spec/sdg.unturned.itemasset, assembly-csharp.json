@@ -1856,7 +1856,8 @@
                     "DefaultValue": [ ],
                     "Variable": "RequiresStaticTags",
                     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#requiresstatictags-list-of-asset-pointer-to-doc-assets-tag",
-                    "Description": "Similar to @RequiresNearbyCraftingTags, but only checked once during level startup. Can test for Level Assets Tags."
+                    "Description": "Similar to @RequiresNearbyCraftingTags, but only checked once during level startup. Can test for LevelAsset Tags.",
+                    "Version": "3.25.10.0"
                 },
                 {
                     "Key": "CategoryTag",

@@ -17,10 +17,10 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
     private readonly bool _isCaseInsensitive;
 
     public static readonly QualifiedType None = default;
-    public static readonly QualifiedType AssetBaseType = new QualifiedType(TypeHierarchy.AssetBaseType);
-    public static readonly QualifiedType ObjectType = new QualifiedType(TypeHierarchy.ObjectType);
-    public static readonly QualifiedType UseableBaseType = new QualifiedType(TypeHierarchy.UseableBaseType);
-    internal static readonly QualifiedType ItemAssetType = new QualifiedType(TypeHierarchy.ItemAssetType);
+    public static readonly QualifiedType AssetBaseType = new QualifiedType(TypeHierarchy.AssetBaseType, true);
+    public static readonly QualifiedType ObjectType = new QualifiedType(TypeHierarchy.ObjectType, true);
+    public static readonly QualifiedType UseableBaseType = new QualifiedType(TypeHierarchy.UseableBaseType, true);
+    internal static readonly QualifiedType ItemAssetType = new QualifiedType(TypeHierarchy.ItemAssetType, true);
 
 #nullable disable
     /// <summary>

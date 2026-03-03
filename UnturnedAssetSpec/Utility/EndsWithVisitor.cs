@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
-internal struct EndsWithVisitor<TSet> : IGenericVisitor, IEquatableArrayVisitor
+public struct EndsWithVisitor<TSet> : IGenericVisitor, IEquatableArrayVisitor
     where TSet : IEquatable<TSet>
 {
     public TSet? Set;

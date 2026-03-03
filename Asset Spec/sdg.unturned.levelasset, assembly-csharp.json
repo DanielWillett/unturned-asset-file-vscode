@@ -265,6 +265,32 @@
             "Description": "Describes the prioritization of per-navmesh and per-table Zombie Difficulty Assets.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
             "Version": "3.25.10.0"
+        },
+        {
+            "Key": "Allow_Building_In_Safezone_In_Singleplayer",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Variable": "ShouldAllowBuildingInSafezonesInSingleplayer",
+            "Description": "Whether or not to bypass SafezoneNode's no-buildables mode in singleplayer.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
+            "Version": "3.25.10.0"
+        },
+        {
+            "Key": "Tags",
+            "Type": 
+            {
+                "Type": "List",
+                "ElementType":
+                {
+                    "Type": "AssetReference",
+                    "AssetType": "SDG.Unturned.TagAsset, Assembly-CSharp"
+                }
+            },
+            "DefaultValue": [ ],
+            "Variable": "Tags",
+            "Description": "Blueprints can test for these tags as an alternative to Map name check.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
+            "Version": "3.25.10.0"
         }
     ],
     "Types":

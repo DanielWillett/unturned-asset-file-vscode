@@ -239,30 +239,59 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
         bool failure = false;
         ImmutableArray<DatObjectPropertyValue>.Builder properties = ImmutableArray.CreateBuilder<DatObjectPropertyValue>();
         bool shouldIgnoreError = args.ShouldIgnoreFailureDiagnostic;
+
+        FileEvaluationContext context;
+        switch (dictionary.Parent)
+        {
+            case IPropertySourceNode property:
+                if (args.Property != null)
+                    ctx.CreateSubContext(out context, args.Property);
+                else
+                    ctx.CreateSubContext(out context, property);
+                break;
+
+            case IListSourceNode list:
+                if (args.Property != null)
+                    ctx.CreateSubContext(out context, args.Property, dictionary.Index);
+                else
+                    ctx.CreateSubContext(out context, list);
+                break;
+
+            // The default case will only happen for the root dictionary.
+            // I dont think this will ever happen but should be ok if it does.
+
+            default:
+                ctx.CreateRootContext(out context);
+                break;
+        }
+
         foreach (DatProperty property in Properties)
         {
-            if (!dictionary.TryGetProperty(property, ref ctx, out IPropertySourceNode? propertyNode, LegacyExpansionFilter.Modern))
+            if (!property.TryGetValue(
+                    ref context,
+                    out IValue? propertyValue,
+                    out IPropertySourceNode? node,
+                    args.DiagnosticSink,
+                    args.ReferencedPropertySink,
+                    TypeParserMissingValueBehavior.FallbackToDefaultValue
+                )
+            )
             {
-                // missing required property
-                if (property.Required != null && property.Required.TryEvaluateValue(out Optional<bool> isRequired, ref ctx) && isRequired.Value)
+                if (!dictionary.TryGetProperty(property, ref ctx, out _, LegacyExpansionFilter.Modern))
                 {
-                    args.DiagnosticSink?.UNT2014_Object(ref args, property.Key, ctx.RootBreadcrumbs.ToString(false));
-                    failure = true;
-                    shouldIgnoreError = true;
+                    // missing required property
+                    if (property.Required != null && property.Required.TryEvaluateValue(out Optional<bool> isRequired, ref ctx) && isRequired.Value)
+                    {
+                        args.DiagnosticSink?.UNT2014_Object(ref args, property.Key, ctx.RootBreadcrumbs.ToString(false));
+                        failure = true;
+                        shouldIgnoreError = true;
+                    }
                 }
 
                 continue;
             }
 
-            if (!property.Type.TryEvaluateType(out IType? propertyType, ref ctx))
-            {
-                args.DiagnosticSink?.UNT2004_CanNotDetermineType(ref args, property.Key);
-                failure = true;
-                shouldIgnoreError = true;
-                continue;
-            }
-
-            //propertyType.Parser
+            properties.Add(new DatObjectPropertyValue(propertyValue, property, node?.Value));
         }
 
         args.ShouldIgnoreFailureDiagnostic = shouldIgnoreError;

@@ -12,7 +12,7 @@ import
     Range
 } from 'vscode';
 
-import { getClient } from '../extension';
+import { getClient, getOutputChannel, getIsReady } from '../extension';
 import { isDatFile } from '../util/path';
 
 import { DiscoverAssetProperties } from '../jsonrpc/asset-property';
@@ -42,15 +42,25 @@ export class AssetPropertiesViewProvider implements TreeDataProvider<AssetProper
 
             this.propertyValues = [];
         }
+        else if (!getIsReady())
+        {
+            if (this.propertyValues.length === 0)
+            {
+                return false;
+            }
+
+            this.propertyValues = [];
+        }
         else
         {
             const result = await getClient().sendRequest(DiscoverAssetProperties, { document: txtDoc.document.uri.toString() });
+            getOutputChannel().info(JSON.stringify(result, null, "  "));
             if (this.propertyValues.length === result.length && result.every((prop, i) => this.propertyValues[i].property === prop))
             {
                 return false;
             }
 
-            this.propertyValues = result.map(prop => new AssetPropertyViewItem(prop));
+            this.propertyValues = result.map(prop => new AssetPropertyViewItem(prop, null));
         }
 
         this._onDidChangeTreeData.fire();
@@ -66,13 +76,18 @@ export class AssetPropertiesViewProvider implements TreeDataProvider<AssetProper
 
     getChildren(element?: AssetPropertyViewItem | undefined): ProviderResult<AssetPropertyViewItem[]>
     {
-        return element === undefined ? this.propertyValues : [];
+        if (!element)
+        {
+            return this.propertyValues;
+        }
+
+        return element.getChildren();
     }
 
 
     getParent?(element: AssetPropertyViewItem): ProviderResult<AssetPropertyViewItem>
     {
-        return null;
+        return element.parent;
     }
 
 
@@ -87,16 +102,43 @@ class AssetPropertyViewItem extends TreeItem
 {
 
     property: AssetProperty;
+    children: AssetPropertyViewItem[] | null;
+    parent: AssetPropertyViewItem | null;
 
-    constructor(property: AssetProperty)
+    constructor(property: AssetProperty, parent: AssetPropertyViewItem | null)
     {
         super(getName(property), TreeItemCollapsibleState.None);
         this.property = property;
-        this.iconPath = new ThemeIcon(property.range === undefined ? "symbol-constant" : "symbol-property");
+        this.collapsibleState = property.children ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None;
+        this.iconPath = getValueIcon(property);
+        this.children = null;
+        this.parent = parent;
+    }
+
+    getChildren(): AssetPropertyViewItem[]
+    {
+        if (!this.property.children)
+        {
+            return [];
+        }
+
+        if (this.children)
+        {
+            return this.children;
+        }
+
+        this.children = this.property.children.map(prop => new AssetPropertyViewItem(prop, this));
+        return this.children;
     }
 
     resolve(): void
     {
+        if (this.property.children)
+        {
+            this.command = undefined;
+            return;
+        }
+
         try
         {
             this.tooltip = this.property.markdown ?? this.property.description ?? this.property.key;
@@ -129,10 +171,15 @@ class AssetPropertyViewItem extends TreeItem
 
 function getName(property: AssetProperty): string
 {
+    let key = property.key;
+    if (property.ordinal)
+    {
+        key = `[${property.ordinal - 1}]`;
+    }
 
     if (property.value === null)
     {
-        return `${property.key} = [no value]`;
+        return `${key} = [no value]`;
     }
 
     switch (typeof (property.value))
@@ -140,15 +187,61 @@ function getName(property: AssetProperty): string
         case "undefined":
         case "function":
         case "symbol":
-            return `${property.key} = [no value]`;
+            return `${key}`;
+
+        case "string":
+            return `${key} = \"${property.value.toString()}\"`;
 
         case "bigint":
         case "number":
         case "boolean":
-        case "string":
-            return `${property.key} = \"${property.value.toString()}\"`;
+            return `${key} = ${property.value.toString()}`;
 
         default:
-            return `${property.key} = ${JSON.stringify(property.value)}`;
+            return `${key} = ${JSON.stringify(property.value)}`;
+    }
+}
+
+function getValueIcon(property: AssetProperty): ThemeIcon
+{
+    if (!property.range)
+    {
+        return new ThemeIcon("add");
+    }
+    else if (property.children)
+    {
+        if (property.children.length === 0 || property.children[0].ordinal)
+        {
+            return new ThemeIcon("symbol-array");
+        }
+        else
+        {
+            return new ThemeIcon("symbol-object");
+        }
+    }
+
+    if (property.value === null)
+    {
+        return new ThemeIcon("symbol-null");
+    }
+
+    switch (typeof (property.value))
+    {
+        case "undefined":
+        case "function":
+        case "symbol":
+            return new ThemeIcon("symbol-null");
+
+        case "string":
+            return new ThemeIcon("symbol-string");
+
+        case "bigint":
+        case "number":
+            return new ThemeIcon("symbol-numeric");
+        case "boolean":
+            return new ThemeIcon("symbol-boolean");
+
+        default:
+            return new ThemeIcon("symbol-object");
     }
 }

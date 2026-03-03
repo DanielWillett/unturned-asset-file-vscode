@@ -8,6 +8,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
 namespace UnturnedAssetSpecTests.Parsers;
 
@@ -124,7 +125,8 @@ public class ParserTest<T> : IDisposable, IDiagnosticSink, IReferencedPropertySi
             loggerFactory,
             new StaticSourceFileWorkspaceEnvironment(useCache: true, database, installationEnvironment: env),
             database.UnturnedInstallDirectory,
-            env
+            env,
+            NilProjectFileProvider.Instance
         );
 
         _diagnostics = new List<DatDiagnosticMessage>();

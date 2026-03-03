@@ -28,8 +28,10 @@ public sealed class Orderfile : DatFileType
     /// </summary>
     internal const string? OrderfileDocs = null; // TODO
 
+    public const string TypeId = "DanielWillett.UnturnedDataFileLspServer.Data.Types.Orderfile, UnturnedAssetSpec";
+
     internal Orderfile(IAssetSpecDatabase database)
-        : base(new QualifiedType("DanielWillett.UnturnedDataFileLspServer.Data.Types.Orderfile, UnturnedAssetSpec", isCaseInsensitive: true), null, default)
+        : base(new QualifiedType(TypeId, isCaseInsensitive: true), null, default)
     {
         DisplayNameIntl = Resources.Type_Name_Orderfile;
         Docs = OrderfileDocs;
@@ -84,7 +86,7 @@ public sealed class Orderfile : DatFileType
     {
         QualifiedType typeName = type.TypeName;
 
-        if (processed.Contains(typeName))
+        if (!processed.Add(typeName))
             return;
 
         if (type.BaseType != null)
@@ -121,7 +123,7 @@ public sealed class Orderfile : DatFileType
         if (type is DatTypeWithProperties propertyType)
         {
             OrderfileListElementType elementType = new OrderfileListElementType(database, propertyType, false);
-            string key = PropertyReference.CreateContextSpecifier(SpecPropertyContext.Localization) + typeName.Type;
+            string key = typeName.Type;
             DatProperty property = DatProperty.Create(key, ListType.Create(elementType), this, default, SpecPropertyContext.Property);
             if (isFile)
             {

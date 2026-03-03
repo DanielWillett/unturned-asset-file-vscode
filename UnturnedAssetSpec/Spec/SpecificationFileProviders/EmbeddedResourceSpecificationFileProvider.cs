@@ -15,7 +15,7 @@ public sealed class EmbeddedResourceSpecificationFileProvider : ISpecificationFi
 {
     private readonly ILogger<EmbeddedResourceSpecificationFileProvider> _logger;
 
-    internal const string EmbeddedResourceLocation = "DanielWillett.UnturnedDataFileLspServer.Data..Asset_Spec.{0}.json";
+    internal const string EmbeddedResourceLocation = "DanielWillett.UnturnedDataFileLspServer.Data..Asset_Spec.{0}";
 
     public int Priority => 0;
 
@@ -28,16 +28,27 @@ public sealed class EmbeddedResourceSpecificationFileProvider : ISpecificationFi
 
     public Task<bool> ReadAssetAsync<TState>(QualifiedType type, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token)
     {
-        string resourceLocation = string.Format(EmbeddedResourceLocation, type.Type.ToLowerInvariant());
+        string resourceLocation = string.Format($"{EmbeddedResourceLocation}.json", type.Type.ToLowerInvariant());
         return ReadResourceAsync(resourceLocation, state, action, token);
     }
 
     public Task<bool> ReadKnownFileAsync<TState>(KnownConfigurationFile file, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default)
     {
-        if (file != KnownConfigurationFile.Assets)
-            return Task.FromResult(false);
+        string resourceLocation;
+        switch (file)
+        {
+            case KnownConfigurationFile.Assets:
+                resourceLocation = string.Format(EmbeddedResourceLocation, "Assets.json");
+                break;
 
-        string resourceLocation = string.Format(EmbeddedResourceLocation, "Assets");
+            case KnownConfigurationFile.Orderfile:
+                resourceLocation = string.Format(EmbeddedResourceLocation, "Orderfile.udatproj");
+                break;
+
+            default:
+                return Task.FromResult(false);
+        }
+        
         return ReadResourceAsync(resourceLocation, state, action, token);
     }
 

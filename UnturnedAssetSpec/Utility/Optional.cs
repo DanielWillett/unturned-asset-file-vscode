@@ -108,4 +108,12 @@ public static class OptionalExtensions
         /// </summary>
         public T? AsNullable() => optional.HasValue ? optional.Value : null;
     }
+
+    extension<T>(T? nullable) where T : struct, IEquatable<T>
+    {
+        /// <summary>
+        /// Gets the value of this nullable value type as an <see cref="Optional{T}"/>.
+        /// </summary>
+        public Optional<T> AsOptional() => nullable.HasValue ? new Optional<T>(nullable.Value) : Optional<T>.Null;
+    }
 }

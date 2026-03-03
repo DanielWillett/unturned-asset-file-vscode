@@ -63,7 +63,7 @@ internal class DiagnosticsManager : IDisposable
         _fileSync.FileRemoved += OnFileClosed;
         _fileSync.ContentUpdated += OnContentUpdated;
 
-        foreach (WorkspaceFolderTracker folder in _workspaceEnvironment.WorkspaceFolders)
+        foreach (WorkspaceFolderTracker folder in _workspaceEnvironment.WorkspaceFolders.Values)
         {
             OnWorkspaceFolderAdded(folder);
         }

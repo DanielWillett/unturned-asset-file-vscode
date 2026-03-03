@@ -242,9 +242,9 @@ public class AssetInformation
         if (!type.IsCaseInsensitive)
             type = type.CaseInsensitive;
 
-        return ParentTypes.TryGetValue(type, out InverseTypeHierarchy? typeHierarchy)
+        return ParentTypes.TryGetValue(type, out InverseTypeHierarchy typeHierarchy)
             ? typeHierarchy
-            : new InverseTypeHierarchy(new TypeHierarchy { Type = type }, Array.Empty<QualifiedType>(), false);
+            : new InverseTypeHierarchy(type);
     }
 
     private Dictionary<QualifiedType, InverseTypeHierarchy> RegenParentTypes()
@@ -271,7 +271,7 @@ public class AssetInformation
             return;
 
         arr ??= typeStack.ToArray();
-        parentTypes[hierarchy.Type] = new InverseTypeHierarchy(hierarchy, arr, true);
+        parentTypes[hierarchy.Type] = new InverseTypeHierarchy(hierarchy, arr);
         if (hierarchy.ChildTypes is not { Count: > 0 })
             return;
 
@@ -372,22 +372,25 @@ public class TypeHierarchy
 }
 
 [DebuggerDisplay("{Type.GetTypeName()}")]
-public class InverseTypeHierarchy
+public readonly struct InverseTypeHierarchy
 {
-    public TypeHierarchy Hierarchy { get; }
+    public TypeHierarchy? Hierarchy { get; }
     public QualifiedType Type { get; }
 
     // [0] = direct parent, [^1] = lowest
     public QualifiedType[] ParentTypes { get; }
-    public bool IsValid { get; }
-    public bool IsAbstract { get; }
-    public InverseTypeHierarchy(TypeHierarchy hierarchy, QualifiedType[] parentTypes, bool isValid)
+    public bool IsValid => Hierarchy != null;
+    public bool IsAbstract => Hierarchy is { IsAbstract: true };
+    public InverseTypeHierarchy(TypeHierarchy hierarchy, QualifiedType[] parentTypes)
     {
         Hierarchy = hierarchy;
         Type = hierarchy.Type;
-        IsAbstract = hierarchy.IsAbstract;
         ParentTypes = parentTypes;
-        IsValid = isValid;
+    }
+    public InverseTypeHierarchy(QualifiedType type)
+    {
+        Type = type;
+        ParentTypes = Array.Empty<QualifiedType>();
     }
 }
 

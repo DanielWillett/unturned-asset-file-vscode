@@ -9,5 +9,11 @@ export function isDatFile(uri: vscode.Uri | undefined)
     }
 
     const path = uri.path.toLowerCase();
-    return path.endsWith(".dat") || path.endsWith(".asset");
+
+    if (path.endsWith(".txt"))
+    {
+        return uri.path.endsWith("Config_Easy.txt") || uri.path.endsWith("Config_Normal.txt") || uri.path.endsWith("Config_Hard.txt") || uri.path.endsWith("Config.txt");
+    }
+
+    return path.endsWith(".dat") || path.endsWith(".asset") || path.endsWith(".udat") || path.endsWith(".udatproj");
 }

@@ -324,6 +324,19 @@ public static class SourceNodeExtensions
             rootDictionary = null;
             return RootDictionaryPosition.Other;
         }
+
+        /// <summary>
+        /// Gets the type of properties that are present in this node's file.
+        /// </summary>
+        /// <returns>Either <see cref="SpecPropertyContext.Property"/> or <see cref="SpecPropertyContext.Localization"/>.</returns>
+        public SpecPropertyContext GetPropertyContext()
+        {
+            return root.File switch
+            {
+                ILocalizationSourceFile => SpecPropertyContext.Localization,
+                _                       => SpecPropertyContext.Property
+            };
+        }
     }
 
     extension(IAnyChildrenSourceNode root)

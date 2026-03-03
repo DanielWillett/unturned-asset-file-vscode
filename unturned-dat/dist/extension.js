@@ -369,7 +369,7 @@ var require_messages = __commonJS({
       }
     };
     exports2.RequestType9 = RequestType9;
-    var NotificationType = class extends AbstractMessageSignature {
+    var NotificationType2 = class extends AbstractMessageSignature {
       _parameterStructures;
       /**
        * Clients must not use this property. It is here to ensure correct typing.
@@ -383,7 +383,7 @@ var require_messages = __commonJS({
         return this._parameterStructures;
       }
     };
-    exports2.NotificationType = NotificationType;
+    exports2.NotificationType = NotificationType2;
     var NotificationType0 = class extends AbstractMessageSignature {
       /**
        * Clients must not use this property. It is here to ensure correct typing.
@@ -409,7 +409,7 @@ var require_messages = __commonJS({
       }
     };
     exports2.NotificationType1 = NotificationType1;
-    var NotificationType2 = class extends AbstractMessageSignature {
+    var NotificationType22 = class extends AbstractMessageSignature {
       /**
        * Clients must not use this property. It is here to ensure correct typing.
        */
@@ -418,7 +418,7 @@ var require_messages = __commonJS({
         super(method, 2);
       }
     };
-    exports2.NotificationType2 = NotificationType2;
+    exports2.NotificationType2 = NotificationType22;
     var NotificationType3 = class extends AbstractMessageSignature {
       /**
        * Clients must not use this property. It is here to ensure correct typing.
@@ -22203,6 +22203,8 @@ __export(extension_exports, {
   fileMatcher: () => fileMatcher,
   getAssetPropertiesViewProvider: () => getAssetPropertiesViewProvider,
   getClient: () => getClient,
+  getIsReady: () => getIsReady,
+  getOutputChannel: () => getOutputChannel,
   languageId: () => languageId
 });
 module.exports = __toCommonJS(extension_exports);
@@ -22221,7 +22223,10 @@ function isDatFile(uri) {
     return false;
   }
   const path = uri.path.toLowerCase();
-  return path.endsWith(".dat") || path.endsWith(".asset");
+  if (path.endsWith(".txt")) {
+    return uri.path.endsWith("Config_Easy.txt") || uri.path.endsWith("Config_Normal.txt") || uri.path.endsWith("Config_Hard.txt") || uri.path.endsWith("Config.txt");
+  }
+  return path.endsWith(".dat") || path.endsWith(".asset") || path.endsWith(".udat") || path.endsWith(".udatproj");
 }
 
 // src/jsonrpc/asset-property.ts
@@ -22240,12 +22245,18 @@ var AssetPropertiesViewProvider = class {
         return false;
       }
       this.propertyValues = [];
+    } else if (!getIsReady()) {
+      if (this.propertyValues.length === 0) {
+        return false;
+      }
+      this.propertyValues = [];
     } else {
       const result = await getClient().sendRequest(DiscoverAssetProperties, { document: txtDoc.document.uri.toString() });
+      getOutputChannel().info(JSON.stringify(result, null, "  "));
       if (this.propertyValues.length === result.length && result.every((prop, i) => this.propertyValues[i].property === prop)) {
         return false;
       }
-      this.propertyValues = result.map((prop) => new AssetPropertyViewItem(prop));
+      this.propertyValues = result.map((prop) => new AssetPropertyViewItem(prop, null));
     }
     this._onDidChangeTreeData.fire();
     return true;
@@ -22254,24 +22265,46 @@ var AssetPropertiesViewProvider = class {
     return element;
   }
   getChildren(element) {
-    return element === void 0 ? this.propertyValues : [];
+    if (!element) {
+      return this.propertyValues;
+    }
+    return element.getChildren();
   }
   getParent(element) {
-    return null;
+    return element.parent;
   }
   resolveTreeItem(item, element, token) {
     element.resolve();
     return item;
   }
 };
-var AssetPropertyViewItem = class extends import_vscode.TreeItem {
+var AssetPropertyViewItem = class _AssetPropertyViewItem extends import_vscode.TreeItem {
   property;
-  constructor(property) {
+  children;
+  parent;
+  constructor(property, parent) {
     super(getName(property), import_vscode.TreeItemCollapsibleState.None);
     this.property = property;
-    this.iconPath = new import_vscode.ThemeIcon(property.range === void 0 ? "symbol-constant" : "symbol-property");
+    this.collapsibleState = property.children ? import_vscode.TreeItemCollapsibleState.Collapsed : import_vscode.TreeItemCollapsibleState.None;
+    this.iconPath = getValueIcon(property);
+    this.children = null;
+    this.parent = parent;
+  }
+  getChildren() {
+    if (!this.property.children) {
+      return [];
+    }
+    if (this.children) {
+      return this.children;
+    }
+    this.children = this.property.children.map((prop) => new _AssetPropertyViewItem(prop, this));
+    return this.children;
   }
   resolve() {
+    if (this.property.children) {
+      this.command = void 0;
+      return;
+    }
     try {
       this.tooltip = this.property.markdown ?? this.property.description ?? this.property.key;
       if (this.property.range?.start !== void 0) {
@@ -22295,21 +22328,55 @@ var AssetPropertyViewItem = class extends import_vscode.TreeItem {
   }
 };
 function getName(property) {
+  let key = property.key;
+  if (property.ordinal) {
+    key = `[${property.ordinal - 1}]`;
+  }
   if (property.value === null) {
-    return `${property.key} = [no value]`;
+    return `${key} = [no value]`;
   }
   switch (typeof property.value) {
     case "undefined":
     case "function":
     case "symbol":
-      return `${property.key} = [no value]`;
+      return `${key}`;
+    case "string":
+      return `${key} = "${property.value.toString()}"`;
     case "bigint":
     case "number":
     case "boolean":
-    case "string":
-      return `${property.key} = "${property.value.toString()}"`;
+      return `${key} = ${property.value.toString()}`;
     default:
-      return `${property.key} = ${JSON.stringify(property.value)}`;
+      return `${key} = ${JSON.stringify(property.value)}`;
+  }
+}
+function getValueIcon(property) {
+  if (!property.range) {
+    return new import_vscode.ThemeIcon("add");
+  } else if (property.children) {
+    if (property.children.length === 0 || property.children[0].ordinal) {
+      return new import_vscode.ThemeIcon("symbol-array");
+    } else {
+      return new import_vscode.ThemeIcon("symbol-object");
+    }
+  }
+  if (property.value === null) {
+    return new import_vscode.ThemeIcon("symbol-null");
+  }
+  switch (typeof property.value) {
+    case "undefined":
+    case "function":
+    case "symbol":
+      return new import_vscode.ThemeIcon("symbol-null");
+    case "string":
+      return new import_vscode.ThemeIcon("symbol-string");
+    case "bigint":
+    case "number":
+      return new import_vscode.ThemeIcon("symbol-numeric");
+    case "boolean":
+      return new import_vscode.ThemeIcon("symbol-boolean");
+    default:
+      return new import_vscode.ThemeIcon("symbol-object");
   }
 }
 
@@ -22385,20 +22452,34 @@ async function handleGetDocumentText(e) {
   }
 }
 
+// src/jsonrpc/ready.ts
+var import_vscode_languageclient4 = __toESM(require_api3());
+var Ready = new import_vscode_languageclient4.NotificationType("unturnedDataFile/ready");
+
 // src/extension.ts
 var languageId = "unturned-dat";
 var configSection = "unturned-data-file-lsp";
-var fileMatcher = "{**/*.dat,**/*.asset,**/Config_*Difficulty.txt,**/Config.txt}";
+var fileMatcher = "{**/*.dat,**/*.asset,**/*.udatproj,**/Config_*Difficulty.txt,**/Config.txt}";
 var dotnetVersion = 10;
 var client;
 var output;
+var isReady;
 var registrations = [];
 var assetPropertiesViewProvider;
 function getClient() {
-  if (client === void 0) {
+  if (!client) {
     throw new Error("Uninitialized.");
   }
   return client;
+}
+function getOutputChannel() {
+  if (!output) {
+    throw new Error("Uninitialized.");
+  }
+  return output;
+}
+function getIsReady() {
+  return isReady;
 }
 function getAssetPropertiesViewProvider() {
   if (assetPropertiesViewProvider === void 0) {
@@ -22423,8 +22504,6 @@ async function activate(context) {
   const relativeFilePath = context.asAbsolutePath((0, import_path2.join)("..", "LspServer", "bin", "Debug", "net10.0"));
   output = import_vscode5.window.createOutputChannel("unturned-dat", { log: true });
   registrations.push(output);
-  let traceOutput = import_vscode5.window.createOutputChannel("unturned-dat-trace", { log: true });
-  registrations.push(traceOutput);
   output.info("Unturned Data File (Full) by DanielWillett loading...");
   output.info("Repository: https://github.com/DanielWillett/unturned-asset-file-vscode");
   output.info("Licensed under the GPL-3.0-or-later.");
@@ -22513,7 +22592,6 @@ async function activate(context) {
       },
       stdioEncoding: "utf8",
       outputChannel: output,
-      traceOutputChannel: traceOutput,
       markdown: {
         isTrusted: true,
         supportHtml: true
@@ -22543,6 +22621,10 @@ async function activate(context) {
         return;
       }
       output?.info("Language server is running.");
+    }));
+    registrations.push(client.onNotification(Ready, async (event) => {
+      output?.info("Language server is ready.");
+      isReady = true;
       await import_vscode5.commands.executeCommand("unturnedDataFile.assetProperties.refreshAssetProperties");
     }));
     await client.start();
@@ -22560,6 +22642,7 @@ async function deactivate() {
   if (assetPropertiesViewProvider) {
     assetPropertiesViewProvider = void 0;
   }
+  isReady = false;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
@@ -22570,6 +22653,8 @@ async function deactivate() {
   fileMatcher,
   getAssetPropertiesViewProvider,
   getClient,
+  getIsReady,
+  getOutputChannel,
   languageId
 });
 //# sourceMappingURL=extension.js.map

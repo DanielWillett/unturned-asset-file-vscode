@@ -8,21 +8,34 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 internal class LspInstallationEnvironment : InstallationEnvironment
 {
     private readonly ILogger<LspInstallationEnvironment> _logger;
+    private readonly InstallDirUtility _installDir;
     private readonly LspWorkspaceEnvironment _workspace;
+    private bool _hasEvents;
 
-    public LspInstallationEnvironment(IAssetSpecDatabase database, ILogger<LspInstallationEnvironment> logger, LspWorkspaceEnvironment workspace) : base(database)
+    public LspInstallationEnvironment(
+        InstallDirUtility installDir,
+        IAssetSpecDatabase database,
+        ILogger<LspInstallationEnvironment> logger,
+        LspWorkspaceEnvironment workspace)
+        : base(database)
     {
+        _installDir = installDir;
         _logger = logger;
         _workspace = workspace;
+    }
 
-        if (database.UnturnedInstallDirectory.TryGetInstallDirectory(out GameInstallDir installDir))
+    internal void Init()
+    {
+        if (_installDir.TryGetInstallDirectory(out GameInstallDir installDir))
         {
             this.AddUnturnedSearchableDirectories(installDir);
         }
 
+        _hasEvents = true;
         _workspace.WorkspaceFolderAdded += OnWorkspaceFolderAdded;
         _workspace.WorkspaceFolderRemoved += OnWorkspaceFolderRemoved;
-        foreach (WorkspaceFolderTracker folder in _workspace.WorkspaceFolders)
+
+        foreach (WorkspaceFolderTracker folder in _workspace.WorkspaceFolders.Values)
         {
             OnWorkspaceFolderAdded(folder);
         }
@@ -37,8 +50,9 @@ internal class LspInstallationEnvironment : InstallationEnvironment
 
     protected override void Dispose(bool disposing)
     {
-        if (disposing)
+        if (disposing && _hasEvents)
         {
+            _hasEvents = false;
             _workspace.WorkspaceFolderAdded -= OnWorkspaceFolderAdded;
             _workspace.WorkspaceFolderRemoved -= OnWorkspaceFolderRemoved;
         }

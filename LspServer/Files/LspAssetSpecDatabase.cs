@@ -34,10 +34,4 @@ public class LspAssetSpecDatabase : AssetSpecDatabase
         _logger = loggerFactory.CreateLogger<LspAssetSpecDatabase>();
         Options = options;
     }
-
-    /// <inheritdoc />
-    protected override void Log(string msg)
-    {
-        _logger.LogError(msg);
-    }
 }

@@ -1,4 +1,7 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using Microsoft.Extensions.Logging;
 #if TEST_LSP
 using DanielWillett.UnturnedDataFileLspServer.Files;
@@ -40,6 +43,23 @@ public class AssetSpecValidity
         Assert.That(db.BlueprintSkills,         Is.Not.Empty);
         // Assert.That(db.NPCAchievementIds,       Is.Not.Empty); requires game files if not online
         // Assert.That(db.ValidActionButtons,      Is.Not.Empty); requires game files if not online
+
+        DatFileType type = db.FileTypes[QualifiedType.AssetBaseType];
+
+        OrderedPropertyReference[] orderfile = db.GlobalOrderFile.GetOrderForType(type.TypeName, SpecPropertyContext.Property);
+        Assert.That(orderfile, Is.Not.Empty);
+
+        Console.WriteLine("Properties:");
+        foreach (string value in orderfile.Select(x => x.GetString(type, false)))
+        {
+            Console.WriteLine("    " + value);
+        }
+
+        Console.WriteLine("Localization:");
+        foreach (string value in orderfile.Select(x => x.GetString(type, false)))
+        {
+            Console.WriteLine("    " + value);
+        }
     }
 }
 

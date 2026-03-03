@@ -549,4 +549,10 @@
   <data name="Type_Name_Version" xml:space="preserve">
     <value>Version Number</value>
   </data>
+  <data name="Type_Name_ProjectFile" xml:space="preserve">
+    <value>Project File</value>
+  </data>
+  <data name="Description_ProjectFile" xml:space="preserve">
+    <value>Defines properties for the behavior of the Unturned Data File Language Server.</value>
+  </data>
 </root>

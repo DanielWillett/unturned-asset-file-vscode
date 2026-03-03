@@ -274,7 +274,7 @@ public struct PropertyReference : IEquatable<PropertyReference>
         };
     }
 
-    private static ReadOnlySpan<char> TryRemoveContext(ReadOnlySpan<char> data, out SpecPropertyContext context)
+    internal static ReadOnlySpan<char> TryRemoveContext(ReadOnlySpan<char> data, out SpecPropertyContext context)
     {
         context = SpecPropertyContext.Unspecified;
         int firstIndex = data.IndexOf("::", StringComparison.Ordinal);

@@ -100,7 +100,8 @@
             [
                 {
                     "id": "unturnedDataFile.assetProperties",
-                    "name": "Asset Properties"
+                    "name": "Asset Properties",
+                    "icon": "$(symbol-property)"
                 }
             ]
         },
@@ -113,11 +114,7 @@
             {
                 "command": "unturnedDataFile.assetProperties.refreshAssetProperties",
                 "title": "Refresh Asset Properties",
-                "icon":
-                {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
-                }
+                "icon": "$(refresh)"
             },
             {
                 "command": "unturnedDataFile.cursorMoveTo",
@@ -162,14 +159,21 @@
                 {
                     "type": "string",
                     "scope": "machine-overridable",
-                    "markdownDescription": "Path to the dotnet executable used to run the language server. Specify 'dotnet' to pull from the `PATH` environment variable. Not required on Windows. Reload the extension to take effect.",
+                    "markdownDescription": "Path to the dotnet runtime executable used to run the language server. Requires .NET 10 or higher. Specify 'dotnet' to pull from the `PATH` environment variable. Not required on Windows. Reload the extension to take effect.",
                     "default": ""
                 },
                 "unturned-data-file-lsp.registerFileAssociations":
                 {
                     "type": "boolean",
                     "scope": "application",
-                    "markdownDescription": "On Windows only, indicates whether or not `.dat`, `.asset`, `.udat`, and `.udatproj` files will be registered for the current user on startup.",
+                    "markdownDescription": "On Windows only, indicates whether or not `.dat`, `.asset`, `.udat`, and `.udatproj` files will be configured to launch in VS Code and have a custom icon set.",
+                    "default": false
+                },
+                "unturned-data-file-lsp.offlineOnly":
+                {
+                    "type": "boolean",
+                    "scope": "application",
+                    "markdownDescription": "When enabled, prevents loading asset information from the internet to get updated information. This means you'll be using asset information embedded in the extension, which will likely be out of date. Information is usually pulled from various GitHub repositories.",
                     "default": false
                 },
                 "unturned-data-file-lsp.u3dsInstallDir":
@@ -184,6 +188,13 @@
                     "type": "string",
                     "scope": "machine-overridable",
                     "description": "If set, overrides the absolute path to the Unturned client. If not set this will be automatically detected.",
+                    "default": ""
+                },
+                "unturned-data-file-lsp.unturnedWorkshopDirectory":
+                {
+                    "type": "string",
+                    "scope": "machine-overridable",
+                    "description": "If set, overrides the absolute path to the Unturned client's workshop folder. If not set this will be automatically detected.",
                     "default": ""
                 },
                 "unturned-data-file-lsp.globalProjectFile":

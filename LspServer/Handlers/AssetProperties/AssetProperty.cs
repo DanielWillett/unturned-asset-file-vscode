@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
@@ -6,17 +7,32 @@ namespace DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 public class AssetProperty
 {
     [JsonProperty("key")]
-    public required string Key { get; set; }
+    public required string Key { get; init; }
 
     [JsonProperty("range")]
     public Range? Range { get; set; }
 
-    [JsonProperty("value")]
-    public object? Value { get; set; }
+    [JsonProperty("ordinal", DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public int IndexPlusOne { get; set; }
+
+    [JsonProperty("value", NullValueHandling = NullValueHandling.Ignore)]
+    public JToken? Value { get; set; }
 
     [JsonProperty("description")]
     public string? Description { get; set; }
 
     [JsonProperty("markdown")]
     public string? Markdown { get; set; }
+
+    [JsonProperty("children", NullValueHandling = NullValueHandling.Ignore)]
+    public AssetProperty[]? Children { get; set; }
+
+    [JsonProperty("typeHierarchy", NullValueHandling = NullValueHandling.Ignore)]
+    public TypeHierarchyElement[]? TypeHierarchy { get; set; }
+
+    public class TypeHierarchyElement
+    {
+        public required string Type { get; init; }
+        public string? DisplayName { get; init; }
+    }
 }

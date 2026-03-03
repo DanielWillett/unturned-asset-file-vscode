@@ -26,4 +26,37 @@ public static class OSPathHelper
         return Path.GetFileName(path);
 #endif
     }
+
+    /// <summary>
+    /// Checks whether a path has the given extension.
+    /// </summary>
+    /// <param name="path">The original file path.</param>
+    /// <param name="ext">The extension. Works whether or not the period is included.</param>
+    public static bool IsExtension(string path, string ext)
+    {
+        if (ext.Length == 0)
+            return false;
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+        ReadOnlySpan<char> extension = Path.GetExtension(path.AsSpan());
+#else
+        string extension = Path.GetExtension(path);
+#endif
+
+        if (ext[0] == '.')
+        {
+            return extension.Equals(ext, PathComparison);
+        }
+        
+        if (extension.Length == 0)
+        {
+            return false;
+        }
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+        return extension.Slice(1)
+#else
+        return extension.AsSpan(1)
+#endif
+            .Equals(ext, PathComparison);
+    }
 }
