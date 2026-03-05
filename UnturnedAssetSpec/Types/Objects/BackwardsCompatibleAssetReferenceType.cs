@@ -158,17 +158,10 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
                 if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
                 {
                     args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                    break;
                 }
-                else
-                {
-                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
-                    {
-                        return defValue.TryGetValueAs(ref ctx, out value);
-                    }
 
-                    return false;
-                }
-                break;
+                return TypeParsers.TryApplyMissingValueBehaviorToNullValue(ref args, ref ctx, out value);
 
             case IListSourceNode l:
                 args.DiagnosticSink?.UNT2004_ListInsteadOfValue(ref args, l, args.Type);

@@ -126,7 +126,7 @@ public class ParserTest<T> : IDisposable, IDiagnosticSink, IReferencedPropertySi
             new StaticSourceFileWorkspaceEnvironment(useCache: true, database, installationEnvironment: env),
             database.UnturnedInstallDirectory,
             env,
-            NilProjectFileProvider.Instance
+            new NilProjectFileProvider(database)
         );
 
         _diagnostics = new List<DatDiagnosticMessage>();

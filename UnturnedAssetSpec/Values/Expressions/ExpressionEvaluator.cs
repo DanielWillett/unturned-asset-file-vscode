@@ -90,13 +90,13 @@ internal struct ExpressionEvaluator
                 if (concreteOnly)
                     return false;
 
-                throw new NotImplementedException();
+                return propRef.Value.VisitValueGeneric(ref argVisitor, ref ctx);
 
             case IDataRefExpressionNode dataRef:
                 if (concreteOnly)
                     return false;
 
-                throw new NotImplementedException();
+                return dataRef.DataRef.VisitValueGeneric(ref argVisitor, ref ctx);
         }
 
         return false;

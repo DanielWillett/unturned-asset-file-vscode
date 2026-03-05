@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
@@ -9,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <summary>
 /// A weakly-typed value created from a <see cref="PropertyReference"/>.
 /// </summary>
-public interface IPropertyReferenceValue : IValue
+public interface IPropertyReferenceValue : IValue, IPropertyReferenceExpressionNode
 {
     /// <summary>
     /// The property being referenced.

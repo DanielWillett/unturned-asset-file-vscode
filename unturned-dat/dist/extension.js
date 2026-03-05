@@ -22256,7 +22256,7 @@ var AssetPropertiesViewProvider = class {
       if (this.propertyValues.length === result.length && result.every((prop, i) => this.propertyValues[i].property === prop)) {
         return false;
       }
-      this.propertyValues = result.map((prop) => new AssetPropertyViewItem(prop, null));
+      this.propertyValues = result.map((prop) => new AssetPropertyViewItem(prop, null, -1));
     }
     this._onDidChangeTreeData.fire();
     return true;
@@ -22282,31 +22282,49 @@ var AssetPropertyViewItem = class _AssetPropertyViewItem extends import_vscode.T
   property;
   children;
   parent;
-  constructor(property, parent) {
-    super(getName(property), import_vscode.TreeItemCollapsibleState.None);
+  typeIndex;
+  constructor(property, parent, typeIndex) {
+    super(
+      typeIndex >= 0 ? property.typeHierarchy[typeIndex].displayName : getName(property),
+      typeIndex < 0 && (property.children || property.typeHierarchy) ? import_vscode.TreeItemCollapsibleState.Collapsed : import_vscode.TreeItemCollapsibleState.None
+    );
     this.property = property;
-    this.collapsibleState = property.children ? import_vscode.TreeItemCollapsibleState.Collapsed : import_vscode.TreeItemCollapsibleState.None;
-    this.iconPath = getValueIcon(property);
+    this.iconPath = typeIndex >= 0 ? new import_vscode.ThemeIcon("type-hierarchy-super") : getValueIcon(property);
     this.children = null;
     this.parent = parent;
+    this.typeIndex = typeIndex;
   }
   getChildren() {
+    if (this.typeIndex >= 0) {
+      return [];
+    }
+    if (this.property.typeHierarchy) {
+      this.children = [];
+      for (let i = 0; i < this.property.typeHierarchy.length; ++i) {
+        this.children.push(new _AssetPropertyViewItem(this.property, this, i));
+      }
+      return this.children;
+    }
     if (!this.property.children) {
       return [];
     }
     if (this.children) {
       return this.children;
     }
-    this.children = this.property.children.map((prop) => new _AssetPropertyViewItem(prop, this));
+    this.children = this.property.children.map((prop) => new _AssetPropertyViewItem(prop, this, -1));
     return this.children;
   }
   resolve() {
-    if (this.property.children) {
-      this.command = void 0;
+    if (this.typeIndex >= 0) {
+      this.tooltip = this.property.typeHierarchy[this.typeIndex].type;
       return;
     }
     try {
       this.tooltip = this.property.markdown ?? this.property.description ?? this.property.key;
+      if (this.property.children) {
+        this.command = void 0;
+        return;
+      }
       if (this.property.range?.start !== void 0) {
         this.command = {
           command: "unturnedDataFile.cursorMoveTo",
@@ -22332,6 +22350,9 @@ function getName(property) {
   if (property.ordinal) {
     key = `[${property.ordinal - 1}]`;
   }
+  if (property.typeHierarchy && property.typeHierarchy.length > 0) {
+    return `${key} = ${property.typeHierarchy[0].displayName}`;
+  }
   if (property.value === null) {
     return `${key} = [no value]`;
   }
@@ -22353,6 +22374,8 @@ function getName(property) {
 function getValueIcon(property) {
   if (!property.range) {
     return new import_vscode.ThemeIcon("add");
+  } else if (property.typeHierarchy) {
+    return new import_vscode.ThemeIcon("symbol-class");
   } else if (property.children) {
     if (property.children.length === 0 || property.children[0].ordinal) {
       return new import_vscode.ThemeIcon("symbol-array");

@@ -168,11 +168,13 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
 
         if (!TypeParsers.Int32.TryParse(ref args, ref ctx, out value))
         {
+            args.Result = TypeParserResult.Failed;
             return false;
         }
 
         if (!value.HasValue || !AllowNegatives && value.Value < 0)
         {
+            args.Result = TypeParserResult.Failed;
             return false;
         }
 
@@ -209,6 +211,7 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
             }
         }
 
+        args.Result = TypeParserResult.Successful;
         return true;
     }
 

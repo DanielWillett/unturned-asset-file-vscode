@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -30,20 +30,40 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
 
     public ISourceFile SourceFile { get; private set; }
 
-    public bool CollectDiagnostics { get; set; }
+    [MemberNotNullWhen(true, nameof(_diagnosticBuffer))]
+    public bool CollectDiagnostics
+    {
+        get;
+        set
+        {
+            if (field == value)
+                return;
+
+            if (value)
+            {
+                Diagnostics = ImmutableArray<DatDiagnosticMessage>.Empty;
+                _diagnosticBuffer = new List<DatDiagnosticMessage>();
+                field = value;
+            }
+            else
+            {
+                field = false;
+                _diagnosticBuffer = null;
+                Diagnostics = default;
+            }
+        }
+    }
 
     public ImmutableArray<DatDiagnosticMessage> Diagnostics { get; private set; }
 
     public FileRelationalCache(ISourceFile file, bool collectDiagnostics, IParsingServices parsingServices, SpecPropertyContext propertyTypes = SpecPropertyContext.Property)
     {
-        if (propertyTypes is SpecPropertyContext.Property and not SpecPropertyContext.Localization)
+        if (propertyTypes is not SpecPropertyContext.Property and not SpecPropertyContext.Localization)
             throw new ArgumentOutOfRangeException(nameof(propertyTypes));
 
         if (collectDiagnostics)
         {
-            Diagnostics = ImmutableArray<DatDiagnosticMessage>.Empty;
             CollectDiagnostics = true;
-            _diagnosticBuffer = new List<DatDiagnosticMessage>();
         }
 
         _entries = new StringDictionary<Entry>(keyComparer: StringComparer.OrdinalIgnoreCase);
@@ -53,14 +73,147 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
         _propertyTypes = propertyTypes;
         _valueProcessorPool = new Stack<ValueProcessor>();
         InitEvalCtx();
+        Rebuild();
+    }
+
+    /// <inheritdoc />
+    public void Rebuild(bool force = true)
+    {
+        ISourceFile file = SourceFile;
         lock (file.TreeSync)
         {
-            RebuildIntl(_evalCtx.FileType.Information, _entries, file);
-            if (collectDiagnostics)
+            if (!force && file.FileVersion == _generation)
             {
-                Diagnostics = _diagnosticBuffer!.ToImmutableArray();
+                return;
+            }
+
+            if (!_evalCtx.FileType.Type.Equals(file.ActualType))
+            {
+                InitEvalCtx();
+            }
+
+            RebuildIntl(_evalCtx.FileType.Information, _entries, file);
+            _generation = file.FileVersion;
+            if (!CollectDiagnostics)
+                return;
+
+            Diagnostics = _diagnosticBuffer!.ToImmutableArray();
+            _diagnosticBuffer!.Clear();
+        }
+    }
+
+    public void Rebuild(ISourceFile file)
+    {
+        lock (_entries)
+        {
+            SourceFile = file;
+            InitEvalCtx();
+            if (CollectDiagnostics && _diagnosticBuffer == null)
+            {
+                _diagnosticBuffer = new List<DatDiagnosticMessage>();
+            }
+
+            lock (file.File.TreeSync)
+            {
+                _generation = file.FileVersion;
+                RebuildIntl(_evalCtx.FileType.Information, _entries, file);
+            }
+
+            if (_diagnosticBuffer != null)
+            {
+                Diagnostics = _diagnosticBuffer.ToImmutableArray();
                 _diagnosticBuffer!.Clear();
             }
+        }
+    }
+
+    private bool TryGetPropertyEntryIntl(
+        IPropertySourceNode node,
+        [NotNullWhen(true)] out Entry? entry
+    )
+    {
+        // assume TreeSync locked
+        return _entries.TryGetValue(node.Key, out entry);
+    }
+
+    /// <inheritdoc />
+    public bool TryGetPropertyFromNode(
+        IPropertySourceNode node,
+        [NotNullWhen(true)] out DatProperty? property
+    )
+    {
+        lock (SourceFile.TreeSync)
+        {
+            for (IParentSourceNode? parentNode = node; parentNode != null; parentNode = parentNode.Parent)
+            {
+                if (parentNode is not IPropertySourceNode propertyNode || !TryGetPropertyEntryIntl(propertyNode, out Entry? entry))
+                    continue;
+
+                property = entry.Property;
+                if (parentNode == node)
+                {
+                    return true;
+                }
+
+                // todo
+                return false;
+            }
+
+            property = null;
+            return false;
+        }
+    }
+
+    /// <inheritdoc />
+    public bool TryGetPropertyInfoFromNode(
+        IPropertySourceNode node,
+        out PropertyNodeRelationalInfo info,
+        bool includeValue = false
+    )
+    {
+        lock (SourceFile.TreeSync)
+        {
+            if (!TryGetPropertyEntryIntl(node, out Entry? entry) || entry.ParentNode == null)
+            {
+                info = default;
+                return false;
+            }
+
+            info = new PropertyNodeRelationalInfo(
+                entry.Property, 
+                entry.Node,
+                entry.ParentNode,
+                includeValue ? entry.CreateValue() : null,
+                entry.Type,
+                entry.RelatedProperties.UnsafeFreeze(),
+                entry.Result
+            );
+            return true;
+        }
+    }
+
+    /// <inheritdoc />
+    public bool TryVisitPropertyValueFromNode<TVisitor>(
+        IPropertySourceNode node,
+        ref TVisitor visitor,
+        [NotNullWhen(true)] out DatProperty? property,
+        TypeParserMissingValueBehavior missingValueBehavior = TypeParserMissingValueBehavior.ErrorIfValueOrPropertyNotProvided
+    ) where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        lock (SourceFile.TreeSync)
+        {
+            if (!TryGetPropertyEntryIntl(node, out Entry? entry))
+            {
+                property = null;
+                return false;
+            }
+
+            property = entry.Property;
+            entry.Visit(ref visitor);
+            return true;
         }
     }
 
@@ -86,37 +239,12 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
         _diagnosticBuffer?.Add(diagnostic);
     }
 
-    public void Rebuild(ISourceFile file)
-    {
-        lock (_entries)
-        {
-            SourceFile = file;
-            InitEvalCtx();
-            if (CollectDiagnostics && _diagnosticBuffer == null)
-            {
-                _diagnosticBuffer = new List<DatDiagnosticMessage>();
-            }
-
-            lock (file.File.TreeSync)
-            {
-                Interlocked.Increment(ref _generation);
-                RebuildIntl(_evalCtx.FileType.Information, _entries, file);
-            }
-            
-            if (_diagnosticBuffer != null)
-            {
-                Diagnostics = _diagnosticBuffer.ToImmutableArray();
-                _diagnosticBuffer!.Clear();
-            }
-        }
-    }
-
     private void InitEvalCtx()
     {
         _evalCtx = new FileEvaluationContext(_services, SourceFile);
     }
 
-    private void RebuildIntl(DatTypeWithProperties type, StringDictionary<Entry> root, IDictionarySourceNode dictionary, bool isMetadata = false)
+    private void RebuildIntl(DatTypeWithProperties type, StringDictionary<Entry> root, IDictionarySourceNode dictionary)
     {
         IPropertySourceNode? ignore = null;
         if (dictionary.IsRootNode && dictionary is IAssetSourceFile asset)
@@ -124,71 +252,82 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
             IDictionarySourceNode? metadata = asset.GetMetadataDictionary();
             if (metadata != null)
             {
-                RebuildIntl(type, root, metadata, isMetadata: true);
+                _evalCtx.RootPosition = AssetDatPropertyPosition.Metadata;
+                RebuildIntl(type, root, metadata);
             }
 
             IDictionarySourceNode? assetData = asset.GetAssetDataDictionary();
             if (assetData != null)
             {
+                _evalCtx.RootPosition = AssetDatPropertyPosition.Asset;
                 RebuildIntl(type, root, assetData);
 
                 // skip rest of file
                 return;
             }
 
+            _evalCtx.RootPosition = AssetDatPropertyPosition.Root;
             ignore = metadata?.Parent as IPropertySourceNode;
+        }
+        else
+        {
+            _evalCtx.RootPosition = AssetDatPropertyPosition.Root;
         }
 
         ValueProcessor p = PopValueProcessor(dictionary, type, root, ignore);
-
-        switch (_propertyTypes)
+        try
         {
-            case SpecPropertyContext.Localization:
-                if (type is IDatTypeWithLocalizationProperties localProps)
-                {
-                    foreach (DatProperty property in localProps.LocalizationProperties)
+            switch (_propertyTypes)
+            {
+                case SpecPropertyContext.Localization:
+                    if (type is IDatTypeWithLocalizationProperties localProps)
+                    {
+                        foreach (DatProperty property in localProps.LocalizationProperties)
+                        {
+                            p.EnqueuePropertyForProcessing(property);
+                        }
+                    }
+                    break;
+
+                case SpecPropertyContext.BundleAsset:
+                    if (type is IDatTypeWithBundleAssets bundleAssets)
+                    {
+                        foreach (DatBundleAsset bundleAsset in bundleAssets.BundleAssets)
+                        {
+                            p.EnqueuePropertyForProcessing(bundleAsset);
+                        }
+                    }
+                    break;
+
+                default:
+                    foreach (DatProperty property in type.Properties)
                     {
                         p.EnqueuePropertyForProcessing(property);
                     }
-                }
-                break;
+                    break;
+            }
 
-            case SpecPropertyContext.BundleAsset:
-                if (type is IDatTypeWithBundleAssets bundleAssets)
-                {
-                    foreach (DatBundleAsset bundleAsset in bundleAssets.BundleAssets)
-                    {
-                        p.EnqueuePropertyForProcessing(bundleAsset);
-                    }
-                }
-                break;
-
-            default:
-                foreach (DatProperty property in type.Properties)
-                {
-                    p.EnqueuePropertyForProcessing(property);
-                }
-                break;
-        }
-
-        while (p.TryDequeue(out DatProperty? property))
-        {
-            p.ProcessProperty(property);
-        }
-
-        if (_propertyTypes is SpecPropertyContext.Property or SpecPropertyContext.Localization)
-        {
-            ImmutableArray<ISourceNode> properties = dictionary.Children;
-            foreach (ISourceNode child in properties)
+            while (p.TryDequeue(out DatProperty? property))
             {
-                if (child is not IPropertySourceNode property || property == ignore)
-                    continue;
+                p.ProcessProperty(property);
+            }
 
-                p.CheckPropertyNodeExists(property);
+            if (_propertyTypes is SpecPropertyContext.Property or SpecPropertyContext.Localization)
+            {
+                ImmutableArray<ISourceNode> properties = dictionary.Children;
+                foreach (ISourceNode child in properties)
+                {
+                    if (child is not IPropertySourceNode property || property == ignore)
+                        continue;
+
+                    p.CheckPropertyNodeExists(property);
+                }
             }
         }
-
-        ReturnValueProcessor(p);
+        finally
+        {
+            ReturnValueProcessor(p);
+        }
     }
 
 
@@ -199,12 +338,21 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
         public DatProperty Property;
 #nullable restore
         public IPropertySourceNode? Node;
+        public IDictionarySourceNode? ParentNode;
         public int Generation;
-        public IValue? OtherValue;
-        public StringDictionary<Entry>? LegacyObjectHead;
-        public ValueProcessor? Processor;
+        //public IValue? OtherValue;
+        // todo: public StringDictionary<Entry>? LegacyObjectHead;
+        // public ValueProcessor? Processor;
         public bool HasLiteralValue;
+        public TypeParserResult Result;
         public IPropertySourceNode[]? RelatedProperties;
+
+        public virtual IType? Type { get; }
+
+        public virtual IValue? CreateValue()
+        {
+            return null;
+        }
 
         public virtual bool Visit<TVisitor>(ref TVisitor visitor)
             where TVisitor : IValueVisitor
@@ -220,6 +368,18 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
         where T : IEquatable<T>
     {
         public Optional<T> Value;
+        public IType<T> Type;
+
+        /// <inheritdoc />
+        public override IValue? CreateValue()
+        {
+            if (!HasLiteralValue)
+            {
+                return null;
+            }
+
+            return Type.CreateValue(Value);
+        }
 
         public override bool Visit<TVisitor>(ref TVisitor visitor)
         {
@@ -374,9 +534,10 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
                 }
 
                 Entry createdEntry = v.NewEntry!;
-
+                createdEntry.Generation = _rootNode.File.FileVersion;
                 createdEntry.Key = key;
                 createdEntry.Node = propertyNode;
+                createdEntry.ParentNode = _rootNode;
                 createdEntry.Property = property;
 
                 if (_referencedPropertyNodeBufferForThisProperty is { Count: > 0 })
@@ -413,6 +574,26 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
         private void ProcessBundleAsset(DatBundleAsset bundleAsset, IType propertyType)
         {
             // todo: bundle assets
+        }
+
+        void IReferencedPropertySink.AcceptReferencedProperty(IPropertySourceNode property)
+        {
+            if (property.Parent != _rootNode)
+                return;
+
+            if (!_referencedProperties.Add(property))
+                return;
+
+            _referencedPropertyNodeBufferForThisProperty ??= new List<IPropertySourceNode>(4);
+            _referencedPropertyNodeBufferForThisProperty.Add(property);
+        }
+
+        void IReferencedPropertySink.AcceptDereferencedProperty(IPropertySourceNode property)
+        {
+            if (property == _currentProperty)
+            {
+                _currentPropertyWasDereferenced = true;
+            }
         }
 
         private struct ValueVisitor : ITypeVisitor
@@ -458,25 +639,5 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
                 ParseSuccess = true;
             }
         }
-        void IReferencedPropertySink.AcceptReferencedProperty(IPropertySourceNode property)
-        {
-            if (property.Parent != _rootNode)
-                return;
-
-            if (!_referencedProperties.Add(property))
-                return;
-
-            _referencedPropertyNodeBufferForThisProperty ??= new List<IPropertySourceNode>(4);
-            _referencedPropertyNodeBufferForThisProperty.Add(property);
-        }
-
-        void IReferencedPropertySink.AcceptDereferencedProperty(IPropertySourceNode property)
-        {
-            if (property == _currentProperty)
-            {
-                _currentPropertyWasDereferenced = true;
-            }
-        }
-
     }
 }

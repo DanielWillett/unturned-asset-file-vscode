@@ -38,8 +38,12 @@ public sealed class ActionKeyType : PrimitiveType<string, ActionKeyType>, ITypeP
         }
 
         if (!TypeParsers.String.TryParse(ref args, ref ctx, out value))
+        {
+            args.Result = TypeParserResult.Failed;
             return false;
+        }
 
+        args.Result = TypeParserResult.Successful;
         if (args.DiagnosticSink == null || !value.HasValue)
             return true;
 

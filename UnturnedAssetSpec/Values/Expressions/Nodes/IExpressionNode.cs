@@ -58,9 +58,14 @@ public interface IValueExpressionNode : IExpressionNode, IValue;
 public interface IPropertyReferenceExpressionNode : IExpressionNode
 {
     /// <summary>
-    /// The property being referenced.
+    /// The property reference that created this value.
     /// </summary>
-    PropertyReference Reference { get; }
+    ref readonly PropertyReference Reference { get; }
+
+    /// <summary>
+    /// The underlying property-ref value for this node. Usually this is just <see langword="this"/>.
+    /// </summary>
+    IPropertyReferenceValue Value { get; }
 }
 
 /// <summary>

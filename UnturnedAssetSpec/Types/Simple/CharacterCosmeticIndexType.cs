@@ -102,9 +102,11 @@ internal class CharacterCosmeticIndexType : BaseType<byte, CharacterCosmeticInde
 
         if (!TypeParsers.UInt8.TryParse(ref args, ref ctx, out value))
         {
+            args.Result = TypeParserResult.Failed;
             return false;
         }
 
+        args.Result = TypeParserResult.Successful;
         if (MaximumValue > 0 && value.HasValue && value.Value > MaximumValue)
         {
             args.DiagnosticSink?.UNT1008(ref args, Kind, value.Value, MaximumValue);

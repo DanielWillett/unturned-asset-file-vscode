@@ -1,4 +1,6 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
@@ -8,7 +10,6 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -17,6 +18,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 /// </summary>
 public class DatProperty : IDatSpecificationObject
 {
+    /// <summary>
+    /// Can either be a <see cref="Tuple{T1,T2}"/>, <see cref="ImmutableDictionary{TKey,TValue}"/>, or <see cref="ImmutableDictionary{TKey,TValue}.Builder"/> with a <see cref="PropertyOrderFile.TypeKey"/> key and <see cref="int"/> value.
+    /// </summary>
+    private object? _indicesOrBuilder;
+    private int _indicesType;
+
     /// <inheritdoc />
     public JsonElement DataRoot { get; }
 
@@ -333,6 +340,84 @@ public class DatProperty : IDatSpecificationObject
             Type = overriding.Type
         };
     }
+
+    internal bool TryAddIndex(PropertyOrderFile.TypeKey key, int index)
+    {
+        switch (_indicesType)
+        {
+            case 0:
+                _indicesOrBuilder = new Tuple<PropertyOrderFile.TypeKey, int>(key, index);
+                _indicesType = 1;
+                return true;
+
+            case 1:
+                Tuple<PropertyOrderFile.TypeKey, int> tuple = (Tuple<PropertyOrderFile.TypeKey, int>)_indicesOrBuilder!;
+                if (tuple.Item1.Equals(key))
+                    return false;
+
+                ImmutableDictionary<PropertyOrderFile.TypeKey, int>.Builder bldr2
+                    = ImmutableDictionary.CreateBuilder<PropertyOrderFile.TypeKey, int>();
+                
+                bldr2.Add(tuple.Item1, tuple.Item2);
+                bldr2.Add(key, index);
+
+                _indicesOrBuilder = bldr2;
+                _indicesType = 2;
+                return true;
+
+            case 2:
+                ImmutableDictionary<PropertyOrderFile.TypeKey, int>.Builder bldr =
+                    (ImmutableDictionary<PropertyOrderFile.TypeKey, int>.Builder)_indicesOrBuilder!;
+
+                if (bldr.ContainsKey(key))
+                    return false;
+                
+                bldr.Add(key, index);
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    internal bool TryGetIndexInType(PropertyOrderFile.TypeKey key, out int index)
+    {
+        switch (_indicesType)
+        {
+            case 1:
+                Tuple<PropertyOrderFile.TypeKey, int> tuple
+                    = (Tuple<PropertyOrderFile.TypeKey, int>)_indicesOrBuilder!;
+                if (!tuple.Item1.Equals(key))
+                    goto default;
+
+                index = tuple.Item2;
+                return true;
+
+            case 2:
+                ImmutableDictionary<PropertyOrderFile.TypeKey, int>.Builder bldr
+                    = (ImmutableDictionary<PropertyOrderFile.TypeKey, int>.Builder)_indicesOrBuilder!;
+                return bldr.TryGetValue(key, out index);
+
+            case 3:
+                ImmutableDictionary<PropertyOrderFile.TypeKey, int> dict
+                    = (ImmutableDictionary<PropertyOrderFile.TypeKey, int>)_indicesOrBuilder!;
+                return dict.TryGetValue(key, out index);
+
+            default:
+                index = 0;
+                return false;
+        }
+    }
+
+    internal void FinalizeIndex()
+    {
+        if (_indicesOrBuilder is ImmutableDictionary<PropertyOrderFile.TypeKey, int>.Builder bldr)
+        {
+            _indicesOrBuilder = bldr.ToImmutable();
+            _indicesType = 3;
+        }
+    }
+
 
     public string FullName => $"{((IDatSpecificationObject)Owner).FullName}.{Key}";
     DatFileType IDatSpecificationObject.Owner => Owner.Owner;

@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -18,6 +19,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 public class CrossedPropertyReferenceValue : ICrossedPropertyReference
 {
     private PropertyReference _propertyReference;
+
+    /// <inheritdoc />
+    public ref readonly PropertyReference Reference => ref _propertyReference;
 
     DatProperty IPropertyReferenceValue.Property => throw new NotSupportedException("Not supported on cross-reference property references.");
 
@@ -62,9 +66,15 @@ public class CrossedPropertyReferenceValue : ICrossedPropertyReference
     }
 
     /// <inheritdoc />
+    public bool Equals(IExpressionNode? other)
+    {
+        return other is CrossedPropertyReferenceValue r && r._propertyReference.Equals(_propertyReference);
+    }
+
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
-        return obj is CrossedPropertyReferenceValue r && Equals(r);
+        return obj is CrossedPropertyReferenceValue r && Equals((IValue?)r);
     }
 
     /// <inheritdoc />
@@ -131,6 +141,7 @@ public class CrossedPropertyReferenceValue : ICrossedPropertyReference
             disp.Dispose();
         }
     }
+    IPropertyReferenceValue IPropertyReferenceExpressionNode.Value => this;
 }
 
 /// <summary>

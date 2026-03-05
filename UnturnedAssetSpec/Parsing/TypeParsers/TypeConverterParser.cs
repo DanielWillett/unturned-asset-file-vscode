@@ -66,14 +66,18 @@ public class TypeConverterParser<T>(ITypeConverter<T> typeConverter)
 
         if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? v))
         {
+            args.Result = TypeParserResult.Failed;
             value = Optional<T>.Null;
             return false;
         }
 
         if (TryParseValueNode(v, ref args, ref ctx, out value))
         {
+            args.Result = TypeParserResult.Successful;
             return true;
         }
+
+        args.Result = TypeParserResult.Failed;
 
         if (!args.ShouldIgnoreFailureDiagnostic)
         {

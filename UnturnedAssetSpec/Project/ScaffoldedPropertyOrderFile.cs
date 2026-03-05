@@ -59,4 +59,19 @@ public class ScaffoldedPropertyOrderFile : IPropertyOrderFile
 
         return Array.Empty<OrderedPropertyReference>();
     }
+
+    /// <inheritdoc />
+    public (int[] ReverseOrder, int AlternateOffset) GetRelativePositions(QualifiedType type, SpecPropertyContext context)
+    {
+        for (int i = 0; i < _files.Length; ++i)
+        {
+            (int[], int) arr = _files[i].GetRelativePositions(type, context);
+            if (arr.Item1.Length == 0)
+                continue;
+
+            return arr;
+        }
+
+        return (Array.Empty<int>(), 0);
+    }
 }

@@ -1,6 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -80,6 +79,11 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
     public required IType<T> Type;
 
     /// <summary>
+    /// The result of the parse operation.
+    /// </summary>
+    public TypeParserResult Result;
+
+    /// <summary>
     /// Used to report diagnostics encountered when parsing. Ignored if <see langword="null"/>.
     /// </summary>
     public IDiagnosticSink? DiagnosticSink;
@@ -139,6 +143,7 @@ public struct TypeParserArgs<T> : IDiagnosticProvider where T : IEquatable<T>
         args.KeyFilter = filter;
         args.Property = Property;
         args.MissingValueBehavior = MissingValueBehavior;
+        args.Result = TypeParserResult.Failed;
     }
 
     /// <summary>
@@ -246,4 +251,44 @@ public enum TypeParserMissingValueBehavior
     /// The <see cref="DatProperty.IncludedDefaultValue"/> or <see cref="DatProperty.DefaultValue"/> will be returned if the value or property are missing.
     /// </summary>
     FallbackToDefaultValue
+}
+
+/// <summary>
+/// Defines the result of a type parser operation (did it use the default value? included default value? etc).
+/// </summary>
+public enum TypeParserResult
+{
+    /// <summary>
+    /// Failed to parse a value or use a fallback value.
+    /// </summary>
+    Failed,
+
+    /// <summary>
+    /// Failed to use default value because one wasn't defined.
+    /// </summary>
+    UsedDefaultValueNoneAvailable,
+
+    /// <summary>
+    /// Failed to use included default value because neither default value option was defined.
+    /// </summary>
+    UsedIncludedDefaultValueNoneAvailable,
+
+    /// <summary>
+    /// Parsed a value from the provided node.
+    /// </summary>
+    Successful,
+
+    /// <summary>
+    /// Used the default value.
+    /// </summary>
+    UsedDefaultValue,
+
+    /// <summary>
+    /// Used the included default value or normal default value if inculded wasn't defined.
+    /// <para>
+    /// Note that this may be used even if there isn't a defined included default value,
+    /// meaning it just used the normal default value.
+    /// </para>
+    /// </summary>
+    UsedIncludedDefaultValue
 }

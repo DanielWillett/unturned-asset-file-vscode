@@ -34,6 +34,9 @@ public struct FileEvaluationContext
         readonly get => _rootBreadcrumbs;
         set
         {
+            if (_rootBreadcrumbs.Equals(in value))
+                return;
+
             _targetDictionary = null;
             _targetDictionaryType = null;
             _rootBreadcrumbs = value;
@@ -46,6 +49,9 @@ public struct FileEvaluationContext
         readonly get => _rootPosition;
         set
         {
+            if (_rootPosition == value)
+                return;
+
             _targetRoot = null;
             _targetDictionary = null;
             _targetDictionaryType = null;

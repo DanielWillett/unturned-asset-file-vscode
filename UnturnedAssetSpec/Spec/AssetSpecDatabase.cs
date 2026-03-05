@@ -283,7 +283,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             installationEnvironment: installation
         );
 
-        parsingServices = new ParsingServiceProvider(database, loggerFactory, environment, installDirUtility, installation, NilProjectFileProvider.Instance);
+        parsingServices = new ParsingServiceProvider(database, loggerFactory, environment, installDirUtility, installation, new NilProjectFileProvider(database));
         return database;
     }
 

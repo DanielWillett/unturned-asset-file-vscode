@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
@@ -6,6 +7,9 @@ namespace DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 
 public class AssetProperty
 {
+    [JsonIgnore]
+    public required DatProperty Property { get; init; }
+
     [JsonProperty("key")]
     public required string Key { get; init; }
 

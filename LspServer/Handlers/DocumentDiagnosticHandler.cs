@@ -120,8 +120,7 @@ internal class DocumentDiagnosticHandler : DocumentDiagnosticHandlerBase
             DatProperty property,
             IType propertyType,
             ref FileEvaluationContext ctx,
-            IPropertySourceNode node,
-            in PropertyBreadcrumbs breadcrumbs)
+            IPropertySourceNode node)
         {
             // todo SpecPropertyTypeParseContext ctx = parseCtx.WithDiagnostics(Diagnostics);
             // todo propertyType.TryParseValue(ref ctx, out _);

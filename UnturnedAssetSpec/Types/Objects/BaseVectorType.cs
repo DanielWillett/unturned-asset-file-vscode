@@ -78,6 +78,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
                             args.ReferencedPropertySink?.AcceptDereferencedProperty(prop);
 
                         value = parsed;
+                        args.Result = TypeParserResult.Successful;
                         return true;
                     }
 
@@ -85,7 +86,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
                     {
                         if (args.ParentNode is IPropertySourceNode prop)
                             args.ReferencedPropertySink?.AcceptDereferencedProperty(prop);
-                        return false;
+                        break;
                     }
                 }
 
@@ -109,12 +110,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
                 }
                 else
                 {
-                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
-                    {
-                        return defValue.TryGetValueAs(ref ctx, out value);
-                    }
-
-                    return false;
+                    return TypeParsers.TryApplyMissingValueBehaviorToNullValue(ref args, ref ctx, out value);
                 }
 
                 break;
@@ -166,6 +162,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
                 }
 
                 value = parsed;
+                args.Result = TypeParserResult.Successful;
                 return true;
 
             case IDictionarySourceNode d:
@@ -188,9 +185,11 @@ public abstract class BaseVectorType<TVector, TSelf> :
                 // check UnityDatColorEx.LegacyParseColor32RGB... if the dictionary is present it always returns true no matter what, so it wouldn't parse the colors here.
                 TryParseFromDictionary(ref args, d, out parsed);
                 value = parsed;
+                args.Result = TypeParserResult.Successful;
                 return true;
         }
 
+        args.Result = TypeParserResult.Failed;
         return false;
     }
 

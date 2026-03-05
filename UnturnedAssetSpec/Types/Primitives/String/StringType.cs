@@ -87,8 +87,11 @@ public sealed class StringType : PrimitiveType<string, StringType>, ITypeParser<
         if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? valueNode))
         {
             value = Optional<string>.Null;
+            args.Result = TypeParserResult.Failed;
             return false;
         }
+
+        args.Result = TypeParserResult.Successful;
 
         value = valueNode.Value;
         if (args.DiagnosticSink != null)

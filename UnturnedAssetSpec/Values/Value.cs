@@ -241,28 +241,30 @@ public static class Value
         return new ConcreteValue<IType>(type, TypeOfType.Factory);
     }
 
-    /// <inheritdoc cref="FromExpression{TResult,TDataRefReadContext}(IType{TResult},string,DatProperty,ref TDataRefReadContext,bool)"/>
+    /// <inheritdoc cref="FromExpression{TResult,TDataRefReadContext}(IType{TResult},string,DatProperty,IAssetSpecDatabase,ref TDataRefReadContext,bool)"/>
     public static IValue<TResult> FromExpression<TResult>(
         IType<TResult> resultType,
         string expression,
         DatProperty owner,
+        IAssetSpecDatabase database,
         bool simplifyConstantExpressions = true
     ) where TResult : IEquatable<TResult>
     {
         DataRefs.NilDataRefContext c;
-        return FromExpression(resultType, expression, owner, ref c, simplifyConstantExpressions);
+        return FromExpression(resultType, expression, owner, database, ref c, simplifyConstantExpressions);
     }
 
-    /// <inheritdoc cref="FromExpression{TResult,TDataRefReadContext}(IType{TResult},string,DatProperty,ref TDataRefReadContext,bool)"/>
+    /// <inheritdoc cref="FromExpression{TResult,TDataRefReadContext}(IType{TResult},string,DatProperty,IAssetSpecDatabase,ref TDataRefReadContext,bool)"/>
     public static IValue<TResult> FromExpression<TResult>(
         IType<TResult> resultType,
         ReadOnlySpan<char> expression,
         DatProperty owner,
+        IAssetSpecDatabase database,
         bool simplifyConstantExpressions = true
     ) where TResult : IEquatable<TResult>
     {
         DataRefs.NilDataRefContext c;
-        return FromExpression(resultType, expression, owner, ref c, simplifyConstantExpressions);
+        return FromExpression(resultType, expression, owner, database, ref c, simplifyConstantExpressions);
     }
 
     /// <summary>
@@ -284,6 +286,7 @@ public static class Value
         IType<TResult> resultType,
         string expression,
         DatProperty owner,
+        IAssetSpecDatabase database,
         ref TDataRefReadContext dataRefContext,
         bool simplifyConstantExpressions = true
     ) where TResult : IEquatable<TResult>
@@ -292,7 +295,7 @@ public static class Value
         // trim '='
         if (expression.Length > 0 && expression[0] == '=')
         {
-            return FromExpression(resultType, expression.AsSpan(1), owner, ref dataRefContext, simplifyConstantExpressions);
+            return FromExpression(resultType, expression.AsSpan(1), owner, database, ref dataRefContext, simplifyConstantExpressions);
         }
 
         IExpressionNode rootNode;
@@ -303,6 +306,7 @@ public static class Value
         using (ExpressionNodeParser<TDataRefReadContext> parser = new ExpressionNodeParser<TDataRefReadContext>(
                    expression,
                    owner,
+                   database,
 #if NET7_0_OR_GREATER
                    ref dataRefContext,
 #else
@@ -326,11 +330,12 @@ public static class Value
         return new ExpressionValue<TResult>(resultType, (IFunctionExpressionNode)rootNode);
     }
 
-    /// <inheritdoc cref="FromExpression{TResult,TDataRefReadContext}(IType{TResult},string,DatProperty,ref TDataRefReadContext,bool)"/>
+    /// <inheritdoc cref="FromExpression{TResult,TDataRefReadContext}(IType{TResult},string,DatProperty,IAssetSpecDatabase,ref TDataRefReadContext,bool)"/>
     public static unsafe IValue<TResult> FromExpression<TResult, TDataRefReadContext>(
         IType<TResult> resultType,
         ReadOnlySpan<char> expression,
         DatProperty owner,
+        IAssetSpecDatabase database,
         ref TDataRefReadContext dataRefContext,
         bool simplifyConstantExpressions = true
     ) where TResult : IEquatable<TResult>
@@ -348,6 +353,7 @@ public static class Value
         using (ExpressionNodeParser<TDataRefReadContext> parser = new ExpressionNodeParser<TDataRefReadContext>(
                    expression,
                    owner,
+                   database,
 #if NET7_0_OR_GREATER
                    ref dataRefContext,
 #else
@@ -593,6 +599,7 @@ public static class Value
                         expressionVisitor.String = str.Length == data.Length ? str : data.ToString();
                         expressionVisitor.ExpressionValue = null;
                         expressionVisitor.Property = propertyOwner;
+                        expressionVisitor.Database = database;
                         fixed (TDataRefReadContext* dataRefContextPtr = &dataRefContext)
                         {
                             expressionVisitor.DataRefContext = dataRefContextPtr;
@@ -747,7 +754,7 @@ public static class Value
                             return null;
                         try
                         {
-                            return FromExpression(valueType, str, propertyOwner, ref dataRefContext);
+                            return FromExpression(valueType, str, propertyOwner, database, ref dataRefContext);
                         }
                         catch
                         {
@@ -950,11 +957,12 @@ public static class Value
         public string String;
         public IValue? ExpressionValue;
         public DatProperty Property;
+        public IAssetSpecDatabase Database;
         public TDataRefReadContext* DataRefContext;
 
         public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
         {
-            ExpressionValue = FromExpression(type, String, Property, ref Unsafe.AsRef<TDataRefReadContext>(DataRefContext));
+            ExpressionValue = FromExpression(type, String, Property, Database, ref Unsafe.AsRef<TDataRefReadContext>(DataRefContext));
         }
     }
 

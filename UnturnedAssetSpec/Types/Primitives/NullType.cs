@@ -10,7 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// A type that can be any type.
 /// </summary>
 /// <remarks>Used by the <c>Asset</c> and <c>Metadata</c> pseudo-properties.</remarks>
-internal sealed class NullType : IType, ITypeFactory
+public sealed class NullType : IType, ITypeFactory
 {
     public static readonly NullType Instance = new NullType();
     public string Id => TypeId;

@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -18,7 +19,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 /// <summary>
 /// A subclass of <see cref="DatType"/> which defines a specific set of values or a set of flags which can be combined (or'd) into a bitwise value.
 /// </summary>
-public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumValue>, IDatTypeWithStringParseableType<DatEnumValue>, IDisposable
+public class DatEnumType : DatType,
+    IType<DatEnumValue>,
+    ITypeConverter<DatEnumValue>,
+    IDatTypeWithStringParseableType<DatEnumValue>,
+    IDisposable,
+    ITypeParser<DatEnumValue>
 {
     internal readonly IDatSpecificationReadContext Context;
     private bool _hasStringParser;
@@ -46,8 +52,7 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
     /// <summary>
     /// The parser used for values of this enum type.
     /// </summary>
-    [field: MaybeNull]
-    public ITypeParser<DatEnumValue> Parser => field ??= new TypeConverterParser<DatEnumValue>(this);
+    public ITypeParser<DatEnumValue> Parser => this;
 
     /// <inheritdoc />
     public QualifiedType StringParseableType { get; internal set; }
@@ -249,6 +254,7 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
 
             case JsonValueKind.String:
                 string str = json.GetString()!;
+                args.TextAsString = str;
                 if (TryParse(str, out DatEnumValue? val, caseInsensitive: false))
                 {
                     value = val;
@@ -279,9 +285,57 @@ public class DatEnumType : DatType, IType<DatEnumValue>, ITypeConverter<DatEnumV
         if (_hasStringParser && StringParser is IDisposable disp)
             disp.Dispose();
     }
+
+    public bool TryParse(ref TypeParserArgs<DatEnumValue> args, ref FileEvaluationContext ctx, out Optional<DatEnumValue> value)
+    {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
+        if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? v))
+        {
+            args.Result = TypeParserResult.Failed;
+            value = Optional<DatEnumValue>.Null;
+            return false;
+        }
+
+        if (TryParseSingleValue(v.Value.AsSpan(), out DatEnumValue? enumValue, true))
+        {
+            args.Result = TypeParserResult.Successful;
+            value = new Optional<DatEnumValue>(enumValue);
+            return true;
+        }
+
+        args.Result = TypeParserResult.Failed;
+        args.DiagnosticSink?.UNT1014(ref args, v.Value);
+        return false;
+    }
+
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<DatEnumValue> value,
+        IType<DatEnumValue> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
+    {
+        TypeConverterParseArgs<DatEnumValue> args = default;
+        args.Type = this;
+        return TryReadJson(in json, out value, ref args);
+    }
+
+    public void WriteValueToJson(Utf8JsonWriter writer, DatEnumValue value, IType<DatEnumValue> valueType, JsonSerializerOptions options)
+    {
+        TypeConverterFormatArgs args = default;
+        WriteJson(writer, value, ref args, options);
+    }
 }
 
-public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConverter<DatFlagEnumValue>
+public class DatFlagEnumType :
+    DatEnumType,
+    IType<DatFlagEnumValue>,
+    ITypeConverter<DatFlagEnumValue>,
+    ITypeParser<DatFlagEnumValue>
 {
     /// <summary>
     /// The null value for this enum type.
@@ -290,8 +344,7 @@ public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConver
     public new IValue<DatFlagEnumValue> Null => field ??= new NullValue<DatFlagEnumValue>(this);
 
     /// <inheritdoc />
-    [field: MaybeNull]
-    public new ITypeParser<DatFlagEnumValue> Parser => field ??= new TypeConverterParser<DatFlagEnumValue>(this);
+    public new ITypeParser<DatFlagEnumValue> Parser => this;
 
     /// <inheritdoc />
     public override DatSpecificationType Type => DatSpecificationType.FlagEnum;
@@ -675,6 +728,49 @@ public class DatFlagEnumType : DatEnumType, IType<DatFlagEnumValue>, ITypeConver
         }
     }
 
+    public bool TryParse(ref TypeParserArgs<DatFlagEnumValue> args, ref FileEvaluationContext ctx, out Optional<DatFlagEnumValue> value)
+    {
+        if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool rtn))
+        {
+            return rtn;
+        }
+
+        if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? v))
+        {
+            args.Result = TypeParserResult.Failed;
+            value = Optional<DatFlagEnumValue>.Null;
+            return false;
+        }
+
+        if (TryParse(v.Value.AsSpan(), out DatFlagEnumValue? enumValue, true))
+        {
+            args.Result = TypeParserResult.Successful;
+            value = new Optional<DatFlagEnumValue>(enumValue);
+            return true;
+        }
+
+        args.Result = TypeParserResult.Failed;
+        args.DiagnosticSink?.UNT1014(ref args, v.Value);
+        return false;
+    }
+
+    public bool TryReadValueFromJson<TDataRefReadContext>(
+        in JsonElement json,
+        out Optional<DatFlagEnumValue> value,
+        IType<DatFlagEnumValue> valueType,
+        ref TDataRefReadContext dataRefContext
+    ) where TDataRefReadContext : IDataRefReadContext?
+    {
+        TypeConverterParseArgs<DatFlagEnumValue> args = default;
+        args.Type = this;
+        return TryReadJson(in json, out value, ref args);
+    }
+
+    public void WriteValueToJson(Utf8JsonWriter writer, DatFlagEnumValue value, IType<DatFlagEnumValue> valueType, JsonSerializerOptions options)
+    {
+        TypeConverterFormatArgs args = default;
+        WriteJson(writer, value, ref args, options);
+    }
 }
 
 /// <summary>

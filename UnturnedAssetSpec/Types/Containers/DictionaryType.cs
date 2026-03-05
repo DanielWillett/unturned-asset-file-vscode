@@ -484,12 +484,10 @@ public class DictionaryType<TKeyType, TValueType>
                 if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
                 {
                     args.DiagnosticSink?.UNT2004_NoDictionary(ref args, args.ParentNode);
+                    break;
                 }
-                else if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
-                {
-                    return defValue.TryGetValueAs(ref ctx, out value);
-                }
-                break;
+
+                return TypeParsers.TryApplyMissingValueBehaviorToNullValue(ref args, ref ctx, out value);
 
             case IDictionarySourceNode dictionaryNode:
                 ImmutableArray<ISourceNode> nodes = dictionaryNode.Children;
@@ -498,6 +496,7 @@ public class DictionaryType<TKeyType, TValueType>
                 if (count == 0)
                 {
                     value = EquatableArray<DictionaryPair<TValueType>>.Empty;
+                    args.Result = TypeParserResult.Successful;
                     return true;
                 }
 
@@ -563,6 +562,7 @@ public class DictionaryType<TKeyType, TValueType>
                 }
 
                 value = new EquatableArray<DictionaryPair<TValueType>>(array, index);
+                args.Result = allPassed ? TypeParserResult.Successful : TypeParserResult.Failed;
                 return allPassed;
 
             case IListSourceNode listNode:
@@ -574,6 +574,7 @@ public class DictionaryType<TKeyType, TValueType>
                 break;
         }
 
+        args.Result = TypeParserResult.Failed;
         return false;
     }
 

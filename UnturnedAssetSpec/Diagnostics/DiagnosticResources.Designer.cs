@@ -673,6 +673,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This dictionary contains multiple &apos;{0}&apos; properties. This property overrides all others with the same name..
+        /// </summary>
+        public static string UNT1032 {
+            get {
+                return ResourceManager.GetString("UNT1032", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The MasterBundleReference (&quot;MasterBundle&quot;, &quot;AssetPath&quot;) format is preferred here over the legacy ContentReference (&quot;Name&quot;, &quot;Path&quot;) format..
         /// </summary>
         public static string UNT104 {
@@ -1074,6 +1083,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics {
         public static string UNT2014_Object {
             get {
                 return ResourceManager.GetString("UNT2014_Object", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This dictionary contains multiple &apos;{0}&apos; properties. This property has no effect..
+        /// </summary>
+        public static string UNT2032 {
+            get {
+                return ResourceManager.GetString("UNT2032", resourceCulture);
             }
         }
         

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using OrderInfo = (DanielWillett.UnturnedDataFileLspServer.Data.Project.OrderedPropertyReference[] Order, int[] ReverseOrder, int AlternateOffset);
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
@@ -19,26 +20,30 @@ public class PropertyOrderFile(string fileName) : IPropertyOrderFile
 
     public string FileName { get; } = fileName;
 
-    internal ImmutableDictionary<TypeKey, OrderedPropertyReference[]> Orders = ImmutableDictionary<TypeKey, OrderedPropertyReference[]>.Empty;
+    internal ImmutableDictionary<TypeKey, OrderInfo> Orders = ImmutableDictionary<TypeKey, OrderInfo>.Empty;
 
     /// <inheritdoc />
     public OrderedPropertyReference[] GetOrderForType(QualifiedType type, SpecPropertyContext context)
     {
-        TypeKey tk;
-        tk.TypeName = type.Normalized.Type;
-        tk.IsLocalization = context switch
-        {
-            SpecPropertyContext.Property => false,
-            SpecPropertyContext.Localization => true,
-            _ => throw new ArgumentOutOfRangeException(nameof(context))
-        };
-
-        if (!Orders.TryGetValue(tk, out OrderedPropertyReference[] values))
+        CreateKey(type, context, out TypeKey tk);
+        if (!Orders.TryGetValue(tk, out OrderInfo values))
         {
             return Array.Empty<OrderedPropertyReference>();
         }
 
-        return values;
+        return values.Order;
+    }
+
+    /// <inheritdoc />
+    public (int[] ReverseOrder, int AlternateOffset) GetRelativePositions(QualifiedType type, SpecPropertyContext context)
+    {
+        CreateKey(type, context, out TypeKey tk);
+        if (!Orders.TryGetValue(tk, out OrderInfo values))
+        {
+            return (Array.Empty<int>(), 0);
+        }
+
+        return (values.ReverseOrder, values.AlternateOffset);
     }
 
     public static bool TryReadFromFile(
@@ -98,7 +103,7 @@ public class PropertyOrderFile(string fileName) : IPropertyOrderFile
         IPropertyOrderFile? parentOrderFile = null)
     {
         ReadState s;
-        s.Output = ImmutableDictionary.CreateBuilder<TypeKey, OrderedPropertyReference[]>();
+        s.Output = ImmutableDictionary.CreateBuilder<TypeKey, OrderInfo>();
         s.Properties = new Dictionary<TypeKey, IPropertySourceNode>();
         s.Database = database;
         s.Processed = new HashSet<IPropertySourceNode>();
@@ -198,6 +203,7 @@ public class PropertyOrderFile(string fileName) : IPropertyOrderFile
             s.BaseTypeStack.Push(baseType);
         }
 
+        OrderedPropertyReference[] order;
         while (s.BaseTypeStack.Count > 0)
         {
             DatTypeWithProperties baseType = s.BaseTypeStack.Pop();
@@ -211,12 +217,99 @@ public class PropertyOrderFile(string fileName) : IPropertyOrderFile
                 continue;
             }
 
-            s.Output[k] = ReadNode(in k, baseType, node, ref s);
+            order = ReadNode(in k, baseType, node, ref s);
+            s.Output[k] = CreateReverseOrder(order, baseType, in k);
             s.Processed.Add(node);
         }
 
-        s.Output[key] = ReadNode(in key, type, property, ref s);
+        order = ReadNode(in key, type, property, ref s);
+        s.Output[key] = CreateReverseOrder(order, type, in key);
         s.Processed.Add(property);
+    }
+
+    private static OrderInfo CreateReverseOrder(OrderedPropertyReference[] order, DatTypeWithProperties type, in TypeKey key)
+    {
+        ImmutableArray<DatProperty> propertyArray = GetPropertyList(type, key.IsLocalization);
+        ImmutableArray<DatProperty> altPropertyArray = GetPropertyList(type, !key.IsLocalization);
+
+        int mainSize = propertyArray.Length, altSize = altPropertyArray.Length;
+
+        for (DatTypeWithProperties? baseType = type.BaseType; baseType != null; baseType = baseType.BaseType)
+        {
+            ImmutableArray<DatProperty> basePropertyArray = GetPropertyList(baseType, key.IsLocalization);
+            ImmutableArray<DatProperty> baseAltPropertyArray = GetPropertyList(baseType, !key.IsLocalization);
+
+            mainSize += basePropertyArray.Length;
+            altSize += baseAltPropertyArray.Length;
+        }
+
+        // filled with -1
+        int ttlSize = mainSize + altSize;
+        int[] reverseOrder = new int[ttlSize];
+
+        for (int i = 0; i < ttlSize; ++i)
+            reverseOrder[i] = -1;
+
+        // index of the first included property in each list
+        int minIncluded = int.MaxValue;
+
+        // sets all properties indices to their position in the file order, skipping one for white space
+        for (int i = 0; i < order.Length; ++i)
+        {
+            OrderedPropertyReference pref = order[i];
+            if (pref.IsEmptyLine)
+                continue;
+
+            int index = pref.Index;
+            if (pref.IsOppositeContext)
+                index += altSize;
+            
+            if (index >= reverseOrder.Length)
+                continue;
+
+            reverseOrder[index] = i;
+            minIncluded = Math.Min(minIncluded, index);
+        }
+
+
+        // add un-included properties somewhere that makes sense, incrementing all indices greater than it
+        int lastIncludedIndex = -1;
+        for (int propertyIndex = 0; propertyIndex < ttlSize; ++propertyIndex)
+        {
+            if (reverseOrder[propertyIndex] >= 0)
+            {
+                lastIncludedIndex = propertyIndex;
+                continue;
+            }
+
+            int insertValue;
+            // insert before first included or after previous included
+            if (lastIncludedIndex < 0)
+            {
+                if (minIncluded == int.MaxValue)
+                    insertValue = 0;
+                else
+                    insertValue = reverseOrder[minIncluded] - 1;
+            }
+            else
+                insertValue = reverseOrder[lastIncludedIndex] + 1;
+
+            InsertIndexIntoArray(reverseOrder, propertyIndex, insertValue);
+            lastIncludedIndex = propertyIndex;
+        }
+
+        return (order, reverseOrder, mainSize);
+        
+        static void InsertIndexIntoArray(int[] array, int atIndex, int withValue)
+        {
+            for (int i = 0; i < array.Length; ++i)
+            {
+                if (array[i] >= withValue)
+                    ++array[i];
+            }
+
+            array[atIndex] = withValue;
+        }
     }
 
     private static OrderedPropertyReference[] ReadNode(in TypeKey key, DatTypeWithProperties type, IPropertySourceNode property, ref ReadState state)
@@ -232,11 +325,16 @@ public class PropertyOrderFile(string fileName) : IPropertyOrderFile
             TypeKey tk;
             tk.TypeName = baseType.TypeName.Type;
             tk.IsLocalization = key.IsLocalization;
-            if (!state.Output.TryGetValue(tk, out OrderedPropertyReference[]? indices))
+            OrderedPropertyReference[]? indices;
+            if (!state.Output.TryGetValue(tk, out OrderInfo info))
             {
                 indices = state.Parent?.GetOrderForType(tk.TypeName, tk.Context);
                 if (indices == null)
                     continue;
+            }
+            else
+            {
+                indices = info.Order;
             }
 
             for (int i = 0; i < indices.Length; ++i)
@@ -410,9 +508,20 @@ public class PropertyOrderFile(string fileName) : IPropertyOrderFile
         return s.Database.ReadContext.LoggerFactory.CreateLogger<PropertyOrderFile>();
     }
 
+    private static void CreateKey(QualifiedType type, SpecPropertyContext context, out TypeKey tk)
+    {
+        tk.TypeName = type.Normalized.Type;
+        tk.IsLocalization = context switch
+        {
+            SpecPropertyContext.Property => false,
+            SpecPropertyContext.Localization => true,
+            _ => throw new ArgumentOutOfRangeException(nameof(context))
+        };
+    }
+
     private struct ReadState
     {
-        public ImmutableDictionary<TypeKey, OrderedPropertyReference[]>.Builder Output;
+        public ImmutableDictionary<TypeKey, OrderInfo>.Builder Output;
         public Stack<DatTypeWithProperties> BaseTypeStack;
         public HashSet<IPropertySourceNode> Processed;
         public Dictionary<TypeKey, IPropertySourceNode> Properties;

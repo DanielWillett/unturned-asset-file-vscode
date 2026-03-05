@@ -96,7 +96,7 @@ internal readonly struct ExpressionNodeFormatter
             case IPropertyReferenceExpressionNode propRef:
                 if (prefix is not false)
                     Write('@');
-                PropertyReference r = propRef.Reference;
+                ref readonly PropertyReference r = ref propRef.Reference;
                 WritePropertyRef(in r);
                 break;
         }

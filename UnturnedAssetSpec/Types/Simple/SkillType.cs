@@ -105,6 +105,7 @@ internal class SkillType : BaseType<SkillReference, SkillType>, ITypeParser<Skil
         
         if (!TypeParsers.String.TryParse(ref stringParseArgs, ref ctx, out Optional<string> valueAsString) || string.IsNullOrEmpty(valueAsString.Value))
         {
+            args.Result = TypeParserResult.Failed;
             return false;
         }
 
@@ -117,6 +118,7 @@ internal class SkillType : BaseType<SkillReference, SkillType>, ITypeParser<Skil
             else if (SkillReference.TryParseFromBlueprintSkill(valueAsString.Value, ctx.Services.Database, out SkillReference blueprintEnumValue))
             {
                 value = blueprintEnumValue;
+                args.Result = TypeParserResult.Successful;
                 return true;
             }
         }
@@ -124,9 +126,11 @@ internal class SkillType : BaseType<SkillReference, SkillType>, ITypeParser<Skil
         if (!SkillReference.TryParse(valueAsString.Value, _info, out SkillReference skillRef))
         {
             args.DiagnosticSink?.UNT1014(ref args, valueAsString.Value);
+            args.Result = TypeParserResult.Failed;
             return false;
         }
 
+        args.Result = TypeParserResult.Successful;
         value = new Optional<SkillReference>(skillRef);
         return true;
     }

@@ -70,7 +70,6 @@ internal class BlueprintUseThisKeyword : PerPropertyCodeFix<BlueprintUseThisKeyw
         IPropertySourceNode propertyNode,
         IType propertyType,
         DatProperty property,
-        in PropertyBreadcrumbs breadcrumbs,
         ref FileEvaluationContext ctx)
     {
         state = default;

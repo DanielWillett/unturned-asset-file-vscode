@@ -100,17 +100,10 @@ public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetRefer
                 if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
                 {
                     args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                    break;
                 }
-                else
-                {
-                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
-                    {
-                        return defValue.TryGetValueAs(ref ctx, out value);
-                    }
 
-                    return false;
-                }
-                break;
+                return TypeParsers.TryApplyMissingValueBehaviorToNullValue(ref args, ref ctx, out value);
 
             case IListSourceNode l:
                 args.DiagnosticSink?.UNT2004_ListInsteadOfValue(ref args, l, args.Type);
@@ -122,14 +115,17 @@ public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetRefer
                     if (!Defaultable || !KnownTypeValueHelper.TryParseInt32(v.Value, out int idAsInt) || idAsInt > ushort.MaxValue)
                     {
                         args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
+                        args.Result = TypeParserResult.Failed;
                         return false;
                     }
 
                     value = Optional<ushort>.Null;
+                    args.Result = TypeParserResult.Successful;
                     return true;
                 }
 
                 value = id;
+                args.Result = TypeParserResult.Successful;
                 return true;
 
             case IDictionarySourceNode:
@@ -137,6 +133,7 @@ public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetRefer
                 break;
         }
 
+        args.Result = TypeParserResult.Failed;
         return false;
     }
 

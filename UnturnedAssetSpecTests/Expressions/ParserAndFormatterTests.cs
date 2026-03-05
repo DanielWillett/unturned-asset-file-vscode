@@ -39,9 +39,9 @@ public class ParserAndFormatterTests
     {
         DataRefs.NilDataRefContext c;
 #if NET7_0_OR_GREATER
-        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, ref c, false);
+        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, null!, ref c, false);
 #else
-        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, &c, false);
+        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, null!, &c, false);
 #endif
 
         IExpressionNode node = parser.Parse<double>();
@@ -56,9 +56,9 @@ public class ParserAndFormatterTests
         Console.WriteLine(str);
 
 #if NET7_0_OR_GREATER
-        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser2 = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, ref c, false);
+        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser2 = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, null!, ref c, false);
 #else
-        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser2 = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, &c, false);
+        using ExpressionNodeParser<DataRefs.NilDataRefContext> parser2 = new ExpressionNodeParser<DataRefs.NilDataRefContext>(input, null!, null!, &c, false);
 #endif
 
         IExpressionNode node2 = parser2.Parse<double>();

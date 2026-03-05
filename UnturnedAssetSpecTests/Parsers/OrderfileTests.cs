@@ -34,7 +34,7 @@ internal class OrderfileTests
             new StaticSourceFileWorkspaceEnvironment(useCache: true, database, installationEnvironment: env),
             database.UnturnedInstallDirectory,
             env,
-            NilProjectFileProvider.Instance
+            new NilProjectFileProvider(database)
         );
 
         await database.InitializeAsync();

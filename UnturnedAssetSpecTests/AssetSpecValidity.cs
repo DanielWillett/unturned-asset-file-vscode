@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data;
+﻿using System.Collections.Immutable;
+using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -59,6 +60,39 @@ public class AssetSpecValidity
         foreach (string value in orderfile.Select(x => x.GetString(type, false)))
         {
             Console.WriteLine("    " + value);
+        }
+
+        QualifiedType sortTest = new QualifiedType("SDG.Unturned.ItemChargeAsset, Assembly-CSharp");
+
+        PropertyOrderFile.TypeKey tk;
+        tk.TypeName = sortTest.Type;
+
+        int mainIndex = 0, altIndex = 0;
+        for (
+            DatAssetFileType? baseType = (DatAssetFileType)db.FileTypes[sortTest];
+            baseType != null;
+            baseType = baseType.BaseType as DatAssetFileType
+        )
+        {
+            ImmutableArray<DatProperty> basePropertyArray = baseType.Properties;
+            ImmutableArray<DatProperty> baseAltPropertyArray = baseType.LocalizationProperties;
+
+            tk.IsLocalization = false;
+            for (int i = 0; i < basePropertyArray.Length; ++i)
+            {
+                Assert.That(basePropertyArray[i].TryGetIndexInType(tk, out int index));
+                Assert.That(index, Is.EqualTo(i + mainIndex));
+            }
+
+            tk.IsLocalization = true;
+            for (int i = 0; i < baseAltPropertyArray.Length; ++i)
+            {
+                Assert.That(baseAltPropertyArray[i].TryGetIndexInType(tk, out int index));
+                Assert.That(index, Is.EqualTo(i + altIndex));
+            }
+
+            mainIndex += basePropertyArray.Length;
+            altIndex += baseAltPropertyArray.Length;
         }
     }
 }

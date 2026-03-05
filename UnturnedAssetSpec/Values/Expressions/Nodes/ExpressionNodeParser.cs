@@ -20,6 +20,7 @@ internal unsafe ref struct ExpressionNodeParser<TDataRefReadContext> : IDisposab
     private ExpressionNodeBuffer _current;
     private readonly int _flags;
     private readonly DatProperty _owner;
+    private readonly IAssetSpecDatabase _database;
 
 #if NET7_0_OR_GREATER
     private readonly ref TDataRefReadContext _dataRefContext;
@@ -32,6 +33,7 @@ internal unsafe ref struct ExpressionNodeParser<TDataRefReadContext> : IDisposab
 
     public ExpressionNodeParser(string expression,
         DatProperty owner,
+        IAssetSpecDatabase database,
 #if NET7_0_OR_GREATER
         ref TDataRefReadContext dataRefContext,
 #else
@@ -45,12 +47,14 @@ internal unsafe ref struct ExpressionNodeParser<TDataRefReadContext> : IDisposab
         _dataRefContext = dataRefContext;
 #endif
         _owner = owner;
+        _database = database;
         _tokenizer = new ExpressionTokenizer(expression);
         _flags = simplifyConstantExpressions ? 1 : 0;
     }
 
     public ExpressionNodeParser(ReadOnlySpan<char> expression,
         DatProperty owner,
+        IAssetSpecDatabase database,
 #if NET7_0_OR_GREATER
         ref TDataRefReadContext dataRefContext,
 #else
@@ -64,12 +68,14 @@ internal unsafe ref struct ExpressionNodeParser<TDataRefReadContext> : IDisposab
         _dataRefContext = dataRefContext;
 #endif
         _owner = owner;
+        _database = database;
         _tokenizer = new ExpressionTokenizer(expression);
         _flags = simplifyConstantExpressions ? 1 : 0;
     }
 
     public ExpressionNodeParser(ExpressionTokenizer tokenizer,
         DatProperty owner,
+        IAssetSpecDatabase database,
 #if NET7_0_OR_GREATER
         ref TDataRefReadContext dataRefContext,
 #else
@@ -83,6 +89,7 @@ internal unsafe ref struct ExpressionNodeParser<TDataRefReadContext> : IDisposab
         _dataRefContext = dataRefContext;
 #endif
         _owner = owner;
+        _database = database;
         _tokenizer = tokenizer;
         _flags = (simplifyConstantExpressions ? 1 : 0) | ((leaveOpen ? 1 : 0) * 2);
     }
@@ -265,7 +272,7 @@ internal unsafe ref struct ExpressionNodeParser<TDataRefReadContext> : IDisposab
 
             case ExpressionValueType.PropertyRef:
                 PropertyReference propRef = PropertyReference.Parse(span, token.ContentAsString);
-                return new PropertyReferenceExpressionNode(propRef);
+                return propRef.CreateValue(_owner, _database);
             
             case ExpressionValueType.DataRef:
                 if (!DataRefs.TryReadDataRef(token.ContentAsString ?? span.ToString(), idealType, _owner, out IDataRef? dataRef,

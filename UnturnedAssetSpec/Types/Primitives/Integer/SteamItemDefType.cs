@@ -62,7 +62,12 @@ public sealed class SteamItemDefType : PrimitiveType<int, SteamItemDefType>, ITy
         }
 
         if (!TypeParsers.Int32.TryParse(ref args, ref ctx, out value) || !value.HasValue)
+        {
+            args.Result = TypeParserResult.Failed;
             return false;
+        }
+
+        args.Result = TypeParserResult.Successful;
 
         switch (value.Value)
         {

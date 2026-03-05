@@ -4,7 +4,9 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -592,5 +594,51 @@ partial class SpecificationFileReader
         }
 
         return new TypeSwitch(switchType, caseArrayBuilder.MoveToImmutable(), maxTrimmingBehavior);
+    }
+
+    private static void IndexProperties(ImmutableDictionary<QualifiedType, DatFileType> fileTypes)
+    {
+        foreach (DatFileType fileType in fileTypes.Values)
+        {
+            IndexPropertiesForType(fileType);
+
+            foreach (DatTypeWithProperties type in fileType.Types.Values.OfType<DatTypeWithProperties>())
+            {
+                IndexPropertiesForType(type);
+            }
+        }
+    }
+
+    private static void IndexPropertiesForType(DatTypeWithProperties type)
+    {
+        PropertyOrderFile.TypeKey tk;
+        tk.IsLocalization = false;
+        tk.TypeName = type.TypeName.Type;
+
+        int index = 0, localizationIndex = 0;
+        for (DatTypeWithProperties? t = type; t != null; t = t.BaseType)
+        {
+            ImmutableArray<DatProperty> props = t.Properties;
+            for (int i = 0; i < props.Length; i++)
+            {
+                props[i].TryAddIndex(tk, index + i);
+            }
+
+            index += props.Length;
+
+            if (t is not IDatTypeWithLocalizationProperties localization)
+                continue;
+
+            tk.IsLocalization = true;
+
+            props = localization.LocalizationProperties;
+            for (int i = 0; i < props.Length; i++)
+            {
+                props[i].TryAddIndex(tk, localizationIndex + i);
+            }
+
+            tk.IsLocalization = false;
+            localizationIndex += props.Length;
+        }
     }
 }

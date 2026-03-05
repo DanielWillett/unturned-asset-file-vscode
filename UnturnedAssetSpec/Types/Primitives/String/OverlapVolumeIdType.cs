@@ -34,8 +34,12 @@ public sealed class OverlapVolumeIdType : PrimitiveType<string, OverlapVolumeIdT
         }
 
         if (!TypeParsers.String.TryParse(ref args, ref ctx, out value))
+        {
+            args.Result = TypeParserResult.Failed;
             return false;
+        }
 
+        args.Result = TypeParserResult.Successful;
         if (args.DiagnosticSink == null || !ctx.TryGetRelevantMap(out _))
         {
             return true;

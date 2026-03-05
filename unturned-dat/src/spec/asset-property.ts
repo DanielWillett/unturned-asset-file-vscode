@@ -1,5 +1,11 @@
 import { Range } from 'vscode';
 
+export interface TypeHierarchyElement
+{
+    type: string,
+    displayName: string
+}
+
 export interface AssetProperty
 {
     key: string,
@@ -9,4 +15,5 @@ export interface AssetProperty
     markdown: string | null | undefined;
     ordinal: number | undefined;
     children: AssetProperty[] | undefined;
+    typeHierarchy: TypeHierarchyElement[] | undefined;
 }

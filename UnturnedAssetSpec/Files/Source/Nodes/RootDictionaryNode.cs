@@ -14,7 +14,11 @@ internal class RootDictionaryNode : DictionaryNode, ISourceFile
     public OneOrMore<KeyValuePair<string, object?>> AdditionalProperties { get; }
 
     public IWorkspaceFile WorkspaceFile { get; internal set; }
+#if NET9_0_OR_GREATER
+    public System.Threading.Lock TreeSync { get; }
+#else
     public object TreeSync { get; }
+#endif
     public int FileVersion { get; private set; }
     public ImmutableArray<IPropertySourceNode> Properties { get; internal set; }
     public QualifiedType ActualType { get; protected set; }
@@ -44,8 +48,13 @@ internal class RootDictionaryNode : DictionaryNode, ISourceFile
         WorkspaceFile = file;
         Database = database;
         AdditionalProperties = additionalProperties;
+
+#if NET9_0_OR_GREATER
+        TreeSync = new System.Threading.Lock();
+#else
         TreeSync = new object();
-        
+#endif
+
         ImmutableArray<IPropertySourceNode>.Builder builder = ImmutableArray.CreateBuilder<IPropertySourceNode>(count);
         for (int i = 0; i < nodes.Length; ++i)
         {

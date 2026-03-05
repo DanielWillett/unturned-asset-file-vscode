@@ -289,8 +289,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
             DatProperty property,
             IType propertyType,
             ref FileEvaluationContext ctx,
-            IPropertySourceNode node,
-            in PropertyBreadcrumbs breadcrumbs)
+            IPropertySourceNode node)
         {
             // todo SpecPropertyTypeParseContext ctx = parseCtx.WithDiagnostics(Diagnostics);
             // todo propertyType.TryParseValue(ref ctx, out _);

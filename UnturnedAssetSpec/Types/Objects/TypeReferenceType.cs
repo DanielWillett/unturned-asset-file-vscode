@@ -110,17 +110,10 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
                 if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
                 {
                     args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                    break;
                 }
-                else
-                {
-                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
-                    {
-                        return defValue.TryGetValueAs(ref ctx, out value);
-                    }
 
-                    return false;
-                }
-                break;
+                return TypeParsers.TryApplyMissingValueBehaviorToNullValue(ref args, ref ctx, out value);
 
             case IListSourceNode l:
                 args.DiagnosticSink?.UNT2004_ListInsteadOfValue(ref args, l, args.Type);
@@ -130,23 +123,24 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
                 if (!TryParseTypeRefValue(ref args, ref ctx, v.Value, out QualifiedType type))
                 {
                     args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
-                    return false;
+                    break;
                 }
 
                 value = type;
+                args.Result = TypeParserResult.Successful;
                 return true;
 
             case IDictionarySourceNode d:
                 if (Kind != TypeReferenceKind.Object)
                 {
                     args.DiagnosticSink?.UNT2004_TypeReferenceStringOnly(ref args, args.Type, args.ParentNode);
-                    return false;
+                    break;
                 }
 
                 if (!d.TryGetProperty("Type", out IPropertySourceNode? guidNode))
                 {
                     args.DiagnosticSink?.UNT1007(ref args, d, "Type");
-                    return false;
+                    break;
                 }
 
                 args.ReferencedPropertySink?.AcceptReferencedProperty(guidNode);
@@ -156,28 +150,34 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
                 {
                     default:
                         args.DiagnosticSink?.UNT2004_NoValue(ref typeArgs, guidNode);
+                        args.Result = TypeParserResult.Failed;
                         return false;
 
                     case IListSourceNode list:
                         args.DiagnosticSink?.UNT2004_ListInsteadOfValue(ref typeArgs, list, this);
+                        args.Result = TypeParserResult.Failed;
                         return false;
 
                     case IDictionarySourceNode dict:
                         args.DiagnosticSink?.UNT2004_DictionaryInsteadOfValue(ref typeArgs, dict, this);
+                        args.Result = TypeParserResult.Failed;
                         return false;
 
                     case IValueSourceNode typeValue:
                         if (!TryParseTypeRefValue(ref typeArgs, ref ctx, typeValue.Value, out type))
                         {
                             args.DiagnosticSink?.UNT2004_Generic(ref typeArgs, typeValue.Value, args.Type);
+                            args.Result = TypeParserResult.Failed;
                             return false;
                         }
 
                         value = type;
+                        args.Result = TypeParserResult.Successful;
                         return true;
                 }
         }
 
+        args.Result = TypeParserResult.Failed;
         return false;
     }
 
@@ -186,11 +186,26 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
 #pragma warning disable CS8500
     private bool TryParseTypeRefValue(ref TypeParserArgs<QualifiedType> args, ref FileEvaluationContext ctx, string value, out QualifiedType type)
     {
-        QualifiedType.ExtractParts(value.AsSpan(), out ReadOnlySpan<char> typeName, out ReadOnlySpan<char> asmName);
-
-        if (Kind == TypeReferenceKind.String && value.IndexOfAny(InvalidTypeChars) >= 0)
+        bool couldBeBadEnum = false;
+        if (!QualifiedType.ExtractParts(value.AsSpan(), out ReadOnlySpan<char> typeName, out ReadOnlySpan<char> asmName)
+            && _enumType != null)
         {
-            args.DiagnosticSink?.UNT2004_Generic(ref args, value, this);
+            if (_enumType.TryParse(value.AsSpan(), out DatEnumValue? enumValue))
+            {
+                QualifiedType correspondingType = enumValue.CorrespondingType;
+                type = correspondingType;
+                goto checkBaseTypes;
+            }
+
+            couldBeBadEnum = true;
+        }
+
+        if (Kind == TypeReferenceKind.String && (typeName.IsEmpty || value.IndexOfAny(InvalidTypeChars) >= 0))
+        {
+            if (couldBeBadEnum)
+                args.DiagnosticSink?.UNT1014(ref args, value);
+            else
+                args.DiagnosticSink?.UNT2004_Generic(ref args, value, this);
             type = QualifiedType.None;
             return false;
         }
@@ -237,10 +252,15 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
             type = new QualifiedType(value, !IsCaseSensitive);
         }
 
+        checkBaseTypes:
         if (args.DiagnosticSink != null && !_baseTypes.IsNull)
         {
             InverseTypeHierarchy parents = ctx.Services.Database.Information.GetParentTypes(value);
-            if (!parents.IsValid || !_baseTypes.Any(x => Array.IndexOf(parents.ParentTypes, x) >= 0))
+            if (couldBeBadEnum && !parents.IsValid)
+            {
+                args.DiagnosticSink?.UNT1014(ref args, value);
+            }
+            else if (!parents.IsValid || !_baseTypes.Any(x => Array.IndexOf(parents.ParentTypes, x) >= 0))
             {
                 args.DiagnosticSink?.UNT103(ref args, value, string.Join(", ", _baseTypes.Select(x => x.Type)));
             }

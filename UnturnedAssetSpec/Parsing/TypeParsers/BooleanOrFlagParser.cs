@@ -12,6 +12,17 @@ internal sealed class BooleanOrFlagParser : ITypeParser<bool>
 {
     public bool TryParse(ref TypeParserArgs<bool> args, ref FileEvaluationContext ctx, out Optional<bool> value)
     {
+        if (args.ValueNode == null && args.ParentNode is not IPropertySourceNode)
+        {
+            if (TypeParsers.TryApplyMissingValueBehavior(ref args, ref ctx, out value, out bool returnValue))
+            {
+                return returnValue;
+            }
+
+            args.Result = TypeParserResult.Failed;
+            return false;
+        }
+
         if (args.ValueNode is IValueSourceNode v)
         {
             args.CreateTypeConverterParseArgs(out TypeConverterParseArgs<bool> parseArgs, v.Value);

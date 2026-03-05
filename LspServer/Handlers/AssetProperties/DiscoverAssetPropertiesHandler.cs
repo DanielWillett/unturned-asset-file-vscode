@@ -11,7 +11,9 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 
@@ -58,14 +60,18 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
 
         AssetProperty[] array = outputProperties.ToArray();
         IPropertyOrderFile orderfile = _parsingServices.ProjectFileProvider.GetScaffoldedOrderfile(file);
-        SortRecursive(array, orderfile);
+
+        IComparer<AssetProperty> comparer = orderfile.CreateComparer<AssetProperty>(
+            sourceFile.ActualType,
+            sourceFile is ILocalizationSourceFile
+                ? SpecPropertyContext.Localization
+                : SpecPropertyContext.Property,
+            x => x.Property
+        );
+
+        outputProperties.Sort(comparer);
 
         return Task.FromResult(new Container<AssetProperty>(outputProperties));
-    }
-
-    private void SortRecursive(AssetProperty[] properties, IPropertyOrderFile orderfile)
-    {
-        
     }
 
     private void Execute(IDictionarySourceNode dictionary, AssetDatPropertyPosition position, List<AssetProperty> outputProperties)
@@ -83,6 +89,9 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
 
             foreach (DatProperty property in properties)
             {
+                if (property is { Type: NullType, AssetPosition: AssetDatPropertyPositionExpectation.Root })
+                    continue;
+
                 if (!property.AssetPosition.IsValidPosition(ctx.RootPosition, ctx.FileHasAssetDictionary, ctx.FileHasMetadataDictionary))
                 {
                     continue;
@@ -95,7 +104,8 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
                 {
                     Key = property.Key,
                     Description = desc,
-                    Markdown = mdDesc
+                    Markdown = mdDesc,
+                    Property = property
                 };
 
                 scoped ValueVisitor v;
@@ -181,6 +191,12 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
                 }
             }
 
+            if (JsonHelper.TryCreateJValue(value.Value, out JValue? jvalue))
+            {
+                Property.Value = jvalue;
+                return;
+            }
+
             if (TypeConverters.TryGet<TValue>() is { } tc)
             {
                 TypeConverterFormatArgs f = TypeConverterFormatArgs.Default;
@@ -204,6 +220,10 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
 
                 case IDictionaryPair<TValue> pair:
                     pair.Visit(ref this);
+                    break;
+
+                default:
+                    Property.Value = JValue.CreateString(value.Value!.ToString());
                     break;
             }
         }
@@ -260,7 +280,8 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
                     Key = pair.Property.Key,
                     Description = desc,
                     Markdown = mdDesc,
-                    Range = pair.Node?.Parent?.Range.ToRange() ?? Node?.Range.ToRange()
+                    Range = pair.Node?.Parent?.Range.ToRange() ?? Node?.Range.ToRange(),
+                    Property = pair.Property
                 };
                 v.ParentProperty = pair.Property;
 
@@ -292,7 +313,8 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
                 {
                     IndexPlusOne = i + 1,
                     Key = string.Empty,
-                    Range = valueNode?.Range.ToRange()
+                    Range = valueNode?.Range.ToRange(),
+                    Property = ParentProperty!
                 };
                 v.Index = i;
 

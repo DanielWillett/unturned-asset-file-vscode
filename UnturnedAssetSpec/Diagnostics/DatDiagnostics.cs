@@ -1,7 +1,5 @@
 // ReSharper disable InconsistentNaming
 
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 
 /// <summary>
@@ -243,6 +241,11 @@ public static class DatDiagnostics
     /// </summary>
     public static readonly DatDiagnostic UNT1031 = new DatDiagnostic("UNT1031", DatDiagnosticSeverity.Warning);
 
+    /// <summary>
+    /// Duplicated property overrides other values in dictionary.
+    /// </summary>
+    public static readonly DatDiagnostic UNT1032 = new DatDiagnostic("UNT1032", DatDiagnosticSeverity.Warning);
+
     /* Errors */
 
     /// <summary>
@@ -304,5 +307,11 @@ public static class DatDiagnostics
     /// Version property values are out of range (strict formatting).
     /// </summary>
     public static readonly DatDiagnostic UNT2031 = new DatDiagnostic("UNT2031", DatDiagnosticSeverity.Error);
+
+    /// <summary>
+    /// Duplicated property overridden by another value in dictionary.
+    /// </summary>
+    public static readonly DatDiagnostic UNT2032 = new DatDiagnostic("UNT2032", DatDiagnosticSeverity.Error);
+
 
 }

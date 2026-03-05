@@ -16,7 +16,7 @@ import { getClient, getOutputChannel, getIsReady } from '../extension';
 import { isDatFile } from '../util/path';
 
 import { DiscoverAssetProperties } from '../jsonrpc/asset-property';
-import { AssetProperty } from '../spec/asset-property';
+import { AssetProperty, TypeHierarchyElement } from '../spec/asset-property';
 
 export class AssetPropertiesViewProvider implements TreeDataProvider<AssetPropertyViewItem>
 {
@@ -60,7 +60,7 @@ export class AssetPropertiesViewProvider implements TreeDataProvider<AssetProper
                 return false;
             }
 
-            this.propertyValues = result.map(prop => new AssetPropertyViewItem(prop, null));
+            this.propertyValues = result.map(prop => new AssetPropertyViewItem(prop, null, -1));
         }
 
         this._onDidChangeTreeData.fire();
@@ -100,26 +100,45 @@ export class AssetPropertiesViewProvider implements TreeDataProvider<AssetProper
 
 class AssetPropertyViewItem extends TreeItem
 {
-
     property: AssetProperty;
     children: AssetPropertyViewItem[] | null;
     parent: AssetPropertyViewItem | null;
+    typeIndex: number;
 
-    constructor(property: AssetProperty, parent: AssetPropertyViewItem | null)
+    constructor(property: AssetProperty, parent: AssetPropertyViewItem | null, typeIndex: number)
     {
-        super(getName(property), TreeItemCollapsibleState.None);
+        super(
+            typeIndex >= 0 ? property.typeHierarchy![typeIndex].displayName : getName(property),
+            typeIndex < 0 && (property.children || property.typeHierarchy) ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+        );
         this.property = property;
-        this.collapsibleState = property.children ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None;
-        this.iconPath = getValueIcon(property);
+        this.iconPath = typeIndex >= 0 ? new ThemeIcon("type-hierarchy-super") : getValueIcon(property);
         this.children = null;
         this.parent = parent;
+        this.typeIndex = typeIndex;
     }
 
     getChildren(): AssetPropertyViewItem[]
     {
+        if (this.typeIndex >= 0)
+        {
+            return [ ];
+        }
+
+        if (this.property.typeHierarchy)
+        {
+            this.children = [ ];
+            for (let i = 0; i < this.property.typeHierarchy.length; ++i)
+            {
+                this.children.push(new AssetPropertyViewItem(this.property, this, i));
+            }
+
+            return this.children;
+        }
+
         if (!this.property.children)
         {
-            return [];
+            return [ ];
         }
 
         if (this.children)
@@ -127,21 +146,27 @@ class AssetPropertyViewItem extends TreeItem
             return this.children;
         }
 
-        this.children = this.property.children.map(prop => new AssetPropertyViewItem(prop, this));
+        this.children = this.property.children.map(prop => new AssetPropertyViewItem(prop, this, -1));
         return this.children;
     }
 
     resolve(): void
     {
-        if (this.property.children)
+        if (this.typeIndex >= 0)
         {
-            this.command = undefined;
+            this.tooltip = this.property.typeHierarchy![this.typeIndex].type;
             return;
         }
 
         try
         {
             this.tooltip = this.property.markdown ?? this.property.description ?? this.property.key;
+
+            if (this.property.children)
+            {
+                this.command = undefined;
+                return;
+            }
 
             if (this.property.range?.start !== undefined)
             {
@@ -177,6 +202,11 @@ function getName(property: AssetProperty): string
         key = `[${property.ordinal - 1}]`;
     }
 
+    if (property.typeHierarchy && property.typeHierarchy.length > 0)
+    {
+        return `${key} = ${property.typeHierarchy[0].displayName}`;
+    }
+
     if (property.value === null)
     {
         return `${key} = [no value]`;
@@ -207,6 +237,10 @@ function getValueIcon(property: AssetProperty): ThemeIcon
     if (!property.range)
     {
         return new ThemeIcon("add");
+    }
+    else if (property.typeHierarchy)
+    {
+        return new ThemeIcon("symbol-class");
     }
     else if (property.children)
     {

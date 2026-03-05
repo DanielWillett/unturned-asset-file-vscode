@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using System;
 using System.Collections.Generic;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
@@ -31,20 +32,16 @@ public interface IProjectFileProvider
 }
 
 /// <summary>
-/// Implementation of <see cref="IProjectFileProvider"/> that has no project files.
+/// Implementation of <see cref="IProjectFileProvider"/> that has no project files and exclusively uses the global orderfile.
 /// </summary>
-/// <remarks>Access the singleton instance through <see cref="Instance"/>.</remarks>
-public class NilProjectFileProvider : IProjectFileProvider
+public sealed class NilProjectFileProvider : IProjectFileProvider
 {
-    private ScaffoldedPropertyOrderFile? _emptyScaffoldedPropertyOrderFile;
+    private readonly IAssetSpecDatabase _database;
 
-    /// <summary>
-    /// Singleton instance of <see cref="NilProjectFileProvider"/>.
-    /// </summary>
-    public static NilProjectFileProvider Instance { get; } = new NilProjectFileProvider();
-
-    static NilProjectFileProvider() { }
-    private NilProjectFileProvider() { }
+    public NilProjectFileProvider(IAssetSpecDatabase database)
+    {
+        _database = database;
+    }
 
     /// <inheritdoc />
     public IEnumerable<ProjectFile> EnumerateProjectFiles(IWorkspaceFile? fileContext) => Array.Empty<ProjectFile>();
@@ -52,7 +49,7 @@ public class NilProjectFileProvider : IProjectFileProvider
     /// <inheritdoc />
     public IPropertyOrderFile GetScaffoldedOrderfile(IWorkspaceFile? fileContext)
     {
-        return _emptyScaffoldedPropertyOrderFile ??= new ScaffoldedPropertyOrderFile(Array.Empty<PropertyOrderFile>());
+        return _database.GlobalOrderFile;
     }
 
     /// <inheritdoc />

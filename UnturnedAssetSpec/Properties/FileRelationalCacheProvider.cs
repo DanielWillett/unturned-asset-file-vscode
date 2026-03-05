@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -11,6 +12,8 @@ public class FileRelationalCacheProvider : IFileRelationalModelProvider
     private readonly Lazy<IParsingServices> _parsingServices;
 
     private readonly ConcurrentDictionary<string, IFileRelationalModel>?[] _cachedModels;
+
+    protected virtual bool CollectDiagnostics => false;
 
     public FileRelationalCacheProvider(Lazy<IParsingServices> parsingServices)
     {
@@ -48,7 +51,7 @@ public class FileRelationalCacheProvider : IFileRelationalModelProvider
     }
 
     /// <inheritdoc />
-    public IFileRelationalModel GetProvider(ISourceFile file, SpecPropertyContext context = SpecPropertyContext.Property)
+    public virtual IFileRelationalModel GetProvider(ISourceFile file, SpecPropertyContext context = SpecPropertyContext.Property)
     {
         string fp = file.WorkspaceFile.File;
         int index = (int)context - 1;
@@ -63,17 +66,44 @@ public class FileRelationalCacheProvider : IFileRelationalModelProvider
         GetOrAddFileState state;
         state.File = file;
         state.Context = context;
-        return dict.GetOrAdd(fp, _valueFactory, state);
+        IFileRelationalModel model = dict.GetOrAdd(fp, _valueFactory, state);
 #else
-        return dict.GetOrAdd(fp, _ => new FileRelationalCache(file, false, _parsingServices.Value, context));
+        IFileRelationalModel model = dict.GetOrAdd(fp, _ => new FileRelationalCache(file, CollectDiagnostics, _parsingServices.Value, context));
 #endif
+        model.Rebuild(force: false);
+        return model;
     }
+
+    /// <inheritdoc />
+    public bool TryGetProvider(
+        ISourceFile file,
+        [NotNullWhen(true)] out IFileRelationalModel? model,
+        SpecPropertyContext context = SpecPropertyContext.Property)
+    {
+        string fp = file.WorkspaceFile.File;
+        int index = (int)context - 1;
+        if (index < 0 || index >= _cachedModels.Length)
+            throw new ArgumentOutOfRangeException(nameof(context));
+
+        ConcurrentDictionary<string, IFileRelationalModel>? dict = _cachedModels[index];
+        if (dict == null)
+            throw new ArgumentOutOfRangeException(nameof(context));
+
+        if (!dict.TryGetValue(fp, out model))
+        {
+            return false;
+        }
+
+        model.Rebuild(force: false);
+        return true;
+    }
+
 
 #if NET472_OR_GREATER || NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     private readonly Func<string, GetOrAddFileState, IFileRelationalModel> _valueFactory;
     private IFileRelationalModel ValueFactory(string fp, GetOrAddFileState state)
     {
-        return new FileRelationalCache(state.File, false, _parsingServices.Value, state.Context);
+        return new FileRelationalCache(state.File, CollectDiagnostics, _parsingServices.Value, state.Context);
     }
 
     private struct GetOrAddFileState

@@ -100,15 +100,18 @@ public sealed class VersionType : PrimitiveType<Version, VersionType>, ITypePars
         if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? valueNode))
         {
             value = Optional<Version>.Null;
+            args.Result = TypeParserResult.Failed;
             return false;
         }
 
         if (!Version.TryParse(valueNode.Value, out Version? version))
         {
             args.DiagnosticSink?.UNT2004_Generic(ref args, valueNode.Value, this);
+            args.Result = TypeParserResult.Failed;
             return false;
         }
 
+        args.Result = TypeParserResult.Successful;
         bool failure = false;
         if (args.DiagnosticSink != null || _strictFormatting)
         {
@@ -217,7 +220,15 @@ public sealed class VersionType : PrimitiveType<Version, VersionType>, ITypePars
         }
 
         value = version;
-        return !failure || !_strictFormatting;
+
+        if (failure && _strictFormatting)
+        {
+            args.Result = TypeParserResult.Failed;
+            return false;
+        }
+
+        args.Result = TypeParserResult.Successful;
+        return true;
     }
 
     private static void TryGetNumberPosition(int presendence, string value, FileRange fullRange, out FileRange range, bool remainder = false)

@@ -358,6 +358,7 @@ public class CommaDelimitedStringType<TElementType>
 
         if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? valueNode))
         {
+            args.Result = TypeParserResult.Failed;
             return false;
         }
 
@@ -443,6 +444,7 @@ public class CommaDelimitedStringType<TElementType>
             }
         }
 
+        args.Result = allPassed ? TypeParserResult.Successful : TypeParserResult.Failed;
         return allPassed;
     }
 

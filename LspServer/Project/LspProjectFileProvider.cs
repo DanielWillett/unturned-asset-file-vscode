@@ -1,5 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Project;
@@ -7,10 +8,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Project;
 internal class LspProjectFileProvider : IProjectFileProvider
 {
     private readonly LspWorkspaceEnvironment _workspaceEnvironment;
+    private readonly IAssetSpecDatabase _database;
 
-    internal LspProjectFileProvider(LspWorkspaceEnvironment workspaceEnvironment)
+    internal LspProjectFileProvider(LspWorkspaceEnvironment workspaceEnvironment, IAssetSpecDatabase database)
     {
         _workspaceEnvironment = workspaceEnvironment;
+        _database = database;
     }
 
     /// <inheritdoc />
@@ -22,7 +25,7 @@ internal class LspProjectFileProvider : IProjectFileProvider
     /// <inheritdoc />
     public IPropertyOrderFile GetScaffoldedOrderfile(IWorkspaceFile? fileContext)
     {
-        return new ScaffoldedPropertyOrderFile(Array.Empty<PropertyOrderFile>());
+        return _database.GlobalOrderFile;
     }
 
     /// <inheritdoc />

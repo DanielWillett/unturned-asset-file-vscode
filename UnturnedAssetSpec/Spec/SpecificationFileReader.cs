@@ -324,6 +324,10 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
             _allTypeBuilder = null;
         }
 
+        ReportProgress(0.94f, "Indexing properties");
+
+        IndexProperties(fileTypes);
+
         ReportProgress(0.95f, "Generating localization file data");
 
         await generateLocalizationFiles;

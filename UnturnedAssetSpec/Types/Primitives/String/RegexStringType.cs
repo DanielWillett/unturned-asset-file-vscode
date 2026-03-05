@@ -58,8 +58,12 @@ public sealed class RegexStringType : PrimitiveType<string, RegexStringType>, IT
 
         if (!StringType.Instance.Parser.TryParse(ref args, ref ctx, out value))
         {
+            args.Result = TypeParserResult.Failed;
             return false;
         }
+
+
+        args.Result = TypeParserResult.Successful;
 
         if (args.DiagnosticSink == null || args.ShouldIgnoreFailureDiagnostic || !value.HasValue)
             return true;

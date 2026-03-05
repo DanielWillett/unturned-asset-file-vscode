@@ -201,10 +201,12 @@ public static class TypeParsers
                     {
                         returnValue = false;
                         value = Optional<T>.Null;
+                        args.Result = TypeParserResult.UsedDefaultValueNoneAvailable;
                     }
                     else
                     {
                         returnValue = property.DefaultValue.TryGetValueAs(ref ctx, out value);
+                        args.Result = returnValue ? TypeParserResult.UsedDefaultValue : TypeParserResult.Failed;
                     }
 
                     return true;
@@ -215,28 +217,41 @@ public static class TypeParsers
                         break;
                     }
 
-                    IValue? defaultValue = property.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode);
-
-                    if (defaultValue == null)
-                    {
-                        returnValue = false;
-                        value = Optional<T>.Null;
-                    }
-                    else
-                    {
-                        returnValue = defaultValue.TryGetValueAs(ref ctx, out value);
-                    }
-
+                    returnValue = TryApplyMissingValueBehaviorToNullValue(ref args, ref ctx, out value);
                     return true;
             }
         }
 
+        args.Result = TypeParserResult.Failed;
         returnValue = false;
 #if NET5_0_OR_GREATER
         Unsafe.SkipInit(out value);
 #else
         value = Optional<T>.Null;
 #endif
+        return false;
+    }
+
+    internal static bool TryApplyMissingValueBehaviorToNullValue<T>(ref TypeParserArgs<T> args, ref FileEvaluationContext ctx, out Optional<T> value)
+        where T : IEquatable<T>
+    {
+        bool hasProperty = args.ParentNode is IPropertySourceNode;
+        if (args.Property?.GetIncludedDefaultValue(hasProperty) is { } defValue)
+        {
+            if (defValue.TryGetValueAs(ref ctx, out value))
+            {
+                args.Result = hasProperty ? TypeParserResult.UsedIncludedDefaultValue : TypeParserResult.UsedDefaultValue;
+                return true;
+            }
+
+            args.Result = TypeParserResult.Failed;
+        }
+        else
+        {
+            args.Result = hasProperty ? TypeParserResult.UsedIncludedDefaultValueNoneAvailable : TypeParserResult.UsedDefaultValueNoneAvailable;
+        }
+
+        value = Optional<T>.Null;
         return false;
     }
 

@@ -10,27 +10,15 @@ public interface IPropertyOrderFile
     /// <summary>
     /// Gets the order-set for the given type.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="context"></param>
     /// <returns>
     /// If the type is not defined in the orderfile, an empty array,
-    /// otherwise, an array with property indicies referencing the type's property array.<br/>
-    /// A value of <see cref="PropertyOrderFile.EmptyLine"/> indicates an empty line.<br/>
-    /// A value of <see cref="PropertyOrderFile.SectionSeparator"/> indicates a new section.<br/>
-    /// A value less than the property count of the type indicates a property positioning.<br/>
-    /// A value greater than or equal to the property count of the type indicates a property reference to a base type.
-    /// Each base type subtracts it's property count from the index.<br/>
-    /// For example:
-    /// <code>
-    /// Type A is the base type of B (B extends A).
-    /// A.Properties:
-    ///    - PropA
-    ///    - PropB
-    /// B.Properties:
-    ///    - PropC
-    /// </code>
-    /// An index of '2' would be equivalent to 'PropB'<br/>
-    /// An index of '3' would be equivalent to '@PropC'.
+    /// otherwise, an array with property indicies referencing the type's property array.
     /// </returns>
     OrderedPropertyReference[] GetOrderForType(QualifiedType type, SpecPropertyContext context);
+
+    /// <summary>
+    /// Gets an array that contains values indexed by property index.
+    /// For example, if the property at index <c>3</c> comes before the property at index <c>5</c>, <c>arr[3]</c> will be less than <c>arr[5]</c>.
+    /// </summary>
+    (int[] ReverseOrder, int AlternateOffset) GetRelativePositions(QualifiedType type, SpecPropertyContext context);
 }

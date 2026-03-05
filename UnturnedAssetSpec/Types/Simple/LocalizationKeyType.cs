@@ -122,6 +122,7 @@ public sealed class LocalizationKeyType : BaseType<string, LocalizationKeyType>,
             if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? valueNode))
             {
                 value = Optional<string>.Null;
+                args.Result = TypeParserResult.Failed;
                 return false;
             }
 
@@ -130,6 +131,7 @@ public sealed class LocalizationKeyType : BaseType<string, LocalizationKeyType>,
             {
                 args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
                 value = Optional<string>.Null;
+                args.Result = TypeParserResult.Failed;
                 return false;
             }
         }
@@ -140,6 +142,7 @@ public sealed class LocalizationKeyType : BaseType<string, LocalizationKeyType>,
         if (file is not IAssetSourceFile assetFile || assetFile.GetDefaultLocalizationFile() is not { } localFile)
         {
             args.DiagnosticSink?.UNT1030_Property(ref args, args.ReferenceNode);
+            args.Result = TypeParserResult.Successful;
             return true;
         }
 
@@ -148,6 +151,7 @@ public sealed class LocalizationKeyType : BaseType<string, LocalizationKeyType>,
         // todo
         // todo }
 
+        args.Result = TypeParserResult.Successful;
         return true;
     }
 

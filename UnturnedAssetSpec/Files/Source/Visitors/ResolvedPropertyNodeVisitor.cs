@@ -4,7 +4,6 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
-using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -17,9 +16,6 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
     private readonly IFileRelationalModelProvider _modelProvider;
     private readonly IParsingServices _parsingServices;
     private readonly PropertyInclusionFlags _flags;
-    private AssetFileType _fileType;
-    private bool _hasFileType;
-    private HashSet<(PropertyBreadcrumbs, DatProperty)>? _visitedMultiProperties;
     private readonly FileRange? _range;
 
     protected override bool IgnoreMetadata => true;
@@ -70,8 +66,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         DatProperty property,
         IType propertyType,
         ref FileEvaluationContext ctx,
-        IPropertySourceNode node,
-        in PropertyBreadcrumbs breadcrumbs) { }
+        IPropertySourceNode node) { }
 
     protected virtual void AcceptUnresolvedProperty(
         IPropertySourceNode node,
@@ -105,44 +100,54 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
             }
         }
 
-        if (!_hasFileType)
-        {
-            _fileType = AssetFileType.FromFile(node.File, _parsingServices.Database);
-            _hasFileType = true;
-        }
-
         PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(node);
 
-        DatProperty? property = null;// todo: _modelProvider.GetProperty(node, in _fileType, in breadcrumbs, out PropertyResolutionContext context);
-        if (property == null)
+        IFileRelationalModel model = _modelProvider.GetProvider(node.File, node.File.GetPropertyContext());
+        if (breadcrumbs.IsRoot)
         {
-            if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0)
+            if (!model.TryGetPropertyInfoFromNode(node, out PropertyNodeRelationalInfo info) || info.ValueType == null)
             {
-                AcceptUnresolvedProperty(node, in breadcrumbs);
+                if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0)
+                {
+                    AcceptUnresolvedProperty(node, in breadcrumbs);
+                }
+
+                return;
             }
-            return;
+
+            if ((_flags & PropertyInclusionFlags.UnresolvedOnly) != 0)
+                return;
+
+            FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, node.File, node.GetRootPosition())
+            {
+                RootBreadcrumbs = breadcrumbs
+            };
+
+            AcceptResolvedProperty(info.Property, info.ValueType, ref ctx, node);
         }
+        else
+        {
+            if (!model.TryGetPropertyFromNode(node, out DatProperty? property))
+            {
+                if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0)
+                {
+                    AcceptUnresolvedProperty(node, in breadcrumbs);
+                }
+                return;
+            }
 
-        if ((_flags & PropertyInclusionFlags.UnresolvedOnly) != 0)
-            return;
+            FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, node.File, node.GetRootPosition())
+            {
+                RootBreadcrumbs = breadcrumbs
+            };
 
-        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, node.File);
+            if ((_flags & PropertyInclusionFlags.UnresolvedOnly) != 0)
+                return;
 
-        if (!property.Type.TryEvaluateType(out IType? type, ref ctx))
-            return;
+            if (!property.Type.TryEvaluateType(out IType? type, ref ctx))
+                return;
 
-        // todo
-        //if (type is ILegacyCompositeTypeProvider)
-        //{
-        //    _visitedMultiProperties ??= new HashSet<(PropertyBreadcrumbs, DatProperty)>();
-        //    if (_visitedMultiProperties.Add((breadcrumbs, property)))
-        //    {
-        //        AcceptResolvedProperty(property, type, in parseContext, node, in breadcrumbs);
-        //    }
-        //}
-        //else
-        //{
-            AcceptResolvedProperty(property, type, ref ctx, node, in breadcrumbs);
-        //}
+            AcceptResolvedProperty(property, type, ref ctx, node);
+        }
     }
 }

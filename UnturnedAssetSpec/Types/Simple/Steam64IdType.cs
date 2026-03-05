@@ -188,10 +188,12 @@ public sealed class Steam64IdType : BaseType<ulong, Steam64IdType>, ITypeParser<
 
         if (!TypeParsers.UInt64.TryParse(ref args, ref ctx, out value) || !value.HasValue)
         {
+            args.Result = TypeParserResult.Failed;
             value = Optional<ulong>.Null;
             return false;
         }
 
+        args.Result = TypeParserResult.Successful;
         CheckValidSteamId(ref args, value.Value);
         return true;
     }

@@ -252,8 +252,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
             DatProperty property,
             IType propertyType,
             ref FileEvaluationContext ctx,
-            IPropertySourceNode node,
-            in PropertyBreadcrumbs breadcrumbs)
+            IPropertySourceNode node)
         {
             foreach (IPerPropertyCodeFix codeFix in _perPropertyFixes)
             {
@@ -264,7 +263,7 @@ internal class CodeActionRequestHandler : CodeActionHandlerBase
                 if (!codeFix.PassesTypeCheck(propertyType))
                     continue;
 
-                CodeFixInstance? instance = codeFix.TryApplyToProperty(node, propertyType, property, in breadcrumbs, ref ctx);
+                CodeFixInstance? instance = codeFix.TryApplyToProperty(node, propertyType, property, ref ctx);
                 if (instance == null)
                     continue;
 

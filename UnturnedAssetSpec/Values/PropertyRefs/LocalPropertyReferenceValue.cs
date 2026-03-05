@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -22,6 +23,9 @@ public class LocalPropertyReferenceValue : IPropertyReferenceValue
     private readonly IAssetSpecDatabase? _database;
 
     private DatProperty? _property;
+
+    /// <inheritdoc />
+    public ref readonly PropertyReference Reference => ref _propertyReference;
 
     /// <inheritdoc />
     public DatProperty Property
@@ -103,9 +107,15 @@ public class LocalPropertyReferenceValue : IPropertyReferenceValue
     }
 
     /// <inheritdoc />
+    public bool Equals(IExpressionNode? other)
+    {
+        return other is LocalPropertyReferenceValue r && r._propertyReference.Equals(_propertyReference);
+    }
+
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
-        return obj is LocalPropertyReferenceValue r && Equals(r);
+        return obj is LocalPropertyReferenceValue r && Equals((IValue?)r);
     }
 
     /// <inheritdoc />
@@ -116,6 +126,7 @@ public class LocalPropertyReferenceValue : IPropertyReferenceValue
 
     bool IValue.VisitConcreteValue<TVisitor>(ref TVisitor visitor) => false;
     bool IValue.IsNull => false;
+    IPropertyReferenceValue IPropertyReferenceExpressionNode.Value => this;
 }
 
 /// <summary>

@@ -468,4 +468,10 @@
   <data name="UNT1031_Digits" xml:space="preserve">
     <value>This version has {0} digits, where it should have exactly {1} digits.</value>
   </data>
+  <data name="UNT2032" xml:space="preserve">
+    <value>This dictionary contains multiple '{0}' properties. This property has no effect.</value>
+  </data>
+  <data name="UNT1032" xml:space="preserve">
+    <value>This dictionary contains multiple '{0}' properties. This property overrides all others with the same name.</value>
+  </data>
 </root>

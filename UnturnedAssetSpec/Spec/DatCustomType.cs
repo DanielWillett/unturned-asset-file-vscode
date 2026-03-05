@@ -157,9 +157,20 @@ public class DatCustomType : DatTypeWithProperties, IType<DatObjectValue>, IType
                     }
                     else
                     {
-                        if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
+                        bool hasProperty = args.ParentNode is IPropertySourceNode;
+                        if (args.Property?.GetIncludedDefaultValue(hasProperty) is { } defValue)
                         {
-                            return defValue.TryGetValueAs(ref ctx, out value);
+                            if (defValue.TryGetValueAs(ref ctx, out value))
+                            {
+                                args.Result = hasProperty ? TypeParserResult.UsedIncludedDefaultValue : TypeParserResult.UsedDefaultValue;
+                                return true;
+                            }
+
+                            args.Result = TypeParserResult.Failed;
+                        }
+                        else
+                        {
+                            args.Result = hasProperty ? TypeParserResult.UsedIncludedDefaultValueNoneAvailable : TypeParserResult.UsedDefaultValueNoneAvailable;
                         }
 
                         return false;

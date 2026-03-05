@@ -97,6 +97,7 @@ public sealed class LocalizableStringType : BaseType<string, LocalizableStringTy
             {
                 args.DiagnosticSink?.UNT2004_Generic(ref args, string.Empty, this);
                 value = Optional<string>.Null;
+                args.Result = TypeParserResult.Failed;
                 return false;
             }
 
@@ -109,6 +110,7 @@ public sealed class LocalizableStringType : BaseType<string, LocalizableStringTy
                 }
 
                 value = Optional<string>.Null;
+                args.Result = TypeParserResult.Failed;
                 return false;
             }
 
@@ -118,6 +120,7 @@ public sealed class LocalizableStringType : BaseType<string, LocalizableStringTy
                 DiagnosticSinkExtensions.CheckStringDiagnostics(ref args, null!, _minLength, _maxLength, _allowLineBreakTag, _allowRichText, _extraTags, _formattingArgs);
             }
             value = Optional<string>.Null;
+            args.Result = TypeParserResult.Failed;
             return false;
         }
 
@@ -129,9 +132,11 @@ public sealed class LocalizableStringType : BaseType<string, LocalizableStringTy
         if (!TypeParsers.TryParseStringValueOnly(ref args, out IValueSourceNode? valueNode))
         {
             value = Optional<string>.Null;
+            args.Result = TypeParserResult.Failed;
             return false;
         }
 
+        args.Result = TypeParserResult.Successful;
         string val = valueNode.Value;
         value = val;
         if (args.DiagnosticSink != null)

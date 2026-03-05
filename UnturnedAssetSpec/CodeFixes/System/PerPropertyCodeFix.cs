@@ -33,7 +33,6 @@ public interface IPerPropertyCodeFix : ICodeFix
         IPropertySourceNode propertyNode,
         IType propertyType,
         DatProperty property,
-        in PropertyBreadcrumbs breadcrumbs,
         ref FileEvaluationContext ctx
     );
 
@@ -110,12 +109,11 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
         IPropertySourceNode propertyNode,
         IType propertyType,
         DatProperty property,
-        in PropertyBreadcrumbs breadcrumbs,
         ref FileEvaluationContext ctx
     )
     {
         bool hasDiagnostic = false;
-        if (!TryApplyToProperty(out TState? state, out FileRange range, ref hasDiagnostic, propertyNode, propertyType, property, in breadcrumbs, ref ctx))
+        if (!TryApplyToProperty(out TState? state, out FileRange range, ref hasDiagnostic, propertyNode, propertyType, property, ref ctx))
         {
             return null;
         }
@@ -158,7 +156,6 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
         IPropertySourceNode propertyNode,
         IType propertyType,
         DatProperty property,
-        in PropertyBreadcrumbs breadcrumbs,
         ref FileEvaluationContext ctx
     );
 
@@ -203,8 +200,7 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
             DatProperty property,
             IType propertyType,
             ref FileEvaluationContext ctx,
-            IPropertySourceNode node,
-            in PropertyBreadcrumbs breadcrumbs)
+            IPropertySourceNode node)
         {
             if (!_codeFix.PassesTypeCheck(propertyType))
             {
@@ -212,7 +208,7 @@ public abstract class PerPropertyCodeFix<TState> : CodeFix<TState>, IPerProperty
             }
 
             bool hasDiagnostic = false;
-            if (_codeFix.TryApplyToProperty(out TState? state, out FileRange range, ref hasDiagnostic, node, propertyType, property, in breadcrumbs, ref ctx))
+            if (_codeFix.TryApplyToProperty(out TState? state, out FileRange range, ref hasDiagnostic, node, propertyType, property, ref ctx))
             {
                 _outputList.Add(new CodeFixInstance<TState>(new CodeFixParameters<TState>
                 {

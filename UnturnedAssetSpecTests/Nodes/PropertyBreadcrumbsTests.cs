@@ -29,7 +29,7 @@ public class PropertyBreadcrumbsTests
             new StaticSourceFileWorkspaceEnvironment(false, database),
             database.UnturnedInstallDirectory,
             new InstallationEnvironment(database),
-            NilProjectFileProvider.Instance
+            new NilProjectFileProvider(database)
         );
 
         await database.InitializeAsync();

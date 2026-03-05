@@ -40,7 +40,7 @@ public sealed class AssetTypeAlias : DatEnumType
         JsonElement element = default;
         foreach (KeyValuePair<string, QualifiedType> enumValue in dict)
         {
-            DatEnumValue autoCreatedValue = new DatEnumValue(enumValue.Value, ++index, this, element)
+            DatEnumValue autoCreatedValue = new DatEnumValue(enumValue.Key, ++index, this, element)
             {
                 CorrespondingType = enumValue.Value.CaseInsensitive
             };

@@ -599,6 +599,7 @@ public class ListType<TCountType, TElementType>
                 else if (!element.HasValue)
                 {
                     // value = null;
+                    args.Result = TypeParserResult.Successful;
                     return true;
                 }
                 else
@@ -606,6 +607,7 @@ public class ListType<TCountType, TElementType>
                     array = new TElementType[1];
                     array[0] = element.Value;
                     value = new EquatableArray<TElementType>(array!);
+                    args.Result = TypeParserResult.Successful;
                     return true;
                 }
             }
@@ -622,13 +624,10 @@ public class ListType<TCountType, TElementType>
                         args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
                     else
                         args.DiagnosticSink?.UNT2004_NoList(ref args, args.ParentNode);
-                }
-                else if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
-                {
-                    return defValue.TryGetValueAs(ref ctx, out value);
+                    break;
                 }
 
-                break;
+                return TypeParsers.TryApplyMissingValueBehaviorToNullValue(ref args, ref ctx, out value);
 
             // wrong type of value
             case IDictionarySourceNode dictionaryNode:
@@ -650,6 +649,7 @@ public class ListType<TCountType, TElementType>
                 if (listNode.Count == 0)
                 {
                     value = EquatableArray<TElementType>.Empty;
+                    args.Result = TypeParserResult.Successful;
                     return true;
                 }
 
@@ -684,6 +684,7 @@ public class ListType<TCountType, TElementType>
                 }
 
                 value = new EquatableArray<TElementType>(array!, index);
+                args.Result = allFailed ? TypeParserResult.Failed : TypeParserResult.Successful;
                 return !allFailed;
 
             case IValueSourceNode valueNode:
@@ -765,6 +766,7 @@ public class ListType<TCountType, TElementType>
                         if (dictionaryNode == null)
                         {
                             args.DiagnosticSink?.UNT2004_MissingFile(ref args, valueNode);
+                            args.Result = TypeParserResult.Failed;
                             return false;
                         }
 
@@ -831,6 +833,7 @@ public class ListType<TCountType, TElementType>
                         }
 
                         value = new EquatableArray<TElementType>(array!);
+                        args.Result = allFailed ? TypeParserResult.Failed : TypeParserResult.Successful;
                         return !allFailed;
                     }
 
@@ -852,6 +855,7 @@ public class ListType<TCountType, TElementType>
                     else if (!element.HasValue)
                     {
                         // value = null;
+                        args.Result = TypeParserResult.Successful;
                         return true;
                     }
                     else
@@ -859,6 +863,7 @@ public class ListType<TCountType, TElementType>
                         array = new TElementType[1];
                         array[0] = element.Value;
                         value = new EquatableArray<TElementType>(array!);
+                        args.Result = TypeParserResult.Successful;
                         return true;
                     }
                 }
@@ -866,6 +871,7 @@ public class ListType<TCountType, TElementType>
                 break;
         }
 
+        args.Result = TypeParserResult.Failed;
         return false;
     }
 

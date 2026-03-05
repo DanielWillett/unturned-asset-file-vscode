@@ -140,17 +140,10 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                 if (args.MissingValueBehavior != TypeParserMissingValueBehavior.FallbackToDefaultValue)
                 {
                     args.DiagnosticSink?.UNT2004_NoValue(ref args, args.ParentNode);
+                    break;
                 }
-                else
-                {
-                    if (args.Property?.GetIncludedDefaultValue(args.ParentNode is IPropertySourceNode) is { } defValue)
-                    {
-                        return defValue.TryGetValueAs(ref ctx, out value);
-                    }
 
-                    return false;
-                }
-                break;
+                return TypeParsers.TryApplyMissingValueBehaviorToNullValue(ref args, ref ctx, out value);
 
             case IListSourceNode l:
                 args.DiagnosticSink?.UNT2004_ListInsteadOfValue(ref args, l, args.Type);
@@ -163,17 +156,20 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                     if (!KnownTypeValueHelper.TryParseTranslationReference(v.Value, out name, out path))
                     {
                         args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
+                        args.Result = TypeParserResult.Failed;
                         return false;
                     }
 
                     args.DiagnosticSink?.UNT1018(ref args);
                     value = new BundleReference(name, path, BundleReferenceKind.TranslationReference);
+                    args.Result = TypeParserResult.Successful;
                     return true;
                 }
 
                 if (!KnownTypeValueHelper.TryParseMasterBundleReference(v.Value, out name, out path))
                 {
                     args.DiagnosticSink?.UNT2004_Generic(ref args, v.Value, args.Type);
+                    args.Result = TypeParserResult.Failed;
                     return false;
                 }
 
@@ -182,6 +178,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                     rType = BundleReferenceKind.MasterBundleReferenceString;
 
                 value = new BundleReference(name, path, rType);
+                args.Result = TypeParserResult.Successful;
                 return true;
 
             case IDictionarySourceNode d:
@@ -201,6 +198,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                     if (TryParseRefObject(d, ref args, out BundleReference br, Kind, diagnostics: true))
                     {
                         value = br;
+                        args.Result = TypeParserResult.Successful;
                         return true;
                     }
                 }
@@ -209,6 +207,7 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                     if (TryParseRefObject(d, ref args, out BundleReference br, BundleReferenceKind.MasterBundleReference, diagnostics: false))
                     {
                         value = br;
+                        args.Result = TypeParserResult.Successful;
                         return true;
                     }
 
@@ -216,11 +215,13 @@ public sealed class BundleReferenceType : BaseType<BundleReference, BundleRefere
                     {
                         args.DiagnosticSink?.UNT104(ref args);
                         value = br;
+                        args.Result = TypeParserResult.Successful;
                         return true;
                     }
 
                     // reparse with diagnostics
                     _ = TryParseRefObject(d, ref args, out br, BundleReferenceKind.MasterBundleReference, diagnostics: true);
+                    args.Result = TypeParserResult.Failed;
                     return false;
                 }
 
