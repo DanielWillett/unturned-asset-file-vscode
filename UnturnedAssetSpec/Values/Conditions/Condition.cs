@@ -209,7 +209,7 @@ public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>
         if (!TryGetConcreteValue(out Optional<bool> v) || !v.HasValue)
             return false;
 
-        visitor.Accept(v);
+        visitor.Accept(BooleanType.Instance, v);
         return true;
     }
 
@@ -223,7 +223,7 @@ public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>
         if (!TryEvaluateValue(out Optional<bool> v, ref ctx) || !v.HasValue)
             return false;
 
-        visitor.Accept(v);
+        visitor.Accept(BooleanType.Instance, v);
         return true;
     }
 
@@ -235,7 +235,7 @@ public readonly struct Condition<TComparand> : IEquatable<Condition<TComparand>>
         public FileEvaluationContext* Context;
         public Condition<TComparand>* Condition;
 
-        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        public void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>
         {
             Optional<TComparand> comparand = Condition->Comparand;
             if (!value.HasValue)
@@ -499,7 +499,7 @@ public static class Conditions
             value.VisitConcreteValue(ref this);
         }
 
-        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        public void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>
         {
             DidFullyParseCondition = true;
             Visitor->Accept(new Condition<TValue>(Variable, Operation, value, Inverted));

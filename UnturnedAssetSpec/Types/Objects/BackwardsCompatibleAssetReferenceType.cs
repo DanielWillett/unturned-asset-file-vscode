@@ -50,7 +50,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// If an amount is supppled (i.e. "102 x 3") a warning will be logged.
 /// </para>
 /// </summary>
-public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, BackwardsCompatibleAssetReferenceType>, ITypeParser<GuidOrId>, ITypeFactory, IAssetReferenceType
+public sealed class BackwardsCompatibleAssetReferenceType :
+    BaseType<GuidOrId, BackwardsCompatibleAssetReferenceType>,
+    ITypeParser<GuidOrId>,
+    ITypeFactory,
+    IAssetReferenceType,
+    IValueMetadataProviderType<GuidOrId>
 {
     private static readonly BackwardsCompatibleAssetReferenceType?[] DefaultInstances = new BackwardsCompatibleAssetReferenceType?[(int)BackwardsCompatibleAssetReferenceKind.BcAssetReferenceString + 1];
 
@@ -333,6 +338,11 @@ public sealed class BackwardsCompatibleAssetReferenceType : BaseType<GuidOrId, B
     protected override bool Equals(BackwardsCompatibleAssetReferenceType other)
     {
         return other.Kind == Kind && other._baseTypes.Equals(_baseTypes) && other.SupportsThis == SupportsThis && other.PreventSelfReference == PreventSelfReference;
+    }
+
+    public bool PopulateMetadata(IAnyValueSourceNode? node, ref FileEvaluationContext ctx, ValueMetadata<GuidOrId> metadata)
+    {
+        return metadata.Value.HasValue && AssetReferenceHelper.PopulateMetadata(metadata.Value.Value, ref ctx, metadata);
     }
 
     public override int GetHashCode()

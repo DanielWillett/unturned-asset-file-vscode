@@ -76,13 +76,14 @@ public class ExclusionCondition : IExclusionCondition
     /// <param name="value">The value the property must equate to to be excluded.</param>
     public static IExclusionCondition<TValue> Create<TValue>(
         in PropertyReference propertyReference,
+        IType<TValue> type,
         Optional<TValue> value,
         IValue<bool>? filterCondition = null
     ) where TValue : IEquatable<TValue>
     {
         return value.HasValue
-            ? new ExclusionCondition<TValue>(in propertyReference, value.Value, filterCondition)
-            : new ExclusionCondition<TValue>(in propertyReference, filterCondition);
+            ? new ExclusionCondition<TValue>(in propertyReference, type, value.Value, filterCondition)
+            : new ExclusionCondition<TValue>(in propertyReference, type, filterCondition);
     }
 
     /// <inheritdoc />
@@ -222,7 +223,7 @@ public class ExclusionCondition : IExclusionCondition
             }
             else
             {
-                Condition = Create(in PropertyReference, concrete);
+                Condition = Create(in PropertyReference, value.Type, concrete);
             }
         }
     }
@@ -234,26 +235,29 @@ public class ExclusionCondition : IExclusionCondition
 public class ExclusionCondition<TValue> : ExclusionCondition, IExclusionCondition<TValue>
     where TValue : IEquatable<TValue>
 {
+    private readonly IType<TValue> _type;
     private readonly TValue? _value;
     private readonly bool _valueIsNull;
 
     public override bool IsAnyValue => false;
 
-    internal ExclusionCondition(in PropertyReference pRef, TValue value, IValue<bool>? filterCondition)
+    internal ExclusionCondition(in PropertyReference pRef, IType<TValue> type, TValue value, IValue<bool>? filterCondition)
         : base(in pRef, filterCondition)
     {
+        _type = type;
         _value = value;
     }
 
-    internal ExclusionCondition(in PropertyReference pRef, IValue<bool>? filterCondition)
+    internal ExclusionCondition(in PropertyReference pRef, IType<TValue> type, IValue<bool>? filterCondition)
         : base(in pRef, filterCondition)
     {
+        _type = type;
         _valueIsNull = true;
     }
 
     public override bool VisitValue<TVisitor>(ref TVisitor visitor)
     {
-        visitor.Accept(_valueIsNull ? Optional<TValue>.Null : new Optional<TValue>(_value));
+        visitor.Accept(_type, _valueIsNull ? Optional<TValue>.Null : new Optional<TValue>(_value));
         return true;
     }
 

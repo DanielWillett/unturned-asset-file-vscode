@@ -77,7 +77,7 @@
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "RedirectableAssetKey": "IconPath",
             "Variable": "Icon",
-            "Required": "@HasIcon"
+            "Required": "@($prop$::HasIcon)"
         }
     ]
 }

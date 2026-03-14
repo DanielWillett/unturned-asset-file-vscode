@@ -27,7 +27,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// }
 /// </code>
 /// </summary>
-public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceType>, ITypeParser<QualifiedType>, ITypeFactory, IReferencingType
+public sealed class TypeReferenceType :
+    BaseType<QualifiedType, TypeReferenceType>,
+    ITypeParser<QualifiedType>,
+    ITypeFactory,
+    IReferencingType,
+    IValueMetadataProviderType<QualifiedType>
 {
     /// <summary>
     /// Gets the default instance for a <see cref="TypeReferenceType"/>.
@@ -399,6 +404,36 @@ public sealed class TypeReferenceType : BaseType<QualifiedType, TypeReferenceTyp
     }
 
     #endregion
+
+    public bool PopulateMetadata(
+        IAnyValueSourceNode? node,
+        ref FileEvaluationContext ctx,
+        ValueMetadata<QualifiedType> metadata
+    )
+    {
+        if (_enumType == null || node is not IValueSourceNode valueNode)
+            return false;
+
+        string val = valueNode.Value;
+        if (val.IndexOf('.') >= 0)
+            return false;
+
+        if (!_enumType.TryParse(val, out DatEnumValue? value)
+            || value.Owner is not IValueMetadataProviderType<DatEnumValue> valueHoverProvider
+            || value.CorrespondingType.IsNull)
+        {
+            return false;
+        }
+
+        ValueMetadata<DatEnumValue> metadata2 = new ValueMetadata<DatEnumValue>(value.Owner, value);
+        bool populate = valueHoverProvider.PopulateMetadata(node, ref ctx, metadata2);
+        if (!populate)
+            return false;
+
+        metadata.CopyDetailsFrom(metadata2);
+        metadata.CorrespondingType = value.CorrespondingType;
+        return true;
+    }
 
     protected override bool Equals(TypeReferenceType other)
     {

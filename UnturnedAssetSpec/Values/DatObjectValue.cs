@@ -129,12 +129,12 @@ public class DatObjectValue :
     }
     bool IValue.VisitConcreteValue<TVisitor>(ref TVisitor visitor)
     {
-        visitor.Accept(new Optional<DatObjectValue>(this));
+        visitor.Accept(Type, new Optional<DatObjectValue>(this));
         return true;
     }
     bool IValue.VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
     {
-        visitor.Accept(new Optional<DatObjectValue>(this));
+        visitor.Accept(Type, new Optional<DatObjectValue>(this));
         return true;
     }
     IType<DatObjectValue> IValue<DatObjectValue>.Type => Type;

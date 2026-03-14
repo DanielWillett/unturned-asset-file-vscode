@@ -331,6 +331,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property &quot;{0}&quot; template group at index {1} couldn&apos;t be parsed..
+        /// </summary>
+        internal static string JsonException_InvalidTemplateGroup {
+            get {
+                return ResourceManager.GetString("JsonException_InvalidTemplateGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &quot;Type&quot; property was set to &quot;{0}&quot; in the file type definition for &quot;{1}&quot;..
         /// </summary>
         internal static string JsonException_InvalidTypeInDatFileType {

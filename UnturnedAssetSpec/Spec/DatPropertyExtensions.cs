@@ -217,7 +217,7 @@ public static class DatPropertyExtensions
     private struct SuccessVisitor : IValueVisitor
     {
         public bool Success;
-        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        public void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>
         {
             Success = value.HasValue;
         }
@@ -556,7 +556,7 @@ public static class DatPropertyExtensions
                 }
                 else
                 {
-                    Visitor->Accept(value);
+                    Visitor->Accept(type, value);
                 }
                 Visited = true;
             }

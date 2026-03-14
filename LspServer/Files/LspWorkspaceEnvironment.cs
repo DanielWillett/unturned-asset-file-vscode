@@ -413,7 +413,7 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         bool deleted = false;
 
         bool hasLock = false;
-        object? @lock = null;
+        Lock? @lock = null;
         IDisposable? disposable = null;
         bool success = false;
         try
@@ -428,7 +428,9 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
                 ISourceFile sourceFile;
                 if (_tracker.Files.TryGetValue(DocumentUri.File(fileName), out OpenedFile? openedFile))
                 {
-                    Monitor.Enter(@lock = openedFile.UpdateLock, ref hasLock);
+                    @lock = openedFile.UpdateLock;
+                    @lock.Enter();
+                    hasLock = true;
                     sourceFile = openedFile.SourceFile;
                 }
                 else
@@ -463,7 +465,7 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         finally
         {
             if (hasLock)
-                Monitor.Exit(@lock!);
+                @lock!.Exit();
 
             disposable?.Dispose();
         }
@@ -528,14 +530,16 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         foreach (string file in tracker.EnumerateFiles("*.udatproj"))
         {
             bool hasLock = false;
-            object? @lock = null;
+            Lock? @lock = null;
             IDisposable? disposable = null;
             try
             {
                 ISourceFile sourceFile;
                 if (_tracker.Files.TryGetValue(DocumentUri.File(file), out OpenedFile? openedFile))
                 {
-                    Monitor.Enter(@lock = openedFile.UpdateLock, ref hasLock);
+                    @lock = openedFile.UpdateLock;
+                    @lock.Enter();
+                    hasLock = true;
                     sourceFile = openedFile.SourceFile;
                 }
                 else
@@ -558,7 +562,7 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
             finally
             {
                 if (hasLock)
-                    Monitor.Exit(@lock!);
+                    @lock!.Exit();
 
                 disposable?.Dispose();
             }

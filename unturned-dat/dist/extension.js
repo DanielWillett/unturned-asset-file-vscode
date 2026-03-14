@@ -22204,7 +22204,7 @@ __export(extension_exports, {
   getAssetPropertiesViewProvider: () => getAssetPropertiesViewProvider,
   getClient: () => getClient,
   getIsReady: () => getIsReady,
-  getOutputChannel: () => getOutputChannel,
+  getOutputChannel: () => getOutputChannel2,
   languageId: () => languageId
 });
 module.exports = __toCommonJS(extension_exports);
@@ -22219,12 +22219,12 @@ var import_vscode = require("vscode");
 
 // src/util/path.ts
 function isDatFile(uri) {
-  if (uri === void 0) {
+  if (!uri) {
     return false;
   }
   const path = uri.path.toLowerCase();
   if (path.endsWith(".txt")) {
-    return uri.path.endsWith("Config_Easy.txt") || uri.path.endsWith("Config_Normal.txt") || uri.path.endsWith("Config_Hard.txt") || uri.path.endsWith("Config.txt");
+    return path.endsWith("config_easy.txt") || uri.path.endsWith("config_normal.txt") || uri.path.endsWith("config_hard.txt") || uri.path.endsWith("config.txt");
   }
   return path.endsWith(".dat") || path.endsWith(".asset") || path.endsWith(".udat") || path.endsWith(".udatproj");
 }
@@ -22252,7 +22252,6 @@ var AssetPropertiesViewProvider = class {
       this.propertyValues = [];
     } else {
       const result = await getClient().sendRequest(DiscoverAssetProperties, { document: txtDoc.document.uri.toString() });
-      getOutputChannel().info(JSON.stringify(result, null, "  "));
       if (this.propertyValues.length === result.length && result.every((prop, i) => this.propertyValues[i].property === prop)) {
         return false;
       }
@@ -22495,7 +22494,7 @@ function getClient() {
   }
   return client;
 }
-function getOutputChannel() {
+function getOutputChannel2() {
   if (!output) {
     throw new Error("Uninitialized.");
   }

@@ -910,7 +910,7 @@ public class ListType<TCountType, TElementType>
         public TElementType?[] Array;
         public int Index;
 
-        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        public void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>
         {
             if (!value.HasValue)
                 return;

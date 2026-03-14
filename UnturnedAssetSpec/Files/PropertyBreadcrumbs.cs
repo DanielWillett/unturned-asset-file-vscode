@@ -569,7 +569,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
 
             int parentCt = 0;
             int sectionCt = 0;
-            for (ISourceNode p = node.Parent; !ReferenceEquals(p, assetData) && !ReferenceEquals(p, metadata) && !ReferenceEquals(p.Parent, p); p = p.Parent)
+            for (ISourceNode? p = node.ParentOrNull; p != null && !ReferenceEquals(p, assetData) && !ReferenceEquals(p, metadata); p = p.ParentOrNull)
             {
                 ++parentCt;
                 if (p is IListSourceNode or IDictionarySourceNode { Parent: IPropertySourceNode })

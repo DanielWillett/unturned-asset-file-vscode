@@ -277,6 +277,18 @@ public static class SourceNodeExtensions
 
     extension(ISourceNode root)
     {
+        public IParentSourceNode? ParentOrNull
+        {
+            get
+            {
+                IParentSourceNode parent = root.Parent;
+                if ((object)parent == root)
+                    return null;
+
+                return parent;
+            }
+        }
+
         /// <summary>
         /// Determines whether this node is the root node, the Assets dictionary node, or the Metadata dictionary node.
         /// </summary>

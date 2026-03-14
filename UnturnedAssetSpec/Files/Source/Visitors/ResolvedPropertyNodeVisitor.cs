@@ -36,23 +36,30 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
     {
         if (sourceFile is IAssetSourceFile asset)
         {
-            IDictionarySourceNode? metadata = asset.GetMetadataDictionary();
-            if (metadata != null)
+            IDictionarySourceNode? assetData = asset.GetAssetDataDictionary(),
+                                   metadata = asset.GetMetadataDictionary();
+            if (metadata != null || assetData != null)
             {
-                IDictionarySourceNode assetData = asset.AssetData;
-                metadata.Visit(ref visitor);
-                assetData.Visit(ref visitor);
-                if ((visitor._flags & PropertyInclusionFlags.ResolvedOnly) != 0)
+                metadata?.Visit(ref visitor);
+                if (assetData == null)
                 {
-                    return;
+                    asset.Visit(ref visitor);
                 }
-
-                foreach (IPropertySourceNode property in asset.Properties)
+                else
                 {
-                    if (ReferenceEquals(property, metadata.Parent) || ReferenceEquals(property, assetData.Parent))
-                        continue;
+                    assetData.Visit(ref visitor);
+                    if ((visitor._flags & PropertyInclusionFlags.ResolvedOnly) != 0)
+                    {
+                        return;
+                    }
 
-                    visitor.AcceptUnresolvedProperty(property, PropertyBreadcrumbs.Root);
+                    foreach (IPropertySourceNode property in asset.Properties)
+                    {
+                        if (ReferenceEquals(property, metadata?.Parent) || ReferenceEquals(property, assetData.Parent))
+                            continue;
+
+                        visitor.AcceptUnresolvedProperty(property, PropertyBreadcrumbs.Root);
+                    }
                 }
 
                 return;
@@ -77,15 +84,6 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         if (!node.IsIncluded(_flags))
             return;
         
-        if (node is { File: IAssetSourceFile, ValueKind: SourceValueType.Dictionary }
-            && ReferenceEquals(node.Parent, node.File)
-            && (node.Key.Equals("Asset", StringComparison.OrdinalIgnoreCase) || node.Key.Equals("Metadata", StringComparison.OrdinalIgnoreCase))
-            )
-        {
-            // Metadata { } or Asset { } properties
-            return;
-        }
-
         if (_range.HasValue)
         {
             FileRange valueRange = node.GetValueRange();
@@ -98,6 +96,15 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
             {
                 return;
             }
+        }
+
+        if (node is { File: IAssetSourceFile, ValueKind: SourceValueType.Dictionary }
+            && ReferenceEquals(node.Parent, node.File)
+            && (node.Key.Equals("Asset", StringComparison.OrdinalIgnoreCase) || node.Key.Equals("Metadata", StringComparison.OrdinalIgnoreCase))
+            )
+        {
+            // Metadata { } or Asset { } properties
+            return;
         }
 
         PropertyBreadcrumbs breadcrumbs = PropertyBreadcrumbs.FromNode(node);

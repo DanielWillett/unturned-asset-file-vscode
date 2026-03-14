@@ -2581,7 +2581,7 @@
             "Deprecated": true,
             "Required":
             {
-                "Variable": "Has_Clip_Prefab",
+                "Variable": "$prop$::Has_Clip_Prefab",
                 "Operation": "eq",
                 "Comparand": true
             }
@@ -2595,6 +2595,14 @@
             "Variable": "ignition"
         },
         {
+            "Key": "Horn",
+            "Type": "UnityEngine.AudioClip, UnityEngine.AudioModule",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#hornaudioclip-master-bundle-pointer",
+            "RedirectableAssetKey": "HornAudioClip",
+            "Description": "Audio clip to play when the horn is honked.",
+            "Variable": "horn"
+        },
+        {
             "Key": "Albedo_Base",
             "Type": "UnityEngine.Texture2D, UnityEngine.CoreModule",
             "Description": "Skin albedo base texture.",
@@ -2602,10 +2610,10 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "ID",
+                    "Key": "$prop$::ID",
                     "Condition":
                     {
-                        "Variable": "ID",
+                        "Variable": "$prop$::ID",
                         "Operation": "gte",
                         "Comparand": 2000
                     }
@@ -2620,10 +2628,10 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "ID",
+                    "Key": "$prop$::ID",
                     "Condition":
                     {
-                        "Variable": "ID",
+                        "Variable": "$prop$::ID",
                         "Operation": "gte",
                         "Comparand": 2000
                     }
@@ -2638,10 +2646,10 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "ID",
+                    "Key": "$prop$::ID",
                     "Condition":
                     {
-                        "Variable": "ID",
+                        "Variable": "$prop$::ID",
                         "Operation": "gte",
                         "Comparand": 2000
                     }

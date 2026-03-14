@@ -97,7 +97,7 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
                 str = typeName.ToString() + ", " + assemblyName.ToString();
             }
 
-            return new QualifiedType(str);
+            return new QualifiedType(str, _isCaseInsensitive);
         }
     }
 

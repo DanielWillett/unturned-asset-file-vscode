@@ -260,10 +260,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                 () => parsingServices
                       ?? throw new InvalidOperationException("Parsing servies not initialized yet.")
             )
-        )
-        {
-            UseInternet = allowInternet
-        };
+        );
 
         InstallationEnvironment installation = new InstallationEnvironment(database);
         if (useInstallDir && installDirUtility.TryGetInstallDirectory(out GameInstallDir installDir))
@@ -291,6 +288,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
     {
         _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         _fileReader = fileReader;
+        UseInternet = fileReader.AllowInternet;
         Options = fileReader.JsonOptions;
         _cache = fileReader.Cache;
         _parsingServices = parsingServices;

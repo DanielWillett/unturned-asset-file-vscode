@@ -219,7 +219,7 @@
             [
                 {
                     "Name": "skin-secondary",
-                    "UseValueOf": "Secondary_$1"
+                    "UseValueOf": "@($prop$::Secondary_Skins)"
                 }
             ],
             "Type": "UnityEngine.Material, UnityEngine.CoreModule",

@@ -24,7 +24,8 @@ public class DatEnumType : DatType,
     ITypeConverter<DatEnumValue>,
     IDatTypeWithStringParseableType<DatEnumValue>,
     IDisposable,
-    ITypeParser<DatEnumValue>
+    ITypeParser<DatEnumValue>,
+    IValueMetadataProviderType<DatEnumValue>
 {
     internal readonly IDatSpecificationReadContext Context;
     private bool _hasStringParser;
@@ -274,6 +275,27 @@ public class DatEnumType : DatType,
     }
 
     private protected override string FullName => $"{Owner.TypeName.GetFullTypeName()}/{TypeName.GetFullTypeName()}";
+
+    /// <inheritdoc />
+    public bool PopulateMetadata(IAnyValueSourceNode? node, ref FileEvaluationContext ctx, ValueMetadata<DatEnumValue> metadata)
+    {
+        if (!metadata.Value.HasValue)
+        {
+            return false;
+        }
+
+        DatEnumValue value = metadata.Value.Value;
+
+        metadata.DisplayName = value.Casing;
+        metadata.DeclaringType = TypeName;
+        metadata.Variable = value.Value;
+        metadata.Description = value.Description;
+        metadata.Version = value.Version ?? Version;
+        metadata.Docs = value.Docs ?? Docs;
+        metadata.IsDeprecated = value.Deprecated;
+        metadata.CorrespondingType = value.CorrespondingType;
+        return true;
+    }
 
     string IType.Id => TypeName.Type;
     IValue<DatEnumValue> IType<DatEnumValue>.CreateValue(Optional<DatEnumValue> value) => value.Value ?? Null;
@@ -907,7 +929,7 @@ public class DatEnumValue : IValue<DatEnumValue>, IEquatable<DatEnumValue>, IDat
         , allows ref struct
 #endif
     {
-        visitor.Accept(new Optional<DatEnumValue>(this));
+        visitor.Accept(Owner, new Optional<DatEnumValue>(this));
         return true;
     }
 
@@ -918,7 +940,7 @@ public class DatEnumValue : IValue<DatEnumValue>, IEquatable<DatEnumValue>, IDat
         , allows ref struct
 #endif
     {
-        visitor.Accept(new Optional<DatEnumValue>(this));
+        visitor.Accept(Owner, new Optional<DatEnumValue>(this));
         return true;
     }
 

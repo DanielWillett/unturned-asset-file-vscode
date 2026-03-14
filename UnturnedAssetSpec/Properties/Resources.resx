@@ -555,4 +555,7 @@
   <data name="Description_ProjectFile" xml:space="preserve">
     <value>Defines properties for the behavior of the Unturned Data File Language Server.</value>
   </data>
+  <data name="JsonException_InvalidTemplateGroup" xml:space="preserve">
+    <value>Property "{0}" template group at index {1} couldn't be parsed.</value>
+  </data>
 </root>

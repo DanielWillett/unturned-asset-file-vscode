@@ -8,14 +8,14 @@
 #endif
 
 using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
-using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 #if DEBUG
 using System.ComponentModel;
 // ReSharper disable InconsistentOrderOfLocks
@@ -49,10 +49,10 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
 
     private ISourceFile? _sourceFile;
 
-    internal object EditLock = new object();
-    internal object UpdateLock = new object();
+    internal Lock EditLock = new Lock();
+    internal Lock UpdateLock = new Lock();
 
-    object IMutableWorkspaceFile.SyncRoot => EditLock;
+    Lock IMutableWorkspaceFile.SyncRoot => EditLock;
 
     private bool _hasChanged;
     private FileRange _changeRange;
@@ -177,8 +177,7 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
                     diagnosticSink: this
                 );
 
-                string fsPath = Uri.GetFileSystemPath();
-                FileTypeInfo typeInfo = new FileTypeInfo(fsPath);
+                FileTypeInfo typeInfo = TypeInfo;
 
                 SourceNodeTokenizer.RootInfo info;
                 if (typeInfo.IsAsset)
@@ -204,6 +203,9 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
                 }
 
                 file = tokenizer.ReadRootDictionary(info);
+
+                Thread.MemoryBarrier();
+
                 _sourceFile = file;
             }
 
@@ -247,6 +249,24 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
     }
 
     public string File { get; }
+
+    /// <returns><see langword="true"/> if the type info changed.</returns>
+    internal bool RecalculateTypeInfo()
+    {
+        FileTypeInfo newTypeInfo = new FileTypeInfo(File);
+        lock (EditLock)
+        {
+            if (newTypeInfo.Equals(in TypeInfo))
+            {
+                return false;
+            }
+
+            TypeInfo = newTypeInfo;
+            _sourceFile = null;
+        }
+
+        return true;
+    }
 
 #pragma warning disable CS8618, CS9264
     // ReSharper disable once UnusedParameter.Local

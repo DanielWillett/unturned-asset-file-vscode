@@ -2,7 +2,6 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 #pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 
@@ -74,7 +73,7 @@ public interface IValueVisitor
     /// <summary>
     /// Invoked by <see cref="IValue.VisitConcreteValue"/> and <see cref="IValue.VisitValue"/>.
     /// </summary>
-    void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>;
+    void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>;
 }
 
 /// <summary>
@@ -199,7 +198,7 @@ public static class ValueExtensions
         public TVisitor* Visitor;
         public bool Visited;
 
-        public void Accept<T>(Optional<T> value) where T : IEquatable<T>
+        public void Accept<T>(IType<T> type, Optional<T> value) where T : IEquatable<T>
         {
             if (value.HasValue)
             {
@@ -223,7 +222,7 @@ public static class ValueExtensions
         public bool Visited;
         public Optional<TResult> Result;
 
-        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        public void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>
         {
             if (!value.HasValue)
             {

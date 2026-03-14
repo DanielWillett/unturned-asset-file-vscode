@@ -2603,14 +2603,14 @@
             "Description": "Main texture for the decal.",
             "Required":
             {
-                "Variable": "Type",
+                "Variable": "$prop$::Type",
                 "Operation": "eq",
                 "Comparand": "DECAL"
             },
             "InclusiveWith":
             [
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "DECAL"
                 }
             ]
@@ -2625,17 +2625,17 @@
                 "And":
                 [
                     {
-                        "Variable": "Has_Clip_Prefab",
+                        "Variable": "$prop$::Has_Clip_Prefab",
                         "Operation": "eq",
                         "Comparand": true
                     },
                     {
-                        "Variable": "Type",
+                        "Variable": "$prop$::Type",
                         "Operation": "neq",
                         "Comparand": "NPC"
                     },
                     {
-                        "Variable": "Type",
+                        "Variable": "$prop$::Type",
                         "Operation": "neq",
                         "Comparand": "DECAL"
                     }
@@ -2645,15 +2645,15 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "DECAL"
                 },
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "NPC"
                 },
                 {
-                    "Key": "Has_Clip_Prefab",
+                    "Key": "$prop$::Has_Clip_Prefab",
                     "Value": false
                 }
             ]
@@ -2667,12 +2667,12 @@
                 "And":
                 [
                     {
-                        "Variable": "Type",
+                        "Variable": "$prop$::Type",
                         "Operation": "neq",
                         "Comparand": "NPC"
                     },
                     {
-                        "Variable": "Type",
+                        "Variable": "$prop$::Type",
                         "Operation": "neq",
                         "Comparand": "DECAL"
                     }
@@ -2682,11 +2682,11 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "DECAL"
                 },
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "NPC"
                 }
             ]
@@ -2700,17 +2700,17 @@
                 "And":
                 [
                     {
-                        "Variable": "Has_Editor_Prefab",
+                        "Variable": "$prop$::Has_Editor_Prefab",
                         "Operation": "eq",
                         "Comparand": true
                     },
                     {
-                        "Variable": "Type",
+                        "Variable": "$prop$::Type",
                         "Operation": "neq",
                         "Comparand": "NPC"
                     },
                     {
-                        "Variable": "Type",
+                        "Variable": "$prop$::Type",
                         "Operation": "neq",
                         "Comparand": "DECAL"
                     }
@@ -2720,15 +2720,15 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "DECAL"
                 },
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "NPC"
                 },
                 {
-                    "Key": "Has_Editor_Prefab",
+                    "Key": "$prop$::Has_Editor_Prefab",
                     "Value": false
                 }
             ]
@@ -2741,11 +2741,11 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "DECAL"
                 },
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "NPC"
                 }
             ]
@@ -2757,18 +2757,18 @@
             "Variable": "navGameObject",
             "Required":
             {
-                "Variable": "Type",
+                "Variable": "$prop$::Type",
                 "Operation": "eq",
                 "Comparand": "LARGE"
             },
             "ExclusiveWith":
             [
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "DECAL"
                 },
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "NPC"
                 }
             ]
@@ -2781,11 +2781,11 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "DECAL"
                 },
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "NPC"
                 }
             ]
@@ -2798,15 +2798,15 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "DECAL"
                 },
                 {
-                    "Key": "Type",
+                    "Key": "$prop$::Type",
                     "Value": "NPC"
                 },
                 {
-                    "Key": "Add_Kill_Triggers",
+                    "Key": "$prop$::Add_Kill_Triggers",
                     "Value": false
                 }
             ]

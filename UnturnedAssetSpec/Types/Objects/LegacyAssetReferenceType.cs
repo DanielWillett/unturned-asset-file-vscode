@@ -30,7 +30,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </list>
 /// </para>
 /// </summary>
-public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetReferenceType>, ITypeParser<ushort>, ITypeFactory, IAssetReferenceType
+public sealed class LegacyAssetReferenceType :
+    BaseType<ushort, LegacyAssetReferenceType>,
+    ITypeParser<ushort>,
+    ITypeFactory,
+    IAssetReferenceType,
+    IValueMetadataProviderType<ushort>
 {
     /// <summary>
     /// Gets the default instance for a <see cref="LegacyAssetReferenceType"/>.
@@ -186,6 +191,15 @@ public sealed class LegacyAssetReferenceType : BaseType<ushort, LegacyAssetRefer
     }
 
     #endregion
+
+    public bool PopulateMetadata(IAnyValueSourceNode? node, ref FileEvaluationContext ctx, ValueMetadata<ushort> metadata)
+    {
+        if (!metadata.Value.HasValue || !this.TryGetTargetCategory(ctx.Services.Database, out AssetCategoryValue targetCategory))
+            return false;
+
+        GuidOrId id = new GuidOrId(metadata.Value.Value, targetCategory);
+        return AssetReferenceHelper.PopulateMetadata(id, ref ctx, metadata);
+    }
 
     protected override bool Equals(LegacyAssetReferenceType other)
     {

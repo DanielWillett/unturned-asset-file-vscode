@@ -479,7 +479,7 @@ public struct PropertyReference : IEquatable<PropertyReference>
         public GuidOrId Id;
         public DatProperty Owner;
 
-        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        public void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>
         {
             if (!value.HasValue)
             {

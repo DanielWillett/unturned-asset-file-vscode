@@ -71,7 +71,7 @@
             "Variable": "characterMeshOverride1pLODs",
             "Description": "First-person character mesh replacement.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html",
-            "Required": "@Has_1P_Character_Mesh_Override"
+            "Required": "@($prop$::Has_1P_Character_Mesh_Override)"
         },
         {
             "Key": "Character_Mesh_3P_Override_*",
@@ -90,7 +90,7 @@
             "Variable": "characterMaterialOverride",
             "Description": "First-person character mesh replacement.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/character-mesh-replacement.html",
-            "Required": "@Has_Character_Material_Override"
+            "Required": "@($prop$::Has_Character_Material_Override)"
         }
     ]
 }

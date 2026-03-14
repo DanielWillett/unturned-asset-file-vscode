@@ -1,10 +1,13 @@
 
+using System.Runtime.CompilerServices;
 using System.Text;
 using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
@@ -35,37 +38,49 @@ internal class HoverHandler : IHoverHandler
     /// <inheritdoc />
     public Task<Hover?> Handle(HoverParams request, CancellationToken cancellationToken)
     {
-        return Task.FromResult<Hover?>(null);
-#if false
-        if (!_evalFactory.TryCreate(request.Position, request.TextDocument.Uri, out SpecPropertyTypeParseContext ctx, out ISourceNode? hoverNode) && hoverNode == null)
+        if (!_evalFactory.TryCreate(
+                request.Position,
+                request.TextDocument.Uri,
+                out FileEvaluationContext ctx,
+                out DatProperty? property,
+                out IPropertySourceNode? propertyNode,
+                out ISourceNode? hoverNode
+            ) && hoverNode == null)
         {
             return Task.FromResult<Hover?>(null);
         }
 
-        HoverMarkdownBuilder builder = new HoverMarkdownBuilder(new StringBuilder(128));
+        HoverMarkdownBuilder builder = new HoverMarkdownBuilder(new StringBuilder(128), propertyNode);
 
-        FileRange range = hoverNode!.Range;
+        FileRange range = hoverNode.Range;
 
-        SpecProperty? prop = ctx.EvaluationContext.Self;
-        if (prop == null)
+        if (property == null)
         {
             builder.UnknownProperty(ref ctx);
         }
+        else if (!property.Type.TryEvaluateType(out IType? type, ref ctx))
+        {
+            builder.UnknownValue(property, type, ref ctx);
+        }
         else
         {
-            ISpecPropertyType? type = prop.Type.GetType(ref ctx.EvaluationContext);
-            bool hasValue = ctx.TryParse(out ISpecDynamicValue? propValue);
-            ValueHoverProviderResult? result = null;
-            if (hasValue && propValue != null && hoverNode is IValueSourceNode && type is IValueHoverProviderSpecPropertyType valueHoverProvider)
-                result = valueHoverProvider.GetDescription(ref ctx, propValue);
+            scoped MetadataVisitor metadataVisitor;
+            metadataVisitor.Context = ref ctx;
+            metadataVisitor.Builder = ref builder;
+            metadataVisitor.Property = property;
+            metadataVisitor.IsOnValue = hoverNode is IAnyValueSourceNode;
+            metadataVisitor.Appended = false;
+            metadataVisitor.ValueNode = propertyNode?.Value;
 
-            if (result?.DisplayName != null)
+            property.VisitValue(
+                ref metadataVisitor,
+                ref ctx,
+                missingValueBahvior: TypeParserMissingValueBehavior.FallbackToDefaultValue
+            );
+
+            if (!metadataVisitor.Appended)
             {
-                builder.Value(prop, result, ref ctx);
-            }
-            else
-            {
-                builder.Property(prop, ref ctx, type, propValue, hasValue);
+                type.Visit(ref metadataVisitor);
             }
         }
 
@@ -78,17 +93,57 @@ internal class HoverHandler : IHoverHandler
                 Value = builder.ToString()
             })
         });
-#endif
+    }
+
+    private ref struct MetadataVisitor : IValueVisitor, ITypeVisitor
+    {
+        public ref HoverMarkdownBuilder Builder;
+        public DatProperty Property;
+        public ref FileEvaluationContext Context;
+        public IAnyValueSourceNode? ValueNode;
+        public bool Appended;
+        public bool IsOnValue;
+
+        public void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>
+        {
+            Appended = true;
+
+            if (IsOnValue)
+            {
+                ValueMetadata<TValue> metadata = type.CreateMetadata(
+                    value,
+                    ValueNode,
+                    ref Context,
+                    out bool metadataIsPopulated
+                );
+                if (metadataIsPopulated)
+                {
+                    Builder.Value(Property, metadata, ref Context);
+                    return;
+                }
+            }
+
+            Builder.Property(Property, ref Context, type, value, true);
+        }
+
+        public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
+        {
+            // fallback
+            Builder.Property(Property, ref Context, type, Optional<TValue>.Null, false);
+            Appended = true;
+        }
     }
 }
-#if false
+
 public readonly struct HoverMarkdownBuilder
 {
     private readonly StringBuilder _hov;
+    private readonly IPropertySourceNode? _node;
 
-    public HoverMarkdownBuilder(StringBuilder hov)
+    public HoverMarkdownBuilder(StringBuilder hov, IPropertySourceNode? node)
     {
         _hov = hov;
+        _node = node;
     }
 
     public override string ToString()
@@ -96,15 +151,74 @@ public readonly struct HoverMarkdownBuilder
         return _hov.ToString();
     }
 
-    public void UnknownProperty(in SpecPropertyTypeParseContext ctx)
+    public void UnknownProperty(ref FileEvaluationContext ctx)
     {
         _hov.Append(Properties.Resources.Hover_UnknownProperty)
             .Append(": '")
-            .Append(ctx.GetParseTargetDisplayName())
+            .Append(_node == null ? ctx.RootBreadcrumbs.ToString(true) : ctx.RootBreadcrumbs.ToString(false, _node.Key))
             .Append('\'');
     }
 
-    public void Value(SpecProperty prop, ValueHoverProviderResult result, in SpecPropertyTypeParseContext ctx)
+    public void UnknownValue(DatProperty prop, IType? type, ref FileEvaluationContext ctx, bool hasValue = false)
+    {
+        _hov.Append("### ").Append(prop.Owner.DisplayName).Append(" → ").Append(prop.Key);
+        if (prop.Variable != null
+            && prop.Variable.TryEvaluateValue(out Optional<string> variable, ref ctx)
+            && variable.HasValue
+            && !string.IsNullOrEmpty(variable.Value))
+        {
+            ReadOnlySpan<char> typeName = prop.Owner.TypeName.GetTypeName();
+            _hov.AppendLine().Append('`').Append(typeName).Append('.').Append(variable.Value).Append('`');
+        }
+
+        _hov.AppendLine().AppendLine().Append('-', 3).AppendLine().AppendLine();
+
+        if (type != null)
+        {
+            _hov.Append("**").Append(type.DisplayName).Append("**").AppendLine().AppendLine()
+                .Append('-', 3).AppendLine().AppendLine();
+        }
+
+        if (prop.Description != null
+            && prop.Description.TryEvaluateValue(out Optional<string> description, ref ctx)
+            && description.HasValue
+            && !string.IsNullOrEmpty(description.Value)
+           )
+        {
+            _hov.Append(description.Value).AppendLine().AppendLine()
+                .Append('-', 3).AppendLine().AppendLine();
+        }
+
+        if (prop.Docs != null
+            && prop.Docs.TryEvaluateValue(out Optional<string> docsLink, ref ctx)
+            && docsLink.HasValue
+            && !string.IsNullOrEmpty(docsLink.Value))
+        {
+            _hov.Append("[").Append(Properties.Resources.Hover_UnturnedDocumentationLinkName).Append("](")
+                .Append(docsLink.Value).Append(')').AppendLine();
+
+            if (prop.Version != null)
+            {
+                _hov.Append('\\').Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(prop.Version)
+                    .AppendLine();
+            }
+
+            _hov.AppendLine()
+                .Append('-', 3).AppendLine().AppendLine();
+        }
+        else if (prop.Version != null)
+        {
+            _hov.Append('\\').Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(prop.Version)
+                .AppendLine().AppendLine().Append('-', 3).AppendLine().AppendLine();
+        }
+
+        if (hasValue)
+            return;
+        _hov.Append("-# ").Append(Properties.Resources.Hover_InvalidValue);
+    }
+
+    public void Value<TValue>(DatProperty prop, ValueMetadata<TValue> result, ref FileEvaluationContext ctx)
+        where TValue : IEquatable<TValue>
     {
         _hov.Append("### ");
         if (result.IsDeprecated)
@@ -162,113 +276,32 @@ public readonly struct HoverMarkdownBuilder
         }
     }
 
-    public void Property(SpecProperty prop, in SpecPropertyTypeParseContext ctx, ISpecPropertyType? type, ISpecDynamicValue? value, bool hasValue)
+    public void Property<TValue>(DatProperty prop, ref FileEvaluationContext ctx, IType? type, Optional<TValue> value, bool hasValue)
+        where TValue : IEquatable<TValue>
     {
-        SpecProperty rootProperty = prop;
-        while (rootProperty.Parent != null)
-            rootProperty = rootProperty.Parent;
-
-        _hov.Append("### ").Append(rootProperty.Owner.DisplayName).Append(" → ").Append(rootProperty.Key);
-        if (prop.Variable != null
-            && prop.Variable.TryEvaluateValue(ref ctx.EvaluationContext, out string? variable, out bool isNull)
-            && !isNull
-            && !string.IsNullOrEmpty(variable))
-        {
-            ReadOnlySpan<char> typeName = QualifiedType.ExtractTypeName(rootProperty.Owner.Type.Type);
-            _hov.AppendLine().Append('`').Append(typeName).Append('.').Append(variable).Append('`');
-        }
-
-        _hov.AppendLine().AppendLine().Append('-', 3).AppendLine().AppendLine();
-
-        if (type != null)
-        {
-            _hov.Append("**").Append(type.DisplayName).Append("**").AppendLine().AppendLine()
-                .Append('-', 3).AppendLine().AppendLine();
-        }
-
-        if (prop.Description != null
-            && prop.Description.TryEvaluateValue(ref ctx.EvaluationContext, out string? description, out isNull)
-            && !isNull
-            && !string.IsNullOrEmpty(description)
-           )
-        {
-            _hov.Append(description).AppendLine().AppendLine()
-                .Append('-', 3).AppendLine().AppendLine();
-        }
-
-        if (prop.Docs != null
-            && prop.Docs.TryEvaluateValue(ref ctx.EvaluationContext, out string? docsLink, out isNull)
-            && !isNull
-            && !string.IsNullOrEmpty(docsLink))
-        {
-            _hov.Append("[").Append(Properties.Resources.Hover_UnturnedDocumentationLinkName).Append("](")
-                .Append(docsLink).Append(')').AppendLine();
-            
-            if (prop.Version != null)
-            {
-                _hov.Append('\\').Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(prop.Version)
-                    .AppendLine();
-            }
-
-            _hov.AppendLine()
-                .Append('-', 3).AppendLine().AppendLine();
-        }
-        else if (prop.Version != null)
-        {
-            _hov.Append('\\').Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(prop.Version)
-                .AppendLine().AppendLine().Append('-', 3).AppendLine().AppendLine();
-        }
-
-        if (value?.ValueType is IStringParseableSpecPropertyType && value is not ISpecConcreteValue)
-        {
-            ReduceToConcreteVisitor visitor;
-            visitor.Value = value;
-            visitor.OutValue = null;
-            visitor.OutValueIsNull = true;
-            visitor.Context = ctx.EvaluationContext;
-            value.ValueType.Visit(ref visitor);
-
-            hasValue = visitor.OutValue != null;
-            value = visitor.OutValueIsNull ? null : visitor.OutValue;
-        }
-
+        UnknownValue(prop, type, ref ctx, hasValue);
         if (!hasValue)
+            return;
+
+        if (!value.HasValue)
         {
-            _hov.Append("-# ").Append(Properties.Resources.Hover_InvalidValue);
+            _hov.Append(Properties.Resources.Hover_ValueTitle).Append(": **null**");
             return;
         }
 
-        if (value == null)
+        string? str;
+        if (typeof(TValue) == typeof(string))
         {
-            _hov.Append(Properties.Resources.Hover_ValueTitle).AppendLine(": **null**");
+            str = Unsafe.As<TValue, string>(ref Unsafe.AsRef(in value.Value));
         }
-        else if (value.ValueType is IStringParseableSpecPropertyType sp)
+        else if (TypeConverters.TryGet<TValue>() is { } tc)
         {
-            try
-            {
-                if (sp.ToString(value) is not { Length: > 0 } str)
-                    _hov.Append(Properties.Resources.Hover_ValueTitle).Append(": **null**");
-                else
-                {
-                    // todo: better escaping
-                    if (str.IndexOf('\n') >= 0)
-                    {
-                        _hov.AppendLine(Properties.Resources.Hover_ValueTitle).AppendLine(str);
-                    }
-                    else
-                    {
-                        _hov.Append(Properties.Resources.Hover_ValueTitle).Append(": `").Append(str).Append('`');
-                    }
-                }
-            }
-            catch (InvalidCastException)
-            {
-
-            }
+            TypeConverterFormatArgs args = TypeConverterFormatArgs.Default;
+            str = tc.Format(value.Value, ref args);
         }
         else
         {
-            switch (ctx.Node)
+            switch (_node?.Value)
             {
                 case IListSourceNode list:
                     _hov.Append(Properties.Resources.Hover_ListTitle).Append(": [ n = ").Append(list.Count).Append(" ]");
@@ -277,30 +310,18 @@ public readonly struct HoverMarkdownBuilder
                     _hov.Append(Properties.Resources.Hover_DictionaryTitle).Append(": { n = ").Append(dict.Count).Append(" }");
                     break;
             }
+
+            return;
         }
-    }
 
-    private struct ReduceToConcreteVisitor : ISpecPropertyTypeVisitor
-    {
-        public ISpecDynamicValue Value;
-        public ISpecDynamicValue? OutValue;
-        public bool OutValueIsNull;
-        public FileEvaluationContext Context;
-
-        /// <inheritdoc />
-        public void Visit<T>(ISpecPropertyType<T> type) where T : IEquatable<T>
+        // todo: better escaping
+        if (str.IndexOf('\n') >= 0)
         {
-            if (Value.TryEvaluateValue(in Context, out T? val, out bool isNull))
-            {
-                OutValueIsNull = isNull;
-                OutValue = isNull ? SpecDynamicValue.Null : type.CreateValue(val);
-            }
-            else
-            {
-                OutValueIsNull = true;
-                OutValue = null;
-            }
+            _hov.AppendLine(Properties.Resources.Hover_ValueTitle).AppendLine(str);
+        }
+        else
+        {
+            _hov.Append(Properties.Resources.Hover_ValueTitle).Append(": `").Append(str).Append('`');
         }
     }
 }
-#endif

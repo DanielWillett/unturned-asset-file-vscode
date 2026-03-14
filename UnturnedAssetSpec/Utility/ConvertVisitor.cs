@@ -1,7 +1,8 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Runtime.CompilerServices;
-using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
@@ -15,7 +16,7 @@ public struct ConvertVisitor<TResult> : IGenericVisitor, IValueVisitor
     public bool WasSuccessful;
     public bool IsNull;
 
-    public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+    public void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>
     {
         if (value.HasValue)
         {

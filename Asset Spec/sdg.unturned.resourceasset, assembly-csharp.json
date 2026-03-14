@@ -465,7 +465,7 @@
             "Deprecated": true,
             "Required":
             {
-                "Variable": "Has_Clip_Prefab",
+                "Variable": "$prop$::Has_Clip_Prefab",
                 "Operation": "eq",
                 "Comparand": true
             },
@@ -473,7 +473,7 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "Has_Clip_Prefab",
+                    "Key": "$prop$::Has_Clip_Prefab",
                     "Value": false
                 }
             ]
@@ -485,7 +485,7 @@
             "Deprecated": true,
             "Required":
             {
-                "Variable": "Has_Clip_Prefab",
+                "Variable": "$prop$::Has_Clip_Prefab",
                 "Operation": "eq",
                 "Comparand": true
             },
@@ -493,7 +493,7 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "Has_Clip_Prefab",
+                    "Key": "$prop$::Has_Clip_Prefab",
                     "Value": false
                 }
             ]
@@ -530,7 +530,7 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "No_Debris",
+                    "Key": "$prop$::No_Debris",
                     "Value": true
                 }
             ]

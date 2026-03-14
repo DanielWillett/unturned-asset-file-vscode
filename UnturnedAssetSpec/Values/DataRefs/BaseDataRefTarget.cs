@@ -3,6 +3,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -27,7 +28,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
             if (!AcceptProperty(in Unsafe.As<TProperty, ExcludedProperty>(ref Unsafe.AsRef(in property)), ref ctx, out bool isExcluded))
                 return false;
 
-            valueVisitor.Accept(new Optional<bool>(isExcluded));
+            valueVisitor.Accept(BooleanType.Instance, new Optional<bool>(isExcluded));
             return true;
         }
         if (typeof(TProperty) == typeof(IncludedProperty))
@@ -35,7 +36,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
             if (!AcceptProperty(in Unsafe.As<TProperty, IncludedProperty>(ref Unsafe.AsRef(in property)), ref ctx, out bool isIncluded))
                 return false;
 
-            valueVisitor.Accept(new Optional<bool>(isIncluded));
+            valueVisitor.Accept(BooleanType.Instance, new Optional<bool>(isIncluded));
             return true;
         }
         if (typeof(TProperty) == typeof(KeyProperty))
@@ -43,7 +44,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
             if (!AcceptProperty(in Unsafe.As<TProperty, KeyProperty>(ref Unsafe.AsRef(in property)), ref ctx, out string? key))
                 return false;
 
-            valueVisitor.Accept(key == null ? Optional<string>.Null : new Optional<string>(key));
+            valueVisitor.Accept(StringType.Instance, key == null ? Optional<string>.Null : new Optional<string>(key));
             return true;
         }
         if (typeof(TProperty) == typeof(AssetNameProperty))
@@ -51,7 +52,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
             if (!AcceptProperty(in Unsafe.As<TProperty, AssetNameProperty>(ref Unsafe.AsRef(in property)), ref ctx, out string? assetName))
                 return false;
 
-            valueVisitor.Accept(assetName == null ? Optional<string>.Null : new Optional<string>(assetName));
+            valueVisitor.Accept(StringType.Instance, assetName == null ? Optional<string>.Null : new Optional<string>(assetName));
             return true;
         }
         if (typeof(TProperty) == typeof(DifficultyProperty))
@@ -59,7 +60,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
             if (!AcceptProperty(in Unsafe.As<TProperty, DifficultyProperty>(ref Unsafe.AsRef(in property)), ref ctx, out string? difficulty))
                 return false;
 
-            valueVisitor.Accept(difficulty == null ? Optional<string>.Null : new Optional<string>(difficulty));
+            valueVisitor.Accept(StringType.Instance, difficulty == null ? Optional<string>.Null : new Optional<string>(difficulty));
             return true;
         }
         if (typeof(TProperty) == typeof(IndicesProperty))
@@ -71,7 +72,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
             if (!AcceptProperty(in Unsafe.As<TProperty, IsLegacyProperty>(ref Unsafe.AsRef(in property)), ref ctx, out bool isLegacy))
                 return false;
 
-            valueVisitor.Accept(new Optional<bool>(isLegacy));
+            valueVisitor.Accept(BooleanType.Instance, new Optional<bool>(isLegacy));
             return true;
         }
         if (typeof(TProperty) == typeof(ValueTypeProperty))
@@ -79,7 +80,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
             if (!AcceptProperty(in Unsafe.As<TProperty, ValueTypeProperty>(ref Unsafe.AsRef(in property)), ref ctx, out string? valueType))
                 return false;
 
-            valueVisitor.Accept(valueType == null ? Optional<string>.Null : new Optional<string>(valueType));
+            valueVisitor.Accept(StringType.Instance, valueType == null ? Optional<string>.Null : new Optional<string>(valueType));
             return true;
         }
         if (typeof(TProperty) == typeof(CountProperty))
@@ -87,7 +88,7 @@ public abstract class BaseDataRefTarget : IDataRefTarget
             if (!AcceptProperty(in Unsafe.As<TProperty, CountProperty>(ref Unsafe.AsRef(in property)), ref ctx, out int count))
                 return false;
 
-            valueVisitor.Accept(new Optional<int>(count));
+            valueVisitor.Accept(Int32Type.Instance, new Optional<int>(count));
             return true;
         }
 

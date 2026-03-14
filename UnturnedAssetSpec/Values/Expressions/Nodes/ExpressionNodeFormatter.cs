@@ -106,7 +106,7 @@ internal readonly struct ExpressionNodeFormatter
     {
         public string? ValueString;
         public string? ValueSuffix;
-        public void Accept<TValue>(Optional<TValue> opt) where TValue : IEquatable<TValue>
+        public void Accept<TValue>(IType<TValue> type, Optional<TValue> opt) where TValue : IEquatable<TValue>
         {
             if (!opt.HasValue)
             {

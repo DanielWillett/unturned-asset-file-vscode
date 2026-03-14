@@ -92,7 +92,12 @@ public readonly struct ValueNodeDescriptor
         bool lockTaken = false;
         if (lockTreeSync)
         {
+#if NET9_0_OR_GREATER
+            node.File.TreeSync.Enter();
+            lockTaken = true;
+#else
             Monitor.Enter(node.File.TreeSync, ref lockTaken);
+#endif
         }
 
         try
@@ -162,7 +167,13 @@ public readonly struct ValueNodeDescriptor
         finally
         {
             if (lockTaken)
+            {
+#if NET9_0_OR_GREATER
+                node.File.TreeSync.Exit();
+#else
                 Monitor.Exit(node.File.TreeSync);
+#endif
+            }
         }
     }
 

@@ -113,6 +113,8 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
             }
         );
 
+        file.RecalculateTypeInfo();
+
         FileAdded?.Invoke(file);
         return Unit.Task;
     }

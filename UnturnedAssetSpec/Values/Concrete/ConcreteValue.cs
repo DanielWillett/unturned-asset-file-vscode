@@ -70,7 +70,7 @@ public sealed class ConcreteValue<TValue>
         , allows ref struct
 #endif
     {
-        visitor.Accept(IsNull ? Optional<TValue>.Null : new Optional<TValue>(_value));
+        visitor.Accept(Type, IsNull ? Optional<TValue>.Null : new Optional<TValue>(_value));
         return true;
     }
 
@@ -81,7 +81,7 @@ public sealed class ConcreteValue<TValue>
         , allows ref struct
 #endif
     {
-        visitor.Accept(IsNull ? Optional<TValue>.Null : new Optional<TValue>(_value));
+        visitor.Accept(Type, IsNull ? Optional<TValue>.Null : new Optional<TValue>(_value));
         return true;
     }
 

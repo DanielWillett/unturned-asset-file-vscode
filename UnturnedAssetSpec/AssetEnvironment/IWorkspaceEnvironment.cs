@@ -42,7 +42,12 @@ public interface IMutableWorkspaceFile : IWorkspaceFile
     /// <summary>
     /// Object used to synchronize changes to the file.
     /// </summary>
+    /// <remarks>Uses <see cref="System.Threading.Lock"/> on .NET 9 and later.</remarks>
+#if NET9_0_OR_GREATER
+    System.Threading.Lock SyncRoot { get; }
+#else
     object SyncRoot { get; }
+#endif
 
     /// <summary>
     /// The range including all text in the file.

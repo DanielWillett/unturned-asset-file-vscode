@@ -37,7 +37,7 @@
             "Description": "The icon for this curation list.",
             "Variable": "Icon",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/server-browser-curation-asset.html#server-browser-curation-assets",
-            "ExclusiveWith": [ "IconURL" ] 
+            "ExclusiveWith": [ "$prop$::IconURL" ] 
         }
     ]
 }

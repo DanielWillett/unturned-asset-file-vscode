@@ -7,6 +7,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -16,6 +17,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 /// <summary>
 /// A property that can be defined in the file of a <see cref="DatFileType"/> or within an instance of a custom type.
 /// </summary>
+[DebuggerDisplay("{GetDebuggerDisplay()}")]
 public class DatProperty : IDatSpecificationObject
 {
     /// <summary>
@@ -418,6 +420,10 @@ public class DatProperty : IDatSpecificationObject
         }
     }
 
+    private string GetDebuggerDisplay()
+    {
+        return IsImport ? $"Import {Type}" : $"{Type} \"{Key}\"";
+    }
 
     public string FullName => $"{((IDatSpecificationObject)Owner).FullName}.{Key}";
     DatFileType IDatSpecificationObject.Owner => Owner.Owner;

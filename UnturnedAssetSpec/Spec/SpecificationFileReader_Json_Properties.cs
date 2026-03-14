@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Project;
+using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
@@ -6,7 +7,6 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -105,71 +105,6 @@ partial class SpecificationFileReader
 
         property.OverriddenProperty = overriding;
 
-        LegacyExpansionFilter filter = LegacyExpansionFilter.Either;
-
-        // Keys
-        if (root.TryGetProperty("KeyLegacyExpansionFilter"u8, out element) && element.ValueKind != JsonValueKind.Null)
-        {
-            if (!Enum.TryParse(element.GetString(), out filter))
-            {
-                throw new JsonException(
-                    string.Format(Resources.JsonException_FailedToParseEnum, nameof(LegacyExpansionFilter), element.GetString(), $"{owner.FullName}.{key}.KeyLegacyExpansionFilter")
-                );
-            }
-        }
-        IValue<bool>? keyCondition = null;
-
-        if (root.TryGetProperty("KeyCondition"u8, out element))
-        {
-            if (!Conditions.TryReadComplexOrBasicConditionFromJson(in element, Database, property, out keyCondition))
-            {
-                throw new JsonException(
-                    string.Format(Resources.JsonException_FailedToParseValue, "complex/basic condition", $"{owner.FullName}.{key}.KeyCondition")
-                );
-            }
-        }
-
-        JsonElement singleAliasElement;
-        if (root.TryGetProperty("Aliases"u8, out element) && element.ValueKind != JsonValueKind.Null)
-        {
-            int aliasCount = element.GetArrayLength();
-            DatPropertyKey? singleAlias = null;
-            if (root.TryGetProperty("Alias"u8, out singleAliasElement) && singleAliasElement.ValueKind != JsonValueKind.Null)
-            {
-                singleAlias = ReadAlias(in singleAliasElement, owner, property, key, -1);
-            }
-
-            ImmutableArray<DatPropertyKey>.Builder b = ImmutableArray.CreateBuilder<DatPropertyKey>(aliasCount + 1 + (singleAlias != null ? 1 : 0));
-            b.Add(new DatPropertyKey(key, filter, keyCondition));
-
-            for (int i = 0; i < aliasCount; ++i)
-            {
-                JsonElement aliasObj = element[i];
-                b.Add(ReadAlias(in aliasObj, owner, property, key, i));
-            }
-
-            if (singleAlias != null)
-                b.Add(singleAlias);
-
-            property.Keys = b.MoveToImmutable();
-        }
-        else if (root.TryGetProperty("Alias"u8, out singleAliasElement) && singleAliasElement.ValueKind != JsonValueKind.Null)
-        {
-            DatPropertyKey singleAlias = ReadAlias(in singleAliasElement, owner, property, key, -1);
-            property.Keys = ImmutableArray.Create(
-                new DatPropertyKey(key, filter, keyCondition),
-                singleAlias
-            );
-        }
-        else if (filter != LegacyExpansionFilter.Either || keyCondition != null)
-        {
-            property.Keys = ImmutableArray.Create(new DatPropertyKey(key, filter, keyCondition));
-        }
-        else
-        {
-            property.Keys = ImmutableArray<DatPropertyKey>.Empty;
-        }
-
         // FileCrossRef
         if (root.TryGetProperty("FileCrossRef"u8, out element) && element.ValueKind != JsonValueKind.Null)
         {
@@ -241,36 +176,6 @@ partial class SpecificationFileReader
             property.IncludedDefaultValue = Value.True;
         }
 
-        // Description
-        if (root.TryGetProperty("Description"u8, out element) && element.ValueKind != JsonValueKind.Null)
-        {
-            property.Description = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Description");
-        }
-
-        // Markdown
-        if (root.TryGetProperty("Markdown"u8, out element) && element.ValueKind != JsonValueKind.Null)
-        {
-            property.MarkdownDescription = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Markdown");
-        }
-
-        // Variable
-        if (root.TryGetProperty("Variable"u8, out element) && element.ValueKind != JsonValueKind.Null)
-        {
-            property.Variable = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Variable");
-        }
-
-        // Version
-        if (root.TryGetProperty("Version"u8, out element) && element.ValueKind != JsonValueKind.Null)
-        {
-            property.Version = this.ReadValue(in element, VersionType.PackableInstance, property, $"{owner.FullName}.{key}.Version");
-        }
-
-        // Docs
-        if (root.TryGetProperty("Docs"u8, out element) && element.ValueKind != JsonValueKind.Null)
-        {
-            property.Docs = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Docs");
-        }
-
         // Minimum[Exclusive]
         if (root.TryGetProperty("Minimum"u8, out element))
         {
@@ -305,6 +210,103 @@ partial class SpecificationFileReader
             }
 
             property.Exceptions = bldr.MoveToImmutableOrCopy();
+        }
+
+        ReadCommonProperties(property, in root, owner, key);
+
+        properties.Add(property);
+    }
+
+    private void ReadBundleAsset<T>(
+        in JsonElement root,
+        int index,
+        string propertyList,
+        T owner) where T : DatTypeWithProperties, IDatTypeWithBundleAssets, IDatSpecificationObject
+    {
+        string key = ReadKey(in root, owner, propertyList, index, out bool isImport);
+
+        if (!root.TryGetProperty("Type"u8, out JsonElement element) || element.ValueKind != JsonValueKind.String)
+        {
+            throw new JsonException(string.Format(Resources.JsonException_PropertyTypeMissing, $"{owner.FullName}.{key}"));
+        }
+
+        string type = element.GetString();
+
+        DatBundleAsset property = DatBundleAsset.Create(key, UnityObjectAssetType.Create(new QualifiedType(type, true)), owner, element);
+
+        property.IsImport = isImport;
+
+        ReadCommonProperties(property, in root, owner, key);
+
+        if (root.TryGetProperty("Template"u8, out element) && element.ValueKind == JsonValueKind.True)
+        {
+            property.IsTemplate = true;
+            property.TemplateGroupUniqueValue
+                = root.TryGetProperty("TemplateGroupUniqueValue"u8, out element)
+                  && element.ValueKind == JsonValueKind.True;
+
+            if (root.TryGetProperty("TemplateGroups", out element) && element.ValueKind != JsonValueKind.Null)
+            {
+                int amt = element.GetArrayLength();
+                ImmutableArray<TemplateGroup>.Builder bldr = ImmutableArray.CreateBuilder<TemplateGroup>(amt);
+                for (int i = 0; i < amt; ++i)
+                {
+                    JsonElement tg = element[i];
+                    if (!TemplateGroup.TryReadFromJson(i, in tg, out TemplateGroup? group))
+                    {
+                        throw new JsonException(string.Format(Resources.JsonException_InvalidTemplateGroup, $"{owner.FullName}.{key}", i));
+                    }
+
+                    bldr.Add(group);
+                }
+
+                property.TemplateGroups = bldr.MoveToImmutableOrCopy();
+            }
+
+            if (property.TemplateGroups.IsDefaultOrEmpty)
+            {
+                property.TemplateGroups = default;
+                property.IsTemplate = false;
+                property.TemplateGroupUniqueValue = false;
+            }
+        }
+
+        owner.BundleAssetsBuilder!.Add(property);
+    }
+
+    // common properties between bundle assets and normal properties
+    private void ReadCommonProperties(DatProperty property, in JsonElement root, IDatSpecificationObject owner, string key)
+    {
+        ReadAliases(property, in root, owner, key);
+
+        // Description
+        if (root.TryGetProperty("Description"u8, out JsonElement element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.Description = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Description");
+        }
+
+        // Markdown
+        if (root.TryGetProperty("Markdown"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.MarkdownDescription = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Markdown");
+        }
+
+        // Variable
+        if (root.TryGetProperty("Variable"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.Variable = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Variable");
+        }
+
+        // Version
+        if (root.TryGetProperty("Version"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.Version = this.ReadValue(in element, VersionType.PackableInstance, property, $"{owner.FullName}.{key}.Version");
+        }
+
+        // Docs
+        if (root.TryGetProperty("Docs"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.Docs = this.ReadValue(in element, StringType.Instance, property, $"{owner.FullName}.{key}.Docs");
         }
 
         // ExclusiveWith
@@ -380,8 +382,107 @@ partial class SpecificationFileReader
         {
             property.Experimental = this.ReadValue(in element, BooleanType.Instance, property, $"{owner.FullName}.{key}.Experimental");
         }
+    }
 
-        properties.Add(property);
+    private static string ReadKey(in JsonElement root, IDatSpecificationObject owner, string propertyList, int index, out bool isImport)
+    {
+        if (!root.TryGetProperty("Key"u8, out JsonElement element) || element.ValueKind != JsonValueKind.String)
+        {
+            throw new JsonException(string.Format(
+                Resources.JsonException_PropertyKeyMissing,
+                $"{owner.FullName}.{propertyList}[{index}]")
+            );
+        }
+
+        string key = element.GetString()!;
+        isImport = string.IsNullOrWhiteSpace(key);
+        if (!isImport && key[0] == '#')
+        {
+            // #This.Key = ""
+            if (DataRefs.TryParseDataRef(key,
+                    out ReadOnlySpan<char> dataRefRoot,
+                    out bool isRootEscaped,
+                    out ReadOnlySpan<char> dataRefProperty,
+                    out ReadOnlySpan<char> _,
+                    out ReadOnlySpan<char> _)
+                && !isRootEscaped
+                && dataRefRoot.Equals("This", StringComparison.OrdinalIgnoreCase)
+                && dataRefProperty.Equals("Key", StringComparison.OrdinalIgnoreCase)
+               )
+            {
+                key = string.Empty;
+            }
+        }
+
+        return key;
+    }
+
+    private void ReadAliases(DatProperty property, in JsonElement root, IDatSpecificationObject owner, string key)
+    {
+        LegacyExpansionFilter filter = LegacyExpansionFilter.Either;
+
+        // Keys
+        if (root.TryGetProperty("KeyLegacyExpansionFilter"u8, out JsonElement element) && element.ValueKind != JsonValueKind.Null)
+        {
+            if (!Enum.TryParse(element.GetString(), out filter))
+            {
+                throw new JsonException(
+                    string.Format(Resources.JsonException_FailedToParseEnum, nameof(LegacyExpansionFilter), element.GetString(), $"{owner.FullName}.{key}.KeyLegacyExpansionFilter")
+                );
+            }
+        }
+        IValue<bool>? keyCondition = null;
+
+        if (root.TryGetProperty("KeyCondition"u8, out element))
+        {
+            if (!Conditions.TryReadComplexOrBasicConditionFromJson(in element, Database, property, out keyCondition))
+            {
+                throw new JsonException(
+                    string.Format(Resources.JsonException_FailedToParseValue, "complex/basic condition", $"{owner.FullName}.{key}.KeyCondition")
+                );
+            }
+        }
+
+        JsonElement singleAliasElement;
+        if (root.TryGetProperty("Aliases"u8, out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            int aliasCount = element.GetArrayLength();
+            DatPropertyKey? singleAlias = null;
+            if (root.TryGetProperty("Alias"u8, out singleAliasElement) && singleAliasElement.ValueKind != JsonValueKind.Null)
+            {
+                singleAlias = ReadAlias(in singleAliasElement, owner, property, key, -1);
+            }
+
+            ImmutableArray<DatPropertyKey>.Builder b = ImmutableArray.CreateBuilder<DatPropertyKey>(aliasCount + 1 + (singleAlias != null ? 1 : 0));
+            b.Add(new DatPropertyKey(key, filter, keyCondition));
+
+            for (int i = 0; i < aliasCount; ++i)
+            {
+                JsonElement aliasObj = element[i];
+                b.Add(ReadAlias(in aliasObj, owner, property, key, i));
+            }
+
+            if (singleAlias != null)
+                b.Add(singleAlias);
+
+            property.Keys = b.MoveToImmutable();
+        }
+        else if (root.TryGetProperty("Alias"u8, out singleAliasElement) && singleAliasElement.ValueKind != JsonValueKind.Null)
+        {
+            DatPropertyKey singleAlias = ReadAlias(in singleAliasElement, owner, property, key, -1);
+            property.Keys = ImmutableArray.Create(
+                new DatPropertyKey(key, filter, keyCondition),
+                singleAlias
+            );
+        }
+        else if (filter != LegacyExpansionFilter.Either || keyCondition != null)
+        {
+            property.Keys = ImmutableArray.Create(new DatPropertyKey(key, filter, keyCondition));
+        }
+        else
+        {
+            property.Keys = ImmutableArray<DatPropertyKey>.Empty;
+        }
     }
 
     private DatPropertyKey ReadAlias(in JsonElement aliasObj, IDatSpecificationObject owner, DatProperty property, string key, int i)

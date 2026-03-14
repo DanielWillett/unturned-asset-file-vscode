@@ -1,11 +1,11 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -56,7 +56,7 @@ public interface ITypeFactory
 /// <summary>
 /// A strongly-typed parsable property type.
 /// </summary>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TValue">The types of values that are parsed from this type.</typeparam>
 public interface IType<TValue> : IType where TValue : IEquatable<TValue>
 {
     /// <summary>
@@ -120,7 +120,22 @@ public interface IAssetReferenceType : IType
     OneOrMore<QualifiedType> BaseTypes { get; }
 }
 
+/// <summary>
+/// A type that provides <see cref="ValueMetadata"/> for its values.
+/// </summary>
+/// <typeparam name="TValue">The types of values that are parsed from this type.</typeparam>
+public interface IValueMetadataProviderType<TValue> : IType<TValue>
+    where TValue : IEquatable<TValue>
+{
+    /// <summary>
+    /// Attempt to populate a <see cref="ValueMetadata{TValue}"/> object for a value.
+    /// </summary>
+    /// <returns>Whether or not the metadata was populated.</returns>
+    bool PopulateMetadata(IAnyValueSourceNode? node, ref FileEvaluationContext ctx, ValueMetadata<TValue> metadata);
+}
+
 public interface ITypeVisitor
 {
+    /// <typeparam name="TValue">The types of values that are parsed from this type.</typeparam>
     void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>;
 }

@@ -18,6 +18,7 @@ public interface ISourceFile : IDictionarySourceNode, IAdditionalPropertyProvide
     /// <summary>
     /// Object to lock on when traversing the file tree.
     /// </summary>
+    /// <remarks>Uses <see cref="System.Threading.Lock"/> on .NET 9 and later.</remarks>
 #if NET9_0_OR_GREATER
     System.Threading.Lock TreeSync { get; }
 #else

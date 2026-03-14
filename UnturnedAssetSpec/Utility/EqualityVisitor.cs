@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,12 @@ public struct EqualityVisitor<TValue> : IValueVisitor, IGenericVisitor
     public bool Success;
     public TValue? Value;
     public bool CaseInsensitive;
+
+    public void Accept<TOtherValue>(IType<TOtherValue> type, Optional<TOtherValue> optVal)
+        where TOtherValue : IEquatable<TOtherValue>
+    {
+        Accept(optVal);
+    }
 
     public void Accept<TOtherValue>(Optional<TOtherValue> optVal)
         where TOtherValue : IEquatable<TOtherValue>

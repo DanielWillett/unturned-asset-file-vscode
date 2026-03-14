@@ -62,7 +62,7 @@ public class ExpressionValue<TResult> : IValue<TResult>, IEquatable<ExpressionVa
         if (!TryGetConcreteValue(out Optional<TResult> r))
             return false;
 
-        visitor.Accept(r);
+        visitor.Accept(Type, r);
         return true;
     }
 
@@ -76,7 +76,7 @@ public class ExpressionValue<TResult> : IValue<TResult>, IEquatable<ExpressionVa
         if (!TryEvaluateValue(out Optional<TResult> r, ref ctx))
             return false;
 
-        visitor.Accept(r);
+        visitor.Accept(Type, r);
         return true;
     }
 

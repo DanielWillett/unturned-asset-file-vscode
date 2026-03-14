@@ -29,6 +29,9 @@ public struct FileEvaluationContext
     private bool _hasAssetDict;
     private bool _hasMetadataDict;
 
+    private IFileRelationalModel? _cachedModel;
+    private SpecPropertyContext _cachedModelContext = (SpecPropertyContext)(-1);
+
     public PropertyBreadcrumbs RootBreadcrumbs
     {
         readonly get => _rootBreadcrumbs;
@@ -309,9 +312,30 @@ public struct FileEvaluationContext
         return dictionary.TryGetProperty(property, ref this, out propertyNode/*, todo: filter */);
     }
 
-    public readonly IFileRelationalModel GetRelationalModel(SpecPropertyContext context = SpecPropertyContext.Property)
+    public IFileRelationalModel GetRelationalModel(SpecPropertyContext context = (SpecPropertyContext)(-1))
     {
-        return Services.RelationalModelProvider.GetProvider(File, context);
+        if (context < 0)
+            context = File.GetPropertyContext();
+
+        IFileRelationalModel model;
+        if (_cachedModelContext != context || _cachedModel == null)
+        {
+            model = Services.RelationalModelProvider.GetProvider(File, context);
+            _cachedModel = model;
+            _cachedModelContext = context;
+        }
+        else
+        {
+            model = _cachedModel;
+            if (_cachedModelContext != context || model != _cachedModel || model == null)
+            {
+                model = Services.RelationalModelProvider.GetProvider(File, context);
+                _cachedModel = model;
+                _cachedModelContext = context;
+            }
+        }
+
+        return model;
     }
 
     public readonly bool TryGetRelevantMap([NotNullWhen(true)] out RelevantMapInfo? mapInfo)

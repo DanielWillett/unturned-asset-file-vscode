@@ -306,7 +306,7 @@
             "InclusiveWith":
             [
                 {
-                    "Key": "Pro",
+                    "Key": "$prop$::Pro",
                     "Value": true
                 }
             ],

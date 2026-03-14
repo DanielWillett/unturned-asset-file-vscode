@@ -249,7 +249,7 @@ internal class SkillLevelType : BaseType<int, SkillLevelType>, ITypeParser<int>,
         public SkillReference Value;
         public IAssetSpecDatabase Information;
         public bool Success;
-        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        public void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>
         {
             if (!value.HasValue)
                 return;

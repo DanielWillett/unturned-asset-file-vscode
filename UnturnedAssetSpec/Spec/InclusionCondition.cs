@@ -1,12 +1,12 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 // ReSharper disable InconsistentNaming
 
@@ -101,14 +101,15 @@ public class InclusionCondition : IInclusionCondition
     /// <param name="value">The value the property must equate to.</param>
     public static IInclusionCondition<TValue> Create<TValue>(
         in PropertyReference propertyReference,
+        IType<TValue> type,
         Optional<TValue> value,
         IValue<bool>? filterCondition = null,
         IValue<bool>? requirementCondition = null
     ) where TValue : IEquatable<TValue>
     {
         return value.HasValue
-            ? new InclusionCondition<TValue>(in propertyReference, value.Value, filterCondition, requirementCondition)
-            : new InclusionCondition<TValue>(in propertyReference, filterCondition, requirementCondition);
+            ? new InclusionCondition<TValue>(in propertyReference, type, value.Value, filterCondition, requirementCondition)
+            : new InclusionCondition<TValue>(in propertyReference, type, filterCondition, requirementCondition);
     }
 
     /// <summary>
@@ -144,6 +145,7 @@ public class InclusionCondition : IInclusionCondition
     /// <exception cref="InvalidEnumArgumentException">Invalid value for <paramref name="conditionBehavior"/>.</exception>
     public static IInclusionCondition<TValue> Create<TValue>(
         in PropertyReference propertyReference,
+        IType<TValue> type,
         Optional<TValue> value,
         IValue<bool> condition,
         ConditionBehavior conditionBehavior
@@ -152,11 +154,11 @@ public class InclusionCondition : IInclusionCondition
         return conditionBehavior switch
         {
             ConditionBehavior.Filter => value.HasValue
-                ? new InclusionCondition<TValue>(in propertyReference, value.Value, condition, null)
-                : new InclusionCondition<TValue>(in propertyReference, condition, null),
+                ? new InclusionCondition<TValue>(in propertyReference, type, value.Value, condition, null)
+                : new InclusionCondition<TValue>(in propertyReference, type, condition, null),
             ConditionBehavior.Requirement => value.HasValue
-                ? new InclusionCondition<TValue>(in propertyReference, value.Value, null, condition)
-                : new InclusionCondition<TValue>(in propertyReference, null, condition),
+                ? new InclusionCondition<TValue>(in propertyReference, type, value.Value, null, condition)
+                : new InclusionCondition<TValue>(in propertyReference, type, null, condition),
             _ => throw new InvalidEnumArgumentException(nameof(conditionBehavior), (int)conditionBehavior, typeof(ConditionBehavior))
         };
     }
@@ -358,11 +360,11 @@ public class InclusionCondition : IInclusionCondition
                         return;
                     }
 
-                    Condition = Create(in PropertyReference, concrete, filterCondition, requirementCondition);
+                    Condition = Create(in PropertyReference, value.Type, concrete, filterCondition, requirementCondition);
                 }
                 else
                 {
-                    Condition = Create(in PropertyReference, concrete, requirementCondition, ConditionBehavior.Requirement);
+                    Condition = Create(in PropertyReference, value.Type, concrete, requirementCondition, ConditionBehavior.Requirement);
                 }
             }
             else if (Json.TryGetProperty("Condition"u8, out conditionElement))
@@ -382,11 +384,11 @@ public class InclusionCondition : IInclusionCondition
                     return;
                 }
 
-                Condition = Create(in PropertyReference, concrete, cond, behavior);
+                Condition = Create(in PropertyReference, value.Type, concrete, cond, behavior);
             }
             else
             {
-                Condition = Create(in PropertyReference, concrete);
+                Condition = Create(in PropertyReference, value.Type, concrete);
             }
         }
     }
@@ -396,26 +398,29 @@ public class InclusionCondition : IInclusionCondition
 public class InclusionCondition<TValue> : InclusionCondition, IInclusionCondition<TValue>
     where TValue : IEquatable<TValue>
 {
+    private readonly IType<TValue> _type;
     private readonly TValue? _value;
     private readonly bool _valueIsNull;
 
     public override bool IsAnyValue => false;
 
-    internal InclusionCondition(in PropertyReference pRef, TValue value, IValue<bool>? filterCondition, IValue<bool>? requirementCondition)
+    internal InclusionCondition(in PropertyReference pRef, IType<TValue> type, TValue value, IValue<bool>? filterCondition, IValue<bool>? requirementCondition)
         : base(in pRef, filterCondition, requirementCondition)
     {
+        _type = type;
         _value = value;
     }
 
-    internal InclusionCondition(in PropertyReference pRef, IValue<bool>? filterCondition, IValue<bool>? requirementCondition)
+    internal InclusionCondition(in PropertyReference pRef, IType<TValue> type, IValue<bool>? filterCondition, IValue<bool>? requirementCondition)
         : base(in pRef, filterCondition, requirementCondition)
     {
+        _type = type;
         _valueIsNull = true;
     }
 
     public override bool VisitValue<TVisitor>(ref TVisitor visitor)
     {
-        visitor.Accept(_valueIsNull ? Optional<TValue>.Null : new Optional<TValue>(_value));
+        visitor.Accept(_type, _valueIsNull ? Optional<TValue>.Null : new Optional<TValue>(_value));
         return true;
     }
 

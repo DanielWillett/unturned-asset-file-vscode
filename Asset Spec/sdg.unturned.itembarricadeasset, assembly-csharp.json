@@ -740,11 +740,11 @@
             "Description": "The barricade object loaded on dedicated servers. This object should not contain renderers usually.",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "barricade",
-            "Required": "@Has_Clip_Prefab"
+            "Required": "@($prop$::Has_Clip_Prefab)"
         },
         {
             "Key": "Barricade",
-            "Description": "The barricade object loaded in-game and on dedicated servers if @Has_Clip_Prefab is false.",
+            "Description": "The barricade object loaded in-game and on dedicated servers if @($prop$::Has_Clip_Prefab) is false.",
             "Type": "UnityEngine.GameObject, UnityEngine.CoreModule",
             "Variable": "barricade",
             "Required": true

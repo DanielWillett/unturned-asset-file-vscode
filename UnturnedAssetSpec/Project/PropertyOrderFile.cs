@@ -91,7 +91,7 @@ public class PropertyOrderFile(string fileName) : IPropertyOrderFile
 
         public readonly override int GetHashCode()
         {
-            int hc = StringComparer.OrdinalIgnoreCase.GetHashCode(TypeName);
+            int hc = TypeName == null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(TypeName);
             if (IsLocalization) hc = ~hc;
             return hc;
         }

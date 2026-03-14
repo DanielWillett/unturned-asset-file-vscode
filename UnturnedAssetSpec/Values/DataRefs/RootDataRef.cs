@@ -2,8 +2,10 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -170,27 +172,47 @@ public abstract class RootDataRef<TSelf> : BaseDataRefTarget, IDataRef
 /// Base type for all strongly-typed root data-refs, that is data-refs that do not have a target.
 /// </summary>
 /// <typeparam name="TSelf">The extending type.</typeparam>
-public abstract class RootDataRef<TValue, TSelf> : RootDataRef<TSelf>
+public abstract class RootDataRef<TValue, TSelf> : RootDataRef<TSelf>, IValue<TValue>
     where TValue : IEquatable<TValue>
     where TSelf : RootDataRef<TValue, TSelf>
 {
+    /// <inheritdoc />
+    public abstract IType<TValue> Type { get; }
+
     /// <summary>
     /// Attempts to evaluate a value given the workspace context.
     /// </summary>
     /// <param name="ctx">Workspace context.</param>
     /// <param name="value">The evaluated value.</param>
     /// <returns>Whether or not a value could be determined.</returns>
-    public abstract bool TryEvaluateValue(ref FileEvaluationContext ctx, out Optional<TValue> value);
+    public abstract bool TryEvaluateValue(
+        ref FileEvaluationContext ctx,
+        [NotNullWhen(true)] out IType<TValue>? type,
+        out Optional<TValue> value
+    );
 
     /// <inheritdoc />
     public override bool VisitValue<TVisitor>(ref TVisitor visitor, ref FileEvaluationContext ctx)
     {
-        if (!TryEvaluateValue(ref ctx, out Optional<TValue> value))
+        if (!TryEvaluateValue(ref ctx, out IType<TValue>? type, out Optional<TValue> value))
         {
             return false;
         }
 
-        visitor.Accept(value);
+        visitor.Accept(type, value);
         return true;
+    }
+
+    /// <inheritdoc />
+    public virtual bool TryGetConcreteValue(out Optional<TValue> value)
+    {
+        value = Optional<TValue>.Null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    public bool TryEvaluateValue(out Optional<TValue> value, ref FileEvaluationContext ctx)
+    {
+        return TryEvaluateValue(ref ctx, out _, out value);
     }
 }

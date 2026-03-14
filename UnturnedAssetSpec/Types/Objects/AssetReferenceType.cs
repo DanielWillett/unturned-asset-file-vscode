@@ -38,7 +38,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </list>
 /// </para>
 /// </summary>
-public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITypeParser<Guid>, ITypeFactory, IAssetReferenceType
+public sealed class AssetReferenceType :
+    BaseType<Guid, AssetReferenceType>,
+    ITypeParser<Guid>,
+    ITypeFactory,
+    IAssetReferenceType,
+    IValueMetadataProviderType<Guid>
 {
     private static readonly AssetReferenceType?[] DefaultInstances = new AssetReferenceType?[(int)AssetReferenceKind.Object];
 
@@ -258,6 +263,15 @@ public sealed class AssetReferenceType : BaseType<Guid, AssetReferenceType>, ITy
     }
 
     #endregion
+
+    public bool PopulateMetadata(IAnyValueSourceNode? node, ref FileEvaluationContext ctx, ValueMetadata<Guid> metadata)
+    {
+        if (!metadata.Value.HasValue)
+            return false;
+
+        GuidOrId id = new GuidOrId(metadata.Value.Value);
+        return AssetReferenceHelper.PopulateMetadata(id, ref ctx, metadata);
+    }
 
     protected override bool Equals(AssetReferenceType other)
     {

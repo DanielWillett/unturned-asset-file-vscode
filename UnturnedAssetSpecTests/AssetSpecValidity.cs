@@ -45,7 +45,7 @@ public class AssetSpecValidity
         // Assert.That(db.NPCAchievementIds,       Is.Not.Empty); requires game files if not online
         // Assert.That(db.ValidActionButtons,      Is.Not.Empty); requires game files if not online
 
-        DatFileType type = db.FileTypes[QualifiedType.AssetBaseType];
+        DatFileType type = db.FileTypes[QualifiedType.ItemAssetType];
 
         OrderedPropertyReference[] orderfile = db.GlobalOrderFile.GetOrderForType(type.TypeName, SpecPropertyContext.Property);
         Assert.That(orderfile, Is.Not.Empty);

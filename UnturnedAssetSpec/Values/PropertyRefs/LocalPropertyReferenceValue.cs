@@ -187,7 +187,7 @@ public class PropertyReferenceValue<TReferencedValue> : LocalPropertyReferenceVa
         public bool Success;
 
         /// <inheritdoc />
-        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        public void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>
         {
             if (typeof(TValue) == typeof(TReferencedValue))
             {

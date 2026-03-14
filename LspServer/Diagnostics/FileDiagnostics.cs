@@ -98,7 +98,8 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
                 lock (OpenedFile.EditLock)
                 {
                     sourceFile = OpenedFile.SourceFile;
-                    Monitor.Enter(sourceFile.TreeSync, ref hasLock);
+                    sourceFile.TreeSync.Enter();
+                    hasLock = true;
                     if (OpenedFile.Version.HasValue && LatestReclaculateVersion.HasValue && LatestReclaculateVersion.Value == OpenedFile.Version.Value)
                     {
                         // up to date
@@ -146,7 +147,8 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
                         }
                         else
                         {
-                            Monitor.Enter(srcFile.TreeSync, ref hasAssetLock);
+                            srcFile.TreeSync.Enter();
+                            hasAssetLock = true;
                         }
 
                         info = SourceNodeTokenizer.RootInfo.Localization(this, _database, assetSrcFile);
@@ -154,7 +156,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
                     finally
                     {
                         if (hasAssetLock)
-                            Monitor.Exit(srcFile!.TreeSync);
+                            srcFile!.TreeSync.Exit();
                     }
                 }
                 else
@@ -190,7 +192,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
         finally
         {
             if (hasLock)
-                Monitor.Exit(sourceFile!.TreeSync);
+                sourceFile!.TreeSync.Exit();
             if (enteredLock != null) enteredLock.Exit();
         }
 

@@ -1,8 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Text.Json;
+using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -134,5 +138,27 @@ internal static class AssetReferenceHelper
         }
 
         return category;
+    }
+
+    internal static bool PopulateMetadata<TValue>(GuidOrId guidOrId, ref FileEvaluationContext ctx, ValueMetadata<TValue> metadata)
+        where TValue : IEquatable<TValue>
+    {
+        OneOrMore<DiscoveredDatFile> files = ctx.Services.Installation.FindFile(guidOrId);
+        if (files.Length != 1)
+        {
+            return false;
+        }
+
+        DiscoveredDatFile file = files[0];
+        string displayName = file.GetDisplayName();
+
+        string fileUri = new Uri(file.FilePath).AbsoluteUri;
+
+        metadata.DisplayName = displayName;
+        metadata.DeclaringType = file.Type;
+        metadata.Description = ReferenceEquals(displayName, file.AssetName) ? null : file.AssetName;
+        metadata.Docs = fileUri;
+        metadata.LinkName = Path.GetFileName(file.FilePath);
+        return true;
     }
 }

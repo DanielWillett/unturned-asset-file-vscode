@@ -58,18 +58,20 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
             Execute(sourceFile, AssetDatPropertyPosition.Root, outputProperties);
         }
 
-        AssetProperty[] array = outputProperties.ToArray();
-        IPropertyOrderFile orderfile = _parsingServices.ProjectFileProvider.GetScaffoldedOrderfile(file);
+        QualifiedType actualType = sourceFile.ActualType;
+        if (outputProperties.Count > 0 && !actualType.IsNull)
+        {
+            IPropertyOrderFile orderfile = _parsingServices.ProjectFileProvider.GetScaffoldedOrderfile(file);
 
-        IComparer<AssetProperty> comparer = orderfile.CreateComparer<AssetProperty>(
-            sourceFile.ActualType,
-            sourceFile is ILocalizationSourceFile
-                ? SpecPropertyContext.Localization
-                : SpecPropertyContext.Property,
-            x => x.Property
-        );
-
-        outputProperties.Sort(comparer);
+            IComparer<AssetProperty> comparer = orderfile.CreateComparer<AssetProperty>(
+                actualType,
+                sourceFile is ILocalizationSourceFile
+                    ? SpecPropertyContext.Localization
+                    : SpecPropertyContext.Property,
+                x => x.Property
+            );
+            outputProperties.Sort(comparer);
+        }
 
         return Task.FromResult(new Container<AssetProperty>(outputProperties));
     }
@@ -141,7 +143,12 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
         public int Index;
         public ISourceNode? Node;
         public ref FileEvaluationContext Context;
-        public void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
+        public void Accept<TValue>(IType<TValue> type, Optional<TValue> value) where TValue : IEquatable<TValue>
+        {
+            Accept(value);
+        }
+
+        private void Accept<TValue>(Optional<TValue> value) where TValue : IEquatable<TValue>
         {
             if (!value.HasValue)
             {

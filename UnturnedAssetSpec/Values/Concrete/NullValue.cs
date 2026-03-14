@@ -10,6 +10,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <summary>
 /// A <see langword="null"/> value of any type.
 /// </summary>
+/// <remarks>Uses <see cref="StringType"/> as its type, which shouldn't matter in most cases.</remarks>
 public sealed class NullValue : IValue
 {
     public static readonly NullValue Instance = new NullValue();
@@ -26,7 +27,7 @@ public sealed class NullValue : IValue
         , allows ref struct
 #endif
     {
-        visitor.Accept(Optional<string>.Null);
+        visitor.Accept(StringType.Instance, Optional<string>.Null);
         return true;
     }
 
@@ -37,7 +38,7 @@ public sealed class NullValue : IValue
         , allows ref struct
 #endif
     {
-        visitor.Accept(Optional<string>.Null);
+        visitor.Accept(StringType.Instance, Optional<string>.Null);
         return true;
     }
 
@@ -98,7 +99,7 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T>, IValueExpressionNod
         , allows ref struct
 #endif
     {
-        visitor.Accept(Optional<T>.Null);
+        visitor.Accept(Type, Optional<T>.Null);
         return true;
     }
 
@@ -109,7 +110,7 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T>, IValueExpressionNod
         , allows ref struct
 #endif
     {
-        visitor.Accept(Optional<T>.Null);
+        visitor.Accept(Type, Optional<T>.Null);
         return true;
     }
 
@@ -169,7 +170,7 @@ public sealed class NullValue<T>(IType<T> type) : IValue<T>, IValueExpressionNod
     {
         public bool IsNull;
 
-        public void Accept<TOtherValue>(Optional<TOtherValue> optVal)
+        public void Accept<TOtherValue>(IType<TOtherValue> type, Optional<TOtherValue> optVal)
             where TOtherValue : IEquatable<TOtherValue>
         {
             IsNull = !optVal.HasValue;

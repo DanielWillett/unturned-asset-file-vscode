@@ -54,7 +54,7 @@ export class AssetPropertiesViewProvider implements TreeDataProvider<AssetProper
         else
         {
             const result = await getClient().sendRequest(DiscoverAssetProperties, { document: txtDoc.document.uri.toString() });
-            getOutputChannel().info(JSON.stringify(result, null, "  "));
+            //getOutputChannel().info(JSON.stringify(result, null, "  "));
             if (this.propertyValues.length === result.length && result.every((prop, i) => this.propertyValues[i].property === prop))
             {
                 return false;

@@ -198,24 +198,47 @@ partial class SpecificationFileReader
                 customType.PropertiesBuilder = null;
             }
 
-            if (customType is DatCustomAssetType assetType && root.TryGetProperty("Localization"u8, out element) && element.ValueKind != JsonValueKind.Null)
+            if (customType is DatCustomAssetType assetType)
             {
-                AssertValueKind(in element, fileType, JsonValueKind.Array);
-                int propertyCount = element.GetArrayLength();
-
-                ImmutableArray<DatProperty>.Builder propertyBuilder = ImmutableArray.CreateBuilder<DatProperty>(propertyCount);
-                assetType.LocalizationPropertiesBuilder = propertyBuilder;
-
-                for (int i = 0; i < propertyCount; ++i)
+                if (root.TryGetProperty("Localization"u8, out element) && element.ValueKind != JsonValueKind.Null)
                 {
-                    JsonElement prop = element[i];
-                    ReadPropertyFirstPass(in prop, i, "Localization", t => t.LocalizationProperties, propertyBuilder, SpecPropertyContext.Localization, assetType);
+                    AssertValueKind(in element, fileType, JsonValueKind.Array);
+                    int propertyCount = element.GetArrayLength();
+
+                    ImmutableArray<DatProperty>.Builder propertyBuilder = ImmutableArray.CreateBuilder<DatProperty>(propertyCount);
+                    assetType.LocalizationPropertiesBuilder = propertyBuilder;
+
+                    for (int i = 0; i < propertyCount; ++i)
+                    {
+                        JsonElement prop = element[i];
+                        ReadPropertyFirstPass(in prop, i, "Localization", t => t.LocalizationProperties, propertyBuilder, SpecPropertyContext.Localization, assetType);
+                    }
+
+                    ApplyImports(propertyBuilder);
+
+                    assetType.LocalizationProperties = propertyBuilder.ToImmutable();
+                    assetType.LocalizationPropertiesBuilder = null;
                 }
 
-                ApplyImports(propertyBuilder);
+                if (root.TryGetProperty("BundleAssets"u8, out element) && element.ValueKind != JsonValueKind.Null)
+                {
+                    AssertValueKind(in element, fileType, JsonValueKind.Array);
+                    int propertyCount = element.GetArrayLength();
 
-                assetType.LocalizationProperties = propertyBuilder.ToImmutable();
-                assetType.LocalizationPropertiesBuilder = null;
+                    ImmutableArray<DatBundleAsset>.Builder propertyBuilder = ImmutableArray.CreateBuilder<DatBundleAsset>(propertyCount);
+                    assetType.BundleAssetsBuilder = propertyBuilder;
+
+                    for (int i = 0; i < propertyCount; ++i)
+                    {
+                        JsonElement prop = element[i];
+                        ReadBundleAsset(in prop, i, "BundleAssets", assetType);
+                    }
+
+                    ApplyImports(propertyBuilder);
+
+                    assetType.BundleAssets = propertyBuilder.ToImmutable();
+                    assetType.BundleAssetsBuilder = null;
+                }
             }
         }
 

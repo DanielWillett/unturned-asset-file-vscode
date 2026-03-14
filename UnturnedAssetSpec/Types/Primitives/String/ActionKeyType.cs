@@ -17,7 +17,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// </code>
 /// </summary>
 /// <remarks>Any lines ending in <c>_Button</c> and <c>_Button_Tooltip</c> are valid.</remarks>
-public sealed class ActionKeyType : PrimitiveType<string, ActionKeyType>, ITypeParser<string>
+public sealed class ActionKeyType : PrimitiveType<string, ActionKeyType>, ITypeParser<string>, IValueMetadataProviderType<string>
 {
     public const string TypeId = "ActionKey";
 
@@ -72,5 +72,21 @@ public sealed class ActionKeyType : PrimitiveType<string, ActionKeyType>, ITypeP
     public void WriteValueToJson(Utf8JsonWriter writer, string value, IType<string> valueType, JsonSerializerOptions options)
     {
         TypeParsers.String.WriteValueToJson(writer, value, valueType, options);
+    }
+
+    /// <inheritdoc />
+    public bool PopulateMetadata(IAnyValueSourceNode? node, ref FileEvaluationContext ctx, ValueMetadata<string> metadata)
+    {
+        if (!metadata.Value.HasValue
+            || ctx.Services.Database.ValidActionButtons == null
+            || !ctx.Services.Database.ValidActionButtons.TryGetValue(metadata.Value.Value, out ActionButton buttonInfo))
+        {
+            return false;
+        }
+
+        metadata.DisplayName = buttonInfo.ButtonValue;
+        metadata.Description = buttonInfo.TooltipValue;
+        metadata.Variable = buttonInfo.Key;
+        return true;
     }
 }

@@ -311,7 +311,7 @@ public class ComplexConditionalValue : ComplexConditionalSwitchCase<bool>
         if (!TryCheckConditionsConcrete(out bool doesPassConditions))
             return false;
 
-        visitor.Accept(new Optional<bool>(doesPassConditions));
+        visitor.Accept(BooleanType.Instance, new Optional<bool>(doesPassConditions));
         return true;
     }
 
@@ -321,7 +321,7 @@ public class ComplexConditionalValue : ComplexConditionalSwitchCase<bool>
         if (!TryCheckConditions(ref ctx, out bool doesPassConditions))
             return false;
 
-        visitor.Accept(new Optional<bool>(doesPassConditions));
+        visitor.Accept(BooleanType.Instance, new Optional<bool>(doesPassConditions));
         return true;
     }
 }

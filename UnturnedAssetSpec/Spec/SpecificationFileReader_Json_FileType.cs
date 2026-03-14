@@ -230,24 +230,47 @@ partial class SpecificationFileReader
                 type.PropertiesBuilder = null;
             }
 
-            if (type is DatAssetFileType assetFile && root.TryGetProperty("Localization"u8, out element) && element.ValueKind != JsonValueKind.Null)
+            if (type is DatAssetFileType assetFile)
             {
-                AssertValueKind(in element, fileType, JsonValueKind.Array);
-                int propertyCount = element.GetArrayLength();
-
-                ImmutableArray<DatProperty>.Builder propertyBuilder = ImmutableArray.CreateBuilder<DatProperty>(propertyCount);
-                assetFile.LocalizationPropertiesBuilder = propertyBuilder;
-
-                for (int i = 0; i < propertyCount; ++i)
+                if (root.TryGetProperty("Localization"u8, out element) && element.ValueKind != JsonValueKind.Null)
                 {
-                    JsonElement prop = element[i];
-                    ReadPropertyFirstPass(in prop, i, "Localization", t => t.LocalizationProperties, propertyBuilder, SpecPropertyContext.Localization, assetFile);
+                    AssertValueKind(in element, fileType, JsonValueKind.Array);
+                    int propertyCount = element.GetArrayLength();
+
+                    ImmutableArray<DatProperty>.Builder propertyBuilder = ImmutableArray.CreateBuilder<DatProperty>(propertyCount);
+                    assetFile.LocalizationPropertiesBuilder = propertyBuilder;
+
+                    for (int i = 0; i < propertyCount; ++i)
+                    {
+                        JsonElement prop = element[i];
+                        ReadPropertyFirstPass(in prop, i, "Localization", t => t.LocalizationProperties, propertyBuilder, SpecPropertyContext.Localization, assetFile);
+                    }
+
+                    ApplyImports(propertyBuilder);
+
+                    assetFile.LocalizationProperties = propertyBuilder.ToImmutable();
+                    assetFile.LocalizationPropertiesBuilder = null;
                 }
 
-                ApplyImports(propertyBuilder);
+                if (root.TryGetProperty("BundleAssets"u8, out element) && element.ValueKind != JsonValueKind.Null)
+                {
+                    AssertValueKind(in element, fileType, JsonValueKind.Array);
+                    int propertyCount = element.GetArrayLength();
 
-                assetFile.LocalizationProperties = propertyBuilder.ToImmutable();
-                assetFile.LocalizationPropertiesBuilder = null;
+                    ImmutableArray<DatBundleAsset>.Builder propertyBuilder = ImmutableArray.CreateBuilder<DatBundleAsset>(propertyCount);
+                    assetFile.BundleAssetsBuilder = propertyBuilder;
+
+                    for (int i = 0; i < propertyCount; ++i)
+                    {
+                        JsonElement prop = element[i];
+                        ReadBundleAsset(in prop, i, "BundleAssets", assetFile);
+                    }
+
+                    ApplyImports(propertyBuilder);
+
+                    assetFile.BundleAssets = propertyBuilder.ToImmutable();
+                    assetFile.BundleAssetsBuilder = null;
+                }
             }
         }
         finally
@@ -266,7 +289,8 @@ partial class SpecificationFileReader
         throw new JsonException(string.Format(Resources.JsonException_InvalidJsonToken, element.ValueKind, kind, type.GetFullTypeName()));
     }
 
-    private static void ApplyImports(ImmutableArray<DatProperty>.Builder propertyBuilder, int start = 0, int len = -1)
+    private static void ApplyImports<T>(ImmutableArray<T>.Builder propertyBuilder, int start = 0, int len = -1)
+        where T : DatProperty
     {
         if (len < 0)
             len = propertyBuilder.Count;
@@ -275,7 +299,7 @@ partial class SpecificationFileReader
 
         for (int i = start; i < len; ++i)
         {
-            DatProperty property = propertyBuilder[i];
+            T property = propertyBuilder[i];
             if (!property.TryGetImportType(out DatTypeWithProperties? importType))
                 continue;
 
@@ -287,10 +311,10 @@ partial class SpecificationFileReader
                 continue;
             }
 
-            propertyBuilder[i] = imported[0];
+            propertyBuilder[i] = (T)imported[0];
             for (int j = 1; j < imported.Length; ++j)
             {
-                propertyBuilder.Insert(i + j, imported[j]);
+                propertyBuilder.Insert(i + j, (T)imported[j]);
             }
 
             ApplyImports(propertyBuilder, i, imported.Length);

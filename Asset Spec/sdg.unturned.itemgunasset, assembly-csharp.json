@@ -1508,21 +1508,21 @@
             "ExclusiveWith":
             [
                 {
-                    "Key": "RechamberAfterMagazineAttached",
+                    "Key": "$prop$::RechamberAfterMagazineAttached",
                     "Value": "Never",
                     "Condition":
                     {
-                        "Variable": "RechamberAfterMagazineDetached",
+                        "Variable": "$prop$::RechamberAfterMagazineDetached",
                         "Operation": "eq",
                         "Comparand": "Never"
                     }
                 },
                 {
-                    "Key": "RechamberAfterMagazineDetached",
+                    "Key": "$prop$::RechamberAfterMagazineDetached",
                     "Value": "Never",
                     "Condition":
                     {
-                        "Variable": "RechamberAfterMagazineAttached",
+                        "Variable": "$prop$::RechamberAfterMagazineAttached",
                         "Operation": "eq",
                         "Comparand": "Never"
                     }
@@ -1545,7 +1545,7 @@
             "InclusiveWith":
             [
                 {
-                    "Key": "Action",
+                    "Key": "$prop$::Action",
                     "Value": "Minigun"
                 }
             ]
@@ -1556,7 +1556,7 @@
             "Description": "The sound played when this gun jams.",
             "Variable": "chamberJammedSound",
             "RedirectableAssetKey": "ChamberJammedAudioClip",
-            "InclusiveWith": [ "Can_Ever_Jam" ]
+            "InclusiveWith": [ "$prop$::Can_Ever_Jam" ]
         },
         {
             "Key": "FireDelay",
@@ -1567,10 +1567,10 @@
             "InclusiveWith":
             [
                 {
-                    "Key": "Fire_Delay_Seconds",
+                    "Key": "$prop$::Fire_Delay_Seconds",
                     "Condition":
                     {
-                        "Variable": "Fire_Delay_Seconds",
+                        "Variable": "$prop$::Fire_Delay_Seconds",
                         "Operation": "gt",
                         "Comparand": 0
                     }

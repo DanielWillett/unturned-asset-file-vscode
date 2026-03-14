@@ -2990,7 +2990,7 @@
                             "Value": true
                         },
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableConsumeable, Assembly-CSharp"
                         }
                     ]
@@ -3000,7 +3000,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableFisher, Assembly-CSharp"
                         }
                     ]
@@ -3010,7 +3010,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableFisher, Assembly-CSharp"
                         }
                     ]
@@ -3020,7 +3020,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableFisher, Assembly-CSharp"
                         }
                     ]
@@ -3031,11 +3031,11 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
                         },
                         {
-                            "Key": "SDG.Unturned.ItemGunAsset, Assembly-CSharp::Can_Ever_Jam",
+                            "Key": "$prop$::SDG.Unturned.ItemGunAsset, Assembly-CSharp::Can_Ever_Jam",
                             "Value": true
                         }
                     ]
@@ -3045,7 +3045,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
                         }
                     ]
@@ -3055,7 +3055,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
                         }
                     ]
@@ -3065,7 +3065,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
                         }
                     ]
@@ -3075,7 +3075,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
                         }
                     ]
@@ -3085,7 +3085,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
                         }
                     ]
@@ -3095,7 +3095,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
                         }
                     ]
@@ -3105,7 +3105,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
                         }
                     ]
@@ -3115,7 +3115,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableGun, Assembly-CSharp"
                         }
                     ]
@@ -3125,7 +3125,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableMelee, Assembly-CSharp"
                         }
                     ]
@@ -3135,7 +3135,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableMelee, Assembly-CSharp"
                         }
                     ]
@@ -3145,7 +3145,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableMelee, Assembly-CSharp"
                         }
                     ]
@@ -3155,7 +3155,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableMelee, Assembly-CSharp"
                         }
                     ]
@@ -3165,7 +3165,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableRefill, Assembly-CSharp"
                         }
                     ]
@@ -3175,7 +3175,7 @@
                     "InclusiveWith":
                     [
                         {
-                            "Key": "Useable",
+                            "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableRefill, Assembly-CSharp"
                         }
                     ]
@@ -3193,12 +3193,12 @@
                 "And":
                 [
                     {
-                        "Variable": "Type",
+                        "Variable": "$prop$::Type",
                         "Operation": "neq",
                         "Comparand": "Shirt"
                     },
                     {
-                        "Variable": "Type",
+                        "Variable": "$prop$::Type",
                         "Operation": "neq",
                         "Comparand": "Pants"
                     }
