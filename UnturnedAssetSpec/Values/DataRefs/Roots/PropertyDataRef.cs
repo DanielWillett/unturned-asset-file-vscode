@@ -208,4 +208,10 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
         value = 0;
         return false;
     }
+
+    protected override bool AcceptProperty<TVisitor>(in ComponentProperty property, ref FileEvaluationContext ctx, ref TVisitor visitor)
+    {
+        // todo
+        return false;
+    }
 }

@@ -4,9 +4,6 @@
     "DisplayName": "Tactical Attachment Item",
     "Parent": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tactical-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

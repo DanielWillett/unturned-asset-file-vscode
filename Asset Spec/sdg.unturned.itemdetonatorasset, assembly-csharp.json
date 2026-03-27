@@ -4,9 +4,6 @@
     "DisplayName": "Detonator Item",
     "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/detonator-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "BundleAssets":
     [
         {

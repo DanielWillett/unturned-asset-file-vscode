@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using System;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
@@ -15,6 +15,7 @@ public class MutableVirtualFile : IMutableWorkspaceFile, IMutableWorkspaceFileUp
 
     public string File => _parent.File;
     public ISourceFile SourceFile => _parent.SourceFile;
+    public IBundleProxy Bundle => _parent.Bundle;
 #if NET9_0_OR_GREATER
     public System.Threading.Lock SyncRoot => _parent.SyncRoot;
 #else

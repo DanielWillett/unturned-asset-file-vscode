@@ -4,9 +4,6 @@
     "DisplayName": "Mask Item",
     "Parent": "SDG.Unturned.ItemGearAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/mask-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

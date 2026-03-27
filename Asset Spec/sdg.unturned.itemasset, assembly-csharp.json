@@ -6,6 +6,7 @@
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html",
     "Category": "ITEM",
     "VanillaIdLimit": 2000,
+    "HasBundleAssets": true,
     "RequireId": true,
     "Properties":
     [

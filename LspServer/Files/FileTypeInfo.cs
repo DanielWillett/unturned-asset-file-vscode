@@ -24,6 +24,12 @@ internal readonly struct FileTypeInfo : IEquatable<FileTypeInfo>
 
         int extStartIndex = fileName.LastIndexOf('.');
         ReadOnlySpan<char> fnWithoutExt = extStartIndex >= 0 ? fileName[..extStartIndex] : fileName;
+        if (fnWithoutExt.IsEmpty)
+        {
+            // file name is '**/.dat' or '**/.asset'
+            return;
+        }
+
         ReadOnlySpan<char> fullDirectoryName = Path.GetDirectoryName(fullName);
         ReadOnlySpan<char> directoryName = Path.GetFileName(fullDirectoryName);
         ReadOnlySpan<char> ext = fileName[extStartIndex..];
@@ -44,6 +50,12 @@ internal readonly struct FileTypeInfo : IEquatable<FileTypeInfo>
         if (!directoryName.IsEmpty && directoryName.Equals(fnWithoutExt, OSPathHelper.PathComparison))
         {
             IsAsset = true;
+            return;
+        }
+
+        if (!char.IsUpper(fnWithoutExt[0]))
+        {
+            // all languages start with a capital letter
             return;
         }
 

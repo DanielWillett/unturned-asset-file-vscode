@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -10,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values.Expressions;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 

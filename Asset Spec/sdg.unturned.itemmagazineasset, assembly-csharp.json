@@ -4,9 +4,6 @@
     "DisplayName": "Magazine Attachment Item",
     "Parent": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/magazine-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

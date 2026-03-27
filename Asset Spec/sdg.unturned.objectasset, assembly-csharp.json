@@ -5,7 +5,7 @@
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Category": "OBJECT",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/object-asset.html",
-    "RequireId": false,
+    "HasBundleAssets": true,
     "Properties":
     [
         {

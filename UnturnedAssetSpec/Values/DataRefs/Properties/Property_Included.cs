@@ -26,7 +26,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <para>
 /// Syntax:<br/>
 /// <c>#Target.Included</c><br/>
-/// <c>#Target.Included{RequireValue=true}</c>
+/// <c>#Target.Included{"RequireValue":true}</c>
 /// </para>
 /// </summary>
 public readonly struct IncludedProperty : IConfigurableDataRefProperty, IEquatable<IncludedProperty>

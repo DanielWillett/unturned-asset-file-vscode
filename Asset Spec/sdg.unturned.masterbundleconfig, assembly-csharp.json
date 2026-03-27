@@ -4,8 +4,6 @@
     "DisplayName": "Master Bundle Definition",
     "Parent": null,
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/asset-bundles.html#master-bundles",
-    "Category": "NONE",
-    "RequireId": false,
     "Properties":
     [
         {

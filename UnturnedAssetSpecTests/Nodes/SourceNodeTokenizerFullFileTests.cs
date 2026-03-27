@@ -1,5 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
@@ -1056,6 +1056,9 @@ Rot_Z Z++
 
         /// <inheritdoc />
         public ISourceFile SourceFile => null!;
+
+        /// <inheritdoc />
+        public IBundleProxy Bundle => IBundleProxy.Null;
 
         /// <inheritdoc />
         public string GetFullText() => null!;

@@ -5,6 +5,7 @@
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Category": "SKIN",
     "RequireId": true,
+    "HasBundleAssets": true,
     "VanillaIdLimit": 2000,
     "Properties":
     [

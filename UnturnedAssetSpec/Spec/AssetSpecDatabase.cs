@@ -1,4 +1,3 @@
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
@@ -262,7 +261,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             )
         );
 
-        InstallationEnvironment installation = new InstallationEnvironment(database);
+        InstallationEnvironment installation = new InstallationEnvironment(database, loggerFactory);
         if (useInstallDir && installDirUtility.TryGetInstallDirectory(out GameInstallDir installDir))
         {
             installation.AddUnturnedSearchableDirectories(

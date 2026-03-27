@@ -4,9 +4,6 @@
     "DisplayName": "Pants Item",
     "Parent": "SDG.Unturned.ItemBagAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/pants-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "BundleAssets":
     [
         {

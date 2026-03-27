@@ -5,7 +5,6 @@
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/spawn-asset.html",
     "Category": "SPAWN",
-    "RequireId": false,
     "Properties":
     [
         {

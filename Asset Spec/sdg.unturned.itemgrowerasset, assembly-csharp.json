@@ -4,9 +4,6 @@
     "DisplayName": "Grower Item (Fertilizer)",
     "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/grower-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "BundleAssets":
     [
         {

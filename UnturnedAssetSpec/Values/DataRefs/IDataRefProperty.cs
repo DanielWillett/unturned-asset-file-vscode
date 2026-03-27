@@ -43,5 +43,5 @@ public interface IIndexableDataRefProperty : IDataRefProperty
 
 public interface IConfigurableDataRefProperty : IDataRefProperty
 {
-    OneOrMore<KeyValuePair<string, object>> Options { get; }
+    OneOrMore<KeyValuePair<string, object?>> Options { get; }
 }

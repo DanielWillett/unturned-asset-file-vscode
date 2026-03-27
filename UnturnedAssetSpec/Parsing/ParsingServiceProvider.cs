@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using DanielWillett.UnturnedDataFileLspServer.Data.Project;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;

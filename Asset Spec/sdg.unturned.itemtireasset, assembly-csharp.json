@@ -4,9 +4,6 @@
     "DisplayName": "Tire Item",
     "Parent": "SDG.Unturned.ItemVehicleRepairToolAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/tire-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

@@ -6,7 +6,6 @@
     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/dialogue-asset.html",
     "Category": "NPC",
     "VanillaIdLimit": 2000,
-    "RequireId": false,
     "Properties":
     [
         {

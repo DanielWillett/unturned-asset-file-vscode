@@ -4,8 +4,6 @@
     "DisplayName": "Crafting Blacklist Rule",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-blacklist-asset.html",
-    "Category": "NONE",
-    "RequireId": false,
     "Properties":
     [
         {

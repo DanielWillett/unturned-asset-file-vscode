@@ -3,9 +3,7 @@
     "Type": "SDG.Unturned.NPCRewardsAsset, Assembly-CSharp",
     "DisplayName": "NPC Reward List",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
-    "Category": "NONE",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/rewards-list-asset.html",
-    "RequireId": false,
     "Properties":
     [
         {

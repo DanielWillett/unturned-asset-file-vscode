@@ -4,9 +4,6 @@
     "DisplayName": "Box Item",
     "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

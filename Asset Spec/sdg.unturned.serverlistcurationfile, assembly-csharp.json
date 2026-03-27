@@ -4,8 +4,6 @@
     "DisplayName": "Curated Server List File",
     "Parent": null,
     "Docs": "https://docs.smartlydressedgames.com/en/stable/servers/server-browser-curation.html",
-    "Category": "NONE",
-    "RequireId": false,
     "Version": "3.24.7.0",
     "Properties":
     [

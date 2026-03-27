@@ -4,14 +4,37 @@
     "DisplayName": "Vehicle",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html",
-    "RequireId": false,
+    "HasBundleAssets": true,
     "Properties":
     [
         {
             "Key": "Pitch_Idle",
             "Type": "Float32",
-            "DefaultValue": 0.5,
-            "Description": "Multiplier on the pitch of the engine audio while idle. The default value for this property depends on the audio clip name and may not be shown accurately in the editor.",
+            "DefaultValue":
+            [
+                {
+                    "Case":
+                    {
+                        "Variable": "#$bndl$::Vehicle.Component{\"Type\":\"UnityEngine.AudioSource, UnityEngine.AudioModule\",\"Property\":\"m_audioClip.m_Name\",\"Fallback\":\"\"}",
+                        "Operation": "eq",
+                        "Comparand": "Engine_Large"
+                    },
+                    "Value": 0.625
+                },
+                {
+                    "Case":
+                    {
+                        "Variable": "#$bndl$::Vehicle.Component{\"Type\":\"UnityEngine.AudioSource, UnityEngine.AudioModule\",\"Property\":\"m_audioClip.m_Name\",\"Fallback\":\"\"}",
+                        "Operation": "eq",
+                        "Comparand": "Engine_Small"
+                    },
+                    "Value": 0.75
+                },
+                {
+                    "Value": 0.5
+                }
+            ],
+            "Description": "Multiplier on the pitch of the engine audio while idle.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#pitch-idle-float32",
             "Variable": "pitchIdle"
         },
@@ -39,31 +62,28 @@
                     "Value": 0.1
                 },
                 {
+                    "Case":
+                    {
+                        "Variable": "#$bndl$::Vehicle.Component{\"Type\":\"UnityEngine.AudioSource, UnityEngine.AudioModule\",\"Property\":\"m_audioClip.m_Name\",\"Fallback\":\"\"}",
+                        "Operation": "eq",
+                        "Comparand": "Engine_Large"
+                    },
+                    "Value": 0.025
+                },
+                {
+                    "Case":
+                    {
+                        "Variable": "#$bndl$::Vehicle.Component{\"Type\":\"UnityEngine.AudioSource, UnityEngine.AudioModule\",\"Property\":\"m_audioClip.m_Name\",\"Fallback\":\"\"}",
+                        "Operation": "eq",
+                        "Comparand": "Engine_Small"
+                    },
+                    "Value": 0.075
+                },
+                {
                     "Value": 0.05
                 }
             ],
-            "Description":
-            [
-                {
-                    "Or":
-                    [
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "HELICOPTER"
-                        },
-                        {
-                            "Variable": "Engine",
-                            "Operation": "eq",
-                            "Comparand": "BLIMP"
-                        }
-                    ],
-                    "Value": "Multiplier on the pitch of the engine audio while driving."
-                },
-                {
-                    "Value": "Multiplier on the pitch of the engine audio while driving. The default value for this property depends on the audio clip name and may not be shown accurately in the editor."
-                }
-            ],
+            "Description": "Multiplier on the pitch of the engine audio while driving.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/vehicle-asset.html#pitch-drive-float32",
             "Variable": "pitchDrive"
         },

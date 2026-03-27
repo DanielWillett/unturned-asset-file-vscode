@@ -91,6 +91,10 @@ public abstract class BaseDataRefTarget : IDataRefTarget
             valueVisitor.Accept(Int32Type.Instance, new Optional<int>(count));
             return true;
         }
+        if (typeof(TProperty) == typeof(ComponentProperty))
+        {
+            return AcceptProperty(in Unsafe.As<TProperty, ComponentProperty>(ref Unsafe.AsRef(in property)), ref ctx, ref valueVisitor);
+        }
 
         return AcceptUnknownProperty(in property, ref valueVisitor, ref ctx);
     }
@@ -199,6 +203,19 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     protected virtual bool AcceptProperty(in CountProperty property, ref FileEvaluationContext ctx, out int value)
     {
         value = 0;
+        return false;
+    }
+
+    /// <summary>
+    /// Invoked when a <see cref="ComponentProperty"/> is accessed on this target.
+    /// </summary>
+    /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
+    protected virtual bool AcceptProperty<TVisitor>(in ComponentProperty property, ref FileEvaluationContext ctx, ref TVisitor visitor)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
         return false;
     }
 

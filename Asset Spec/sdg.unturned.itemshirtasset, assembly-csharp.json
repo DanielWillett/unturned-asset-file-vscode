@@ -4,9 +4,6 @@
     "DisplayName": "Shirt Item",
     "Parent": "SDG.Unturned.ItemBagAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/shirt-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

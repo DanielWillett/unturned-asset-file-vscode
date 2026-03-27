@@ -4,9 +4,6 @@
     "DisplayName": "Vehicle Paint Tool Item",
     "Parent": "SDG.Unturned.ItemToolAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vehicle-paint-tool-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

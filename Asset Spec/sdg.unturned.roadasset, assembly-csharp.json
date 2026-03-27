@@ -4,8 +4,7 @@
     "DisplayName": "Road Material",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/road-asset.html",
-    "Category": "NONE",
-    "RequireId": false,
+    "HasBundleAssets": true,
     "Properties":
     [
         {

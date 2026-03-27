@@ -3,9 +3,7 @@
     "Type": "SDG.Unturned.ObjectNPCAsset, Assembly-CSharp",
     "DisplayName": "NPC Level Object",
     "Parent": "SDG.Unturned.ObjectAsset, Assembly-CSharp",
-    "Category": "OBJECT",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/npc-asset.html",
-    "RequireId": false,
     "Properties":
     [
         {

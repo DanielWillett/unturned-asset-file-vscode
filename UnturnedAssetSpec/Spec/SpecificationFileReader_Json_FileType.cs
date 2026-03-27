@@ -147,7 +147,7 @@ partial class SpecificationFileReader
                 if (root.TryGetProperty("Category"u8, out element) && element.ValueKind != JsonValueKind.Null)
                     assetType.Category = new AssetCategoryValue(element.GetString()!);
                 else
-                    assetType.Category = AssetCategoryValue.None;
+                    assetType.Category = (parentType as DatAssetFileType)?.Category ?? AssetCategoryValue.None;
 
                 // VanillaIdLimit
                 if (root.TryGetProperty("VanillaIdLimit"u8, out element) && element.ValueKind != JsonValueKind.Null)
@@ -156,11 +156,19 @@ partial class SpecificationFileReader
                     assetType.VanillaIdLimit = id == 0 ? null : id;
                 }
                 else
-                    assetType.VanillaIdLimit = null;
+                    assetType.VanillaIdLimit = (parentType as DatAssetFileType)?.VanillaIdLimit;
 
                 // RequireId
                 if (root.TryGetProperty("RequireId"u8, out element) && element.ValueKind != JsonValueKind.Null)
                     assetType.RequireId = element.GetBoolean();
+                else
+                    assetType.RequireId = (parentType as DatAssetFileType)?.RequireId ?? false;
+
+                // HasBundleAssets
+                if (root.TryGetProperty("HasBundleAssets"u8, out element) && element.ValueKind != JsonValueKind.Null)
+                    assetType.HasBundleAssets = element.GetBoolean();
+                else
+                    assetType.HasBundleAssets = (parentType as DatAssetFileType)?.HasBundleAssets ?? false;
             }
 
             // DisplayName

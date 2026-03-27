@@ -4,7 +4,7 @@
     "DisplayName": "Tag",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/tag-asset.html",
-    "RequireId": false,
+    "HasBundleAssets": true,
     "Version": "3.25.4.0",
     "Properties":
     [

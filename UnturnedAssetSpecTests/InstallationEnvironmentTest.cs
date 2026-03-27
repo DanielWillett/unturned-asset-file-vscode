@@ -1,8 +1,9 @@
 using DanielWillett.UnturnedDataFileLspServer.Data;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace UnturnedAssetSpecTests;
 
@@ -30,7 +31,7 @@ public class InstallationEnvironmentTest
 
         await _database.InitializeAsync();
 
-        _runner = new InstallationEnvironment(_database);
+        _runner = new InstallationEnvironment(_database, NullLoggerFactory.Instance);
         _runner.AddUnturnedSearchableDirectories(_database.UnturnedInstallDirectory.InstallDirectory);
 
         Stopwatch sw = Stopwatch.StartNew();
@@ -104,7 +105,7 @@ public class InstallationEnvironmentTest
 
         await _database.InitializeAsync();
 
-        _runner = new InstallationEnvironment(_database, homeDir.FullName);
+        _runner = new InstallationEnvironment(_database, NullLoggerFactory.Instance, homeDir.FullName);
         _runner.Discover();
 
         Assert.That(_runner.FileCount, Is.EqualTo(4));
@@ -164,7 +165,7 @@ public class InstallationEnvironmentTest
         _database = AssetSpecDatabase.FromOffline();
         await _database.InitializeAsync();
 
-        _runner = new InstallationEnvironment(_database, homeDir.FullName);
+        _runner = new InstallationEnvironment(_database, NullLoggerFactory.Instance, homeDir.FullName);
         _runner.Discover();
 
         _runner.OnFileUpdated += RunnerOnOnFileUpdated;
@@ -282,7 +283,7 @@ public class InstallationEnvironmentTest
         _database = AssetSpecDatabase.FromOffline();
         await _database.InitializeAsync();
 
-        _runner = new InstallationEnvironment(_database, homeDir.FullName);
+        _runner = new InstallationEnvironment(_database, NullLoggerFactory.Instance, homeDir.FullName);
         _runner.Discover();
 
         Assert.That(_runner.FileCount, Is.EqualTo(1));
@@ -360,7 +361,7 @@ public class InstallationEnvironmentTest
         _database = AssetSpecDatabase.FromOffline();
         await _database.InitializeAsync();
 
-        _runner = new InstallationEnvironment(_database, homeDir.FullName);
+        _runner = new InstallationEnvironment(_database, NullLoggerFactory.Instance, homeDir.FullName);
         _runner.Discover();
 
         Assert.That(_runner.FileCount, Is.EqualTo(1));
@@ -414,7 +415,7 @@ public class InstallationEnvironmentTest
         _database = AssetSpecDatabase.FromOffline();
         await _database.InitializeAsync();
 
-        _runner = new InstallationEnvironment(_database, homeDir.FullName);
+        _runner = new InstallationEnvironment(_database, NullLoggerFactory.Instance, homeDir.FullName);
         _runner.Discover();
 
         Assert.That(_runner.FileCount, Is.EqualTo(1));

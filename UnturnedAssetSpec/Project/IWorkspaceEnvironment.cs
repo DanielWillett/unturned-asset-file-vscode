@@ -1,7 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using System;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
 public interface IWorkspaceEnvironment
 {
@@ -21,6 +21,7 @@ public interface IWorkspaceFile : IDisposable
     /// </summary>
     string File { get; }
     ISourceFile SourceFile { get; }
+    IBundleProxy Bundle { get; }
 
     /// <summary>
     /// Gets the entire text of the file as a string in it's current state.

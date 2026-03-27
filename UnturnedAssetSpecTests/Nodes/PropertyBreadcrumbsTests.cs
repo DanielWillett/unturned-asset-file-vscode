@@ -1,14 +1,13 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using Microsoft.Extensions.Logging;
 using System.Collections.Immutable;
-using DanielWillett.UnturnedDataFileLspServer.Data.Project;
-using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 namespace UnturnedAssetSpecTests.Nodes;
 
@@ -28,7 +27,7 @@ public class PropertyBreadcrumbsTests
             loggerFactory,
             new StaticSourceFileWorkspaceEnvironment(false, database),
             database.UnturnedInstallDirectory,
-            new InstallationEnvironment(database),
+            new InstallationEnvironment(database, loggerFactory),
             new NilProjectFileProvider(database)
         );
 

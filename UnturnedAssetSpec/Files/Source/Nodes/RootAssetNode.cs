@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -235,7 +235,8 @@ internal sealed class RootAssetNode : RootAssetNodeSkippedLocalization
 
         Localization = ImmutableArray<ILocalizationSourceFile>.Empty;
         
-        if (database.FileTypes.TryGetValue(ActualType, out DatFileType specType) && specType is not IDatTypeWithLocalizationProperties { LocalizationProperties.Length: > 0 })
+        if (database.FileTypes.TryGetValue(ActualType, out DatFileType specType)
+            && specType is not IDatTypeWithLocalizationProperties { LocalizationProperties.Length: > 0 })
         {
             return;
         }
@@ -284,7 +285,7 @@ internal sealed class RootAssetNode : RootAssetNodeSkippedLocalization
                         SourceNodeTokenizerOptions.None
                     );
                     return tokenizer.ReadRootDictionary(SourceNodeTokenizer.RootInfo.Localization(file, file.Database, (IAssetSourceFile)state!));
-                });
+                }, file.Bundle);
 
                 if (workspaceFile.SourceFile is not ILocalizationSourceFile local)
                 {

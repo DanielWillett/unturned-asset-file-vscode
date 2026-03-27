@@ -1,5 +1,5 @@
 using DanielWillett.UnturnedDataFileLspServer.Data;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;

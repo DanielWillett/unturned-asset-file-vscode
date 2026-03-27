@@ -3,8 +3,6 @@
     "Type": "SDG.Unturned.LandscapeMaterialAsset, Assembly-CSharp",
     "DisplayName": "Landscape Material",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
-    "Category": "NONE",
-    "RequireId": false,
     "Properties":
     [
         {

@@ -4,8 +4,6 @@
     "DisplayName": "Instanced Mesh Foliage",
     "Parent": "SDG.Framework.Foliage.FoliageInfoAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/foliage-asset.html",
-    "Category": "NONE",
-    "RequireId": false,
     "Properties":
     [
         {

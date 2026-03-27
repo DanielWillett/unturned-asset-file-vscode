@@ -4,9 +4,6 @@
     "DisplayName": "Sight Attachment Item",
     "Parent": "SDG.Unturned.ItemCaliberAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sight-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

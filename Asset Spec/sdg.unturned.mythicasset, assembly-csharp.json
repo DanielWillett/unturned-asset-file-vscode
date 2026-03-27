@@ -3,9 +3,10 @@
     "Type": "SDG.Unturned.MythicAsset, Assembly-CSharp",
     "DisplayName": "Mythic",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html",
     "Category": "MYTHIC",
     "VanillaIdLimit": 500,
-    "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/mythical-asset.html",
+    "HasBundleAssets": true,
     "RequireId": true,
     "Properties":
     [

@@ -7,7 +7,6 @@
 
 #endif
 
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
@@ -16,8 +15,10 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 #if DEBUG
 using System.ComponentModel;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 // ReSharper disable InconsistentOrderOfLocks
 #endif
 #if KEEP_VIRTUAL_FILE_SYSTEM
@@ -32,7 +33,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 /// Incrementally tracked text file.
 /// </summary>
 [DebuggerDisplay("{Uri} - {LineCount, nq} L, {_contentSegment.Count,nq} C")]
-public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
+public partial class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink, IBundleProxy
 {
     private const SourceNodeTokenizerOptions ReadFileOptions = SourceNodeTokenizerOptions.Lazy | SourceNodeTokenizerOptions.Metadata;
 
@@ -42,17 +43,16 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
 #endif
 
     private readonly ILogger _logger;
-    private readonly IAssetSpecDatabase _database;
+
 
     private readonly bool _obsessivelyValidate;
-    private readonly IWorkspaceEnvironment? _environment;
+    private readonly IParsingServices _services;
 
     private ISourceFile? _sourceFile;
+    private IBundleProxy _intlBundleProxy = IBundleProxy.Null;
 
     internal Lock EditLock = new Lock();
     internal Lock UpdateLock = new Lock();
-
-    Lock IMutableWorkspaceFile.SyncRoot => EditLock;
 
     private bool _hasChanged;
     private FileRange _changeRange;
@@ -82,6 +82,7 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
 #if KEEP_VIRTUAL_FILE_SYSTEM
     private readonly bool _useVirtualFiles;
 #endif
+
 
     /// <summary>
     /// Returns the complete text content as a string.
@@ -182,24 +183,24 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
                 SourceNodeTokenizer.RootInfo info;
                 if (typeInfo.IsAsset)
                 {
-                    info = SourceNodeTokenizer.RootInfo.Asset(this, _database);
+                    info = SourceNodeTokenizer.RootInfo.Asset(this, _services.Database);
                 }
                 else if (typeInfo.IsLocalization)
                 {
                     if (typeInfo.AssetPath != null && _assetSourceFile == null)
                     {
-                        _assetSourceFile = _environment?.TemporarilyGetOrLoadFile(typeInfo.AssetPath);
+                        _assetSourceFile = _services?.Workspace.TemporarilyGetOrLoadFile(typeInfo.AssetPath);
                         if (_assetSourceFile != null)
                             _assetSourceFile.OnUpdated += OnAssetFileUpdated;
                     }
 
                     info = _assetSourceFile?.SourceFile is not IAssetSourceFile a
-                        ? SourceNodeTokenizer.RootInfo.Other(this, _database)
-                        : SourceNodeTokenizer.RootInfo.Localization(this, _database, a);
+                        ? SourceNodeTokenizer.RootInfo.Other(this, _services.Database)
+                        : SourceNodeTokenizer.RootInfo.Localization(this, _services.Database, a);
                 }
                 else
                 {
-                    info = SourceNodeTokenizer.RootInfo.Other(this, _database);
+                    info = SourceNodeTokenizer.RootInfo.Other(this, _services.Database);
                 }
 
                 file = tokenizer.ReadRootDictionary(info);
@@ -270,12 +271,11 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
 
 #pragma warning disable CS8618, CS9264
     // ReSharper disable once UnusedParameter.Local
-    internal OpenedFile(DocumentUri uri, ReadOnlySpan<char> text, ILogger logger, IAssetSpecDatabase database, bool obsessivelyValidate = false, bool useVirtualFiles = false, IWorkspaceEnvironment? environment = null)
+    internal OpenedFile(DocumentUri uri, ReadOnlySpan<char> text, ILogger logger, IParsingServices services, bool obsessivelyValidate = false, bool useVirtualFiles = false)
     {
         _logger = logger;
-        _database = database;
         _obsessivelyValidate = obsessivelyValidate;
-        _environment = environment;
+        _services = services;
         Uri = uri;
 
         string path = Path.GetFullPath(uri.GetFileSystemPath());
@@ -1467,4 +1467,12 @@ public class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink
         SetFullTextIntl(_contentSegment);
         throw new InvalidOperationException("File is corrupted.");
     }
+
+    Lock IMutableWorkspaceFile.SyncRoot => EditLock;
+    IBundleProxy IWorkspaceFile.Bundle => this;
+    bool IBundleProxy.Exists => _intlBundleProxy.Exists;
+    DiscoveredBundle? IBundleProxy.Bundle => _intlBundleProxy.Bundle;
+    string? IBundleProxy.Path => _intlBundleProxy.Path;
+    bool IBundleProxy.ConvertShadersToStandard => _intlBundleProxy.ConvertShadersToStandard;
+    bool IBundleProxy.ConsolidateShaders => _intlBundleProxy.ConsolidateShaders;
 }

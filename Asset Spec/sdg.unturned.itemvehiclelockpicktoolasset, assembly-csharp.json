@@ -5,9 +5,6 @@
     "Parent": "SDG.Unturned.ItemToolAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/vehicle-lockpick-tool-asset.html",
     "Version": "3.25.10.0",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

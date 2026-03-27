@@ -1,5 +1,4 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
@@ -118,7 +117,7 @@ public class ParserTest<T> : IDisposable, IDiagnosticSink, IReferencedPropertySi
 
         AssetSpecDatabase database = AssetSpecDatabase.FromOffline(loggerFactory: loggerFactory);
 
-        InstallationEnvironment env = new InstallationEnvironment(database);
+        InstallationEnvironment env = new InstallationEnvironment(database, loggerFactory);
 
         _parsingServices = new ParsingServiceProvider(
             database,

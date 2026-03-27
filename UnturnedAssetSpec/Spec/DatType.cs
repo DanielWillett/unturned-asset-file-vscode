@@ -389,6 +389,11 @@ public class DatAssetFileType : DatFileType, IDatTypeWithLocalizationProperties,
     /// </summary>
     public bool RequireId { get; internal set; }
 
+    /// <summary>
+    /// Whether or not this type or any of it's parent types can have bundle assets.
+    /// </summary>
+    public bool HasBundleAssets { get; internal set; }
+
     /// <inheritdoc />
     public ImmutableArray<DatProperty> LocalizationProperties { get; internal set; }
 

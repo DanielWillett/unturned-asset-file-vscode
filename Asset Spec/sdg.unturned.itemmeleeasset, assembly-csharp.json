@@ -4,9 +4,6 @@
     "DisplayName": "Melee Item",
     "Parent": "SDG.Unturned.ItemWeaponAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/melee-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

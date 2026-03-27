@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 public static class UnturnedInstallationEnvironmentExtensions
 {
     public struct UnturnedDirectorySearchOptions

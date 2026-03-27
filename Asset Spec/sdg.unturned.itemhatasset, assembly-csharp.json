@@ -4,9 +4,6 @@
     "DisplayName": "Hat Item",
     "Parent": "SDG.Unturned.ItemGearAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/hat-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "BundleAssets":
     [
         {

@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
@@ -24,7 +23,7 @@ public class RelationalCacheTests
             loggerFactory,
             new StaticSourceFileWorkspaceEnvironment(false, database),
             database.UnturnedInstallDirectory,
-            new InstallationEnvironment(database),
+            new InstallationEnvironment(database, loggerFactory),
             new NilProjectFileProvider(database)
         );
 

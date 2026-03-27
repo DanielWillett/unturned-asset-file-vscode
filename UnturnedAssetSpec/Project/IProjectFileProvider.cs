@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 

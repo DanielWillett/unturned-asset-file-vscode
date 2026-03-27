@@ -1,4 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 using System.IO;
@@ -23,6 +23,9 @@ public sealed class StaticSourceFile : IWorkspaceFile
     /// <inheritdoc />
     public ISourceFile SourceFile { get; }
 
+    /// <inheritdoc />
+    public IBundleProxy Bundle { get; }
+
     /// <summary>
     /// Create a source file from an asset file.
     /// </summary>
@@ -41,9 +44,10 @@ public sealed class StaticSourceFile : IWorkspaceFile
     public static StaticSourceFile FromAssetFile(
         string filePath,
         IAssetSpecDatabase database,
-        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy,
+        IBundleProxy? bundle = null)
     {
-        return FromAssetFile(filePath, System.IO.File.ReadAllText(filePath, Encoding.UTF8).AsMemory(), database, options);
+        return FromAssetFile(filePath, System.IO.File.ReadAllText(filePath, Encoding.UTF8).AsMemory(), database, options, bundle);
     }
 
     /// <summary>
@@ -58,7 +62,8 @@ public sealed class StaticSourceFile : IWorkspaceFile
         string filePath,
         ReadOnlyMemory<char> fileContents,
         IAssetSpecDatabase database,
-        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy,
+        IBundleProxy? bundle = null)
     {
         if (filePath == null)
             throw new ArgumentNullException(nameof(filePath));
@@ -70,7 +75,7 @@ public sealed class StaticSourceFile : IWorkspaceFile
             SourceNodeTokenizer.RootInfo info = SourceNodeTokenizer.RootInfo.Asset(file, database);
             using SourceNodeTokenizer tokenizer = new SourceNodeTokenizer(fileContents, options);
             return tokenizer.ReadRootDictionary(info);
-        }, null);
+        }, null, bundle);
     }
 
     /// <inheritdoc cref="FromOtherFile(string,ReadOnlyMemory{char},IAssetSpecDatabase?,SourceNodeTokenizerOptions)"/>
@@ -78,9 +83,10 @@ public sealed class StaticSourceFile : IWorkspaceFile
         string filePath,
         string fileContents,
         IAssetSpecDatabase database,
-        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy,
+        IBundleProxy? bundle = null)
     {
-        return FromAssetFile(filePath, fileContents.AsMemory(), database, options);
+        return FromAssetFile(filePath, fileContents.AsMemory(), database, options, bundle);
     }
 
     /// <summary>
@@ -103,9 +109,10 @@ public sealed class StaticSourceFile : IWorkspaceFile
         string filePath,
         IAssetSpecDatabase database,
         IAssetSourceFile asset,
-        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy,
+        IBundleProxy? bundle = null)
     {
-        return FromLocalizationFile(filePath, System.IO.File.ReadAllText(filePath, Encoding.UTF8).AsMemory(), database, asset, options);
+        return FromLocalizationFile(filePath, System.IO.File.ReadAllText(filePath, Encoding.UTF8).AsMemory(), database, asset, options, bundle);
     }
 
     /// <summary>
@@ -122,7 +129,8 @@ public sealed class StaticSourceFile : IWorkspaceFile
         ReadOnlyMemory<char> fileContents,
         IAssetSpecDatabase database,
         IAssetSourceFile asset,
-        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy,
+        IBundleProxy? bundle = null)
     {
         if (filePath == null)
             throw new ArgumentNullException(nameof(filePath));
@@ -136,7 +144,7 @@ public sealed class StaticSourceFile : IWorkspaceFile
             SourceNodeTokenizer.RootInfo info = SourceNodeTokenizer.RootInfo.Localization(file, database, (IAssetSourceFile)state!);
             using SourceNodeTokenizer tokenizer = new SourceNodeTokenizer(fileContents, options);
             return tokenizer.ReadRootDictionary(info);
-        }, asset);
+        }, asset, bundle);
     }
 
     /// <inheritdoc cref="FromOtherFile(string,ReadOnlyMemory{char},IAssetSpecDatabase?,SourceNodeTokenizerOptions)"/>
@@ -145,9 +153,10 @@ public sealed class StaticSourceFile : IWorkspaceFile
         string fileContents,
         IAssetSpecDatabase database,
         IAssetSourceFile asset,
-        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy,
+        IBundleProxy? bundle = null)
     {
-        return FromLocalizationFile(filePath, fileContents.AsMemory(), database, asset, options);
+        return FromLocalizationFile(filePath, fileContents.AsMemory(), database, asset, options, bundle);
     }
 
     /// <summary>
@@ -168,9 +177,10 @@ public sealed class StaticSourceFile : IWorkspaceFile
     public static StaticSourceFile FromOtherFile(
         string filePath,
         IAssetSpecDatabase? database,
-        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy,
+        IBundleProxy? bundle = null)
     {
-        return FromOtherFile(filePath, System.IO.File.ReadAllText(filePath, Encoding.UTF8).AsMemory(), database, options);
+        return FromOtherFile(filePath, System.IO.File.ReadAllText(filePath, Encoding.UTF8).AsMemory(), database, options, bundle);
     }
 
     /// <summary>
@@ -186,7 +196,8 @@ public sealed class StaticSourceFile : IWorkspaceFile
         string filePath,
         ReadOnlyMemory<char> fileContents,
         IAssetSpecDatabase? database,
-        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy,
+        IBundleProxy? bundle = null)
     {
         if (filePath == null)
             throw new ArgumentNullException(nameof(filePath));
@@ -196,7 +207,7 @@ public sealed class StaticSourceFile : IWorkspaceFile
             SourceNodeTokenizer.RootInfo info = SourceNodeTokenizer.RootInfo.Other(file, database);
             using SourceNodeTokenizer tokenizer = new SourceNodeTokenizer(fileContents, options);
             return tokenizer.ReadRootDictionary(info);
-        }, null);
+        }, null, bundle);
     }
 
     /// <inheritdoc cref="FromOtherFile(string,ReadOnlyMemory{char},IAssetSpecDatabase?,SourceNodeTokenizerOptions)"/>
@@ -204,7 +215,8 @@ public sealed class StaticSourceFile : IWorkspaceFile
         string filePath,
         string fileContents,
         IAssetSpecDatabase? database,
-        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy)
+        SourceNodeTokenizerOptions options = SourceNodeTokenizerOptions.Lazy,
+        IBundleProxy? bundle = null)
     {
         return FromOtherFile(filePath, fileContents.AsMemory(), database, options);
     }
@@ -214,9 +226,11 @@ public sealed class StaticSourceFile : IWorkspaceFile
         ReadOnlyMemory<char> fileContents,
         SourceNodeTokenizerOptions options,
         ReadFile creationCallback,
-        object? state)
+        object? state,
+        IBundleProxy? bundle)
     {
         File = filePath;
+        Bundle = bundle ?? IBundleProxy.Null;
         SourceFile = creationCallback(this, database, fileContents, options, state);
         _fileContent = fileContents;
     }

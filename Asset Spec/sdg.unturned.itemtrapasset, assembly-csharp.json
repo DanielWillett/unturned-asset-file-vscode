@@ -4,9 +4,6 @@
     "DisplayName": "Trap Barricade Item",
     "Parent": "SDG.Unturned.ItemBarricadeAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/trap-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

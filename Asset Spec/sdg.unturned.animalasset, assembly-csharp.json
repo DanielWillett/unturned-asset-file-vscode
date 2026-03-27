@@ -6,6 +6,7 @@
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html",
     "Category": "ANIMAL",
     "VanillaIdLimit": 50,
+    "HasBundleAssets": true,
     "RequireId": true,
     "Properties":
     [

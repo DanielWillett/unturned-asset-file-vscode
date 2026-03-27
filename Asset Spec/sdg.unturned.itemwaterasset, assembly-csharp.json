@@ -3,8 +3,5 @@
     "Type": "SDG.Unturned.ItemWaterAsset, Assembly-CSharp",
     "DisplayName": "Water Item",
     "Parent": "SDG.Unturned.ItemConsumeableAsset, Assembly-CSharp",
-    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/medical-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/medical-asset.html"
 }

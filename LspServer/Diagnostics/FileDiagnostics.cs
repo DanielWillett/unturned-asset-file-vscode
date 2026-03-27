@@ -1,8 +1,8 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
-using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
@@ -269,6 +269,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
     string IWorkspaceFile.File => FilePath;
     ISourceFile IWorkspaceFile.SourceFile => SourceFile ?? throw new InvalidOperationException();
     string IWorkspaceFile.GetFullText() => throw new NotSupportedException();
+    IBundleProxy IWorkspaceFile.Bundle => throw new NotSupportedException();
 
     private class DiagnosticsNodeVisitor : ResolvedPropertyNodeVisitor, IDiagnosticSink
     {

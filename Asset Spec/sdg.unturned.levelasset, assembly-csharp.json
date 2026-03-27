@@ -3,9 +3,7 @@
     "Type": "SDG.Unturned.LevelAsset, Assembly-CSharp",
     "DisplayName": "Level",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
-    "Category": "NONE",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html",
-    "RequireId": false,
     "Properties":
     [
         {

@@ -3,9 +3,7 @@
     "Type": "SDG.Unturned.PhysicsMaterialAssetBase, Assembly-CSharp",
     "DisplayName": "Base Physics Material",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
-    "Category": "NONE",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/physics-material-asset.html",
-    "RequireId": false,
     "Properties":
     [
         {

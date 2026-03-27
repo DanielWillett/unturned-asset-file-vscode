@@ -1,25 +1,63 @@
+using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
-using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
+using System.Threading;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
-namespace DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
-[DebuggerDisplay("{Name} [{DanielWillett.UnturnedDataFileLspServer.Data.Types.AssetCategory.TypeOf.Values[Category],nq}]")]
-public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
+[DebuggerDisplay("{Name} [{DanielWillett.UnturnedDataFileLspServer.Data.AssetCategory.Instance.Values[Category],nq}]")]
+public partial class DiscoveredDatFile : IEquatable<DiscoveredDatFile>, IDisposable
 {
     private readonly int _nameIndexStart, _nameLength;
     private string? _name;
 
     internal DiscoveredDatFile? Next;
     internal DiscoveredDatFile? Prev;
+
+    /// <summary><c>Bundle_Override_Path</c></summary>
+    private readonly string? _bundleOverridePath;
+
+    /// <summary><c>Bundle_Path_Include_Filename</c></summary>
+    private readonly bool _bundlePathIncludeFilename;
+
+
+    /// <summary><c>Master_Bundle_Override</c></summary>
+    private readonly string? _masterBundleName;
+
+    // [legacy asset bundle][is default bundle][is cached][consolidate shaders][reservedx4][asset versionx12][effective asset versionx12]
+    private int _bundleFlags;
+
+    /// <summary>
+    /// The version of this asset's legacy bundle.
+    /// <para><c>Asset_Bundle_Version</c></para>
+    /// </summary>
+    private int AssetBundleVersion => (_bundleFlags >> 8) & 0xFFF;
+
+    /// <summary>
+    /// Actual version of this bundle, based on the referenced masterbundle.
+    /// </summary>
+    private int EffectiveBundleVersion => (_bundleFlags >> 20) & 0xFFF;
+
+    /// <summary>
+    /// Explicitly search for a legacy bundle.
+    /// <para><c>Exclude_From_Master_Bundle</c></para>
+    /// </summary>
+    public bool IsExcludedFromMasterBundle => (_bundleFlags & 1) != 0;
+
+    /// <summary>
+    /// Safe to use the default logic to find the associated bundle.
+    /// </summary>
+    private bool IsDefaultBundle => (_bundleFlags & 2) != 0;
+
 
     public static IComparer<DiscoveredDatFile> AscendingIdComparer => IdComparer.Instance;
 
@@ -29,6 +67,16 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
     public Guid Guid { get; }
     public ushort Id { get; }
     public int Category { get; }
+
+    /// <summary>
+    /// Path to this asset's legacy bundle.
+    /// </summary>
+    public DiscoveredBundle? LegacyBundle { get; internal set; }
+
+    /// <summary>
+    /// The object representing this asset's folder in it's bundle.
+    /// </summary>
+    public IBundleProxy Bundle => this;
 
     /// <summary>
     /// Note: blade ids are currently bytes but i feel this will be changed at some point.
@@ -54,11 +102,16 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
         return _name ??= Name.ToString();
     }
 
-    private enum NextValueType { None = -1, Metadata, Asset, Guid, Id, Type, AssetCategory }
+    private enum NextValueType { None = -1, Metadata, Asset, Guid, Id, Type, AssetCategory, MasterBundleOverride, BundleOverridePath, BundlePathIncludeFilename, AssetBundleVersion }
     private enum NextCaliberType { None = -1, MagazineCaliber, AttachmentCaliber, MagazineCalibers, AttachmentCalibers, LegacyCaliber }
     private enum NextBladeType { None = -1, Rubble, Interactability, BladeIds, BladeId }
 
-    public DiscoveredDatFile(string fileName, ReadOnlySpan<char> text, IAssetSpecDatabase database, ICollection<DatDiagnosticMessage>? diagMessages, Action<string, string>? log)
+    public DiscoveredDatFile(
+        string fileName,
+        ReadOnlySpan<char> text,
+        IAssetSpecDatabase database,
+        ICollection<DatDiagnosticMessage>? diagMessages,
+        Action<string, string>? log)
     {
         FilePath = fileName;
 
@@ -88,9 +141,28 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
         ReadOnlySpan<char> idKey = "ID".AsSpan();
         ReadOnlySpan<char> assetCategoryKey = "AssetCategory".AsSpan();
 
+        ReadOnlySpan<char> masterBundleOverrideKey = "Master_Bundle_Override".AsSpan();
+        ReadOnlySpan<char> excludedFromMasterBundleKey = "Exclude_From_Master_Bundle".AsSpan();
+        ReadOnlySpan<char> bundleOverridePathKey = "Bundle_Override_Path".AsSpan();
+        ReadOnlySpan<char> bundlePathIncludeFilenameKey = "Bundle_Path_Include_Filename".AsSpan();
+        ReadOnlySpan<char> assetBundleVersionKey = "Asset_Bundle_Version".AsSpan();
+        ReadOnlySpan<char> enableShaderConsolidationKey = "Enable_Shader_Consolidation".AsSpan();
+        ReadOnlySpan<char> disableShaderConsolidationKey = "Disable_Shader_Consolidation".AsSpan();
+
         NextValueType nextValueType = NextValueType.None;
 
-        bool hasGuid = false, hasId = false, hasType = false, hasTypeInMetadata = false, hasAssetCategory = false;
+        bool hasGuid = false,
+             hasId = false,
+             hasType = false,
+             hasTypeInMetadata = false,
+             hasAssetCategory = false,
+             hasEnableShaderConsolidation = false,
+             hasDisableShaderConsolidation = false;
+
+        bool excludedFromMasterBundle = false;
+
+        int assetBundleVersion = 1;
+        string? masterBundleOverride = null;
 
         bool isErrored = false;
 
@@ -103,36 +175,80 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
                 case DatTokenType.Key:
 
                     ReadOnlySpan<char> content = tokenizer.Token.Content;
-                    if (dictionaryDepth == 0 && listDepth == 0 && !ignoreMetadata && content.Equals(metaKey, StringComparison.OrdinalIgnoreCase))
+                    nextValueType = NextValueType.None;
+                    if (listDepth == 0)
+                        break;
+
+                    if (dictionaryDepth == 0)
                     {
-                        nextValueType = NextValueType.Metadata;
+                        // in root
+                        if (!ignoreMetadata && content.Equals(metaKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            nextValueType = NextValueType.Metadata;
+                            break;
+                        }
+                        if (!ignoreExplicitAsset && content.Equals(assetKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            nextValueType = NextValueType.Asset;
+                            break;
+                        }
                     }
-                    else if (dictionaryDepth == 0 && listDepth == 0 && !ignoreExplicitAsset && content.Equals(assetKey, StringComparison.OrdinalIgnoreCase))
+
+                    if (!hasMetadata && dictionaryDepth == 0 || isInMetadata && dictionaryDepth == 1)
                     {
-                        nextValueType = NextValueType.Asset;
+                        // in Metadata or root
+                        if ((isInMetadata || !hasTypeInMetadata) && content.Equals(typeKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            nextValueType = NextValueType.Type;
+                            break;
+                        }
+
+                        if (content.Equals(guidKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            nextValueType = NextValueType.Guid;
+                            break;
+                        }
                     }
-                    else if (!hasType && (!hasMetadata && dictionaryDepth == 0 || isInMetadata && dictionaryDepth == 1)
-                                      && (isInMetadata || !hasTypeInMetadata)
-                                      && listDepth == 0
-                                      && content.Equals(typeKey, StringComparison.OrdinalIgnoreCase))
+
+                    if (dictionaryDepth == (isExplicitlyInAsset ? 1 : 0))
                     {
-                        nextValueType = NextValueType.Type;
-                    }
-                    else if (!hasGuid && (!hasMetadata && dictionaryDepth == 0 || isInMetadata && dictionaryDepth == 1) && listDepth == 0 && content.Equals(guidKey, StringComparison.OrdinalIgnoreCase))
-                    {
-                        nextValueType = NextValueType.Guid;
-                    }
-                    else if (!hasId && dictionaryDepth == (isExplicitlyInAsset ? 1 : 0) && listDepth == 0 && content.Equals(idKey, StringComparison.OrdinalIgnoreCase))
-                    {
-                        nextValueType = NextValueType.Id;
-                    }
-                    else if (!hasAssetCategory && dictionaryDepth == (isExplicitlyInAsset ? 1 : 0) && listDepth == 0 && content.Equals(assetCategoryKey, StringComparison.OrdinalIgnoreCase))
-                    {
-                        nextValueType = NextValueType.AssetCategory;
-                    }
-                    else
-                    {
-                        nextValueType = NextValueType.None;
+                        // in Assets or root
+                        if (content.Equals(idKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            nextValueType = NextValueType.Id;
+                        }
+                        else if (content.Equals(assetCategoryKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            nextValueType = NextValueType.AssetCategory;
+                        }
+                        else if (content.Equals(excludedFromMasterBundleKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            excludedFromMasterBundle = true;
+                        }
+                        else if (content.Equals(masterBundleOverrideKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            nextValueType = NextValueType.MasterBundleOverride;
+                        }
+                        else if (content.Equals(bundleOverridePathKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            nextValueType = NextValueType.BundleOverridePath;
+                        }
+                        else if (content.Equals(bundlePathIncludeFilenameKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            nextValueType = NextValueType.BundlePathIncludeFilename;
+                        }
+                        else if (content.Equals(assetBundleVersionKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            nextValueType = NextValueType.AssetBundleVersion;
+                        }
+                        else if (content.Equals(enableShaderConsolidationKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            hasEnableShaderConsolidation = true;
+                        }
+                        else if (content.Equals(disableShaderConsolidationKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            hasDisableShaderConsolidation = true;
+                        }
                     }
 
                     break;
@@ -232,6 +348,33 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
 
                             hasAssetCategory = true;
                             break;
+
+                        case NextValueType.MasterBundleOverride:
+                            masterBundleOverride = content.ToString();
+                            break;
+
+                        case NextValueType.BundleOverridePath:
+                            _bundleOverridePath = content.ToString();
+                            break;
+
+                        case NextValueType.BundlePathIncludeFilename:
+                            if (!KnownTypeValueHelper.TryParseBoolean(content, out _bundlePathIncludeFilename))
+                            {
+                                log?.Invoke(fileName, "Can't parse \"Bundle_Path_Include_Filename\" tag.");
+                            }
+                            break;
+
+                        case NextValueType.AssetBundleVersion:
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+                            if (!int.TryParse(content, NumberStyles.Any, CultureInfo.InvariantCulture, out assetBundleVersion))
+#else
+                            if (!int.TryParse(content.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out assetBundleVersion))
+#endif
+                            {
+                                assetBundleVersion = 1;
+                                log?.Invoke(fileName, "Can't parse \"Asset_Bundle_Version\" tag.");
+                            }
+                            break;
                     }
 
                     nextValueType = NextValueType.None;
@@ -262,6 +405,13 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
                             isExplicitlyInAsset = true;
                             hasAssets = true;
                             hasId = false;
+                            excludedFromMasterBundle = false;
+                            masterBundleOverride = null;
+                            _bundleOverridePath = null;
+                            _bundlePathIncludeFilename = false;
+                            assetBundleVersion = 1;
+                            hasEnableShaderConsolidation = false;
+                            hasDisableShaderConsolidation = false;
                             break;
 
                         case NextValueType.Guid:
@@ -278,6 +428,22 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
 
                         case NextValueType.AssetCategory:
                             hasAssetCategory = true;
+                            break;
+
+                        case NextValueType.MasterBundleOverride:
+                            masterBundleOverride = null;
+                            break;
+
+                        case NextValueType.BundleOverridePath:
+                            _bundleOverridePath = null;
+                            break;
+
+                        case NextValueType.BundlePathIncludeFilename:
+                            _bundlePathIncludeFilename = false;
+                            break;
+
+                        case NextValueType.AssetBundleVersion:
+                            assetBundleVersion = 1;
                             break;
                     }
 
@@ -331,6 +497,22 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
                         case NextValueType.AssetCategory:
                             hasAssetCategory = true;
                             break;
+
+                        case NextValueType.MasterBundleOverride:
+                            masterBundleOverride = null;
+                            break;
+
+                        case NextValueType.BundleOverridePath:
+                            _bundleOverridePath = null;
+                            break;
+
+                        case NextValueType.BundlePathIncludeFilename:
+                            _bundlePathIncludeFilename = false;
+                            break;
+
+                        case NextValueType.AssetBundleVersion:
+                            assetBundleVersion = 1;
+                            break;
                     }
 
                     nextValueType = NextValueType.None;
@@ -351,6 +533,11 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
             {
                 isExplicitlyInAsset = false;
             }
+        }
+
+        if (!hasId)
+        {
+            Id = 0;
         }
 
         if (isErrored)
@@ -382,6 +569,23 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
         {
             Category = c;
         }
+
+        if (masterBundleOverride == null && !excludedFromMasterBundle)
+        {
+            _bundleFlags = 2;
+        }
+        else
+        {
+            _bundleFlags = excludedFromMasterBundle ? 1 : 0;
+        }
+
+        if (hasEnableShaderConsolidation && !hasDisableShaderConsolidation)
+        {
+            _bundleFlags |= 8;
+        }
+
+        _masterBundleName = masterBundleOverride;
+        _bundleFlags |= (assetBundleVersion & 0xFFF) << 8;
 
         if (Type.Equals("SDG.Unturned.ItemGunAsset, Assembly-CSharp"))
         {
@@ -1294,17 +1498,28 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
         }
     }
 
-    internal void UpdateLocalizationFile()
+    internal void ResetLocalizationProperties()
     {
         FriendlyName = null;
-        if (!File.Exists(LocalizationFilePath))
-            return;
+    }
 
+    internal void UpdateLocalizationFile()
+    {
         if (!AssetCategory.HasFriendlyName(Category))
+        {
+            ResetLocalizationProperties();
             return;
+        }
+
+        string? localPath = LocalizationFilePath;
+        if (!File.Exists(localPath))
+        {
+            ResetLocalizationProperties();
+            return;
+        }
 
         string localizationFileContents;
-        using (FileStream fs = new FileStream(LocalizationFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 256, FileOptions.SequentialScan))
+        using (FileStream fs = new FileStream(localPath, FileMode.Open, FileAccess.Read, FileShare.Read, 256, FileOptions.SequentialScan))
         using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, true, 256, true))
         {
             localizationFileContents = sr.ReadToEnd();
@@ -1312,7 +1527,7 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
 
         if (string.IsNullOrEmpty(localizationFileContents))
         {
-            LocalizationFilePath = null;
+            ResetLocalizationProperties();
             return;
         }
 
@@ -1320,7 +1535,8 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
         int dictionaryDepth = 0, listDepth = 0;
         ReadOnlySpan<char> nameKey = "Name".AsSpan();
         bool nextIsName = false;
-        while (localTokenizer.MoveNext() && FriendlyName == null)
+        string? friendlyName = null;
+        while (localTokenizer.MoveNext() && friendlyName == null)
         {
             switch (localTokenizer.Token.Type)
             {
@@ -1331,7 +1547,7 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
                 case DatTokenType.Value:
                     if (nextIsName)
                     {
-                        FriendlyName = localTokenizer.Token.Content.ToString();
+                        friendlyName = localTokenizer.Token.Content.ToString();
                     }
 
                     nextIsName = false;
@@ -1356,10 +1572,38 @@ public class DiscoveredDatFile : IEquatable<DiscoveredDatFile>
                     break;
             }
         }
+
+        FriendlyName = friendlyName;
     }
+
+    /// <summary>
+    /// Gets or creates a <see cref="IBundleProxy"/> for this asset file.
+    /// </summary>
+    public IBundleProxy GetBundleProxy(IParsingServices services)
+    {
+        if (!services.Database.FileTypes.TryGetValue(Type, out DatFileType fileType)
+            || fileType is not DatAssetFileType { HasBundleAssets: true } assetFileType)
+        {
+            return NullBundleProxy.Instance;
+        }
+
+        EnsureBundleInfoCreated(services, assetFileType);
+        return this;
+    }
+
 
     /// <inheritdoc />
     public bool Equals(DiscoveredDatFile other) => other != null && string.Equals(other.FilePath, FilePath, StringComparison.Ordinal);
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (!_ownsBundle || Interlocked.Exchange(ref _bundle, null) is not { } bundle)
+            return;
+
+        bundle.Dispose();
+        _ownsBundle = false;
+    }
 
 
     private sealed class IdComparer : IComparer<DiscoveredDatFile>

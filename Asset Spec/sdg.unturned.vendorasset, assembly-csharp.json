@@ -4,7 +4,7 @@
     "DisplayName": "Vendor (NPC Shop)",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/npcs/vendor-asset.html",
-    "RequireId": false,
+    "Category": "NPC",
     "VanillaIdLimit": 2000,
     "Properties":
     [

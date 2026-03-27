@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using DanielWillett.UnturnedDataFileLspServer.Data;
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
@@ -26,7 +25,7 @@ internal class OrderfileTests
 
         database.ReadOrderfile = false;
 
-        InstallationEnvironment env = new InstallationEnvironment(database);
+        InstallationEnvironment env = new InstallationEnvironment(database, loggerFactory);
 
         _parsingServices = new ParsingServiceProvider(
             database,

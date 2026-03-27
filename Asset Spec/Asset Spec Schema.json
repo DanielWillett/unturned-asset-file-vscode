@@ -2539,7 +2539,12 @@
         "RequireId":
         {
             "type": [ "boolean", "null" ],
-            "description": "If this type requires a non-zero unique ID."
+            "description": "If this type requires a non-zero unique ID. Defaults to the value of it's parent type."
+        },
+        "HasBundleAssets":
+        {
+            "type": [ "boolean", "null" ],
+            "description": "Whether or not this type or any of it's parent types can have bundle assets. Defaults to the value of it's parent type."
         },
         "DisplayName":
         {

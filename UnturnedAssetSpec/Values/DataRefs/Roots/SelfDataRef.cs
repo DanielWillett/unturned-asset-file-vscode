@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -74,6 +75,12 @@ public sealed class SelfDataRef : RootDataRef<SelfDataRef>
     {
         // todo
         value = 0;
+        return false;
+    }
+
+    protected override bool AcceptProperty<TVisitor>(in ComponentProperty property, ref FileEvaluationContext ctx, ref TVisitor visitor)
+    {
+        // todo
         return false;
     }
 

@@ -25,6 +25,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// Syntax:<br/>
 /// <c>#Target.Indices</c><br/>
 /// <c>#Target.Indices[0]</c><br/>
+/// <c>#Target.Indices[0]{"PreventSelfReference":true}</c><br/>
 /// <c>#Target.Indices[-1]</c> (starts from end of array)
 /// </para>
 /// </summary>

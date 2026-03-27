@@ -4,9 +4,6 @@
     "DisplayName": "Fuel Item (Canister)",
     "Parent": "SDG.Unturned.ItemAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fuel-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

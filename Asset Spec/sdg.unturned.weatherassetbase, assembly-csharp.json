@@ -4,7 +4,6 @@
     "DisplayName": "Base Weather",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html",
-    "RequireId": false,
     "Properties":
     [
         {

@@ -4,9 +4,6 @@
     "DisplayName": "Barricade Item",
     "Parent": "SDG.Unturned.ItemPlaceableAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/barricade-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

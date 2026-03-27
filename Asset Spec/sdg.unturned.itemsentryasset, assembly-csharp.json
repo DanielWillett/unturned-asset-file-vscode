@@ -4,9 +4,6 @@
     "DisplayName": "Sentry Barricade Item",
     "Parent": "SDG.Unturned.ItemStorageAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/sentry-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

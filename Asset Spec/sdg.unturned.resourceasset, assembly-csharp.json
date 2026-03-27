@@ -6,6 +6,7 @@
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html",
     "Category": "RESOURCE",
     "RequireId": true,
+    "HasBundleAssets": true,
     "VanillaIdLimit": 50,
     "Properties":
     [

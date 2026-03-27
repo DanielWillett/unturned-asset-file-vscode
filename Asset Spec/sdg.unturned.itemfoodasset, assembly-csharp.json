@@ -3,8 +3,5 @@
     "Type": "SDG.Unturned.ItemFoodAsset, Assembly-CSharp",
     "DisplayName": "Food Item",
     "Parent": "SDG.Unturned.ItemConsumeableAsset, Assembly-CSharp",
-    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/food-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true
+    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/food-asset.html"
 }

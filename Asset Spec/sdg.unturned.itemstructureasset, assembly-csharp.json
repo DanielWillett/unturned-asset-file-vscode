@@ -4,9 +4,6 @@
     "DisplayName": "Structure Item",
     "Parent": "SDG.Unturned.ItemPlaceableAsset, Assembly-CSharp",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/items/structure-asset.html",
-    "Category": "ITEM",
-    "VanillaIdLimit": 2000,
-    "RequireId": true,
     "Properties":
     [
         {

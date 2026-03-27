@@ -39,6 +39,45 @@ public static class KnownTypeValueHelper
         value = false;
         return false;
     }
+    public static bool TryParseBoolean(ReadOnlySpan<char> key, out bool value)
+    {
+        if (!key.IsEmpty)
+        {
+            if (key.Length != 1)
+            {
+                key = key.Trim();
+                if (key.Equals("True", StringComparison.OrdinalIgnoreCase))
+                {
+                    value = true;
+                    return true;
+                }
+                if (key.Equals("False", StringComparison.OrdinalIgnoreCase))
+                {
+                    value = false;
+                    return true;
+                }
+
+                return bool.TryParse(key.ToString(), out value);
+            }
+
+            switch (key[0])
+            {
+                case '0':
+                case 'f':
+                case 'n':
+                    value = false;
+                    return true;
+                case '1':
+                case 't':
+                case 'y':
+                    value = true;
+                    return true;
+            }
+        }
+
+        value = false;
+        return false;
+    }
 
     public static bool TryParseUInt8(string key, out byte value)
     {

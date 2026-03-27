@@ -1,4 +1,4 @@
-using DanielWillett.UnturnedDataFileLspServer.Data.AssetEnvironment;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using Microsoft.Extensions.Logging;
@@ -7,7 +7,6 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 
 internal class LspInstallationEnvironment : InstallationEnvironment
 {
-    private readonly ILogger<LspInstallationEnvironment> _logger;
     private readonly InstallDirUtility _installDir;
     private readonly LspWorkspaceEnvironment _workspace;
     private bool _hasEvents;
@@ -15,12 +14,11 @@ internal class LspInstallationEnvironment : InstallationEnvironment
     public LspInstallationEnvironment(
         InstallDirUtility installDir,
         IAssetSpecDatabase database,
-        ILogger<LspInstallationEnvironment> logger,
+        ILoggerFactory loggerFactory,
         LspWorkspaceEnvironment workspace)
-        : base(database)
+        : base(database, loggerFactory)
     {
         _installDir = installDir;
-        _logger = logger;
         _workspace = workspace;
     }
 
@@ -40,11 +38,11 @@ internal class LspInstallationEnvironment : InstallationEnvironment
             OnWorkspaceFolderAdded(folder);
         }
 
-        using IDisposable? scope = _logger.BeginScope("Source directories");
-        _logger.LogInformation("Source directories: ");
+        using IDisposable? scope = Logger.BeginScope("Source directories");
+        Logger.LogInformation("Source directories: ");
         foreach (string dir in SourceDirectories)
         {
-            _logger.LogInformation(dir);
+            Logger.LogInformation(dir);
         }
     }
 
@@ -69,15 +67,5 @@ internal class LspInstallationEnvironment : InstallationEnvironment
     private void OnWorkspaceFolderRemoved(WorkspaceFolderTracker obj)
     {
         RemoveSearchableDirectory(obj.FilePath);
-    }
-
-    protected override void Log(string fileName, string msg)
-    {
-        _logger.LogWarning("{0} - " + msg, fileName);
-    }
-
-    protected override void Log(string msg)
-    {
-        _logger.LogError(msg);
     }
 }

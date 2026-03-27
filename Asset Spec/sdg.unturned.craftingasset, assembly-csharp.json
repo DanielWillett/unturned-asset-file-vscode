@@ -3,9 +3,7 @@
     "Type": "SDG.Unturned.CraftingAsset, Assembly-CSharp",
     "DisplayName": "Crafting Blueprint List",
     "Parent": "SDG.Unturned.Asset, Assembly-CSharp",
-    "Category": "NONE",
     "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/crafting-asset.html",
-    "RequireId": false,
     "Properties":
     [
         {

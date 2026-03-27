@@ -10,6 +10,7 @@ using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -304,6 +305,12 @@ public static class DatPropertyExtensions
         if (!property.Type.TryEvaluateType(out IType? propertyType, ref ctx))
         {
             return false;
+        }
+
+        if (property is DatBundleAsset)
+        {
+            // todo: IBundleProxy bundleProxy = ctx.Services.Installation.GetBundleProxyForFile(ctx.File.WorkspaceFile);
+            throw new NotImplementedException();
         }
 
         IDictionarySourceNode? startingDictionary;
