@@ -149,6 +149,12 @@ public static class DatPropertyExtensions
     /// <param name="ctx">Workspace context for the operation.</param>
     public static bool IsExcluded(this DatProperty property, ref FileEvaluationContext ctx)
     {
+        if (property.Context == SpecPropertyContext.BundleAsset)
+        {
+            IBundleProxy bndl = ctx.File.WorkspaceFile.Bundle;
+            return bndl.GetCorrespondingAsset(property.Key, ctx.Services) == null;
+        }
+
         return !ctx.File.TryGetProperty(property, ref ctx, out _);
     }
 
@@ -159,7 +165,8 @@ public static class DatPropertyExtensions
     /// <param name="ctx">Workspace context for the operation.</param>
     public static SourceValueType GetValueType(this DatProperty property, ref FileEvaluationContext ctx)
     {
-        if (!ctx.File.TryGetProperty(property, ref ctx, out IPropertySourceNode? propertyNode))
+        if (property.Context == SpecPropertyContext.BundleAsset
+         || !ctx.File.TryGetProperty(property, ref ctx, out IPropertySourceNode? propertyNode))
         {
             return SourceValueType.Value;
         }
@@ -173,7 +180,6 @@ public static class DatPropertyExtensions
     /// <param name="property">The property to evaluate.</param>
     /// <param name="requireValue">Whether or not a valid value must also be present to be considered included.</param>
     /// <param name="ctx">Workspace context for the operation.</param>
-    /// <param name="keyFilter">The current object context (modern/legacy).</param>
     public static unsafe bool IsIncluded(this DatProperty property, bool requireValue, ref FileEvaluationContext ctx)
     {
         if (!ctx.File.TryGetProperty(property, ref ctx, out IPropertySourceNode? propertyNode))

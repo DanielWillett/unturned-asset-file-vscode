@@ -1,6 +1,9 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -38,6 +41,8 @@ public sealed class UnityObjectAssetType : IBundleAssetType, ITypeFactory
 
     /// <inheritdoc />
     public QualifiedType TypeName => _type;
+
+    ITypeParser<UnityObject> IType<UnityObject>.Parser => throw new NotSupportedException();
 
     string IType.Id => _type.Type;
     string IType.DisplayName => _type.GetTypeName();
@@ -114,5 +119,10 @@ public sealed class UnityObjectAssetType : IBundleAssetType, ITypeFactory
     bool IEquatable<IType?>.Equals(IType? other)
     {
         return other is UnityObjectAssetType bt && _type.Equals(bt.TypeName);
+    }
+
+    public IValue<UnityObject> CreateValue(Optional<UnityObject> value)
+    {
+        return (IValue<UnityObject>?)value.Value ?? Value.Null(this);
     }
 }

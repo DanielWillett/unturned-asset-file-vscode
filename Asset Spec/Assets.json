@@ -49,6 +49,36 @@
         "Level.hierarchy": "SDG.Framework.Devkit.LevelHierarchy, Assembly-CSharp",
         "MasterBundle.dat": "SDG.Unturned.MasterBundleConfig, Assembly-CSharp"
     },
+    "BundleValidFileExtensions":
+    {
+        "UnityEngine.Material, UnityEngine.CoreModule": [ ".mat" ],
+        "UnityEngine.Texture2D, UnityEngine.CoreModule": [ ".png", ".jpg" ],
+        "UnityEngine.GameObject, UnityEngine.CoreModule": [ ".prefab" ],
+        "UnityEngine.AudioClip, UnityEngine.AudioModule": [ ".wav", ".ogg", ".mp3" ]
+    },
+    "RelevantBundleAssetClasses":
+    [
+        "GameObject",
+        "AssetBundle",
+        "Texture",
+        "Texture2D",
+        "Texture3D",
+        "Texture2DArray",
+        "BaseVideoTexture",
+        "CustomRenderTexture",
+        "GUITexture",
+        "RenderTexture",
+        "WebCamTexture",
+        "LowerResBlitTexture",
+        "MovieTexture",
+        "ProceduralTexture",
+        "SparseTexture",
+        "AnimationClip",
+        "Mesh",
+        "AudioClip",
+        "Material",
+        "PhysicMaterial"
+    ],
     "FaceCount": 32,
     "BeardCount": 16,
     "HairCount": 23,
@@ -536,6 +566,29 @@
                 "SDG.Unturned.LegacyRainComponent, Assembly-CSharp": { },
                 "SDG.Unturned.LegacySnowComponent, Assembly-CSharp": { }
             }
+        },
+        "UnityEngine.Object, UnityEngine.CoreModule":
+        {
+            "UnityEngine.GameObject, UnityEngine.CoreModule": { },
+            "UnityEngine.Mesh, UnityEngine.CoreModule": { },
+            "UnityEngine.Material, UnityEngine.CoreModule": { },
+            "UnityEngine.Component, UnityEngine.CoreModule":
+            {
+                "UnityEngine.Behaviour, UnityEngine.CoreModule":
+                {
+                    "UnityEngine.MonoBehaviour, UnityEngine.CoreModule": { }
+                },
+                "UnityEngine.Collider, UnityEngine.PhysicsModule":
+                {
+                    "UnityEngine.WheelCollider, UnityEngine.VehiclesModule": { }
+                }
+            },
+            "UnityEngine.Texture, UnityEngine.CoreModule":
+            {
+                "UnityEngine.Texture2D, UnityEngine.CoreModule": { }
+            },
+            "UnityEngine.AudioClip, UnityEngine.AudioModule": { },
+            "UnityEngine.PhysicMaterial, UnityEngine.PhysicsModule": { }
         }
     },
     "AssetAliases":

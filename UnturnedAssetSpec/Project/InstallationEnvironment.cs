@@ -1,13 +1,15 @@
+using AssetsTools.NET.Extra;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AssetsTools.NET.Extra;
-using Microsoft.Extensions.Logging;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
@@ -57,6 +59,37 @@ public class InstallationEnvironment : IDisposable
 
     private readonly Dictionary<string, OneOrMore<DiscoveredBundle>> _masterBundleIndex;
     private readonly List<DiscoveredBundle> _masterBundles;
+
+    [field: MaybeNull]
+    internal ImmutableHashSet<AssetClassID> RelevantBundleClasses
+    {
+        get
+        {
+            if (field == null && _database.Information != null)
+            {
+                ImmutableHashSet<AssetClassID>.Builder relevantClasses = ImmutableHashSet.CreateBuilder<AssetClassID>();
+
+                if (_database.Information.RelevantBundleAssetClasses != null)
+                {
+                    foreach (string? str in _database.Information.RelevantBundleAssetClasses)
+                    {
+                        if (Enum.TryParse(str, out AssetClassID id))
+                        {
+                            relevantClasses.Add(id);
+                        }
+                        else
+                        {
+                            Logger.LogWarning("Unknown RelevantBundleAssetClasses: {0}.", str);
+                        }
+                    }
+                }
+
+                field = relevantClasses.ToImmutable();
+            }
+
+            return field ?? ImmutableHashSet<AssetClassID>.Empty;
+        }
+    }
 
     internal AssetsManager? AssetBundleManager;
     internal InstallationEnvironmentAssetBundleCache BundleCache;

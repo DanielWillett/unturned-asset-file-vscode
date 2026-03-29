@@ -1,3 +1,4 @@
+using AssetsTools.NET.Extra;
 using DanielWillett.UnturnedDataFileLspServer.Data.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
@@ -28,6 +29,9 @@ public class AssetInformation
     [JsonConverter(typeof(TypeDictionaryConverter<TypeHierarchy>))]
     public Dictionary<QualifiedType, TypeHierarchy> Types { get; set; }
 
+    [JsonConverter(typeof(TypeDictionaryConverter<TypeHierarchy>))]
+    public Dictionary<QualifiedType, string[]> BundleValidFileExtensions { get; set; }
+
     public Dictionary<string, QualifiedType> KnownFileNames { get; set; }
 
     [JsonIgnore] // generated at runtime from Types
@@ -52,6 +56,8 @@ public class AssetInformation
     public string?[]? KeyOnlyLocalizationFiles { get; set; }
     public AssetBundleVersionInfo?[]? AssetBundleVersions { get; set; }
     public SkillsetInfo?[]? Skillsets { get; set; }
+
+    public string?[]? RelevantBundleAssetClasses { get; set; }
 
     public SpecialityInfo?[]? Specialities
     {

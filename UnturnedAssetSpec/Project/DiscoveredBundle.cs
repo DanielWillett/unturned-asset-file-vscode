@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
+using AssetsTools.NET;
 using AssetsTools.NET.Extra;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
@@ -12,9 +17,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 /// </summary>
 public sealed class DiscoveredBundle : IDisposable
 {
-    private BundleFileInstance? _openedfile;
+    private BundleData _openedfile;
     private AssetsManager? _assetsManager;
     private InstallationEnvironment? _installationEnvironment;
+
+    private ImmutableDictionary<long, string>? _pathCache;
+    private ImmutableDictionary<string, int>? _nameCache;
 
     /// <summary>
     /// Whether or not the bundle is a legacy (unity3d) bundle.
@@ -25,6 +33,11 @@ public sealed class DiscoveredBundle : IDisposable
     /// The directory this bundle applies to. This is the folder the bundle is in.
     /// </summary>
     public string Directory { get; }
+
+    /// <summary>
+    /// The version of Unity Engine used to build this bundle.
+    /// </summary>
+    public UnityEngineVersion BuildVersion { get; internal set; }
     
     /// <summary>
     /// The file this bundle was discovered from.
@@ -53,6 +66,25 @@ public sealed class DiscoveredBundle : IDisposable
         ConfigurationFile = configurationFile;
         BundleFile = bundleFile;
         Version = version;
+        UpdateBuildVersion();
+    }
+
+    internal void UpdateBuildVersion()
+    {
+        try
+        {
+            UnityAssetBundleHeader header = UnityAssetBundleHeader.FromFile(BundleFile, out _);
+            BuildVersion = header.EngineVersion;
+        }
+        catch (FormatException)
+        {
+            BuildVersion = default;
+        }
+    }
+
+    internal void ApplyBundleFileChanges()
+    {
+        UpdateBuildVersion();
     }
 
     public bool IsReferencingFile(string file)
@@ -99,13 +131,21 @@ public sealed class DiscoveredBundle : IDisposable
     }
 
     /// <summary>
-    /// Opens a reader for the bundle file.
+    /// Gets the lock used for this bundle.
     /// </summary>
-    /// <param name="parsingServices"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"><paramref name="parsingServices"/> has changed since the last time this was called.</exception>
-    /// <exception cref="ObjectDisposedException"><paramref name="parsingServices"/>'s <see cref="InstallationEnvironment"/> has been disposed.</exception>
-    public BundleFileInstance GetOrOpen(IParsingServices parsingServices)
+    internal
+#if NET9_0_OR_GREATER
+        System.Threading.Lock
+#else
+        object
+#endif
+        GetLock(IParsingServices parsingServices)
+    {
+        InstallationEnvironment env = ApplyInstallationEnvironment(parsingServices);
+        return env.AssetBundleLock;
+    }
+
+    private InstallationEnvironment ApplyInstallationEnvironment(IParsingServices parsingServices)
     {
         InstallationEnvironment env = parsingServices.Installation;
         InstallationEnvironment? originalValue = Interlocked.CompareExchange(ref _installationEnvironment, env, null);
@@ -115,50 +155,208 @@ public sealed class DiscoveredBundle : IDisposable
             throw new InvalidOperationException("This file does not belong to the provided InstallationEnvironment.");
         }
 
-        BundleFileInstance? file = _openedfile;
-        if (file != null)
+        return env;
+    }
+
+    /// <summary>
+    /// Loads an asset by it's name or path. Name for legacy bundles and path for new bundles.
+    /// </summary>
+    internal bool TryLoadAssetBaseField(
+        in BundleData data,
+        string nameOrPath,
+        [NotNullWhen(true)] out AssetFileInfo? fileInfo,
+        [NotNullWhen(true)] out AssetTypeValueField? baseField,
+        [NotNullWhen(true)] out string? path
+    )
+    {
+        fileInfo = null;
+        baseField = null;
+        path = null;
+        if (_nameCache == null || !_nameCache.TryGetValue(nameOrPath, out int index))
         {
-            return file;
+            return false;
+        }
+
+        fileInfo = data.AssetBundle.file.Metadata.AssetInfos[index];
+
+        AssetTypeValueField? val = data.Manager.GetBaseField(
+            data.AssetBundle,
+            fileInfo,
+            AssetReadFlags.SkipMonoBehaviourFields
+        );
+
+        if (val is not { IsDummy: false })
+            return false;
+
+        return _pathCache != null && _pathCache.TryGetValue(fileInfo.PathId, out path);
+    }
+
+    /// <summary>
+    /// Opens a reader for the bundle file.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"><paramref name="parsingServices"/> has changed since the last time this was called.</exception>
+    /// <exception cref="ObjectDisposedException"><paramref name="parsingServices"/>'s <see cref="InstallationEnvironment"/> has been disposed.</exception>
+    public BundleData GetOrOpen(IParsingServices parsingServices)
+    {
+        InstallationEnvironment env = ApplyInstallationEnvironment(parsingServices);
+
+        BundleData? file = _openedfile;
+        if (file.HasValue)
+        {
+            return file.Value;
         }
 
         lock (env.AssetBundleLock)
         {
-            if (_openedfile != null)
-            {
-                return _openedfile;
-            }
-
-            AssetsManager? assetsManager = env.AssetBundleManager;
-
-            if (assetsManager == null)
-            {
-                assetsManager = _assetsManager ?? throw new ObjectDisposedException(nameof(InstallationEnvironment));
-            }
-            else
-            {
-                _assetsManager = assetsManager;
-            }
-
-            file = assetsManager.LoadBundleFile(BundleFile, false);
-            _openedfile = file;
+            return GetOrOpenIntl(env);
         }
-
-        return file;
     }
 
+    /// <inheritdoc cref="GetOrOpen"/>
+    internal BundleData GetOrOpenNoLock(IParsingServices parsingServices)
+    {
+        InstallationEnvironment env = ApplyInstallationEnvironment(parsingServices);
+
+        BundleData? file = _openedfile;
+        if (file.HasValue)
+        {
+            return file.Value;
+        }
+
+        return GetOrOpenIntl(env);
+    }
+    private BundleData GetOrOpenIntl(InstallationEnvironment env)
+    {
+        if (_openedfile.Info != null)
+        {
+            return _openedfile;
+        }
+
+        AssetsManager? assetsManager = env.AssetBundleManager;
+
+        if (assetsManager == null)
+        {
+            assetsManager = _assetsManager ?? throw new ObjectDisposedException(nameof(InstallationEnvironment));
+        }
+        else
+        {
+            _assetsManager = assetsManager;
+        }
+
+        BundleFileInstance file = assetsManager.LoadBundleFile(BundleFile, false);
+        AssetsFileInstance assetFile = assetsManager.LoadAssetsFileFromBundle(file, 0);
+        _openedfile = new BundleData(file, assetFile, assetsManager);
+
+        IList<AssetFileInfo> assets = assetFile.file.Metadata.AssetInfos;
+
+        bool cacheNames = IsLegacyBundle;
+
+        ImmutableDictionary<long, string>.Builder pathIdMap = ImmutableDictionary.CreateBuilder<long, string>();
+        ImmutableDictionary<string, int>.Builder nameIndexMap = ImmutableDictionary.CreateBuilder<string, int>(StringComparer.Ordinal);
+
+        int abIndex = assets.Count;
+        for (int index = 0; index < assets.Count; index++)
+        {
+            AssetFileInfo obj = assets[index];
+            AssetClassID classId = (AssetClassID)obj.TypeId;
+            
+            if (!env.RelevantBundleClasses.Contains(classId))
+                continue;
+
+            AssetTypeValueField baseField = assetsManager.GetBaseField(assetFile, obj);
+            if (baseField.IsDummy)
+                continue;
+
+            if (cacheNames)
+            {
+                AssetTypeValue? nameValue = baseField["m_Name"].Value;
+                if (nameValue is { ValueType: AssetValueType.String })
+                {
+                    string str = nameValue.AsString;
+                    if (!string.IsNullOrEmpty(str))
+                    {
+                        nameIndexMap[str] = index;
+                    }
+                }
+
+                continue;
+            }
+            else if (index > abIndex)
+            {
+                if (pathIdMap.TryGetValue(obj.PathId, out string path))
+                {
+                    nameIndexMap[path] = index;
+                }
+            }
+
+            if (classId != AssetClassID.AssetBundle || abIndex >= 0)
+                continue;
+
+            abIndex = index;
+            AssetTypeValueField container = baseField["m_Container.Array"];
+            if (container.IsDummy)
+                continue;
+
+            foreach (AssetTypeValueField data in container.Children)
+            {
+                if (data.Children.Count <= 1)
+                    continue;
+
+                AssetTypeValue pathValue = data[0].Value;
+                AssetTypeValue? pathIdValue = data[1]["asset.m_PathID"].Value;
+                if (pathIdValue == null
+                 || pathValue.ValueType != AssetValueType.String
+                 || pathIdValue.ValueType != AssetValueType.Int64)
+                {
+                    continue;
+                }
+
+                string name = pathValue.AsString;
+                long pathId = pathIdValue.AsLong;
+                if (pathId == 0)
+                    continue;
+
+                pathIdMap![pathId] = name;
+            }
+        }
+
+        if (!cacheNames)
+        {
+            for (int index = 0; index < abIndex; index++)
+            {
+                AssetFileInfo obj = assets[index];
+                AssetClassID classId = (AssetClassID)obj.TypeId;
+
+                if (!env.RelevantBundleClasses.Contains(classId))
+                    continue;
+
+                if (pathIdMap.TryGetValue(obj.PathId, out string path))
+                {
+                    nameIndexMap[path] = index;
+                }
+            }
+        }
+
+        _nameCache = nameIndexMap.ToImmutable();
+        _pathCache = pathIdMap.ToImmutable();
+
+        return new BundleData(file, assetFile, assetsManager);
+    }
 
     public void Dispose()
     {
-        BundleFileInstance? file = Interlocked.Exchange(ref _openedfile, null);
-        if (file == null)
-            return;
-
         InstallationEnvironment? env = _installationEnvironment;
         if (env == null)
             return;
 
         lock (env.AssetBundleLock)
         {
+            BundleData data = _openedfile;
+            _openedfile = default;
+            BundleFileInstance? file = data.Info;
+            if (file == null)
+                return;
+
             AssetsManager? manager = _assetsManager;
             try
             {
@@ -177,4 +375,10 @@ public sealed class DiscoveredBundle : IDisposable
             _assetsManager = null;
         }
     }
+
+    public record struct BundleData(
+        BundleFileInstance Info,
+        AssetsFileInstance AssetBundle,
+        AssetsManager Manager
+    );
 }
