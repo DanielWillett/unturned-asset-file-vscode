@@ -220,6 +220,12 @@ public class DatProperty : IDatSpecificationObject
     /// <remarks>Corresponds to the <c>IncludedDefaultValue</c> property.</remarks>
     public IValue? IncludedDefaultValue { get; internal set; }
 
+    /// <summary>
+    /// For config data, whether or not the field is decorated with the <c>[ConfigWarnIfTrue]</c> attribute, meaning a value of <see langword="true"/> will show a warning in the server menu.
+    /// </summary>
+    /// <remarks>Corresponds to the <c>ConfigWarnIfTrue</c> property.</remarks>
+    public bool ServerMenuWarnsForTrueValues { get; internal set; }
+
     internal DatProperty(string key, DatTypeWithProperties owner, JsonElement element, SpecPropertyContext context)
     {
         Key = key;

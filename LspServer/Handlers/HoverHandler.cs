@@ -197,18 +197,18 @@ public readonly struct HoverMarkdownBuilder
             _hov.Append("[").Append(Properties.Resources.Hover_UnturnedDocumentationLinkName).Append("](")
                 .Append(docsLink.Value).Append(')').AppendLine();
 
-            if (prop.Version != null)
+            if (prop.Version != null && prop.Version.TryEvaluateValue(out Optional<Version> version, ref ctx) && version.Value is not null)
             {
-                _hov.Append('\\').Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(prop.Version)
+                _hov.Append('\\').AppendLine().Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(version.Value)
                     .AppendLine();
             }
 
             _hov.AppendLine()
                 .Append('-', 3).AppendLine().AppendLine();
         }
-        else if (prop.Version != null)
+        else if (prop.Version != null && prop.Version.TryEvaluateValue(out Optional<Version> version, ref ctx) && version.Value is not null)
         {
-            _hov.Append('\\').Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(prop.Version)
+            _hov.Append('\\').AppendLine().Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(version.Value)
                 .AppendLine().AppendLine().Append('-', 3).AppendLine().AppendLine();
         }
 
@@ -260,18 +260,18 @@ public readonly struct HoverMarkdownBuilder
             _hov.Append("[").Append(result.LinkName ?? Properties.Resources.Hover_UnturnedDocumentationLinkName).Append("](")
                 .Append(result.Docs).Append(')').AppendLine();
 
-            if (prop.Version != null)
+            if (prop.Version != null && prop.Version.TryEvaluateValue(out Optional<Version> version, ref ctx) && version.Value is not null)
             {
-                _hov.Append('\\').Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(prop.Version)
+                _hov.Append('\\').AppendLine().Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(version.Value)
                     .AppendLine();
             }
 
             _hov.AppendLine()
                 .Append('-', 3).AppendLine().AppendLine();
         }
-        else if (prop.Version != null)
+        else if (prop.Version != null && prop.Version.TryEvaluateValue(out Optional<Version> version, ref ctx) && version.Value is not null)
         {
-            _hov.Append('\\').Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(prop.Version)
+            _hov.Append('\\').AppendLine().Append(Properties.Resources.Hover_AddedVersion).Append(" v").Append(version.Value)
                 .AppendLine().AppendLine().Append('-', 3).AppendLine().AppendLine();
         }
     }

@@ -24,6 +24,8 @@ public sealed class DiscoveredBundle : IDisposable
     private ImmutableDictionary<long, string>? _pathCache;
     private ImmutableDictionary<string, int>? _nameCache;
 
+    internal ImmutableDictionary<long, AssetFileInfo>? FilePreloadCache;
+
     /// <summary>
     /// Whether or not the bundle is a legacy (unity3d) bundle.
     /// </summary>
@@ -133,13 +135,7 @@ public sealed class DiscoveredBundle : IDisposable
     /// <summary>
     /// Gets the lock used for this bundle.
     /// </summary>
-    internal
-#if NET9_0_OR_GREATER
-        System.Threading.Lock
-#else
-        object
-#endif
-        GetLock(IParsingServices parsingServices)
+    internal TfmLock GetLock(IParsingServices parsingServices)
     {
         InstallationEnvironment env = ApplyInstallationEnvironment(parsingServices);
         return env.AssetBundleLock;
@@ -254,6 +250,8 @@ public sealed class DiscoveredBundle : IDisposable
         ImmutableDictionary<long, string>.Builder pathIdMap = ImmutableDictionary.CreateBuilder<long, string>();
         ImmutableDictionary<string, int>.Builder nameIndexMap = ImmutableDictionary.CreateBuilder<string, int>(StringComparer.Ordinal);
 
+        ImmutableDictionary<long, AssetFileInfo>.Builder fileCache = ImmutableDictionary.CreateBuilder<long, AssetFileInfo>();
+
         int abIndex = assets.Count;
         for (int index = 0; index < assets.Count; index++)
         {
@@ -262,6 +260,11 @@ public sealed class DiscoveredBundle : IDisposable
             
             if (!env.RelevantBundleClasses.Contains(classId))
                 continue;
+
+            if (classId is AssetClassID.GameObject or AssetClassID.Transform or AssetClassID.RectTransform)
+            {
+                fileCache[obj.PathId] = obj;
+            }
 
             AssetTypeValueField baseField = assetsManager.GetBaseField(assetFile, obj);
             if (baseField.IsDummy)
@@ -339,6 +342,8 @@ public sealed class DiscoveredBundle : IDisposable
 
         _nameCache = nameIndexMap.ToImmutable();
         _pathCache = pathIdMap.ToImmutable();
+
+        FilePreloadCache = fileCache.ToImmutable();
 
         return new BundleData(file, assetFile, assetsManager);
     }

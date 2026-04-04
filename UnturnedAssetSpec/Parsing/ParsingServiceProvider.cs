@@ -94,24 +94,71 @@ public class ParsingServiceProvider : IParsingServices, IDisposable
         if (serviceProvider == null)
             throw new ArgumentNullException(nameof(serviceProvider));
 
-        Database =
-            (IAssetSpecDatabase?)serviceProvider.GetService(typeof(IAssetSpecDatabase))
-                ?? throw new InvalidOperationException($"Service not found: {nameof(IAssetSpecDatabase)}.");
-        LoggerFactory =
-            (ILoggerFactory?)serviceProvider.GetService(typeof(ILoggerFactory))
-                ?? throw new InvalidOperationException($"Service not found: {nameof(ILoggerFactory)}.");
-        Workspace =
-            (IWorkspaceEnvironment?)serviceProvider.GetService(typeof(IWorkspaceEnvironment))
-                ?? throw new InvalidOperationException($"Service not found: {nameof(IWorkspaceEnvironment)}.");
-        GameDirectory =
-            (InstallDirUtility?)serviceProvider.GetService(typeof(InstallDirUtility))
-                ?? throw new InvalidOperationException($"Service not found: {nameof(InstallDirUtility)}.");
-        Installation =
-            (InstallationEnvironment?)serviceProvider.GetService(typeof(InstallationEnvironment))
-                ?? throw new InvalidOperationException($"Service not found: {nameof(InstallationEnvironment)}.");
-        ProjectFileProvider =
-            (IProjectFileProvider?)serviceProvider.GetService(typeof(IProjectFileProvider))
-                ?? throw new InvalidOperationException($"Service not found: {nameof(IProjectFileProvider)}.");
+        try
+        {
+            Database =
+                (IAssetSpecDatabase?)serviceProvider.GetService(typeof(IAssetSpecDatabase))
+                    ?? throw new InvalidOperationException($"Service not found: {nameof(IAssetSpecDatabase)}.");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to get service: {nameof(IAssetSpecDatabase)}.", ex);
+        }
+
+        try
+        {
+            LoggerFactory =
+                (ILoggerFactory?)serviceProvider.GetService(typeof(ILoggerFactory))
+                    ?? throw new InvalidOperationException($"Service not found: {nameof(ILoggerFactory)}.");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to get service: {nameof(ILoggerFactory)}.", ex);
+        }
+
+        try
+        {
+            Workspace =
+                (IWorkspaceEnvironment?)serviceProvider.GetService(typeof(IWorkspaceEnvironment))
+                    ?? throw new InvalidOperationException($"Service not found: {nameof(IWorkspaceEnvironment)}.");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to get service: {nameof(IWorkspaceEnvironment)}.", ex);
+        }
+
+        try
+        {
+            GameDirectory =
+                (InstallDirUtility?)serviceProvider.GetService(typeof(InstallDirUtility))
+                    ?? throw new InvalidOperationException($"Service not found: {nameof(InstallDirUtility)}.");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to get service: {nameof(InstallDirUtility)}.", ex);
+        }
+
+        try
+        {
+            Installation =
+                (InstallationEnvironment?)serviceProvider.GetService(typeof(InstallationEnvironment))
+                    ?? throw new InvalidOperationException($"Service not found: {nameof(InstallationEnvironment)}.");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to get service: {nameof(InstallationEnvironment)}.", ex);
+        }
+
+        try
+        {
+            ProjectFileProvider =
+                (IProjectFileProvider?)serviceProvider.GetService(typeof(IProjectFileProvider))
+                    ?? throw new InvalidOperationException($"Service not found: {nameof(IProjectFileProvider)}.");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to get service: {nameof(IProjectFileProvider)}.", ex);
+        }
 
         ServiceProvider = serviceProvider;
     }

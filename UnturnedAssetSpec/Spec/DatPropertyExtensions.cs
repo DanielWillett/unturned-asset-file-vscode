@@ -152,7 +152,7 @@ public static class DatPropertyExtensions
         if (property.Context == SpecPropertyContext.BundleAsset)
         {
             IBundleProxy bndl = ctx.File.WorkspaceFile.Bundle;
-            return bndl.GetCorrespondingAsset(property.Key, ctx.Services) == null;
+            return bndl.GetCorrespondingAsset(property.Key, property.Type, ref ctx) == null;
         }
 
         return !ctx.File.TryGetProperty(property, ref ctx, out _);

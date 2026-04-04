@@ -56,15 +56,17 @@ public static class DataRefs
         ImmutableDictionary<string, IPropertyFactory>.Builder properties
             = ImmutableDictionary.CreateBuilder<string, IPropertyFactory>(StringComparer.OrdinalIgnoreCase);
 
-        properties["Excluded"]   = new DataRefPropertyFactory<ExcludedProperty>();
-        properties["Included"]   = new DataRefPropertyFactory<IncludedProperty>();
-        properties["Key"]        = new DataRefPropertyFactory<KeyProperty>();
-        properties["AssetName"]  = new DataRefPropertyFactory<AssetNameProperty>();
-        properties["Difficulty"] = new DataRefPropertyFactory<DifficultyProperty>();
-        properties["Indices"]    = new DataRefPropertyFactory<IndicesProperty>();
-        properties["IsLegacy"]   = new DataRefPropertyFactory<IsLegacyProperty>();
-        properties["ValueType"]  = new DataRefPropertyFactory<ValueTypeProperty>();
-        properties["Count"]      = new DataRefPropertyFactory<CountProperty>();
+        properties["Excluded"]       = new DataRefPropertyFactory<ExcludedProperty>();
+        properties["Included"]       = new DataRefPropertyFactory<IncludedProperty>();
+        properties["Key"]            = new DataRefPropertyFactory<KeyProperty>();
+        properties["AssetName"]      = new DataRefPropertyFactory<AssetNameProperty>();
+        properties["Difficulty"]     = new DataRefPropertyFactory<DifficultyProperty>();
+        properties["IsSingleplayer"] = new DataRefPropertyFactory<IsSingleplayerProperty>();
+        properties["Indices"]        = new DataRefPropertyFactory<IndicesProperty>();
+        properties["IsLegacy"]       = new DataRefPropertyFactory<IsLegacyProperty>();
+        properties["ValueType"]      = new DataRefPropertyFactory<ValueTypeProperty>();
+        properties["Count"]          = new DataRefPropertyFactory<CountProperty>();
+        properties["Component"]      = new DataRefPropertyFactory<ComponentProperty>();
 
         Properties = properties.ToImmutable();
     }

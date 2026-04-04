@@ -63,6 +63,14 @@ public abstract class BaseDataRefTarget : IDataRefTarget
             valueVisitor.Accept(StringType.Instance, difficulty == null ? Optional<string>.Null : new Optional<string>(difficulty));
             return true;
         }
+        if (typeof(TProperty) == typeof(IsSingleplayerProperty))
+        {
+            if (!AcceptProperty(in Unsafe.As<TProperty, IsSingleplayerProperty>(ref Unsafe.AsRef(in property)), ref ctx, out bool isSingleplayer))
+                return false;
+
+            valueVisitor.Accept(BooleanType.Instance, new Optional<bool>(isSingleplayer));
+            return true;
+        }
         if (typeof(TProperty) == typeof(IndicesProperty))
         {
             return AcceptProperty(in Unsafe.As<TProperty, IndicesProperty>(ref Unsafe.AsRef(in property)), ref ctx, ref valueVisitor);
@@ -160,6 +168,16 @@ public abstract class BaseDataRefTarget : IDataRefTarget
     protected virtual bool AcceptProperty(in DifficultyProperty property, ref FileEvaluationContext ctx, [NotNullWhen(true)] out string? value)
     {
         value = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Invoked when a <see cref="IsSingleplayerProperty"/> is accessed on this target.
+    /// </summary>
+    /// <inheritdoc cref="IDataRefTarget.AcceptProperty"/>.
+    protected virtual bool AcceptProperty(in IsSingleplayerProperty property, ref FileEvaluationContext ctx, out bool value)
+    {
+        value = false;
         return false;
     }
 

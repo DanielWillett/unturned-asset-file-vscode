@@ -144,7 +144,7 @@
             "Type": "Float32",
             "DefaultValue": 1.0,
             "Minimum": 0.0,
-            "Description": "Multiplier for how quickly the player loses while item is outside the cursor.",
+            "Description": "Multiplier for how quickly the player loses the fish while it's outside the cursor.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
             "Variable": "CatchChallengeEscapeSpeedMultiplier",
             "Version": "3.26.2.0"

@@ -330,6 +330,8 @@
     Allow_Manual_Drop
     Equipable_Movement_Speed_Multiplier
     _
+    Fishing_Catchable
+    _
     Blueprints
     _
     Add_Default_Actions
@@ -411,7 +413,9 @@
 
     @Skin_Override
     Hair_Override
+    Hair_Override_NonGoldColor
     Beard_Override
+    Beard_Override_NonGoldColor
 ]
 
 // Backpack item asset
@@ -1272,6 +1276,18 @@
     Reward_ID
     Reward_Experience_Min
     Reward_Experience_Max
+    _
+    Fishing_Reward_Mode
+    CatchChallenge_Enabled
+    CatchChallenge_CursorSize
+    CatchChallenge_Gravity
+    CatchChallenge_Acceleration
+    CatchChallenge_UpperRestitution
+    CatchChallenge_LowerRestitution
+    CatchChallenge_CaptureSpeed
+    CatchChallenge_EscapeSpeed
+    _
+    Fish_Bite_Interval_Multiplier
 
     @Actions
     _
@@ -1450,6 +1466,9 @@
     Loading_Screen_Music
     Death_Music
     TerrainColors
+    _
+    Supports_Fishing_Volumes
+    Default_Fish_Spawn_Table
 ]
 
 // Material Palette asset
@@ -2180,6 +2199,8 @@
 	Fade_In_Duration
 	Fade_Out_Duration
     Ambient_Audio_Clip
+    Ambient_Audio_Takes_Priority_Over_Ambiance_Volumes
+    Fish_Bite_Interval_Multiplier
 ]
 
 // custom Weather asset
@@ -2664,6 +2685,27 @@
     Zombie
     Nav
     LevelTable
+]
+
+// Fishing Catchable Properties
+"SDG.Unturned.FishingCatchableProperties, Assembly-CSharp"
+[
+    Min_Relocate_Interval
+    Max_Relocate_Interval
+    Max_Upward_Acceleration
+    Max_Downward_Acceleration
+    Max_Upward_Speed
+    Max_Downward_Speed
+    Upper_Restitution
+    Lower_Restitution
+    Min_Target_Delta
+    Max_Target_Delta
+    Min_Target_Position
+    Max_Target_Position
+    Capture_Duration
+    Escape_Duration
+    Spring_Stiffness
+    Spring_Damping
 ]
 
 // Loadout items from Level asset

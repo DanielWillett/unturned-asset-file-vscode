@@ -311,7 +311,7 @@
             "Key": "Name",
             "Type": "String",
             "Description": "Display name of the animal.",
-            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#drops"
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/animal-asset.html#localization"
         }
     ],
     "BundleAssets":

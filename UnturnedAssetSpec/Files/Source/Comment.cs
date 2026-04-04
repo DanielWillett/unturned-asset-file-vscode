@@ -37,6 +37,12 @@ public readonly record struct Comment(CommentPrefix Prefix, string Content, Comm
     public const string DifficultyAdditionalProperty = "difficulty";
 
     /// <summary>
+    /// Case-sensitive <c>udat-singleplayer</c> additional property overriding whether or not the current file is for singleplayer.
+    /// </summary>
+    /// <remarks>Must go at the top of the file in a comment.</remarks>
+    public const string SingleplayerAdditionalProperty = "singleplayer";
+
+    /// <summary>
     /// Total length of this comment's prefix and content.
     /// </summary>
     public int Length => Prefix.Length + Content.Length;

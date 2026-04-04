@@ -192,7 +192,9 @@ To emit diagnostics, extension methods are usually created in [DiagnosticSinkExt
 
 If you'd like to contribute to the asset specification JSON data, your pull request should contain only the changes to the JSON files, do not bundle the changes, as I'll handle doing that after review.
 
-Please read the docs before contributing as the schema is quite complex. It's important that every single property value is deterministic unless it's literally impossible (in which case the description should indicate this).
+Please read the docs before contributing as the schema is quite complex. It's important that every single property value is deterministic unless it's literally impossible (in which case the description should indicate this). Also ensure new types and properties have the `Version` property filled in with the version of Unturned they were added in.
+
+Additionally, if adding properties, also add the properties to the default `Orderfile.udatproj` file.
 
 #### Formatting
 * Opening brackets should be placed on new-lines when formatting your JSON data.
@@ -200,6 +202,8 @@ Please read the docs before contributing as the schema is quite complex. It's im
 * GUIDs should be in lowercase and use dashes, as it's more effecient when reading using `System.Text.Json`.
 * Enum values have to match in case exactly.
 * When adding new asset files, remove any fragment data from the link (ex. `.../data-file-format.html#doc-data-file-format` -> `.../data-file-format.html`).
+* For property doc links, use the best link available. If the doc page is using the old format, link to the header that contains the property info.
+* All links should use the `stable` branch of the docs. If it's not published yet manually change the URL so it points to the stable branch when it comes out.
 
 ### Code
 

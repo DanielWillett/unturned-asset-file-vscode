@@ -35,13 +35,8 @@ public class InstallationEnvironment : IDisposable
         }
     }
 
-#if NET9_0_OR_GREATER
-    private readonly System.Threading.Lock _fileSync = new System.Threading.Lock();
-    internal readonly System.Threading.Lock AssetBundleLock = new System.Threading.Lock();
-#else
-    private readonly object _fileSync = new object();
-    internal readonly object AssetBundleLock = new object();
-#endif
+    private readonly TfmLock _fileSync = new TfmLock();
+    internal readonly TfmLock AssetBundleLock = new TfmLock();
 
     private readonly IAssetSpecDatabase _database;
     private readonly List<SourceDirectory> _sourceDirs;

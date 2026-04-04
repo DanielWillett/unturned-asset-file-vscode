@@ -8,10 +8,10 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 internal class OpenedFileTracker : IDisposable
 {
     private readonly ILogger<OpenedFileTracker> _logger;
-    private readonly IParsingServices _parsingServices;
+    private readonly Lazy<IParsingServices> _parsingServices;
     public ConcurrentDictionary<DocumentUri, OpenedFile> Files { get; } = new ConcurrentDictionary<DocumentUri, OpenedFile>();
 
-    public OpenedFileTracker(ILogger<OpenedFileTracker> logger, IParsingServices parsingServices)
+    public OpenedFileTracker(ILogger<OpenedFileTracker> logger, Lazy<IParsingServices> parsingServices)
     {
         _logger = logger;
         _parsingServices = parsingServices;
@@ -19,7 +19,7 @@ internal class OpenedFileTracker : IDisposable
 
     public OpenedFile CreateFile(DocumentUri uri, ReadOnlySpan<char> text)
     {
-        return new OpenedFile(uri, text, _logger, _parsingServices, useVirtualFiles: true);
+        return new OpenedFile(uri, text, _logger, _parsingServices.Value, useVirtualFiles: true);
     }
 
     public void Dispose()

@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Threading;
+using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -90,14 +91,11 @@ public readonly struct ValueNodeDescriptor
     public static ValueNodeDescriptor FromNode(ISourceNode node, bool lockTreeSync = true)
     {
         bool lockTaken = false;
+        TfmLock? @lock = null;
         if (lockTreeSync)
         {
-#if NET9_0_OR_GREATER
-            node.File.TreeSync.Enter();
-            lockTaken = true;
-#else
-            Monitor.Enter(node.File.TreeSync, ref lockTaken);
-#endif
+            @lock = node.File.TreeSync;
+            PlatformLockHelper.EnterLock(@lock, ref lockTaken);
         }
 
         try
@@ -168,11 +166,7 @@ public readonly struct ValueNodeDescriptor
         {
             if (lockTaken)
             {
-#if NET9_0_OR_GREATER
-                node.File.TreeSync.Exit();
-#else
-                Monitor.Exit(node.File.TreeSync);
-#endif
+                PlatformLockHelper.ExitLock(@lock!);
             }
         }
     }

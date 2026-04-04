@@ -212,6 +212,11 @@ partial class SpecificationFileReader
             property.Exceptions = bldr.MoveToImmutableOrCopy();
         }
 
+        if (root.TryGetProperty("ConfigWarnIfTrue", out element) && element.ValueKind != JsonValueKind.Null)
+        {
+            property.ServerMenuWarnsForTrueValues = element.GetBoolean();
+        }
+
         ReadCommonProperties(property, in root, owner, key);
 
         properties.Add(property);

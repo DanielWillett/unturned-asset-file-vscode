@@ -88,6 +88,12 @@ public sealed class ThisDataRef : RootDataRef<ThisDataRef>
         return true;
     }
 
+    protected override bool AcceptProperty(in IsSingleplayerProperty property, ref FileEvaluationContext ctx, out bool value)
+    {
+        value = IsSingleplayerProperty.IsConfigFileForSingleplayer(ref ctx);
+        return true;
+    }
+
     protected override bool AcceptProperty<TVisitor>(in IndicesProperty property, ref FileEvaluationContext ctx, ref TVisitor visitor)
     {
         // todo

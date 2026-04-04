@@ -30,7 +30,7 @@
 
   </PropertyGroup>
 
-  <PropertyGroup Condition="exists($(StrongNameKeyPath))">
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net481' And exists($(StrongNameKeyPath))">
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$(StrongNameKeyPath)</AssemblyOriginatorKeyFile>

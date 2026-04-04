@@ -30,6 +30,7 @@ Data-Ref targets can use the following properties:
 | Key | The exact key given for this property. | any |
 | AssetName | The internal name of the asset. This is usually the file name. | `This` |
 | Difficulty | The contextual difficulty of the current file. | `This` |
+| IsSingleplayer | Whether or not the current config file refers to a singleplayer config. | `This` |
 | Indices | Array of indices used to get the target's index within a list or it's key within a dictionary. | any |
 | IsLegacy | Whether or not the currently parsing property is being parsed in the legacy format (ex. with blueprints, spawn tables, etc using the v1 format). | `Self`, `@Property` |
 | ValueType | Which type of value this property provides: 'Value', 'List', or 'Dictionary'. | `Self`, `@Property` |
@@ -99,6 +100,24 @@ Note that the difficulty is usually cached and may not auto-update in some cases
 Not affected by the target, use `This` for consistancy.
 
 Represented by the class: [DifficultyProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.DifficultyProperty.yml).
+
+*No properties, not indexable*
+
+### IsSingleplayer
+Returns a boolean value representing whether or not the file being edited is a config file for a singleplayer world.
+
+If the `singleplayer` additional file property is provided, that value will be used instead.
+```cs
+// udat-singleplayer: true
+
+// > Unturned Server Configuration File
+// > 
+// ...
+```
+
+Not affected by the target, use `This` for consistancy.
+
+Represented by the class: [IsSingleplayerProperty](/api/DanielWillett.UnturnedDataFileLspServer.Data.Values.IsSingleplayerProperty.yml).
 
 *No properties, not indexable*
 

@@ -322,6 +322,24 @@ public class DatEnumType : DatType,
             return false;
         }
 
+        if (StringParser is { } stringParser)
+        {
+            args.CreateTypeConverterParseArgs(out TypeConverterParseArgs<DatEnumValue> convArgs, v.Value);
+            if (stringParser.TryParse(v.Value, ref convArgs, out DatEnumValue? stringParsedValue))
+            {
+                args.Result = TypeParserResult.Successful;
+                value = new Optional<DatEnumValue>(stringParsedValue);
+                return true;
+            }
+
+            if (_stringParserNoFallback)
+            {
+                args.Result = TypeParserResult.Failed;
+                value = Optional<DatEnumValue>.Null;
+                return false;
+            }
+        }
+
         if (TryParseSingleValue(v.Value.AsSpan(), out DatEnumValue? enumValue, true))
         {
             args.Result = TypeParserResult.Successful;

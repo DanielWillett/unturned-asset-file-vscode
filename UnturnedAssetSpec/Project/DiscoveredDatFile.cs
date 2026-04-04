@@ -176,7 +176,7 @@ public partial class DiscoveredDatFile : IEquatable<DiscoveredDatFile>, IDisposa
 
                     ReadOnlySpan<char> content = tokenizer.Token.Content;
                     nextValueType = NextValueType.None;
-                    if (listDepth == 0)
+                    if (listDepth != 0)
                         break;
 
                     if (dictionaryDepth == 0)

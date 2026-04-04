@@ -29,7 +29,7 @@ public class AssetInformation
     [JsonConverter(typeof(TypeDictionaryConverter<TypeHierarchy>))]
     public Dictionary<QualifiedType, TypeHierarchy> Types { get; set; }
 
-    [JsonConverter(typeof(TypeDictionaryConverter<TypeHierarchy>))]
+    [JsonConverter(typeof(TypeDictionaryConverter<string[]>))]
     public Dictionary<QualifiedType, string[]> BundleValidFileExtensions { get; set; }
 
     public Dictionary<string, QualifiedType> KnownFileNames { get; set; }

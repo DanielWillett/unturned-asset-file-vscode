@@ -74,7 +74,7 @@ public class ParserTest_ENPCLogicType
         test.AssertHasDiagnostic(new DatDiagnosticMessage
         {
             Range = text.Length == 0 ? propertyNode.Range : propertyNode.GetValueRange(),
-            Diagnostic = DatDiagnostics.UNT2004
+            Diagnostic = text.Length == 0 ? DatDiagnostics.UNT2004 : DatDiagnostics.UNT1014
         });
     }
 }

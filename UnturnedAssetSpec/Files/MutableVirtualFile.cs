@@ -16,11 +16,7 @@ public class MutableVirtualFile : IMutableWorkspaceFile, IMutableWorkspaceFileUp
     public string File => _parent.File;
     public ISourceFile SourceFile => _parent.SourceFile;
     public IBundleProxy Bundle => _parent.Bundle;
-#if NET9_0_OR_GREATER
-    public System.Threading.Lock SyncRoot => _parent.SyncRoot;
-#else
-    public object SyncRoot => _parent.SyncRoot;
-#endif
+    public TfmLock SyncRoot => _parent.SyncRoot;
     public FileRange FullRange => _parent.FullRange;
 
     public MutableVirtualFile(IMutableWorkspaceFile parent, IFileUpdateListener listener)

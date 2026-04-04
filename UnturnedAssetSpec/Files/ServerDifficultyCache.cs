@@ -1,5 +1,4 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -25,6 +24,46 @@ public readonly struct ServerDifficultyCache
     public static ServerDifficultyCache Create()
     {
         return new ServerDifficultyCache(new ConcurrentDictionary<string, ServerDifficulty>(OSPathHelper.PathComparer));
+    }
+
+    /// <summary>
+    /// Checks whether or not the given file's name is a valid config file. Expects a file name only, not a full path.
+    /// </summary>
+    public static bool IsValidConfigFileName(ReadOnlySpan<char> fileName, out ServerDifficulty? diff)
+    {
+        if (fileName.Length < 10 || !fileName.StartsWith("Config", OSPathHelper.PathComparison) || !fileName.EndsWith(".txt", OSPathHelper.PathComparison))
+        {
+            diff = null;
+            return false;
+        }
+
+        ReadOnlySpan<char> difficulty = fileName.Slice(5, fileName.Length - 10);
+        if (difficulty.IsEmpty)
+        {
+            diff = null;
+            return true;
+        }
+
+        if (difficulty.Equals("EasyDifficulty", OSPathHelper.PathComparison))
+        {
+            diff = ServerDifficulty.Easy;
+            return true;
+        }
+
+        if (difficulty.Equals("NormalDifficulty", OSPathHelper.PathComparison))
+        {
+            diff = ServerDifficulty.Normal;
+            return true;
+        }
+
+        if (difficulty.Equals("HardDifficulty", OSPathHelper.PathComparison))
+        {
+            diff = ServerDifficulty.Hard;
+            return true;
+        }
+
+        diff = null;
+        return false;
     }
 
     public bool RemoveCachedFile(string oldFilePath)
@@ -76,23 +115,20 @@ public readonly struct ServerDifficultyCache
 
     public bool TryGetDifficulty(string filePath, out ServerDifficulty difficulty)
     {
-        if (filePath.EndsWith("Config_EasyDifficulty.txt", OSPathHelper.PathComparison))
+        ReadOnlySpan<char> fileName = OSPathHelper.GetFileName(filePath);
+        if (!IsValidConfigFileName(fileName, out ServerDifficulty? d))
         {
             difficulty = ServerDifficulty.Easy;
+            return false;
+        }
+
+        if (d.HasValue)
+        {
+            difficulty = d.Value;
             return true;
         }
 
-        if (filePath.EndsWith("Config_NormalDifficulty.txt", OSPathHelper.PathComparison))
-        {
-            difficulty = ServerDifficulty.Normal;
-            return true;
-        }
-
-        if (filePath.EndsWith("Config_HardDifficulty.txt", OSPathHelper.PathComparison))
-        {
-            difficulty = ServerDifficulty.Hard;
-            return true;
-        }
+        // read difficulty from Commands.dat
 
         // note: small issue here...
         // The check from Commands.dat for the Mode command uses the localization values

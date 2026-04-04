@@ -261,7 +261,7 @@ public static class OSPathHelper
     }
 
     /// <summary>
-    /// Removes the trailing extension and period.
+    /// Removes the trailing file/directory name.
     /// <para>
     /// Examples:<br/>
     /// <c>"Folder\File.txt"</c> -> <c>"Folder"</c><br/>
