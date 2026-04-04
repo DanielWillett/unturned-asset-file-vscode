@@ -37,6 +37,15 @@
             "Variable": "ambientAudio"
         },
         {
+            "Key": "Ambient_Audio_Takes_Priority_Over_Ambiance_Volumes",
+            "Type": "Boolean",
+            "DefaultValue": null,
+            "Description": "Whether or not @Ambient_Audio_Clip causes per-ambiance-volume audio to fade out.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/weather-asset.html#properties-reference",
+            "Variable": "IsAudioHigherPriorityThanAmbianceVolumes",
+            "Version": "3.26.2.0"
+        },
+        {
             "Key": "Component_Type",
             "Type":
             {
@@ -138,6 +147,15 @@
                     "Value": true
                 }
             ]
+        },
+        {
+            "Key": "Fish_Bite_Interval_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 0.0,
+            "Description": "Multiplier for the amount of time it takes for a fish to take the bait.",
+            "Variable": "FishBiteIntervalMultiplier",
+            "Version": "3.26.2.0"
         }
     ]
 }

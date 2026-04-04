@@ -2157,6 +2157,11 @@
                 {
                     "$ref": "#/$defs/BooleanValueAllowConditionals",
                     "description": "If this property is experimental and may change in the future."
+                },
+                "ConfigWarnIfTrue":
+                {
+                    "type": [ "boolean", "null" ],
+                    "description": "For config data, whether or not the property is decorated with the [ConfigWarnIfTrue] attribute, meaning a value of true will show a warning in the server menu."
                 }
             },
             "required": [ "Key", "Type" ]
@@ -2499,6 +2504,11 @@
                 "InclusiveWith":
                 {
                     "$ref": "#/$defs/InclusionConditions"
+                },
+                "Version":
+                {
+                    "$ref": "#/$defs/Version",
+                    "description": "Unturned version when this animation was added."
                 },
                 "TemplateGroups":
                 {

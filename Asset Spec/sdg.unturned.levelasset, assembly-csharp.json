@@ -289,6 +289,33 @@
             "Description": "Blueprints can test for these tags as an alternative to Map name check.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
             "Version": "3.25.10.0"
+        },
+        {
+            "Key": "Supports_Fishing_Volumes",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Variable": "SupportsFishingVolumes",
+            "Description": "Whether or not this level has assigned fishing spawn tables to water volumes (or set the default table).",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
+            "Version": "3.26.2.0"
+        },
+        {
+            "Key": "Default_Fish_Spawn_Table",
+            "Type":
+            {
+                "Type": "AssetReference",
+                "AssetType": "SDG.Unturned.SpawnAsset, Assembly-CSharp"
+            },
+            "InclusiveWith":
+            {
+                "Key": "Supports_Fishing_Volumes",
+                "Value": true
+            },
+            "DefaultValue": null,
+            "Variable": "SupportsFishingVolumes",
+            "Description": "A spawn table for fishing rods using per-water-volume spawn tables to fall back on. If a water volume doesn't define a spawn table, this one will be used.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/level-asset.html#level-assets",
+            "Version": "3.26.2.0"
         }
     ],
     "Types":

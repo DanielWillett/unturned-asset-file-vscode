@@ -39,6 +39,15 @@
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gear-asset.html#hair-override-string"
         },
         {
+            "Key": "Hair_Override_NonGoldColor",
+            "Type": "Color32",
+            "DefaultValue": null,
+            "Description": "For items using @Hair_Override, the hair material color will default to this for players without the Gold Upgrade. Since the Gold Upgrade is required for full RGB control, the default hair colors may look boring for items that cover the hair but aren't hair in of themselves. Also used as the color in the cosmetic preview.",
+            "Variable": "hairOverrideNonGoldColor",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gear-asset.html#hair-override-nongoldcolor-color",
+            "Version": "3.26.2.0"
+        },
+        {
             "Key": "Beard_Override",
             "Type": "String",
             "DefaultValue": null,
@@ -46,6 +55,15 @@
             "Variable": "BeardOverride",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gear-asset.html#beard-override-string",
             "Version": "3.25.10.0"
+        },
+        {
+            "Key": "Beard_Override_NonGoldColor",
+            "Type": "Color32",
+            "DefaultValue": null,
+            "Description": "For items using @Beard_Override, the beard material color will default to this for players without the Gold Upgrade. Since the Gold Upgrade is required for full RGB control, the default beard colors may look boring for items that cover the beard but aren't beards in of themselves. Also used as the color in the cosmetic preview.",
+            "Variable": "beardOverrideNonGoldColor",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/gear-asset.html#beard-override-nongoldcolor-color",
+            "Version": "3.26.2.0"
         }
     ]
 }

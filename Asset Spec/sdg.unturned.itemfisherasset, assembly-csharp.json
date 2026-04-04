@@ -50,6 +50,124 @@
             "Description": "Rewards applied when catching a fish.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
             "Variable": "rewardsList"
+        },
+        {
+            "Key": "Fish_Bite_Interval_Multiplier",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 0.0,
+            "Description": "Multiplier for interval before a fish takes the bait.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "FishBiteIntervalMultiplier",
+            "Version": "3.26.2.0"
+        },
+        {
+            "Key": "Fishing_Reward_Mode",
+            "Type": "SDG.Unturned.EFishingRewardMode, Assembly-CSharp",
+            "DefaultValue": "Rod",
+            "Description": "Where item rewards are drawn from. Defaults to 'Rod' for backwards-compatability but should usually be changed to 'WaterVolumes'.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "FishingRewardMode",
+            "Version": "3.26.2.0"
+        },
+        {
+            "Key": "CatchChallenge_Enabled",
+            "Type": "Boolean",
+            "DefaultValue": false,
+            "Description": "Whether or not the player must complete a challenge when fish takes the bait before catching. Defaults to false for backwards-compatability but should usually be changed to true.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "EnableCatchChallenge",
+            "Version": "3.26.2.0"
+        },
+        {
+            "Key": "CatchChallenge_CursorSize",
+            "Type": "Float32",
+            "DefaultValue": 0.2,
+            "MinimumExclusive": 0.0,
+            "Description": "Percentage (0-1) of the fishing window taken up by the cursor.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "CatchChallengeCursorSize",
+            "Version": "3.26.2.0"
+        },
+        {
+            "Key": "CatchChallenge_Gravity",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "MinimumExclusive": 0.0,
+            "Description": "Downward acceleration while input is not held.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "CatchChallengeGravity",
+            "Version": "3.26.2.0"
+        },
+        {
+            "Key": "CatchChallenge_Acceleration",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "MinimumExclusive": 0.0,
+            "Description": "Upward acceleration while input is held.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "CatchChallengeAcceleration",
+            "Version": "3.26.2.0"
+        },
+        {
+            "Key": "CatchChallenge_UpperRestitution",
+            "Type": "Float32",
+            "DefaultValue": 0.5,
+            "Minimum": 0.0,
+            "Description": "How much velocity to preserve when bouncing off the top.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "CatchChallengeUpperRestitution",
+            "Version": "3.26.2.0"
+        },
+        {
+            "Key": "CatchChallenge_LowerRestitution",
+            "Type": "Float32",
+            "DefaultValue": 0.5,
+            "Minimum": 0.0,
+            "Description": "How much velocity to preserve when bouncing off the bottom.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "CatchChallengeLowerRestitution",
+            "Version": "3.26.2.0"
+        },
+        {
+            "Key": "CatchChallenge_CaptureSpeed",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "MinimumExclusive": 0.0,
+            "Description": "Multiplier for how quickly item is caught while within cursor.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "CatchChallengeCaptureSpeedMultiplier",
+            "Version": "3.26.2.0"
+        },
+        {
+            "Key": "CatchChallenge_EscapeSpeed",
+            "Type": "Float32",
+            "DefaultValue": 1.0,
+            "Minimum": 0.0,
+            "Description": "Multiplier for how quickly the player loses while item is outside the cursor.",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Variable": "CatchChallengeEscapeSpeedMultiplier",
+            "Version": "3.26.2.0"
+        }
+    ],
+    "Types":
+    [
+        {
+            "Type": "SDG.Unturned.EFishingRewardMode, Assembly-CSharp",
+            "DisplayName": "Fishing Reward Mode",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fisher-asset.html#fisher-asset-properties",
+            "Version": "3.26.2.0",
+            "Values":
+            [
+                {
+                    "Value": "Rod",
+                    "Description": "Fishing rod itself defines rewards. Ignore per-volume rewards."
+                },
+                {
+                    "Value": "WaterVolumes",
+                    "Description": "Use per-volume (or per-level if volume unspecified) rewards. If level doesn't support volume rewards, fallback to 'Rod' rewards."
+                }
+            ]
         }
     ],
     "BundleAssets":

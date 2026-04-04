@@ -885,6 +885,18 @@
             "Variable": "ShouldDeleteAtZeroAmount",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#delete-empty-flag",
             "Description": "When used on a magazine, deletes the magazine when it runs out of ammo."
+        },
+        {
+            "Key": "Fishing_Catchable",
+            "Type": "SDG.Unturned.FishingCatchableProperties, Assembly-CSharp",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/introduction.html#fishing-catchable-fishing-catchable-properties",
+            "DefaultValue":
+            {
+                "$udat-type": "SDG.Unturned.FishingCatchableProperties, Assembly-CSharp"
+            },
+            "Description": "Overrides settings used when this item is caught by a fishing rod.",
+            "Variable": "FishingCatchable",
+            "Version": "3.26.2.0"
         }
     ],
     "Localization":
@@ -916,7 +928,6 @@
         {
             "DisplayName": "Blueprint Type",
             "Type": "SDG.Unturned.EBlueprintType, Assembly-CSharp",
-            "Description": "Determines which tab the crafting recipe appears under in the inventory.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/blueprints.html#doc-item-asset-blueprints-eblueprinttype-enumeration",
             "Values":
             [
@@ -2934,6 +2945,166 @@
                     "NumericValue": 3
                 }
             ]
+        },
+        {
+            "Type": "SDG.Unturned.FishingCatchableProperties, Assembly-CSharp",
+            "DisplayName": "Fishing Catchable Properties",
+            "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html",
+            "Version": "3.26.2.0",
+            "Properties":
+            [
+                {
+                    "Key": "Min_Relocate_Interval",
+                    "Type": "Float32",
+                    "DefaultValue": 1.5,
+                    "Description": "Minimum seconds before target position changes.",
+                    "Variable": "minChangeTargetTicks",
+                    "Maximum": "@Max_Relocate_Interval",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "MinimumExclusive": 0.0
+                },
+                {
+                    "Key": "Max_Relocate_Interval",
+                    "Type": "Float32",
+                    "DefaultValue": 2.0,
+                    "Description": "Maximum seconds before target position changes.",
+                    "Variable": "maxChangeTargetTicks",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "Minimum": "@Min_Relocate_Interval"
+                },
+                {
+                    "Key": "Max_Upward_Acceleration",
+                    "Type": "Float32",
+                    "DefaultValue": 1.5,
+                    "Description": "Upward acceleration cannot increase beyond this limit.",
+                    "Variable": "maxUpwardAcceleration",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "MinimumExclusive": 0.0
+                },
+                {
+                    "Key": "Max_Downward_Acceleration",
+                    "Type": "Float32",
+                    "DefaultValue": 1.2,
+                    "Description": "Downward acceleration cannot increase beyond this limit.",
+                    "Variable": "maxDownwardAcceleration",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "MinimumExclusive": 0.0
+                },
+                {
+                    "Key": "Max_Upward_Speed",
+                    "Type": "Float32",
+                    "DefaultValue": 0.6,
+                    "Description": "Upward speed cannot increase beyond this limit.",
+                    "Variable": "maxUpwardSpeed",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "MinimumExclusive": 0.0
+                },
+                {
+                    "Key": "Max_Downward_Speed",
+                    "Type": "Float32",
+                    "DefaultValue": 0.45,
+                    "Description": "Downward speed cannot increase beyond this limit.",
+                    "Variable": "maxDownwardSpeed",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "MinimumExclusive": 0.0
+                },
+                {
+                    "Key": "Upper_Restitution",
+                    "Type": "Float32",
+                    "DefaultValue": 0.6,
+                    "Description": "Percentage (0-1) of velocity to preserve when bouncing off the top.",
+                    "Variable": "upperRestitution",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0
+                },
+                {
+                    "Key": "Lower_Restitution",
+                    "Type": "Float32",
+                    "DefaultValue": 0.4,
+                    "Description": "Percentage (0-1) of velocity to preserve when bouncing off the bottom.",
+                    "Variable": "lowerRestitution",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "Minimum": 0.0,
+                    "Maximum": 1.0
+                },
+                {
+                    "Key": "Min_Target_Delta",
+                    "Type": "Float32",
+                    "DefaultValue": 0.3,
+                    "Description": "Minimum distance (percentage 0-1) away from the fish's current position of the next location it will move to.",
+                    "Variable": "minTargetDelta",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "Minimum": 0.0,
+                    "Maximum": "@Max_Target_Delta"
+                },
+                {
+                    "Key": "Max_Target_Delta",
+                    "Type": "Float32",
+                    "DefaultValue": 0.4,
+                    "Description": "Maximum distance (percentage 0-1) away from the fish's current position of the next location it will move to.",
+                    "Variable": "maxTargetDelta",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "Minimum": "@Min_Target_Delta",
+                    "Maximum": 1.0
+                },
+                {
+                    "Key": "Min_Target_Position",
+                    "Type": "Float32",
+                    "DefaultValue": 0.1,
+                    "Description": "Minimum position where the fish can reside within the window, as a percentage (0-1).",
+                    "Variable": "minTargetPosition",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "Minimum": 0.0,
+                    "Maximum": "@Max_Target_Position"
+                },
+                {
+                    "Key": "Max_Target_Position",
+                    "Type": "Float32",
+                    "DefaultValue": 0.9,
+                    "Description": "Maximum position where the fish can reside within the window, as a percentage (0-1).",
+                    "Variable": "maxTargetPosition",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "Minimum": "@Min_Target_Position",
+                    "Maximum": 1.0
+                },
+                {
+                    "Key": "Capture_Duration",
+                    "Type": "Float32",
+                    "DefaultValue": 2.0,
+                    "Description": "Total time in seconds during which the player must keep the item within the cursor before it's caught.",
+                    "Variable": "captureTicks",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "Minimum": 0.0
+                },
+                {
+                    "Key": "Escape_Duration",
+                    "Type": "Float32",
+                    "DefaultValue": 2.0,
+                    "Description": "Total time in seconds it takes the fish to escape if not within the cursor.",
+                    "Variable": "escapeTicks",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "MinimumExclusive": 0.0
+                },
+                {
+                    "Key": "Spring_Stiffness",
+                    "Type": "Float32",
+                    "DefaultValue": 16.0,
+                    "Description": "Multiplier for how quickly the fish approaches its next target location.",
+                    "Variable": "springStiffness",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "MinimumExclusive": 0.0
+                },
+                {
+                    "Key": "Spring_Damping",
+                    "Type": "Float32",
+                    "DefaultValue": 4.0,
+                    "Description": "Multiplier for how quickly the fish approaches its next target location.",
+                    "Variable": "springDamping",
+                    "Docs": "https://docs.smartlydressedgames.com/en/stable/items/fishing-catchable-properties.html#fishing-catchable-properties",
+                    "MinimumExclusive": 0.0
+                }
+            ]
         }
     ],
     "BundleAssets":
@@ -3023,6 +3194,40 @@
                         {
                             "Key": "$prop$::Useable",
                             "Value": "SDG.Unturned.UseableFisher, Assembly-CSharp"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Catch_Loop",
+                    "Version": "3.26.2.0",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "$prop$::Useable",
+                            "Value": "SDG.Unturned.UseableFisher, Assembly-CSharp",
+                            "Condition":
+                            {
+                                "Variable": "$prop$::SDG.Unturned.UseableFisher, Assembly-CSharp::CatchChallenge_Enabled",
+                                "Operation": "eq",
+                                "Comparand": true
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Name": "Catch_Failure",
+                    "Version": "3.26.2.0",
+                    "InclusiveWith":
+                    [
+                        {
+                            "Key": "$prop$::Useable",
+                            "Value": "SDG.Unturned.UseableFisher, Assembly-CSharp",
+                            "Condition":
+                            {
+                                "Variable": "$prop$::SDG.Unturned.UseableFisher, Assembly-CSharp::CatchChallenge_Enabled",
+                                "Operation": "eq",
+                                "Comparand": true
+                            }
                         }
                     ]
                 },

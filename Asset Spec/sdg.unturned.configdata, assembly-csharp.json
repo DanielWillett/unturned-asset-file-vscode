@@ -2679,6 +2679,14 @@
                     "DefaultValue": 0.5
                 },
                 {
+                    "Key": "Skill_Cost_Multiplier",
+                    "Type": "Float32",
+                    "Minimum": 0,
+                    "Description": "Scales XP cost to purchase/upgrade skills.",
+                    "DefaultValue": 1.0,
+                    "Version": "3.26.2.0"
+                },
+                {
                     "Key": "Lose_Items_PvP",
                     "Type": "Float32",
                     "Minimum": 0,
@@ -3257,7 +3265,7 @@
                     }
                 },
                 {
-                    "Key": "Group_Map",
+                    "Key": "Group_HUD",
                     "Type": "Boolean",
                     "Description": "Should group member names be visible through walls?",
                     "DefaultValue": true
@@ -3321,13 +3329,37 @@
                     "Key": "Bypass_Buildable_Mobility",
                     "Type": "Boolean",
                     "Description": "Are sentry guns and beds allowed on vehicles?",
+                    "DefaultValue":
+                    {
+                        "Variable": "#This.IsSingleplayer",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
+                },
+                {
+                    "Key": "Bypass_No_Building_Zones",
+                    "Type": "Boolean",
+                    "Description": "Whether or not buildables can be placed in \"no building\" zones.",
+                    "Version": "3.26.2.0",
                     "DefaultValue": false
+                },
+                {
+                    "Key": "Bypass_Building_In_Safezones",
+                    "Type": "Boolean",
+                    "Description": "Whether or not buildables can be placed in \"no building\" zones.",
+                    "Version": "3.26.2.0",
+                    "DefaultValue":
+                    {
+                        "Variable": "#This.IsSingleplayer",
+                        "Operation": "eq",
+                        "Comparand": true
+                    }
                 },
                 {
                     "Key": "Allow_Holidays",
                     "Type": "Boolean",
                     "Description": "Should holiday (Halloween and Christmas) content like NPC outfits and decorations be loaded?",
-                    "DefaultValue": false
+                    "DefaultValue": true
                 },
                 {
                     "Key": "Allow_Freeform_Buildables",
@@ -3363,13 +3395,29 @@
                     "Key": "Disable_Motion_Sickness_Options",
                     "Type": "Boolean",
                     "Description": "If true, client-side options like damage flinch, explosion camera shake, viewmodel bob are ignored.",
-                    "DefaultValue": false
+                    "DefaultValue": false,
+                    "ConfigWarnIfTrue": true
+                },
+                {
+                    "Key": "Disable_Foliage_Off",
+                    "Type": "Boolean",
+                    "Description": "If true, minimum foliage density of \"Low\" is enforced.",
+                    "Version": "3.26.2.0",
+                    "DefaultValue": false,
+                    "ConfigWarnIfTrue": true
                 },
                 {
                     "Key": "Use_2D_Scope_Overlay",
                     "Type": "Boolean",
                     "Description": "If true, hide viewmodel while aiming a dual-render scope and show a 2D overlay instead. Useful for backwards compatibility with modded scopes that have a small enough dual-render surface to zoom-*out* when aiming in.",
                     "DefaultValue": false
+                },
+                {
+                    "Key": "Enable_Fishing_Catch_Challenge",
+                    "Type": "Boolean",
+                    "Description": "If true, a challenge must be completed before catching a fish. Only applicable for supported maps and fishing rods. (I.e., not older custom maps.)",
+                    "Version": "3.26.2.0",
+                    "DefaultValue": true
                 },
                 {
                     "Key": "Timer_Exit",
@@ -3563,6 +3611,59 @@
                             "Value": 1.0
                         }
                     ]
+                },
+                {
+                    "Key": "Min_Fishing_Bite_Interval",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Maximum": "@Max_Fishing_Bite_Interval",
+                    "Description": "Shortest amount of time before a fish takes the bait.",
+                    "Version": "3.26.2.0",
+                    "DefaultValue":
+                    [
+                        {
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
+                            "Value": 35.0
+                        },
+                        {
+                            "Value": 48.0
+                        }
+                    ]
+                },
+                {
+                    "Key": "Max_Fishing_Bite_Interval",
+                    "Type": "Float32",
+                    "Minimum": "@Min_Fishing_Bite_Interval",
+                    "Description": "Longest amount of time before a fish takes the bait.",
+                    "Version": "3.26.2.0",
+                    "DefaultValue":
+                    [
+                        {
+                            "Case":
+                            {
+                                "Variable": "#This.Difficulty",
+                                "Operation": "eq",
+                                "Comparand": "EASY"
+                            },
+                            "Value": 48.0
+                        },
+                        {
+                            "Value": 60.0
+                        }
+                    ]
+                },
+                {
+                    "Key": "Fishing_MaxStrength_Bite_Interval_Multiplier",
+                    "Type": "Float32",
+                    "Minimum": 0.0,
+                    "Description": "Multiplier for fishing bite interval when casting strength bar is full.",
+                    "Version": "3.26.2.0",
+                    "DefaultValue": 0.3
                 }
             ]
         }
