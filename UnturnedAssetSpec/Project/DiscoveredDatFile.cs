@@ -74,11 +74,6 @@ public partial class DiscoveredDatFile : IEquatable<DiscoveredDatFile>, IDisposa
     public DiscoveredBundle? LegacyBundle { get; internal set; }
 
     /// <summary>
-    /// The object representing this asset's folder in it's bundle.
-    /// </summary>
-    public IBundleProxy Bundle => this;
-
-    /// <summary>
     /// Note: blade ids are currently bytes but i feel this will be changed at some point.
     /// </summary>
     public OneOrMore<byte> BladeIds { get; private set; }
@@ -110,7 +105,7 @@ public partial class DiscoveredDatFile : IEquatable<DiscoveredDatFile>, IDisposa
         string fileName,
         ReadOnlySpan<char> text,
         IAssetSpecDatabase database,
-        ICollection<DatDiagnosticMessage>? diagMessages,
+        IDiagnosticSink? diagMessages,
         Action<string, string>? log)
     {
         FilePath = fileName;
@@ -134,20 +129,20 @@ public partial class DiscoveredDatFile : IEquatable<DiscoveredDatFile>, IDisposa
         int dictionaryDepth = 0, listDepth = 0;
         bool isInMetadata = false, isExplicitlyInAsset = false, ignoreExplicitAsset = false, hasAssets = false;
         bool hasMetadata = false, ignoreMetadata = false;
-        ReadOnlySpan<char> metaKey = "Metadata".AsSpan();
-        ReadOnlySpan<char> assetKey = "Asset".AsSpan();
-        ReadOnlySpan<char> guidKey = "GUID".AsSpan();
-        ReadOnlySpan<char> typeKey = "Type".AsSpan();
-        ReadOnlySpan<char> idKey = "ID".AsSpan();
-        ReadOnlySpan<char> assetCategoryKey = "AssetCategory".AsSpan();
+        ReadOnlySpan<char> metaKey = "Metadata";
+        ReadOnlySpan<char> assetKey = "Asset";
+        ReadOnlySpan<char> guidKey = "GUID";
+        ReadOnlySpan<char> typeKey = "Type";
+        ReadOnlySpan<char> idKey = "ID";
+        ReadOnlySpan<char> assetCategoryKey = "AssetCategory";
 
-        ReadOnlySpan<char> masterBundleOverrideKey = "Master_Bundle_Override".AsSpan();
-        ReadOnlySpan<char> excludedFromMasterBundleKey = "Exclude_From_Master_Bundle".AsSpan();
-        ReadOnlySpan<char> bundleOverridePathKey = "Bundle_Override_Path".AsSpan();
-        ReadOnlySpan<char> bundlePathIncludeFilenameKey = "Bundle_Path_Include_Filename".AsSpan();
-        ReadOnlySpan<char> assetBundleVersionKey = "Asset_Bundle_Version".AsSpan();
-        ReadOnlySpan<char> enableShaderConsolidationKey = "Enable_Shader_Consolidation".AsSpan();
-        ReadOnlySpan<char> disableShaderConsolidationKey = "Disable_Shader_Consolidation".AsSpan();
+        ReadOnlySpan<char> masterBundleOverrideKey = "Master_Bundle_Override";
+        ReadOnlySpan<char> excludedFromMasterBundleKey = "Exclude_From_Master_Bundle";
+        ReadOnlySpan<char> bundleOverridePathKey = "Bundle_Override_Path";
+        ReadOnlySpan<char> bundlePathIncludeFilenameKey = "Bundle_Path_Include_Filename";
+        ReadOnlySpan<char> assetBundleVersionKey = "Asset_Bundle_Version";
+        ReadOnlySpan<char> enableShaderConsolidationKey = "Enable_Shader_Consolidation";
+        ReadOnlySpan<char> disableShaderConsolidationKey = "Disable_Shader_Consolidation";
 
         NextValueType nextValueType = NextValueType.None;
 
@@ -1581,19 +1576,22 @@ public partial class DiscoveredDatFile : IEquatable<DiscoveredDatFile>, IDisposa
     /// </summary>
     public IBundleProxy GetBundleProxy(IParsingServices services)
     {
-        if (!services.Database.FileTypes.TryGetValue(Type, out DatFileType fileType)
-            || fileType is not DatAssetFileType { HasBundleAssets: true } assetFileType)
+        if (!services.Database.FileTypes.TryGetValue(Type, out DatFileType? fileType)
+            || fileType is not DatAssetFileType { HasBundleAssets: true })
         {
             return NullBundleProxy.Instance;
         }
 
-        EnsureBundleInfoCreated(services, assetFileType);
+        if ((_bundleFlags & 4) == 0)
+        {
+            CreateBundleInfo(services);
+        }
         return this;
     }
 
 
     /// <inheritdoc />
-    public bool Equals(DiscoveredDatFile other) => other != null && string.Equals(other.FilePath, FilePath, StringComparison.Ordinal);
+    public bool Equals(DiscoveredDatFile? other) => other != null && string.Equals(other.FilePath, FilePath, StringComparison.Ordinal);
 
     /// <inheritdoc />
     public void Dispose()

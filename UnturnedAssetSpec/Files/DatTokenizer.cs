@@ -1,14 +1,12 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
-using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using System;
-using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
 public ref struct DatTokenizer
 {
     private readonly ReadOnlySpan<char> _file;
-    private readonly ICollection<DatDiagnosticMessage>? _diagnostics;
+    private readonly IDiagnosticSink? _diagnostics;
 
     private char _currentChar;
     private bool _hasChar;
@@ -22,11 +20,8 @@ public ref struct DatTokenizer
     /// </summary>
     public DatToken Token;
 
-    public DatTokenizer(ReadOnlySpan<char> data, ICollection<DatDiagnosticMessage>? diagnostics = null)
+    public DatTokenizer(ReadOnlySpan<char> data, IDiagnosticSink? diagnostics = null)
     {
-        if (diagnostics is { IsReadOnly: true })
-            throw new ArgumentException("Diagnostics collection is readonly.", nameof(diagnostics));
-
         _file = data;
         _diagnostics = diagnostics;
         _position = -1;
@@ -40,14 +35,13 @@ public ref struct DatTokenizer
     public void Reset()
     {
         _position = -1;
-        _currentChar = default;
+        _currentChar = '\0';
         _hasChar = false;
         Token = default;
         Token.StartLine = 1;
         Token.StartColumn = 1;
         _lineNumber = 1;
         _columnNumber = 0;
-        _diagnostics?.Clear();
     }
 
     public bool MoveNext()
@@ -101,7 +95,7 @@ public ref struct DatTokenizer
                                 Diagnostic = DatDiagnostics.UNT1001,
                                 Message = DiagnosticResources.UNT1001
                             };
-                            _diagnostics.Add(error);
+                            _diagnostics.AcceptDiagnostic(error);
                         }
                         goto case DatTokenType.Value;
                     }
@@ -139,7 +133,7 @@ public ref struct DatTokenizer
                         return true;
                     }
 
-                    _diagnostics?.Add(new DatDiagnosticMessage
+                    _diagnostics?.AcceptDiagnostic(new DatDiagnosticMessage
                     {
                         Range = new FileRange(_lineNumber + 1, _columnNumber + 1, _lineNumber + 1, _columnNumber + 1),
                         Diagnostic = DatDiagnostics.UNT2001,
@@ -206,7 +200,7 @@ public ref struct DatTokenizer
                         return true;
                     }
 
-                    _diagnostics?.Add(new DatDiagnosticMessage
+                    _diagnostics?.AcceptDiagnostic(new DatDiagnosticMessage
                     {
                         Range = new FileRange(_lineNumber + 1, _columnNumber + 1, _lineNumber + 1, _columnNumber + 1),
                         Diagnostic = DatDiagnostics.UNT2002,
@@ -303,7 +297,7 @@ public ref struct DatTokenizer
         {
             _position = _file.Length;
             _hasChar = false;
-            _currentChar = default;
+            _currentChar = '\0';
             return;
         }
 
@@ -397,7 +391,7 @@ public ref struct DatTokenizer
                     _currentChar = '\t';
                 else if (_currentChar != '\\' && _currentChar != '"' && _diagnostics != null)
                 {
-                    _diagnostics.Add(new DatDiagnosticMessage
+                    _diagnostics.AcceptDiagnostic(new DatDiagnosticMessage
                     {
                         Range = new FileRange(startLine + 1, _columnNumber, startLine + 1, _columnNumber - 1),
                         Diagnostic = DatDiagnostics.UNT1004,
@@ -431,7 +425,7 @@ public ref struct DatTokenizer
 
         if (!foundEndQuote && _diagnostics != null)
         {
-            _diagnostics.Add(new DatDiagnosticMessage
+            _diagnostics.AcceptDiagnostic(new DatDiagnosticMessage
             {
                 Range = new FileRange(_lineNumber + 1, startColumn + 1, _lineNumber + 1, startColumn + length),
                 Diagnostic = DatDiagnostics.UNT1002,
@@ -463,7 +457,7 @@ public ref struct DatTokenizer
                     _currentChar = '\t';
                 else if (_currentChar != '\\' && _diagnostics != null)
                 {
-                    _diagnostics.Add(new DatDiagnosticMessage
+                    _diagnostics.AcceptDiagnostic(new DatDiagnosticMessage
                     {
                         Range = new FileRange(startLine + 1, _columnNumber, startLine + 1, _columnNumber - 1),
                         Diagnostic = DatDiagnostics.UNT1004,

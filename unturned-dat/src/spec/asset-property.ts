@@ -16,4 +16,5 @@ export interface AssetProperty
     ordinal: number | undefined;
     children: AssetProperty[] | undefined;
     typeHierarchy: TypeHierarchyElement[] | undefined;
+    bundlePath: string | null | undefined;
 }

@@ -162,6 +162,11 @@ class AssetPropertyViewItem extends TreeItem
         {
             this.tooltip = this.property.markdown ?? this.property.description ?? this.property.key;
 
+            if (this.property.bundlePath)
+            {
+                this.tooltip += "\r\n\\`" + this.property.bundlePath + "`";
+            }
+
             if (this.property.children)
             {
                 this.command = undefined;
@@ -234,6 +239,17 @@ function getName(property: AssetProperty): string
 
 function getValueIcon(property: AssetProperty): ThemeIcon
 {
+    if (property.bundlePath !== null && property.bundlePath !== undefined)
+    {
+        if (property.bundlePath.length == 0)
+        {
+            return new ThemeIcon(!property.children || property.children.length === 0 ? "question" : "list-selection");
+        }
+        else
+        {
+            return new ThemeIcon("build");
+        }
+    }
     if (!property.range)
     {
         return new ThemeIcon("add");

@@ -22320,6 +22320,9 @@ var AssetPropertyViewItem = class _AssetPropertyViewItem extends import_vscode.T
     }
     try {
       this.tooltip = this.property.markdown ?? this.property.description ?? this.property.key;
+      if (this.property.bundlePath) {
+        this.tooltip += "\r\n\\`" + this.property.bundlePath + "`";
+      }
       if (this.property.children) {
         this.command = void 0;
         return;
@@ -22371,6 +22374,13 @@ function getName(property) {
   }
 }
 function getValueIcon(property) {
+  if (property.bundlePath !== null && property.bundlePath !== void 0) {
+    if (property.bundlePath.length == 0) {
+      return new import_vscode.ThemeIcon(!property.children || property.children.length === 0 ? "question" : "list-selection");
+    } else {
+      return new import_vscode.ThemeIcon("build");
+    }
+  }
   if (!property.range) {
     return new import_vscode.ThemeIcon("add");
   } else if (property.typeHierarchy) {

@@ -1,5 +1,4 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -29,7 +28,18 @@ partial class DiscoveredDatFile : IBundleProxy
         get
         {
             AssertBundleProxyCreated();
-            return _bundle;
+            DiscoveredBundle? oldBundle = _bundle;
+            while (oldBundle is { IsDisposed: true })
+            {
+                DiscoveredBundle? replacement = oldBundle.BundleReplacement;
+                DiscoveredBundle? newBundle = Interlocked.CompareExchange(ref _bundle, replacement, oldBundle);
+                if (newBundle != oldBundle)
+                    return newBundle;
+
+                oldBundle = replacement;
+            }
+
+            return oldBundle;
         }
     }
 
@@ -59,6 +69,7 @@ partial class DiscoveredDatFile : IBundleProxy
             return _bundlePath;
         }
     }
+#pragma warning disable CS8774
 
     [MemberNotNull(nameof(_bundlePath))]
     private void AssertBundleProxyCreated()
@@ -67,11 +78,10 @@ partial class DiscoveredDatFile : IBundleProxy
             throw new InvalidOperationException("Use GetBundleProxy to create a bundle broxy for this asset.");
     }
 
-    private void EnsureBundleInfoCreated(IParsingServices services, DatAssetFileType assetFileType)
-    {
-        if ((_bundleFlags & 4) != 0)
-            return;
+#pragma warning restore CS8774
 
+    private void CreateBundleInfo(IParsingServices services)
+    {
         DiscoveredBundle? bundle;
         int assetBundleVersion = AssetBundleVersion;
         if (IsDefaultBundle)
@@ -110,7 +120,7 @@ partial class DiscoveredDatFile : IBundleProxy
                 unity3dPath = OSPathHelper.CombineAndConcat(OSPathHelper.GetDirectoryName(FilePath), AssetName, ".unity3d");
             }
 
-            _bundle = new DiscoveredBundle(true, Path.GetDirectoryName(unity3dPath) ?? string.Empty, FilePath, unity3dPath, assetBundleVersion);
+            _bundle = new DiscoveredBundle(true, Path.GetDirectoryName(unity3dPath) ?? string.Empty, FilePath, unity3dPath, null, assetBundleVersion);
             _ownsBundle = true;
             _bundleFlags = (_bundleFlags & ~(0xFFF << 20)) | ((assetBundleVersion & 0xFFF) << 20) | 4;
             return;

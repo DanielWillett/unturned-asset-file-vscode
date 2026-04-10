@@ -101,6 +101,8 @@ public class InstallationEnvironment : IDisposable
 
     public int FileCount => _fileCount;
 
+    public int MasterBundleCount => _masterBundles.Count;
+
     public string[] SourceDirectories
     {
         get
@@ -266,7 +268,7 @@ public class InstallationEnvironment : IDisposable
         {
             for (DiscoveredDatFile? file = _head; file != null; file = file.Next)
             {
-                if (file.FilePath.Equals(fullName, StringComparison.OrdinalIgnoreCase))
+                if (file.FilePath.Equals(fullName, OSPathHelper.PathComparison))
                     return file;
             }
 
@@ -275,7 +277,7 @@ public class InstallationEnvironment : IDisposable
 
             for (DiscoveredDatFile? file = _head; file != null; file = file.Next)
             {
-                if (string.Equals(file.LocalizationFilePath, fullName, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(file.LocalizationFilePath, fullName, OSPathHelper.PathComparison))
                     return file;
             }
         }
@@ -411,7 +413,7 @@ public class InstallationEnvironment : IDisposable
 
         lock (_fileSync)
         {
-            if (_sourceDirs.Exists(x => x.Path.StartsWith(dir, StringComparison.OrdinalIgnoreCase)))
+            if (_sourceDirs.Exists(x => x.Path.StartsWith(dir, OSPathHelper.PathComparison)))
             {
                 return false;
             }
@@ -449,7 +451,7 @@ public class InstallationEnvironment : IDisposable
         dir = Path.GetFullPath(dir);
         lock (_fileSync)
         {
-            int index = _sourceDirs.FindIndex(x => x.Path.Equals(dir, StringComparison.OrdinalIgnoreCase));
+            int index = _sourceDirs.FindIndex(x => x.Path.Equals(dir, OSPathHelper.PathComparison));
             if (index == -1)
                 return false;
 
@@ -493,11 +495,41 @@ public class InstallationEnvironment : IDisposable
     {
         lock (_fileSync)
         {
+            bool foundMasterBundle = false;
+            for (int i = _masterBundles.Count - 1; i >= 0; i--)
+            {
+                DiscoveredBundle bundle = _masterBundles[i];
+                if (string.Equals(fullName, bundle.ConfigurationFile, OSPathHelper.PathComparison))
+                {
+                    DiscoveredBundle? newBundle = DiscoveredBundle.FromMasterBundleConfig(fullName, log: _logAction);
+                    if (newBundle == null)
+                    {
+                        RemoveMasterBundle(bundle);
+                    }
+                    else
+                    {
+                        ApplyMasterbundleConfigUpdate(newBundle, bundle);
+                    }
+                }
+                else if (bundle.IsReferencingFile(fullName))
+                {
+                    ApplyMasterbundleContentsUpdate(bundle);
+                }
+                else continue;
+
+                foundMasterBundle = true;
+            }
+
+            if (foundMasterBundle)
+            {
+                return;
+            }
+
             bool foundAny = false;
             DiscoveredDatFile? newFile;
             for (DiscoveredDatFile? file = _head; file != null; file = file.Next)
             {
-                if (file.FilePath.Equals(fullName, StringComparison.OrdinalIgnoreCase))
+                if (file.FilePath.Equals(fullName, OSPathHelper.PathComparison))
                 {
                     newFile = ReadFile(fullName);
                     if (newFile == null)
@@ -511,7 +543,7 @@ public class InstallationEnvironment : IDisposable
                     }
                     foundAny = true;
                 }
-                else if (string.Equals(file.LocalizationFilePath, fullName, StringComparison.OrdinalIgnoreCase))
+                else if (string.Equals(file.LocalizationFilePath, fullName, OSPathHelper.PathComparison))
                 {
                     file.UpdateLocalizationFile();
                 }
@@ -538,11 +570,11 @@ public class InstallationEnvironment : IDisposable
                 DiscoveredBundle bundle = _masterBundles[i];
                 if (string.Equals(fullName, bundle.ConfigurationFile, OSPathHelper.PathComparison))
                 {
-                    RemoveMasterBundle(bundle, i);
+                    RemoveMasterBundle(bundle);
                 }
-                else if (string.Equals(fullName, bundle.BundleFile, OSPathHelper.PathComparison))
+                else if (bundle.IsReferencingFile(fullName))
                 {
-                    UpdateMasterBundle(bundle, i);
+                    ApplyMasterbundleContentsUpdate(bundle);
                 }
                 else continue;
 
@@ -591,11 +623,11 @@ public class InstallationEnvironment : IDisposable
             {
                 for (DiscoveredDatFile? file = _head; file != null; file = file.Next)
                 {
-                    if (file.FilePath.Equals(fullName, StringComparison.OrdinalIgnoreCase))
+                    if (file.FilePath.Equals(fullName, OSPathHelper.PathComparison))
                     {
                         RemoveFile(file);
                     }
-                    else if (string.Equals(file.LocalizationFilePath, fullName, StringComparison.OrdinalIgnoreCase))
+                    else if (string.Equals(file.LocalizationFilePath, fullName, OSPathHelper.PathComparison))
                     {
                         file.UpdateLocalizationFile();
                     }
@@ -612,22 +644,12 @@ public class InstallationEnvironment : IDisposable
             if (bundle == null)
                 continue;
 
-            if (string.Equals(bundle.BundleFile, fullName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(bundle.BundleFile, fullName, OSPathHelper.PathComparison))
             {
                 file.LegacyBundle = null;
                 bundle.Dispose();
             }
         }
-    }
-
-    private void RemoveMasterBundle(DiscoveredBundle bundle, int index)
-    {
-        
-    }
-
-    private void UpdateMasterBundle(DiscoveredBundle bundle, int index)
-    {
-        
     }
 
     private void FileRenamed(string oldFullName, string fullName)
@@ -652,7 +674,7 @@ public class InstallationEnvironment : IDisposable
                 foreach (string masterBundleFile in c.MasterbundleConfigs)
                 {
                     string oldPath = masterBundleFile.Replace(fullName, oldFullName);
-                    FileRenamedIntl(oldPath, masterBundleFile);
+                    MasterBundleRenamedIntl(oldPath, masterBundleFile, true, true);
                 }
 
                 foreach (string newFile in c.AssetFiles)
@@ -663,7 +685,23 @@ public class InstallationEnvironment : IDisposable
             }
             else
             {
-                FileRenamedIntl(oldFullName, fullName);
+                if (OSPathHelper.IsFileName(oldFullName, "MasterBundle.dat"))
+                {
+                    MasterBundleRenamedIntl(
+                        oldFullName,
+                        fullName,
+                        true,
+                        OSPathHelper.IsFileName(fullName, "MasterBundle.dat")
+                    );
+                }
+                else if (OSPathHelper.IsFileName(fullName, "MasterBundle.dat"))
+                {
+                    MasterBundleRenamedIntl(oldFullName, fullName, false, true);
+                }
+                else
+                {
+                    FileRenamedIntl(oldFullName, fullName);
+                }
             }
         }
     }
@@ -674,7 +712,7 @@ public class InstallationEnvironment : IDisposable
         DiscoveredDatFile? newFile;
         for (DiscoveredDatFile? file = _head; file != null; file = file.Next)
         {
-            if (file.FilePath.Equals(oldFullName, StringComparison.OrdinalIgnoreCase))
+            if (file.FilePath.Equals(oldFullName, OSPathHelper.PathComparison))
             {
                 if (!ShouldLoadAssetFile(fullName))
                 {
@@ -695,7 +733,7 @@ public class InstallationEnvironment : IDisposable
                 }
                 foundAny = true;
             }
-            else if (string.Equals(file.LocalizationFilePath, oldFullName, StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(file.LocalizationFilePath, oldFullName, OSPathHelper.PathComparison))
             {
                 file.UpdateLocalizationFile();
             }
@@ -711,6 +749,219 @@ public class InstallationEnvironment : IDisposable
         }
     }
 
+    private void MasterBundleRenamedIntl(string oldFullName, string fullName, bool wasBundle, bool isBundle)
+    {
+        DiscoveredBundle? masterBundle = null;
+        if (wasBundle)
+        {
+            foreach (DiscoveredBundle bndl in _masterBundles)
+            {
+                if (!string.Equals(bndl.ConfigurationFile, oldFullName, OSPathHelper.PathComparison))
+                    continue;
+
+                masterBundle = bndl;
+                break;
+            }
+
+            if (masterBundle == null)
+            {
+                Logger.LogWarning($"Failed to find previous MasterBundle: {oldFullName} after being renamed to {fullName}.");
+                return;
+            }
+        }
+
+        if (isBundle && wasBundle) // Bundle -> Bundle
+        {
+            DiscoveredBundle? newBundle = DiscoveredBundle.FromMasterBundleConfig(fullName, log: _logAction);
+            if (newBundle == null)
+                RemoveMasterBundle(masterBundle!);
+            else
+                ApplyMasterbundleConfigUpdate(newBundle, masterBundle!);
+        }
+        else if (isBundle) // Asset -> Bundle
+        {
+            bool log = true;
+            for (DiscoveredDatFile? file = _head; file != null; file = file.Next)
+            {
+                if (!string.Equals(file.FilePath, oldFullName, OSPathHelper.PathComparison))
+                {
+                    continue;
+                }
+
+                RemoveFile(file);
+                log = false;
+                break;
+            }
+
+            DiscoveredBundle? newBundle = DiscoveredBundle.FromMasterBundleConfig(fullName, log: _logAction);
+            if (newBundle == null)
+            {
+                if (!log)
+                    Logger.LogTrace($"File removed: {oldFullName}. Changed from MasterBundle -> Asset, but couldn't read bundle config.");
+            }
+            else
+            {
+                AddMasterBundle(newBundle, log);
+                if (!log)
+                    Logger.LogTrace($"File updated (renamed): {oldFullName} -> {fullName}. Changed from Asset -> MasterBundle.");
+            }
+        }
+        else // Bundle -> Asset
+        {
+            RemoveMasterBundle(masterBundle!);
+            DiscoveredDatFile? newFile = ReadFile(fullName);
+            if (newFile != null)
+            {
+                AddFile(newFile, log: false);
+                Logger.LogTrace($"File updated (renamed): {oldFullName} -> {newFile.FilePath}. Changed from MasterBundle -> Asset.");
+            }
+        }
+    }
+
+    private void ApplyMasterbundleContentsUpdate(DiscoveredBundle bundle)
+    {
+        lock (AssetBundleLock)
+        {
+            bundle.UnloadFile();
+        }
+
+        bundle.ApplyBundleFileChanges();
+
+        Logger.LogTrace($"MasterBundle content updated: {bundle.ConfigurationFile}");
+    }
+
+    private void ApplyMasterbundleConfigUpdate(DiscoveredBundle bundle, DiscoveredBundle oldBundle)
+    {
+        lock (AssetBundleLock)
+        {
+            int index = oldBundle.Index;
+            oldBundle.Index = -1;
+            if (index < 0 || index >= _masterBundles.Count || _masterBundles[index] != oldBundle)
+            {
+                index = _masterBundles.IndexOf(oldBundle);
+            }
+
+            string oldName = Path.GetFileName(oldBundle.BundleFile);
+            string newName = Path.GetFileName(bundle.BundleFile);
+            if (_masterBundleIndex.TryGetValue(oldName, out OneOrMore<DiscoveredBundle> bundles))
+            {
+                bundles = bundles.Remove(bundle);
+                if (bundles.IsNull)
+                    _masterBundleIndex.Remove(oldName);
+                else
+                    _masterBundleIndex[oldName] = bundles;
+            }
+
+            oldBundle.BundleReplacement = bundle;
+            oldBundle.Dispose();
+
+            if (index == -1)
+            {
+                AddMasterBundle(bundle);
+                return;
+            }
+
+            if (_masterBundleIndex.TryGetValue(newName, out bundles))
+                _masterBundleIndex[newName] = bundles.Add(bundle);
+            else
+                _masterBundleIndex.Add(newName, bundles);
+
+            _masterBundles[index] = bundle;
+        }
+
+        try
+        {
+            OnBundleUpdated?.Invoke(oldBundle, bundle);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error invoking OnBundleUpdated");
+        }
+
+        Logger.LogTrace($"MasterBundle configuration updated: {bundle.ConfigurationFile}");
+    }
+
+    private void RemoveMasterBundle(DiscoveredBundle bundle, bool log = true)
+    {
+        lock (AssetBundleLock)
+        {
+            int index = bundle.Index;
+            bundle.Index = -1;
+            if (index < 0 || index >= _masterBundles.Count || _masterBundles[index] != bundle)
+            {
+                index = _masterBundles.IndexOf(bundle);
+            }
+
+            if (index == -1)
+            {
+                Logger.LogWarning($"Tried to remove MasterBundle that isn't registered: {bundle.ConfigurationFile}");
+                return;
+            }
+
+            if (index == _masterBundles.Count - 1)
+            {
+                _masterBundles.RemoveAt(index);
+            }
+            else
+            {
+                DiscoveredBundle toMove = _masterBundles[^1];
+                toMove.Index = index;
+                _masterBundles[index] = toMove;
+                _masterBundles.RemoveAt(_masterBundles.Count - 1);
+            }
+
+            bundle.Index = -1;
+            string name = Path.GetFileName(bundle.BundleFile);
+
+            if (_masterBundleIndex.TryGetValue(name, out OneOrMore<DiscoveredBundle> bundles))
+            {
+                bundles = bundles.Remove(bundle);
+                if (bundles.IsNull)
+                    _masterBundleIndex.Remove(name);
+                else
+                    _masterBundleIndex[name] = bundles;
+            }
+
+            bundle.Dispose();
+        }
+
+        try
+        {
+            OnBundleRemoved?.Invoke(bundle);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error invoking OnBundleRemoved");
+        }
+
+        if (log)
+            Logger.LogTrace($"MasterBundle removed: {bundle.ConfigurationFile}");
+    }
+
+    private void AddMasterBundle(DiscoveredBundle bundle, bool log = true)
+    {
+        bundle.Index = _masterBundles.Count;
+        _masterBundles.Add(bundle);
+
+        string name = Path.GetFileName(bundle.BundleFile);
+        if (_masterBundleIndex.TryGetValue(name, out OneOrMore<DiscoveredBundle> bundles))
+            _masterBundleIndex[name] = bundles.Add(bundle);
+        else
+            _masterBundleIndex.Add(name, bundle);
+
+        try
+        {
+            OnBundleAdded?.Invoke(bundle);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error invoking OnBundleAdded");
+        }
+
+        if (log)
+            Logger.LogTrace($"MasterBundle added: {bundle.ConfigurationFile}");
+    }
+
     private void ApplyFileUpdate(DiscoveredDatFile file, DiscoveredDatFile oldFile)
     {
         file.Prev = oldFile.Prev;
@@ -724,10 +975,10 @@ public class InstallationEnvironment : IDisposable
         oldFile.IsRemoved = true;
         file.IsRemoved = false;
 
-        OneOrMore<DiscoveredDatFile> index;
-        if (!ReferenceEquals(file, oldFile) || file.Guid != oldFile.Guid)
+        if (!ReferenceEquals(file, oldFile))
         {
-            if (oldFile.Guid != Guid.Empty && _guidIndex.TryGetValue(oldFile.Guid, out index))
+            if (oldFile.Guid != Guid.Empty
+                && _guidIndex.TryGetValue(oldFile.Guid, out OneOrMore<DiscoveredDatFile> index))
             {
                 index = index.Remove(oldFile);
                 if (index.IsNull)
@@ -742,12 +993,12 @@ public class InstallationEnvironment : IDisposable
                 else
                     _guidIndex.Add(file.Guid, file);
             }
-        }
 
-        if (!ReferenceEquals(file, oldFile) || file.Id != oldFile.Id)
-        {
             int oldCategory = oldFile.Category;
-            if (oldFile.Id != 0 && oldCategory > 0 && oldCategory <= _idIndex.Length && _idIndex[oldCategory - 1].TryGetValue(oldFile.Id, out index))
+            if (oldFile.Id != 0
+                && oldCategory > 0
+                && oldCategory <= _idIndex.Length
+                && _idIndex[oldCategory - 1].TryGetValue(oldFile.Id, out index))
             {
                 index = index.Remove(oldFile);
                 if (index.IsNull)
@@ -1070,7 +1321,7 @@ public class InstallationEnvironment : IDisposable
         {
             DiscoveredFilesCollection c;
             c.AssetFiles = new List<string>(_previousCount + 16);
-            c.MasterbundleConfigs = new List<string>(_previousCount + 16);
+            c.MasterbundleConfigs = new List<string>(32);
             UpdateWatch(false);
             try
             {
@@ -1087,6 +1338,74 @@ public class InstallationEnvironment : IDisposable
                     }
                 }
 
+
+                /* Parse MasterBundle.dat files */
+                DiscoveredBundle?[] prevBundles = _masterBundles.ToArray();
+                _masterBundles.Clear();
+
+                _masterBundleIndex.Clear();
+                foreach (string masterBundleConfig in c.MasterbundleConfigs)
+                {
+                    DiscoveredBundle? masterBundle = null;
+                    bool applied = false;
+                    try
+                    {
+                        masterBundle = DiscoveredBundle.FromMasterBundleConfig(
+                            masterBundleConfig,
+                            log: _logAction
+                        );
+                    }
+                    catch (IOException ex)
+                    {
+                        Logger.LogWarning(
+                            ex,
+                            "Unable to read 'MasterBundle.dat' at {0}.",
+                            Path.GetDirectoryName(masterBundleConfig)
+                        );
+                        continue;
+                    }
+                    finally
+                    {
+                        for (int i = 0; i < prevBundles.Length; ++i)
+                        {
+                            DiscoveredBundle? bndl = prevBundles[i];
+                            if (bndl == null || !string.Equals(bndl.ConfigurationFile, masterBundleConfig, OSPathHelper.PathComparison))
+                            {
+                                continue;
+                            }
+
+                            // clean up old bundle at same location
+                            bndl.BundleReplacement = masterBundle; // maybe null its ok
+                            bndl.Dispose();
+                            if (masterBundle != null)
+                            {
+                                ApplyMasterbundleConfigUpdate(masterBundle, bndl);
+                                applied = true;
+                            }
+
+                            prevBundles[i] = null;
+                        }
+                    }
+
+                    if (masterBundle == null)
+                    {
+                        Logger.LogWarning("Unable to create bundle from 'MasterBundle.dat' at {0}.", Path.GetDirectoryName(masterBundleConfig));
+                        continue;
+                    }
+
+                    if (!applied)
+                    {
+                        AddMasterBundle(masterBundle, log: false);
+                    }
+                }
+
+                // clean up removed bundles
+                for (int i = 0; i < prevBundles.Length; ++i)
+                {
+                    prevBundles[i]?.Dispose();
+                }
+
+                /* Parse other asset files */
                 _previousCount = c.AssetFiles.Count;
 
                 DiscoveredDatFile[] files = new DiscoveredDatFile[c.AssetFiles.Count];
@@ -1168,28 +1487,28 @@ public class InstallationEnvironment : IDisposable
 
     private static bool ShouldLoadAssetFile(string filePath)
     {
-        string? dirName = Path.GetDirectoryName(filePath);
-        string fileName = Path.GetFileName(filePath);
+        ReadOnlySpan<char> dirName = OSPathHelper.GetDirectoryName(filePath);
+        ReadOnlySpan<char> fileName = OSPathHelper.GetFileName(filePath);
 
         if (dirName == null)
             return false;
 
-        if (fileName.Equals("Asset.dat", StringComparison.OrdinalIgnoreCase))
+        if (fileName.Equals("Asset.dat", OSPathHelper.PathComparison))
         {
             return true;
         }
 
-        string nameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
-        if (nameWithoutExt.Equals(Path.GetFileName(dirName), StringComparison.OrdinalIgnoreCase))
+        ReadOnlySpan<char> nameWithoutExt = OSPathHelper.GetFileNameWithoutExtension(fileName);
+        if (nameWithoutExt.Equals(OSPathHelper.GetFileName(dirName), OSPathHelper.PathComparison))
         {
-            return fileName.EndsWith(".dat", StringComparison.OrdinalIgnoreCase) ||
-                   fileName.EndsWith(".asset", StringComparison.OrdinalIgnoreCase);
+            return OSPathHelper.IsExtension(fileName, ".dat") ||
+                   OSPathHelper.IsExtension(fileName, ".asset");
         }
 
-        return filePath.EndsWith(".asset", StringComparison.OrdinalIgnoreCase)
-               && !File.Exists(Path.Combine(dirName, fileName + ".asset"))
-               && !File.Exists(Path.Combine(dirName, fileName + ".dat"))
-               && !File.Exists(Path.Combine(dirName, "Asset.dat"));
+        return OSPathHelper.IsExtension(filePath, ".asset")
+               && !File.Exists(OSPathHelper.CombineAndConcat(dirName, fileName, ".asset"))
+               && !File.Exists(OSPathHelper.CombineAndConcat(dirName, fileName, ".dat"))
+               && !File.Exists(OSPathHelper.CombineAndConcat(dirName, "Asset.dat", ReadOnlySpan<char>.Empty));
     }
 
     private struct DiscoveredFilesCollection
@@ -1211,7 +1530,7 @@ public class InstallationEnvironment : IDisposable
         ReadOnlySpan<char> fileName = filePath.AsSpan(firstDirIndex + 1, filePath.Length - firstDirIndex - 1 - (isDatFile ? 4 : 6));
         ReadOnlySpan<char> dirPath;
 
-        if (isDatFile && fileName.Equals("Masterbundle", StringComparison.OrdinalIgnoreCase))
+        if (isDatFile && fileName.Equals("MasterBundle", OSPathHelper.PathComparison))
         {
             collection.MasterbundleConfigs?.Add(filePath);
         }

@@ -34,6 +34,9 @@ public class AssetProperty
     [JsonProperty("typeHierarchy", NullValueHandling = NullValueHandling.Ignore)]
     public TypeHierarchyElement[]? TypeHierarchy { get; set; }
 
+    [JsonProperty("bundlePath", NullValueHandling = NullValueHandling.Ignore)]
+    public string? BundlePath { get; set; }
+
     public class TypeHierarchyElement
     {
         public required string Type { get; init; }

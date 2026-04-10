@@ -1,4 +1,5 @@
 ﻿using AssetsTools.NET;
+using AssetsTools.NET.Extra;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
@@ -58,16 +59,20 @@ public static class BundleExtensions
                 }
 
                 DiscoveredBundle.BundleData data = bndl.GetOrOpenNoLock(ctx.Services);
+                if (data.AssetBundle == null)
+                {
+                    return null;
+                }
+
                 if (bundle.Path == null || bndl.IsLegacyBundle)
                 {
-                    if (bndl.TryLoadAssetBaseField(
+                    if (bndl.TryLoadAssetFileInfo(
                         in data,
                         assetName,
                         out AssetFileInfo? fileInfo,
-                        out AssetTypeValueField? field,
                         out string? assetPath))
                     {
-                        return Create(bundle, bundleAssetType, fileInfo, field, ctx.Services, assetPath);
+                        return Create(bundle, bundleAssetType, data.AssetBundle!, fileInfo, ctx.Services, assetPath);
                     }
                 }
                 else
@@ -81,14 +86,13 @@ public static class BundleExtensions
                         foreach (string str in values)
                         {
                             string p = path + str;
-                            if (bndl.TryLoadAssetBaseField(
+                            if (bndl.TryLoadAssetFileInfo(
                                 in data,
                                 p,
                                 out AssetFileInfo? fileInfo,
-                                out AssetTypeValueField? field,
                                 out string? assetPath))
                             {
-                                return Create(bundle, bundleAssetType, fileInfo, field, ctx.Services, assetPath);
+                                return Create(bundle, bundleAssetType, data.AssetBundle, fileInfo, ctx.Services, assetPath);
                             }
                         }
                     }
@@ -104,8 +108,8 @@ public static class BundleExtensions
         }
     }
 
-    private static UnityObject Create(IBundleProxy bundle, IBundleAssetType type, AssetFileInfo fileInfo, AssetTypeValueField field, IParsingServices parsingServices, string assetPath)
+    private static UnityObject Create(IBundleProxy bundle, IBundleAssetType type, AssetsFileInstance file, AssetFileInfo fileInfo, IParsingServices parsingServices, string assetPath)
     {
-        return new UnityObject(type, assetPath, bundle, fileInfo, field, parsingServices);
+        return new UnityObject(type, assetPath, bundle, file, fileInfo, parsingServices);
     }
 }

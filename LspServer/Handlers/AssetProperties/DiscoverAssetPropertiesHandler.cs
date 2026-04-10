@@ -73,6 +73,61 @@ internal class DiscoverAssetPropertiesHandler : IDiscoverAssetPropertiesHandler
             outputProperties.Sort(comparer);
         }
 
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile);
+        DatFileType fileType = ctx.FileType.Information;
+
+        if (fileType is DatAssetFileType { HasBundleAssets: true, BundleAssets.Length: > 0 } assetType )
+        {
+            AssetProperty[] assetList = new AssetProperty[assetType.BundleAssets.Length];
+            AssetProperty bundleAssetsHeader = new AssetProperty
+            {
+                Key = "Bundle Assets",
+                Property = null!,
+                Children = assetList,
+                BundlePath = string.Empty
+            };
+
+            for (int i = 0; i < assetType.BundleAssets.Length; i++)
+            {
+                DatBundleAsset unityAsset = assetType.BundleAssets[i];
+                AssetProperty prop = new AssetProperty
+                {
+                    Key = unityAsset.Key,
+                    Property = unityAsset
+                };
+
+                if (unityAsset.Description != null && unityAsset.Description.TryEvaluateValue(out Optional<string> desc, ref ctx))
+                {
+                    prop.Description = desc.Value;
+                }
+
+                if (unityAsset.MarkdownDescription != null && unityAsset.MarkdownDescription.TryEvaluateValue(out desc, ref ctx))
+                {
+                    prop.Markdown = desc.Value;
+                }
+
+                IBundleProxy bundle = sourceFile.WorkspaceFile.Bundle;
+                UnityObject? obj = bundle.GetCorrespondingAsset(unityAsset.Key, unityAsset.Type, ref ctx);
+                if (obj == null)
+                {
+                    prop.BundlePath = string.Empty;
+                }
+                else
+                {
+                    prop.BundlePath = obj.Path;
+                    string? prefix = bundle.Bundle?.Prefix;
+                    if (!string.IsNullOrEmpty(prefix) && prop.BundlePath.StartsWith(prefix))
+                    {
+                        prop.BundlePath = prop.BundlePath[prefix.Length..];
+                    }
+                }
+
+                assetList[i] = prop;
+            }
+
+            outputProperties.Add(bundleAssetsHeader);
+        }
+
         return Task.FromResult(new Container<AssetProperty>(outputProperties));
     }
 

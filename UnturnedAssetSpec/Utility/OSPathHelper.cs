@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
+using System.IO.Hashing;
 using System.Runtime.InteropServices;
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
@@ -179,6 +182,7 @@ public static class OSPathHelper
             int newIndex = src.Slice(startIndex).IndexOf(from);
             if (newIndex < 0)
                 break;
+            newIndex += startIndex;
             dst[newIndex] = to;
             index = newIndex;
         }
@@ -257,6 +261,23 @@ public static class OSPathHelper
         }
 
         return fileNameIndex >= 0 && fileNameIndex + 1 < path.Length ? path.Slice(fileNameIndex + 1) : ReadOnlySpan<char>.Empty;
+#endif
+    }
+
+    /// <summary>
+    /// Gets the name of a directory or file without it's extension.
+    /// </summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+    public static ReadOnlySpan<char> GetFileNameWithoutExtension(ReadOnlySpan<char> path)
+    {
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        return Path.GetFileNameWithoutExtension(path);
+#else
+        ReadOnlySpan<char> fileName = GetFileName(path);
+        int extStart = fileName.LastIndexOf('.');
+        return extStart >= 0 ? fileName[..extStart] : fileName;
 #endif
     }
 
@@ -386,7 +407,7 @@ public static class OSPathHelper
     /// <summary>
     /// Combines a folder to a file name, concatenating text to the end (usually a file extension).
     /// </summary>
-    /// <param name="baseFolder">The first part of the path.</param>
+    /// <param name="baseFolder">The first part of the path. Can be empty.</param>
     /// <param name="path">The second part of the path.</param>
     /// <param name="concatToFileName">Text to append to the end of <paramref name="path"/> before combining. Usually an extension.</param>
     /// <param name="insertBeforeExtension">Whether or not to insert <paramref name="concatToFileName"/> before <paramref name="path"/>'s extension.</param>
@@ -407,7 +428,7 @@ public static class OSPathHelper
 
         TrimSeparatorsFromCombiningPaths(ref baseFolder, ref path);
 
-        int length = baseFolder.Length + path.Length + concatToFileName.Length + tail.Length;
+        int length = baseFolder.Length + 1 + path.Length + concatToFileName.Length + tail.Length;
 
 #if NET9_0_OR_GREATER
         CombinePathAndConcatState state;
@@ -435,20 +456,27 @@ public static class OSPathHelper
 #else
         if (length > 256)
         {
-            return Path.GetFullPath(Path.Combine(baseFolder.ToString(), path.ToString()));
+            char[] buffer = new char[length];
+            Core(buffer, baseFolder, path, concatToFileName, tail);
+            return new string(buffer);
         }
-
-        Span<char> buffer = stackalloc char[length];
-        Core(buffer, baseFolder, path, concatToFileName, tail);
-        return buffer.ToString();
+        else
+        {
+            Span<char> buffer = stackalloc char[length];
+            Core(buffer, baseFolder, path, concatToFileName, tail);
+            return buffer.ToString();
+        }
 #endif
 
         static void Core(Span<char> buffer, ReadOnlySpan<char> baseFolder, ReadOnlySpan<char> path, ReadOnlySpan<char> concatToFileName, ReadOnlySpan<char> tail)
         {
-            baseFolder.CopyTo(buffer);
             int index = baseFolder.Length;
-            buffer[index] = Path.DirectorySeparatorChar;
-            ++index;
+            if (!baseFolder.IsEmpty)
+            {
+                baseFolder.CopyTo(buffer);
+                buffer[index] = Path.DirectorySeparatorChar;
+                ++index;
+            }
             if (Path.DirectorySeparatorChar != '/')
             {
                 ReplaceToSpan(path, buffer[index..], '/', Path.DirectorySeparatorChar);
@@ -484,6 +512,113 @@ public static class OSPathHelper
         public ReadOnlySpan<char>* Span;
         public ReadOnlySpan<char>* Concat;
         public ReadOnlySpan<char>* Tail;
+    }
+#endif
+
+    internal static int CreateStablePathHash(ReadOnlySpan<char> path)
+    {
+        if (!IsCaseInsensitive)
+        {
+            return DoXxHash32(MemoryMarshal.Cast<char, byte>(path));
+        }
+
+        Span<byte> data = stackalloc byte[path.Length];
+        for (int i = 0; i < path.Length; ++i)
+        {
+            char c = path[i];
+            if (c > byte.MaxValue)
+            {
+                // non-ascii
+                string p = path.ToString().ToLowerInvariant();
+                return DoXxHash32(MemoryMarshal.Cast<char, byte>(p.AsSpan()));
+            }
+
+            if (c is >= 'A' and <= 'Z')
+                data[i] = (byte)(c + 32);
+            else
+                data[i] = (byte)c;
+        }
+
+        return DoXxHash32(data);
+
+        static int DoXxHash32(ReadOnlySpan<byte> data)
+        {
+            Span<byte> hash = stackalloc byte[4];
+            XxHash32.Hash(data, hash);
+            return MemoryMarshal.Read<int>(hash);
+        }
+    }
+
+
+    public static string CombineWithUnixSeparators(ReadOnlySpan<char> p1, ReadOnlySpan<char> p2)
+    {
+        TrimSeparatorsFromCombiningPaths(ref p1, ref p2);
+
+        if (p1.IsEmpty)
+        {
+            return p2.ToString();
+        }
+
+        if (p2.IsEmpty)
+        {
+            return p1.ToString();
+        }
+
+        int length = p1.Length + 1 + p2.Length;
+
+#if NET9_0_OR_GREATER
+        CombineWithUnixSeparatorsState state;
+        state.P1 = p1;
+        state.P2 = p2;
+        return string.Create(length, state, static (span, state) =>
+        {
+            Core(span, state.P1, state.P2);
+        });
+#elif NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        unsafe
+        {
+            CombineWithUnixSeparatorsState state;
+            state.P1 = &p1;
+            state.P2 = &p2;
+            return string.Create(length, state, static (span, state) =>
+            {
+                Core(span, *state.P1, *state.P2);
+            });
+        }
+#else
+        if (length > 256)
+        {
+            char[] buffer = new char[length];
+            Core(buffer, p1, p2);
+            return new string(buffer);
+        }
+        else
+        {
+            Span<char> buffer = stackalloc char[length];
+            Core(buffer, p1, p2);
+            return buffer.ToString();
+        }
+#endif
+
+        static void Core(Span<char> buffer, ReadOnlySpan<char> p1, ReadOnlySpan<char> p2)
+        {
+            ReplaceToSpan(p1, buffer, '\\', '/');
+            buffer[p1.Length] = '/';
+            ReplaceToSpan(p2, buffer.Slice(p1.Length + 1), '\\', '/');
+        }
+    }
+
+#if NET9_0_OR_GREATER
+    private ref struct CombineWithUnixSeparatorsState
+    {
+        public ReadOnlySpan<char> P1;
+        public ReadOnlySpan<char> P2;
+    }
+#elif NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    private unsafe struct CombineWithUnixSeparatorsState
+    {
+        public ReadOnlySpan<char>* P1;
+        public ReadOnlySpan<char>* P2;
     }
 #endif
 }

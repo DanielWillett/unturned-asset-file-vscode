@@ -6,19 +6,24 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
 /// <summary>
 /// An object from a unity bundle at a given path.
 /// </summary>
-public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>
+public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>, IDisposable
 {
-    internal readonly AssetFileInfo FileInfo;
-    internal readonly AssetsFileInstance File;
-    internal readonly AssetTypeValueField BaseField;
+    private readonly AssetsFileInstance _file;
+    private readonly AssetFileInfo _pathInfo;
+
+    private AssetTypeValueField? _baseField;
     private readonly IParsingServices _services;
+    private readonly int _level;
+    private bool _disposed;
 
     private UnityTransform? _transform;
     private bool _hasTransform;
@@ -29,9 +34,24 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>
 
     public IBundleProxy Bundle { get; }
 
-    public AssetClassID ObjectType { get; }
+    public AssetClassID ObjectType => (AssetClassID)_pathInfo.TypeId;
 
     public string Path { get; }
+
+    internal AssetTypeValueField BaseField
+    {
+        get
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(UnityObject));
+
+            if (_baseField != null)
+                return _baseField;
+
+            CacheBaseField();
+            return _baseField ?? AssetTypeValueField.DUMMY_FIELD;
+        }
+    }
 
     /// <summary>
     /// Allows access to the object's hierarchy.
@@ -40,6 +60,9 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>
     {
         get
         {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(UnityObject));
+
             if (ObjectType != AssetClassID.GameObject)
                 return null;
 
@@ -51,77 +74,60 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>
         IBundleAssetType type,
         string path,
         IBundleProxy bundle,
+        AssetsFileInstance file,
         AssetFileInfo fileInfo,
-        AssetTypeValueField baseField,
-        IParsingServices services
+        IParsingServices services,
+        int level = 0
     )
     {
-        FileInfo = fileInfo;
-        BaseField = baseField;
+        _file = file;
+        _pathInfo = fileInfo;
         _services = services;
-        ObjectType = (AssetClassID)FileInfo.TypeId;
+        _level = level;
         Type = type;
         Bundle = bundle;
         Path = path;
     }
 
-    public bool Equals(IValue? other)
+    [MemberNotNull(nameof(_baseField))]
+    private void CacheBaseField()
     {
-        return other is UnityObject obj && Equals(obj);
-    }
+        BundleUtility.RunOperationOnBundle(
+            this, Bundle, _services,
+            static (_, _, manager, @this) =>
+            {
+                if (@this._baseField != null)
+                    return;
 
-    public bool Equals(UnityObject? other)
-    {
-        if (other == null)
-            return false;
+                @this._baseField = manager.GetBaseField(@this._file, @this._pathInfo);
+            }
+        );
 
-        return other.Type.Equals(Type)
-            && Bundle.Equals(other.Bundle)
-            && string.Equals(Path, other.Path, StringComparison.OrdinalIgnoreCase);
+        _baseField ??= AssetTypeValueField.DUMMY_FIELD;
     }
 
     private UnityTransform? CreateTransform()
     {
-
-        bool hasLock = false;
-        TfmLock? @lock = null;
-
-        try
+        BundleUtility.RunOperationOnBundle(this, Bundle, _services, static (bundle, _, _, @this) =>
         {
-            DiscoveredBundle? bndl;
-            while (true)
+            if (@this._hasTransform)
+                return;
+            
+            if (bundle.FilePreloadCache == null)
             {
-                bndl = Bundle.Bundle;
-                if (bndl == null)
-                    break;
-
-                @lock = bndl.GetLock(_services);
-                PlatformLockHelper.EnterLock(@lock, ref hasLock);
-                if (bndl != Bundle.Bundle)
-                {
-                    PlatformLockHelper.ExitLock(@lock);
-                    hasLock = false;
-                    continue;
-                }
-
-                break;
+                return;
             }
 
-            if (bndl?.FilePreloadCache == null)
+            AssetTypeValueField baseField = @this.BaseField;
+            if (baseField.IsDummy)
             {
-                return null;
+                return;
             }
 
-            AssetsManager? assetsManager = _services.Installation.AssetBundleManager;
-            if (assetsManager == null)
-            {
-                return null;
-            }
-
-            AssetTypeValueField component = BaseField["m_Component"];
+            AssetTypeValueField component = baseField["m_Component"];
             if (component.IsDummy)
             {
-                return null;
+                return;
             }
 
             foreach (AssetTypeValueField componentSet in component.Children)
@@ -136,43 +142,52 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>
 
                     foreach (AssetTypeValueField componentPtr in componentPair.Children)
                     {
-                        if (!TryReadPathId(componentPtr, out long pathId))
+                        if (!BundleUtility.TryReadPathId(componentPtr, out long pathId))
                             continue;
 
-                        if (!bndl.FilePreloadCache.TryGetValue(pathId, out AssetFileInfo? componentPath))
+                        if (!bundle.FilePreloadCache.TryGetValue(pathId, out AssetFileInfo? componentFileInfo))
                             continue;
 
-                        AssetTypeValueField transformField = assetsManager.GetBaseField(File, componentPath);
+                        @this._transform = new UnityTransform(null, @this, @this._file, componentFileInfo, @this._level, @this._services);
+                        @this._hasTransform = true;
 
-                        _transform = new UnityTransform(null, this, transformField);
-                        _hasTransform = true;
-                        return _transform;
+                        if (@this._disposed)
+                        {
+                            @this._hasTransform = false;
+                            Interlocked.Exchange(ref @this._transform, null).Dispose();
+                            throw new ObjectDisposedException(nameof(UnityObject));
+                        }
+
+                        return;
                     }
                 }
             }
 
-            _hasTransform = true;
-            return null;
-        }
-        finally
-        {
-            if (hasLock)
-                PlatformLockHelper.ExitLock(@lock!);
-        }
+            @this._hasTransform = true;
+            if (@this._disposed)
+            {
+                @this._hasTransform = false;
+                Interlocked.Exchange(ref @this._transform, null)?.Dispose();
+                throw new ObjectDisposedException(nameof(UnityObject));
+            }
+        });
+
+        return _transform;
     }
 
-    private static bool TryReadPathId(AssetTypeValueField? childGameObject, out long pathId)
+    public bool Equals(IValue? other)
     {
-        pathId = 0;
-        if (childGameObject == null)
+        return other is UnityObject obj && Equals(obj);
+    }
+
+    public bool Equals(UnityObject? other)
+    {
+        if (other == null)
             return false;
 
-        AssetTypeValueField pathIdField = childGameObject["m_PathID"];
-        if (pathIdField.IsDummy || pathIdField.Value.ValueType != AssetValueType.Int64)
-            return false;
-
-        pathId = pathIdField.AsLong;
-        return true;
+        return other.Type.Equals(Type)
+               && Bundle.Equals(other.Bundle)
+               && string.Equals(Path, other.Path, StringComparison.OrdinalIgnoreCase);
     }
 
     void IValue.WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
@@ -204,4 +219,12 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>
         return true;
     }
     IType<UnityObject> IValue<UnityObject>.Type => Type;
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        _disposed = true;
+        _hasTransform = false;
+        Interlocked.Exchange(ref _transform, null)?.Dispose();
+    }
 }

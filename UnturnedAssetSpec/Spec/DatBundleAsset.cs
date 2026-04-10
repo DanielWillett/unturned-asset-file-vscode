@@ -35,8 +35,8 @@ public sealed class DatBundleAsset : DatProperty
     public new IBundleAssetType Type => (IBundleAssetType)base.Type;
 
     /// <inheritdoc />
-    internal DatBundleAsset(string key, IBundleAssetType type, DatTypeWithProperties owner, JsonElement element, SpecPropertyContext context)
-        : base(key, owner, element, context)
+    internal DatBundleAsset(string key, IBundleAssetType type, DatTypeWithProperties owner, JsonElement element)
+        : base(key, owner, element, SpecPropertyContext.BundleAsset)
     {
         base.Type = type;
     }
@@ -56,8 +56,7 @@ public sealed class DatBundleAsset : DatProperty
             key ?? throw new ArgumentNullException(nameof(key)),
             type ?? throw new ArgumentNullException(nameof(type)),
             owner ?? throw new ArgumentNullException(nameof(owner)),
-            element,
-            SpecPropertyContext.BundleAsset
+            element
         );
     }
 }

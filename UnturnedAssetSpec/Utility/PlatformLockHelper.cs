@@ -1,11 +1,9 @@
-﻿using System.Threading;
-
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
+﻿namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 internal static class PlatformLockHelper
 {
 #if NET9_0_OR_GREATER
-    internal static void EnterLock(Lock @lock, ref bool hasLock)
+    internal static void EnterLock(TfmLock @lock, ref bool hasLock)
     {
         try
         {
@@ -22,19 +20,19 @@ internal static class PlatformLockHelper
         }
     }
 
-    internal static void ExitLock(Lock @lock)
+    internal static void ExitLock(TfmLock @lock)
     {
         @lock.Exit();
     }
 #else
-    internal static void EnterLock(object @lock, ref bool hasLock)
+    internal static void EnterLock(TfmLock @lock, ref bool hasLock)
     {
-        Monitor.Enter(@lock, ref hasLock);
+        System.Threading.Monitor.Enter(@lock, ref hasLock);
     }
 
-    internal static void ExitLock(object @lock)
+    internal static void ExitLock(TfmLock @lock)
     {
-        Monitor.Exit(@lock);
+        System.Threading.Monitor.Exit(@lock);
     }
 #endif
 }

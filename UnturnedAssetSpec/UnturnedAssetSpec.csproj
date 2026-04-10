@@ -45,6 +45,11 @@
     <None Remove="UnturnedAssetSpec.dll.publickey" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <EmbeddedResource Include="Project\InstallationEnvironmentAssetBundleCache_README.md" />
+  </ItemGroup>
+
   <ItemGroup>
 
     <ProjectReference Include="../DanielWillett.MathMatrix/DanielWillett.MathMatrix.csproj" Private="False" />
@@ -63,6 +68,9 @@
     </PackageReference>
     <PackageReference Include="System.Collections.Immutable" Version="1.7.1" Condition="'$(TargetFramework)' != 'net9.0'" />
     <PackageReference Include="System.Collections.Immutable" Version="9.0.0" Condition="'$(TargetFramework)' == 'net9.0'" />
+
+    <PackageReference Include="System.IO.Hashing" Version="6.0.0" Condition="'$(TargetFramework)' != 'net9.0'" />
+    <PackageReference Include="System.IO.Hashing" Version="9.0.0" Condition="'$(TargetFramework)' == 'net9.0'" />
 
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0" Condition="'$(TargetFramework)' != 'net9.0'" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" Condition="'$(TargetFramework)' == 'net9.0'" />

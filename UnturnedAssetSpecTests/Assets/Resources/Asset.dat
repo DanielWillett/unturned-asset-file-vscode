@@ -1,0 +1,11 @@
+﻿Metadata
+{
+    GUID 260d3c7718664fd09a600e18ca3a4255
+    Type SDG.Unturned.ItemAsset, Assembly-CSharp
+}
+Asset
+{
+    ID 9999
+    Type Supply
+    Bundle_Path_Include_Filename false
+}
