@@ -49,7 +49,6 @@ public partial class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink, IBundl
     private readonly IParsingServices _services;
 
     private ISourceFile? _sourceFile;
-    private IBundleProxy _intlBundleProxy = IBundleProxy.Null;
 
     internal Lock EditLock = new Lock();
     internal Lock UpdateLock = new Lock();
@@ -292,6 +291,7 @@ public partial class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink, IBundl
         SetFullText(text);
         IndexTextIntl();
     }
+
 #pragma warning restore CS8618, CS9264
 
 #if KEEP_VIRTUAL_FILE_SYSTEM
@@ -847,6 +847,17 @@ public partial class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink, IBundl
             _assetSourceFile.OnUpdated -= OnAssetFileUpdated;
             _assetSourceFile.Dispose();
             _assetSourceFile = null;
+
+            if (_isListeningForFileRemoved)
+            {
+                _isListeningForFileRemoved = false;
+                _services.Installation.OnFileRemoved -= OnFileRemoved;
+            }
+
+            if (_ownsBundleProxy)
+            {
+                (Interlocked.Exchange(ref _intlBundleProxy, IBundleProxy.Null) as IDisposable)?.Dispose();
+            }
         }
 
 #if KEEP_VIRTUAL_FILE_SYSTEM
@@ -1469,10 +1480,4 @@ public partial class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink, IBundl
     }
 
     Lock IMutableWorkspaceFile.SyncRoot => EditLock;
-    IBundleProxy IWorkspaceFile.Bundle => this;
-    bool IBundleProxy.Exists => _intlBundleProxy.Exists;
-    DiscoveredBundle? IBundleProxy.Bundle => _intlBundleProxy.Bundle;
-    string? IBundleProxy.Path => _intlBundleProxy.Path;
-    bool IBundleProxy.ConvertShadersToStandard => _intlBundleProxy.ConvertShadersToStandard;
-    bool IBundleProxy.ConsolidateShaders => _intlBundleProxy.ConsolidateShaders;
 }

@@ -133,14 +133,4 @@ internal class TestCache : ISpecDatabaseCache
     {
         return Task.CompletedTask;
     }
-
-    public Task<bool> ReadAssetAsync<TState>(QualifiedType type, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default)
-    {
-        return Task.FromResult(false);
-    }
-
-    public Task<bool> ReadKnownFileAsync<TState>(KnownConfigurationFile file, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default)
-    {
-        return Task.FromResult(false);
-    }
 }

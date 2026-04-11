@@ -59,6 +59,13 @@ public class StaticSourceFileWorkspaceEnvironment : IWorkspaceEnvironment, IDisp
     }
 
     /// <inheritdoc />
+    public DiscoveredBundle? LoadBundleForAsset(ISourceFile file)
+    {
+        // todo
+        return null;
+    }
+
+    /// <inheritdoc />
     public IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath)
     {
         StaticSourceFile file;

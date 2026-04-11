@@ -159,6 +159,7 @@ partial class DiscoveredDatFile : IBundleProxy
             _bundleFlags |= 4;
         }
 
+        _ownsBundle = false;
         _bundle = bundle;
     }
 }

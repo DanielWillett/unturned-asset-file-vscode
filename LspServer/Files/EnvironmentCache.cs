@@ -1,4 +1,3 @@
-using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using Microsoft.Extensions.Logging;
@@ -18,7 +17,6 @@ internal class EnvironmentCache : ISpecDatabaseCache
     private readonly ILogger<EnvironmentCache> _logger;
     private readonly string _cacheDir;
     private readonly string _cacheMetaFile;
-    private readonly string _informationFile;
 
     private CacheMetadata _cacheMetadataInfo;
 
@@ -71,7 +69,6 @@ internal class EnvironmentCache : ISpecDatabaseCache
         }
 
         _cacheMetaFile = Path.Combine(_cacheDir, CacheMetaName);
-        _informationFile = Path.Combine(_cacheDir, "assets.json");
 
         ReadCacheMetadata();
     }
@@ -121,57 +118,6 @@ internal class EnvironmentCache : ISpecDatabaseCache
         // ill leave this function here in case I need it in the future
 
         return Task.CompletedTask;
-    }
-
-    private string GetFileName(QualifiedType type)
-    {
-        return Path.Combine(_cacheDir, type.Normalized.Type.ToLowerInvariant() + ".json");
-    }
-
-    public Task<bool> ReadAssetAsync<TState>(QualifiedType type, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default)
-    {
-        string path = GetFileName(type);
-        return ReadFileAsync(path, state, action, token);
-    }
-
-    public Task<bool> ReadKnownFileAsync<TState>(KnownConfigurationFile file, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default)
-    {
-        switch (file)
-        {
-            case KnownConfigurationFile.Assets:
-                return ReadFileAsync(_informationFile, state, action, token);
-
-            default:
-                return Task.FromResult(false);
-        }
-    }
-
-    private async Task<bool> ReadFileAsync<TState>(
-        string file,
-        TState state,
-        Func<Stream, TState, CancellationToken, Task> action,
-        CancellationToken token = default,
-        int maxSize = 524288  /* 512 KiB */
-    )
-    {
-        FileInfo fileInfo = new FileInfo(file);
-        if (fileInfo.Length > maxSize)
-        {
-            _logger.LogWarning("Cache file too long: {0}. Files > {1} B ignored.", file, maxSize);
-            return false;
-        }
-
-        using FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 8192, FileOptions.SequentialScan);
-        try
-        {
-            await action(fs, state, token).ConfigureAwait(false);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to read cache file {0}.", file);
-            return false;
-        }
     }
 
     public class CacheMetadata

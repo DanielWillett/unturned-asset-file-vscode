@@ -156,4 +156,7 @@
   <data name="Hover_ValueTitle" xml:space="preserve">
     <value>Value</value>
   </data>
+  <data name="AssetList_BundleAssetsHeaderTooltip" xml:space="preserve">
+    <value>All assets that can exist in the bundle for this asset. These are the objects packaged in this asset's folder in the masterbundle.</value>
+  </data>
 </root>

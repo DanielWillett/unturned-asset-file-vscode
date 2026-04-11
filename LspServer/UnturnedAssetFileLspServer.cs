@@ -125,6 +125,7 @@ internal sealed class UnturnedAssetFileLspServer
                 // .WithHandler<DocumentSymbolHandler>()
                 // .WithHandler<KeyCompletionHandler>()
                 .WithHandler<DiscoverAssetPropertiesHandler>()
+                .WithHandler<DiscoverBundleAssetsHandler>()
                 // .WithHandler<LspWorkspaceEnvironment>()
                 // todo: .WithHandler<GetAssetPropertyAddLocationHandler>()
                 // .WithHandler<CodeActionRequestHandler>()

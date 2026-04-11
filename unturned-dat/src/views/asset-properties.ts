@@ -9,19 +9,26 @@ import
     ProviderResult,
     TreeItemCollapsibleState,
     ThemeIcon,
-    Range
+    Range,
+    MarkdownString,
+    env
 } from 'vscode';
 
 import { getClient, getOutputChannel, getIsReady } from '../extension';
 import { isDatFile } from '../util/path';
 
 import { DiscoverAssetProperties } from '../jsonrpc/asset-property';
+import { DiscoverBundleAssets } from '../jsonrpc/bundle-asset-info';
 import { AssetProperty, TypeHierarchyElement } from '../spec/asset-property';
+import { BundleAssetInfo } from "../spec/bundle-asset-info";
 
 export class AssetPropertiesViewProvider implements TreeDataProvider<AssetPropertyViewItem>
 {
 
     propertyValues: AssetPropertyViewItem[] = [];
+    bundleChildren: BundleAssetInfo[] | null = null;
+    bundleChildrenElements: AssetPropertyViewItem[] | null = null;
+    bundleRequestVersion: number = 0;
 
     private _onDidChangeTreeData: EventEmitter<void | AssetPropertyViewItem | AssetPropertyViewItem[] | null | undefined>
         = new EventEmitter<void | AssetPropertyViewItem | AssetPropertyViewItem[] | null | undefined>();
@@ -60,7 +67,8 @@ export class AssetPropertiesViewProvider implements TreeDataProvider<AssetProper
                 return false;
             }
 
-            this.propertyValues = result.map(prop => new AssetPropertyViewItem(prop, null, -1));
+            this.propertyValues = result.map(prop => AssetPropertyViewItem.createForAssetProperty(prop, null, -1));
+            this.bundleChildrenElements = null;
         }
 
         this._onDidChangeTreeData.fire();
@@ -81,9 +89,55 @@ export class AssetPropertiesViewProvider implements TreeDataProvider<AssetProper
             return this.propertyValues;
         }
 
+        if (element.property?.isBundleHeader)
+        {
+            if (this.bundleChildrenElements)
+                return this.bundleChildrenElements;
+
+            return this.getBundleChildren(element);
+        }
+
         return element.getChildren();
     }
 
+    async getBundleChildren(parent: AssetPropertyViewItem): Promise<AssetPropertyViewItem[]>
+    {
+        const txtDoc = window.activeTextEditor;
+
+        if (txtDoc === undefined || !isDatFile(txtDoc.document.uri) || !getIsReady())
+        {
+            this.bundleChildren = [];
+            this.bundleChildrenElements = [];
+            return this.bundleChildrenElements;
+        }
+
+        this.bundleRequestVersion += 1;
+        const startVersion = this.bundleRequestVersion;
+        const result = await getClient().sendRequest(DiscoverBundleAssets, { document: txtDoc.document.uri.toString(), path: undefined });
+
+        const elements = AssetPropertiesViewProvider.createBundleChildren(parent, result);
+
+        if (startVersion === this.bundleRequestVersion)
+        {
+            this.bundleChildren = result;
+            this.bundleChildrenElements = elements;
+        }
+
+        return elements;
+    }
+
+    static createBundleChildren(parent: AssetPropertyViewItem, bundleChildren: BundleAssetInfo[]): AssetPropertyViewItem[]
+    {
+        const outputs: AssetPropertyViewItem[] = [];
+
+        for (let i = 0; i < bundleChildren.length; ++i)
+        {
+            const bundleInfo = bundleChildren[i];
+            outputs[i] = AssetPropertyViewItem.createForBundleObject(bundleInfo, parent);
+        }
+
+        return outputs;
+    }
 
     getParent?(element: AssetPropertyViewItem): ProviderResult<AssetPropertyViewItem>
     {
@@ -100,27 +154,54 @@ export class AssetPropertiesViewProvider implements TreeDataProvider<AssetProper
 
 class AssetPropertyViewItem extends TreeItem
 {
-    property: AssetProperty;
+    property: AssetProperty | undefined;
+    bundleObject: BundleAssetInfo | undefined;
     children: AssetPropertyViewItem[] | null;
     parent: AssetPropertyViewItem | null;
     typeIndex: number;
 
-    constructor(property: AssetProperty, parent: AssetPropertyViewItem | null, typeIndex: number)
+
+    static createForAssetProperty(property: AssetProperty, parent: AssetPropertyViewItem | null, typeIndex: number): AssetPropertyViewItem
     {
-        super(
-            typeIndex >= 0 ? property.typeHierarchy![typeIndex].displayName : getName(property),
-            typeIndex < 0 && (property.children || property.typeHierarchy) ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
-        );
-        this.property = property;
-        this.iconPath = typeIndex >= 0 ? new ThemeIcon("type-hierarchy-super") : getValueIcon(property);
+        const name = typeIndex >= 0
+            ? property.typeHierarchy![typeIndex].displayName
+            : getName(property);
+
+        const state = property.isBundleHeader || (typeIndex < 0 && (property.children || property.typeHierarchy))
+            ? TreeItemCollapsibleState.Collapsed
+            : TreeItemCollapsibleState.None;
+
+        const icon = typeIndex >= 0 ? new ThemeIcon("type-hierarchy-super") : getValueIcon(property);
+
+        const item = new AssetPropertyViewItem(name, state, icon, parent, typeIndex);
+        item.property = property;
+        return item;
+    }
+
+    static createForBundleObject(object: BundleAssetInfo, parent: AssetPropertyViewItem): AssetPropertyViewItem
+    {
+        const name = object.key;
+
+        const icon = new ThemeIcon(object.path ? "build" : "question");
+
+        const item = new AssetPropertyViewItem(name, TreeItemCollapsibleState.None, icon, parent, -1);
+        item.bundleObject = object;
+        return item;
+    }
+
+
+    constructor(name: string, collapsableState: TreeItemCollapsibleState, iconPath: ThemeIcon, parent: AssetPropertyViewItem | null, typeIndex: number)
+    {
+        super(name, collapsableState);
         this.children = null;
+        this.iconPath = iconPath;
         this.parent = parent;
         this.typeIndex = typeIndex;
     }
 
     getChildren(): AssetPropertyViewItem[]
     {
-        if (this.typeIndex >= 0)
+        if (this.typeIndex >= 0 || !this.property)
         {
             return [ ];
         }
@@ -130,7 +211,7 @@ class AssetPropertyViewItem extends TreeItem
             this.children = [ ];
             for (let i = 0; i < this.property.typeHierarchy.length; ++i)
             {
-                this.children.push(new AssetPropertyViewItem(this.property, this, i));
+                this.children.push(AssetPropertyViewItem.createForAssetProperty(this.property, this, i));
             }
 
             return this.children;
@@ -146,12 +227,49 @@ class AssetPropertyViewItem extends TreeItem
             return this.children;
         }
 
-        this.children = this.property.children.map(prop => new AssetPropertyViewItem(prop, this, -1));
+        this.children = this.property.children.map(prop => AssetPropertyViewItem.createForAssetProperty(prop, this, -1));
         return this.children;
     }
 
     resolve(): void
     {
+        if (!this.property)
+        {
+            if (!this.bundleObject)
+            {
+                return;
+            }
+
+            if (this.bundleObject.markdown)
+            {
+                if (this.bundleObject.path)
+                {
+                    this.tooltip = new MarkdownString(this.bundleObject.markdown + "\r\n\\\r\n`" + this.bundleObject.path + "`");
+                }
+                else
+                {
+                    this.tooltip = new MarkdownString(this.bundleObject.markdown);
+                }
+            }
+            if (this.bundleObject.path)
+            {
+                if (this.bundleObject.description)
+                {
+                    this.tooltip = new MarkdownString(this.bundleObject.description + "\r\n\\\r\n`" + this.bundleObject.path + "`");
+                }
+                else
+                {
+                    this.tooltip = new MarkdownString("`" + this.bundleObject.path + "`");
+                }
+            }
+            else
+            {
+                this.tooltip = this.bundleObject.description ?? this.bundleObject.key;
+            }
+
+            return;
+        }
+
         if (this.typeIndex >= 0)
         {
             this.tooltip = this.property.typeHierarchy![this.typeIndex].type;
@@ -160,11 +278,13 @@ class AssetPropertyViewItem extends TreeItem
 
         try
         {
-            this.tooltip = this.property.markdown ?? this.property.description ?? this.property.key;
-
-            if (this.property.bundlePath)
+            if (this.property.markdown)
             {
-                this.tooltip += "\r\n\\`" + this.property.bundlePath + "`";
+                this.tooltip = new MarkdownString(this.property.markdown);
+            }
+            else
+            {
+                this.tooltip = this.property.description ?? this.property.key;
             }
 
             if (this.property.children)
@@ -239,16 +359,9 @@ function getName(property: AssetProperty): string
 
 function getValueIcon(property: AssetProperty): ThemeIcon
 {
-    if (property.bundlePath !== null && property.bundlePath !== undefined)
+    if (property.isBundleHeader)
     {
-        if (property.bundlePath.length == 0)
-        {
-            return new ThemeIcon(!property.children || property.children.length === 0 ? "question" : "list-selection");
-        }
-        else
-        {
-            return new ThemeIcon("build");
-        }
+        return new ThemeIcon("list-selection");
     }
     if (!property.range)
     {

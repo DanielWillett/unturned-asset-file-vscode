@@ -598,6 +598,13 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         ProjectFileCreated?.Invoke(tracker, pjFile);
     }
 
+    /// <inheritdoc />
+    public DiscoveredBundle? LoadBundleForAsset(ISourceFile file)
+    {
+        // todo
+        return null;
+    }
+
     public IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath)
     {
         if (!File.Exists(filePath))

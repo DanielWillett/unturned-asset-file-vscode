@@ -61,6 +61,15 @@ namespace DanielWillett.UnturnedDataFileLspServer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All assets that can exist in the bundle for this asset. These are the objects packaged in this asset&apos;s folder in the masterbundle..
+        /// </summary>
+        internal static string AssetList_BundleAssetsHeaderTooltip {
+            get {
+                return ResourceManager.GetString("AssetList_BundleAssetsHeaderTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to find installed location of Visual Studio Code..
         /// </summary>
         internal static string Error_FailedToFindVscode {

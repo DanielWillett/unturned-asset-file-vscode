@@ -8,7 +8,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 public class AssetProperty
 {
     [JsonIgnore]
-    public required DatProperty Property { get; init; }
+    public DatProperty? Property { get; init; }
 
     [JsonProperty("key")]
     public required string Key { get; init; }
@@ -34,8 +34,8 @@ public class AssetProperty
     [JsonProperty("typeHierarchy", NullValueHandling = NullValueHandling.Ignore)]
     public TypeHierarchyElement[]? TypeHierarchy { get; set; }
 
-    [JsonProperty("bundlePath", NullValueHandling = NullValueHandling.Ignore)]
-    public string? BundlePath { get; set; }
+    [JsonProperty("isBundleHeader", DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public bool IsBundleHeader { get; set; }
 
     public class TypeHierarchyElement
     {

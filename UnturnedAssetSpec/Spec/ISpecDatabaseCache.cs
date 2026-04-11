@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,8 +8,4 @@ public interface ISpecDatabaseCache
     string? RootDirectory { get; }
 
     Task CacheNewFilesAsync(IAssetSpecDatabase database, CancellationToken token = default);
-
-    Task<bool> ReadAssetAsync<TState>(QualifiedType type, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default);
-    Task<bool> ReadKnownFileAsync<TState>(KnownConfigurationFile file, TState state, Func<Stream, TState, CancellationToken, Task> action, CancellationToken token = default);
-
 }

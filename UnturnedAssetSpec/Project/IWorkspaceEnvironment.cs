@@ -5,6 +5,8 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
 public interface IWorkspaceEnvironment
 {
+    DiscoveredBundle? LoadBundleForAsset(ISourceFile file);
+
     IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath);
 
     /// <summary>
@@ -14,13 +16,25 @@ public interface IWorkspaceEnvironment
     bool TryGetFileDifficulty(string file, out ServerDifficulty difficulty);
 }
 
+/// <summary>
+/// A file opened in the editor that supports diagnostic operations.
+/// </summary>
+/// <remarks>Workspace files may also be temporarily loaded when evaluating related files.</remarks>
 public interface IWorkspaceFile : IDisposable
 {
     /// <summary>
     /// Full path to the file.
     /// </summary>
     string File { get; }
+
+    /// <summary>
+    /// The parsed dictionary for this file.
+    /// </summary>
     ISourceFile SourceFile { get; }
+
+    /// <summary>
+    /// A proxy to the bundle loaded for this file, including the path offset for masterbundles.
+    /// </summary>
     IBundleProxy Bundle { get; }
 
     /// <summary>
@@ -37,6 +51,9 @@ public interface IWorkspaceFile : IDisposable
 public delegate void SpanAction<TState>(ReadOnlySpan<char> span, ref TState state);
 public delegate void SpanAction(ReadOnlySpan<char> span);
 
+/// <summary>
+/// A <see cref="IWorkspaceFile"/> that can be modified.
+/// </summary>
 // ReSharper disable once TypeParameterCanBeVariant
 public interface IMutableWorkspaceFile : IWorkspaceFile
 {
@@ -106,6 +123,9 @@ public interface IMutableWorkspaceFile : IWorkspaceFile
     void OperateOnFullSpan<TState>(ref TState state, SpanAction<TState> action);
 }
 
+/// <summary>
+/// Used to consume modifications to a <see cref="IMutableWorkspaceFile"/>.
+/// </summary>
 // ReSharper disable once TypeParameterCanBeVariant
 public interface IMutableWorkspaceFileUpdater
 {
@@ -159,7 +179,10 @@ public interface IMutableWorkspaceFileUpdater
     void AddAnnotation(string annotationId, string label, string? description = null, bool? needsConfirmation = null);
 }
 
-public static class MutableWorkspaceFileUpdaterExtensions
+/// <summary>
+/// Extensions for <see cref="IWorkspaceFile"/>, <see cref="IMutableWorkspaceFile"/>, and <see cref="IMutableWorkspaceFileUpdater"/>.
+/// </summary>
+public static class WorkspaceFileExtensions
 {
     /// <summary>
     /// Fully remove all lines within the given range.

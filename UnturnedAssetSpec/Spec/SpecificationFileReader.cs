@@ -49,6 +49,8 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 
     public bool AllowInternet { get; set; }
 
+    public bool ReadFromCache { get; set; } = true;
+
 
     /// <inheritdoc />
     public AssetInformation Information => _readInformation ?? throw new InvalidOperationException("Not yet read.");
@@ -84,10 +86,20 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 
         _fileProviderFactory = fileProviderFactory ?? (static reader =>
         [
-            new UnturnedInstallationFileProvider(reader.InstallDirUtility, reader._loggerFactory.CreateLogger<UnturnedInstallationFileProvider>()),
-            //new CacheSpecificationFileProvider(reader.Cache, reader.LatestCommitHash),
-            new GitHubSpecificationFileProvider(reader._loggerFactory.CreateLogger<GitHubSpecificationFileProvider>(), reader._httpClientFactory, reader.AllowInternet, reader.Cache, () => reader._readInformation),
-            new EmbeddedResourceSpecificationFileProvider(reader._loggerFactory.CreateLogger<EmbeddedResourceSpecificationFileProvider>())
+            new UnturnedInstallationFileProvider(
+                reader.InstallDirUtility,
+                reader._loggerFactory.CreateLogger<UnturnedInstallationFileProvider>()
+            ),
+            new GitHubSpecificationFileProvider(
+                reader._loggerFactory.CreateLogger<GitHubSpecificationFileProvider>(),
+                reader._httpClientFactory,
+                reader.AllowInternet,
+                reader.ReadFromCache ? reader.Cache : null,
+                () => reader._readInformation
+            ),
+            new EmbeddedResourceSpecificationFileProvider(
+                reader._loggerFactory.CreateLogger<EmbeddedResourceSpecificationFileProvider>()
+            )
         ]);
     }
 
