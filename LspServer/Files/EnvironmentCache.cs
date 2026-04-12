@@ -2,12 +2,12 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Files;
 
+// TODO: https://learn.microsoft.com/en-us/windows/win32/lwef/disk-cleanup#using-the-datadrivencleaner-object
 internal class EnvironmentCache : ISpecDatabaseCache
 {
     public const string EnvVarSpecCacheFolder = "UNTURNED_ASSET_SPEC_CACHE_FOLDER";
@@ -48,25 +48,7 @@ internal class EnvironmentCache : ISpecDatabaseCache
             }
         }
 
-        if (_cacheDir == null)
-        {
-            bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            if (windows || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                _cacheDir = Path.Combine(
-                    Environment.GetFolderPath(
-                        windows
-                            ? Environment.SpecialFolder.CommonApplicationData
-                            : Environment.SpecialFolder.InternetCache),
-                    "UnturnedAssetFileLsp", "Cache"
-                );
-            }
-            else
-            {
-                // Linux, FreeBSD
-                _cacheDir = "/var/cache/UnturnedAssetFileLsp/Cache";
-            }
-        }
+        _cacheDir ??= Path.Combine(UnturnedAssetFileLspServer.DataPath, "Cache");
 
         _cacheMetaFile = Path.Combine(_cacheDir, CacheMetaName);
 

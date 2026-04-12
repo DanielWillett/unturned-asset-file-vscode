@@ -159,4 +159,13 @@
   <data name="AssetList_BundleAssetsHeaderTooltip" xml:space="preserve">
     <value>All assets that can exist in the bundle for this asset. These are the objects packaged in this asset's folder in the masterbundle.</value>
   </data>
+  <data name="WindowsDiskCleanup_Description" xml:space="preserve">
+    <value>Clean up cache files used by the Unturned Data File language server. This includes downloaded asset specifications and uncompressed bundles (which can get quite large).</value>
+  </data>
+  <data name="WindowsDiskCleanup_Display" xml:space="preserve">
+    <value>Unturned Data File Language Server</value>
+  </data>
+  <data name="WindowsDiskCleanup_PermissionRequest" xml:space="preserve">
+    <value>To register this extension's cache folder with the Windows Disk Cleanup utility, it needs to modify the machine's registry, which requires elevated permissions. The following command will be ran with elevated permissions, after which the extension will continue to run as a normal user: '{0}'. Would you like to proceed or skip this step?</value>
+  </data>
 </root>

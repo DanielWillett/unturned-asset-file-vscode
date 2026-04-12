@@ -10,6 +10,7 @@
 
 		<RootNamespace>DanielWillett.UnturnedDataFileLspServer</RootNamespace>
     <StrongNameKeyPath>C:\Strong Name Keys\UnturnedAssetSpec\UnturnedAssetSpec_LspServer.exe.snk</StrongNameKeyPath>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="exists($(StrongNameKeyPath))">
@@ -47,6 +48,10 @@
 
     <Content Include="../x64/$(Configuration)/**" CopyToOutputDirectory="PreserveNewest" Visible="false" />
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="favicon.ico" />
   </ItemGroup>
 
 	<ItemGroup>

@@ -31,7 +31,7 @@ internal class FileAssociationUtility
     {
         const string dataVersionValueName = "LspServer_AssocDataVersion";
 
-        string projIdKeyPath = $@"Software\Classes\{AssetProgId}";
+        const string projIdKeyPath = $@"Software\Classes\{AssetProgId}";
 
         int version = 0;
         RegistryKey? projIdKey = null;
@@ -145,7 +145,10 @@ internal class FileAssociationUtility
                 {
                     string[] paths =
                     [
-                        @"%LOCALAPPDATA%\Programs\Microsoft VS Code\Code.exe",
+                        Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                            @"Programs\Microsoft VS Code\Code.exe"
+                        ),
                         @"C:\Program Files\Microsoft VS Code\Code.exe",
                         @"C:\Program Files (x86)\Microsoft VS Code\Code.exe"
                     ];

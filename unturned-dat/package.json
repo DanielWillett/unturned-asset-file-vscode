@@ -169,6 +169,13 @@
                     "markdownDescription": "On Windows only, indicates whether or not `.dat`, `.asset`, `.udat`, and `.udatproj` files will be configured to launch in VS Code and have a custom icon set.",
                     "default": false
                 },
+                "unturned-data-file-lsp.registerDiskCleanupHandler":
+                {
+                    "type": "boolean",
+                    "scope": "machine",
+                    "markdownDescription": "On Windows only, indicates whether or not the cache folder will attempt to be registered with the Windows Disk Cleanup utility on startup. Requires elevated permissions (a popup will be shown beforehand).",
+                    "default": true
+                },
                 "unturned-data-file-lsp.offlineOnly":
                 {
                     "type": "boolean",

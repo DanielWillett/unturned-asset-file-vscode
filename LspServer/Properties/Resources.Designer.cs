@@ -185,5 +185,32 @@ namespace DanielWillett.UnturnedDataFileLspServer.Properties {
                 return ResourceManager.GetString("Hover_ValueTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clean up cache files used by the Unturned Data File language server. This includes downloaded asset specifications and uncompressed bundles (which can get quite large)..
+        /// </summary>
+        internal static string WindowsDiskCleanup_Description {
+            get {
+                return ResourceManager.GetString("WindowsDiskCleanup_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unturned Data File Language Server.
+        /// </summary>
+        internal static string WindowsDiskCleanup_Display {
+            get {
+                return ResourceManager.GetString("WindowsDiskCleanup_Display", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To register this extension&apos;s cache folder with the Windows Disk Cleanup utility, it needs to modify the machine&apos;s registry, which requires elevated permissions. The following command will be ran with elevated permissions, after which the extension will continue to run as a normal user: &apos;{0}&apos;. Would you like to proceed or skip this step?.
+        /// </summary>
+        internal static string WindowsDiskCleanup_PermissionRequest {
+            get {
+                return ResourceManager.GetString("WindowsDiskCleanup_PermissionRequest", resourceCulture);
+            }
+        }
     }
 }

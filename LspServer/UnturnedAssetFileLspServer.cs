@@ -1,3 +1,5 @@
+#define ALLOW_TRACE
+
 using DanielWillett.UnturnedDataFileLspServer.Data.CodeFixes;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
@@ -24,6 +26,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using OmniSharp.Extensions.JsonRpc;
 
 namespace DanielWillett.UnturnedDataFileLspServer;
 
@@ -34,6 +37,10 @@ internal sealed class UnturnedAssetFileLspServer
     public const string DiagnosticSource = "unturned-dat";
 
     private static ILogger<UnturnedAssetFileLspServer> _logger = null!;
+    private static DiskCleanupRegistrationUtility? _diskCleanupUtil;
+
+    private static readonly TaskCompletionSource<SendAdminPrivilegesResponseParams>?[] AdminPrompts
+        = new TaskCompletionSource<SendAdminPrivilegesResponseParams>?[1];
 
     public static long? ClientProcessId { get; private set; }
 
@@ -57,33 +64,34 @@ internal sealed class UnturnedAssetFileLspServer
     public static string DebugPath { get; private set; }
 #endif
 
+    public static string DataPath { get; private set; }
+
 #nullable restore
 
 
     private static async Task Main()
     {
-#if DEBUG
         bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         if (windows || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            DebugPath = Path.Combine(
+            DataPath = Path.Combine(
                 Environment.GetFolderPath(
                     windows
                         ? Environment.SpecialFolder.CommonApplicationData
-                        : Environment.SpecialFolder.InternetCache),
-                "UnturnedAssetFileLsp", "Debug"
+                        : Environment.SpecialFolder.InternetCache
+                ),
+                "UnturnedAssetFileLsp"
             );
         }
         else
         {
             // Linux, FreeBSD
-            DebugPath = "/var/cache/UnturnedAssetFileLsp/Debug";
+            DataPath = "/var/cache/UnturnedAssetFileLsp";
         }
 
-        Directory.CreateDirectory(DebugPath);
-#endif
-
+        Directory.CreateDirectory(DataPath);
 #if DEBUG
+        DebugPath = Path.Combine(DataPath, "Debug");
         if (EnvironmentHelper.ParseBooleanEnvironmentVariable("UNTURNED_LSP_DEBUG"))
         {
             Debugger.Launch();
@@ -92,7 +100,7 @@ internal sealed class UnturnedAssetFileLspServer
 
         _server = await LanguageServer.From(bldr =>
         {
-#if DEBUG
+#if ALLOW_TRACE
             bldr.OnSetTrace(trace =>
             {
                 if (trace.Value == InitializeTrace.Verbose)
@@ -126,6 +134,14 @@ internal sealed class UnturnedAssetFileLspServer
                 // .WithHandler<KeyCompletionHandler>()
                 .WithHandler<DiscoverAssetPropertiesHandler>()
                 .WithHandler<DiscoverBundleAssetsHandler>()
+                .OnNotification<SendAdminPrivilegesResponseParams>("unturnedDataFile/sendAdminPrivilegesResponse", p =>
+                {
+                    int index = p.Type - 1;
+                    if (index < 0 || index >= AdminPrompts.Length)
+                        return;
+
+                    Interlocked.Exchange(ref AdminPrompts[index], null)?.TrySetResult(p);
+                })
                 // .WithHandler<LspWorkspaceEnvironment>()
                 // todo: .WithHandler<GetAssetPropertyAddLocationHandler>()
                 // .WithHandler<CodeActionRequestHandler>()
@@ -170,7 +186,7 @@ internal sealed class UnturnedAssetFileLspServer
                 .OnInitialize(async (server, request, token) =>
                 {
                     _server = server;
-#if DEBUG
+#if ALLOW_TRACE
                     typeof(InitializeParams).GetField("<Trace>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance)!
                         .SetValue(request, InitializeTrace.Verbose);
                     object loggingManager = server.GetType().GetField("_languageServerLoggingManager", BindingFlags.NonPublic | BindingFlags.Instance)!
@@ -335,12 +351,17 @@ internal sealed class UnturnedAssetFileLspServer
 
         InitializeWorkspaceEnvironment();
 
-        bool registerFileAssociations = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && config.GetValue<bool>("registerFileAssociations");
+        bool registerFileAssociations = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                                        && config.GetValue<bool>("registerFileAssociations");
+
+        bool registerDiskCleanupHandler = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                                          && config.GetValue("registerDiskCleanupHandler", true)
+                                          && !EnvironmentHelper.ParseBooleanEnvironmentVariable(DiskCleanupRegistrationUtility.EnvVarDisableDiskCleanupHandler);
 
         workDoneManager.OnNext(new WorkDoneProgressReport
         {
             Message = "Initialized.",
-            Percentage = registerFileAssociations ? 95 : 99
+            Percentage = registerFileAssociations || registerDiskCleanupHandler ? 95 : 99
         });
 
         if (registerFileAssociations)
@@ -348,7 +369,7 @@ internal sealed class UnturnedAssetFileLspServer
             workDoneManager.OnNext(new WorkDoneProgressReport
             {
                 Message = "Checking file associations",
-                Percentage = 99
+                Percentage = registerDiskCleanupHandler ? 98 : 99
             });
 
             FileAssociationUtility util = ActivatorUtilities.CreateInstance<FileAssociationUtility>(_server.Services);
@@ -365,6 +386,89 @@ internal sealed class UnturnedAssetFileLspServer
         else
         {
             _logger.LogTrace("Skipping registering file associations.");
+        }
+
+        if (registerDiskCleanupHandler)
+        {
+            workDoneManager.OnNext(new WorkDoneProgressReport
+            {
+                Message = "Checking disk cleanup handler",
+                Percentage = 99
+            });
+
+            _diskCleanupUtil = ActivatorUtilities.CreateInstance<DiskCleanupRegistrationUtility>(_server.Services);
+            DiskCleanupRegistrationUtility.RegisterDiskCleanupHandlerResult result;
+            string? command = null;
+            try
+            {
+                result = _diskCleanupUtil.RegisterDiskCleanupHandler(false, out command);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error registering Windows disk cleanup handler.");
+                result = DiskCleanupRegistrationUtility.RegisterDiskCleanupHandlerResult.Failure;
+            }
+
+            if (result == DiskCleanupRegistrationUtility.RegisterDiskCleanupHandlerResult.RequiresPermission && !string.IsNullOrEmpty(command))
+            {
+                _logger.LogInformation("Waiting for permission to request admin privileges.");
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        TaskCompletionSource<SendAdminPrivilegesResponseParams> tcs = new TaskCompletionSource<SendAdminPrivilegesResponseParams>();
+                        AdminPrompts[0] = tcs;
+                        string message = string.Format(Properties.Resources.WindowsDiskCleanup_PermissionRequest, command);
+
+                        _logger.LogTrace("Sending admin permission request...");
+
+                        _server.SendNotification("unturnedDataFile/requestAdminPrivileges", new RequestAdminPrivilegesParams
+                        {
+                            Message = message,
+                            Type = 1
+                        });
+
+                        await Task.WhenAny(Task.Delay(60000, token), tcs.Task);
+
+                        if (!tcs.Task.IsCompleted)
+                        {
+                            _logger.LogWarning("Admin permission request timed out.");
+                            return;
+                        }
+
+                        SendAdminPrivilegesResponseParams response = tcs.Task.Result;
+                        if (!response.Allowed)
+                        {
+                            _logger.LogWarning("Denied request to register Windows disk cleanup handler.");
+                            return;
+                        }
+
+                        _logger.LogInformation("Accepted request to register Windows disk cleanup handler.");
+                        try
+                        {
+                            result = _diskCleanupUtil.RegisterDiskCleanupHandler(true, out command);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Error registering Windows disk cleanup handler.");
+                            result = DiskCleanupRegistrationUtility.RegisterDiskCleanupHandlerResult.Failure;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error checking for permission to register Windows disk cleanup handler.");
+                    }
+
+                }, token);
+            }
+            else if (result != DiskCleanupRegistrationUtility.RegisterDiskCleanupHandlerResult.Success)
+            {
+                _logger.LogError("Error registering Windows disk cleanup handler: {0}.", result);
+            }
+        }
+        else
+        {
+            _logger.LogTrace("Skipping registering disk cleanup handler.");
         }
     }
 

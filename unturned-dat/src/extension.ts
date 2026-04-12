@@ -1,6 +1,6 @@
 import { existsSync, accessSync, constants } from 'fs';
 import { join } from 'path';
-import { commands, Disposable, env, ExtensionContext, LogLevel, window, workspace, LogOutputChannel } from 'vscode';
+import { commands, Disposable, env, ExtensionContext, LogLevel, window, workspace, LogOutputChannel, ConfigurationTarget, MarkdownString } from 'vscode';
 import { ExecutableOptions, LanguageClient, LanguageClientOptions, ServerOptions, State, TransportKind } from 'vscode-languageclient/node';
 
 import { execFile, execFileSync, spawnSync } from 'child_process';
@@ -17,6 +17,7 @@ import { GetDocumentText, handleGetDocumentText } from './jsonrpc/get-document-t
 import { Ready } from './jsonrpc/ready';
 import { getEnvironmentData } from 'worker_threads';
 import { Trace } from "vscode-jsonrpc";
+import { RequestAdminPrivileges, SendAdminPrivilegesResponse } from "./jsonrpc/request-admin-privileges";
 
 
 export const languageId = "unturned-dat";
@@ -269,6 +270,25 @@ export async function activate(context: ExtensionContext): Promise<void>
             output?.info("Language server is ready.");
             isReady = true;
             await commands.executeCommand("unturnedDataFile.assetProperties.refreshAssetProperties");
+        }));
+
+        registrations.push(client.onNotification(RequestAdminPrivileges, async event =>
+        {
+            const result = await window.showInformationMessage(event.message, "Allow", "Not now", "Don't ask again");
+
+            switch (result)
+            {
+                case "Allow":
+                    client?.sendNotification(SendAdminPrivilegesResponse, { type: event.type, allowed: true });
+                    return;
+
+                case "Don't ask again":
+                    const config = workspace.getConfiguration(configSection);
+                    await config.update("registerDiskCleanupHandler", false, ConfigurationTarget.Global);
+                    break;
+            }
+
+            client?.sendNotification(SendAdminPrivilegesResponse, { type: event.type, allowed: false });
         }));
 
         await client.start();
