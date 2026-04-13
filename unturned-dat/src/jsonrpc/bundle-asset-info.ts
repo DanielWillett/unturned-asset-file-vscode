@@ -6,5 +6,6 @@ export const DiscoverBundleAssets = new RequestType<DiscoverBundleAssetsParams, 
 export interface DiscoverBundleAssetsParams
 {
     readonly document: string,
+    readonly key: string | undefined,
     readonly path: string | undefined;
 }

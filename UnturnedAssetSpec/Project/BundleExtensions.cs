@@ -7,6 +7,10 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
@@ -16,6 +20,11 @@ public static class BundleExtensions
     extension(IBundleProxy bundle)
     {
         /// <summary>
+        /// A bundle that doesn't exist.
+        /// </summary>
+        public static IBundleProxy Null => NullBundleProxy.Instance;
+
+        /// <summary>
         /// Creates a <see cref="UnityObject"/> in a <see cref="IBundleProxy"/> from an asset name.
         /// </summary>
         /// <param name="assetName">The asset name, such as <c>Item</c>.</param>
@@ -24,6 +33,11 @@ public static class BundleExtensions
         /// <returns>An object representing the given unity asset, or <see langword="null"/> if it's not present.</returns>
         public UnityObject? GetCorrespondingAsset(string assetName, IPropertyType type, ref FileEvaluationContext ctx)
         {
+            if (bundle is NullBundleProxy)
+            {
+                return null;
+            }
+
             if (!type.TryEvaluateType(out IType? actualType, ref ctx) || actualType is not IBundleAssetType bundleAssetType)
             {
                 return null;
@@ -106,10 +120,190 @@ public static class BundleExtensions
                     PlatformLockHelper.ExitLock(@lock!);
             }
         }
+
+        /// <summary>
+        /// Enumerate all <see cref="UnityObject"/>s logically contained in the bundle.
+        /// </summary>
+        /// <param name="services">Workspace services.</param>
+        /// <param name="classId">Type filter. If <see cref="AssetClassID.Object"/>, all assets will be selected. Use <paramref name="selector"/> for more control.</param>
+        /// <param name="selector">Predicate applied to each asset's header.</param>
+        public BundleProxyEnumerator EnumerateAssets(
+            IParsingServices services,
+            AssetClassID classId = AssetClassID.Object,
+            Func<AssetFileInfo, bool>? selector = null
+        )
+        {
+            BundleProxyEnumerator enumerator = new BundleProxyEnumerator(services, bundle, classId, selector);
+
+            if (bundle is NullBundleProxy)
+            {
+                return enumerator;
+            }
+
+            try
+            {
+                if (!BundleUtility.TryLockBundle(
+                        bundle,
+                        services,
+                        ref enumerator.Lock,
+                        ref enumerator.HasLock,
+                        out enumerator.Bundle,
+                        out enumerator.File,
+                        out enumerator.Manager))
+                {
+                    throw new InvalidOperationException("Unable to enumerate children. Bundle could not be loaded.");
+                }
+
+                if (bundle.Path != null)
+                {
+                    enumerator.Prefix = enumerator.Bundle.Prefix == null
+                        ? bundle.Path
+                        : OSPathHelper.CombineWithUnixSeparators(enumerator.Bundle.Prefix, bundle.Path);
+                }
+
+                return enumerator;
+            }
+            catch
+            {
+                if (enumerator.HasLock)
+                    PlatformLockHelper.ExitLock(enumerator.Lock!);
+                throw;
+            }
+        }
+
     }
 
     private static UnityObject Create(IBundleProxy bundle, IBundleAssetType type, AssetsFileInstance file, AssetFileInfo fileInfo, IParsingServices parsingServices, string assetPath)
     {
         return new UnityObject(type, assetPath, bundle, file, fileInfo, parsingServices);
+    }
+}
+
+
+/// <summary>
+/// Enumerates bundle assets within a <see cref="IBundleProxy"/>.
+/// <para>
+/// Must be disposed after usage to avoid deadlocks.
+/// </para>
+/// </summary>
+/// <remarks>Objects are created lazily so they will only be read as the enumerator progresses.</remarks>
+public sealed class BundleProxyEnumerator : IEnumerator<UnityObject>
+{
+    private readonly IParsingServices _services;
+    private readonly IBundleProxy _bundle;
+    private readonly AssetClassID _classId;
+    private readonly Func<AssetFileInfo, bool>? _selector;
+
+    internal TfmLock? Lock;
+    internal string? Prefix;
+    internal bool HasLock;
+    internal DiscoveredBundle? Bundle;
+    internal AssetsFileInstance? File;
+    internal AssetsManager? Manager;
+    private int _state;
+    private ImmutableDictionary<long, string>.Enumerator _underlyingEnumerator;
+
+    internal BundleProxyEnumerator(
+        IParsingServices services,
+        IBundleProxy bundle,
+        AssetClassID classId = 0,
+        Func<AssetFileInfo, bool>? selector = null)
+    {
+        _services = services;
+        _bundle = bundle;
+        _classId = classId;
+        _selector = selector;
+    }
+
+#nullable disable
+
+    /// <inheritdoc />
+    public UnityObject Current { get; private set; }
+
+    object IEnumerator.Current => Current;
+
+#nullable restore
+
+    /// <inheritdoc />
+    public void Reset()
+    {
+        if (_state <= 0)
+            return;
+
+        _underlyingEnumerator.Reset();
+        _state = 1;
+    }
+
+    /// <inheritdoc />
+    public bool MoveNext()
+    {
+        switch (_state)
+        {
+            case 0:
+                if (Bundle?.PathCache == null || Bundle.FilePreloadCache == null)
+                {
+                    return false;
+                }
+
+                // ReSharper disable once GenericEnumeratorNotDisposed
+                _underlyingEnumerator = Bundle.PathCache.GetEnumerator();
+                _state = 1;
+                goto case 1;
+
+            case 1:
+                while (_underlyingEnumerator.MoveNext())
+                {
+                    KeyValuePair<long, string> pair = _underlyingEnumerator.Current;
+                    if (Prefix != null && !pair.Value.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    if (!Bundle!.FilePreloadCache!.TryGetValue(pair.Key, out AssetFileInfo? fileInfo))
+                    {
+                        continue;
+                    }
+
+                    if (!_services.Installation.KnownUnityClassTypes.TryGetValue(
+                            (AssetClassID)fileInfo.TypeId, out IBundleAssetType? type)
+                       )
+                    {
+                        continue;
+                    }
+
+                    if (_classId != AssetClassID.Object && (AssetClassID)fileInfo.TypeId != _classId)
+                    {
+                        continue;
+                    }
+
+                    if (_selector != null && _selector(fileInfo))
+                    {
+                        continue;
+                    }
+
+                    Current = new UnityObject(type, pair.Value, _bundle, File!, fileInfo, _services);
+                    return true;
+                }
+
+                _state = 2;
+                goto default;
+
+            default:
+                return false;
+        }
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (_state > 0)
+        {
+            _underlyingEnumerator.Dispose();
+        }
+        if (!HasLock)
+            return;
+
+        PlatformLockHelper.ExitLock(Lock!);
+        HasLock = false;
     }
 }

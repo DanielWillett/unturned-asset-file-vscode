@@ -30,12 +30,12 @@ internal static class BundleUtility
         return true;
     }
 
-    internal static bool TryLockBundle(
-        IBundleProxy proxy,
+    internal static bool TryLockBundle(IBundleProxy proxy,
         IParsingServices services,
         ref TfmLock? @lock,
         ref bool hasLock,
         [NotNullWhen(true)] out DiscoveredBundle? bndl,
+        [NotNullWhen(true)] out AssetsFileInstance? file,
         [NotNullWhen(true)] out AssetsManager? assetsManager)
     {
         while (true)
@@ -57,8 +57,11 @@ internal static class BundleUtility
         }
 
         assetsManager = services.Installation.AssetBundleManager;
-        if (bndl == null)
+        file = bndl?.Openedfile.AssetBundle;
+        if (file == null)
+        {
             return false;
+        }
 
         return assetsManager != null;
     }
@@ -96,7 +99,7 @@ internal static class BundleUtility
 
         try
         {
-            if (!TryLockBundle(proxy, services, ref @lock, ref hasLock, out DiscoveredBundle? bndl, out AssetsManager? assetsManager))
+            if (!TryLockBundle(proxy, services, ref @lock, ref hasLock, out DiscoveredBundle? bndl, out _, out AssetsManager? assetsManager))
             {
                 return false;
             }
@@ -144,7 +147,7 @@ internal static class BundleUtility
 
         try
         {
-            if (!TryLockBundle(proxy, services, ref @lock, ref hasLock, out DiscoveredBundle? bndl, out AssetsManager? assetsManager))
+            if (!TryLockBundle(proxy, services, ref @lock, ref hasLock, out DiscoveredBundle? bndl, out _, out AssetsManager? assetsManager))
             {
                 return false;
             }

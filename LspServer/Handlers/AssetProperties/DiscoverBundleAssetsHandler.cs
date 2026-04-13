@@ -41,6 +41,11 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
             return Task.FromResult(Empty);
         }
 
+        if (!string.IsNullOrEmpty(request.Key))
+        {
+            
+        }
+
         List<BundleAssetInfo> outputProperties = new List<BundleAssetInfo>(8);
 
         for (DatFileType? ft = assetType; ft != null; ft = ft.Parent)
@@ -51,6 +56,7 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
             ImmutableArray<DatBundleAsset> bundleAssets = type.BundleAssets;
             for (int i = 0; i < bundleAssets.Length; i++)
             {
+                // todo: template groups
                 DatBundleAsset unityAsset = bundleAssets[i];
                 BundleAssetInfo prop = new BundleAssetInfo
                 {
@@ -59,27 +65,29 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
                     TypeName = unityAsset.Type.TypeName.GetTypeName()
                 };
 
-                if (unityAsset.Description != null && unityAsset.Description.TryEvaluateValue(out Optional<string> desc, ref ctx))
+                if (unityAsset.Description?.TryEvaluateValue(out Optional<string> desc, ref ctx) is true)
                 {
                     prop.Description = desc.Value;
                 }
 
-                if (unityAsset.MarkdownDescription != null && unityAsset.MarkdownDescription.TryEvaluateValue(out desc, ref ctx))
+                if (unityAsset.MarkdownDescription?.TryEvaluateValue(out desc, ref ctx) is true)
                 {
                     prop.Markdown = desc.Value;
                 }
 
+                if (unityAsset.Required?.TryEvaluateValue(out Optional<bool> isRequired, ref ctx) is true)
+                {
+                    prop.IsRequired = isRequired.Value;
+                }
+
                 IBundleProxy bundle = sourceFile.WorkspaceFile.Bundle;
                 UnityObject? obj = bundle.GetCorrespondingAsset(unityAsset.Key, unityAsset.Type, ref ctx);
-                if (obj == null)
-                {
-                    prop.Path = string.Empty;
-                }
-                else
+                if (obj != null)
                 {
                     prop.Path = obj.Path;
+                    prop.HasChildren = obj.Transform?.ChildCount > 0;
                     string? prefix = bundle.Bundle?.Prefix;
-                    if (!string.IsNullOrEmpty(prefix) && prop.Path.StartsWith(prefix))
+                    if (!string.IsNullOrEmpty(prefix) && prop.Path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                     {
                         prop.Path = prop.Path[prefix.Length..];
                     }

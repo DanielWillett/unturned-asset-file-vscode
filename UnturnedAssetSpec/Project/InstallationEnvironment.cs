@@ -10,6 +10,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
@@ -85,6 +86,38 @@ public class InstallationEnvironment : IDisposable
             return field ?? ImmutableHashSet<AssetClassID>.Empty;
         }
     }
+
+    [field: MaybeNull]
+    internal ImmutableDictionary<AssetClassID, IBundleAssetType> KnownUnityClassTypes
+    {
+        get
+        {
+            if (field == null && _database.Information != null)
+            {
+                ImmutableDictionary<AssetClassID, IBundleAssetType>.Builder knownClassTypes = ImmutableDictionary.CreateBuilder<AssetClassID, IBundleAssetType>();
+
+                if (_database.Information.KnownUnityClassTypes != null)
+                {
+                    foreach (KeyValuePair<string, QualifiedType> pair in _database.Information.KnownUnityClassTypes)
+                    {
+                        if (Enum.TryParse(pair.Key, out AssetClassID id))
+                        {
+                            knownClassTypes.Add(id, UnityObjectAssetType.Create(pair.Value));
+                        }
+                        else
+                        {
+                            Logger.LogWarning("Unknown KnownUnityClassTypes: {0}.", pair.Key);
+                        }
+                    }
+                }
+
+                field = knownClassTypes.ToImmutable();
+            }
+
+            return field ?? ImmutableDictionary<AssetClassID, IBundleAssetType>.Empty;
+        }
+    }
+
 
     internal AssetsManager? AssetBundleManager;
     internal InstallationEnvironmentAssetBundleCache BundleCache;

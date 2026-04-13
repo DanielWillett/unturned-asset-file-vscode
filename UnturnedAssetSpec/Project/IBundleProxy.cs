@@ -37,20 +37,6 @@ public interface IBundleProxy
     bool ConsolidateShaders { get; }
 }
 
-/// <summary>
-/// Extensions for <see cref="IBundleProxy"/> objects.
-/// </summary>
-public static class BundleProxyExtensions
-{
-    extension(IBundleProxy)
-    {
-        /// <summary>
-        /// A bundle that doesn't exist.
-        /// </summary>
-        public static IBundleProxy Null => NullBundleProxy.Instance;
-    }
-}
-
 internal sealed class NullBundleProxy : IBundleProxy
 {
     internal static readonly NullBundleProxy Instance = new NullBundleProxy();

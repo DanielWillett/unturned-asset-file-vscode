@@ -34,6 +34,8 @@ public class AssetInformation
 
     public Dictionary<string, QualifiedType> KnownFileNames { get; set; }
 
+    public Dictionary<string, QualifiedType> KnownUnityClassTypes { get; set; }
+
     [JsonIgnore] // generated at runtime from Types
     [field: MaybeNull]
     public Dictionary<QualifiedType, InverseTypeHierarchy> ParentTypes => field ??= RegenParentTypes();

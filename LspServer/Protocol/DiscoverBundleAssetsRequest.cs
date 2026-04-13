@@ -17,7 +17,13 @@ public class DiscoverBundleAssetsParams : IRequest<Container<BundleAssetInfo>>
     public required DocumentUri Document { get; set; }
 
     /// <summary>
-    /// Path to the property to get children for.
+    /// Key of the property to get children for.
+    /// </summary>
+    [JsonProperty("key")]
+    public string? Key { get; set; }
+
+    /// <summary>
+    /// Path to child object to get children for (the Transform.Find argument).
     /// </summary>
     [JsonProperty("path")]
     public string? Path { get; set; }

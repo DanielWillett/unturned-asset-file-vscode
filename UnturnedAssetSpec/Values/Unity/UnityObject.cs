@@ -22,7 +22,6 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>,
 
     private AssetTypeValueField? _baseField;
     private readonly IParsingServices _services;
-    private readonly int _level;
     private bool _disposed;
 
     private UnityTransform? _transform;
@@ -76,14 +75,12 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>,
         IBundleProxy bundle,
         AssetsFileInstance file,
         AssetFileInfo fileInfo,
-        IParsingServices services,
-        int level = 0
+        IParsingServices services
     )
     {
         _file = file;
         _pathInfo = fileInfo;
         _services = services;
-        _level = level;
         Type = type;
         Bundle = bundle;
         Path = path;
@@ -148,7 +145,7 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>,
                         if (!bundle.FilePreloadCache.TryGetValue(pathId, out AssetFileInfo? componentFileInfo))
                             continue;
 
-                        @this._transform = new UnityTransform(null, @this, @this._file, componentFileInfo, @this._level, @this._services);
+                        @this._transform = new UnityTransform(null, @this, @this._file, componentFileInfo, 0, @this._services);
                         @this._hasTransform = true;
 
                         if (@this._disposed)

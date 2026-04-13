@@ -24,4 +24,13 @@ public class BundleAssetInfo
 
     [JsonProperty("isComponent")]
     public bool IsComponent { get; set; }
+
+    [JsonProperty("hasChildren")]
+    public bool HasChildren { get; set; }
+
+    [JsonProperty("isRequired")]
+    public bool IsRequired { get; set; }
+
+    [JsonProperty("isUnknown")]
+    public bool IsUnknown { get; set; }
 }

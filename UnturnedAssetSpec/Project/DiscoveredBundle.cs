@@ -20,7 +20,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 /// </summary>
 public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
 {
-    private BundleData _openedfile;
+    internal BundleData Openedfile;
     private AssetsManager? _assetsManager;
     private InstallationEnvironment? _installationEnvironment;
 
@@ -33,8 +33,8 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
     internal int Index = -1;
     internal bool IsDisposed;
 
-    private ImmutableDictionary<long, string>? _pathCache;
-    private ImmutableDictionary<string, int>? _nameCache;
+    internal ImmutableDictionary<long, string>? PathCache;
+    internal ImmutableDictionary<string, int>? NameCache;
 
     private BundleOperatingSystems? _operatingSystems;
     private UnityEngineVersion? _buildVersion;
@@ -409,7 +409,7 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
             nameOrPath = OSPathHelper.CombineWithUnixSeparators(Prefix, nameOrPath);
         }
 
-        if (_nameCache == null || data.AssetBundle == null || !_nameCache.TryGetValue(nameOrPath, out int index))
+        if (NameCache == null || data.AssetBundle == null || !NameCache.TryGetValue(nameOrPath, out int index))
         {
             return false;
         }
@@ -425,7 +425,7 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
         if (val is not { IsDummy: false })
             return false;
 
-        return _pathCache != null && _pathCache.TryGetValue(fileInfo.PathId, out path);
+        return PathCache != null && PathCache.TryGetValue(fileInfo.PathId, out path);
     }
 
     /// <summary>
@@ -437,7 +437,7 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
     {
         InstallationEnvironment env = ApplyInstallationEnvironment(parsingServices.Installation);
 
-        BundleData? file = _openedfile;
+        BundleData? file = Openedfile;
         if (file.HasValue)
         {
             return file.Value;
@@ -454,7 +454,7 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
     {
         InstallationEnvironment env = ApplyInstallationEnvironment(parsingServices.Installation);
 
-        BundleData file = _openedfile;
+        BundleData file = Openedfile;
         if (file.Info != null)
         {
             return file;
@@ -467,9 +467,9 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
         if (IsDisposed)
             throw new ObjectDisposedException(nameof(DiscoveredBundle));
 
-        if (_openedfile.Info != null)
+        if (Openedfile.Info != null)
         {
-            return _openedfile;
+            return Openedfile;
         }
 
         AssetsManager? assetsManager = env.AssetBundleManager;
@@ -546,7 +546,7 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
         }
 
         AssetsFileInstance assetFile = assetsManager.LoadAssetsFileFromBundle(file, 0);
-        _openedfile = new BundleData(file, assetFile, assetsManager);
+        Openedfile = new BundleData(file, assetFile, assetsManager);
 
         IList<AssetFileInfo> assets = assetFile.file.Metadata.AssetInfos;
 
@@ -647,8 +647,8 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
             }
         }
 
-        _nameCache = nameIndexMap.ToImmutable();
-        _pathCache = pathIdMap.ToImmutable();
+        NameCache = nameIndexMap.ToImmutable();
+        PathCache = pathIdMap.ToImmutable();
 
         FilePreloadCache = fileCache.ToImmutable();
 
@@ -672,8 +672,8 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
 
         lock (env.AssetBundleLock)
         {
-            BundleData data = _openedfile;
-            _openedfile = default;
+            BundleData data = Openedfile;
+            Openedfile = default;
             BundleFileInstance? file = data.Info;
             if (file == null)
                 return;

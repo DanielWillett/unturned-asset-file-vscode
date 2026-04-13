@@ -22204,7 +22204,7 @@ __export(extension_exports, {
   getAssetPropertiesViewProvider: () => getAssetPropertiesViewProvider,
   getClient: () => getClient,
   getIsReady: () => getIsReady,
-  getOutputChannel: () => getOutputChannel,
+  getOutputChannel: () => getOutputChannel2,
   languageId: () => languageId
 });
 module.exports = __toCommonJS(extension_exports);
@@ -22258,11 +22258,12 @@ var AssetPropertiesViewProvider = class _AssetPropertiesViewProvider {
       }
       this.propertyValues = [];
     } else {
-      const result = await getClient().sendRequest(DiscoverAssetProperties, { document: txtDoc.document.uri.toString() });
+      const document = txtDoc.document.uri.toString();
+      const result = await getClient().sendRequest(DiscoverAssetProperties, { document });
       if (this.propertyValues.length === result.length && result.every((prop, i) => this.propertyValues[i].property === prop)) {
         return false;
       }
-      this.propertyValues = result.map((prop) => AssetPropertyViewItem.createForAssetProperty(prop, null, -1));
+      this.propertyValues = result.map((prop) => AssetPropertyViewItem.createForAssetProperty(prop, null, document, -1));
       this.bundleChildrenElements = null;
     }
     this._onDidChangeTreeData.fire();
@@ -22278,35 +22279,34 @@ var AssetPropertiesViewProvider = class _AssetPropertiesViewProvider {
     if (element.property?.isBundleHeader) {
       if (this.bundleChildrenElements)
         return this.bundleChildrenElements;
-      return this.getBundleChildren(element);
+      return this.getBundleAssets(element);
+    }
+    if (element.bundleObject) {
+      return element.children ?? element.getBundleChildren();
     }
     return element.getChildren();
   }
-  async getBundleChildren(parent) {
+  async getBundleAssets(parent) {
     const txtDoc = import_vscode.window.activeTextEditor;
-    if (txtDoc === void 0 || !isDatFile(txtDoc.document.uri) || !getIsReady()) {
-      this.bundleChildren = [];
-      this.bundleChildrenElements = [];
-      return this.bundleChildrenElements;
+    if (!txtDoc) {
+      return [];
     }
+    const document = txtDoc.document.uri.toString();
     this.bundleRequestVersion += 1;
     const startVersion = this.bundleRequestVersion;
-    getOutputChannel().info("Sending request...");
-    const result = await getClient().sendRequest(DiscoverBundleAssets, { document: txtDoc.document.uri.toString(), path: void 0 });
-    getOutputChannel().info("response");
-    getOutputChannel().info(JSON.stringify(result));
-    const elements = _AssetPropertiesViewProvider.createBundleChildren(parent, result);
-    if (startVersion === this.bundleRequestVersion) {
+    const result = await getClient().sendRequest(DiscoverBundleAssets, { document, path: void 0, key: void 0 });
+    const elements = _AssetPropertiesViewProvider.createBundleChildren(parent, result, document);
+    if (startVersion === this.bundleRequestVersion || !this.bundleChildrenElements) {
       this.bundleChildren = result;
       this.bundleChildrenElements = elements;
     }
-    return elements;
+    return this.bundleChildrenElements;
   }
-  static createBundleChildren(parent, bundleChildren) {
+  static createBundleChildren(parent, bundleChildren, documentUri) {
     const outputs = [];
     for (let i = 0; i < bundleChildren.length; ++i) {
       const bundleInfo = bundleChildren[i];
-      outputs[i] = AssetPropertyViewItem.createForBundleObject(bundleInfo, parent);
+      outputs[i] = AssetPropertyViewItem.createForBundleObject(bundleInfo, parent, documentUri);
     }
     return outputs;
   }
@@ -22320,50 +22320,86 @@ var AssetPropertiesViewProvider = class _AssetPropertiesViewProvider {
 };
 var AssetPropertyViewItem = class _AssetPropertyViewItem extends import_vscode.TreeItem {
   property;
-  bundleObject;
   children;
   parent;
   typeIndex;
-  static createForAssetProperty(property, parent, typeIndex) {
+  bundleRequestVersion = 0;
+  documentUri;
+  bundleObject;
+  bundleChildren = null;
+  static createForAssetProperty(property, parent, documentUri, typeIndex) {
     const name = typeIndex >= 0 ? property.typeHierarchy[typeIndex].displayName : getName(property);
     const state = property.isBundleHeader || typeIndex < 0 && (property.children || property.typeHierarchy) ? import_vscode.TreeItemCollapsibleState.Collapsed : import_vscode.TreeItemCollapsibleState.None;
     const icon = typeIndex >= 0 ? new import_vscode.ThemeIcon("type-hierarchy-super") : getValueIcon(property);
-    const item = new _AssetPropertyViewItem(name, state, icon, parent, typeIndex);
+    const item = new _AssetPropertyViewItem(name, state, icon, parent, documentUri, typeIndex);
     item.property = property;
     return item;
   }
-  static createForBundleObject(object, parent) {
-    const name = object.key;
-    const icon = new import_vscode.ThemeIcon(object.path ? "build" : "question");
-    const item = new _AssetPropertyViewItem(name, import_vscode.TreeItemCollapsibleState.None, icon, parent, -1);
+  static createForBundleObject(object, parent, documentUri) {
+    const name = object.isComponent ? object.typeName : object.key;
+    const state = object.path && !object.isComponent && object.hasChildren ? import_vscode.TreeItemCollapsibleState.Collapsed : import_vscode.TreeItemCollapsibleState.None;
+    let icon;
+    if (object.isComponent) {
+      icon = new import_vscode.ThemeIcon("symbol-misc");
+    } else if (!object.path) {
+      icon = new import_vscode.ThemeIcon(object.isRequired ? "error" : "circle-large");
+    } else {
+      icon = new import_vscode.ThemeIcon(object.isUnknown ? "question" : "package");
+    }
+    const item = new _AssetPropertyViewItem(name, state, icon, parent, documentUri, -1);
     item.bundleObject = object;
     return item;
   }
-  constructor(name, collapsableState, iconPath, parent, typeIndex) {
+  constructor(name, collapsableState, iconPath, parent, documentUri, typeIndex) {
     super(name, collapsableState);
     this.children = null;
+    this.documentUri = documentUri;
     this.iconPath = iconPath;
     this.parent = parent;
     this.typeIndex = typeIndex;
   }
+  async getBundleChildren() {
+    if (!this.bundleObject) {
+      return [];
+    }
+    if (!this.bundleObject.hasChildren || this.bundleObject.isComponent) {
+      return [];
+    }
+    this.bundleRequestVersion += 1;
+    const startVersion = this.bundleRequestVersion;
+    const result = await getClient().sendRequest(
+      DiscoverBundleAssets,
+      {
+        document: this.documentUri,
+        path: this.bundleObject.path,
+        key: this.bundleObject.key
+      }
+    );
+    const elements = AssetPropertiesViewProvider.createBundleChildren(this, result, this.documentUri);
+    if (startVersion === this.bundleRequestVersion) {
+      this.bundleChildren = result;
+      this.children = elements;
+    }
+    return elements;
+  }
   getChildren() {
+    if (this.children) {
+      return this.children;
+    }
     if (this.typeIndex >= 0 || !this.property) {
       return [];
     }
     if (this.property.typeHierarchy) {
       this.children = [];
       for (let i = 0; i < this.property.typeHierarchy.length; ++i) {
-        this.children.push(_AssetPropertyViewItem.createForAssetProperty(this.property, this, i));
+        this.children.push(_AssetPropertyViewItem.createForAssetProperty(this.property, this, this.documentUri, i));
       }
       return this.children;
     }
     if (!this.property.children) {
       return [];
     }
-    if (this.children) {
-      return this.children;
-    }
-    this.children = this.property.children.map((prop) => _AssetPropertyViewItem.createForAssetProperty(prop, this, -1));
+    this.children = this.property.children.map((prop) => _AssetPropertyViewItem.createForAssetProperty(prop, this, this.documentUri, -1));
     return this.children;
   }
   resolve() {
@@ -22581,7 +22617,7 @@ function getClient() {
   }
   return client;
 }
-function getOutputChannel() {
+function getOutputChannel2() {
   if (!output) {
     throw new Error("Uninitialized.");
   }

@@ -6,5 +6,8 @@ export interface BundleAssetInfo
     path: string | undefined,
     description: string | undefined,
     markdown: string | undefined,
-    isComponent: boolean;
+    isComponent: boolean,
+    hasChildren: boolean,
+    isRequired: boolean,
+    isUnknown: boolean;
 }

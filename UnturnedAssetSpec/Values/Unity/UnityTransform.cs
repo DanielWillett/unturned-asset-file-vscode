@@ -184,6 +184,12 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
         }
     }
 
+    /// <summary>
+    /// Number of hierarchical levels from being a root object.
+    /// </summary>
+    /// <remarks>A value of <c>0</c> indicates the transform belongs to a root object, <c>1</c> indicates a child of a root object, etc.</remarks>
+    public int Depth => _level;
+
     public UnityTransform(UnityTransform? parent, UnityObject rootObject, AssetsFileInstance file, AssetFileInfo transformPathInfo, int level, IParsingServices services)
     {
         Object = rootObject;
@@ -578,7 +584,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
         ChildEnumerator enumerator = new ChildEnumerator(this);
         try
         {
-            if (!BundleUtility.TryLockBundle(_bundle, _services, ref enumerator.Lock, ref enumerator.HasLock, out enumerator.Bundle, out enumerator.Manager))
+            if (!BundleUtility.TryLockBundle(_bundle, _services, ref enumerator.Lock, ref enumerator.HasLock, out enumerator.Bundle, out _, out enumerator.Manager))
             {
                 throw new InvalidOperationException("Unable to enumerate children. Bundle could not be loaded.");
             }
