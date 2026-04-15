@@ -71,6 +71,12 @@ public static class OSPathHelper
         return prevChar == Path.DirectorySeparatorChar || prevChar == Path.AltDirectorySeparatorChar;
     }
 
+    /// <inheritdoc cref="Contains(string,string,StringComparison)"/>
+    public static bool Contains(string directory, string path)
+    {
+        return Contains(directory, path, PathComparison);
+    }
+
     /// <summary>
     /// Checks whether a <paramref name="path"/> is within the given <paramref name="directory"/>.
     /// Expects that both paths are absolute and normalized.
@@ -78,7 +84,7 @@ public static class OSPathHelper
     /// <remarks>Effectively the same as <c><paramref name="path"/>.StartsWith(<paramref name="directory"/>, <see cref="PathComparison"/>)</c> but handles the following edge case:
     /// <code>"Folder1/Folder23".StartsWith("Folder1/Folder2")</code>
     /// </remarks>
-    public static bool Contains(string directory, string path)
+    public static bool Contains(string directory, string path, StringComparison comparison)
     {
         if (directory.Length == 0 || directory.Length > path.Length)
             return false;
@@ -86,9 +92,9 @@ public static class OSPathHelper
         char lastChar = directory[^1];
         // trim trailing slash
         if (lastChar == Path.DirectorySeparatorChar || lastChar == Path.AltDirectorySeparatorChar)
-            return Contains(directory.AsSpan(0, directory.Length - 1), path);
+            return Contains(directory.AsSpan(0, directory.Length - 1), path, comparison);
 
-        if (!path.StartsWith(directory, PathComparison))
+        if (!path.StartsWith(directory, comparison))
             return false;
 
         if (path.Length == directory.Length)
@@ -98,8 +104,14 @@ public static class OSPathHelper
         return lastChar == Path.DirectorySeparatorChar || lastChar == Path.AltDirectorySeparatorChar;
     }
 
-    /// <inheritdoc cref="Contains(string,string)"/>
+    /// <inheritdoc cref="Contains(string,string,StringComparison)"/>
     public static bool Contains(ReadOnlySpan<char> directory, ReadOnlySpan<char> path)
+    {
+        return Contains(directory, path, PathComparison);
+    }
+
+    /// <inheritdoc cref="Contains(string,string,StringComparison)"/>
+    public static bool Contains(ReadOnlySpan<char> directory, ReadOnlySpan<char> path, StringComparison comparison)
     {
         if (directory.Length == 0 || directory.Length > path.Length)
             return false;
@@ -111,7 +123,7 @@ public static class OSPathHelper
             directory = directory[..^1];
         }
 
-        if (!path.StartsWith(directory, PathComparison))
+        if (!path.StartsWith(directory, comparison))
             return false;
 
         if (path.Length == directory.Length)

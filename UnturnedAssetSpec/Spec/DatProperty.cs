@@ -417,6 +417,91 @@ public class DatProperty : IDatSpecificationObject
         }
     }
 
+    public readonly struct KeyMatch
+    {
+        public static readonly KeyMatch None = new KeyMatch(-1);
+
+        public readonly int KeyIndex;
+        public readonly OneOrMore<int> Indices;
+
+        public KeyMatch(int keyIndex)
+        {
+            KeyIndex = keyIndex;
+            Indices = OneOrMore<int>.Null;
+        }
+
+        public KeyMatch(int keyIndex, OneOrMore<int> indices)
+        {
+            KeyIndex = keyIndex;
+            Indices = indices;
+        }
+    }
+
+    /// <inheritdoc cref="MatchesKey(string,ref FileEvaluationContext,bool,out DatProperty.KeyMatch)"/>
+    public virtual bool MatchesKey(string candidateKey, ref FileEvaluationContext ctx, out KeyMatch match)
+    {
+        return MatchesKey(candidateKey, ref ctx, true, out match);
+    }
+
+    /// <summary>
+    /// Checks whether a not a property name could refer to this property.
+    /// </summary>
+    /// <param name="candidateKey">The property name.</param>
+    /// <param name="ctx">Workspace context.</param>
+    /// <param name="isCaseInsensitive">Whether or not the comparison should ignore case.
+    /// Defaults to <see langword="true"/> on normal properties and <see langword="false"/> on bundle assets.</param>
+    /// <param name="match">Information about the key that was matched.</param>
+    /// <returns>Whether or not a key was matched.</returns>
+    public virtual bool MatchesKey(string candidateKey, ref FileEvaluationContext ctx, bool isCaseInsensitive, out KeyMatch match)
+    {
+        StringComparison comparison = isCaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        if (Keys.IsDefaultOrEmpty)
+        {
+            if (!Key.Equals(candidateKey, comparison))
+            {
+                match = KeyMatch.None;
+                return false;
+            }
+
+            match = new KeyMatch(0);
+            return true;
+        }
+
+        LegacyExpansionFilter keyFilter = LegacyExpansionFilter.Either;
+        bool hasKeyFilter = false;
+        for (int i = 0; i < Keys.Length; i++)
+        {
+            DatPropertyKey key = Keys[i];
+            if (!key.Key.Equals(candidateKey, comparison))
+            {
+                continue;
+            }
+
+            if (!hasKeyFilter)
+            {
+                keyFilter = ctx.GetKeyFilter();
+                hasKeyFilter = true;
+            }
+
+            if (!SourceNodeExtensions.FilterMatches(key.Filter, keyFilter))
+            {
+                continue;
+            }
+
+            if (key.Condition != null && (!key.Condition.TryEvaluateValue(out Optional<bool> conditionValue, ref ctx) ||
+                                          !conditionValue.Value))
+            {
+                continue;
+            }
+
+            match = new KeyMatch(i);
+            return true;
+        }
+
+        match = KeyMatch.None;
+        return false;
+    }
+
     internal void FinalizeIndex()
     {
         if (_indicesOrBuilder is ImmutableDictionary<PropertyOrderFile.TypeKey, int>.Builder bldr)
@@ -438,7 +523,7 @@ public class DatProperty : IDatSpecificationObject
 /// <summary>
 /// Extra information about a property key.
 /// </summary>
-public sealed class DatPropertyKey
+public class DatPropertyKey
 {
     /// <summary>
     /// The key corresponding to the information in this object.
@@ -464,6 +549,39 @@ public sealed class DatPropertyKey
         Filter = filter;
         Condition = condition;
     }
+
+    /// <inheritdoc />
+    public override string ToString() => Key;
+}
+
+/// <summary>
+/// An implementation of <see cref="DatPropertyKey"/> that contains information about template properties.
+/// </summary>
+public class DatTemplatePropertyKey : DatPropertyKey
+{
+    /// <summary>
+    /// Object used to parse template keys.
+    /// </summary>
+    public TemplateProcessor TemplateProcessor { get; }
+
+    /// <summary>
+    /// The key that includes the '*' wildcards instead of '#'.
+    /// </summary>
+    public string OriginalKey { get; }
+
+    internal DatTemplatePropertyKey(string key, LegacyExpansionFilter filter, IValue<bool>? condition)
+        : base(
+            TemplateProcessor.CreateForKey(key, out TemplateProcessor processor),
+            filter,
+            condition
+        )
+    {
+        OriginalKey = key;
+        TemplateProcessor = processor;
+    }
+
+    /// <inheritdoc />
+    public override string ToString() => OriginalKey;
 }
 
 /// <summary>

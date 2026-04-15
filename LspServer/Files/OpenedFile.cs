@@ -9,7 +9,6 @@
 
 using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using System.Diagnostics;

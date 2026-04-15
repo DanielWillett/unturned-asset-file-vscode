@@ -6,6 +6,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading;
@@ -15,6 +16,7 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <summary>
 /// An object from a unity bundle at a given path.
 /// </summary>
+[DebuggerDisplay("{ObjectType,nq} - {Name,nq}")]
 public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>, IDisposable
 {
     private readonly AssetsFileInstance _file;
@@ -44,11 +46,14 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>,
             if (_disposed)
                 throw new ObjectDisposedException(nameof(UnityObject));
 
-            if (_baseField != null)
-                return _baseField;
+            AssetTypeValueField? baseField = _baseField;
+            while (baseField == null)
+            {
+                CacheBaseField();
+                baseField = _baseField;
+            }
 
-            CacheBaseField();
-            return _baseField ?? AssetTypeValueField.DUMMY_FIELD;
+            return baseField;
         }
     }
 
@@ -69,6 +74,38 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>,
         }
     }
 
+    /// <summary>
+    /// The name of this object.
+    /// </summary>
+    public string? Name
+    {
+        get
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(UnityObject));
+
+            AssetTypeValueField? baseField = _baseField;
+            while (baseField == null)
+            {
+                CacheBaseField();
+                baseField = _baseField;
+            }
+
+            if (baseField.IsDummy)
+            {
+                return null;
+            }
+
+            AssetTypeValueField nameField = baseField["m_Name"];
+            if (nameField.IsDummy || nameField.Value.ValueType != AssetValueType.String)
+            {
+                return null;
+            }
+
+            return nameField.Value.AsString;
+        }
+    }
+
     public UnityObject(
         IBundleAssetType type,
         string path,
@@ -84,6 +121,23 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>,
         Type = type;
         Bundle = bundle;
         Path = path;
+    }
+
+    /// <summary>
+    /// Attempts to get this object's type as a <see cref="IBundleAssetType"/>.
+    /// </summary>
+    /// <param name="type">A known CLR type associated with this object's <see cref="AssetClassID"/> (stored in <see cref="ObjectType"/>).</param>
+    /// <returns>Whether or not this object has a known CLR type associated with it.</returns>
+    public bool TryGetBundleAssetType([NotNullWhen(true)] out IBundleAssetType? type)
+    {
+        if (_services.Installation.KnownUnityClassTypes.TryGetValue(ObjectType, out IBundleAssetType? value))
+        {
+            type = value;
+            return true;
+        }
+
+        type = null;
+        return false;
     }
 
     [MemberNotNull(nameof(_baseField))]
@@ -187,6 +241,12 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>,
                && string.Equals(Path, other.Path, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return Path;
+    }
+
     void IValue.WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
         throw new NotSupportedException();
@@ -223,5 +283,6 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>,
         _disposed = true;
         _hasTransform = false;
         Interlocked.Exchange(ref _transform, null)?.Dispose();
+        _baseField = null;
     }
 }

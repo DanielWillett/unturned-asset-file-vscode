@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
@@ -216,7 +217,6 @@ public sealed class BundleProxyEnumerator : IEnumerator<UnityObject>
     }
 
 #nullable disable
-
     /// <inheritdoc />
     public UnityObject Current { get; private set; }
 
@@ -235,6 +235,7 @@ public sealed class BundleProxyEnumerator : IEnumerator<UnityObject>
     }
 
     /// <inheritdoc />
+    [MemberNotNullWhen(true, nameof(Current))]
     public bool MoveNext()
     {
         switch (_state)
@@ -254,7 +255,7 @@ public sealed class BundleProxyEnumerator : IEnumerator<UnityObject>
                 while (_underlyingEnumerator.MoveNext())
                 {
                     KeyValuePair<long, string> pair = _underlyingEnumerator.Current;
-                    if (Prefix != null && !pair.Value.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase))
+                    if (Prefix != null && !OSPathHelper.Contains(Prefix, pair.Value, StringComparison.OrdinalIgnoreCase))
                     {
                         continue;
                     }
@@ -282,7 +283,9 @@ public sealed class BundleProxyEnumerator : IEnumerator<UnityObject>
                     }
 
                     Current = new UnityObject(type, pair.Value, _bundle, File!, fileInfo, _services);
+#pragma warning disable CS8775
                     return true;
+#pragma warning restore CS8775
                 }
 
                 _state = 2;

@@ -33,4 +33,10 @@ public class BundleAssetInfo
 
     [JsonProperty("isUnknown")]
     public bool IsUnknown { get; set; }
+
+    /// <summary>
+    /// Whether or not this bundle object is within the folder (instead of being a child object).
+    /// </summary>
+    [JsonProperty("isAsset")]
+    public bool IsAsset { get; set; }
 }

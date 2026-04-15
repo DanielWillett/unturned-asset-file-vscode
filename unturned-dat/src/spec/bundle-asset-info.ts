@@ -9,5 +9,6 @@ export interface BundleAssetInfo
     isComponent: boolean,
     hasChildren: boolean,
     isRequired: boolean,
-    isUnknown: boolean;
+    isUnknown: boolean,
+    isAsset: boolean;
 }

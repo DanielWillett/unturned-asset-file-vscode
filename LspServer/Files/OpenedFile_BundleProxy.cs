@@ -7,6 +7,10 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 
 partial class OpenedFile
 {
+    /*
+     * TODO: this doesn't work for files outside the folders loaded by InstallationEnvironment
+     */
+
     private IBundleProxy? _intlBundleProxy;
     private bool _ownsBundleProxy;
     private int _lastBundleUpdateVersion;

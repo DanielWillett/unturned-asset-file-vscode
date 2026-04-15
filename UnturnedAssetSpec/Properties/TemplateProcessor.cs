@@ -171,6 +171,12 @@ public sealed class TemplateProcessor
         return sb.ToString();
     }
 
+    public static string CreateForKey(string key, out TemplateProcessor processor)
+    {
+        processor = CreateForKey(ref key);
+        return key;
+    }
+
     public static TemplateProcessor CreateForKey(ref string key)
     {
         if (key == null)

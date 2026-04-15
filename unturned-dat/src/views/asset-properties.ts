@@ -201,6 +201,10 @@ class AssetPropertyViewItem extends TreeItem
         {
             icon = new ThemeIcon("symbol-misc");
         }
+        else if (!object.isAsset)
+        {
+            icon = new ThemeIcon("symbol-method");
+        }
         else if (!object.path)
         {
             icon = new ThemeIcon(object.isRequired ? "error" : "circle-large");
@@ -240,12 +244,18 @@ class AssetPropertyViewItem extends TreeItem
 
         this.bundleRequestVersion += 1;
         const startVersion = this.bundleRequestVersion;
+        let key = this.bundleObject.key;
+        for (let parent = this.parent; parent?.bundleObject != null; parent = parent.parent)
+        {
+            key = parent.bundleObject.key;
+        }
+
         const result = await getClient().sendRequest(
             DiscoverBundleAssets,
             {
                 document: this.documentUri,
-                path: this.bundleObject.path,
-                key: this.bundleObject.key
+                path: this.bundleObject.isAsset ? "" : this.bundleObject.path,
+                key: key
             }
         );
 
@@ -312,7 +322,7 @@ class AssetPropertyViewItem extends TreeItem
                     this.tooltip = new MarkdownString(this.bundleObject.markdown);
                 }
             }
-            if (this.bundleObject.path)
+            if (this.bundleObject.path && this.bundleObject.isAsset)
             {
                 if (this.bundleObject.description)
                 {

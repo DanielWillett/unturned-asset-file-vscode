@@ -8,6 +8,8 @@ using DanielWillett.UnturnedDataFileLspServer.Files;
 using DanielWillett.UnturnedDataFileLspServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Collections.Immutable;
+using DanielWillett.UnturnedDataFileLspServer.Data;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 
@@ -41,12 +43,10 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
             return Task.FromResult(Empty);
         }
 
-        if (!string.IsNullOrEmpty(request.Key))
-        {
-            
-        }
-
         List<BundleAssetInfo> outputProperties = new List<BundleAssetInfo>(8);
+
+        IBundleProxy bundle = sourceFile.WorkspaceFile.Bundle;
+        string? prefix = bundle.Bundle?.Prefix;
 
         for (DatFileType? ft = assetType; ft != null; ft = ft.Parent)
         {
@@ -56,13 +56,27 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
             ImmutableArray<DatBundleAsset> bundleAssets = type.BundleAssets;
             for (int i = 0; i < bundleAssets.Length; i++)
             {
-                // todo: template groups
                 DatBundleAsset unityAsset = bundleAssets[i];
+
+
+                if (!string.IsNullOrEmpty(request.Key))
+                {
+                    if (!unityAsset.MatchesKey(request.Key, ref ctx, out _))
+                    {
+                        continue;
+                    }
+
+                    ResolveChildObjects(unityAsset, request.Path, outputProperties, ref ctx);
+                    goto rtn;
+                }
+
+
                 BundleAssetInfo prop = new BundleAssetInfo
                 {
                     Key = unityAsset.Key,
                     Type = unityAsset.Type.TypeName.Type,
-                    TypeName = unityAsset.Type.TypeName.GetTypeName()
+                    TypeName = unityAsset.Type.TypeName.GetTypeName(),
+                    IsAsset = true
                 };
 
                 if (unityAsset.Description?.TryEvaluateValue(out Optional<string> desc, ref ctx) is true)
@@ -80,13 +94,11 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
                     prop.IsRequired = isRequired.Value;
                 }
 
-                IBundleProxy bundle = sourceFile.WorkspaceFile.Bundle;
                 UnityObject? obj = bundle.GetCorrespondingAsset(unityAsset.Key, unityAsset.Type, ref ctx);
                 if (obj != null)
                 {
                     prop.Path = obj.Path;
                     prop.HasChildren = obj.Transform?.ChildCount > 0;
-                    string? prefix = bundle.Bundle?.Prefix;
                     if (!string.IsNullOrEmpty(prefix) && prop.Path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                     {
                         prop.Path = prop.Path[prefix.Length..];
@@ -97,6 +109,116 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
             }
         }
 
+        using (BundleProxyEnumerator bundleEnumerator = bundle.EnumerateAssets(_parsingServices))
+        {
+            while (bundleEnumerator.MoveNext())
+            {
+                UnityObject obj = bundleEnumerator.Current;
+                ReadOnlySpan<char> path = obj.Path;
+                if (!string.IsNullOrEmpty(prefix) && path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    path = path[prefix.Length..];
+                }
+
+                bool alreadyExists = false;
+                foreach (BundleAssetInfo bundleInfo in outputProperties)
+                {
+                    if (path.Equals(bundleInfo.Path, StringComparison.OrdinalIgnoreCase))
+                    {
+                        alreadyExists = true;
+                        break;
+                    }
+                }
+
+                if (alreadyExists)
+                    continue;
+
+                string type, typeName;
+                if (obj.TryGetBundleAssetType(out IBundleAssetType? bundleAssetType))
+                {
+                    QualifiedType qualifiedType = bundleAssetType.TypeName;
+                    type = qualifiedType.Type;
+                    typeName = qualifiedType.GetTypeName();
+                }
+                else
+                {
+                    type = typeName = obj.ObjectType.ToString();
+                }
+
+                UnityTransform? transform = obj.Transform;
+                outputProperties.Add(new BundleAssetInfo
+                {
+                    Key = obj.Name ?? Path.GetFileName(obj.Path),
+                    Type = type,
+                    TypeName = typeName,
+                    HasChildren = transform is { ChildCount: > 0 },
+                    Path = path.ToString(),
+                    IsUnknown = true,
+                    IsAsset = true
+                });
+            }
+        }
+
+        // put included properties at the top
+        outputProperties.Sort((a, b) =>
+        {
+            if (b.Path == null)
+            {
+                return a.Path == null ? 0 : -1;
+            }
+            if (a.Path == null)
+            {
+                return 1;
+            }
+
+            ReadOnlySpan<char> aName = OSPathHelper.GetFileName(a.Path);
+            ReadOnlySpan<char> bName = OSPathHelper.GetFileName(b.Path);
+            return aName.CompareTo(bName, StringComparison.OrdinalIgnoreCase);
+        });
+
+        rtn:
         return Task.FromResult(new Container<BundleAssetInfo>(outputProperties));
+    }
+
+    private void ResolveChildObjects(DatBundleAsset unityAsset, string? requestPath, List<BundleAssetInfo> outputProperties, ref FileEvaluationContext ctx)
+    {
+        IBundleProxy bundle = ctx.File.WorkspaceFile.Bundle;
+        UnityObject? obj = bundle.GetCorrespondingAsset(unityAsset.Key, unityAsset.Type, ref ctx);
+        if (obj == null)
+        {
+            return;
+        }
+
+        UnityTransform? parent = obj.Transform;
+        if (parent == null)
+        {
+            // not a prefab
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(requestPath))
+        {
+            parent = parent.Find(requestPath);
+            if (parent == null)
+            {
+                return;
+            }
+        }
+
+        int index = 0;
+        foreach (UnityTransform childObject in parent)
+        {
+            string? name = childObject.Name;
+            outputProperties.Add(new BundleAssetInfo
+            {
+                Key = name ?? $"<child #{index}>",
+                Type = QualifiedType.ObjectType.Type,
+                TypeName = "Object",
+                HasChildren = childObject.ChildCount > 0,
+                IsComponent = false,
+                Path = name != null ? OSPathHelper.CombineWithUnixSeparators(requestPath, name) : null
+            });
+            ++index;
+        }
     }
 }

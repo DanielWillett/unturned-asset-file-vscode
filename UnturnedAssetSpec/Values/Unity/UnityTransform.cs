@@ -646,6 +646,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
         }
 
         /// <inheritdoc />
+        [MemberNotNullWhen(true, nameof(Current))]
         public bool MoveNext()
         {
             int index = _index;
@@ -659,9 +660,10 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
                 _parent.CreateChildLocked(Bundle!, Manager!, index);
             }
 
-            Current = transform;
+            Current = transform!;
+#pragma warning disable CS8775
             return true;
-
+#pragma warning restore CS8775
         }
 
         /// <inheritdoc />

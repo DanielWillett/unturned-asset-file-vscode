@@ -217,7 +217,7 @@ partial class SpecificationFileReader
             property.ServerMenuWarnsForTrueValues = element.GetBoolean();
         }
 
-        ReadCommonProperties(property, in root, owner, key);
+        ReadCommonProperties(property, in root, owner, key, false);
 
         properties.Add(property);
     }
@@ -235,13 +235,11 @@ partial class SpecificationFileReader
             throw new JsonException(string.Format(Resources.JsonException_PropertyTypeMissing, $"{owner.FullName}.{key}"));
         }
 
-        string type = element.GetString();
+        string type = element.GetString()!;
 
         DatBundleAsset property = DatBundleAsset.Create(key, UnityObjectAssetType.Create(new QualifiedType(type, true)), owner, element);
 
         property.IsImport = isImport;
-
-        ReadCommonProperties(property, in root, owner, key);
 
         if (root.TryGetProperty("Template"u8, out element) && element.ValueKind == JsonValueKind.True)
         {
@@ -276,13 +274,15 @@ partial class SpecificationFileReader
             }
         }
 
+        ReadCommonProperties(property, in root, owner, key, property.IsTemplate);
+
         owner.BundleAssetsBuilder!.Add(property);
     }
 
     // common properties between bundle assets and normal properties
-    private void ReadCommonProperties(DatProperty property, in JsonElement root, IDatSpecificationObject owner, string key)
+    private void ReadCommonProperties(DatProperty property, in JsonElement root, IDatSpecificationObject owner, string key, bool isTemplateGroup)
     {
-        ReadAliases(property, in root, owner, key);
+        ReadAliases(property, in root, owner, key, isTemplateGroup);
 
         // Description
         if (root.TryGetProperty("Description"u8, out JsonElement element) && element.ValueKind != JsonValueKind.Null)
@@ -422,7 +422,7 @@ partial class SpecificationFileReader
         return key;
     }
 
-    private void ReadAliases(DatProperty property, in JsonElement root, IDatSpecificationObject owner, string key)
+    private void ReadAliases(DatProperty property, in JsonElement root, IDatSpecificationObject owner, string key, bool isTemplateGroup)
     {
         LegacyExpansionFilter filter = LegacyExpansionFilter.Either;
 
@@ -459,7 +459,7 @@ partial class SpecificationFileReader
             }
 
             ImmutableArray<DatPropertyKey>.Builder b = ImmutableArray.CreateBuilder<DatPropertyKey>(aliasCount + 1 + (singleAlias != null ? 1 : 0));
-            b.Add(new DatPropertyKey(key, filter, keyCondition));
+            b.Add(isTemplateGroup ? new DatTemplatePropertyKey(key, filter, keyCondition) : new DatPropertyKey(key, filter, keyCondition));
 
             for (int i = 0; i < aliasCount; ++i)
             {
@@ -476,13 +476,13 @@ partial class SpecificationFileReader
         {
             DatPropertyKey singleAlias = ReadAlias(in singleAliasElement, owner, property, key, -1);
             property.Keys = ImmutableArray.Create(
-                new DatPropertyKey(key, filter, keyCondition),
+                isTemplateGroup ? new DatTemplatePropertyKey(key, filter, keyCondition) : new DatPropertyKey(key, filter, keyCondition),
                 singleAlias
             );
         }
-        else if (filter != LegacyExpansionFilter.Either || keyCondition != null)
+        else if (filter != LegacyExpansionFilter.Either || keyCondition != null || isTemplateGroup)
         {
-            property.Keys = ImmutableArray.Create(new DatPropertyKey(key, filter, keyCondition));
+            property.Keys = ImmutableArray.Create(isTemplateGroup ? new DatTemplatePropertyKey(key, filter, keyCondition) : new DatPropertyKey(key, filter, keyCondition));
         }
         else
         {

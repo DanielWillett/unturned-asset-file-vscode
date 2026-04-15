@@ -57,7 +57,7 @@ internal class DiskCleanupRegistrationUtility
         string? csidlValue = key?.GetValue("CSIDL")?.ToString();
 
         GetFolderValues(out bool useCsidl, out string folder);
-        return useCsidl == (csidlValue != null) && string.Equals(folder, folderValue, OSPathHelper.PathComparison);
+        return useCsidl != (csidlValue != null) || !string.Equals(folder, folderValue, OSPathHelper.PathComparison);
     }
 
     private void GetFolderValues(out bool useCsidl, out string folder)
