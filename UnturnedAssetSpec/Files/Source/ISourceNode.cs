@@ -235,6 +235,11 @@ public interface IDictionarySourceNode : IAnyChildrenSourceNode
     /// Try to get a property by name.
     /// </summary>
     bool TryGetProperty(string propertyName, [NotNullWhen(true)] out IPropertySourceNode? node);
+
+    /// <summary>
+    /// Determine whether or not a property is present.
+    /// </summary>
+    bool ContainsProperty(string propertyName);
 }
 
 /// <summary>

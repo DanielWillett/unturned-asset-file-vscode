@@ -21,7 +21,7 @@ public class RelationalCacheTests
         _parsingServices = new ParsingServiceProvider(
             database,
             loggerFactory,
-            new StaticSourceFileWorkspaceEnvironment(false, database),
+            new StaticSourceFileWorkspaceEnvironment(false, new Lazy<IParsingServices>(() => _parsingServices)),
             database.UnturnedInstallDirectory,
             new InstallationEnvironment(database, loggerFactory),
             new NilProjectFileProvider(database)

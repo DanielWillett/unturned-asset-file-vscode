@@ -93,7 +93,9 @@ export class AssetPropertiesViewProvider implements TreeDataProvider<AssetProper
         if (element.property?.isBundleHeader)
         {
             if (this.bundleChildrenElements)
+            {
                 return this.bundleChildrenElements;
+            }
 
             return this.getBundleAssets(element);
         }
@@ -245,7 +247,7 @@ class AssetPropertyViewItem extends TreeItem
         this.bundleRequestVersion += 1;
         const startVersion = this.bundleRequestVersion;
         let key = this.bundleObject.key;
-        for (let parent = this.parent; parent?.bundleObject != null; parent = parent.parent)
+        for (let parent = this.parent; parent?.bundleObject; parent = parent.parent)
         {
             key = parent.bundleObject.key;
         }

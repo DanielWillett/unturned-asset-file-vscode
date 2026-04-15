@@ -53,6 +53,22 @@ internal class DictionaryNode : AnySourceNode, IDictionarySourceNode
         return p.TryGetValue(propertyName, out node);
     }
 
+    public bool ContainsProperty(string propertyName)
+    {
+        StringDictionary<IPropertySourceNode>? p = _properties;
+        if (p == null)
+        {
+            RebuildProperties();
+            p = _properties;
+            if (p == null)
+            {
+                return false;
+            }
+        }
+
+        return p.ContainsKey(propertyName);
+    }
+
     public static DictionaryNode Create(int count, ISourceNode[] values, OneOrMore<Comment> comments, in AnySourceNodeProperties properties)
     {
         return comments.Length switch

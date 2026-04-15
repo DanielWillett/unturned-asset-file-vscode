@@ -31,13 +31,14 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
     private readonly IAssetSpecDatabase _database;
     private readonly ILanguageServerFacade? _languageServer;
     private readonly IDisposable? _workspaceFoldersUnsubscriber;
+    private MasterBundleCache? _bundleCache;
+
 
     private readonly ServerDifficultyCache _difficultyCache;
 
     private bool _hasInitialized;
 
-    private readonly ConcurrentDictionary<DocumentUri, WorkspaceFolderTracker> _folderTrackers =
-        new ConcurrentDictionary<DocumentUri, WorkspaceFolderTracker>();
+    private readonly ConcurrentDictionary<DocumentUri, WorkspaceFolderTracker> _folderTrackers;
 
     private readonly List<DocumentUri> _rootUris;
 
@@ -73,6 +74,7 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         _database = database;
         _languageServer = languageServer;
 
+        _folderTrackers = new ConcurrentDictionary<DocumentUri, WorkspaceFolderTracker>();
         WorkspaceFolders = new ReadOnlyDictionary<DocumentUri, WorkspaceFolderTracker>(_folderTrackers);
 
         if (fileSync != null)
@@ -81,14 +83,15 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
             fileSync.FileRemoved += OnFileClosed;
         }
 
-        if (workspaceFolderManager == null || languageServer == null)
+        if (workspaceFolderManager != null && languageServer != null)
+        {
+            _workspaceFoldersUnsubscriber = workspaceFolderManager.Changed.Subscribe(this);
+            _rootUris = new List<DocumentUri>();
+        }
+        else
         {
             _rootUris = new List<DocumentUri>(0);
-            return;
         }
-
-        _workspaceFoldersUnsubscriber = workspaceFolderManager.Changed.Subscribe(this);
-        _rootUris = new List<DocumentUri>();
     }
 
     void IObserver<WorkspaceFolderChange>.OnCompleted() { }
@@ -124,7 +127,7 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
                     return;
                 }
 
-                tracker = new WorkspaceFolderTracker(value.Folder.Uri, value.Folder, !_hasInitialized);
+                tracker = new WorkspaceFolderTracker(value.Folder.Uri, value.Folder, !_hasInitialized, _logger);
                 _folderTrackers.AddOrUpdate(value.Folder.Uri,
                     _ =>
                     {
@@ -292,7 +295,7 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         {
             foreach (WorkspaceFolder rootFolder in _languageServer.ClientSettings.WorkspaceFolders)
             {
-                WorkspaceFolderTracker folder = new WorkspaceFolderTracker(rootFolder.Uri, rootFolder, !_hasInitialized);
+                WorkspaceFolderTracker folder = new WorkspaceFolderTracker(rootFolder.Uri, rootFolder, !_hasInitialized, _logger);
                 if (!_folderTrackers.TryAdd(rootFolder.Uri, folder))
                     folder.Dispose();
                 if (!_rootUris.Contains(rootFolder.Uri))
@@ -304,7 +307,7 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
         DocumentUri? rootFolderUri = _languageServer.ClientSettings.RootUri;
         if (rootFolderUri is not null && !_folderTrackers.ContainsKey(rootFolderUri))
         {
-            WorkspaceFolderTracker folder = new WorkspaceFolderTracker(rootFolderUri, null, !_hasInitialized);
+            WorkspaceFolderTracker folder = new WorkspaceFolderTracker(rootFolderUri, null, !_hasInitialized, _logger);
             if (!_folderTrackers.TryAdd(rootFolderUri, folder))
                 folder.Dispose();
             if (!_rootUris.Contains(rootFolderUri))
@@ -599,10 +602,11 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
     }
 
     /// <inheritdoc />
-    public DiscoveredBundle? LoadBundleForAsset(ISourceFile file)
+    public IBundleProxy? LoadBundleProxyForAsset(IWorkspaceFile file)
     {
-        // todo
-        return null;
+        IParsingServices parsingServices = _parsingServices.Value;
+        _bundleCache ??= new MasterBundleCache(parsingServices.CreateLogger<MasterBundleCache>());
+        return StaticBundleProxy.Create(file, parsingServices, _bundleCache);
     }
 
     public IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath)
@@ -653,6 +657,8 @@ internal class LspWorkspaceEnvironment : IWorkspaceEnvironment, IObserver<Worksp
                 }
             }
         }
+
+        Interlocked.Exchange(ref _bundleCache, null)?.Dispose();
     }
 
     private class DontDisposeWorkspaceFile(IWorkspaceFile file) : IWorkspaceFile

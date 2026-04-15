@@ -22277,8 +22277,9 @@ var AssetPropertiesViewProvider = class _AssetPropertiesViewProvider {
       return this.propertyValues;
     }
     if (element.property?.isBundleHeader) {
-      if (this.bundleChildrenElements)
+      if (this.bundleChildrenElements) {
         return this.bundleChildrenElements;
+      }
       return this.getBundleAssets(element);
     }
     if (element.bundleObject) {
@@ -22370,7 +22371,7 @@ var AssetPropertyViewItem = class _AssetPropertyViewItem extends import_vscode.T
     this.bundleRequestVersion += 1;
     const startVersion = this.bundleRequestVersion;
     let key = this.bundleObject.key;
-    for (let parent = this.parent; parent?.bundleObject != null; parent = parent.parent) {
+    for (let parent = this.parent; parent?.bundleObject; parent = parent.parent) {
       key = parent.bundleObject.key;
     }
     const result = await getClient().sendRequest(

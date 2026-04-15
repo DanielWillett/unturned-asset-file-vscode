@@ -27,7 +27,7 @@ internal class OrderfileTests
         _parsingServices = new ParsingServiceProvider(
             database,
             loggerFactory,
-            new StaticSourceFileWorkspaceEnvironment(useCache: true, database, installationEnvironment: env),
+            new StaticSourceFileWorkspaceEnvironment(useCache: true, new Lazy<IParsingServices>(() => _parsingServices), installationEnvironment: env),
             database.UnturnedInstallDirectory,
             env,
             new NilProjectFileProvider(database)

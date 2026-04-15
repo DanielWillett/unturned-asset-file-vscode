@@ -245,6 +245,9 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
             useInstallDir ? "304930" : "\0"
         );
         IParsingServices? parsingServices = null;
+        Lazy<IParsingServices> parsingServicesAccessor = new Lazy<IParsingServices>(() => parsingServices
+            ?? throw new InvalidOperationException("Parsing servies not initialized yet.")
+        );
 
         AssetSpecDatabase database = new AssetSpecDatabase(
             new SpecificationFileReader(
@@ -255,10 +258,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
                 installDirUtility,
                 cache: cache
             ),
-            new Lazy<IParsingServices>(
-                () => parsingServices
-                      ?? throw new InvalidOperationException("Parsing servies not initialized yet.")
-            )
+            parsingServicesAccessor
         );
 
         InstallationEnvironment installation = new InstallationEnvironment(database, loggerFactory);
@@ -275,7 +275,7 @@ public class AssetSpecDatabase : IDisposable, IAssetSpecDatabase
 
         IWorkspaceEnvironment environment = new StaticSourceFileWorkspaceEnvironment(
             cache != null,
-            database,
+            parsingServicesAccessor,
             installationEnvironment: installation
         );
 

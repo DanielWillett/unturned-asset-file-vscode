@@ -5,7 +5,10 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
 public interface IWorkspaceEnvironment
 {
-    DiscoveredBundle? LoadBundleForAsset(ISourceFile file);
+    /// <summary>
+    /// Creates a <see cref="IBundleProxy"/> for the given <see cref="IWorkspaceFile"/>.
+    /// </summary>
+    IBundleProxy? LoadBundleProxyForAsset(IWorkspaceFile file);
 
     IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath);
 

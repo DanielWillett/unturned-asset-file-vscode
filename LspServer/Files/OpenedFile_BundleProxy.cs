@@ -7,10 +7,6 @@ namespace DanielWillett.UnturnedDataFileLspServer.Files;
 
 partial class OpenedFile
 {
-    /*
-     * TODO: this doesn't work for files outside the folders loaded by InstallationEnvironment
-     */
-
     private IBundleProxy? _intlBundleProxy;
     private bool _ownsBundleProxy;
     private int _lastBundleUpdateVersion;
@@ -29,7 +25,7 @@ partial class OpenedFile
         if (_ownsBundleProxy)
         {
             _ownsBundleProxy = false;
-            (Interlocked.Exchange(ref _intlBundleProxy, null) as IDisposable)?.Dispose();
+            (Interlocked.Exchange(ref _intlBundleProxy, IBundleProxy.Null) as IDisposable)?.Dispose();
         }
 
         DiscoveredDatFile? datFile = _services.Installation.FindFile(File, matchLocalizationAlso: true);
@@ -62,11 +58,17 @@ partial class OpenedFile
             }
             else
             {
-                // todo: use IWorkspaceEnvironment.LoadBundleForAsset instead
-                datFile = new DiscoveredDatFile(File, _contentSegment.AsSpan(), _services.Database, null, null);
-                _ = datFile.GetBundleProxy(_services);
-                _intlBundleProxy = datFile;
-                _ownsBundleProxy = true;
+                IBundleProxy? bndl = _services.Workspace.LoadBundleProxyForAsset(this);
+                if (bndl == null)
+                {
+                    _intlBundleProxy = IBundleProxy.Null;
+                    _ownsBundleProxy = false;
+                }
+                else
+                {
+                    _intlBundleProxy = bndl;
+                    _ownsBundleProxy = true;
+                }
             }
         }
 
@@ -95,19 +97,6 @@ partial class OpenedFile
     /// Bundle loaded for this asset file.
     /// </summary>
     public IBundleProxy Bundle => this;
-
-    bool IBundleProxy.Exists
-    {
-        get
-        {
-            if (_intlBundleProxy == null || _lastBundleUpdateVersion != ChangeVersion)
-            {
-                lock (EditLock)
-                    UpdateBundle();
-            }
-            return _intlBundleProxy.Exists;
-        }
-    }
 
     DiscoveredBundle? IBundleProxy.Bundle
     {

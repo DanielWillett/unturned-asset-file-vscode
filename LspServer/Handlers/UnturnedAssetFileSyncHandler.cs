@@ -200,7 +200,7 @@ internal class UnturnedAssetFileSyncHandler : ITextDocumentSyncHandler
     public Task<Unit> Handle(DidCloseTextDocumentParams request, CancellationToken cancellationToken)
     {
         //_logger.LogInformation("Received didCloseTextDocument: {0}", request.TextDocument.Uri);
-        if (_fileTracker.Files.Remove(request.TextDocument.Uri, out OpenedFile? file))
+        if (_fileTracker.Files.TryRemove(request.TextDocument.Uri, out OpenedFile? file))
         {
             file.Dispose();
             _cacheProvider.RemoveModel(file.File);

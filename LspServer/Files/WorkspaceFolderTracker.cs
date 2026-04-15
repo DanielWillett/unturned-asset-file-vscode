@@ -2,12 +2,14 @@
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Collections.Immutable;
+using Microsoft.Extensions.Logging;
 using FileSystemWatcher = System.IO.FileSystemWatcher;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Files;
 
 internal class WorkspaceFolderTracker : IDisposable
 {
+    private readonly ILogger _logger;
     private FileSystemWatcher? _watcher;
     internal Lock ProjectFileLock;
 
@@ -26,8 +28,9 @@ internal class WorkspaceFolderTracker : IDisposable
     public event Action<WorkspaceFolderTracker, string>? FileUpdated;
     public event Action<WorkspaceFolderTracker, string, string>? FileRenamed;
 
-    public WorkspaceFolderTracker(DocumentUri uri, WorkspaceFolder? folder, bool isWatchedByClient)
+    public WorkspaceFolderTracker(DocumentUri uri, WorkspaceFolder? folder, bool isWatchedByClient, ILogger logger)
     {
+        _logger = logger;
         ProjectFileLock = new Lock();
         Folder = folder;
         Uri = uri;
@@ -101,7 +104,25 @@ internal class WorkspaceFolderTracker : IDisposable
 
     public IEnumerable<string> EnumerateFiles(string pattern)
     {
-        return IsActive ? Directory.EnumerateFiles(FilePath, pattern, SearchOption.AllDirectories) : Enumerable.Empty<string>();
+        if (!IsActive)
+        {
+            return Enumerable.Empty<string>();
+        }
+
+        try
+        {
+            return Directory.EnumerateFiles(FilePath, pattern, SearchOption.AllDirectories);
+        }
+        catch (DirectoryNotFoundException)
+        {
+            _logger.LogWarning("Workspace no longer exists: \"{0}\".", Uri);
+        }
+        catch (SystemException ex)
+        {
+            _logger.LogWarning(ex, "Error enumerating files for workspace: \"{0}\". Ignoring files.", Uri);
+        }
+
+        return Enumerable.Empty<string>();
     }
 
     /// <inheritdoc />

@@ -1,5 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Project;
-using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Concurrent;
@@ -12,21 +12,22 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 /// </summary>
 public class StaticSourceFileWorkspaceEnvironment : IWorkspaceEnvironment, IDisposable
 {
-    private readonly IAssetSpecDatabase _database;
+    private readonly Lazy<IParsingServices> _parsingServices;
     private readonly SourceNodeTokenizerOptions _defaultSourceOptions;
     private InstallationEnvironment? _installationEnvironment;
     private readonly ConcurrentDictionary<string, StaticSourceFile>? _cache;
+    private MasterBundleCache? _bundleCache;
 
     private readonly ServerDifficultyCache _difficultyCache;
 
     public StaticSourceFileWorkspaceEnvironment(
         bool useCache,
-        IAssetSpecDatabase database,
+        Lazy<IParsingServices> parsingServices,
         SourceNodeTokenizerOptions defaultSourceOptions = SourceNodeTokenizerOptions.Lazy,
         InstallationEnvironment? installationEnvironment = null)
     {
         _difficultyCache = ServerDifficultyCache.Create();
-        _database = database;
+        _parsingServices = parsingServices;
         _defaultSourceOptions = defaultSourceOptions;
         _cache = useCache ? new ConcurrentDictionary<string, StaticSourceFile>(OSPathHelper.PathComparer) : null;
 
@@ -36,16 +37,6 @@ public class StaticSourceFileWorkspaceEnvironment : IWorkspaceEnvironment, IDisp
             installationEnvironment.OnFileUpdated += OnFileUpdated;
             installationEnvironment.OnFileRemoved += OnFileRemoved;
         }
-    }
-
-    public void Dispose()
-    {
-        InstallationEnvironment? env = Interlocked.Exchange(ref _installationEnvironment, null);
-        if (env == null)
-            return;
-
-        env.OnFileUpdated -= OnFileUpdated;
-        env.OnFileRemoved -= OnFileRemoved;
     }
 
     private void OnFileRemoved(DiscoveredDatFile file)
@@ -59,19 +50,20 @@ public class StaticSourceFileWorkspaceEnvironment : IWorkspaceEnvironment, IDisp
     }
 
     /// <inheritdoc />
-    public DiscoveredBundle? LoadBundleForAsset(ISourceFile file)
+    public IBundleProxy? LoadBundleProxyForAsset(IWorkspaceFile file)
     {
-        // todo
-        return null;
+        IParsingServices parsingServices = _parsingServices.Value;
+        _bundleCache ??= new MasterBundleCache(parsingServices.CreateLogger<MasterBundleCache>());
+        return StaticBundleProxy.Create(file, parsingServices, _bundleCache);
     }
 
     /// <inheritdoc />
-    public IWorkspaceFile? TemporarilyGetOrLoadFile(string filePath)
+    public IWorkspaceFile TemporarilyGetOrLoadFile(string filePath)
     {
         StaticSourceFile file;
         if (_cache == null)
         {
-            file = StaticSourceFile.FromAssetFile(filePath, _database, _defaultSourceOptions);
+            file = StaticSourceFile.FromAssetFile(filePath, _parsingServices.Value.Database, _defaultSourceOptions);
             file.Environment = this;
             return file;
         }
@@ -81,7 +73,7 @@ public class StaticSourceFileWorkspaceEnvironment : IWorkspaceEnvironment, IDisp
             filePath,
             static (filePath, env) =>
             {
-                StaticSourceFile file = StaticSourceFile.FromAssetFile(filePath, env._database, env._defaultSourceOptions);
+                StaticSourceFile file = StaticSourceFile.FromAssetFile(filePath, env._parsingServices.Value.Database, env._defaultSourceOptions);
                 file.Environment = env;
                 return file;
             },
@@ -92,7 +84,7 @@ public class StaticSourceFileWorkspaceEnvironment : IWorkspaceEnvironment, IDisp
             filePath,
             filePath =>
             {
-                StaticSourceFile file = StaticSourceFile.FromAssetFile(filePath, _database, _defaultSourceOptions);
+                StaticSourceFile file = StaticSourceFile.FromAssetFile(filePath, _parsingServices.Value.Database, _defaultSourceOptions);
                 file.Environment = this;
                 return file;
             });
@@ -109,5 +101,17 @@ public class StaticSourceFileWorkspaceEnvironment : IWorkspaceEnvironment, IDisp
     public void CloseFile(StaticSourceFile file)
     {
         _difficultyCache.RemoveCachedFile(file.File);
+    }
+
+    public void Dispose()
+    {
+        Interlocked.Exchange(ref _bundleCache, null)?.Dispose();
+
+        InstallationEnvironment? env = Interlocked.Exchange(ref _installationEnvironment, null);
+        if (env == null)
+            return;
+
+        env.OnFileUpdated -= OnFileUpdated;
+        env.OnFileRemoved -= OnFileRemoved;
     }
 }

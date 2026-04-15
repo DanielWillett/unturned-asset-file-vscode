@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
@@ -177,6 +178,50 @@ public static class BundleExtensions
     private static UnityObject Create(IBundleProxy bundle, IBundleAssetType type, AssetsFileInstance file, AssetFileInfo fileInfo, IParsingServices parsingServices, string assetPath)
     {
         return new UnityObject(type, assetPath, bundle, file, fileInfo, parsingServices);
+    }
+
+    /// <summary>
+    /// Walks up the folder hierarchy until a masterbundle is found.
+    /// </summary>
+    /// <param name="file">Name of the file to find a masterbundle for.</param>
+    /// <returns>The full path to the <c>MasterBundle.dat</c> file, or <see langword="null"/> if one is not found.</returns>
+    public static string? FindMasterBundleForPath(ReadOnlySpan<char> file, InstallDirUtility installDir)
+    {
+        ReadOnlySpan<char> baseFolder = ReadOnlySpan<char>.Empty;
+        if (installDir.TryGetInstallDirectory(out GameInstallDir gameInstallDir))
+        {
+            if (OSPathHelper.Contains(gameInstallDir.BaseFolder, file))
+            {
+                baseFolder = gameInstallDir.BaseFolder;
+            }
+            else if (gameInstallDir.WorkshopFolder != null
+                     && OSPathHelper.Contains(gameInstallDir.WorkshopFolder, file))
+            {
+                Span<char> options = stackalloc char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+                int startIndex = gameInstallDir.WorkshopFolder!.Length + 1;
+                int nextIndex = file.Slice(startIndex).IndexOfAny(options);
+                baseFolder = nextIndex < 0 ? ReadOnlySpan<char>.Empty : file.Slice(0, startIndex + nextIndex);
+            }
+        }
+
+        for (ReadOnlySpan<char> directory = OSPathHelper.GetDirectoryName(file);
+             !directory.IsEmpty;
+             directory = OSPathHelper.GetDirectoryName(directory)
+        )
+        {
+            string masterBundlePath = OSPathHelper.CombineAndConcat(directory, "MasterBundle.dat", ReadOnlySpan<char>.Empty);
+            if (File.Exists(masterBundlePath))
+            {
+                return masterBundlePath;
+            }
+
+            if (!baseFolder.IsEmpty && !OSPathHelper.Contains(baseFolder, directory))
+            {
+                break;
+            }
+        }
+
+        return null;
     }
 }
 

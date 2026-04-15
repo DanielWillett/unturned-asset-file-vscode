@@ -14,15 +14,6 @@ partial class DiscoveredDatFile : IBundleProxy
     private DiscoveredBundle? _bundle;
     private bool _ownsBundle;
 
-    bool IBundleProxy.Exists
-    {
-        get
-        {
-            AssertBundleProxyCreated();
-            return _bundle != null;
-        }
-    }
-
     DiscoveredBundle? IBundleProxy.Bundle
     {
         get

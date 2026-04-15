@@ -187,7 +187,7 @@ public partial class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink, IBundl
                 {
                     if (typeInfo.AssetPath != null && _assetSourceFile == null)
                     {
-                        _assetSourceFile = _services?.Workspace.TemporarilyGetOrLoadFile(typeInfo.AssetPath);
+                        _assetSourceFile = _services.Workspace.TemporarilyGetOrLoadFile(typeInfo.AssetPath);
                         if (_assetSourceFile != null)
                             _assetSourceFile.OnUpdated += OnAssetFileUpdated;
                     }
@@ -840,12 +840,12 @@ public partial class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink, IBundl
     {
         lock (EditLock)
         {
-            if (_assetSourceFile == null)
-                return;
-
-            _assetSourceFile.OnUpdated -= OnAssetFileUpdated;
-            _assetSourceFile.Dispose();
-            _assetSourceFile = null;
+            if (_assetSourceFile != null)
+            {
+                _assetSourceFile.OnUpdated -= OnAssetFileUpdated;
+                _assetSourceFile.Dispose();
+                _assetSourceFile = null;
+            }
 
             if (_isListeningForFileRemoved)
             {
@@ -855,6 +855,8 @@ public partial class OpenedFile : IMutableWorkspaceFile, IDiagnosticSink, IBundl
 
             if (_ownsBundleProxy)
             {
+                (Interlocked.Exchange(ref _intlBundleProxy, IBundleProxy.Null) as IDisposable)?.Dispose();
+                _ownsBundleProxy = false;
                 (Interlocked.Exchange(ref _intlBundleProxy, IBundleProxy.Null) as IDisposable)?.Dispose();
             }
         }

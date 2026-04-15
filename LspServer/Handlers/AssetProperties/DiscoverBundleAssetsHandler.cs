@@ -114,6 +114,17 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
             while (bundleEnumerator.MoveNext())
             {
                 UnityObject obj = bundleEnumerator.Current;
+                if (!string.IsNullOrEmpty(request.Key))
+                {
+                    if (!string.Equals(obj.Name, request.Key, StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
+                    ResolveChildObjects(obj, request.Path, outputProperties, ref ctx);
+                    goto rtn;
+                }
+
                 ReadOnlySpan<char> path = obj.Path;
                 if (!string.IsNullOrEmpty(prefix) && path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 {
@@ -180,7 +191,7 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
         return Task.FromResult(new Container<BundleAssetInfo>(outputProperties));
     }
 
-    private void ResolveChildObjects(DatBundleAsset unityAsset, string? requestPath, List<BundleAssetInfo> outputProperties, ref FileEvaluationContext ctx)
+    private static void ResolveChildObjects(DatBundleAsset unityAsset, string? requestPath, List<BundleAssetInfo> outputProperties, ref FileEvaluationContext ctx)
     {
         IBundleProxy bundle = ctx.File.WorkspaceFile.Bundle;
         UnityObject? obj = bundle.GetCorrespondingAsset(unityAsset.Key, unityAsset.Type, ref ctx);
@@ -189,6 +200,11 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
             return;
         }
 
+        ResolveChildObjects(obj, requestPath, outputProperties, ref ctx);
+    }
+
+    private static void ResolveChildObjects(UnityObject obj, string? requestPath, List<BundleAssetInfo> outputProperties, ref FileEvaluationContext ctx)
+    {
         UnityTransform? parent = obj.Transform;
         if (parent == null)
         {

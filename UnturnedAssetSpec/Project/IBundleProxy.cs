@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
+﻿namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
 /// <summary>
 /// A reference to a bundle through the eyes of an asset file, applying the asset's path when searching for objects.
@@ -8,22 +6,13 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 public interface IBundleProxy
 {
     /// <summary>
-    /// Whether or not this proxy references an existing bundle.
-    /// </summary>
-    [MemberNotNullWhen(true, nameof(Bundle))]
-    [MemberNotNullWhen(true, nameof(Path))]
-    bool Exists { get; }
-
-    /// <summary>
     /// The bundle represented by this <see cref="IBundleProxy"/>.
     /// </summary>
-    /// <value><see langword="null"/> unless <see cref="Exists"/> is <see langword="true"/>.</value>
     DiscoveredBundle? Bundle { get; }
 
     /// <summary>
     /// The path to the root folder for this asset in <see cref="Bundle"/>.
     /// </summary>
-    /// <value><see langword="null"/> unless <see cref="Exists"/> is <see langword="true"/>.</value>
     string? Path { get; }
 
     /// <summary>
@@ -41,7 +30,6 @@ internal sealed class NullBundleProxy : IBundleProxy
 {
     internal static readonly NullBundleProxy Instance = new NullBundleProxy();
     static NullBundleProxy() { }
-    bool IBundleProxy.Exists => false;
     DiscoveredBundle? IBundleProxy.Bundle => null;
     string? IBundleProxy.Path => null;
     bool IBundleProxy.ConvertShadersToStandard => false;
