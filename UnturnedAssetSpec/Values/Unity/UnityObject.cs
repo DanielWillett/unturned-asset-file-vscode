@@ -196,8 +196,11 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>,
                         if (!BundleUtility.TryReadPathId(componentPtr, out long pathId))
                             continue;
 
-                        if (!bundle.FilePreloadCache.TryGetValue(pathId, out AssetFileInfo? componentFileInfo))
+                        if (!bundle.FilePreloadCache.TryGetValue(pathId, out AssetFileInfo? componentFileInfo)
+                            || (AssetClassID)componentFileInfo.TypeId is not AssetClassID.Transform and not AssetClassID.RectTransform)
+                        {
                             continue;
+                        }
 
                         @this._transform = new UnityTransform(null, @this, @this._file, componentFileInfo, 0, @this._services);
                         @this._hasTransform = true;

@@ -87,6 +87,9 @@ public class InstallationEnvironment : IDisposable
         }
     }
 
+    /// <remarks>
+    /// Inverse of <see cref="KnownClassIdsByTypes"/>.
+    /// </remarks>
     [field: MaybeNull]
     internal ImmutableDictionary<AssetClassID, IBundleAssetType> KnownUnityClassTypes
     {
@@ -115,6 +118,40 @@ public class InstallationEnvironment : IDisposable
             }
 
             return field ?? ImmutableDictionary<AssetClassID, IBundleAssetType>.Empty;
+        }
+    }
+
+    /// <remarks>
+    /// Inverse of <see cref="KnownUnityClassTypes"/>.
+    /// </remarks>
+    [field: MaybeNull]
+    internal ImmutableDictionary<QualifiedType, AssetClassID> KnownClassIdsByTypes
+    {
+        get
+        {
+            if (field == null && _database.Information != null)
+            {
+                ImmutableDictionary<QualifiedType, AssetClassID>.Builder knownClassTypes = ImmutableDictionary.CreateBuilder<QualifiedType, AssetClassID>();
+
+                if (_database.Information.KnownUnityClassTypes != null)
+                {
+                    foreach (KeyValuePair<string, QualifiedType> pair in _database.Information.KnownUnityClassTypes)
+                    {
+                        if (Enum.TryParse(pair.Key, out AssetClassID id))
+                        {
+                            knownClassTypes[pair.Value.CaseInsensitive.Normalized] = id;
+                        }
+                        else
+                        {
+                            Logger.LogWarning("Unknown KnownUnityClassTypes: {0}.", pair.Key);
+                        }
+                    }
+                }
+
+                field = knownClassTypes.ToImmutable();
+            }
+
+            return field ?? ImmutableDictionary<QualifiedType, AssetClassID>.Empty;
         }
     }
 

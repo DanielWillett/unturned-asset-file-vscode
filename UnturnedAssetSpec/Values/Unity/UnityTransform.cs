@@ -17,54 +17,29 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <summary>
 /// Represents an object under the hierarchy of a prefab <see cref="UnityObject"/>.
 /// </summary>
-public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
+/// <remarks>Extends <see cref="UnityComponent"/>.</remarks>
+public class UnityTransform : UnityComponent, IEnumerable<UnityTransform>
 {
     private readonly UnityTransform? _parent;
-    private readonly AssetsFileInstance _file;
-    private readonly AssetFileInfo _pathInfo;
-
-    private readonly IParsingServices _services;
-    private readonly IBundleProxy _bundle;
 
     private readonly int _level;
 
-    private AssetTypeValueField? _baseField;
     private AssetTypeValueField? _objectBaseField;
+    private AssetTypeValueField? _childrenField;
 
     private UnityTransform?[]? _children;
     private int? _childCount;
 
-    private bool _disposed;
+    private Dictionary<AssetClassID, UnityComponent>? _components;
 
-    private AssetTypeValueField ChildrenField => field ??= BaseField["m_Children"];
-
-    /// <summary>
-    /// The root object this transform belongs to. This is not the same as a GameObject, as a <see cref="UnityObject"/> references a prefab, not a GameObject.
-    /// </summary>
-    public UnityObject Object { get; }
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-    internal AssetTypeValueField BaseField
-    {
-        get
-        {
-            if (_disposed)
-                throw new ObjectDisposedException(nameof(UnityTransform));
-
-            if (_baseField != null)
-                return _baseField;
-
-            CacheBaseField();
-            return _baseField ?? AssetTypeValueField.DUMMY_FIELD;
-        }
-    }
+    private AssetTypeValueField ChildrenField => _childrenField ??= BaseField["m_Children"];
 
     [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
     internal AssetTypeValueField GameObjectBaseField
     {
         get
         {
-            if (_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(nameof(UnityTransform));
 
             if (_objectBaseField != null)
@@ -83,7 +58,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
     {
         get
         {
-            if (_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(nameof(UnityTransform));
 
             return _childCount ?? CountChildren();
@@ -98,14 +73,14 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
     {
         get
         {
-            if (_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(nameof(UnityTransform));
 
-            AssetTypeValueField? baseField = _baseField;
+            AssetTypeValueField? baseField = BaseFieldIntl;
             while (baseField == null)
             {
                 CacheBaseField();
-                baseField = _baseField;
+                baseField = BaseFieldIntl;
             }
 
             return BundleUtility.ConstructVector3(baseField, "m_LocalPosition");
@@ -120,14 +95,14 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
     {
         get
         {
-            if (_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(nameof(UnityTransform));
 
-            AssetTypeValueField? baseField = _baseField;
+            AssetTypeValueField? baseField = BaseFieldIntl;
             while (baseField == null)
             {
                 CacheBaseField();
-                baseField = _baseField;
+                baseField = BaseFieldIntl;
             }
 
             return BundleUtility.ConstructQuaternion(baseField, "m_LocalRotation");
@@ -142,14 +117,14 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
     {
         get
         {
-            if (_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(nameof(UnityTransform));
 
-            AssetTypeValueField? baseField = _baseField;
+            AssetTypeValueField? baseField = BaseFieldIntl;
             while (baseField == null)
             {
                 CacheBaseField();
-                baseField = _baseField;
+                baseField = BaseFieldIntl;
             }
 
             return BundleUtility.ConstructVector3(baseField, "m_LocalScale");
@@ -164,7 +139,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
     {
         get
         {
-            if (_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(nameof(UnityTransform));
 
             AssetTypeValueField? objectBaseField = _objectBaseField;
@@ -190,31 +165,214 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
     /// <remarks>A value of <c>0</c> indicates the transform belongs to a root object, <c>1</c> indicates a child of a root object, etc.</remarks>
     public int Depth => _level;
 
-    public UnityTransform(UnityTransform? parent, UnityObject rootObject, AssetsFileInstance file, AssetFileInfo transformPathInfo, int level, IParsingServices services)
+    internal UnityTransform(
+        UnityTransform? parent,
+        UnityObject rootObject,
+        AssetsFileInstance file,
+        AssetFileInfo transformPathInfo,
+        int level,
+        IParsingServices services)
+    : base(rootObject, file, transformPathInfo, services)
     {
-        Object = rootObject;
-        _bundle = rootObject.Bundle;
-
         _parent = parent;
-        _file = file;
-        _pathInfo = transformPathInfo;
         _level = level;
-        _services = services;
     }
 
-    public UnityTransform(UnityTransform parent, UnityObject rootObject, AssetsFileInstance file, AssetFileInfo transformPathInfo)
+    internal UnityTransform(
+        UnityTransform parent,
+        UnityObject rootObject,
+        AssetsFileInstance file,
+        AssetFileInfo transformPathInfo)
+    : base(rootObject, file, transformPathInfo, parent.Services)
     {
         _parent = parent;
-        _bundle = parent._bundle;
-        _file = file;
-        _pathInfo = transformPathInfo;
         _level = parent._level + 1;
-        _services = parent._services;
-        Object = rootObject;
+    }
+
+    private struct TryGetComponentState
+    {
+        public UnityComponent? Component;
+        public UnityTransform This;
+        public AssetClassID Class;
+    }
+
+    /// <summary>
+    /// Attempt to get a component attached to this object from a <see cref="AssetClassID"/>.
+    /// </summary>
+    /// <param name="type">The known class ID type of the component.</param>
+    /// <returns>Whether or not the component could be found.</returns>
+    public bool TryGetComponent(AssetClassID type, [NotNullWhen(true)] out UnityComponent? component)
+    {
+        switch (type)
+        {
+            case AssetClassID.GameObject:
+            case AssetClassID.AssetBundle:
+            case AssetClassID.AssetBundleManifest:
+            case AssetClassID.@bool:
+            case AssetClassID.@float:
+            case AssetClassID.@int:
+            case AssetClassID.@void:
+                component = null;
+                return false;
+
+            case AssetClassID.Object:
+            case AssetClassID.Component:
+            case AssetClassID.Transform:
+                component = this;
+                return true;
+
+            case AssetClassID.RectTransform:
+                if (Class == AssetClassID.RectTransform)
+                {
+                    component = this;
+                    return true;
+                }
+
+                component = null;
+                return false;
+
+            default:
+
+                Dictionary<AssetClassID, UnityComponent>? compCache = _components;
+                if (compCache != null)
+                {
+                    lock (compCache)
+                    {
+                        if (compCache.TryGetValue(type, out UnityComponent comp))
+                        {
+                            component = comp;
+                            return true;
+                        }
+                    }
+                }
+
+                TryGetComponentState state;
+                state.Component = null;
+                state.This = this;
+                state.Class = type;
+                BundleUtility.RunOperationOnBundle(ref state, Bundle, Services, static (bundle, _, manager, ref state) =>
+                {
+                    if (!state.This.TryGetComponentIntlLocked(state.Class, bundle, manager, out state.Component))
+                        state.Component = null;
+                });
+
+                component = state.Component;
+                return component != null;
+        }
+    }
+
+    private bool TryGetComponentIntlLocked(
+        AssetClassID type,
+        DiscoveredBundle bundle,
+        AssetsManager manager,
+        [NotNullWhen(true)] out UnityComponent? component)
+    {
+        component = null;
+
+        AssetTypeValueField? gameObject = _objectBaseField;
+        if (gameObject == null)
+        {
+            CacheObjectBaseFieldLocked(manager);
+            gameObject = _objectBaseField ?? AssetTypeValueField.DUMMY_FIELD;
+        }
+
+        if (gameObject.IsDummy || bundle.FilePreloadCache == null)
+            return false;
+
+        AssetTypeValueField components = gameObject["m_Component"];
+        if (components.IsDummy)
+            return false;
+
+        foreach (AssetTypeValueField componentSet in components.Children)
+        {
+            if (componentSet.Value.ValueType != AssetValueType.Array)
+                continue;
+
+            foreach (AssetTypeValueField componentPair in componentSet.Children)
+            {
+                if (componentPair.Value != null)
+                    continue;
+
+                foreach (AssetTypeValueField componentPtr in componentPair.Children)
+                {
+                    if (!BundleUtility.TryReadPathId(componentPtr, out long pathId))
+                        continue;
+
+                    if (!bundle.FilePreloadCache.TryGetValue(pathId, out AssetFileInfo? componentFileInfo)
+                        || (AssetClassID)componentFileInfo.TypeId != type)
+                    {
+                        continue;
+                    }
+
+                    UnityComponent comp = new UnityComponent(Object, File, componentFileInfo, Services);
+
+                    Dictionary<AssetClassID, UnityComponent> dictionary = ComponentCache;
+
+                    lock (dictionary)
+                    {
+                        dictionary[type] = comp;
+                    }
+
+                    if (IsDisposed)
+                    {
+                        lock (dictionary)
+                        {
+                            if (dictionary.TryGetValue(type, out UnityComponent comp2) && comp == comp2)
+                            {
+                                dictionary.Remove(type);
+                            }
+                        }
+                        comp.Dispose();
+                        throw new ObjectDisposedException(nameof(UnityObject));
+                    }
+
+                    component = comp;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private Dictionary<AssetClassID, UnityComponent> ComponentCache
+    {
+        get
+        {
+            Dictionary<AssetClassID, UnityComponent>? dictionary = _components;
+            if (dictionary == null)
+            {
+                Dictionary<AssetClassID, UnityComponent> newDict = new Dictionary<AssetClassID, UnityComponent>(1);
+                dictionary = Interlocked.CompareExchange(ref _components, newDict, null) ?? newDict;
+            }
+
+            return dictionary;
+        }
+    }
+
+    /// <summary>
+    /// Attempt to get a component attached to this object from a <see cref="QualifiedType"/>.
+    /// Only works on types that can be mapped to a <see cref="AssetClassID"/>.
+    /// </summary>
+    /// <param name="type">The fully-qualified type name of the component to get.</param>
+    /// <returns>Whether or not the component could be found.</returns>
+    public bool TryGetComponent(QualifiedType type, [NotNullWhen(true)] out UnityComponent? component)
+    {
+        if (!type.IsCaseInsensitive)
+            type = type.CaseInsensitive;
+
+        if (Services.Installation.KnownClassIdsByTypes.TryGetValue(type, out AssetClassID classId))
+        {
+            return TryGetComponent(classId, out component);
+        }
+
+        component = null;
+        return false;
+
     }
 
     /// <inheritdoc />
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
         UnityTransform?[]? children = Interlocked.Exchange(ref _children, null);
         if (children != null)
@@ -225,10 +383,11 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
             }
         }
 
-        _disposed = true;
-
-        _baseField = null;
-        _objectBaseField = null;
+        if (disposing)
+        {
+            _childrenField = null;
+            _objectBaseField = null;
+        }
     }
 
     /// <summary>
@@ -241,7 +400,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
     {
         get
         {
-            if (_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(nameof(UnityTransform));
 
             if (index < 0)
@@ -279,7 +438,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
         state.Transform = this;
         state.Path = path;
 
-        BundleUtility.RunOperationOnBundle(ref state, _bundle, _services, static (bundle, _, manager, ref state) =>
+        BundleUtility.RunOperationOnBundle(ref state, Bundle, Services, static (bundle, _, manager, ref state) =>
         {
             state.Transform = state.Transform!.FindLocked(state.Path, bundle, manager);
         });
@@ -341,62 +500,38 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
         }
     }
 
-    [MemberNotNull(nameof(_baseField))]
-    private void CacheBaseField()
-    {
-        BundleUtility.RunOperationOnBundle(
-            this, _bundle, _services,
-            static (_, _, manager, @this) =>
-            {
-                @this.CacheBaseFieldLocked(manager);
-            }
-        );
-
-        _baseField ??= AssetTypeValueField.DUMMY_FIELD;
-    }
-
-    [MemberNotNull(nameof(_baseField))]
-    private void CacheBaseFieldLocked(AssetsManager manager)
-    {
-        _baseField ??= manager.GetBaseField(_file, _pathInfo) ?? AssetTypeValueField.DUMMY_FIELD;
-        if (!_disposed)
-            return;
-
-        _baseField = null;
-        throw new ObjectDisposedException(nameof(UnityTransform));
-    }
-
     [MemberNotNull(nameof(_objectBaseField))]
     private void CacheObjectBaseField()
     {
-        BundleUtility.RunOperationOnBundle(this, _bundle, _services, static (_, _, manager, @this) =>
+        BundleUtility.RunOperationOnBundle(this, Bundle, Services, static (_, _, manager, @this) =>
         {
             if (@this._objectBaseField != null)
             {
                 return;
             }
 
-            @this.CacheBaseFieldLocked(manager);
-            if (@this._baseField.IsDummy)
-            {
-                return;
-            }
-
-            AssetTypeValueField gameObjectPtr = @this.BaseField["m_GameObject"];
-            if (!BundleUtility.TryReadPathId(gameObjectPtr, out long gameObjectPathId))
-            {
-                return;
-            }
-
-            @this._objectBaseField = manager.GetBaseField(@this._file, gameObjectPathId);
+            @this.CacheObjectBaseFieldLocked(manager);
         });
 
         _objectBaseField ??= AssetTypeValueField.DUMMY_FIELD;
-        if (!_disposed)
+        if (!IsDisposed)
             return;
 
         _objectBaseField = null;
         throw new ObjectDisposedException(nameof(UnityTransform));
+    }
+
+    private void CacheObjectBaseFieldLocked(AssetsManager manager)
+    {
+        CacheBaseFieldLocked(manager);
+        if (BaseFieldIntl.IsDummy)
+            return;
+
+        AssetTypeValueField gameObjectPtr = BaseField["m_GameObject"];
+        if (BundleUtility.TryReadPathId(gameObjectPtr, out long gameObjectPathId))
+        {
+            _objectBaseField = manager.GetBaseField(File, gameObjectPathId);
+        }
     }
 
     /// <inheritdoc />
@@ -425,7 +560,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
     [MemberNotNull(nameof(_childCount))]
     private int CountChildren()
     {
-        BundleUtility.RunOperationOnBundle(this, _bundle, _services, static (_, _, manager, @this) =>
+        BundleUtility.RunOperationOnBundle(this, Bundle, Services, static (_, _, manager, @this) =>
         {
             @this.CountChildrenLocked(manager);
         });
@@ -446,7 +581,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
         }
 
         CacheBaseFieldLocked(manager);
-        if (_baseField.IsDummy)
+        if (BaseFieldIntl.IsDummy)
         {
             _childCount = 0;
             return 0;
@@ -492,7 +627,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
         state.This = this;
         state.Index = index;
 
-        BundleUtility.RunOperationOnBundle(ref state, _bundle, _services, static (bndl, _, manager, ref state) =>
+        BundleUtility.RunOperationOnBundle(ref state, Bundle, Services, static (bndl, _, manager, ref state) =>
         {
             state.This.CreateChildLocked(bndl, manager, state.Index);
         });
@@ -526,7 +661,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
             throw new FormatException($"Child #{index} not defined. Likely caused by a corrupted bundle.");
         }
 
-        UnityTransform child = new UnityTransform(this, Object, _file, transformPathInfo);
+        UnityTransform child = new UnityTransform(this, Object, File, transformPathInfo);
 
         UnityTransform? oldValue = Interlocked.CompareExchange(ref childElem, child, null);
         if (oldValue != null)
@@ -534,7 +669,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
             // didn't replace
             child.Dispose();
         }
-        else if (_disposed && _children != children)
+        else if (IsDisposed && _children != children)
         {
             child.Dispose();
         }
@@ -542,7 +677,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
 
     private bool TryGetChildAtIndex(DiscoveredBundle bndl, AssetsManager manager, int index, [NotNullWhen(true)] out AssetFileInfo? transformPathInfo)
     {
-        if (_baseField == null)
+        if (BaseFieldIntl == null)
             CacheBaseFieldLocked(manager);
 
         AssetTypeValueField field = ChildrenField;
@@ -584,7 +719,7 @@ public class UnityTransform : IEnumerable<UnityTransform>, IDisposable
         ChildEnumerator enumerator = new ChildEnumerator(this);
         try
         {
-            if (!BundleUtility.TryLockBundle(_bundle, _services, ref enumerator.Lock, ref enumerator.HasLock, out enumerator.Bundle, out _, out enumerator.Manager))
+            if (!BundleUtility.TryLockBundle(Bundle, Services, ref enumerator.Lock, ref enumerator.HasLock, out enumerator.Bundle, out _, out enumerator.Manager))
             {
                 throw new InvalidOperationException("Unable to enumerate children. Bundle could not be loaded.");
             }
