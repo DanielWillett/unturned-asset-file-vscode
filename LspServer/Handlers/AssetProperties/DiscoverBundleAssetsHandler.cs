@@ -8,6 +8,7 @@ using DanielWillett.UnturnedDataFileLspServer.Files;
 using DanielWillett.UnturnedDataFileLspServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Collections.Immutable;
+using AssetsTools.NET.Extra;
 using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -94,11 +95,16 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
                     prop.IsRequired = isRequired.Value;
                 }
 
-                UnityObject? obj = bundle.GetCorrespondingAsset(unityAsset.Key, unityAsset.Type, ref ctx);
+                UnityObject? obj = bundle.GetCorrespondingAsset(unityAsset, ref ctx);
                 if (obj != null)
                 {
                     prop.Path = obj.Path;
-                    prop.HasChildren = obj.Transform?.ChildCount > 0;
+                    UnityTransform? transform = obj.Transform;
+                    if (transform != null)
+                    {                                                            // > 1 = skip transform
+                        prop.HasChildren = transform.ChildCount > 0 || transform.ComponentCount > 1;
+                    }
+
                     if (!string.IsNullOrEmpty(prefix) && prop.Path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                     {
                         prop.Path = prop.Path[prefix.Length..];
@@ -162,7 +168,7 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
                     Key = obj.Name ?? Path.GetFileName(obj.Path),
                     Type = type,
                     TypeName = typeName,
-                    HasChildren = transform is { ChildCount: > 0 },
+                    HasChildren = transform != null && (transform.ChildCount > 0 || transform.ComponentCount > 1),
                     Path = path.ToString(),
                     IsUnknown = true,
                     IsAsset = true
@@ -194,7 +200,7 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
     private static void ResolveChildObjects(DatBundleAsset unityAsset, string? requestPath, List<BundleAssetInfo> outputProperties, ref FileEvaluationContext ctx)
     {
         IBundleProxy bundle = ctx.File.WorkspaceFile.Bundle;
-        UnityObject? obj = bundle.GetCorrespondingAsset(unityAsset.Key, unityAsset.Type, ref ctx);
+        UnityObject? obj = bundle.GetCorrespondingAsset(unityAsset, ref ctx);
         if (obj == null)
         {
             return;
@@ -221,6 +227,30 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
             }
         }
 
+        using (UnityTransform.ComponentEnumerator compEnumerator = parent.EnumerateComponents())
+        {
+            while (compEnumerator.MoveNext())
+            {
+                if (compEnumerator.CurrentClass is AssetClassID.Transform or AssetClassID.RectTransform)
+                    continue;
+
+                QualifiedType type = compEnumerator.CurrentClass == AssetClassID.MonoBehaviour
+                    ? compEnumerator.Current!.Type
+                    : compEnumerator.CurrentType;
+
+                string typeName = type.GetTypeName();
+                outputProperties.Add(new BundleAssetInfo
+                {
+                    Key = typeName,
+                    Type = type.Type,
+                    TypeName = typeName,
+                    HasChildren = false,
+                    IsComponent = true,
+                    Path = requestPath
+                });
+            }
+        }
+
         int index = 0;
         foreach (UnityTransform childObject in parent)
         {
@@ -230,7 +260,7 @@ internal class DiscoverBundleAssetsHandler : IDiscoverBundleAssetsHandler
                 Key = name ?? $"<child #{index}>",
                 Type = QualifiedType.ObjectType.Type,
                 TypeName = "Object",
-                HasChildren = childObject.ChildCount > 0,
+                HasChildren = childObject.ChildCount > 0 || childObject.ComponentCount > 1,
                 IsComponent = false,
                 Path = name != null ? OSPathHelper.CombineWithUnixSeparators(requestPath, name) : null
             });

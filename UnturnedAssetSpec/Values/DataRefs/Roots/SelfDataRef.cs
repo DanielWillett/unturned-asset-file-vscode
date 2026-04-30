@@ -1,7 +1,6 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 
@@ -80,8 +79,12 @@ public sealed class SelfDataRef : RootDataRef<SelfDataRef>
 
     protected override bool AcceptProperty<TVisitor>(in ComponentProperty property, ref FileEvaluationContext ctx, ref TVisitor visitor)
     {
-        // todo
-        return false;
+        if (Owner is not DatBundleAsset bundleAsset)
+        {
+            return false;
+        }
+
+        return property.GetValue(bundleAsset, ref ctx, ref visitor);
     }
 
     /// <inheritdoc />

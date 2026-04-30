@@ -7,8 +7,8 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Threading;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
@@ -39,6 +39,35 @@ partial class UnityTransform
     }
 
     /// <summary>
+    /// Number of direct children this transform has.
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
+    public int ComponentCount
+    {
+        get
+        {
+            UnityComponent?[]? componentList = _components;
+            while (componentList == null)
+            {
+                if (IsDisposed)
+                    throw new ObjectDisposedException(nameof(UnityTransform));
+
+                BundleUtility.RunOperationOnBundle(
+                    this, Bundle, Services,
+                    static (_, _, manager, @this) =>
+                    {
+                        @this.CreateComponentListLocked(manager);
+                    }
+                );
+
+                componentList = _components;
+            }
+
+            return componentList.Length;
+        }
+    }
+
+    /// <summary>
     /// Get the component at the given index on this transform's object.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException"/>
@@ -54,13 +83,13 @@ partial class UnityTransform
         state.Component = null;
         BundleUtility.RunOperationOnBundle(ref state, Bundle, Services, static (bundle, _, manager, ref state) =>
         {
-            state.Component = state.This.GetComponentLocked(state.Index, bundle, manager, QualifiedType.None);
+            state.Component = state.This.GetComponentLocked(state.Index, bundle, manager);
         });
 
         return state.Component ?? throw new FormatException("Invalid bundle format.");
     }
 
-    private UnityComponent? GetComponentLocked(int index, DiscoveredBundle bundle, AssetsManager manager, QualifiedType baseType)
+    private UnityComponent? GetComponentLocked(int index, DiscoveredBundle bundle, AssetsManager manager)
     {
         UnityComponent?[]? componentList = _components;
         while (componentList == null)
@@ -113,10 +142,10 @@ partial class UnityTransform
             return null;
         }
 
-        return GetComponentLocked(componentFileInfo, componentList, index, bundle, manager);
+        return GetComponentLocked(componentFileInfo, componentList, index);
     }
 
-    private UnityComponent? GetComponentLocked(AssetFileInfo componentFileInfo, UnityComponent?[] componentList, int index, DiscoveredBundle bundle, AssetsManager manager)
+    private UnityComponent? GetComponentLocked(AssetFileInfo componentFileInfo, UnityComponent?[] componentList, int index)
     {
         AssetClassID classId = (AssetClassID)componentFileInfo.TypeId;
         if (!Services.Installation.KnownUnityClassTypes.TryGetValue(classId, out IBundleAssetType? type))
@@ -166,7 +195,7 @@ partial class UnityTransform
 
             default:
                 if (options != QueryComponentOptions.None
-                    && Services.Installation.KnownUnityClassTypes.TryGetValue(type, out IBundleAssetType actualType))
+                    && Services.Installation.KnownUnityClassTypes.TryGetValue(type, out IBundleAssetType? actualType))
                 {
                     TryGetComponentByTypeState state2;
                     state2.Component = null;
@@ -202,27 +231,21 @@ partial class UnityTransform
     /// Enumerate all components.
     /// </summary>
     /// <param name="options">Changes how components are searched.</param>
-    /// <returns>An enumerator that steps through the matched components, creating them as the enumerator progresses.</returns>
+    /// <returns>An enumerator that steps through matching components, loading them as the enumerator progresses.</returns>
     public ComponentEnumerator EnumerateComponents(QueryComponentOptions options = QueryComponentOptions.None)
     {
         return EnumerateComponents(QualifiedType.None, options);
     }
 
     /// <summary>
-    /// Enumerate all components of the given type (including sub-classes).
+    /// Enumerate all components of the given type (including sub-classes, unless specified in <paramref name="options"/>).
     /// </summary>
     /// <param name="type">Base type of all components.</param>
     /// <param name="options">Changes how components are searched.</param>
-    /// <returns>An enumerator that steps through the matched components, creating them as the enumerator progresses.</returns>
+    /// <returns>An enumerator that steps through matching components, loading them as the enumerator progresses.</returns>
     public ComponentEnumerator EnumerateComponents(QualifiedType type, QueryComponentOptions options = QueryComponentOptions.None)
     {
-        ComponentEnumerator enumerator = new ComponentEnumerator(
-            this,
-            type,
-            (options & QueryComponentOptions.InChildren) != 0,
-            (options & QueryComponentOptions.InParents) != 0,
-            options
-        );
+        ComponentEnumerator enumerator = new ComponentEnumerator(this, type, options);
 
         try
         {
@@ -240,8 +263,7 @@ partial class UnityTransform
         }
         catch
         {
-            if (enumerator.HasLock)
-                PlatformLockHelper.ExitLock(enumerator.Lock!);
+            enumerator.Dispose();
             throw;
         }
     }
@@ -288,7 +310,7 @@ partial class UnityTransform
         state.Component = null;
         state.Options = options;
 
-        BundleUtility.RunOperationOnBundle(ref state, Bundle, Services, static (bundle, services, manager, ref state) =>
+        BundleUtility.RunOperationOnBundle(ref state, Bundle, Services, static (bundle, _, manager, ref state) =>
         {
             if (!state.This.TryGetComponentIntlLocked(state.Type, bundle, manager, out state.Component, state.Options))
                 state.Component = null;
@@ -351,8 +373,7 @@ partial class UnityTransform
         AssetsManager manager,
         [NotNullWhen(true)] out UnityComponent? component)
     {
-        QualifiedType qType = Type.Type;
-        if (!type.IsAbstract && Services.Installation.KnownClassIdsByTypes.TryGetValue(qType, out AssetClassID classId))
+        if (!type.IsAbstract && Services.Installation.KnownClassIdsByTypes.TryGetValue(type.Type, out AssetClassID classId))
         {
             if (TryGetComponentIntlLocked(classId, bundle, manager, out component))
                 return true;
@@ -411,12 +432,14 @@ partial class UnityTransform
                 continue;
 
             if (!bundle.TryGetFileInfoFromPathId(pathId, out AssetFileInfo? componentFileInfo)
-                || (AssetClassID)componentFileInfo.TypeId != type)
+                || (AssetClassID)componentFileInfo.TypeId != type
+                || !Services.Installation.KnownUnityClassTypes.TryGetValue(type, out IBundleAssetType? clrType))
             {
                 continue;
             }
 
-            UnityComponent comp = new UnityComponent(Object, File, componentFileInfo, Services);
+            QualifiedType typeName = clrType.TypeName;
+            UnityComponent comp = new UnityComponent(Object, File, componentFileInfo, Services, this, typeName);
 
             UnityComponent? oldValue = Interlocked.CompareExchange(ref componentList[i], comp, null);
             if (oldValue != null)
@@ -564,9 +587,6 @@ partial class UnityTransform
         private readonly bool _includeParents;
         private readonly QueryComponentOptions _options;
 
-        private AssetTypeValueField? _componentsField;
-        private int _index1, index2, index3;
-
         // current parent
         private UnityTransform _current;
         private UnityComponent? _currentComponent;
@@ -577,28 +597,23 @@ partial class UnityTransform
 
         // child stack (DFS)
         private Stack<UnityTransform>? _stack;
-#nullable disable
-
-        /// <inheritdoc />
-        public UnityComponent Current
-        {
-            get
-            {
-                
-            }
-        }
 
         public QualifiedType CurrentType { get; private set; }
+        public AssetClassID CurrentClass { get; private set; }
+
+#nullable disable
+        /// <inheritdoc />
+        public UnityComponent Current => _currentComponent ?? CreateComponentObject()!;
 
         object IEnumerator.Current => Current;
-
 #nullable restore
-        internal ComponentEnumerator(UnityTransform seed, QualifiedType type, bool includeChildren, bool includeParents, QueryComponentOptions options)
+
+        internal ComponentEnumerator(UnityTransform seed, QualifiedType type, QueryComponentOptions options)
         {
             _seed = seed;
             _type = type;
-            _includeChildren = includeChildren;
-            _includeParents = includeParents;
+            _includeChildren = (options & QueryComponentOptions.InChildren) != 0;
+            _includeParents = (options & QueryComponentOptions.InParents) != 0;
             _options = options;
             _index = -1;
             _current = _seed;
@@ -636,18 +651,105 @@ partial class UnityTransform
             return true;
         }
 
+        private bool MoveNextWithParents()
+        {
+            UnityComponent?[] components = _current._components ?? throw new ObjectDisposedException(nameof(UnityTransform));
+            do
+            {
+                ++_index;
+                if (_index < components.Length)
+                    continue;
+
+                nextParent:
+                UnityTransform? parent = _current._parent;
+                if (parent == null)
+                    return false;
+
+                if (parent._components == null)
+                {
+                    parent.CreateComponentListLocked(Manager!);
+                }
+
+                _current = parent;
+                _index = 0;
+                if (components.Length == 0)
+                    goto nextParent;
+
+                components = parent._components ?? throw new ObjectDisposedException(nameof(UnityTransform));
+
+            } while (!SetComponent(_current, components, _index));
+            return true;
+        }
+
+        private bool MoveNextWithChildren()
+        {
+            if (_index == -1 && _current == _seed)
+            {
+                _stack ??= new Stack<UnityTransform>(16);
+                ChildEnumerator enumerator = _seed.EnumerateChildrenLocked(Bundle!, Manager!);
+                while (enumerator.MoveNext())
+                {
+                    _stack.Push(enumerator.Current);
+                }
+                enumerator.Dispose();
+            }
+
+            UnityComponent?[] components = _current._components ?? throw new ObjectDisposedException(nameof(UnityTransform));
+            do
+            {
+                ++_index;
+                if (_index < components.Length)
+                    continue;
+
+                if (_stack!.Count == 0)
+                {
+                    return false;
+                }
+
+                nextChild:
+                UnityTransform next = _stack.Pop();
+                ChildEnumerator enumerator = next.EnumerateChildrenLocked(Bundle!, Manager!);
+                while (enumerator.MoveNext())
+                {
+                    _stack.Push(enumerator.Current);
+                }
+
+                enumerator.Dispose();
+                if (next._components == null)
+                {
+                    next.CreateComponentListLocked(Manager!);
+                }
+
+                _current = next;
+                _index = 0;
+                if (components.Length == 0)
+                    goto nextChild;
+
+                components = next._components ?? throw new ObjectDisposedException(nameof(UnityTransform));
+
+            } while (!SetComponent(_current, components, _index));
+            return true;
+        }
+
         private bool SetComponent(UnityTransform obj, UnityComponent?[] components, int index)
         {
-            UnityComponent? current = components[_index];
+            UnityComponent? current = components[index];
             _currentComponent = current;
             if (current != null)
             {
-                CurrentType = current.Type;
+                _currentFileInfo = current.PathInfo;
+
+                CurrentType = current.IsMonoBehaviourType
+                    ? new QualifiedType("UnityEngine.MonoBehaviour, UnityEngine.CoreModule", true)
+                    : current.Type;
+                CurrentClass = current.Class;
+
+                _currentComponent = current;
                 return true;
             }
 
             AssetTypeValueField value = obj.GetComponentsArrayLocked(Manager!);
-            AssetTypeValueField componentPair = value.Children[_index];
+            AssetTypeValueField componentPair = value.Children[index];
             if (componentPair.Children.Count < 1)
                 return false;
 
@@ -668,23 +770,57 @@ partial class UnityTransform
             }
 
             QualifiedType typeName = type.TypeName;
-            if (!_type.IsNull && !_current.Services.Database.Information.IsAssignableFrom(_type, typeName))
+            if (!_type.IsNull)
             {
-                return false;
+                if ((_options & QueryComponentOptions.ExactTypeOnly) != 0)
+                {
+                    if (!typeName.Equals(_type))
+                        return false;
+                }
+                else
+                {
+                    if (!_current.Services.Database.Information.IsAssignableFrom(_type, typeName))
+                        return false;
+                }
             }
 
             CurrentType = typeName;
+            CurrentClass = classId;
             return true;
         }
 
-        private bool MoveNextWithParents()
+        private UnityComponent? CreateComponentObject()
         {
-            return false;
-        }
+            if (_currentFileInfo == null)
+                return null;
 
-        private bool MoveNextWithChildren()
-        {
-            return false;
+            UnityComponent?[] components = _current._components ?? throw new ObjectDisposedException(nameof(UnityTransform));
+            UnityComponent? current = components[_index];
+            if (current != null)
+            {
+                _currentComponent = current;
+                return current;
+            }
+
+            UnityComponent component = new UnityComponent(
+                _current.Object,
+                _current.File,
+                _currentFileInfo,
+                _current.Services,
+                _current,
+                CurrentType
+            );
+
+            UnityComponent? oldComponent = Interlocked.CompareExchange(ref components[_index], component, null);
+            if (oldComponent != null)
+            {
+                _currentComponent = oldComponent;
+                component.Dispose();
+                return oldComponent;
+            }
+
+            _currentComponent = component;
+            return component;
         }
 
         /// <exception cref="NotSupportedException"/>
@@ -692,15 +828,17 @@ partial class UnityTransform
         {
             _current = _seed;
             _index = -1;
-            _stack = null;
+            _stack?.Clear();
             _currentComponent = null;
             _currentFileInfo = null;
+            CurrentType = QualifiedType.None;
+            CurrentClass = AssetClassID.Object;
         }
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
         public ComponentEnumerator GetEnumerator()
         {
-            if (_stack == null && _index == -1 && _current == _seed)
+            if ((_stack == null || _stack.Count == 0) && _index == -1 && _current == _seed)
                 return this;
 
             throw new InvalidOperationException("Can not call GetEnumerator on a used enumerator.");

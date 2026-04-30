@@ -1,4 +1,5 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data;
+﻿using AssetsTools.NET.Extra;
+using DanielWillett.UnturnedDataFileLspServer.Data;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
@@ -71,7 +72,7 @@ public class UnityObjectTests
 
         FileEvaluationContext context = new FileEvaluationContext(_parsingServices, srcFile.SourceFile);
 
-        UnityObject? unityObject = bundleProxy.GetCorrespondingAsset(bundleAsset.Key, bundleAsset.Type, ref context);
+        UnityObject? unityObject = bundleProxy.GetCorrespondingAsset(bundleAsset, ref context);
 
         Assert.That(unityObject, Is.Not.Null);
 
@@ -132,7 +133,9 @@ public class UnityObjectTests
             Assert.Inconclusive();
         }
 
-        _parsingServices.Installation.AddSearchableDirectory(@"A:\SteamLibrary\steamapps\workshop\content\304930\2839462324\UncreatedUI");
+        _parsingServices.Installation.AddSearchableDirectory(
+            @"C:\Program Files (x86)\Steam\steamapps\workshop\content\304930\2839462324\UncreatedUI"
+        );
         _parsingServices.Installation.Discover();
 
         DiscoveredDatFile file = _parsingServices.Installation.FindFile(
@@ -155,9 +158,16 @@ public class UnityObjectTests
         UnityTransform? transform = unityObject.Transform;
         Assert.That(transform, Is.Not.Null);
 
-        Assert.That(transform.TryGetComponent("UnityEngine.Object, UnityEngine.CoreModule", out UnityComponent? component));
+        UnityTransform canvas = transform.First();
+        Assert.That(canvas.TryGetComponent(AssetClassID.Canvas, out UnityComponent? comp), Is.True);
 
-        _ = component;
+        Assert.That(comp!.TryReadProperty("m_SortingOrder", out Optional<short> value1), Is.True);
+        Assert.That(value1.HasValue, Is.True);
+        Assert.That(value1.Value, Is.EqualTo((short)0));
+
+        Assert.That(comp.TryReadProperty("m_GameObject.m_Name", out Optional<string> value2), Is.True);
+        Assert.That(value2.HasValue, Is.True);
+        Assert.That(value2.Value, Is.EqualTo("Canvas"));
     }
 }
 

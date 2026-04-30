@@ -22,6 +22,7 @@ public partial class UnityTransform : UnityComponent
     /// <summary>
     /// Local position to parent, or world position if this object has no parent.
     /// </summary>
+    /// <exception cref="ObjectDisposedException"/>
     [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
     public Vector3 Position
     {
@@ -44,6 +45,7 @@ public partial class UnityTransform : UnityComponent
     /// <summary>
     /// Local rotation to parent, or world rotation if this object has no parent.
     /// </summary>
+    /// <exception cref="ObjectDisposedException"/>
     [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
     public Quaternion Rotation
     {
@@ -66,6 +68,7 @@ public partial class UnityTransform : UnityComponent
     /// <summary>
     /// Local scale to parent, or global scale if this object has no parent.
     /// </summary>
+    /// <exception cref="ObjectDisposedException"/>
     [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
     public Vector3 Scale
     {
@@ -88,6 +91,7 @@ public partial class UnityTransform : UnityComponent
     /// <summary>
     /// The name of the object this transform represents.
     /// </summary>
+    /// <exception cref="ObjectDisposedException"/>
     [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
     public string? Name
     {
@@ -112,6 +116,11 @@ public partial class UnityTransform : UnityComponent
             return nameField.Value.AsString;
         }
     }
+
+    /// <summary>
+    /// Whether or not this transform represents a <c>RectTransform</c> component.
+    /// </summary>
+    public bool IsRectTransform => Class == AssetClassID.RectTransform;
 
     internal UnityTransform(
         UnityTransform? parent,

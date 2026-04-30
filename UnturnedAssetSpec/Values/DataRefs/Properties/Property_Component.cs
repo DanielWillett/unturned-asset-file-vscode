@@ -1,4 +1,7 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Types;
+﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Collections.Generic;
@@ -209,6 +212,192 @@ public readonly struct ComponentProperty : IConfigurableDataRefProperty, IEquata
             flags: flags,
             fallback: fallback
         );
+    }
+
+#pragma warning disable CS8500
+    /// <summary>
+    /// Visit the result of a <see cref="ComponentProperty"/> for an asset.
+    /// </summary>
+    /// <param name="bundleAsset">Asset to resolve.</param>
+    /// <param name="ctx">Workspace context.</param>
+    /// <param name="visitor">Visitor to accept the value.</param>
+    /// <returns>Whether or not the visitor was invoked.</returns>
+    public unsafe bool GetValue<TVisitor>(DatBundleAsset bundleAsset, ref FileEvaluationContext ctx, ref TVisitor visitor)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        IBundleProxy bundle = ctx.File.WorkspaceFile.Bundle;
+        using UnityObject? obj = bundle.GetCorrespondingAsset(bundleAsset, ref ctx);
+
+        if (obj == null)
+        {
+            return VisitFallback(ref visitor);
+        }
+
+        UnityTransform.QueryComponentOptions options = UnityTransform.QueryComponentOptions.None;
+
+        if (InParents)
+            options |= UnityTransform.QueryComponentOptions.InParents;
+        else if (InChildren)
+            options |= UnityTransform.QueryComponentOptions.InChildren;
+
+        UnityTransform? transform = obj.Transform;
+        if (!string.IsNullOrEmpty(Path) && transform != null)
+        {
+            transform = transform.Find(Path);
+        }
+
+        if (transform == null || !transform.TryGetComponent(Type, out UnityComponent? component, options))
+        {
+            return VisitFallback(ref visitor);
+        }
+
+        if (string.IsNullOrWhiteSpace(Property))
+        {
+            visitor.Accept(BooleanType.Instance, new Optional<bool>(component != null));
+            return true;
+        }
+
+        ValueVisitor<TVisitor> valueVisitor;
+        valueVisitor.Visited = false;
+
+        bool success;
+
+        fixed (TVisitor* visitorPtr = &visitor)
+        {
+            valueVisitor.Visitor = visitorPtr;
+            success = component.TryReadProperty(Property, ref valueVisitor);
+        }
+
+        if (success && valueVisitor.Visited)
+        {
+            return true;
+        }
+
+        return VisitFallback(ref visitor);
+    }
+
+    private unsafe struct ValueVisitor<TVisitor> : IGenericVisitor
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        public bool Visited;
+        public TVisitor* Visitor;
+
+        public void Accept<T>(T? value) where T : IEquatable<T>
+        {
+            IType<T>? type = CommonTypes.TryGetDefaultValueType<T>();
+            if (type == null)
+                return;
+
+            Visitor->Accept(type, new Optional<T>(value));
+            Visited = true;
+        }
+    }
+
+#pragma warning restore CS8500
+
+    private bool VisitFallback<TVisitor>(ref TVisitor visitor)
+        where TVisitor : IValueVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        if (!HasFallback)
+        {
+            return false;
+        }
+
+        object? fb = Fallback;
+        if (fb == null)
+        {
+            visitor.Accept(StringType.Instance, Optional<string>.Null);
+            return true;
+        }
+
+        if (fb is IConvertible conv)
+        {
+            TypeCode typeCode = conv.GetTypeCode();
+            switch (typeCode)
+            {
+                case TypeCode.Empty:
+                case TypeCode.DBNull:
+                    visitor.Accept(StringType.Instance, Optional<string>.Null);
+                    return true;
+                case TypeCode.Boolean:
+                    visitor.Accept(BooleanType.Instance, (bool)fb);
+                    return true;
+                case TypeCode.Char:
+                    visitor.Accept(CharacterType.Instance, (char)fb);
+                    return true;
+                case TypeCode.SByte:
+                    visitor.Accept(Int8Type.Instance, (sbyte)fb);
+                    return true;
+                case TypeCode.Byte:
+                    visitor.Accept(UInt8Type.Instance, (byte)fb);
+                    return true;
+                case TypeCode.Int16:
+                    visitor.Accept(Int16Type.Instance, (short)fb);
+                    return true;
+                case TypeCode.UInt16:
+                    visitor.Accept(UInt16Type.Instance, (ushort)fb);
+                    return true;
+                case TypeCode.Int32:
+                    visitor.Accept(Int32Type.Instance, (int)fb);
+                    return true;
+                case TypeCode.UInt32:
+                    visitor.Accept(UInt32Type.Instance, (uint)fb);
+                    return true;
+                case TypeCode.Int64:
+                    visitor.Accept(Int64Type.Instance, (long)fb);
+                    return true;
+                case TypeCode.UInt64:
+                    visitor.Accept(UInt64Type.Instance, (ulong)fb);
+                    return true;
+                case TypeCode.Single:
+                    visitor.Accept(Float32Type.Instance, (float)fb);
+                    return true;
+                case TypeCode.Double:
+                    visitor.Accept(Float64Type.Instance, (double)fb);
+                    return true;
+                case TypeCode.Decimal:
+                    visitor.Accept(Float128Type.Instance, (decimal)fb);
+                    return true;
+                case TypeCode.DateTime:
+                    visitor.Accept(DateTimeType.Instance, (DateTime)fb);
+                    return true;
+                case (TypeCode)17:
+                    if (fb is not TimeSpan ts)
+                        goto default;
+                    visitor.Accept(TimeSpanType.Instance, ts);
+                    return true;
+                case TypeCode.String:
+                    visitor.Accept(StringType.Instance, (string)fb);
+                    return true;
+                case TypeCode.Object:
+                default:
+                    return false;
+            }
+        }
+
+        switch (fb)
+        {
+            case Guid guid:
+                visitor.Accept(GuidType.Instance, guid);
+                return true;
+
+            case DateTimeOffset dto:
+                visitor.Accept(DateTimeOffsetType.Instance, dto);
+                return true;
+
+            // not supporting arrays thats way too much work
+        }
+
+        return false;
     }
 
     /// <inheritdoc />

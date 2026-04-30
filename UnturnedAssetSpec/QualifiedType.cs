@@ -101,7 +101,7 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
         }
     }
 
-    internal QualifiedType(string type, bool isCaseInsensitive)
+    public QualifiedType(string type, bool isCaseInsensitive)
     {
         if (!string.IsNullOrEmpty(type))
             Type = type;
@@ -111,7 +111,73 @@ public readonly struct QualifiedType : IEquatable<QualifiedType>, IEquatable<str
     public QualifiedType(string? type)
     {
         if (!string.IsNullOrEmpty(type))
-            Type = type!;
+            Type = type;
+    }
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+    private struct QualifiedTypeConstructState
+    {
+        public string AssemblyName, TypeName;
+        public string? Namespace;
+    }
+#endif
+
+    /// <summary>
+    /// Construct a normalized <see cref="QualifiedType"/> from an assembly name and full type name.
+    /// </summary>
+    /// <param name="assemblyName">The name of the assembly, without version info.</param>
+    /// <param name="fullTypeName">The namespace and name of the type.</param>
+    /// <param name="isCaseInsensitive">Whether or not comparisons using this type should be case-insensitive (ignore-case).</param>
+    public QualifiedType(string assemblyName, string fullTypeName, bool isCaseInsensitive)
+        : this(assemblyName, null, fullTypeName, isCaseInsensitive) { }
+
+    /// <summary>
+    /// Construct a normalized <see cref="QualifiedType"/> from an assembly name, namespace, and type name.
+    /// </summary>
+    /// <param name="assemblyName">The name of the assembly, without version info.</param>
+    /// <param name="namespace">The namespace of the type. Can optionally just be provided as part of <paramref name="typeName"/> instead.</param>
+    /// <param name="typeName">The name of the type. Can optionally also include the namespace if <paramref name="namespace"/> is left <see langword="null"/>.</param>
+    /// <param name="isCaseInsensitive">Whether or not comparisons using this type should be case-insensitive (ignore-case).</param>
+    public QualifiedType(string assemblyName, string? @namespace, string typeName, bool isCaseInsensitive)
+    {
+        int len = string.IsNullOrEmpty(@namespace)
+            ? typeName.Length + 2 + assemblyName.Length
+            : @namespace.Length + typeName.Length + 3 + assemblyName.Length;
+
+        _isCaseInsensitive = isCaseInsensitive;
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+        QualifiedTypeConstructState state;
+        state.AssemblyName = assemblyName;
+        state.Namespace = @namespace;
+        state.TypeName = typeName;
+        Type = string.Create(len, state, static (span, state) =>
+        {
+            Construct(span, state.AssemblyName, state.Namespace, state.TypeName);
+        });
+#else
+        Span<char> buffer = stackalloc char[len];
+        Construct(buffer, assemblyName, @namespace, typeName);
+        Type = buffer.ToString();
+#endif
+        static void Construct(Span<char> span, string assemblyName, string? @namespace, string typeName)
+        {
+            int index = 0;
+            if (!string.IsNullOrEmpty(@namespace))
+            {
+                @namespace.AsSpan().CopyTo(span);
+                index = @namespace.Length;
+                span[index] = '.';
+                ++index;
+            }
+
+            typeName.AsSpan().CopyTo(span.Slice(index));
+            index += typeName.Length;
+            span[index] = ',';
+            ++index;
+            span[index] = ' ';
+            ++index;
+            assemblyName.AsSpan().CopyTo(span.Slice(index));
+        }
     }
 
     public string GetTypeName()

@@ -1,4 +1,5 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
@@ -157,7 +158,54 @@ public struct EqualityVisitor<TValue> : IValueVisitor, IGenericVisitor
             }
         }
 
+        if (Value is DatEnumValue enumValue)
+        {
+            EquateEnumAndValue(enumValue, optVal.Value);
+            return;
+        }
+
+        if (optVal.Value is DatEnumValue enumValue2)
+        {
+            EquateEnumAndValue(enumValue2, Value!);
+            return;
+        }
+
         Success = false;
+    }
+
+    private void EquateEnumAndValue<TOtherValue>(DatEnumValue enumValue, TOtherValue value) where TOtherValue : IEquatable<TOtherValue>
+    {
+        if (typeof(TOtherValue) == typeof(string))
+        {
+            string? str = MathMatrix.As<TOtherValue?, string?>(value);
+            if (!enumValue.Owner.TryParse(str.AsSpan(), out DatEnumValue? otherEnumValue, caseInsensitive: false))
+            {
+                Success = false;
+                IsEqual = false;
+            }
+            else
+            {
+                IsEqual = otherEnumValue.Equals(enumValue);
+                Success = true;
+            }
+
+            return;
+        }
+        
+        if (!enumValue.NumericValue.HasValue)
+        {
+            Success = false;
+            IsEqual = false;
+            return;
+        }
+
+        ReduceRight<long> reduceRight;
+        reduceRight.Value = enumValue.NumericValue.Value;
+        reduceRight.IsEqual = false;
+        reduceRight.Success = false;
+
+        Success = MathMatrix.TryReduce(value, ref reduceRight) & reduceRight.Success;
+        IsEqual = reduceRight.IsEqual;
     }
 
     public void Accept<T>(T? value) where T : IEquatable<T>

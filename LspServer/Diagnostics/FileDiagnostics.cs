@@ -269,7 +269,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
     string IWorkspaceFile.File => FilePath;
     ISourceFile IWorkspaceFile.SourceFile => SourceFile ?? throw new InvalidOperationException();
     string IWorkspaceFile.GetFullText() => throw new NotSupportedException();
-    IBundleProxy IWorkspaceFile.Bundle => throw new NotSupportedException();
+    IBundleProxy IWorkspaceFile.Bundle => /* todo */ IBundleProxy.Null;
 
     private class DiagnosticsNodeVisitor : ResolvedPropertyNodeVisitor, IDiagnosticSink
     {

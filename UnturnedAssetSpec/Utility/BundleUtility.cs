@@ -1,4 +1,5 @@
-﻿using AssetsTools.NET;
+﻿using System;
+using AssetsTools.NET;
 using AssetsTools.NET.Extra;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
@@ -162,6 +163,52 @@ internal static class BundleUtility
         }
     }
 
+    internal static Vector4 ConstructVector4(AssetTypeValueField field, string propertyName)
+    {
+        AssetTypeValueField v4Field = field[propertyName];
+        if (v4Field.IsDummy || v4Field.Value != null)
+        {
+            return default;
+        }
+
+        return ConstructVector4(v4Field);
+    }
+
+    internal static Vector4 ConstructVector4(AssetTypeValueField v4Field)
+    {
+        List<AssetTypeValueField> children = v4Field.Children;
+        if (children.Count != 4)
+        {
+            return default;
+        }
+
+        AssetTypeValueField x = children[0], y = children[1], z = children[2], w = children[3];
+        Vector4 v4;
+
+        if (x == null || x.IsDummy || x.Value.ValueType != AssetValueType.Float)
+            v4.X = 0f;
+        else
+            v4.X = x.AsFloat;
+
+        if (y == null || y.IsDummy || y.Value.ValueType != AssetValueType.Float)
+            v4.Y = 0f;
+        else
+            v4.Y = y.AsFloat;
+
+        if (z == null || z.IsDummy || z.Value.ValueType != AssetValueType.Float)
+            v4.Z = 0f;
+        else
+            v4.Z = z.AsFloat;
+
+        if (w == null || w.IsDummy || w.Value.ValueType != AssetValueType.Float)
+            v4.W = 0f;
+        else
+            v4.W = w.AsFloat;
+
+        return v4;
+    }
+    
+
     internal static Vector3 ConstructVector3(AssetTypeValueField field, string propertyName)
     {
         AssetTypeValueField v3Field = field[propertyName];
@@ -200,6 +247,41 @@ internal static class BundleUtility
             v3.Z = z.AsFloat;
 
         return v3;
+    }
+
+    internal static Vector2 ConstructVector2(AssetTypeValueField field, string propertyName)
+    {
+        AssetTypeValueField v2Field = field[propertyName];
+        if (v2Field.IsDummy || v2Field.Value != null)
+        {
+            return default;
+        }
+
+        return ConstructVector2(v2Field);
+    }
+
+    internal static Vector2 ConstructVector2(AssetTypeValueField v2Field)
+    {
+        List<AssetTypeValueField> children = v2Field.Children;
+        if (children.Count != 2)
+        {
+            return default;
+        }
+
+        AssetTypeValueField x = children[0], y = children[1];
+        Vector2 v2;
+
+        if (x == null || x.IsDummy || x.Value.ValueType != AssetValueType.Float)
+            v2.X = 0f;
+        else
+            v2.X = x.AsFloat;
+
+        if (y == null || y.IsDummy || y.Value.ValueType != AssetValueType.Float)
+            v2.Y = 0f;
+        else
+            v2.Y = y.AsFloat;
+
+        return v2;
     }
 
     internal static Quaternion ConstructQuaternion(AssetTypeValueField field, string propertyName)
@@ -256,6 +338,9 @@ internal static class BundleUtility
     /// <returns>Whether or not the visitor could be invoked.</returns>
     internal static bool VisitFieldValue<TVisitor>(AssetTypeValueField field, ref TVisitor visitor)
         where TVisitor : IGenericVisitor
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         if (field.IsDummy)
         {
@@ -265,6 +350,34 @@ internal static class BundleUtility
         AssetTypeValue? value = field.Value;
         if (value == null)
         {
+            if (string.Equals(field.TypeName, "Vector3f", StringComparison.Ordinal))
+            {
+                Vector3 v3 = ConstructVector3(field);
+                visitor.Accept(v3);
+                return true;
+            }
+            
+            if (string.Equals(field.TypeName, "Vector2f", StringComparison.Ordinal))
+            {
+                Vector2 v2 = ConstructVector2(field);
+                visitor.Accept(v2);
+                return true;
+            }
+            
+            if (string.Equals(field.TypeName, "Vector4f", StringComparison.Ordinal))
+            {
+                Vector4 v4 = ConstructVector4(field);
+                visitor.Accept(v4);
+                return true;
+            }
+            
+            if (string.Equals(field.TypeName, "Quaternionf", StringComparison.Ordinal))
+            {
+                Quaternion qt = ConstructQuaternion(field);
+                visitor.Accept(qt);
+                return true;
+            }
+
             // object
             return false;
         }

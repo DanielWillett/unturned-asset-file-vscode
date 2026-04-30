@@ -211,7 +211,18 @@ public sealed class PropertyDataRef : RootDataRef<PropertyDataRef>
 
     protected override bool AcceptProperty<TVisitor>(in ComponentProperty property, ref FileEvaluationContext ctx, ref TVisitor visitor)
     {
-        // todo
-        return false;
+        if (_propReference.IsCrossReference)
+        {
+            // not supported.
+            return false;
+        }
+
+        EnsureValueExists(ctx.Services.Database);
+        if (_value.Property is not DatBundleAsset bundleAsset)
+        {
+            return false;
+        }
+
+        return property.GetValue(bundleAsset, ref ctx, ref visitor);
     }
 }

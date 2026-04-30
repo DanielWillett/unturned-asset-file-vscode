@@ -75,10 +75,7 @@ public sealed class ListType : ITypeFactory
     public static ListType<int, TElementType> Create<TElementType>(IType<TElementType> subType)
         where TElementType : IEquatable<TElementType>
     {
-        return new ListType<int, TElementType>(new ListTypeArgs<int, TElementType>
-        {
-            Mode = ListMode.ModernList
-        }, subType);
+        return new ListType<int, TElementType>(subType);
     }
 
     IType ITypeFactory.CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
@@ -379,6 +376,21 @@ public class ListType<TCountType, TElementType>
 
             return field;
         }
+    }
+
+    /// <summary>
+    /// Use the factory methods in <see cref="ListType"/> to create a list type.
+    /// </summary>
+    internal ListType(IType<TElementType> subType)
+        : this(
+            new ListTypeArgs<TCountType, TElementType>
+            {
+                Mode = ListMode.ModernList
+            },
+            subType
+        )
+    {
+
     }
 
     /// <summary>

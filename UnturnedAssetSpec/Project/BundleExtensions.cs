@@ -33,6 +33,44 @@ public static class BundleExtensions
         /// <param name="type">The type of asset to get.</param>
         /// <param name="parsingServices">Workspace services.</param>
         /// <returns>An object representing the given unity asset, or <see langword="null"/> if it's not present.</returns>
+        public UnityObject? GetCorrespondingAsset(DatBundleAsset asset, ref FileEvaluationContext ctx)
+        {
+            ImmutableArray<DatPropertyKey> keys = asset.Keys;
+            if (keys.IsDefaultOrEmpty)
+            {
+                return bundle.GetCorrespondingAsset(asset.Key, asset.Type, ref ctx);
+            }
+
+            foreach (DatPropertyKey key in keys)
+            {
+                LegacyExpansionFilter filter = ctx.GetKeyFilter();
+                if (!SourceNodeExtensions.FilterMatches(key.Filter, filter))
+                {
+                    continue;
+                }
+
+                if (key.Condition != null && !(key.Condition.TryEvaluateValue(out Optional<bool> b, ref ctx) && b.Value))
+                {
+                    continue;
+                }
+
+                UnityObject? obj = bundle.GetCorrespondingAsset(key.Key, asset.Type, ref ctx);
+                if (obj == null)
+                    continue;
+
+                return obj;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="UnityObject"/> in a <see cref="IBundleProxy"/> from an asset name.
+        /// </summary>
+        /// <param name="assetName">The asset name, such as <c>Item</c>.</param>
+        /// <param name="type">The type of asset to get.</param>
+        /// <param name="parsingServices">Workspace services.</param>
+        /// <returns>An object representing the given unity asset, or <see langword="null"/> if it's not present.</returns>
         public UnityObject? GetCorrespondingAsset(string assetName, IPropertyType type, ref FileEvaluationContext ctx)
         {
             if (bundle is NullBundleProxy)
@@ -167,8 +205,7 @@ public static class BundleExtensions
             }
             catch
             {
-                if (enumerator.HasLock)
-                    PlatformLockHelper.ExitLock(enumerator.Lock!);
+                enumerator.Dispose();
                 throw;
             }
         }
