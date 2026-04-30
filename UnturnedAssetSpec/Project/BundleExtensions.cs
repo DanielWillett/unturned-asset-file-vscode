@@ -305,7 +305,7 @@ public sealed class BundleProxyEnumerator : IEnumerator<UnityObject>
                         continue;
                     }
 
-                    if (!Bundle!.FilePreloadCache!.TryGetValue(pair.Key, out AssetFileInfo? fileInfo))
+                    if (!Bundle!.TryGetFileInfoFromPathId(pair.Key, out AssetFileInfo? fileInfo))
                     {
                         continue;
                     }

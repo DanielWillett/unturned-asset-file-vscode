@@ -1,7 +1,7 @@
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -12,8 +12,6 @@ public class TypeHierarchyConverter : JsonConverter<TypeHierarchy?>
     private static readonly JsonEncodedText IsAbstractProperty = JsonEncodedText.Encode("IsAbstract"u8);
     private static readonly JsonEncodedText HasDataFilesProperty = JsonEncodedText.Encode("HasDataFiles"u8);
 
-    private static readonly Dictionary<QualifiedType, TypeHierarchy> EmptyDictionary = new Dictionary<QualifiedType, TypeHierarchy>();
-
     /// <inheritdoc />
     public override TypeHierarchy? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -21,7 +19,7 @@ public class TypeHierarchyConverter : JsonConverter<TypeHierarchy?>
             return null;
 
         TypeHierarchy hierarchy = new TypeHierarchy();
-        Dictionary<QualifiedType, TypeHierarchy>? childTypes = null;
+        ImmutableDictionary<QualifiedType, TypeHierarchy>.Builder? childTypes = null;
     recheck:
         switch (reader.TokenType)
         {
@@ -63,7 +61,7 @@ public class TypeHierarchyConverter : JsonConverter<TypeHierarchy?>
                                 child.Parent = hierarchy;
                                 if (hierarchy.HasDataFiles)
                                     ApplyHasDataFiles(child);
-                                childTypes ??= new Dictionary<QualifiedType, TypeHierarchy>();
+                                childTypes ??= ImmutableDictionary.CreateBuilder<QualifiedType, TypeHierarchy>();
                                 childTypes[child.Type] = child;
                             }
                             break;
@@ -82,7 +80,7 @@ public class TypeHierarchyConverter : JsonConverter<TypeHierarchy?>
                 throw new JsonException($"Unexpected token {reader.TokenType} reading TypeHierarchy.");
         }
 
-        hierarchy.ChildTypes = childTypes ?? EmptyDictionary;
+        hierarchy.ChildTypes = childTypes?.ToImmutable() ?? ImmutableDictionary<QualifiedType, TypeHierarchy>.Empty;
         return hierarchy;
     }
 
@@ -92,9 +90,9 @@ public class TypeHierarchyConverter : JsonConverter<TypeHierarchy?>
         if (hierarchy.ChildTypes == null)
             return;
 
-        foreach (TypeHierarchy child in hierarchy.ChildTypes.Values)
+        foreach (KeyValuePair<QualifiedType, TypeHierarchy> child in hierarchy.ChildTypes)
         {
-            ApplyHasDataFiles(child);
+            ApplyHasDataFiles(child.Value);
         }
     }
 
@@ -125,11 +123,11 @@ public class TypeHierarchyConverter : JsonConverter<TypeHierarchy?>
             return;
         }
 
-        foreach (TypeHierarchy child in value.ChildTypes.Values)
+        foreach (KeyValuePair<QualifiedType, TypeHierarchy> child in value.ChildTypes)
         {
-            writer.WritePropertyName(child.Type.Type);
+            writer.WritePropertyName(child.Value.Type.Type);
 
-            Write(writer, child, options);
+            Write(writer, child.Value, options);
         }
 
         writer.WriteEndObject();

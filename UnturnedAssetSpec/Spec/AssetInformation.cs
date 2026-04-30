@@ -2,6 +2,7 @@ using AssetsTools.NET.Extra;
 using DanielWillett.UnturnedDataFileLspServer.Data.Json;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -245,6 +246,18 @@ public class AssetInformation
         return hierarchy;
     }
 
+    public bool TryGetHierarchy(QualifiedType baseType, [NotNullWhen(true)] out TypeHierarchy? hierarchy)
+    {
+        if (!baseType.IsCaseInsensitive)
+            baseType = baseType.CaseInsensitive;
+
+        if (Types != null && Types.TryGetValue(baseType, out hierarchy))
+            return true;
+
+        hierarchy = null;
+        return false;
+    }
+
     public InverseTypeHierarchy GetParentTypes(QualifiedType type)
     {
         if (!type.IsCaseInsensitive)
@@ -253,6 +266,36 @@ public class AssetInformation
         return ParentTypes.TryGetValue(type, out InverseTypeHierarchy typeHierarchy)
             ? typeHierarchy
             : new InverseTypeHierarchy(type);
+    }
+
+    /// <remarks>Use <see cref="EnumerateTypeHierarchyDescending"/> to go from requested type to base type.</remarks>
+    /// <inheritdoc cref="TypeHierarchyAscendingEnumerator"/>
+    public TypeHierarchyAscendingEnumerator EnumerateTypeHierarchyAscending(QualifiedType type)
+    {
+        if (!type.IsCaseInsensitive)
+            type = type.CaseInsensitive;
+
+        if (!ParentTypes.TryGetValue(type, out InverseTypeHierarchy typeHierarchy))
+        {
+            return new TypeHierarchyAscendingEnumerator(type, Array.Empty<QualifiedType>());
+        }
+
+        return new TypeHierarchyAscendingEnumerator(type, typeHierarchy.ParentTypes);
+    }
+
+    /// <remarks>Use <see cref="EnumerateTypeHierarchyAscending"/> to go from requested type to base type.</remarks>
+    /// <inheritdoc cref="TypeHierarchyDescendingEnumerator"/>
+    public TypeHierarchyDescendingEnumerator EnumerateTypeHierarchyDescending(QualifiedType type)
+    {
+        if (!type.IsCaseInsensitive)
+            type = type.CaseInsensitive;
+
+        if (!ParentTypes.TryGetValue(type, out InverseTypeHierarchy typeHierarchy))
+        {
+            return new TypeHierarchyDescendingEnumerator(type, Array.Empty<QualifiedType>());
+        }
+
+        return new TypeHierarchyDescendingEnumerator(type, typeHierarchy.ParentTypes);
     }
 
     private Dictionary<QualifiedType, InverseTypeHierarchy> RegenParentTypes()
@@ -285,11 +328,11 @@ public class AssetInformation
 
         typeStack.Push(hierarchy.Type);
         QualifiedType[]? arrNull = null;
-        foreach (TypeHierarchy h in hierarchy.ChildTypes.Values)
+        foreach (KeyValuePair<QualifiedType, TypeHierarchy> h in hierarchy.ChildTypes)
         {
-            h.HasDataFiles |= hierarchy.HasDataFiles;
-            h.Parent = hierarchy;
-            RegenParentTypesRecursive(h, typeStack, ref arrNull, parentTypes);
+            h.Value.HasDataFiles |= hierarchy.HasDataFiles;
+            h.Value.Parent = hierarchy;
+            RegenParentTypesRecursive(h.Value, typeStack, ref arrNull, parentTypes);
         }
 
         typeStack.Pop();
@@ -375,7 +418,7 @@ public class TypeHierarchy
     public QualifiedType Type { get; set; }
     public TypeHierarchy? Parent { get; set; }
 #nullable disable
-    public Dictionary<QualifiedType, TypeHierarchy> ChildTypes { get; set; }
+    public ImmutableDictionary<QualifiedType, TypeHierarchy> ChildTypes { get; set; }
 #nullable restore
 }
 
@@ -389,16 +432,32 @@ public readonly struct InverseTypeHierarchy
     public QualifiedType[] ParentTypes { get; }
     public bool IsValid => Hierarchy != null;
     public bool IsAbstract => Hierarchy is { IsAbstract: true };
+
     public InverseTypeHierarchy(TypeHierarchy hierarchy, QualifiedType[] parentTypes)
     {
         Hierarchy = hierarchy;
         Type = hierarchy.Type;
         ParentTypes = parentTypes;
     }
+
     public InverseTypeHierarchy(QualifiedType type)
     {
         Type = type;
         ParentTypes = Array.Empty<QualifiedType>();
+    }
+
+    /// <remarks>Use <see cref="EnumerateDescending"/> to go from requested type to base type.</remarks>
+    /// <inheritdoc cref="TypeHierarchyAscendingEnumerator"/>
+    public TypeHierarchyAscendingEnumerator EnumerateAscending()
+    {
+        return new TypeHierarchyAscendingEnumerator(Type, ParentTypes);
+    }
+
+    /// <remarks>Use <see cref="EnumerateAscending"/> to go from requested type to base type.</remarks>
+    /// <inheritdoc cref="TypeHierarchyDescendingEnumerator"/>
+    public TypeHierarchyDescendingEnumerator EnumerateDescending()
+    {
+        return new TypeHierarchyDescendingEnumerator(Type, ParentTypes);
     }
 }
 
@@ -473,4 +532,128 @@ public class SkillInfo
         --i;
         return Levels != null && i < Levels.Length ? Levels[i] : null;
     }
+}
+
+/// <summary>
+/// Enumerates a type's hierarchy from base type to requested type.
+/// Includes the requested type but not base types like <see cref="object"/>, <see cref="ValueType"/>, or <see cref="Enum"/>.
+/// </summary>
+/// <remarks>Use <see cref="TypeHierarchyDescendingEnumerator"/> to go from requested type to base type.</remarks>
+public struct TypeHierarchyAscendingEnumerator : IEnumerator<QualifiedType>, IEnumerable<QualifiedType>
+{
+    private readonly QualifiedType _type;
+    private readonly QualifiedType[] _parentTypes;
+    private int _index;
+
+    /// <inheritdoc />
+    public QualifiedType Current { get; private set; }
+
+    internal TypeHierarchyAscendingEnumerator(QualifiedType type, QualifiedType[] parentTypes)
+    {
+        _type = type;
+        _parentTypes = parentTypes;
+        _index = -1;
+    }
+
+    /// <inheritdoc cref="IEnumerable{QualifiedType}.GetEnumerator()"/>
+    public readonly TypeHierarchyAscendingEnumerator GetEnumerator()
+    {
+        return _index < 0 ? this : new TypeHierarchyAscendingEnumerator(_type, _parentTypes);
+    }
+
+    /// <inheritdoc />
+    public bool MoveNext()
+    {
+        int index = ++_index;
+        int l = _parentTypes.Length;
+        if (index == l)
+        {
+            Current = _type;
+            return true;
+        }
+
+        if (index > l)
+            return false;
+
+        Current = _parentTypes[l - index - 1];
+        return true;
+    }
+
+    /// <inheritdoc />
+    public void Reset()
+    {
+        _index = -1;
+    }
+
+    /// <summary>
+    /// Does nothing.
+    /// </summary>
+    public readonly void Dispose() { }
+
+    readonly object IEnumerator.Current => Current;
+    readonly IEnumerator<QualifiedType> IEnumerable<QualifiedType>.GetEnumerator() => GetEnumerator();
+    readonly IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+}
+
+/// <summary>
+/// Enumerates a type's hierarchy from requested type to base type.
+/// Includes the requested type but not base types like <see cref="object"/>, <see cref="ValueType"/>, or <see cref="Enum"/>.
+/// </summary>
+/// <remarks>Use <see cref="TypeHierarchyAscendingEnumerator"/> to go from base type to requested type.</remarks>
+public struct TypeHierarchyDescendingEnumerator : IEnumerator<QualifiedType>, IEnumerable<QualifiedType>
+{
+    private readonly QualifiedType _type;
+    private readonly QualifiedType[] _parentTypes;
+    private int _index;
+
+    /// <inheritdoc />
+    public QualifiedType Current { get; private set; }
+
+    internal TypeHierarchyDescendingEnumerator(QualifiedType type, QualifiedType[] parentTypes)
+    {
+        _type = type;
+        _parentTypes = parentTypes;
+        _index = -2;
+    }
+
+    /// <inheritdoc cref="IEnumerable{QualifiedType}.GetEnumerator()"/>
+    public readonly TypeHierarchyDescendingEnumerator GetEnumerator()
+    {
+        return _index < -1 ? this : new TypeHierarchyDescendingEnumerator(_type, _parentTypes);
+    }
+
+    /// <inheritdoc />
+    public bool MoveNext()
+    {
+        int index = ++_index;
+        if (index == -1)
+        {
+            Current = _type;
+            return true;
+        }
+
+        int l = _parentTypes.Length;
+        if (index >= l)
+        {
+            return false;
+        }
+
+        Current = _parentTypes[index];
+        return true;
+    }
+
+    /// <inheritdoc />
+    public void Reset()
+    {
+        _index = -2;
+    }
+
+    /// <summary>
+    /// Does nothing.
+    /// </summary>
+    public readonly void Dispose() { }
+
+    readonly object IEnumerator.Current => Current;
+    readonly IEnumerator<QualifiedType> IEnumerable<QualifiedType>.GetEnumerator() => GetEnumerator();
+    readonly IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

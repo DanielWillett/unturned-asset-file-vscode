@@ -40,9 +40,9 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
     private UnityEngineVersion? _buildVersion;
 
     /// <summary>
-    /// Contains GameObjects, Transforms, and RectTransforms.
+    /// Caches path IDs to the index of their asset info.
     /// </summary>
-    internal ImmutableDictionary<long, AssetFileInfo>? FilePreloadCache;
+    internal ImmutableDictionary<long, int>? FilePreloadCache;
 
     /// <summary>
     /// Whether or not the bundle is a legacy (unity3d) bundle.
@@ -429,6 +429,71 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
     }
 
     /// <summary>
+    /// Loads the base field for the given path ID.
+    /// </summary>
+    internal bool TryGetBaseFieldFromPathId(long pathId, [NotNullWhen(true)] out AssetTypeValueField? baseField, bool doLock = true)
+    {
+        while (!IsDisposed)
+        {
+            ImmutableDictionary<long, int>? cache = FilePreloadCache;
+            AssetsFileInstance? assetBundle = Openedfile.AssetBundle;
+            InstallationEnvironment? env = _installationEnvironment;
+            AssetsManager manager = Openedfile.Manager;
+            if (assetBundle == null || cache == null || env == null || manager == null
+                || !cache.TryGetValue(pathId, out int index))
+            {
+                baseField = null;
+                return false;
+            }
+
+            IList<AssetFileInfo> infos = assetBundle.file.Metadata.AssetInfos;
+            if (cache != FilePreloadCache || assetBundle != Openedfile.AssetBundle)
+                continue;
+
+            AssetFileInfo fileInfo = infos[index];
+            if (!doLock)
+            {
+                baseField = manager.GetBaseField(assetBundle, fileInfo);
+                return baseField is { IsDummy: false };
+            }
+
+            lock (env.AssetBundleLock)
+            {
+                baseField = manager.GetBaseField(assetBundle, fileInfo);
+                return baseField is { IsDummy: false };
+            }
+        }
+
+        throw new ObjectDisposedException(nameof(DiscoveredBundle));
+    }
+
+    /// <summary>
+    /// Loads a file info for the given path ID.
+    /// </summary>
+    internal bool TryGetFileInfoFromPathId(long pathId, [NotNullWhen(true)] out AssetFileInfo? fileInfo)
+    {
+        while (!IsDisposed)
+        {
+            ImmutableDictionary<long, int>? cache = FilePreloadCache;
+            AssetsFileInstance? assetBundle = Openedfile.AssetBundle;
+            if (assetBundle == null || cache == null || !cache.TryGetValue(pathId, out int index))
+            {
+                fileInfo = null;
+                return false;
+            }
+
+            IList<AssetFileInfo> infos = assetBundle.file.Metadata.AssetInfos;
+            if (cache != FilePreloadCache || assetBundle != Openedfile.AssetBundle)
+                continue;
+
+            fileInfo = infos[index];
+            return true;
+        }
+
+        throw new ObjectDisposedException(nameof(DiscoveredBundle));
+    }
+
+    /// <summary>
     /// Opens a reader for the bundle file.
     /// </summary>
     /// <exception cref="InvalidOperationException"><paramref name="parsingServices"/> has changed since the last time this was called.</exception>
@@ -557,21 +622,17 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
             cacheNames ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase
         );
 
-        ImmutableDictionary<long, AssetFileInfo>.Builder fileCache = ImmutableDictionary.CreateBuilder<long, AssetFileInfo>();
+        ImmutableDictionary<long, int>.Builder fileCache = ImmutableDictionary.CreateBuilder<long, int>();
 
         int abIndex = assets.Count;
         for (int index = 0; index < assets.Count; index++)
         {
             AssetFileInfo obj = assets[index];
             AssetClassID classId = (AssetClassID)obj.TypeId;
-            
+            fileCache[obj.PathId] = index;
+
             if (!env.RelevantBundleClasses.Contains(classId))
                 continue;
-
-            if (classId is AssetClassID.GameObject or AssetClassID.Transform or AssetClassID.RectTransform)
-            {
-                fileCache[obj.PathId] = obj;
-            }
 
             AssetTypeValueField baseField = assetsManager.GetBaseField(assetFile, obj);
             if (baseField.IsDummy)
@@ -673,6 +734,7 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
         lock (env.AssetBundleLock)
         {
             BundleData data = Openedfile;
+            FilePreloadCache = ImmutableDictionary<long, int>.Empty;
             Openedfile = default;
             BundleFileInstance? file = data.Info;
             if (file == null)

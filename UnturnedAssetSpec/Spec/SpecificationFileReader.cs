@@ -267,9 +267,9 @@ public partial class SpecificationFileReader : IDatSpecificationReadContext
 
                 typeReadOrder.Add(_currentType);
 
-                foreach (TypeHierarchy hierarchy in type.ChildTypes.Values.Where(x => x.HasDataFiles))
+                foreach (KeyValuePair<QualifiedType, TypeHierarchy> hierarchy in type.ChildTypes.Where(x => x.Value.HasDataFiles))
                 {
-                    types.Enqueue(hierarchy);
+                    types.Enqueue(hierarchy.Value);
                 }
             }
 

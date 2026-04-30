@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using AssetsTools.NET;
+﻿using AssetsTools.NET;
 using AssetsTools.NET.Extra;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
@@ -19,7 +19,7 @@ internal static class BundleUtility
     internal static bool TryReadPathId(AssetTypeValueField? childGameObject, out long pathId)
     {
         pathId = 0;
-        if (childGameObject == null)
+        if (childGameObject is not { Value: null })
             return false;
 
         AssetTypeValueField pathIdField = childGameObject["m_PathID"];
@@ -245,5 +245,209 @@ internal static class BundleUtility
             v4.W = w.AsFloat;
 
         return v4;
+    }
+
+    /// <summary>
+    /// Invoke a visitor with the correctly typed value from a field.
+    /// </summary>
+    /// <typeparam name="TVisitor">The type of visitor to accept the value.</typeparam>
+    /// <param name="field">The field to read a value from.</param>
+    /// <param name="visitor">The visitor to call <see cref="IGenericVisitor.Accept{T}"/> on.</param>
+    /// <returns>Whether or not the visitor could be invoked.</returns>
+    internal static bool VisitFieldValue<TVisitor>(AssetTypeValueField field, ref TVisitor visitor)
+        where TVisitor : IGenericVisitor
+    {
+        if (field.IsDummy)
+        {
+            return false;
+        }
+
+        AssetTypeValue? value = field.Value;
+        if (value == null)
+        {
+            // object
+            return false;
+        }
+
+        switch (value.ValueType)
+        {
+            case AssetValueType.None:
+            case AssetValueType.ManagedReferencesRegistry:
+                break;
+
+            case AssetValueType.Bool:
+                visitor.Accept(value.AsBool);
+                return true;
+
+            case AssetValueType.Int8:
+                visitor.Accept(value.AsSByte);
+                return true;
+
+            case AssetValueType.UInt8:
+                visitor.Accept(value.AsByte);
+                return true;
+
+            case AssetValueType.Int16:
+                visitor.Accept(value.AsShort);
+                return true;
+
+            case AssetValueType.UInt16:
+                visitor.Accept(value.AsUShort);
+                return true;
+
+            case AssetValueType.Int32:
+                visitor.Accept(value.AsInt);
+                return true;
+
+            case AssetValueType.UInt32:
+                visitor.Accept(value.AsUInt);
+                return true;
+
+            case AssetValueType.Int64:
+                visitor.Accept(value.AsLong);
+                return true;
+
+            case AssetValueType.UInt64:
+                visitor.Accept(value.AsULong);
+                return true;
+
+            case AssetValueType.Float:
+                visitor.Accept(value.AsFloat);
+                return true;
+
+            case AssetValueType.Double:
+                visitor.Accept(value.AsDouble);
+                return true;
+
+            case AssetValueType.String:
+                visitor.Accept(value.AsString);
+                return true;
+
+            case AssetValueType.Array:
+                List<AssetTypeValueField> children = field.Children;
+                if (children.Count == 0)
+                {
+                    visitor.Accept(new EquatableArray<int>(0));
+                    return true;
+                }
+
+                AssetValueType t = children[0].Value?.ValueType ?? AssetValueType.None;
+                for (int i = 1; i < children.Count; ++i)
+                {
+                    AssetTypeValueField child = children[i];
+                    if (child.IsDummy || t != (child.Value?.ValueType ?? AssetValueType.None))
+                    {
+                        return false;
+                    }
+                }
+
+                switch (t)
+                {
+                    case AssetValueType.None:
+                    case AssetValueType.Array:
+                    case AssetValueType.ManagedReferencesRegistry:
+                        break;
+
+                    case AssetValueType.Bool:
+                        bool[] arr1 = new bool[children.Count];
+                        for (int i = 0; i < arr1.Length; ++i)
+                            arr1[i] = children[i].AsBool;
+                        visitor.Accept(new EquatableArray<bool>(arr1));
+                        return true;
+
+                    case AssetValueType.Int8:
+                        sbyte[] arr2 = new sbyte[children.Count];
+                        for (int i = 0; i < arr2.Length; ++i)
+                            arr2[i] = children[i].AsSByte;
+                        visitor.Accept(new EquatableArray<sbyte>(arr2));
+                        return true;
+
+                    case AssetValueType.UInt8:
+                        byte[] arr3 = new byte[children.Count];
+                        for (int i = 0; i < arr3.Length; ++i)
+                            arr3[i] = children[i].AsByte;
+                        visitor.Accept(new EquatableArray<byte>(arr3));
+                        return true;
+
+                    case AssetValueType.Int16:
+                        short[] arr4 = new short[children.Count];
+                        for (int i = 0; i < arr4.Length; ++i)
+                            arr4[i] = children[i].AsShort;
+                        visitor.Accept(new EquatableArray<short>(arr4));
+                        return true;
+
+                    case AssetValueType.UInt16:
+                        ushort[] arr5 = new ushort[children.Count];
+                        for (int i = 0; i < arr5.Length; ++i)
+                            arr5[i] = children[i].AsUShort;
+                        visitor.Accept(new EquatableArray<ushort>(arr5));
+                        return true;
+
+                    case AssetValueType.Int32:
+                        int[] arr6 = new int[children.Count];
+                        for (int i = 0; i < arr6.Length; ++i)
+                            arr6[i] = children[i].AsInt;
+                        visitor.Accept(new EquatableArray<int>(arr6));
+                        return true;
+
+                    case AssetValueType.UInt32:
+                        uint[] arr7 = new uint[children.Count];
+                        for (int i = 0; i < arr7.Length; ++i)
+                            arr7[i] = children[i].AsUInt;
+                        visitor.Accept(new EquatableArray<uint>(arr7));
+                        return true;
+
+                    case AssetValueType.Int64:
+                        long[] arr8 = new long[children.Count];
+                        for (int i = 0; i < arr8.Length; ++i)
+                            arr8[i] = children[i].AsLong;
+                        visitor.Accept(new EquatableArray<long>(arr8));
+                        return true;
+
+                    case AssetValueType.UInt64:
+                        ulong[] arr9 = new ulong[children.Count];
+                        for (int i = 0; i < arr9.Length; ++i)
+                            arr9[i] = children[i].AsULong;
+                        visitor.Accept(new EquatableArray<ulong>(arr9));
+                        return true;
+
+                    case AssetValueType.Float:
+                        float[] arr10 = new float[children.Count];
+                        for (int i = 0; i < arr10.Length; ++i)
+                            arr10[i] = children[i].AsFloat;
+                        visitor.Accept(new EquatableArray<float>(arr10));
+                        return true;
+
+                    case AssetValueType.Double:
+                        double[] arr11 = new double[children.Count];
+                        for (int i = 0; i < arr11.Length; ++i)
+                            arr11[i] = children[i].AsDouble;
+                        visitor.Accept(new EquatableArray<double>(arr11));
+                        return true;
+
+                    case AssetValueType.String:
+                        string[] arr12 = new string[children.Count];
+                        for (int i = 0; i < arr12.Length; ++i)
+                            arr12[i] = children[i].AsString;
+                        visitor.Accept(new EquatableArray<string>(arr12));
+                        return true;
+
+
+                    case AssetValueType.ByteArray:
+                        EquatableArray<byte>[] arr13 = new EquatableArray<byte>[children.Count];
+                        for (int i = 0; i < arr13.Length; ++i)
+                            arr13[i] = new EquatableArray<byte>(children[i].AsByteArray);
+                        visitor.Accept(new EquatableArray<EquatableArray<byte>>(arr13));
+                        return true;
+                }
+
+                break;
+
+            case AssetValueType.ByteArray:
+                visitor.Accept(new EquatableArray<byte>(value.AsByteArray));
+                return true;
+        }
+
+        return false;
     }
 }

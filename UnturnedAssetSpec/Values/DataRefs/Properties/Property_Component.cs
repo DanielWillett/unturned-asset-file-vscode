@@ -13,7 +13,12 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Values;
 /// <para>
 /// Supported properties:
 /// <list type="bullet">
-///     <item><see cref="bool"/> RequireValue - Whether or not the property must also have a valid value to count as 'included'.</item>
+///     <item><see cref="QualifiedType"/> Type - Type of component to check for.</item>
+///     <item><see cref="string"/> Path - Path to the target object from the original object (Transform.Find).</item>
+///     <item><see cref="string"/> Property - Property to get the value of. Supports nested properties via dot-notation and indexers.</item>
+///     <item><see langword="any"/> Fallback - Fallback value if the property or component can't be found.</item>
+///     <item><see cref="bool"/> InParents - Include all parent objects in the search. Default: <see langword="false"/>.</item>
+///     <item><see cref="bool"/> InChildren - Include all child objects in the search. Default: <see langword="false"/>.</item>
 /// </list>
 /// </para>
 /// <para>
@@ -46,10 +51,13 @@ public readonly struct ComponentProperty : IConfigurableDataRefProperty, IEquata
     public string? Path { get; }
 
     /// <summary>
-    /// The properties to get the value of, in order.
-    /// If empty this property, returns a boolean indicating whether or not the component is attached to the object.
+    /// The properties to get the value of. Can use dot-notation and indexers to access nested objects.
+    /// <para>
+    /// If <see langword="null"/> or empty, this property will return
+    /// a boolean indicating whether or not the component is attached to the object.
+    /// </para>
     /// </summary>
-    public OneOrMore<string> Properties { get; }
+    public string? Property { get; }
 
     /// <summary>
     /// Fallback value if the component isn't attached to the object.
@@ -81,13 +89,13 @@ public readonly struct ComponentProperty : IConfigurableDataRefProperty, IEquata
 
     public ComponentProperty(
         QualifiedType type,
-        OneOrMore<string> properties,
+        string? property,
         string? path,
         int flags,
         object? fallback = null)
     {
         Type = type;
-        Properties = properties;
+        Property = property;
         Path = path;
         Flags = flags;
         if (HasFallback)
@@ -100,12 +108,17 @@ public readonly struct ComponentProperty : IConfigurableDataRefProperty, IEquata
         get
         {
             KeyValuePair<string, object?> componentType = new KeyValuePair<string, object?>(nameof(Type), Type.Type);
-            int ct = HasFallback ? 4 : 3;
-
-            if (Properties.IsNull)
-                --ct;
-            if (Path == null)
-                --ct;
+            int ct = 1;
+            if (!string.IsNullOrEmpty(Property))
+                ++ct;
+            if (!string.IsNullOrEmpty(Path))
+                ++ct;
+            if (HasFallback)
+                ++ct;
+            if (InParents)
+                ++ct;
+            if (InChildren)
+                ++ct;
 
             if (ct == 1)
             {
@@ -115,19 +128,17 @@ public readonly struct ComponentProperty : IConfigurableDataRefProperty, IEquata
             KeyValuePair<string, object?>[] pairs = new KeyValuePair<string, object?>[ct];
 
             pairs[0] = componentType;
-
-            pairs[1] = new KeyValuePair<string, object?>(
-                nameof(Properties),
-                Properties.IsSingle ? Properties[0] : string.Join(".", Properties.Values)
-            );
-
-            int index = 1;
-
-            if (!Properties.IsNull)
-                pairs[++index] = new KeyValuePair<string, object?>(nameof(Fallback), Fallback);
-
-            if (Path != null)
+            int index = 0;
+            if (!string.IsNullOrEmpty(Property))
+                pairs[++index] = new KeyValuePair<string, object?>(nameof(Property), Property);
+            if (!string.IsNullOrEmpty(Path))
                 pairs[++index] = new KeyValuePair<string, object?>(nameof(Path), Path);
+            if (HasFallback)
+                pairs[++index] = new KeyValuePair<string, object?>(nameof(Fallback), Fallback);
+            if (InParents)
+                pairs[++index] = new KeyValuePair<string, object?>(nameof(InParents), BoxedPrimitives.True);
+            if (InChildren)
+                pairs[++index] = new KeyValuePair<string, object?>(nameof(InChildren), BoxedPrimitives.True);
 
             return new OneOrMore<KeyValuePair<string, object?>>(pairs);
         }
@@ -137,7 +148,7 @@ public readonly struct ComponentProperty : IConfigurableDataRefProperty, IEquata
     public bool Equals(ComponentProperty other)
     {
         return Type.Equals(other.Type)
-               && Properties.Equals(other.Properties, StringComparison.Ordinal)
+               && string.Equals(Property, other.Property, StringComparison.Ordinal)
                && Flags == other.Flags
                && string.Equals(Path, other.Path, StringComparison.Ordinal)
                && (!HasFallback || (Fallback?.Equals(other.Fallback) ?? other.Fallback == null)
@@ -153,7 +164,9 @@ public readonly struct ComponentProperty : IConfigurableDataRefProperty, IEquata
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return HashCode.Combine(2068625652, Type, Properties, Path, Flags, Fallback);
+        return HasFallback
+            ? HashCode.Combine(2068625652, Type, Property, Path, Flags, Fallback)
+            : HashCode.Combine(2068625652, Type, Property, Path, Flags);
     }
 
     internal static ComponentProperty Create(OneOrMore<KeyValuePair<string, object?>> properties)
@@ -163,18 +176,10 @@ public readonly struct ComponentProperty : IConfigurableDataRefProperty, IEquata
             throw new InvalidOperationException("Expected string value for \"Type\".");
         }
 
-        OneOrMore<string> propNames = OneOrMore<string>.Null;
-        if (properties.TryGetValue(nameof(Properties), out object? stringBox) && stringBox is string propNameStr)
+        string? propNames = null;
+        if (properties.TryGetValue(nameof(Property), out object? stringBox))
         {
-            if (propNameStr.IndexOf('.') < 0)
-            {
-                propNames = new OneOrMore<string>(propNameStr);
-            }
-            else
-            {
-                string[] split = propNameStr.Split([ '.' ], StringSplitOptions.RemoveEmptyEntries);
-                propNames = new OneOrMore<string>(split);
-            }
+            propNames = stringBox?.ToString();
         }
 
         int flags = 0;
@@ -192,14 +197,14 @@ public readonly struct ComponentProperty : IConfigurableDataRefProperty, IEquata
         }
 
         string? path = null;
-        if (properties.TryGetValue(nameof(Properties), out stringBox))
+        if (properties.TryGetValue(nameof(Path), out stringBox))
         {
-            path = stringBox as string;
+            path = stringBox?.ToString();
         }
 
         return new ComponentProperty(
             type: new QualifiedType(typeIdStr),
-            properties: propNames,
+            property: propNames,
             path: path,
             flags: flags,
             fallback: fallback

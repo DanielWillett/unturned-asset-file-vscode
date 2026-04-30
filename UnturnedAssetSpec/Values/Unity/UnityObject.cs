@@ -164,57 +164,54 @@ public sealed class UnityObject : IValue<UnityObject>, IEquatable<UnityObject?>,
             if (@this._hasTransform)
                 return;
             
-            if (bundle.FilePreloadCache == null)
-            {
-                return;
-            }
-
             AssetTypeValueField baseField = @this.BaseField;
             if (baseField.IsDummy)
             {
                 return;
             }
 
-            AssetTypeValueField component = baseField["m_Component"];
-            if (component.IsDummy)
+            AssetTypeValueField componentsArray = baseField["m_Component"];
+
+            componentsArray = !componentsArray.IsDummy
+                ? componentsArray["Array"]
+                : AssetTypeValueField.DUMMY_FIELD;
+
+            if (componentsArray.IsDummy)
             {
                 return;
             }
 
-            foreach (AssetTypeValueField componentSet in component.Children)
+            for (int i = 0; i < componentsArray.Children.Count; i++)
             {
-                if (componentSet.Value.ValueType != AssetValueType.Array)
+                AssetTypeValueField componentPair = componentsArray.Children[i];
+                if (componentPair.Children.Count < 1)
                     continue;
 
-                foreach (AssetTypeValueField componentPair in componentSet.Children)
+                AssetTypeValueField componentPtr = componentPair.Children[0];
+                if (componentPtr.Value != null)
+                    continue;
+
+                if (!BundleUtility.TryReadPathId(componentPtr, out long pathId))
+                    continue;
+
+                if (!bundle.TryGetFileInfoFromPathId(pathId, out AssetFileInfo? componentFileInfo)
+                    || (AssetClassID)componentFileInfo.TypeId is not AssetClassID.Transform
+                    and not AssetClassID.RectTransform)
                 {
-                    if (componentPair.Value != null)
-                        continue;
-
-                    foreach (AssetTypeValueField componentPtr in componentPair.Children)
-                    {
-                        if (!BundleUtility.TryReadPathId(componentPtr, out long pathId))
-                            continue;
-
-                        if (!bundle.FilePreloadCache.TryGetValue(pathId, out AssetFileInfo? componentFileInfo)
-                            || (AssetClassID)componentFileInfo.TypeId is not AssetClassID.Transform and not AssetClassID.RectTransform)
-                        {
-                            continue;
-                        }
-
-                        @this._transform = new UnityTransform(null, @this, @this._file, componentFileInfo, 0, @this._services);
-                        @this._hasTransform = true;
-
-                        if (@this._disposed)
-                        {
-                            @this._hasTransform = false;
-                            Interlocked.Exchange(ref @this._transform, null).Dispose();
-                            throw new ObjectDisposedException(nameof(UnityObject));
-                        }
-
-                        return;
-                    }
+                    continue;
                 }
+
+                @this._transform = new UnityTransform(null, @this, @this._file, componentFileInfo, 0, -1, @this._services);
+                @this._hasTransform = true;
+
+                if (@this._disposed)
+                {
+                    @this._hasTransform = false;
+                    Interlocked.Exchange(ref @this._transform, null)?.Dispose();
+                    throw new ObjectDisposedException(nameof(UnityObject));
+                }
+
+                return;
             }
 
             @this._hasTransform = true;

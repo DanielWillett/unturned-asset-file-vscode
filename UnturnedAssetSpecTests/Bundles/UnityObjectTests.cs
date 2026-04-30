@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace UnturnedAssetSpecTests.Bundles;
 
 [TestFixture]
+//[Ignore("Slow")]
 public class UnityObjectTests
 {
     private IParsingServices _parsingServices;
@@ -54,7 +55,7 @@ public class UnityObjectTests
 
         DatBundleAsset bundleAsset = DatBundleAsset.Create(
             "TPV_Char_Server",
-            new UnityObjectAssetType(new QualifiedType("UnityEngine.GameObject, UnityEngine.CoreModule")),
+            UnityObjectAssetType.Create("UnityEngine.GameObject, UnityEngine.CoreModule"),
             new DatFileType(QualifiedType.AssetBaseType, null, default),
             default
         );
@@ -107,9 +108,7 @@ public class UnityObjectTests
 
         FileEvaluationContext context = new FileEvaluationContext(_parsingServices, srcFile.SourceFile);
 
-        IBundleAssetType gameObjectType = new UnityObjectAssetType(
-            new QualifiedType("UnityEngine.GameObject, UnityEngine.CoreModule", true)
-        );
+        IBundleAssetType gameObjectType = UnityObjectAssetType.Create("UnityEngine.GameObject, UnityEngine.CoreModule");
 
         UnityObject? unityObject = bundleProxy.GetCorrespondingAsset("Resource", gameObjectType, ref context);
         Assert.That(unityObject, Is.Not.Null);
@@ -122,6 +121,43 @@ public class UnityObjectTests
 
         UnityTransform? foliage0 = transform.Find("Model_0/Foliage_0");
         Assert.That(foliage0, Is.Not.Null);
+    }
+
+    [Test]
+    //[Ignore("Requires files on tester PC.")]
+    public void TestComponentTest()
+    {
+        if (!_parsingServices.GameDirectory.TryGetInstallDirectory(out GameInstallDir gameDir))
+        {
+            Assert.Inconclusive();
+        }
+
+        _parsingServices.Installation.AddSearchableDirectory(@"A:\SteamLibrary\steamapps\workshop\content\304930\2839462324\UncreatedUI");
+        _parsingServices.Installation.Discover();
+
+        DiscoveredDatFile file = _parsingServices.Installation.FindFile(
+            new Guid("f298af0b4d34405b98a539b8d2ff0505")
+        ).First();
+
+        IBundleProxy bundleProxy = file.GetBundleProxy(_parsingServices);
+        Assert.That(bundleProxy, Is.Not.Null);
+        Assert.That(bundleProxy, Is.Not.InstanceOf<NullBundleProxy>());
+
+        using StaticSourceFile srcFile = StaticSourceFile.FromAssetFile(file.FilePath, _parsingServices.Database, bundle: bundleProxy);
+
+        FileEvaluationContext context = new FileEvaluationContext(_parsingServices, srcFile.SourceFile);
+
+        IBundleAssetType gameObjectType = UnityObjectAssetType.Create("UnityEngine.GameObject, UnityEngine.CoreModule");
+
+        UnityObject? unityObject = bundleProxy.GetCorrespondingAsset("Effect", gameObjectType, ref context);
+        Assert.That(unityObject, Is.Not.Null);
+
+        UnityTransform? transform = unityObject.Transform;
+        Assert.That(transform, Is.Not.Null);
+
+        Assert.That(transform.TryGetComponent("UnityEngine.Object, UnityEngine.CoreModule", out UnityComponent? component));
+
+        _ = component;
     }
 }
 

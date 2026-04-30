@@ -78,7 +78,7 @@
             "Type":
             {
                 "Type": "MasterBundleReferenceString",
-                "BaseType": "UnityEngine.PhysicMaterial, UnityEngine.PhysicsModule"
+                "BaseType": "UnityEngine.PhysicsMaterial, UnityEngine.PhysicsModule"
             },
             "DefaultValue": null,
             "Required": "#VanillaPhysicsMaterial.Excluded",

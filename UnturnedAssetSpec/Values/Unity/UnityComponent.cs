@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
@@ -55,7 +56,11 @@ public class UnityComponent : IDisposable
         }
     }
 
-    internal UnityComponent(UnityObject rootObject, AssetsFileInstance file, AssetFileInfo pathInfo, IParsingServices services)
+    internal UnityComponent(
+        UnityObject rootObject,
+        AssetsFileInstance file,
+        AssetFileInfo pathInfo,
+        IParsingServices services)
         : this(
             rootObject,
             file,
@@ -99,6 +104,97 @@ public class UnityComponent : IDisposable
 
         Type = type.CaseInsensitive.Normalized;
         Class = (AssetClassID)pathInfo.TypeId;
+    }
+
+    /// <summary>
+    /// Gets a property path within this component.
+    /// Paths can include indexers and multiple properties separated by periods.
+    /// </summary>
+    /// <param name="value">Read value (or <see langword="null"/>) converted to <typeparamref name="TValue"/>.</param>
+    /// <returns>Whether or not the property was found and the value could be converted to <typeparamref name="TValue"/>.</returns>
+    /// <inheritdoc cref="TryReadProperty{TVisitor}(string,ref TVisitor)"/>
+    public bool TryReadProperty<TValue>(string propertyPath, out Optional<TValue> value)
+        where TValue : IEquatable<TValue>
+    {
+        ConvertVisitor<TValue> visitor = new ConvertVisitor<TValue>();
+        if (!TryReadProperty(propertyPath, ref visitor) || !visitor.WasSuccessful)
+        {
+            value = default;
+            return false;
+        }
+        
+        value = visitor.IsNull ? Optional<TValue>.Null : new Optional<TValue>(visitor.Result);
+        return true;
+    }
+
+    /// <summary>
+    /// Visits a property path within this component.
+    /// Paths can include indexers and multiple properties separated by periods.
+    /// </summary>
+    /// <typeparam name="TVisitor">Visitor type.</typeparam>
+    /// <param name="propertyPath">Property to read.
+    /// Can optionally include multiple properties separated by periods, and indexers for arrays.
+    /// Example: <c>m_Prop1.m_Prop2[^1].m_Prop3</c>.</param>
+    /// <param name="visitor">Visitor</param>
+    /// <returns>Whether or not the property was found and the <paramref name="visitor"/> was invoked.</returns>
+    public bool TryReadProperty<TVisitor>(string propertyPath, ref TVisitor visitor)
+        where TVisitor : IGenericVisitor
+    {
+        TryReadPropertyState state = default;
+        state.PropertyPath = propertyPath;
+        state.This = this;
+        state.Field = null;
+        BundleUtility.RunOperationOnBundle(
+            ref state, Bundle, Services,
+            static (_, _, manager, ref state) =>
+            {
+                AssetTypeValueField? baseField = state.This.BaseFieldIntl;
+                while (baseField == null)
+                {
+                    state.This.CacheBaseFieldLocked(manager);
+                    baseField = state.This.BaseFieldIntl;
+                }
+
+                UnityPropertyPathEnumerator enumerator = new UnityPropertyPathEnumerator(state.PropertyPath);
+                while (enumerator.MoveNext())
+                {
+                    string prop = enumerator.Property;
+
+                    AssetTypeValueField fld = baseField[prop];
+                    if (fld.IsDummy)
+                    {
+                        return;
+                    }
+
+                    if (enumerator.Index.HasValue && fld.Value.ValueType == AssetValueType.Array)
+                    {
+                        List<AssetTypeValueField> children = fld.Children;
+                        int index = enumerator.Index.Value.GetOffset(children.Count);
+                        if (index < 0 || index >= children.Count)
+                            return;
+
+                        baseField = children[index];
+                        if (baseField.IsDummy)
+                            return;
+                    }
+                    else
+                    {
+                        baseField = fld;
+                    }
+                }
+
+                state.Field = baseField;
+            }
+        );
+
+        return state.Field is { IsDummy: false } && BundleUtility.VisitFieldValue(state.Field, ref visitor);
+    }
+
+    private struct TryReadPropertyState
+    {
+        public string PropertyPath;
+        public UnityComponent This;
+        public AssetTypeValueField? Field;
     }
 
 #pragma warning disable CS8774 //  BaseField -> BaseFieldIntl

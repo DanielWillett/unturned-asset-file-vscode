@@ -102,6 +102,7 @@
         "CustomRenderTexture": "UnityEngine.CustomRenderTexture, UnityEngine.CoreModule",
         "Cubemap": "UnityEngine.Cubemap, UnityEngine.CoreModule",
         "Avatar": "UnityEngine.Avatar, UnityEngine.AnimationModule",
+        "AnimatorController": "UnityEditorInternal.AnimatorController, UnityEngine.AnimationModule",
         "GUILayer": "UnityEngine.GUILayer, UnityEngine.IMGUIModule",
         "RuntimeAnimatorController": "UnityEngine.RuntimeAnimatorController, UnityEngine.AnimationModule",
         "Animator": "UnityEngine.Animator, UnityEngine.AnimationModule",
@@ -245,82 +246,6 @@
         "VisualEffectObject": "UnityEngine.VFX.VisualEffectObject, UnityEngine.VFXModule",
         "VisualEffect": "UnityEngine.VFX.VisualEffect, UnityEngine.VFXModule",
         "LocalizationAsset": "UnityEngine.LocalizationAsset, UnityEngine.LocalizationModule"
-    },
-    "UnityClassParents":
-    {
-        "Component":
-        [
-            "Cloth",
-            "Behaviour",
-            "LODGroup",
-            "MeshFilter",
-            "OcclusionArea",
-            "OcclusionPortal",
-            "Renderer",
-            "Transform",
-            "ParticleSystem",
-            "Rigidbody2D",
-            "Collider",
-            "Joint",
-            "Rigidbody",
-            "Tree",
-            "TextMesh",
-            "CanvasRenderer",
-            "WindZone"
-        ],
-        "Behaviour":
-        [
-            "NavMeshAgent",
-            "NavMeshObstacle",
-            "OffMeshLink",
-            "AimConstraint",
-            "Animation",
-            "Animator",
-            "LookAtConstraint",
-            "ParentConstraint",
-            "PositionConstraint",
-            "RotationConstraint",
-            "ScaleConstraint",
-            "AudioBehaviour",
-            "AudioChorusFilter",
-            "AudioDistortionFilter",
-            "AudioEchoFilter",
-            "AudioHighPassFilter",
-            "AudioLowPassFilter",
-            "AudioReverbFilter",
-            "AudioReverbZone",
-            "Camera",
-            "FlareLayer",
-            "Halo",
-            "LensFlare",
-            "Light",
-            "LightProbeGroup",
-            "LightProbeProxyVolume",
-            "MonoBehaviour",
-            "Projector",
-            "ReflectionProbe",
-            "Skybox",
-            "SortingGroup",
-            "PlayableDirector",
-            "GridLayout",
-            "ParticleSystemForceField",
-            "Collider2D",
-            "Effector2D",
-            "Joint2D",
-            "PhysicsUpdateBehaviour2D",
-            "ArticulationBody",
-            "ConstantForce",
-            "StreamingController",
-            "Terrain",
-            "Canvas",
-            "VisualEffect",
-            "VideoPlayer"
-        ],
-        "AudioBehaviour":
-        [
-            "AudioListener",
-            "AudioSource"
-        ]
     },
     "RelevantBundleAssetClasses":
     [
@@ -838,25 +763,242 @@
         "UnityEngine.Object, UnityEngine.CoreModule":
         {
             "UnityEngine.GameObject, UnityEngine.CoreModule": { },
-            "UnityEngine.Mesh, UnityEngine.CoreModule": { },
-            "UnityEngine.Material, UnityEngine.CoreModule": { },
             "UnityEngine.Component, UnityEngine.CoreModule":
             {
+                "UnityEngine.Cloth, UnityEngine.ClothModule": { },
                 "UnityEngine.Behaviour, UnityEngine.CoreModule":
                 {
-                    "UnityEngine.MonoBehaviour, UnityEngine.CoreModule": { }
+                    "UnityEngine.AI.NavMeshAgent, UnityEngine.AIModule": { },
+                    "UnityEngine.AI.NavMeshObstacle, UnityEngine.AIModule": { },
+                    "UnityEngine.AI.OffMeshLink, UnityEngine.AIModule": { },
+                    "UnityEngine.Animations.AimConstraint, UnityEngine.AnimationModule": { },
+                    "UnityEngine.Animation, UnityEngine.AnimationModule": { },
+                    "UnityEngine.Animator, UnityEngine.AnimationModule": { },
+                    "UnityEngine.Animations.LookAtConstraint, UnityEngine.AnimationModule": { },
+                    "UnityEngine.Animations.ParentConstraint, UnityEngine.AnimationModule": { },
+                    "UnityEngine.Animations.PositionConstraint, UnityEngine.AnimationModule": { },
+                    "UnityEngine.Animations.RotationConstraint, UnityEngine.AnimationModule": { },
+                    "UnityEngine.Animations.ScaleConstraint, UnityEngine.AnimationModule": { },
+                    "UnityEngine.AudioBehaviour, UnityEngine.AudioModule":
+                    {
+                        "UnityEngine.AudioListener, UnityEngine.AudioModule": { },
+                        "UnityEngine.AudioSource, UnityEngine.AudioModule": { }
+                    },
+                    "UnityEngine.AudioChorusFilter, UnityEngine.AudioModule": { },
+                    "UnityEngine.AudioDistortionFilter, UnityEngine.AudioModule": { },
+                    "UnityEngine.AudioEchoFilter, UnityEngine.AudioModule": { },
+                    "UnityEngine.AudioHighPassFilter, UnityEngine.AudioModule": { },
+                    "UnityEngine.AudioLowPassFilter, UnityEngine.AudioModule": { },
+                    "UnityEngine.AudioReverbFilter, UnityEngine.AudioModule": { },
+                    "UnityEngine.AudioReverbZone, UnityEngine.AudioModule": { },
+                    "UnityEngine.Camera, UnityEngine.CoreModule": { },
+                    "UnityEngine.FlareLayer, UnityEngine.CoreModule": { },
+                    "UnityEngine.Halo, UnityEngine.CoreModule": { },
+                    "UnityEngine.LensFlare, UnityEngine.CoreModule": { },
+                    "UnityEngine.Light, UnityEngine.CoreModule": { },
+                    "UnityEngine.LightProbeGroup, UnityEngine.CoreModule": { },
+                    "UnityEngine.CanvasGroup, UnityEngine.UIModule": { },
+                    "UnityEngine.LightProbeProxyVolume, UnityEngine.CoreModule": { },
+                    "UnityEngine.MonoBehaviour, UnityEngine.CoreModule": { },
+                    "UnityEngine.Projector, UnityEngine.CoreModule": { },
+                    "UnityEngine.ReflectionProbe, UnityEngine.CoreModule": { },
+                    "UnityEngine.Skybox, UnityEngine.CoreModule": { },
+                    "UnityEngine.Rendering.SortingGroup, UnityEngine.CoreModule": { },
+                    "UnityEngine.Playables.PlayableDirector, UnityEngine.DirectorModule": { },
+                    "UnityEngine.GridLayout, UnityEngine.GridModule":
+                    {
+                        "UnityEngine.Grid, UnityEngine.GridModule": { },
+                        "UnityEngine.Tilemaps.Tilemap, UnityEngine.TilemapModule": { }
+                    },
+                    "UnityEngine.ParticleSystemForceField, UnityEngine.ParticleSystemModule": { },
+                    "UnityEngine.Collider2D, UnityEngine.Physics2DModule":
+                    {
+                        "UnityEngine.BoxCollider2D, UnityEngine.Physics2DModule": { },
+                        "UnityEngine.CapsuleCollider2D, UnityEngine.Physics2DModule": { },
+                        "UnityEngine.CircleCollider2D, UnityEngine.Physics2DModule": { },
+                        "UnityEngine.CompositeCollider2D, UnityEngine.Physics2DModule": { },
+                        "UnityEngine.EdgeCollider2D, UnityEngine.Physics2DModule": { },
+                        "UnityEngine.PolygonCollider2D, UnityEngine.Physics2DModule": { },
+                        "UnityEngine.Tilemaps.TilemapCollider2D, UnityEngine.TilemapModule": { }
+                    },
+                    "UnityEngine.Effector2D, UnityEngine.Physics2DModule":
+                    {
+                        "UnityEngine.AreaEffector2D, UnityEngine.Physics2DModule": { },
+                        "UnityEngine.BuoyancyEffector2D, UnityEngine.Physics2DModule": { },
+                        "UnityEngine.PlatformEffector2D, UnityEngine.Physics2DModule": { },
+                        "UnityEngine.PointEffector2D, UnityEngine.Physics2DModule": { },
+                        "UnityEngine.SurfaceEffector2D, UnityEngine.Physics2DModule": { }
+                    },
+                    "UnityEngine.Joint2D, UnityEngine.Physics2DModule":
+                    {
+                        "UnityEngine.AnchoredJoint2D, UnityEngine.Physics2DModule":
+                        {
+                            "UnityEngine.DistanceJoint2D, UnityEngine.Physics2DModule": { },
+                            "UnityEngine.FixedJoint2D, UnityEngine.Physics2DModule": { },
+                            "UnityEngine.FrictionJoint2D, UnityEngine.Physics2DModule": { },
+                            "UnityEngine.HingeJoint2D, UnityEngine.Physics2DModule": { },
+                            "UnityEngine.SliderJoint2D, UnityEngine.Physics2DModule": { },
+                            "UnityEngine.SpringJoint2D, UnityEngine.Physics2DModule": { },
+                            "UnityEngine.WheelJoint2D, UnityEngine.Physics2DModule": { }
+                        },
+                        "UnityEngine.RelativeJoint2D, UnityEngine.Physics2DModule": { },
+                        "UnityEngine.TargetJoint2D, UnityEngine.Physics2DModule": { }
+                    },
+                    "UnityEngine.PhysicsUpdateBehaviour2D, UnityEngine.Physics2DModule":
+                    {
+                        "UnityEngine.ConstantForce2D, UnityEngine.Physics2DModule": { }
+                    },
+                    "UnityEngine.ArticulationBody, UnityEngine.PhysicsModule": { },
+                    "UnityEngine.ConstantForce, UnityEngine.PhysicsModule": { },
+                    "UnityEngine.StreamingController, UnityEngine.StreamingModule": { },
+                    "UnityEngine.Terrain, UnityEngine.TerrainModule": { },
+                    "UnityEngine.Canvas, UnityEngine.UIModule": { },
+                    "UnityEngine.VFX.VisualEffect, UnityEngine.VFXModule": { },
+                    "UnityEngine.Video.VideoPlayer, UnityEngine.VideoModule": { }
                 },
+                "UnityEngine.LODGroup, UnityEngine.CoreModule": { },
+                "UnityEngine.MeshFilter, UnityEngine.CoreModule": { },
+                "UnityEngine.OcclusionArea, UnityEngine.CoreModule": { },
+                "UnityEngine.OcclusionPortal, UnityEngine.CoreModule": { },
+                "UnityEngine.Renderer, UnityEngine.CoreModule":
+                {
+                    "UnityEngine.BillboardRenderer, UnityEngine.CoreModule": { },
+                    "UnityEngine.LineRenderer, UnityEngine.CoreModule": { },
+                    "UnityEngine.MeshRenderer, UnityEngine.CoreModule": { },
+                    "UnityEngine.ParticleSystemRenderer, UnityEngine.ParticleSystemModule": { },
+                    "UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule": { },
+                    "UnityEngine.SpriteMask, UnityEngine.SpriteMaskModule": { },
+                    "UnityEngine.SpriteRenderer, UnityEngine.CoreModule": { },
+                    "UnityEngine.Tilemaps.TilemapRenderer, UnityEngine.TilemapModule": { },
+                    "UnityEngine.TrailRenderer, UnityEngine.CoreModule": { },
+                    "UnityEngine.U2D.SpriteShapeRenderer, UnityEngine.SpriteShapeModule": { },
+                    "UnityEngine.VFX.VFXRenderer, UnityEngine.VFXModule": { }
+                },
+                "UnityEngine.Transform, UnityEngine.CoreModule":
+                {
+                    "UnityEngine.RectTransform, UnityEngine.CoreModule": { }
+                },
+                "UnityEngine.ParticleSystem, UnityEngine.ParticleSystemModule": { },
+                "UnityEngine.Rigidbody2D, UnityEngine.Physics2DModule": { },
                 "UnityEngine.Collider, UnityEngine.PhysicsModule":
                 {
+                    "UnityEngine.BoxCollider, UnityEngine.PhysicsModule": { },
+                    "UnityEngine.CapsuleCollider, UnityEngine.PhysicsModule": { },
+                    "UnityEngine.CharacterController, UnityEngine.PhysicsModule": { },
+                    "UnityEngine.MeshCollider, UnityEngine.PhysicsModule": { },
+                    "UnityEngine.SphereCollider, UnityEngine.PhysicsModule": { },
+                    "UnityEngine.TerrainCollider, UnityEngine.TerrainPhysicsModule": { },
                     "UnityEngine.WheelCollider, UnityEngine.VehiclesModule": { }
-                }
+                },
+                "UnityEngine.Joint, UnityEngine.PhysicsModule":
+                {
+                    "UnityEngine.CharacterJoint, UnityEngine.PhysicsModule": { },
+                    "UnityEngine.ConfigurableJoint, UnityEngine.PhysicsModule": { },
+                    "UnityEngine.FixedJoint, UnityEngine.PhysicsModule": { },
+                    "UnityEngine.HingeJoint, UnityEngine.PhysicsModule": { },
+                    "UnityEngine.SpringJoint, UnityEngine.PhysicsModule": { }
+                },
+                "UnityEngine.Rigidbody, UnityEngine.PhysicsModule": { },
+                "UnityEngine.Tree, UnityEngine.TerrainModule": { },
+                "UnityEngine.TextMesh, UnityEngine.TextRenderingModule": { },
+                "UnityEngine.CanvasRenderer, UnityEngine.UIModule": { },
+                "UnityEngine.WindZone, UnityEngine.WindModule": { }
             },
+            "UnityEngine.Material, UnityEngine.CoreModule": { },
             "UnityEngine.Texture, UnityEngine.CoreModule":
             {
-                "UnityEngine.Texture2D, UnityEngine.CoreModule": { }
+                "UnityEngine.Cubemap, UnityEngine.CoreModule": { },
+                "UnityEngine.CubemapArray, UnityEngine.CoreModule": { },
+                "UnityEngine.MovieTexture, UnityEngine.AudioModule": { },
+                "UnityEngine.RenderTexture, UnityEngine.CoreModule":
+                {
+                    "UnityEngine.CustomRenderTexture, UnityEngine.CoreModule": { }
+                },
+                "UnityEngine.SparseTexture, UnityEngine.CoreModule": { },
+                "UnityEngine.Texture2D, UnityEngine.CoreModule": { },
+                "UnityEngine.Texture2DArray, UnityEngine.CoreModule": { },
+                "UnityEngine.Texture3D, UnityEngine.CoreModule": { },
+                "UnityEngine.WebCamTexture, UnityEngine.AudioModule": { }
             },
+            "UnityEngine.Rendering.GraphicsSettings, UnityEngine.CoreModule": { },
+            "UnityEngine.Mesh, UnityEngine.CoreModule": { },
+            "UnityEngine.QualitySettings, UnityEngine.CoreModule": { },
+            "UnityEngine.Shader, UnityEngine.CoreModule": { },
+            "UnityEngine.TextAsset, UnityEngine.CoreModule": { },
+            "UnityEngine.ComputeShader, UnityEngine.CoreModule": { },
             "UnityEngine.AudioClip, UnityEngine.AudioModule": { },
-            "UnityEngine.PhysicMaterial, UnityEngine.PhysicsModule": { }
+            "UnityEngine.Avatar, UnityEngine.AnimationModule": { },
+            "UnityEngine.RenderSettings, UnityEngine.CoreModule": { },
+            "UnityEngine.RuntimeAnimatorController, UnityEngine.AnimationModule":
+            {
+                "UnityEditorInternal.AnimatorController, UnityEngine.AnimationModule": { },
+                "UnityEngine.AnimatorOverrideController, UnityEngine.AnimationModule": { }
+            },
+            "UnityEngine.Flare, UnityEngine.CoreModule": { },
+            "UnityEngine.Font, UnityEngine.TextRenderingModule": { },
+            "UnityEngine.PhysicsMaterial, UnityEngine.PhysicsModule": { },
+            "UnityEngine.AssetBundle, UnityEngine.AssetBundleModule": { },
+            "UnityEngine.PreloadData, UnityEngine.CoreModule": { },
+            "UnityEngine.TerrainData, UnityEngine.TerrainModule": { },
+            "UnityEngine.LightmapSettings, UnityEngine.CoreModule": { },
+            "UnityEngine.ShaderVariantCollection, UnityEngine.CoreModule": { },
+            "UnityEngine.Motion, UnityEngine.AnimationModule":
+            {
+                "UnityEngine.AnimationClip, UnityEngine.AnimationModule": { },
+                "UnityEditorInternal.BlendTree, UnityEngine.AnimationModule": { }
+            },
+            "UnityEngine.Sprite, UnityEngine.CoreModule": { },
+            "UnityEngine.BillboardAsset, UnityEngine.CoreModule": { },
+            "UnityEngine.SpeedTreeWindAsset, UnityEngine.TerrainModule": { },
+            "UnityEngine.AI.NavMeshData, UnityEngine.AIModule": { },
+            "UnityEngine.Audio.AudioMixer, UnityEngine.AudioModule": { },
+            "UnityEngine.LightProbes, UnityEngine.CoreModule": { },
+            "UnityEngine.Audio.AudioMixerSnapshot, UnityEngine.AudioModule": { },
+            "UnityEngine.Audio.AudioMixerGroup, UnityEngine.AudioModule": { },
+            "UnityEngine.AssetBundleManifest, UnityEngine.AssetBundleModule": { },
+            "UnityEngine.Connect.UnityConnectSettings, UnityEngine.UnityConnectModule": { },
+            "UnityEngine.AvatarMask, UnityEngine.AnimationModule": { },
+            "UnityEngine.Video.VideoClip, UnityEngine.VideoModule": { },
+            "UnityEngine.U2D.SpriteAtlas, UnityEngine.CoreModule": { },
+            "UnityEngine.Rendering.RayTracingShader, UnityEngine.CoreModule": { },
+            "UnityEngine.LightingSettings, UnityEngine.CoreModule": { },
+            "UnityEngine.LowerResBlitTexture, UnityEngine.CoreModule": { },
+            "UnityEngine.TerrainLayer, UnityEngine.TerrainModule": { },
+            "UnityEngine.LocalizationAsset, UnityEngine.LocalizationModule": { },
+            "UnityEngine.VFX.VisualEffectObject, UnityEngine.VFXModule":
+            {
+                "UnityEngine.VFX.VisualEffectAsset, UnityEngine.VFXModule": { }
+            }
+        },
+        "UnityEngine.Animations.IConstraint, UnityEngine.AnimationModule":
+        {
+            "IsAbstract": true,
+            "UnityEngine.Animations.AimConstraint, UnityEngine.AnimationModule": { },
+            "UnityEngine.Animations.LookAtConstraint, UnityEngine.AnimationModule": { },
+            "UnityEngine.Animations.ParentConstraint, UnityEngine.AnimationModule": { },
+            "UnityEngine.Animations.PositionConstraint, UnityEngine.AnimationModule": { },
+            "UnityEngine.Animations.RotationConstraint, UnityEngine.AnimationModule": { },
+            "UnityEngine.Animations.ScaleConstraint, UnityEngine.AnimationModule": { }
+        },
+        "UnityEngine.GUILayer, UnityEngine.IMGUIModule": { },
+        "UnityEngine.GUITexture, UnityEngine.IMGUIModule": { },
+        "UnityEngine.GUIText, UnityEngine.TextRenderingModule": { },
+        "UnityEngine.GUIElement, UnityEngine.IMGUIModule": { },
+        "UnityEngine.ProceduralMaterial, UnityEngine": { },
+        "UnityEngine.ProceduralTexture, UnityEngine": { },
+        "UnityEngine.IExposedPropertyTable, UnityEngine.CoreModule":
+        {
+            "IsAbstract": true,
+            "UnityEngine.Playables.PlayableDirector, UnityEngine.DirectorModule": { }
+        },
+        "UnityEngine.Collision, UnityEngine.PhysicsModule": { },
+        "UnityEngine.Vector2, UnityEngine.CoreModule": { },
+        "UnityEngine.Vector3, UnityEngine.CoreModule": { },
+        "UnityEngine.Quaternion, UnityEngine.CoreModule": { },
+        "UnityEngine.Collision2D, UnityEngine.PhysicsModule": { },
+        "UnityEngine.VFX.VFXManager, UnityEngine.VFXModule":
+        {
+            "IsAbstract": true
         }
     },
     "AssetAliases":
