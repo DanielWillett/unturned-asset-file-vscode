@@ -1,16 +1,16 @@
-﻿using DanielWillett.UnturnedDataFileLspServer.Data.Files;
+﻿using AssetsTools.NET.Extra;
+using DanielWillett.UnturnedDataFileLspServer.Data;
+using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
+using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using DanielWillett.UnturnedDataFileLspServer.Files;
 using DanielWillett.UnturnedDataFileLspServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using System.Collections.Immutable;
-using AssetsTools.NET.Extra;
-using DanielWillett.UnturnedDataFileLspServer.Data;
-using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Handlers.AssetProperties;
 

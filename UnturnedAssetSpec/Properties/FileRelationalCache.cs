@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 
@@ -73,13 +72,19 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
         _propertyTypes = propertyTypes;
         _valueProcessorPool = new Stack<ValueProcessor>();
         InitEvalCtx();
-        Rebuild();
+        Rebuild(file, true);
     }
 
     /// <inheritdoc />
-    public void Rebuild(bool force = true)
+    public void Rebuild(ISourceFile maybeNewFile, bool force)
     {
         ISourceFile file = SourceFile;
+        if (maybeNewFile != file)
+        {
+            Rebuild(maybeNewFile);
+            return;
+        }
+
         lock (file.TreeSync)
         lock (_entries)
         {
@@ -139,6 +144,17 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
         [NotNullWhen(true)] out Entry? entry
     )
     {
+        IDictionarySourceNode parent = (IDictionarySourceNode)node.Parent;
+        if (parent != SourceFile)
+        {
+            RootDictionaryPosition pos = parent.GetRootAssetNode(out _);
+            if (pos == RootDictionaryPosition.Other || parent.File != SourceFile)
+            {
+                entry = null;
+                return false;
+            }
+        }
+
         // assume TreeSync locked
         return _entries.TryGetValue(node.Key, out entry);
     }
@@ -146,7 +162,8 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
     /// <inheritdoc />
     public bool TryGetPropertyFromNode(
         IPropertySourceNode node,
-        [NotNullWhen(true)] out DatProperty? property
+        [NotNullWhen(true)] out DatProperty? property,
+        bool valueOnly = false
     )
     {
         lock (SourceFile.TreeSync)
@@ -156,14 +173,48 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
                 if (parentNode is not IPropertySourceNode propertyNode || !TryGetPropertyEntryIntl(propertyNode, out Entry? entry))
                     continue;
 
-                property = entry.Property;
-                if (parentNode == node)
+                // find root property
+
+                if (propertyNode == node)
                 {
+                    property = entry.Property;
                     return true;
                 }
 
-                // todo
-                return false;
+                if (entry.ParentNode == null)
+                {
+                    property = null;
+                    return false;
+                }
+
+                PropertyBreadcrumbs crumbs = PropertyBreadcrumbs.FromNode(node);
+
+                if (!crumbs.TryTraceRelativeTo(
+                        entry.ParentNode,
+                        _evalCtx.FileType.Information,
+                        out IAnyValueSourceNode? valueNode,
+                        out IType? valueType,
+                        out DatProperty? dictTypeProperty,
+                        ref _evalCtx
+                    ))
+                {
+                    property = null;
+                    return false;
+                }
+
+                if (dictTypeProperty != null)
+                {
+                    property = dictTypeProperty;
+                    return !valueOnly;
+                }
+
+                if (valueNode != node.Parent || valueType is not DatTypeWithProperties propType)
+                {
+                    property = null;
+                    return false;
+                }
+
+                return propType.TryFindPropertyByKey(node.Key, ref _evalCtx, out property, out _);
             }
 
             property = null;
@@ -374,10 +425,10 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
         where T : IEquatable<T>
     {
         public Optional<T> Value;
-        internal IType<T> TypedType;
+        internal required IType<T> TypedType;
 
         /// <inheritdoc />
-        public override IType? Type => TypedType;
+        public override IType Type => TypedType;
 
         /// <inheritdoc />
         public override IValue? CreateValue()
@@ -598,11 +649,11 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
 
         void IReferencedPropertySink.AcceptReferencedProperty(IPropertySourceNode property)
         {
-            if (property.Parent != _rootNode)
-                return;
-
-            if (!_referencedProperties.Add(property))
-                return;
+            if (property.Parent == _rootNode)
+            {
+                if (!_referencedProperties.Add(property))
+                    return;
+            }
 
             _referencedPropertyNodeBufferForThisProperty ??= new List<IPropertySourceNode>(4);
             _referencedPropertyNodeBufferForThisProperty.Add(property);
@@ -647,14 +698,17 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
 
                 if (Entry is not Entry<TValue> value)
                 {
-                    NewEntry = value = new Entry<TValue>();
+                    NewEntry = value = new Entry<TValue>
+                    {
+                        TypedType = type
+                    };
                 }
                 else
                 {
                     NewEntry = Entry;
+                    value.TypedType = type;
                 }
 
-                value.TypedType = type;
                 value.Value = optionalValue;
                 value.HasLiteralValue = true;
                 ParseSuccess = true;

@@ -4,6 +4,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using System;
+using System.Collections.Generic;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Files;
 
@@ -17,6 +18,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
     private readonly IParsingServices _parsingServices;
     private readonly PropertyInclusionFlags _flags;
     private readonly FileRange? _range;
+    private readonly HashSet<IPropertySourceNode> _ignoreProperties;
 
     protected override bool IgnoreMetadata => true;
 
@@ -30,6 +32,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         _parsingServices = parsingServices;
         _flags = flags;
         _range = range;
+        _ignoreProperties = new HashSet<IPropertySourceNode>();
     }
 
     public static void VisitFile<T>(ISourceFile sourceFile, ref T visitor) where T : ResolvedPropertyNodeVisitor
@@ -114,12 +117,17 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         {
             if (!model.TryGetPropertyInfoFromNode(node, out PropertyNodeRelationalInfo info) || info.ValueType == null)
             {
-                if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0)
+                if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0 && !_ignoreProperties.Contains(node))
                 {
                     AcceptUnresolvedProperty(node, in breadcrumbs);
                 }
 
                 return;
+            }
+
+            foreach (IPropertySourceNode n in info.RelatedProperties)
+            {
+                _ignoreProperties.Add(n);
             }
 
             if ((_flags & PropertyInclusionFlags.UnresolvedOnly) != 0)
@@ -134,9 +142,9 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         }
         else
         {
-            if (!model.TryGetPropertyFromNode(node, out DatProperty? property))
+            if (!model.TryGetPropertyFromNode(node, out DatProperty? property, valueOnly: true))
             {
-                if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0)
+                if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0 && !_ignoreProperties.Contains(node))
                 {
                     AcceptUnresolvedProperty(node, in breadcrumbs);
                 }

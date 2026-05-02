@@ -25,8 +25,8 @@
         },
         {
             "Key": "Auto_Skybox",
-            "Type": "Boolean",
-            "DefaultValue": true,
+            "Type": "Flag",
+            "DefaultValue": false,
             "Description": "Automatically render a card texture on startup and apply the texture to the @($bndl$::Skybox) model ('Model_0').",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/assets/resource-asset.html#resource-properties",
             "InclusiveWith": [ "$bndl$::Skybox" ]

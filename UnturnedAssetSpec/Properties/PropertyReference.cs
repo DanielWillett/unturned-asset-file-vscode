@@ -469,7 +469,7 @@ public struct PropertyReference : IEquatable<PropertyReference>
             return false;
         }
 
-        Breadcrumbs.ResolveFromPropertyRef(IsCrossReference ? objectOwner : owner.Owner, ctx.Services.Database, context);
+        Breadcrumbs.ResolveFromPropertyRef(IsCrossReference ? objectOwner : owner.Owner, ref ctx);
         return true;
     }
 

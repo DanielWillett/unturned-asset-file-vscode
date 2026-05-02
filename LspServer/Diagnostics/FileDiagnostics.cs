@@ -90,6 +90,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
 
         ISourceFile? sourceFile = null;
         bool hasLock = false;
+        // ReSharper disable InconsistentlySynchronizedField
         try
         {
             _diagnosticBuffer.Clear();
@@ -193,6 +194,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
         {
             if (hasLock)
                 sourceFile!.TreeSync.Exit();
+            // ReSharper restore InconsistentlySynchronizedField
             if (enteredLock != null) enteredLock.Exit();
         }
 
@@ -294,8 +296,12 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
             ref FileEvaluationContext ctx,
             IPropertySourceNode node)
         {
-            // todo SpecPropertyTypeParseContext ctx = parseCtx.WithDiagnostics(Diagnostics);
-            // todo propertyType.TryParseValue(ref ctx, out _);
+            scoped DiagnosticPropertyVisitor v;
+            v.DiagnosticSink = this;
+            v.Property = property;
+            v.PropertyNode = node;
+            v.Context = ref ctx;
+            propertyType.Visit(ref v);
         }
 
         /// <inheritdoc />
@@ -315,6 +321,29 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
         public void AcceptDiagnostic(DatDiagnosticMessage diagnostic)
         {
             Diagnostics.Add(diagnostic);
+        }
+
+        private ref struct DiagnosticPropertyVisitor : ITypeVisitor
+        {
+            public IDiagnosticSink DiagnosticSink;
+            public IPropertySourceNode PropertyNode;
+            public DatProperty Property;
+            public ref FileEvaluationContext Context;
+            
+            public void Accept<TValue>(IType<TValue> type) where TValue : IEquatable<TValue>
+            {
+                TypeParserArgs<TValue> args = new TypeParserArgs<TValue>
+                {
+                    Type = type,
+                    ValueNode = PropertyNode.Value,
+                    KeyFilter = Context.GetKeyFilter(),
+                    DiagnosticSink = DiagnosticSink,
+                    ParentNode = PropertyNode,
+                    Property = Property
+                };
+
+                type.Parser.TryParse(ref args, ref Context, out _);
+            }
         }
     }
 }

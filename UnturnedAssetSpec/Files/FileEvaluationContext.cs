@@ -250,6 +250,7 @@ public struct FileEvaluationContext
                 FileType.Information,
                 out IAnyValueSourceNode? targetedValue,
                 out IType? valueType,
+                out _,
                 ref this
             )
             || targetedValue is not IDictionarySourceNode dictionary 

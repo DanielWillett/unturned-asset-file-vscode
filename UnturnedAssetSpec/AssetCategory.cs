@@ -276,23 +276,30 @@ public sealed class AssetCategory : DatEnumType, IEquatable<AssetCategory>, ICom
     /// <returns>The index of the type, or -1 if this type is a redirector asset.</returns>
     public static int GetCategoryFromType(QualifiedType type, AssetInformation info)
     {
+        string? category;
+        DatEnumValue? categoryType;
+
         if (type.Equals("SDG.Unturned.RedirectorAsset, Assembly-CSharp"))
         {
             return -1;
         }
 
         InverseTypeHierarchy typeHierarchy = info.GetParentTypes(type);
-
         QualifiedType[] types = typeHierarchy.ParentTypes;
         for (int i = types.Length - 1; i >= 0; --i)
         {
-            if (!info.AssetCategories.TryGetValue(typeHierarchy.ParentTypes[i], out string? category))
+            if (!info.AssetCategories.TryGetValue(typeHierarchy.ParentTypes[i], out category))
                 continue;
 
-            if (TryParse(category, out DatEnumValue? categoryType))
+            if (TryParse(category, out categoryType))
             {
                 return categoryType.Index;
             }
+        }
+
+        if (info.AssetCategories.TryGetValue(type, out category) && TryParse(category, out categoryType))
+        {
+            return categoryType.Index;
         }
 
         return 0;

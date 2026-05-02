@@ -471,7 +471,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     /// <summary>
     /// Resolves possible properties in-place from this property-ref.
     /// </summary>
-    public void ResolveFromPropertyRef(DatType baseType, IAssetSpecDatabase database, SpecPropertyContext context = SpecPropertyContext.Property)
+    public void ResolveFromPropertyRef(DatType baseType, ref FileEvaluationContext ctx)
     {
         if (IsRoot)
             return;
@@ -485,9 +485,9 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
             if (typeOwner != null && skipType <= 0)
             {
                 DatProperty? property = section.Property as DatProperty;
-                if (property == null && section.Property is string propertyName && typeOwner != null)
+                if (property == null && section.Property is string propertyName && typeOwner is DatTypeWithProperties typeWithProps)
                 {
-                    // todo property = database.FindPropertyInfoByKey(propertyName, typeOwner, section.Context, context: context).Property;
+                    typeWithProps.TryFindPropertyByKey(propertyName, ref ctx, out property, out _);
                 }
 
                 if (property == null)
@@ -627,6 +627,10 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
     /// <param name="rootType">The object type of the root dictionary.</param>
     /// <param name="dictionaryOrValue">The value being referred to by these breadcrumbs. This is usually a dictionary.</param>
     /// <param name="valueType">The type of object represented by <paramref name="dictionaryOrValue"/>.</param>
+    /// <param name="dictTypeProperty">
+    /// If the breadcrumbs point to a dictionary object (not a custom type), this will contain the property of the dictionary
+    /// (or the last property containing the dicitonary, i.e. in the case of a List of Dictionaries).
+    /// </param>
     /// <param name="ctx">Evaluation context.</param>
     /// <param name="context">The type of properties to search for.</param>
     /// <returns>Whether or not the breadcrumbs could be fully traced.</returns>
@@ -637,8 +641,8 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
         DatTypeWithProperties rootType,
         [NotNullWhen(true)] out IAnyValueSourceNode? dictionaryOrValue,
         [NotNullWhen(true)] out IType? valueType,
-        ref FileEvaluationContext ctx,
-        SpecPropertyContext context = SpecPropertyContext.Property
+        out DatProperty? dictTypeProperty,
+        ref FileEvaluationContext ctx
     )
     {
         if (root == null)
@@ -650,6 +654,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
 
         dictionaryOrValue = null;
         valueType = null;
+        dictTypeProperty = null;
         if (IsRoot)
         {
             dictionaryOrValue = root;
@@ -720,11 +725,14 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
                         valueNode = propertyNode.Value;
                         propertyType = lastDictionaryType.ValueType;
                         lastDictionaryType = null;
+                        property = null;
+                        dictTypeProperty = null;
                         break;
                     }
 
-                    if (dictionaryType.TryFindProperty(propertyName, context, out property))
+                    if (dictionaryType.TryFindPropertyByKey(propertyName, ref ctx, out property, out _))
                     {
+                        section = new PropertyBreadcrumbSection(in section, property);
                         goto propLbl;
                     }
 
@@ -757,9 +765,12 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
 
                     propertyType = listType.ElementType;
                     alreadyAppliedIndex = true;
+                    property = null;
+                    dictTypeProperty = null;
                     break;
 
                 default:
+                    dictTypeProperty = null;
                     return false;
             }
 
@@ -793,6 +804,11 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
 
             if (sectionIndex == _sections.Length - 1)
             {
+                if (type is IDictionaryType)
+                {
+                    dictTypeProperty = property;
+                }
+
                 dictionaryOrValue = valueNode;
                 valueType = type;
                 return valueNode != null;
@@ -806,11 +822,13 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
                     if (type is IDictionaryType dictType)
                     {
                         lastDictionaryType = dictType;
+                        dictTypeProperty = property;
                         previousResolvedType = dictType.ValueType;
                     }
                     else
                     {
                         dictionaryType = type as DatTypeWithProperties;
+                        dictTypeProperty = null;
                     }
 
                     current = dict;
@@ -820,6 +838,7 @@ public readonly struct PropertyBreadcrumbs : IEquatable<PropertyBreadcrumbs>
 
                 case IListSourceNode list:
                     lastListValue = list;
+                    dictTypeProperty = null;
                     break;
 
                 default:

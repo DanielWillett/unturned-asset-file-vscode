@@ -2250,7 +2250,7 @@
         },
         {
             "Key": "Allow_Structures",
-            "Type": "Boolean",
+            "Type": "Flag",
             "DefaultValue": false,
             "Description": "Indicates that structures can be built on this object.",
             "Variable": "allowStructures",

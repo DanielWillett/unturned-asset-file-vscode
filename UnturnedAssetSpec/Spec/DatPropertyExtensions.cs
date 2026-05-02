@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 using DanielWillett.UnturnedDataFileLspServer.Data.Properties;
 using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
@@ -10,7 +11,6 @@ using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
@@ -36,7 +36,7 @@ public static class DatPropertyExtensions
     }
 
     /// <summary>
-    /// Attempts to find a property or bundle asset by its key in <paramref name="type"/> or any of its child types.
+    /// Attempts to find a property or bundle asset by its key in <paramref name="type"/> or any of its parent types.
     /// </summary>
     /// <param name="type">The type to search.</param>
     /// <param name="key">The exact key of the property. This method does not match aliases.</param>
@@ -137,6 +137,89 @@ public static class DatPropertyExtensions
         }
 
         property = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Attempts to find a property by its key or aliases in <paramref name="type"/> or any of its parent types.
+    /// </summary>
+    /// <param name="type">The type to search.</param>
+    /// <param name="key">The exact key of the property. This method does not match aliases.</param>
+    /// <param name="ctx">Workspace context.</param>
+    /// <param name="property">The found property.</param>
+    /// <param name="keyMatch">Information about which key was matched.</param>
+    /// <param name="isCaseInsensitive">Whether or not matches should ignore case. Defaults to <see langword="true"/>.</param>
+    /// <returns>Whether or not the property was found.</returns>
+    public static bool TryFindPropertyByKey(
+        this DatTypeWithProperties type,
+        string key,
+        ref FileEvaluationContext ctx,
+        [NotNullWhen(true)] out DatProperty? property,
+        out DatProperty.KeyMatch keyMatch,
+        bool isCaseInsensitive = true)
+    {
+        int propListCode = ctx.PropertyContext switch
+        {
+            SpecPropertyContext.Localization or SpecPropertyContext.CrossReferenceLocalization => 1,
+            _ => 0
+        };
+
+        for (DatTypeWithProperties? parent = type; parent != null; parent = parent.BaseType)
+        {
+            ImmutableArray<DatProperty> propertyList;
+            switch (propListCode)
+            {
+                case 0:
+                    propertyList = parent.Properties;
+                    break;
+
+                default: // case 1:
+                    if (parent is not IDatTypeWithLocalizationProperties locals)
+                        continue;
+
+                    propertyList = locals.LocalizationProperties;
+                    break;
+            }
+
+            foreach (DatProperty prop in propertyList)
+            {
+                if (!prop.MatchesKey(key, ref ctx, isCaseInsensitive, out keyMatch))
+                    continue;
+
+                property = prop;
+                return true;
+            }
+
+            ImmutableArray<DatProperty>.Builder? propertyListFallback;
+            switch (propListCode)
+            {
+                case 0:
+                    propertyListFallback = parent.PropertiesBuilder;
+                    break;
+
+                default: // case 1:
+                    if (parent is not IDatTypeWithLocalizationProperties locals)
+                        continue;
+
+                    propertyListFallback = locals.LocalizationPropertiesBuilder;
+                    break;
+            }
+
+            if (propertyListFallback != null)
+            {
+                foreach (DatProperty prop in propertyListFallback)
+                {
+                    if (!prop.MatchesKey(key, ref ctx, isCaseInsensitive, out keyMatch))
+                        continue;
+
+                    property = prop;
+                    return true;
+                }
+            }
+        }
+
+        property = null;
+        keyMatch = default;
         return false;
     }
 
@@ -344,7 +427,7 @@ public static class DatPropertyExtensions
             filter = ctx.GetKeyFilter();
         }
 
-        if (!breadcrumbs.TryTraceRelativeTo(startingDictionary, type, out IAnyValueSourceNode? targetValue, out _, ref ctx)
+        if (!breadcrumbs.TryTraceRelativeTo(startingDictionary, type, out IAnyValueSourceNode? targetValue, out _, out _, ref ctx)
             || targetValue is not IDictionarySourceNode targetDictionary)
         {
             return false;
@@ -490,7 +573,7 @@ public static class DatPropertyExtensions
             filter = ctx.GetKeyFilter();
         }
 
-        if (!breadcrumbs.TryTraceRelativeTo(startingDictionary, type, out IAnyValueSourceNode? targetValue, out _, ref ctx)
+        if (!breadcrumbs.TryTraceRelativeTo(startingDictionary, type, out IAnyValueSourceNode? targetValue, out _, out _, ref ctx)
             || targetValue is not IDictionarySourceNode targetDictionary)
         {
             return false;

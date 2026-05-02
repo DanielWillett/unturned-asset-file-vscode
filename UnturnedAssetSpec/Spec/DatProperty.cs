@@ -435,6 +435,34 @@ public class DatProperty : IDatSpecificationObject
             KeyIndex = keyIndex;
             Indices = indices;
         }
+
+        /// <summary>
+        /// Gets information about the key that was matched.
+        /// </summary>
+        /// <param name="property">The original property that was searched.</param>
+        public DatPropertyKey GetKeyInfo(DatProperty property)
+        {
+            ImmutableArray<DatPropertyKey> keys = property.Keys;
+            if (keys.IsDefaultOrEmpty || keys.Length >= KeyIndex)
+            {
+                throw new ArgumentException("Property isn't the same as the one that was used in the search.", nameof(property));
+            }
+
+            return keys[KeyIndex];
+        }
+
+        /// <summary>
+        /// Gets the normalized casing of the key that was matched, inserting template arguments where required.
+        /// </summary>
+        /// <param name="property">The original property that was searched.</param>
+        public string GetKey(DatProperty property)
+        {
+            DatPropertyKey key = GetKeyInfo(property);
+            if (key is not DatTemplatePropertyKey template)
+                return key.Key;
+
+            return template.TemplateProcessor.CreateKey(template.Key, Indices);
+        }
     }
 
     /// <inheritdoc cref="MatchesKey(string,ref FileEvaluationContext,bool,out DatProperty.KeyMatch)"/>

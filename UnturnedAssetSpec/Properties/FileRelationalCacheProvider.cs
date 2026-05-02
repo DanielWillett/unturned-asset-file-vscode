@@ -70,7 +70,7 @@ public class FileRelationalCacheProvider : IFileRelationalModelProvider
 #else
         IFileRelationalModel model = dict.GetOrAdd(fp, _ => new FileRelationalCache(file, CollectDiagnostics, _parsingServices.Value, context));
 #endif
-        model.Rebuild(force: false);
+        model.Rebuild(file, force: false);
         return model;
     }
 
@@ -94,7 +94,7 @@ public class FileRelationalCacheProvider : IFileRelationalModelProvider
             return false;
         }
 
-        model.Rebuild(force: false);
+        model.Rebuild(file, force: false);
         return true;
     }
 

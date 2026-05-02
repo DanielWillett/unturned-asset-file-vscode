@@ -214,7 +214,7 @@ public readonly struct HoverMarkdownBuilder
 
         if (hasValue)
             return;
-        _hov.Append("-# ").Append(Properties.Resources.Hover_InvalidValue);
+        _hov.Append(Properties.Resources.Hover_InvalidValue);
     }
 
     public void Value<TValue>(DatProperty prop, ValueMetadata<TValue> result, ref FileEvaluationContext ctx)

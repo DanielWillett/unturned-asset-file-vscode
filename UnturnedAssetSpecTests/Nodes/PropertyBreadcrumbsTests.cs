@@ -75,15 +75,16 @@ public class PropertyBreadcrumbsTests
         Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("2001"));
 
         Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
-        Assert.That(breadcrumbs.TryTraceRelativeTo(targetRoot!, assetType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+        Assert.That(breadcrumbs.TryTraceRelativeTo(targetRoot!, assetType, out IAnyValueSourceNode? dictionary, out IType? valueType, out DatProperty? property, ref ctx));
         Assert.That(dictionary, Is.SameAs(sourceFile));
         Assert.That(valueType, Is.SameAs(assetType));
+        Assert.That(property, Is.Null);
 
         PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("ID", out string propertyName);
         Assert.That(bc.IsRoot);
         Assert.That(propertyName, Is.EqualTo("ID"));
 
-        bc.ResolveFromPropertyRef(assetType, _parsingServices.Database);
+        bc.ResolveFromPropertyRef(assetType, ref ctx);
         Assert.That(bc.IsRoot);
     }
 
@@ -128,15 +129,16 @@ public class PropertyBreadcrumbsTests
         Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("2001"));
         
         Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
-        Assert.That(breadcrumbs.TryTraceRelativeTo(targetRoot!, assetType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+        Assert.That(breadcrumbs.TryTraceRelativeTo(targetRoot!, assetType, out IAnyValueSourceNode? dictionary, out IType? valueType, out DatProperty? property, ref ctx));
         Assert.That(dictionary, Is.SameAs(sourceFile.GetAssetDataDictionary()));
         Assert.That(valueType, Is.SameAs(assetType));
+        Assert.That(property, Is.Null);
 
         PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("ID", out string propertyName);
         Assert.That(bc.IsRoot);
         Assert.That(propertyName, Is.EqualTo("ID"));
 
-        bc.ResolveFromPropertyRef(assetType, _parsingServices.Database);
+        bc.ResolveFromPropertyRef(assetType, ref ctx);
         Assert.That(bc.IsRoot);
     }
 
@@ -181,15 +183,16 @@ public class PropertyBreadcrumbsTests
         Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("7ae3737efae940999dc51919ce558ec4"));
 
         Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
-        Assert.That(breadcrumbs.TryTraceRelativeTo(targetRoot!, assetType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+        Assert.That(breadcrumbs.TryTraceRelativeTo(targetRoot!, assetType, out IAnyValueSourceNode? dictionary, out IType? valueType, out DatProperty? property, ref ctx));
         Assert.That(dictionary, Is.SameAs(sourceFile.GetMetadataDictionary()));
         Assert.That(valueType, Is.SameAs(assetType));
+        Assert.That(property, Is.Null);
 
         PropertyBreadcrumbs bc = PropertyBreadcrumbs.FromPropertyRef("GUID", out string propertyName);
         Assert.That(bc.IsRoot);
         Assert.That(propertyName, Is.EqualTo("GUID"));
 
-        bc.ResolveFromPropertyRef(assetType, _parsingServices.Database);
+        bc.ResolveFromPropertyRef(assetType, ref ctx);
         Assert.That(bc.IsRoot);
     }
 
@@ -267,7 +270,7 @@ public class PropertyBreadcrumbsTests
 
         Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(1));
         Assert.That(propertyName, Is.EqualTo("A"));
-        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, ref ctx);
 
         PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config");
         PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1);
@@ -286,9 +289,10 @@ public class PropertyBreadcrumbsTests
             Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("1"));
 
             Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
-            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, out DatProperty? property, ref ctx));
             Assert.That(dictionary, Is.SameAs(expectedDictionary));
             Assert.That(valueType, Is.SameAs(nestedProperty.Owner));
+            Assert.That(property, Is.Null);
         }
     }
 
@@ -362,7 +366,7 @@ public class PropertyBreadcrumbsTests
         PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config.NestedConfig.A", out string propertyName);
         Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(2));
         Assert.That(propertyName, Is.EqualTo("A"));
-        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, ref ctx);
 
         PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config").Combine("NestedConfig");
         PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1).Combine(sn2);
@@ -381,9 +385,10 @@ public class PropertyBreadcrumbsTests
             Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("1"));
 
             Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
-            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, out DatProperty? property, ref ctx));
             Assert.That(dictionary, Is.SameAs(expectedDictionary));
             Assert.That(valueType, Is.SameAs(nestedProperty2.Owner));
+            Assert.That(property, Is.Null);
         }
     }
 
@@ -492,7 +497,7 @@ public class PropertyBreadcrumbsTests
         PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config.NestedConfig.List[1].Entry2.A", out string propertyName);
         Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(4));
         Assert.That(propertyName, Is.EqualTo("A"));
-        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, ref ctx);
 
         PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config").Combine("NestedConfig").Combine("List", index: 1).Combine("Entry2");
         PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1).Combine(sn2).Combine(sn4).Combine(sn5);
@@ -511,9 +516,10 @@ public class PropertyBreadcrumbsTests
             Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("1"));
 
             Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
-            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, out DatProperty? property, ref ctx));
             Assert.That(dictionary, Is.SameAs(expectedDictionary));
             Assert.That(valueType, Is.SameAs(nestedProperty3.Owner));
+            Assert.That(property, Is.Null);
         }
     }
 
@@ -591,7 +597,7 @@ public class PropertyBreadcrumbsTests
         PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config[1][1].A", out string propertyName);
         Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(2));
         Assert.That(propertyName, Is.EqualTo("A"));
-        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, ref ctx);
 
         PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config", index: 1).Combine(index: 1);
         PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1).Combine(sn2).Combine(sn3);
@@ -610,10 +616,11 @@ public class PropertyBreadcrumbsTests
             Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("1"));
 
             Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
-            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, out DatProperty? property, ref ctx));
             Assert.That(dictionary, Is.SameAs(expectedDictionary));
             Assert.That(valueType, Is.SameAs(nestedProperty.Owner));
-            
+            Assert.That(property, Is.Null);
+
         }
     }
 
@@ -696,7 +703,7 @@ public class PropertyBreadcrumbsTests
         PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config[1][0][0].A", out string propertyName);
         Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(3));
         Assert.That(propertyName, Is.EqualTo("A"));
-        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, _parsingServices.Database);
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, ref ctx);
 
         PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config", index: 1).Combine(index: 0).Combine(index: 0);
         PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1).Combine(sn2).Combine(sn3).Combine(sn4!);
@@ -715,9 +722,158 @@ public class PropertyBreadcrumbsTests
             Assert.That((sourceNode.Value as IValueSourceNode)?.Value, Is.EqualTo("1"));
 
             Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
-            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, ref ctx));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, out DatProperty? property, ref ctx));
             Assert.That(dictionary, Is.SameAs(expectedDictionary));
             Assert.That(valueType, Is.SameAs(nestedProperty.Owner));
+            Assert.That(property, Is.Null);
+        }
+    }
+
+    [Test]
+    public void Dictionary()
+    {
+        const string fileContents = """
+                                    GUID 7ae3737efae940999dc51919ce558ec4
+                                    ID 2001
+                                    Type Supply
+                                    
+                                    // Dictionary<string, string>
+                                    Config
+                                    {
+                                        A
+                                    }
+                                    """;
+
+        using StaticSourceFile openedFile = StaticSourceFile.FromAssetFile(
+            "./test.dat",
+            fileContents.AsMemory(),
+            _parsingServices.Database,
+            SourceNodeTokenizerOptions.None
+        );
+
+        ISourceFile sourceFile = openedFile.SourceFile;
+
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile, AssetDatPropertyPosition.Root);
+
+        DatAssetFileType? supplyType = (DatAssetFileType)AssetFileType.FromType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", _parsingServices.Database).Information;
+        Assert.That(supplyType, Is.Not.Null);
+
+        DatProperty testProperty = DatProperty.Create("Config", supplyType, default, SpecPropertyContext.Property);
+        testProperty.Type = DictionaryType.Create(new DictionaryTypeArgs<string>(), StringType.Instance);
+
+        using IDisposable addProp = AddRootPropertyForTest(supplyType, SpecPropertyContext.Property, testProperty);
+
+        // "/Config/"
+        Assert.That(sourceFile.TryGetProperty(testProperty, ref ctx, out IPropertySourceNode? sn1));
+        Assert.That(sn1!.Value is IDictionarySourceNode);
+        IDictionarySourceNode expectedDictionary = (IDictionarySourceNode)sn1.Value!;
+        Assert.That(expectedDictionary.TryGetProperty("A", out IPropertySourceNode? prop));
+
+        PropertyBreadcrumbs autoBreadcrumbs = PropertyBreadcrumbs.FromNode(prop!);
+
+        PropertyBreadcrumbs manualBreadcrumbs = new PropertyBreadcrumbs(
+            new PropertyBreadcrumbSection(testProperty, PropertyResolutionContext.Modern)
+        );
+        
+        PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config.A", out string propertyName);
+        Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(1));
+        Assert.That(propertyName, Is.EqualTo("A"));
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, ref ctx);
+
+        PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config");
+        PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1);
+
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs, combinedBreadcrumbsString, combinedBreadcrumbsNode ];
+
+        foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
+        {
+            Assert.That(breadcrumb.ToString(), Is.EqualTo("/Config/"));
+
+            ctx.RootBreadcrumbs = breadcrumb;
+
+            Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, out DatProperty? property, ref ctx));
+            Assert.That(dictionary, Is.SameAs(expectedDictionary));
+            Assert.That(valueType, Is.SameAs(testProperty.Type));
+            Assert.That(property, Is.SameAs(testProperty));
+        }
+    }
+
+    [Test]
+    public void ListOfDictionaries()
+    {
+        const string fileContents = """
+                                    GUID 7ae3737efae940999dc51919ce558ec4
+                                    ID 2001
+                                    Type Supply
+                                    
+                                    // List<Dictionary<string, string>>
+                                    Config
+                                    [
+                                        {
+                                            A
+                                        }
+                                        {
+                                            B
+                                        }
+                                    ]
+                                    """;
+
+        using StaticSourceFile openedFile = StaticSourceFile.FromAssetFile(
+            "./test.dat",
+            fileContents.AsMemory(),
+            _parsingServices.Database,
+            SourceNodeTokenizerOptions.None
+        );
+
+        ISourceFile sourceFile = openedFile.SourceFile;
+
+        FileEvaluationContext ctx = new FileEvaluationContext(_parsingServices, sourceFile, AssetDatPropertyPosition.Root);
+
+        DatAssetFileType? supplyType = (DatAssetFileType)AssetFileType.FromType("SDG.Unturned.ItemSupplyAsset, Assembly-CSharp", _parsingServices.Database).Information;
+        Assert.That(supplyType, Is.Not.Null);
+
+        DatProperty testProperty = DatProperty.Create("Config", supplyType, default, SpecPropertyContext.Property);
+        DictionaryType<string, string> dictType = DictionaryType.Create(new DictionaryTypeArgs<string>(), StringType.Instance);
+        testProperty.Type = ListType.Create(dictType);
+
+        using IDisposable addProp = AddRootPropertyForTest(supplyType, SpecPropertyContext.Property, testProperty);
+
+        // "/Config[1]/"
+        Assert.That(sourceFile.TryGetProperty(testProperty, ref ctx, out IPropertySourceNode? sn1));
+        Assert.That(sn1!.Value is IListSourceNode);
+        Assert.That(((IListSourceNode)sn1.Value!).TryGetElement(1, out IAnyValueSourceNode? sn2));
+        Assert.That(sn2 is IDictionarySourceNode);
+        IDictionarySourceNode expectedDictionary = (IDictionarySourceNode)sn2!;
+        Assert.That(expectedDictionary.TryGetProperty("B", out IPropertySourceNode? prop));
+
+        PropertyBreadcrumbs autoBreadcrumbs = PropertyBreadcrumbs.FromNode(prop!);
+
+        PropertyBreadcrumbs manualBreadcrumbs = new PropertyBreadcrumbs(
+            new PropertyBreadcrumbSection(testProperty, PropertyResolutionContext.Modern, index: 1)
+        );
+        
+        PropertyBreadcrumbs parsedBreadcrumbs = PropertyBreadcrumbs.FromPropertyRef("Config[1].B", out string propertyName);
+        Assert.That(parsedBreadcrumbs.Length, Is.EqualTo(1));
+        Assert.That(propertyName, Is.EqualTo("B"));
+        parsedBreadcrumbs.ResolveFromPropertyRef(supplyType, ref ctx);
+
+        PropertyBreadcrumbs combinedBreadcrumbsString = PropertyBreadcrumbs.Root.Combine("Config", index: 1);
+        PropertyBreadcrumbs combinedBreadcrumbsNode = PropertyBreadcrumbs.Root.Combine(sn1).Combine(expectedDictionary);
+
+        PropertyBreadcrumbs[] breadcrumbs = [ autoBreadcrumbs, manualBreadcrumbs, parsedBreadcrumbs, combinedBreadcrumbsString, combinedBreadcrumbsNode ];
+
+        foreach (PropertyBreadcrumbs breadcrumb in breadcrumbs)
+        {
+            Assert.That(breadcrumb.ToString(), Is.EqualTo("/Config[1]/"));
+
+            ctx.RootBreadcrumbs = breadcrumb;
+
+            Assert.That(ctx.TryGetTargetRoot(out IDictionarySourceNode? targetRoot));
+            Assert.That(breadcrumb.TryTraceRelativeTo(targetRoot!, supplyType, out IAnyValueSourceNode? dictionary, out IType? valueType, out DatProperty? property, ref ctx));
+            Assert.That(dictionary, Is.SameAs(expectedDictionary));
+            Assert.That(valueType, Is.SameAs(dictType));
+            Assert.That(property, Is.SameAs(testProperty));
         }
     }
 

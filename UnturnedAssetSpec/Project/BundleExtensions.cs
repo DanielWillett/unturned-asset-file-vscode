@@ -26,14 +26,20 @@ public static class BundleExtensions
         /// </summary>
         public static IBundleProxy Null => NullBundleProxy.Instance;
 
+        /// <inheritdoc cref="BundleExtensions.GetCorrespondingAsset(IBundleProxy,DatBundleAsset,ref FileEvaluationContext,OneOrMore{int})"/>
+        public UnityObject? GetCorrespondingAsset(DatBundleAsset asset, ref FileEvaluationContext ctx)
+        {
+            return bundle.GetCorrespondingAsset(asset, ref ctx, OneOrMore<int>.Null);
+        }
+
         /// <summary>
         /// Creates a <see cref="UnityObject"/> in a <see cref="IBundleProxy"/> from an asset name.
         /// </summary>
-        /// <param name="assetName">The asset name, such as <c>Item</c>.</param>
-        /// <param name="type">The type of asset to get.</param>
-        /// <param name="parsingServices">Workspace services.</param>
+        /// <param name="asset">Bundle asset.</param>
+        /// <param name="ctx">Workspace context.</param>
+        /// <param name="templateArgs">Indicies of template arguments, such as <c>Panic_#</c>.</param>
         /// <returns>An object representing the given unity asset, or <see langword="null"/> if it's not present.</returns>
-        public UnityObject? GetCorrespondingAsset(DatBundleAsset asset, ref FileEvaluationContext ctx)
+        public UnityObject? GetCorrespondingAsset(DatBundleAsset asset, ref FileEvaluationContext ctx, OneOrMore<int> templateArgs)
         {
             ImmutableArray<DatPropertyKey> keys = asset.Keys;
             if (keys.IsDefaultOrEmpty)
@@ -54,7 +60,13 @@ public static class BundleExtensions
                     continue;
                 }
 
-                UnityObject? obj = bundle.GetCorrespondingAsset(key.Key, asset.Type, ref ctx);
+                string name = key.Key;
+                if (key is DatTemplatePropertyKey templateKey)
+                {
+                    name = templateKey.TemplateProcessor.CreateKey(name, templateArgs);
+                }
+
+                UnityObject? obj = bundle.GetCorrespondingAsset(name, asset.Type, ref ctx);
                 if (obj == null)
                     continue;
 

@@ -33,7 +33,7 @@ public interface IFileRelationalModel
     /// Rebuilds the model, collecting diagnostics if <see cref="CollectDiagnostics"/> is <see langword="true"/>.
     /// </summary>
     /// <param name="force">If <see langword="false"/>, the model will only be rebuilt if the file has changed since it was last built.</param>
-    void Rebuild(bool force = true);
+    void Rebuild(ISourceFile maybeNewFile, bool force);
 
     /// <summary>
     /// Rebuilds the model from a new file, collecting diagnostics if <see cref="CollectDiagnostics"/> is <see langword="true"/>.
@@ -46,10 +46,12 @@ public interface IFileRelationalModel
     /// </summary>
     /// <param name="node">Any node that's part of the property on the same level as the main node of the property.</param>
     /// <param name="property">The found property.</param>
+    /// <param name="valueOnly">If <see langword="true"/>, the property of a sub-level property (like the key of a dictionary) will not return the dictionary as a property, instead failing.</param>
     /// <returns>Whether or not the property was found.</returns>
     bool TryGetPropertyFromNode(
         IPropertySourceNode node,
-        [NotNullWhen(true)] out DatProperty? property
+        [NotNullWhen(true)] out DatProperty? property,
+        bool valueOnly = false
     );
 
     /// <summary>
@@ -82,23 +84,6 @@ public interface IFileRelationalModel
         , allows ref struct
 #endif
     ;
-
-// todo: do we need this?     /// <summary>
-// todo:                      /// Visits the cached value of a property by it's definition.
-// todo:                      /// </summary>
-// todo:                      /// <param name="property">The property to get the value of.</param>
-// todo:                      /// <param name="value">The value.</param>
-// todo:                      /// <param name="missingValueBehavior">What to do if the property isn't defined in the file.</param>
-// todo:                      /// <returns>Whether or not a value could be returned.</returns>
-// todo:                      bool TryVisitPropertyValue<TVisitor>(
-// todo:                          DatProperty property,
-// todo:                          ref TVisitor visitor,
-// todo:                          TypeParserMissingValueBehavior missingValueBehavior = TypeParserMissingValueBehavior.ErrorIfValueOrPropertyNotProvided
-// todo:                      ) where TVisitor : IValueVisitor
-// todo:                  #if NET9_0_OR_GREATER
-// todo:                          , allows ref struct
-// todo:                  #endif
-// todo:                      ;
 }
 
 public struct PropertyNodeRelationalInfo
