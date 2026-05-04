@@ -34,7 +34,7 @@ Contains JSON files that are kept up to date so the extension doesn't have to be
 See [the docs](https://github.com/DanielWillett/unturned-asset-file-vscode/tree/master/Docs/format) for how these files are formatted if you'd like to contribute (if I miss an update).
 
 `asset-spec.g.bin` contains all the files combined together so only one web request has to be made to download them all.
-See [GitHubSpecificationFileProvider](https://github.com/DanielWillett/unturned-asset-file-vscode/blob/master/UnturnedAssetSpec/Spec/ISpecificationFileProvider.cs#L141) for how to split the file up.
+See [GitHubSpecificationFileProvider](https://github.com/DanielWillett/unturned-asset-file-vscode/blob/master/UnturnedAssetSpec/Spec/SpecificationFileProviders/GitHubSpecificationFileProvider.cs#L174) for how to split the file up.
 
 Basic format for a property includes a key, data type, default value, basic metadata, and information about it's relationship to other properties. To see a full list of properties use an IDE that supports JSON schemas (VS Code does) and read through the docs.
 ```json
