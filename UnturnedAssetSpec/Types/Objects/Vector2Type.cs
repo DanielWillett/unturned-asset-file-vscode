@@ -104,9 +104,10 @@ public sealed class Vector2Type : BaseVectorType<Vector2, Vector2Type>
 
         if (args.ReferencedPropertySink != null)
         {
-            if (xProperty != null)
+            IParentSourceNode? queryPropNode = args.ValueNode?.Parent;
+            if (xProperty != null && queryPropNode != xProperty)
                 args.ReferencedPropertySink.AcceptReferencedProperty(xProperty);
-            if (yProperty != null)
+            if (yProperty != null && queryPropNode != yProperty)
                 args.ReferencedPropertySink.AcceptReferencedProperty(yProperty);
         }
 

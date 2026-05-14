@@ -1,12 +1,8 @@
-using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
-using DanielWillett.UnturnedDataFileLspServer.Data.Files;
-using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Text.RegularExpressions;
-using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 
@@ -169,7 +165,7 @@ public static class KnownTypeValueHelper
                 return false;
             }
 
-            Type systemType = typeof(object).Assembly.GetType(key, false, true);
+            Type? systemType = typeof(object).Assembly.GetType(key, false, true);
             if (systemType != null)
             {
                 value = new QualifiedType(
@@ -181,7 +177,8 @@ public static class KnownTypeValueHelper
             }
             else
             {
-                value = new QualifiedType(key + ", Assembly-CSharp", true);
+                // note: ParseType is within the UnturnedDat assembly, so technically this is correct.
+                value = new QualifiedType(key + ", UnturnedDat", true);
             }
         }
 
@@ -205,7 +202,7 @@ public static class KnownTypeValueHelper
                 return false;
             }
 
-            Type systemType = typeof(object).Assembly.GetType(fullTypeName.ToString(), false, true);
+            Type? systemType = typeof(object).Assembly.GetType(fullTypeName.ToString(), false, true);
             if (systemType != null)
             {
                 value = new QualifiedType(
@@ -216,9 +213,10 @@ public static class KnownTypeValueHelper
             }
             else
             {
+                // note: ParseType is within the UnturnedDat assembly, so technically this is correct.
                 Span<char> outStr = stackalloc char[key.Length + 17];
                 key.CopyTo(outStr);
-                ", Assembly-CSharp".AsSpan().CopyTo(outStr.Slice(key.Length));
+                ", UnturnedDat".AsSpan().CopyTo(outStr.Slice(key.Length));
                 value = new QualifiedType(outStr.ToString(), true);
             }
         }

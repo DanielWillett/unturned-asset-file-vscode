@@ -20,20 +20,23 @@
             "Type": "SteamItemDef",
             "Description": "The itemdefid removed by opening this box, which is used to display the correct UI element after an unbox.",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties",
-            "Variable": "generate",
-            "DefaultValue": 0,
-            "Required": true
+            "Variable": "destroy",
+            "DefaultValue": 0
         },
         {
             "Key": "Drops",
             "Type":
             {
                 "Type": "List",
-                "ElementType": "SteamItemDef",
+                "ElementType":
+                {
+                    "Type": "SteamItemDef",
+                    "AllowNegativeForFirstElementOnly": true
+                },
                 "Mode": "LegacyList"
             },
             "DefaultValue": [ ],
-            "Description": "The itemdefid of the items in the box, which are visually displayed as a UI element when showing box contents.",
+            "Description": "The itemdefid of the items in the box, which are visually displayed as a UI element when showing box contents. A value of -1 for the first index represents a mythical mystery item.",
             "Variable": "drops",
             "Docs": "https://docs.smartlydressedgames.com/en/stable/items/box-asset.html#box-asset-properties"
         },

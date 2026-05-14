@@ -5,6 +5,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Types;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Globalization;
+using System.Numerics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 
 #pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
@@ -327,6 +328,35 @@ internal unsafe ref struct ExpressionNodeParser<TDataRefReadContext> : IDisposab
     private IExpressionNode ParseValueAny(ReadOnlySpan<char> span, bool numericAny)
     {
         ReadOnlySpan<char> spanTrimmed = span.Trim();
+
+        int commaCt = span.Count(',');
+        if (commaCt > 0)
+        {
+            // parse vector
+            switch (commaCt)
+            {
+                case 1:
+                    if (KnownTypeValueHelper.TryParseVector2Components(span, out Vector2 v2))
+                        return new ConcreteValue<Vector2>(v2, Vector2Type.Instance);
+                    
+                    throw new FormatException($"Unable to parse Vector2: \"{spanTrimmed.ToString()}\".");
+                    
+                case 2:
+                    if (KnownTypeValueHelper.TryParseVector3Components(span, out Vector3 v3))
+                        return new ConcreteValue<Vector3>(v3, Vector3Type.Instance);
+                    
+                    throw new FormatException($"Unable to parse Vector3: \"{spanTrimmed.ToString()}\".");
+                    
+                case 3:
+                    if (KnownTypeValueHelper.TryParseVector4Components(span, out Vector4 v4))
+                        return new ConcreteValue<Vector4>(v4, Vector4Type.Instance);
+                    
+                    throw new FormatException($"Unable to parse Vector4: \"{spanTrimmed.ToString()}\".");
+
+                default:
+                    throw new FormatException($"Too many arguments supplied for vector type: \"{spanTrimmed.ToString()}\".");
+            }
+        }
 
         if (!numericAny)
         {

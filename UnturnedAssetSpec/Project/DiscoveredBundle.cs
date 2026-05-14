@@ -12,6 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace DanielWillett.UnturnedDataFileLspServer.Data.Project;
 
@@ -266,14 +267,22 @@ public sealed class DiscoveredBundle : IDisposable, IEquatable<DiscoveredBundle>
         }
 
         string directoryPath = Path.GetDirectoryName(configurationFilePath)!;
-        return new DiscoveredBundle(
-            isLegacyBundle: false,
-            directoryPath,
-            configurationFilePath,
-            Path.Combine(directoryPath, name),
-            prefix,
-            masterBundleVersion
-        );
+        try
+        {
+            return new DiscoveredBundle(
+                isLegacyBundle: false,
+                directoryPath,
+                configurationFilePath,
+                Path.Combine(directoryPath, name),
+                prefix,
+                masterBundleVersion
+            );
+        }
+        catch (FileNotFoundException)
+        {
+            log?.Invoke(configurationFilePath, $"Bundle configured by \"{configurationFilePath}\" no longer exists.");
+            return null;
+        }
     }
 
     [MemberNotNull(nameof(_operatingSystems))]

@@ -86,7 +86,12 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
     {
         if (!node.IsIncluded(_flags))
             return;
-        
+
+        if (_ignoreProperties.Contains(node))
+        {
+            return;
+        }
+
         if (_range.HasValue)
         {
             FileRange valueRange = node.GetValueRange();
@@ -117,7 +122,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         {
             if (!model.TryGetPropertyInfoFromNode(node, out PropertyNodeRelationalInfo info) || info.ValueType == null)
             {
-                if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0 && !_ignoreProperties.Contains(node))
+                if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0)
                 {
                     AcceptUnresolvedProperty(node, in breadcrumbs);
                 }
@@ -144,7 +149,7 @@ public abstract class ResolvedPropertyNodeVisitor : OrderedNodeVisitor
         {
             if (!model.TryGetPropertyFromNode(node, out DatProperty? property, valueOnly: true))
             {
-                if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0 && !_ignoreProperties.Contains(node))
+                if ((_flags & PropertyInclusionFlags.ResolvedOnly) == 0)
                 {
                     AcceptUnresolvedProperty(node, in breadcrumbs);
                 }

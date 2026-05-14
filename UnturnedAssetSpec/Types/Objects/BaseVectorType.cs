@@ -6,6 +6,7 @@ using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using DanielWillett.UnturnedDataFileLspServer.Data.Values;
 using System;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -35,6 +36,67 @@ public abstract class BaseVectorType<TVector, TSelf> :
         Options = options;
     }
 
+    private bool TryParseLegacy(
+        ref TypeParserArgs<TVector> args,
+        IDictionarySourceNode dictionary,
+        DatProperty property,
+        [NotNullWhen(true)] out TVector? value,
+        out bool hadOneComp)
+    {
+        ImmutableArray<DatPropertyKey> keys = property.Keys;
+        if (keys.IsDefaultOrEmpty)
+        {
+            return TryParseLegacy(ref args, dictionary, property.Key, out value, out hadOneComp);
+        }
+
+        int index = -1;
+        
+        IDiagnosticSink? diagSink = args.DiagnosticSink;
+        IReferencedPropertySink? refSink = args.ReferencedPropertySink;
+
+        value = default!;
+        hadOneComp = false;
+
+        try
+        {
+            args.DiagnosticSink = null;
+            args.ReferencedPropertySink = null;
+            for (int i = 0; i < keys.Length; i++)
+            {
+                DatPropertyKey key = keys[i];
+                if (!SourceNodeExtensions.FilterMatches(key.Filter, args.KeyFilter))
+                {
+                    continue;
+                }
+
+                if (TryParseLegacy(ref args, dictionary, key.Key, out value, out hadOneComp))
+                {
+                    index = i;
+                    break;
+                }
+            }
+        }
+        finally
+        {
+            args.DiagnosticSink = diagSink;
+            args.ReferencedPropertySink = refSink;
+        }
+
+        if (index == -1)
+        {
+            value = default;
+            hadOneComp = false;
+            return false;
+        }
+
+        if (args.DiagnosticSink == null && args.ReferencedPropertySink == null)
+        {
+            return true;
+        }
+
+        return TryParseLegacy(ref args, dictionary, keys[index].Key, out value, out hadOneComp);
+    }
+
     protected abstract bool TryParseLegacy(ref TypeParserArgs<TVector> args, IDictionarySourceNode dictionary, string baseKey, out TVector value, out bool hadOneComp);
 
     protected abstract bool TryParseFromDictionary(ref TypeParserArgs<TVector> args, IDictionarySourceNode dict, out TVector value);
@@ -61,10 +123,16 @@ public abstract class BaseVectorType<TVector, TSelf> :
     public bool TryParse(ref TypeParserArgs<TVector> args, ref FileEvaluationContext ctx, out Optional<TVector> value)
     {
         value = Optional<TVector>.Null;
-        TVector parsed;
+        TVector? parsed;
 
         bool sendNullMsg = true;
-        switch (args.ValueNode)
+        IAnyValueSourceNode? n = args.ValueNode;
+        if (n != null && args.Property != null && n.Parent is IPropertySourceNode propParent && !IsPropertyKeyNode(propParent, args.Property, args.KeyFilter))
+        {
+            n = null;
+        }
+
+        switch (n)
         {
             default:
                 if ((Options & VectorTypeOptions.Legacy) != 0
@@ -72,7 +140,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
                     && (args.ParentNode as IDictionarySourceNode ?? (args.ParentNode as IPropertySourceNode)?.Parent as IDictionarySourceNode) is { } dictionary
                     && args.Property != null)
                 {
-                    if (TryParseLegacy(ref args, dictionary, args.Property.Key, out parsed, out bool hadOneComp))
+                    if (TryParseLegacy(ref args, dictionary, args.Property, out parsed, out bool hadOneComp))
                     {
                         if (args.ParentNode is IPropertySourceNode prop)
                             args.ReferencedPropertySink?.AcceptDereferencedProperty(prop);
@@ -131,6 +199,7 @@ public abstract class BaseVectorType<TVector, TSelf> :
                 break;
 
             case IValueSourceNode v:
+
                 if ((Options & VectorTypeOptions.String) == 0)
                 {
                     if ((Options & VectorTypeOptions.Object) != 0)
@@ -190,6 +259,32 @@ public abstract class BaseVectorType<TVector, TSelf> :
         }
 
         args.Result = TypeParserResult.Failed;
+        return false;
+    }
+
+    private static bool IsPropertyKeyNode(IPropertySourceNode propertyNode, DatProperty property, LegacyExpansionFilter filter)
+    {
+        ImmutableArray<DatPropertyKey> keys = property.Keys;
+        if (keys.IsDefaultOrEmpty)
+        {
+            return string.Equals(propertyNode.Key, property.Key, StringComparison.OrdinalIgnoreCase);
+        }
+
+        foreach (DatPropertyKey key in keys)
+        {
+            if (!string.Equals(propertyNode.Key, key.Key, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (!SourceNodeExtensions.FilterMatches(key.Filter, filter))
+            {
+                continue;
+            }
+
+            return true;
+        }
+
         return false;
     }
 

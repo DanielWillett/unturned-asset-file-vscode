@@ -1,6 +1,7 @@
 ﻿using DanielWillett.UnturnedDataFileLspServer.Data.Diagnostics;
 using DanielWillett.UnturnedDataFileLspServer.Data.Files;
 using DanielWillett.UnturnedDataFileLspServer.Data.Parsing;
+using DanielWillett.UnturnedDataFileLspServer.Data.Spec;
 using DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 using System;
 using System.Text.Json;
@@ -14,9 +15,21 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Types;
 /// <code>
 /// Prop 52400
 /// </code>
+/// <para>
+/// Supports the following properties:
+/// <list type="bullet">
+///     <item><c><see cref="bool"/> AllowNegative</c> - Allows a negative value without logging a warning.</item>
+///     <item><c><see cref="bool"/> AllowNegativeForFirstElementOnly</c> - Allows a negative value on only the first element in a list without logging a warning.</item>
+/// </list>
+/// </para>
 /// </summary>
 public sealed class SteamItemDefType : PrimitiveType<int, SteamItemDefType>, ITypeConverter<int>, ITypeParser<int>
 {
+    private readonly bool _allowNegative;
+
+    // special case for Drops list
+    private readonly bool _allowNegativeForFirstElement;
+
     public const string TypeId = "SteamItemDef";
 
     public const int MinValue = 1;
@@ -33,22 +46,24 @@ public sealed class SteamItemDefType : PrimitiveType<int, SteamItemDefType>, ITy
     /// </summary>
     public ITypeConverter<int> Converter => this;
 
-    public override int GetHashCode() => 1048421756;
+    public override int GetHashCode() => !_allowNegative ? _allowNegativeForFirstElement ? 1243504125 : 1048421756 : 1597310889;
+
+    public SteamItemDefType() { }
+
+    public SteamItemDefType(bool allowNegative = false, bool onlyIfFirstElement = false)
+    {
+        _allowNegative = allowNegative && !onlyIfFirstElement;
+        _allowNegativeForFirstElement = allowNegative && onlyIfFirstElement;
+    }
 
     bool ITypeConverter<int>.TryParse(ReadOnlySpan<char> text, ref TypeConverterParseArgs<int> args, out int parsedValue)
     {
         if (!TypeConverters.Int32.TryParse(text, ref args, out parsedValue))
             return false;
 
-        switch (parsedValue)
+        if (args.DiagnosticSink != null)
         {
-            case < MinValue:
-                args.DiagnosticSink?.UNT1028_MinimumInclusive(ref args, null, parsedValue.ToString("N"), MinValue.ToString("N"));
-                break;
-
-            case > MaxValue:
-                args.DiagnosticSink?.UNT1028_MaximumInclusive(ref args, null, parsedValue.ToString("N"), MaxValue.ToString("N"));
-                break;
+            CheckRange(parsedValue, args.DiagnosticSink, ref args);
         }
 
         return true;
@@ -69,18 +84,31 @@ public sealed class SteamItemDefType : PrimitiveType<int, SteamItemDefType>, ITy
 
         args.Result = TypeParserResult.Successful;
 
-        switch (value.Value)
+        if (args.DiagnosticSink != null)
         {
-            case < MinValue:
-                args.DiagnosticSink?.UNT1028_MinimumInclusive(ref args, args.ReferenceNode, value.Value.ToString("N"), MinValue.ToString("N"));
-                break;
-
-            case > MaxValue:
-                args.DiagnosticSink?.UNT1028_MaximumInclusive(ref args, args.ReferenceNode, value.Value.ToString("N"), MaxValue.ToString("N"));
-                break;
+            CheckRange(value.Value, args.DiagnosticSink, ref args);
         }
 
         return true;
+    }
+
+    private void CheckRange<TDiagnosticProvider>(int parsedValue, IDiagnosticSink sink, ref TDiagnosticProvider args)
+        where TDiagnosticProvider : struct, IDiagnosticProvider
+    {
+        switch (parsedValue)
+        {
+            case < 0 when _allowNegative
+                         || _allowNegativeForFirstElement && ListType.Index.IsValueCreated && ListType.Index.Value == 0:
+                break;
+                
+            case < MinValue:
+                sink.UNT1028_MinimumInclusive(ref args, null, parsedValue.ToString("N"), MinValue.ToString("N"));
+                break;
+
+            case > MaxValue:
+                sink.UNT1028_MaximumInclusive(ref args, null, parsedValue.ToString("N"), MaxValue.ToString("N"));
+                break;
+        }
     }
 
     IType<int> ITypeConverter<int>.DefaultType => this;
@@ -124,4 +152,52 @@ public sealed class SteamItemDefType : PrimitiveType<int, SteamItemDefType>, ITy
     {
         TypeParsers.Int32.WriteValueToJson(writer, value, valueType, options);
     }
+
+    #region JSON
+
+    /// <inheritdoc />
+    protected override IType CreateType(in JsonElement typeDefinition, string typeId, IDatSpecificationReadContext spec, DatProperty owner, string context)
+    {
+        if (typeDefinition.ValueKind != JsonValueKind.Object)
+            return Instance;
+
+        bool allowAll = false, allowFirst = false;
+        if (typeDefinition.TryGetProperty("AllowNegative"u8, out JsonElement value) && value.ValueKind != JsonValueKind.Null)
+        {
+            allowAll = value.GetBoolean();
+        }
+        if (typeDefinition.TryGetProperty("AllowNegativeForFirstElementOnly", out value) && value.ValueKind != JsonValueKind.Null)
+        {
+            allowFirst = value.GetBoolean();
+        }
+
+        return !allowAll && !allowFirst ? Instance : new SteamItemDefType(allowAll || allowFirst, allowFirst);
+    }
+
+    /// <inheritdoc />
+    public override void WriteToJson(Utf8JsonWriter writer, JsonSerializerOptions options)
+    {
+        if (!_allowNegative && !_allowNegativeForFirstElement)
+        {
+            base.WriteToJson(writer, options);
+            return;
+        }
+
+        writer.WriteStartObject();
+
+        WriteTypeName(writer);
+
+        if (_allowNegative)
+        {
+            writer.WriteBoolean(_allowNegativeForFirstElement
+                ? "AllowNegativeForFirstElementOnly"u8
+                : "AllowNegative"u8,
+                true
+            );
+        }
+
+        writer.WriteEndObject();
+    }
+
+    #endregion
 }

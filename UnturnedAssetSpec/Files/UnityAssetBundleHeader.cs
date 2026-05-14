@@ -41,6 +41,9 @@ public class UnityAssetBundleHeader
     /// Reads an asset bundle header from a file.
     /// </summary>
     /// <exception cref="FormatException">Invalid or unsupported asset bundle header.</exception>
+    /// <exception cref="FileNotFoundException">File not found.</exception>
+    /// <exception cref="DirectoryNotFoundException">Directory not found.</exception>
+    /// <exception cref="SystemException">Other IO/system exception.</exception>
     public static UnityAssetBundleHeader FromFile(string file, out int bytesRead)
     {
         return FromStream(new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 48, FileOptions.SequentialScan), out bytesRead, leaveOpen: false);

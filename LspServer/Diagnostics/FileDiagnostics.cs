@@ -44,7 +44,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
         _diagnostics = new List<Diagnostic>();
         _diagnosticReadLock = new Lock();
         SourceFile = null!;
-        _diagnosticBuffer = new List<DatDiagnosticMessage>();
+        _diagnosticBuffer = new List<DatDiagnosticMessage>(32);
     }
 
     [MemberNotNull(nameof(FilePath), nameof(Uri))]
@@ -258,7 +258,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
 
     void IDiagnosticSink.AcceptDiagnostic(DatDiagnosticMessage diagnostic)
     {
-
+        _diagnosticBuffer.Add(diagnostic);
     }
 
     event Action<IWorkspaceFile, FileRange>? IWorkspaceFile.OnUpdated
@@ -271,7 +271,7 @@ internal class FileDiagnostics : IWorkspaceFile, IDiagnosticSink
     string IWorkspaceFile.File => FilePath;
     ISourceFile IWorkspaceFile.SourceFile => SourceFile ?? throw new InvalidOperationException();
     string IWorkspaceFile.GetFullText() => throw new NotSupportedException();
-    IBundleProxy IWorkspaceFile.Bundle => /* todo */ IBundleProxy.Null;
+    IBundleProxy IWorkspaceFile.Bundle =>  /* todo */ IBundleProxy.Null;
 
     private class DiagnosticsNodeVisitor : ResolvedPropertyNodeVisitor, IDiagnosticSink
     {

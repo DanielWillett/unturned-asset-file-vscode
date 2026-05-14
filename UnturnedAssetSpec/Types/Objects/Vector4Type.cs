@@ -132,13 +132,14 @@ public sealed class Vector4Type : BaseVectorType<Vector4, Vector4Type>
 
         if (args.ReferencedPropertySink != null)
         {
-            if (xProperty != null)
+            IParentSourceNode? queryPropNode = args.ValueNode?.Parent;
+            if (xProperty != null && queryPropNode != xProperty)
                 args.ReferencedPropertySink.AcceptReferencedProperty(xProperty);
-            if (yProperty != null)
+            if (yProperty != null && queryPropNode != yProperty)
                 args.ReferencedPropertySink.AcceptReferencedProperty(yProperty);
-            if (zProperty != null)
+            if (zProperty != null && queryPropNode != zProperty)
                 args.ReferencedPropertySink.AcceptReferencedProperty(zProperty);
-            if (wProperty != null)
+            if (wProperty != null && queryPropNode != wProperty)
                 args.ReferencedPropertySink.AcceptReferencedProperty(wProperty);
         }
 

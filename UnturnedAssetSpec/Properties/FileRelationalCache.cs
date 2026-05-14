@@ -144,6 +144,7 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
         [NotNullWhen(true)] out Entry? entry
     )
     {
+        // assume TreeSync locked
         IDictionarySourceNode parent = (IDictionarySourceNode)node.Parent;
         if (parent != SourceFile)
         {
@@ -155,8 +156,25 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
             }
         }
 
-        // assume TreeSync locked
-        return _entries.TryGetValue(node.Key, out entry);
+        if (_entries.TryGetValue(node.Key, out entry))
+        {
+            return true;
+        }
+
+        foreach (Entry e in _entries.Values)
+        {
+            if (e.Type is not { TrimmingBehavior: > PropertySearchTrimmingBehavior.ExactPropertyOnly })
+                continue;
+
+            if (e.RelatedProperties == null || Array.IndexOf(e.RelatedProperties, node) < 0)
+                continue;
+
+            entry = e;
+            return true;
+        }
+
+        entry = null;
+        return false;
     }
 
     /// <inheritdoc />
@@ -237,10 +255,11 @@ public class FileRelationalCache : IDiagnosticSink, IFileRelationalModel
                 return false;
             }
 
+            // selected property is the main property or type is not an object or list
             info = new PropertyNodeRelationalInfo(
-                entry.Property, 
-                entry.Node,
-                entry.ParentNode,
+                entry.Property,
+                node,
+                (IDictionarySourceNode)node.Parent,
                 includeValue ? entry.CreateValue() : null,
                 entry.Type,
                 entry.RelatedProperties.UnsafeFreeze(),

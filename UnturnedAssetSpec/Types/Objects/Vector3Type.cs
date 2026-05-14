@@ -124,11 +124,12 @@ public sealed class Vector3Type : BaseVectorType<Vector3, Vector3Type>
 
         if (args.ReferencedPropertySink != null)
         {
-            if (xProperty != null)
+            IParentSourceNode? queryPropNode = args.ValueNode?.Parent;
+            if (xProperty != null && queryPropNode != xProperty)
                 args.ReferencedPropertySink.AcceptReferencedProperty(xProperty);
-            if (yProperty != null)
+            if (yProperty != null && queryPropNode != yProperty)
                 args.ReferencedPropertySink.AcceptReferencedProperty(yProperty);
-            if (zProperty != null)
+            if (zProperty != null && queryPropNode != zProperty)
                 args.ReferencedPropertySink.AcceptReferencedProperty(zProperty);
         }
 

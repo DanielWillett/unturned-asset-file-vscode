@@ -8,6 +8,40 @@ namespace DanielWillett.UnturnedDataFileLspServer.Data.Utility;
 
 internal static class StringHelper
 {
+#if !NET7_0_OR_GREATER
+    private static readonly char[] Digits = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ];
+#endif
+
+    /// <summary>
+    /// Checks whether a span of characters contains a digit.
+    /// </summary>
+    /// <param name="str">The span of characters to check.</param>
+    /// <returns><see langword="true"/> if <paramref name="str"/> contains at least one digit (0-9), otherwise <see langword="false"/>.</returns>
+    public static bool ContainsDigit(string str)
+    {
+#if NET7_0_OR_GREATER
+        ReadOnlySpan<char> digits = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ];
+        return str.IndexOfAny(digits) >= 0;
+#else
+        return str.IndexOfAny(Digits) >= 0;
+#endif
+    }
+
+    /// <summary>
+    /// Checks whether a span of characters contains a digit.
+    /// </summary>
+    /// <param name="str">The span of characters to check.</param>
+    /// <returns><see langword="true"/> if <paramref name="str"/> contains at least one digit (0-9), otherwise <see langword="false"/>.</returns>
+    public static bool ContainsDigit(ReadOnlySpan<char> str)
+    {
+#if NET7_0_OR_GREATER
+        ReadOnlySpan<char> digits = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ];
+        return str.IndexOfAny(digits) >= 0;
+#else
+        return str.IndexOfAny(Digits) >= 0;
+#endif
+    }
+
     /// <inheritdoc cref="NextUnescapedIndexOf" />
     public static int NextUnescapedIndexOfParenthesis(ReadOnlySpan<char> span, out bool hadEscapeSequences, bool useDepth = true)
     {

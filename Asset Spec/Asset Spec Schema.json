@@ -1538,6 +1538,29 @@
                     "additionalProperties": false
                 },
                 {
+                    "type": "object",
+                    "properties":
+                    {
+                        "Type":
+                        {
+                            "const": "SteamItemDef",
+                            "title": "A 32 bit integer representing a SteamItemDef_t value (Steam inventory item ID)."
+                        },
+                        "AllowNegative":
+                        {
+                            "type": [ "boolean", "null" ],
+                            "description": "Allows a negative value without logging a warning."
+                        },
+                        "AllowNegativeForFirstElementOnly":
+                        {
+                            "type": [ "boolean", "null" ],
+                            "description": "Allows a negative value on only the first element in a list without logging a warning."
+                        }
+                    },
+                    "required": [ "Type" ],
+                    "additionalProperties": false
+                },
+                {
                     "const": "Flag",
                     "title": "A flag which does not have a value."
                 },

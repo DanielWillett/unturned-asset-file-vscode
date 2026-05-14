@@ -717,6 +717,12 @@ public class ListType<TCountType, TElementType>
                     {
                         success = _countConverter.TryConvertTo(new Optional<TCountType>(countValue!), out Optional<int> newCount) && newCount.HasValue;
                         count = newCount.Value;
+                        if (count < 0)
+                        {
+                            args.DiagnosticSink?.UNT1024_Less(ref args, args.ParentNode, 0);
+                            args.Result = TypeParserResult.Failed;
+                            return false;
+                        }
                     }
 
                     if (success)
@@ -889,8 +895,15 @@ public class ListType<TCountType, TElementType>
 
     private bool TryParseWithIndex(int index, ref TypeParserArgs<TElementType> parseArgs, ref FileEvaluationContext ctx, out Optional<TElementType> element)
     {
-        _ = index; // todo probably will use this in the future
-        return _subType.Parser.TryParse(ref parseArgs, ref ctx, out element);
+        ListType.Index.Value = index;
+        try
+        {
+            return _subType.Parser.TryParse(ref parseArgs, ref ctx, out element);
+        }
+        finally
+        {
+            ListType.Index.Value = -1;
+        }
     }
 
     private static void CheckUniqueValue(ref TypeParserArgs<TElementType> args, ISourceNode node, TElementType?[] array, int index)
